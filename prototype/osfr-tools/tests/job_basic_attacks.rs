@@ -393,3 +393,87 @@ fn unequipped_basic_is_refused_without_combat_change() {
         "a refused attack mutates no combat state"
     );
 }
+
+/// P2 combat-kits: the same campaign with the shipped weapon kits installed, and an enemy
+/// that survives a super.
+fn kit_fixture() -> Fixture {
+    let fixture = Fixture::new();
+    for name in ["weapon_kits.json", "status_effects.json"] {
+        fs::copy(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content").join(name),
+            fixture.content().join(name),
+        )
+        .unwrap();
+    }
+    let path = fixture.content().join("encounters.json");
+    let mut encounters: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    for dungeon in encounters["dungeons"].as_array_mut().unwrap() {
+        if dungeon["id"] == 411 {
+            dungeon["enemies"][0]["max_health"] = serde_json::json!(100_000);
+        }
+    }
+    fs::write(path, serde_json::to_vec(&encounters).unwrap()).unwrap();
+    fixture
+}
+
+fn slot_press(slot: i32, target: u64) -> Vec<u8> {
+    [command(36, 10, &[1, slot, 0]), target.to_le_bytes().to_vec()].concat()
+}
+
+fn enemy_health(game: &Gameplay, target: u64) -> u32 {
+    let encounter = game.state().encounter.unwrap();
+    let active = encounter.active.as_ref().unwrap();
+    active.enemies.iter().find(|enemy| enemy.guid == target).unwrap().health
+}
+
+/// The real entry path: 36/10 bar 1 slot 0 and slot 1 through `Gameplay`, each job holding its
+/// starter weapon. Slot 0 is the kit's basic on the Power 1 ladder, slot 1 its super for the
+/// whole energy bar, and a second super is refused with the client's "not enough energy" (285).
+#[test]
+fn weapon_kits_cast_the_basic_and_the_super_for_each_job() {
+    // (job, basic, super per hit, hits of the super) at Power 1, from the wiki ladder.
+    let expected = [
+        (2, 279, 1143, 1),  // Flame Flash, Dragonstrike
+        (11, 279, 889, 1),  // Incision, Triage
+        (12, 279, 1143, 1), // Zap, Lightning Blast
+        (32, 279, 507, 3),  // Sweeping Slash, Spinning Attack 3 x (4732 at Power 5)
+        (35, 279, 507, 3),  // Barrage, Volley 3 x
+        (43, 254, 889, 1),  // Glancing Blow, Leg Sweep
+    ];
+    for (job, basic, super_hit, super_hits) in expected {
+        let fixture = kit_fixture();
+        let (mut game, mut location, _) = fresh_game(&fixture, job);
+        let (position, target, health) = start_cave(&mut game, &location);
+        location.zone_id = 411;
+        location.position = position;
+        game.initialize_world(&location, 300).unwrap();
+
+        let out = game.handle_in_world(&slot_press(0, target), &location, 1_000).unwrap();
+        assert!(hit(&out), "job {job}: the basic lands");
+        let after_basic = enemy_health(&game, target);
+        let lost = health - after_basic;
+        assert!(lost == basic || lost == basic * 3 / 2, "job {job}: the basic took {lost}, not {basic}");
+
+        let out = game.handle_in_world(&slot_press(1, target), &location, 2_000).unwrap();
+        let energy = out
+            .replies
+            .iter()
+            .rev()
+            .find(|packet| packet.starts_with(&[38, 0, 13, 0]))
+            .map(|packet| i32::from_le_bytes(packet[4..8].try_into().unwrap()));
+        assert_eq!(energy, Some(0), "job {job}: the super costs the whole bar");
+        let lost = after_basic - enemy_health(&game, target);
+        let (low, high) = (super_hit * super_hits, super_hit * 3 / 2 * super_hits);
+        assert!((low..=high).contains(&lost), "job {job}: the super took {lost}, not {low} to {high}");
+
+        let before = enemy_health(&game, target);
+        let out = game.handle_in_world(&slot_press(1, target), &location, 3_500).unwrap();
+        let refused = out
+            .replies
+            .iter()
+            .find(|packet| packet.starts_with(&[36, 0, 1, 0]))
+            .map(|packet| i32::from_le_bytes(packet[4..8].try_into().unwrap()));
+        assert_eq!(refused, Some(285), "job {job}: no energy for a second super");
+        assert_eq!(enemy_health(&game, target), before, "job {job}: a refused cast does nothing");
+    }
+}

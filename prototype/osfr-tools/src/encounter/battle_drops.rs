@@ -82,19 +82,23 @@ impl EncounterEngine {
     /// Roll the won battle's drops. No battle row, no drops, or no OS
     /// randomness means no drop: a win is never refused over a bonus.
     pub(super) fn roll_battle_drops(&mut self, battle: u32) -> Vec<(i32, u32)> {
-        let Some(row) = self.battles.iter().find(|b| b.id == battle) else {
+        // A fight file that is not a `field_battles.json` row carries its own drops.
+        let fights = self.fight_state.drops.clone();
+        let Some(drops) = (self.battles.iter().find(|b| b.id == battle))
+            .map(|row| &row.drops)
+            .or_else(|| fights.get(&battle))
+            .filter(|drops| !drops.is_empty())
+            .cloned()
+        else {
             return Vec::new();
         };
-        if row.drops.is_empty() {
-            return Vec::new();
-        }
         if self.power_up_rng.is_none() {
             self.power_up_rng = Rng::from_entropy().ok();
         }
         let Some(rng) = self.power_up_rng.as_mut() else {
             return Vec::new();
         };
-        roll(&row.drops, self.field_rewards.loot_tables(), rng)
+        roll(&drops, self.field_rewards.loot_tables(), rng)
     }
 }
 

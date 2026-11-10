@@ -102,7 +102,26 @@ pub(super) struct FieldKillRewards {
     overrides: Vec<DefinitionReward>,
     /// L084: the tables `loot` rows roll (`loot_tables.json` beside this file).
     loot_tables: crate::loot_tables::LootTables,
+    /// Sorted by `definition_id`; one enemy kind may carry several.
+    quest_drops: Vec<QuestDrop>,
 }
+
+/// (R) Combat design section 12: an item an enemy kind drops only for a player whose quest
+/// `quest_id` is on a step that collects it ("Collect Wolf Fangs 0/5"). `chance` is the
+/// percent of credited kills that drop one. An `item_id` the item catalogue does not define
+/// is a counter with no bag item: the kill then credits the step directly.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+struct QuestDrop {
+    definition_id: u32,
+    item_id: i32,
+    chance: u32,
+    quest_id: u32,
+    source: Vec<crate::content::SourceTag>,
+}
+
+/// (R) The most quest-drop rows the table carries.
+const MAX_QUEST_DROPS: usize = 512;
 
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -135,6 +154,8 @@ struct RewardFile {
     level_rewards: Vec<LevelReward>,
     #[serde(default)]
     definition_overrides: Vec<DefinitionReward>,
+    #[serde(default)]
+    quest_drops: Vec<QuestDrop>,
 }
 
 impl FieldKillRewards {
@@ -226,10 +247,34 @@ impl FieldKillRewards {
         {
             return Err(invalid("duplicate field kill reward override"));
         }
+        let mut quest_drops = file.quest_drops;
+        if quest_drops.len() > MAX_QUEST_DROPS {
+            return Err(invalid("too many quest drops"));
+        }
+        for row in &quest_drops {
+            if row.definition_id == 0
+                || row.item_id <= 0
+                || row.quest_id == 0
+                || !(1..=100).contains(&row.chance)
+            {
+                return Err(invalid(
+                    "quest drop: a positive definition, item and quest, and a 1-100 chance",
+                ));
+            }
+            validate_source(&row.source)?;
+        }
+        quest_drops.sort_by_key(|row| (row.definition_id, row.quest_id, row.item_id));
+        if quest_drops.windows(2).any(|pair| {
+            (pair[0].definition_id, pair[0].quest_id, pair[0].item_id)
+                == (pair[1].definition_id, pair[1].quest_id, pair[1].item_id)
+        }) {
+            return Err(invalid("duplicate quest drop"));
+        }
         Ok(Self {
             bands,
             overrides,
             loot_tables: Default::default(),
+            quest_drops,
         })
     }
 
@@ -369,9 +414,7 @@ impl EncounterEngine {
                 // The claimant's own server-authored defeat event. The killer
                 // is excluded from its own credits, so the T256 push in
                 // `strike_damage` remains the single event for the killer.
-                if credit.definition > 0 {
-                    out.defeated.push(credit.definition);
-                }
+                self.record_kill(credit.definition, credit.kill.0, false, true, out);
             }
         }
     }
@@ -407,15 +450,42 @@ impl EncounterEngine {
     /// `percent` of calls roll the table; the engine's power-up random source, made on first use.
     fn roll_loot(&mut self, chance: &LootChance) -> crate::loot_tables::Loot {
         let tables = Arc::clone(&self.field_rewards);
-        let rng = self.power_up_rng.get_or_insert_with(|| {
-            // ponytail: OS randomness never fails in practice; a fixed seed keeps drops working if it does.
-            crate::power_ups::Rng::from_entropy().unwrap_or(crate::power_ups::Rng::seeded(0x5EED))
-        });
-        let mut below = |n: u32| (rng.next_u64() % u64::from(n.max(1))) as u32;
+        let mut below = |n: u32| self.roll_below(n);
         if below(100) >= chance.percent {
             return Default::default();
         }
         tables.loot_tables.roll(&chance.table, &mut below)
+    }
+
+    /// A number below `n` from the engine's power-up random source, made on first use.
+    fn roll_below(&mut self, n: u32) -> u32 {
+        let rng = self.power_up_rng.get_or_insert_with(|| {
+            // ponytail: OS randomness never fails in practice; a fixed seed keeps drops working if it does.
+            crate::power_ups::Rng::from_entropy().unwrap_or(crate::power_ups::Rng::seeded(0x5EED))
+        });
+        (rng.next_u64() % u64::from(n.max(1))) as u32
+    }
+
+    /// (R) Section 12: the quest items one credited kill of `kind` drops for this player.
+    /// `wanted(quest_id, item_id)` says whether that quest is on a step that collects the
+    /// item; a row nobody wants is not rolled, so it can never drop outside its step. Works
+    /// for every kill the engine reports (field, battle and dungeon).
+    pub(crate) fn roll_quest_drops(
+        &mut self,
+        kind: u32,
+        wanted: impl Fn(u32, i32) -> bool,
+    ) -> Vec<i32> {
+        let rewards = Arc::clone(&self.field_rewards);
+        let start = rewards
+            .quest_drops
+            .partition_point(|row| row.definition_id < kind);
+        rewards.quest_drops[start..]
+            .iter()
+            .take_while(|row| row.definition_id == kind)
+            .filter(|row| wanted(row.quest_id, row.item_id))
+            .filter(|row| self.roll_below(100) < row.chance)
+            .map(|row| row.item_id)
+            .collect()
     }
 }
 

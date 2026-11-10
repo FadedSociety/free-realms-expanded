@@ -54,6 +54,7 @@ mod identity;
 mod kart_garage;
 mod pirates_arena;
 mod coin_authoring;
+mod combat_sim;
 mod collection_pickup;
 mod content_presence;
 mod content_reload;
@@ -92,6 +93,7 @@ mod placement_watch;
 mod portal_games;
 mod power_up_use;
 mod profile_outfit;
+mod quest_combat;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
 /// T786: a Talk step that hands items over, atomically with the quest credit.
@@ -2874,149 +2876,12 @@ impl Gameplay {
                 };
                 say(out, text);
             }
-            ["sim", rest @ ..] => {
-                let battle = rest
-                    .first()
-                    .and_then(|n| n.parse::<u32>().ok())
-                    .unwrap_or(96);
-                for line in self.simulate_battle(battle, character)? {
-                    say(out, line);
-                }
-            }
-            ["fightlog"] => {
-                let log = self
-                    .encounter
-                    .as_ref()
-                    .map(|e| e.fight_log().to_vec())
-                    .unwrap_or_default();
-                let dealt: i64 = log
-                    .iter()
-                    .filter(|e| e.source == "you" && matches!(e.kind, "hit" | "crit"))
-                    .map(|e| e.amount)
-                    .sum();
-                let taken: i64 = log
-                    .iter()
-                    .filter(|e| e.kind == "taken")
-                    .map(|e| e.amount)
-                    .sum();
-                let healed: i64 = log
-                    .iter()
-                    .filter(|e| e.kind == "heal")
-                    .map(|e| e.amount)
-                    .sum();
-                let crits = log.iter().filter(|e| e.kind == "crit").count();
-                say(
-                    out,
-                    format!(
-                        "Fight log: {} events; dealt {dealt} ({crits} crits), taken {taken}, healed {healed}.",
-                        log.len()
-                    ),
-                );
-            }
+            ["sim", rest @ ..] => self.developer_sim(rest, character, out)?,
+            ["fightlog"] => self.developer_fightlog(out),
             _ => return Ok(false),
         }
         Ok(true)
     }
-
-    /// Balance simulator: a scripted player of the active job fights `battle`
-    /// at several job levels on a copy of the engine (nothing is changed).
-    /// The bot stands next to its target, swings on cooldown, uses First Aid
-    /// below 60% health and Triage-like strikes when energy allows.
-    fn simulate_battle(&self, battle: u32, character: &CharacterState) -> io::Result<Vec<String>> {
-        let profile = self.profiles()?.active();
-        let Some(base) = self.encounter.as_ref() else {
-            return Ok(vec!["No encounter engine.".into()]);
-        };
-        if base.active() {
-            return Ok(vec!["Finish or exit the current encounter first.".into()]);
-        }
-        if !self.battle_prizes_available(battle) {
-            return Ok(vec![field_battle::UNAVAILABLE_BATTLE_PRIZE.into()]);
-        }
-        let mut lines = vec![format!("Battle {battle}, job {profile} (scripted bot):")];
-        for level in [1_u32, 5, 10, 15, 20] {
-            let mut engine = base.clone();
-            // The scripted bot must not be helped by power-up hearts.
-            engine.unload_power_ups();
-            engine.set_player_job(profile, level);
-            // Eligibility is per level; the eligible levels still run through
-            // the same production `begin` guard.
-            if let Some(required) = engine.battle_level_refusal(battle, level) {
-                lines.push(format!(
-                    "  level {level:>2}: needs level {required}; skipped"
-                ));
-                continue;
-            }
-            if let Err(error) = engine.begin(battle, character.clone(), profile) {
-                return Ok(vec![format!("Cannot simulate battle {battle}: {error}")]);
-            }
-            engine.on_zone_ready(profile, 0)?;
-            let abilities = self.abilities.as_ref();
-            let slots: Vec<_> = (1..=7)
-                .filter_map(|slot| {
-                    abilities
-                        .and_then(|a| a.job_slot(profile, slot, level))
-                        .cloned()
-                })
-                .collect();
-            let mut result = "timeout";
-            let mut t = 0_u64;
-            let mut lowest = engine.player_health().0;
-            while t < 600_000 {
-                t += 100;
-                let standing = engine.standing_enemies();
-                let Some(&(target, at, _)) =
-                    standing.iter().min_by_key(|(_, _, shielded)| *shielded)
-                else {
-                    break;
-                };
-                let me = [at[0] + 1.5, at[1], at[2]];
-                engine.tick(me, profile, t)?;
-                let (hp, max) = engine.player_health();
-                lowest = lowest.min(hp);
-                if hp == 0 {
-                    result = "lost";
-                    break;
-                }
-                let heal = slots
-                    .iter()
-                    .find(|a| a.heal > 0 && a.damage_multiplier == 0.0);
-                let strike = slots.iter().find(|a| a.damage_multiplier > 0.0);
-                if hp * 10 < max * 6 {
-                    if let Some(heal) = heal {
-                        engine.job_ability(heal, 1, me, profile, t)?;
-                    }
-                }
-                if let Some(strike) = strike {
-                    engine.job_ability(strike, target, me, profile, t)?;
-                }
-                engine.attack(target, me, profile, 0, t)?;
-                if engine
-                    .state()
-                    .active
-                    .as_ref()
-                    .is_some_and(|a| a.phase == crate::encounter::EncounterPhase::Won)
-                {
-                    result = "won";
-                    break;
-                }
-            }
-            let log = engine.fight_log();
-            let dealt: i64 = log
-                .iter()
-                .filter(|e| matches!(e.kind, "hit" | "crit"))
-                .map(|e| e.amount)
-                .sum();
-            let crits = log.iter().filter(|e| e.kind == "crit").count();
-            let max = engine.player_health().1;
-            lines.push(format!(
-                "  level {level:>2}: {result} in {:.0}s, lowest health {lowest}/{max}, dealt {dealt} ({crits} crits)",
-                t as f64 / 1000.0
-            ));
-        }
-        Ok(lines)
-    }
-
     pub fn game_clock(&self) -> crate::game_clock::GameClock {
         self.game_clock
     }
@@ -4159,6 +4024,7 @@ impl Gameplay {
                 self.sync_world_stage(&mut out)?;
                 // T521: a committed slot-7 change relabels or empties the bar.
                 self.resend_bar_after_weapon_change(&inventory_before, &mut out)?;
+                self.sync_weapon();
             }
             return Ok(out);
         }
@@ -4553,36 +4419,14 @@ impl Gameplay {
         for reward in result.rewards {
             self.apply_encounter_reward(reward, out)?;
         }
-        for definition in result.defeated {
-            let result = self.opening_mut()?.on_event(OpeningEvent::Defeat {
-                definition_id: definition,
-            })?;
-            self.apply_opening(result, out)?;
-            // NPC quests count kills by enemy definition id ("defeat" goals author
-            // that id as `model_id`; quest_engine maps it to KillActorKind).
-            if let Ok(actor_kind_id) = u32::try_from(definition) {
-                if actor_kind_id != 0 {
-                    // Ticks and requests both report kills here; register any goal
-                    // this defeat opened before the outcome is returned.
-                    self.npc_quest_event(
-                        crate::quest_engine::QuestEvent::KillActorKind {
-                            actor_kind_id,
-                            count: 1,
-                        },
-                        out,
-                    )?;
-                }
-            }
-        }
-        self.emit_ability_uses(result.abilities_used, out)?;
-        if let Some(id) = result.win_completed {
-            self.npc_quest_event(
-                crate::quest_engine::QuestEvent::CompleteDungeon { encounter_id: id },
-                out,
-            )?;
-            // T229: the win transition (once per run, with the win grants) is the clear.
-            self.pay_earned_station_cash(EarnSource::DungeonClear { id }, out)?;
-        }
+        self.credit_combat(
+            result.defeated,
+            result.abilities_used,
+            result.win_completed,
+            result.kills,
+            result.facts,
+            out,
+        )?;
         if let Some(id) = result.completed {
             let result = self
                 .opening_mut()?
@@ -4892,6 +4736,7 @@ impl Gameplay {
             self.npc_inventory_events(&before, &mut out)?;
             out.replies.extend(self.learn_consumed_patterns(&before)?);
             self.resend_bar_after_weapon_change(&before, &mut out)?;
+            self.sync_weapon();
         }
         if inner.starts_with(&[26, 0, 13, 0]) {
             let (8, Some(id)) = (inner.len(), le::i32(inner, 4)) else {

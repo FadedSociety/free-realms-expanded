@@ -53,6 +53,9 @@ impl Gameplay {
         let Some(encounter) = self.encounter.as_mut() else {
             return Ok(BattleStart::Refused(invalid("no encounter engine")));
         };
+        if let Err(error) = encounter.prepare_fights() {
+            return Ok(BattleStart::Refused(error));
+        }
         match encounter.begin(battle, character.clone(), profile) {
             Ok(result) => {
                 self.apply_encounter(result, out)?;
@@ -114,7 +117,9 @@ impl Gameplay {
         let Some(encounter) = self.encounter.as_mut() else {
             return Ok(false);
         };
-        let result = match encounter.begin(battle, character.clone(), profile) {
+        let prepared = encounter.prepare_fights();
+        let begun = prepared.and_then(|()| encounter.begin(battle, character.clone(), profile));
+        let result = match begun {
             Ok(result) => result,
             // A refused `begin` (knocked out, busy) is a chat refusal with the
             // same screen, not a session error that ends the connection.

@@ -1,249 +1,7 @@
-//! One battle run's enemy simulation: attack clocks, walk set and skittish kiting.
+//! One battle run's lifecycle: the shared arena, joining and leaving, the win and the knockout.
+//! The enemy tick lives in `arena_ai.rs`.
+use super::arena_ai::*;
 use super::*;
-
-/// (R) The one arena-simulation value. The engine owns exactly one `ArenaSim`;
-/// a group's shared run (`SharedArena`) copies its own into the acting member's
-/// engine for one action and copies it back (`enter_arena`, `leave_arena`).
-/// Never add a second engine field that would have to be copied separately.
-///
-/// Runtime clocks only: none of it is saved (`ActiveEncounter` still holds the
-/// enemies and phase), so every load, begin and `reset_session` starts it
-/// empty. Keys are arena enemy GUIDs, and the opening stage's `world_enemies`
-/// share the same tick loop and so the same maps. Field enemy GUIDs never
-/// appear here: the encounter, field-enemy and field-battle loaders refuse an
-/// actor GUID that another set already uses (`arena_and_field_guids_are_disjoint`).
-#[derive(Clone, Default)]
-pub(super) struct ArenaSim {
-    /// Enemy GUID to its last attack time.
-    pub(super) attacks: BTreeMap<u64, u64>,
-    /// Enemy GUIDs whose walk animation is active.
-    pub(super) moving: BTreeSet<u64>,
-    /// Skittish actors fighting alone: running or resting, until a time.
-    pub(super) kiting: BTreeMap<u64, Kite>,
-    /// Shared runs only: enemy GUID to the member who last damaged it (its target).
-    pub(super) last_hit: BTreeMap<u64, u64>,
-    /// The member whose action holds a shared run's sim; `None` for a solo run (and so for
-    /// `ArenaSim::default()` after every `reset_session`, which also detaches a member).
-    pub(super) acting: Option<u64>,
-}
-
-#[derive(Clone, Copy, Debug)]
-pub(super) enum Kite {
-    Run(u64),
-    Rest(u64),
-}
-
-/// What one arena tick reads from the engine; the sim itself is `&mut`.
-pub(super) struct ArenaTick<'a> {
-    pub(super) position: [f32; 3],
-    pub(super) ground: &'a Ground,
-    pub(super) behaviours: &'a BTreeMap<u64, Behaviour>,
-    pub(super) skills: &'a SkillEffects,
-    pub(super) mitigation: f32,
-    pub(super) player_health: u32,
-    pub(super) max_health: u32,
-    pub(super) now_ms: u64,
-    pub(super) elapsed: u64,
-    /// Summoned minions still stand (the summoner fights beside them instead of kiting);
-    /// read off the whole roster, so a driver's per-member subset cannot change it.
-    pub(super) backup: bool,
-}
-
-/// Whether a summoner has minions standing: `actors` is the whole roster.
-pub(super) fn summoner_backup(actors: &[Actor], states: &[EnemyState]) -> bool {
-    actors.iter().any(|a| {
-        a.summon_below_percent.is_some()
-            && states
-                .iter()
-                .any(|s| s.guid == a.guid && s.health > 0 && !s.dormant)
-    })
-}
-
-impl ArenaSim {
-    /// A defeated enemy leaves the walk-away and target books.
-    pub(super) fn forget(&mut self, guid: u64) {
-        self.kiting.remove(&guid);
-        self.last_hit.remove(&guid);
-    }
-
-    /// Move, chase and swing every standing enemy for one tick; returns the
-    /// damage the player takes (the caller applies it).
-    pub(super) fn tick_enemies(
-        &mut self,
-        actors: Vec<Actor>,
-        states: &mut [EnemyState],
-        t: &ArenaTick,
-        out: &mut EncounterOutcome,
-    ) -> u32 {
-        let (position, now_ms, elapsed) = (t.position, t.now_ms, t.elapsed);
-        let mut total_damage = 0_u32;
-        for actor in actors {
-            let Some(s) = states.iter_mut().find(|s| s.guid == actor.guid) else {
-                continue;
-            };
-            if s.health == 0 || s.dormant {
-                continue;
-            }
-            if t.skills.stunned(actor.guid, now_ms) {
-                continue;
-            }
-            let b = t.behaviours.get(&actor.guid).cloned().unwrap_or_default();
-            // L092: a scared enemy runs straight away from its scarer and strikes nobody.
-            if let Some(from) = t.skills.fleeing_from(actor.guid, now_ms) {
-                let step = b.move_speed * elapsed.min(250) as f32 / 1000.0;
-                let unit = super::battle_items::away_from(s.position, from, 1.0);
-                let away = [unit[0] - s.position[0], 0.0, unit[2] - s.position[2]];
-                let mut next = super::battle_items::away_from(s.position, from, step);
-                t.ground.snap(&mut next);
-                s.position = next;
-                out.replies.push(movement(actor.guid, next, away));
-                if self.moving.insert(actor.guid) {
-                    out.replies.push(animation(actor.guid, 3, true));
-                }
-                out.changed = true;
-                continue;
-            }
-            if b.mode == Mode::Skittish {
-                if t.backup {
-                    self.kiting.remove(&actor.guid);
-                } else {
-                    self.kite_turn(&actor, s, t, &b, out);
-                    continue;
-                }
-            }
-            let delta = distance(position, s.position);
-            if delta > b.chase_limit {
-                if self.moving.remove(&actor.guid) {
-                    out.replies.push(animation(actor.guid, 1, true));
-                }
-                continue;
-            }
-            if delta > b.reach && b.mode != Mode::Stationary && !t.skills.rooted(actor.guid, now_ms)
-            {
-                let heading = [
-                    (position[0] - s.position[0]) / delta,
-                    0.0,
-                    (position[2] - s.position[2]) / delta,
-                ];
-                // Stop inside reach so f32 rounding at world coordinates cannot
-                // strand a pursuer just outside the attack threshold.
-                let step =
-                    (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
-                for (coord, to) in s.position.iter_mut().zip(position) {
-                    *coord += (to - *coord) / delta * step;
-                }
-                t.ground.snap(&mut s.position);
-                out.replies.push(movement(actor.guid, s.position, heading));
-                if self.moving.insert(actor.guid) {
-                    out.replies.push(animation(actor.guid, 3, true));
-                }
-                out.changed = true;
-            }
-            if distance(position, s.position) <= b.reach {
-                if self.moving.remove(&actor.guid) {
-                    out.replies.push(animation(actor.guid, 1, true));
-                }
-                if self
-                    .attacks
-                    .get(&actor.guid)
-                    .is_some_and(|last| now_ms.saturating_sub(*last) < b.attack_ms)
-                {
-                    continue;
-                }
-                self.attacks.insert(actor.guid, now_ms);
-                out.replies.push(animation(actor.guid, 1001, false));
-                let attack_damage = (actor.damage as f32 * t.mitigation).round() as u32;
-                let damage = attack_damage.min(t.player_health.saturating_sub(total_damage));
-                out.replies.push(attack_processed(
-                    actor.guid,
-                    1,
-                    damage,
-                    t.player_health
-                        .saturating_sub(total_damage)
-                        .saturating_sub(damage),
-                    t.max_health,
-                    false,
-                ));
-                total_damage = total_damage.saturating_add(attack_damage);
-            }
-        }
-        total_damage
-    }
-
-    /// One tick of a skittish actor fighting alone: run from the player, then
-    /// rest (no attacks), then run again.
-    fn kite_turn(
-        &mut self,
-        actor: &Actor,
-        s: &mut EnemyState,
-        t: &ArenaTick,
-        b: &Behaviour,
-        out: &mut EncounterOutcome,
-    ) {
-        let (player, now_ms, elapsed) = (t.position, t.now_ms, t.elapsed);
-        let delta = distance(player, s.position).max(0.01);
-        let away = [
-            (s.position[0] - player[0]) / delta,
-            0.0,
-            (s.position[2] - player[2]) / delta,
-        ];
-        let phase = *self
-            .kiting
-            .entry(actor.guid)
-            .or_insert(Kite::Run(now_ms.saturating_add(b.run_ms)));
-        match phase {
-            Kite::Rest(until) if now_ms < until => {}
-            Kite::Rest(_) => {
-                self.kiting
-                    .insert(actor.guid, Kite::Run(now_ms.saturating_add(b.run_ms)));
-            }
-            Kite::Run(until) if now_ms >= until => {
-                self.kiting
-                    .insert(actor.guid, Kite::Rest(now_ms.saturating_add(b.rest_ms)));
-                self.moving.remove(&actor.guid);
-                // Turn to face the player and catch its breath.
-                out.replies
-                    .push(movement(actor.guid, s.position, [-away[0], 0.0, -away[2]]));
-                out.replies.push(animation(actor.guid, 1, true));
-                out.replies
-                    .push(animation(actor.guid, b.rest_animation, false));
-                out.changed = true;
-            }
-            Kite::Run(until) if delta > b.run_from => {
-                self.kiting
-                    .insert(actor.guid, Kite::Run(until.saturating_add(elapsed)));
-                if self.moving.remove(&actor.guid) {
-                    out.replies
-                        .push(movement(actor.guid, s.position, [-away[0], 0.0, -away[2]]));
-                    out.replies.push(animation(actor.guid, 1, true));
-                    out.changed = true;
-                }
-            }
-            Kite::Run(_) => {
-                let step = b.run_speed * elapsed.min(250) as f32 / 1000.0;
-                // Straight away, or along the leash edge (either tangent) when cornered.
-                let directions = [away, [away[2], 0.0, -away[0]], [-away[2], 0.0, away[0]]];
-                let next = directions.iter().find_map(|d| {
-                    let next = t.ground.snapped([
-                        s.position[0] + d[0] * step,
-                        player[1],
-                        s.position[2] + d[2] * step,
-                    ]);
-                    let flat = [next[0], actor.position[1], next[2]];
-                    (distance(flat, actor.position) <= b.leash).then_some((next, *d))
-                });
-                if let Some((next, heading)) = next {
-                    s.position = next;
-                    out.replies.push(movement(actor.guid, s.position, heading));
-                    if self.moving.insert(actor.guid) {
-                        out.replies.push(animation(actor.guid, 3, true));
-                    }
-                    out.changed = true;
-                }
-            }
-        }
-    }
-}
 
 /// Most members one shared run admits (R, a sanity bound; the party's own size limit is the
 /// real cap, since only party members are invited). A joiner past it is refused.
@@ -261,6 +19,8 @@ pub struct SharedArena {
     stuns: BTreeMap<u64, u64>,
     holds: BTreeMap<u64, super::skills::Hold>,
     target_buffs: BTreeMap<(u64, i32), SkillBuff>,
+    /// The director's run, one for the whole group.
+    run: director::RunSlot,
     /// The arena's own tick clock: one driver tick per interval, whoever drives it.
     last_tick: Option<u64>,
     won: bool,
@@ -285,9 +45,13 @@ impl SharedArena {
     pub fn set_lost(&mut self, lost: bool) {
         self.lost = lost;
     }
-    /// A run that is over, frozen or full takes nobody new.
+    /// A run that is over, frozen or full takes nobody new. A fight file may set a smaller
+    /// group than `MAX_MEMBERS`.
     pub fn admits(&self) -> bool {
-        !self.won && !self.lost && !self.faulted && self.members.len() < MAX_MEMBERS
+        let room = (self.run.run.as_ref())
+            .filter(|run| !run.legacy)
+            .map_or(MAX_MEMBERS, |run| run.def.group_max());
+        !self.won && !self.lost && !self.faulted && self.members.len() < room
     }
     /// Milliseconds since the last arena tick, or `None` while one is not yet due (100 ms, the
     /// solo tick's step).
@@ -307,26 +71,6 @@ impl SharedArena {
     pub fn attack_clock(&self, guid: u64) -> Option<u64> {
         self.sim.attacks.get(&guid).copied()
     }
-}
-
-/// An enemy's target (R): its last attacker while that member is standing in the fight, else
-/// the nearest standing member. `players` holds only members who can be hit.
-fn target_of(
-    last_hit: &BTreeMap<u64, u64>,
-    guid: u64,
-    at: [f32; 3],
-    players: &[FieldParticipant],
-) -> Option<u64> {
-    last_hit
-        .get(&guid)
-        .filter(|hitter| players.iter().any(|p| p.guid == **hitter))
-        .copied()
-        .or_else(|| {
-            players
-                .iter()
-                .min_by(|a, b| distance(a.position, at).total_cmp(&distance(b.position, at)))
-                .map(|p| p.guid)
-        })
 }
 
 impl EncounterEngine {
@@ -358,6 +102,7 @@ impl EncounterEngine {
             stuns: self.skills.stuns.clone(),
             holds: self.skills.holds.clone(),
             target_buffs: self.skills.target_buffs.clone(),
+            run: self.run.clone(),
             last_tick: None,
             won: false,
             lost: false,
@@ -385,6 +130,7 @@ impl EncounterEngine {
         self.skills.stuns.clone_from(&arena.stuns);
         self.skills.holds.clone_from(&arena.holds);
         self.skills.target_buffs.clone_from(&arena.target_buffs);
+        self.run.clone_from(&arena.run);
         true
     }
 
@@ -403,6 +149,9 @@ impl EncounterEngine {
         arena.stuns.clone_from(&self.skills.stuns);
         arena.holds.clone_from(&self.skills.holds);
         arena.target_buffs.clone_from(&self.skills.target_buffs);
+        arena.run.clone_from(&self.run);
+        // A fight file's run that was won is won for the whole group.
+        arena.won |= (arena.run.run.as_ref()).is_some_and(|run| run.outcome() == Some(true));
     }
 
     /// This player as a target of the shared run: standing, in the fight, scene loaded.
@@ -420,65 +169,6 @@ impl EncounterEngine {
     /// The phase of this player's own run.
     pub fn run_phase(&self) -> Option<EncounterPhase> {
         self.state.active.as_ref().map(|a| a.phase.clone())
-    }
-
-    /// One tick of a shared run's enemies, on the arena's enemies (call it between `enter_arena`
-    /// and `leave_arena`). Each enemy moves and swings once, at its own target; returns, per
-    /// member hit, the damage it takes and the packets that tick made (a member's own damage
-    /// popups are among them).
-    pub fn tick_arena_enemies(
-        &mut self,
-        players: &[FieldParticipant],
-        now_ms: u64,
-        elapsed: u64,
-    ) -> Vec<(u64, u32, Vec<Vec<u8>>)> {
-        let Some(actors) = self.dungeon().map(|d| d.enemies.clone()) else {
-            return Vec::new();
-        };
-        let ground = self.ground();
-        let Some(active) = &mut self.state.active else {
-            return Vec::new();
-        };
-        let states = &mut active.enemies;
-        let backup = summoner_backup(&actors, states);
-        let targets: BTreeMap<u64, u64> = actors
-            .iter()
-            .filter_map(|a| {
-                let s = states.iter().find(|s| s.guid == a.guid)?;
-                if s.health == 0 || s.dormant {
-                    return None;
-                }
-                let target = target_of(&self.arena.last_hit, a.guid, s.position, players)?;
-                Some((a.guid, target))
-            })
-            .collect();
-        let mut hits = Vec::new();
-        for p in players {
-            let mine: Vec<Actor> = actors
-                .iter()
-                .filter(|a| targets.get(&a.guid) == Some(&p.guid))
-                .cloned()
-                .collect();
-            if mine.is_empty() {
-                continue;
-            }
-            let tick = ArenaTick {
-                position: p.position,
-                ground: &ground,
-                behaviours: &self.behaviour_of,
-                skills: &self.skills,
-                mitigation: p.mitigation,
-                player_health: p.health,
-                max_health: p.max_health,
-                now_ms,
-                elapsed,
-                backup,
-            };
-            let mut out = EncounterOutcome::default();
-            let damage = self.arena.tick_enemies(mine, states, &tick, &mut out);
-            hits.push((p.guid, damage, out.replies));
-        }
-        hits
     }
 
     /// Enemy damage the shared run dealt this member (its own health, knockout and results).
@@ -504,8 +194,10 @@ impl EncounterEngine {
         let Some(d) = self.dungeon() else {
             return out;
         };
-        let (count, _) = goal_progress(d, active);
-        out.replies.push(objective(2, d.objective_id, count));
+        if self.fight_run().is_none() {
+            let (count, _) = goal_progress(d, active);
+            out.replies.push(objective(2, d.objective_id, count));
+        }
         out.changed = true;
         self.win_run(now_ms, &mut out);
         self.present_results(&mut out);
@@ -516,6 +208,7 @@ impl EncounterEngine {
     /// wheel pick, the member's own reward and quest credit, results and rules off. The solo
     /// hit path and a shared run's other members both end here.
     pub(super) fn win_run(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
+        let pay = self.fight_pay();
         // Both callers hold an active run of a content dungeon.
         let (Some(active), Some(d)) = (self.state.active.as_ref(), self.dungeon()) else {
             return;
@@ -538,13 +231,21 @@ impl EncounterEngine {
                 // (R) 50 job XP per battle win (half a rank on the
                 // local 100-XP curve); the cave's XP stays with the
                 // opening's own rewards.
-                job_xp: if d.guide.is_none() { BATTLE_JOB_XP } else { 0 },
-                coins: d.reward_coins,
+                job_xp: match &pay {
+                    Some((job_xp, bonus)) => job_xp + bonus.job_xp,
+                    None if d.guide.is_none() => BATTLE_JOB_XP,
+                    None => 0,
+                },
+                coins: d.reward_coins + pay.as_ref().map_or(0, |(_, bonus)| bonus.coins),
                 items: d
                     .reward_items
                     .iter()
                     .copied()
                     .chain(prize.iter().map(|p| (p.item_id, p.quantity)))
+                    .chain(
+                        pay.iter()
+                            .flat_map(|(_, bonus)| bonus.items.iter().copied()),
+                    )
                     .collect(),
                 ..Default::default()
             },
@@ -555,13 +256,17 @@ impl EncounterEngine {
             active.phase = EncounterPhase::Won;
         }
         out.win_completed = Some(id);
+        out.facts.push(FightFact::Won { fight: id });
         // The cave rewards once; overworld battles every win (R).
         // Repeatable battles are never recorded: their ids are not in the
         // opening content that validates `rewarded` at load.
         if repeatable || self.state.rewarded.insert(id) {
             out.rewards.push(reward);
         }
-        out.replies.push(objective_complete(objective_id));
+        if pay.is_none() {
+            // A fight file's goals completed as they were done.
+            out.replies.push(objective_complete(objective_id));
+        }
         out.replies.push(game_over(true, instance, id));
         if let Some(prize) = &prize {
             // 39/45 MiniGameLootWheelSetItemToLandOn: the wheel lands
@@ -579,6 +284,30 @@ impl EncounterEngine {
         } else {
             "Darkthorne's defense is complete. Close the results to return. This encounter uses reconstructed combat rules.".into()
         });
+        self.run_end(true, now_ms, out);
+    }
+
+    /// The run is lost for this player: the results follow. A shared fight run that ran out of
+    /// knockouts ends this way for every member, each on their own step.
+    pub(super) fn lose_run(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
+        let live = |a: &&mut ActiveEncounter| {
+            matches!(a.phase, EncounterPhase::Loading | EncounterPhase::Fighting)
+        };
+        let Some(a) = self.state.active.as_mut().filter(live) else {
+            return;
+        };
+        a.phase = EncounterPhase::Lost;
+        out.changed = true;
+        out.replies
+            .push(game_over(false, a.instance_id, a.encounter_id));
+        out.replies.push(rules(false));
+        out.replies
+            .push(combat_flag(133, a.encounter_id, a.instance_id, false));
+        out.feedback = Some("Knocked out. Close the results to leave.".into());
+        out.facts.push(FightFact::Lost {
+            fight: a.encounter_id,
+        });
+        self.run_end(false, now_ms, out);
     }
 
     /// Enemy damage to the player: the fight log, god mode, health, and the knockout (results
@@ -611,14 +340,11 @@ impl EncounterEngine {
                 } else {
                     self.skills.clear();
                 }
-                if let Some(a) = &mut self.state.active {
-                    a.phase = EncounterPhase::Lost;
-                    out.replies
-                        .push(game_over(false, a.instance_id, a.encounter_id));
-                    out.replies.push(rules(false));
-                    out.replies
-                        .push(combat_flag(133, a.encounter_id, a.instance_id, false));
-                    out.feedback = Some("Knocked out. Close the results to leave.".into());
+                if self.state.active.is_some() {
+                    // A fight file's run lets the group be knocked out a number of times.
+                    if !self.player_down(now_ms, out) {
+                        self.lose_run(now_ms, out);
+                    }
                 } else if self.world_stage_fighting() {
                     self.state.player_health = self.max_health;
                     out.replies

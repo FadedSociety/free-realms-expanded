@@ -199,7 +199,7 @@ fn heal_numbers(out: &EncounterOutcome) -> Vec<i32> {
     out.replies
         .iter()
         .filter(|p| p.starts_with(&[35, 0, 35, 0]))
-        .map(|p| i32::from_le_bytes(p[21..25].try_into().unwrap()))
+        .map(|p| i32::from_le_bytes(p[29..33].try_into().unwrap()))
         .collect()
 }
 fn energy(out: &EncounterOutcome) -> Option<i32> {

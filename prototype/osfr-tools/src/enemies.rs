@@ -100,6 +100,41 @@ struct EnemyDefinition {
     boss: bool,
     reward: EnemyReward,
     source: String,
+    // The live catalogue's keys (`encounter/scale/catalogue.rs` reads and checks them); this
+    // dormant loader only lets them pass.
+    #[serde(default)]
+    #[allow(dead_code)]
+    rank: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    tier: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    health: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    hit: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    behaviour: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    attacks: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    speeds: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    scale: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    status_immune: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    loot: serde::de::IgnoredAny,
+    #[serde(default)]
+    #[allow(dead_code)]
+    tags: serde::de::IgnoredAny,
 }
 
 #[derive(Clone, Deserialize)]

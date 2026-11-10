@@ -162,12 +162,20 @@ fn switching_jobs_keeps_each_jobs_level_and_unlocked_bar() {
         .map(|id| (*id, abilities.activation(*id, levels[id]).unwrap()))
         .collect();
 
-    // T421: Brawler at 5 has Leg Sweep (row 1) and Rock Toss (row 2) with no
-    // blank button before them; Pummel opens row 3 at 10, and rows 4-7, which
-    // the client never draws, stay empty.
+    // P2 combat-kits (pin moved): the bar comes from the weapon, as captured (p12 36/5):
+    // slot 0 the kit's basic, slot 1 its super, nothing else. A Brawler's starter kit is
+    // Glancing Blow and Leg Sweep; the 2009 ladder rows (62018 Leg Sweep, 62024 Rock Toss)
+    // are no longer on it.
+    let kits = osfr_tools::encounter::kits::KitTable::builtin().expect("shipped kits");
+    let id = |key: &str| Some(kits.ability(key).expect("a shipped ability").ability_id);
     let brawler = bar_ids(&canonical[&43]);
-    assert_eq!(&brawler[..4], &[Some(4895), Some(62018), Some(62024), None]);
+    assert_eq!(&brawler[..4], &[id("glancing_blow"), id("leg_sweep"), None, None]);
     assert!(brawler[4..].iter().all(Option::is_none));
+    for job in [11, 32, 12, 2, 35] {
+        let bar = bar_ids(&canonical[&job]);
+        assert!(bar[0].is_some() && bar[1].is_some(), "job {job} has its basic and super");
+        assert!(bar[2..].iter().all(Option::is_none), "job {job} shows two abilities");
+    }
 
     // Switching through every combat job and the non-combat Adventurer returns
     // exactly the same job bar each time; experience and levels stay intact.

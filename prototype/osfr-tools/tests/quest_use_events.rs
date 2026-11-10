@@ -280,6 +280,7 @@ fn enter_dungeon(
         phase,
         return_location: character_at_for(guid, 0, [0.0, 0.0, 0.0]),
         enemies,
+        run_save: None,
     });
 }
 

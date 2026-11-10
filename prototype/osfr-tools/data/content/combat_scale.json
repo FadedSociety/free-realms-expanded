@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "basic_damage": {
     "0": 254,
     "2": 254,
@@ -14,6 +14,174 @@
   "player_base_health": 500,
   "enemy_health_scale": 3.72,
   "enemy_damage_scale": 0.5,
+  "max_level": 20,
+  "health_step_levels": 4,
+  "ability_damage": {
+    "basic_rider": [254, 444, 776, 1357, 2372],
+    "basic_plain": [279, 488, 853, 1492, 2609],
+    "super_utility": [640, 1118, 1955, 3420, 5977],
+    "super_standard": [889, 1554, 2716, 4750, 8302],
+    "super_heavy": [1143, 1998, 3492, 6107, 10674]
+  },
+  "plain_basic": "basic_plain",
+  "ranks": {
+    "object": {
+      "hp_basics": 1.0,
+      "hit": 1.0,
+      "regen": false,
+      "solo_seconds": [0.5, 1.5]
+    },
+    "minion": {
+      "hp_basics": 0.932,
+      "hit": 1.0,
+      "regen": true,
+      "solo_seconds": [0.5, 1.5]
+    },
+    "normal": {
+      "hp_basics": 2.724,
+      "hit": 1.0,
+      "regen": true,
+      "solo_seconds": [1.5, 3.0]
+    },
+    "tough": {
+      "hp_basics": 6.1875,
+      "hit": 1.0,
+      "regen": true,
+      "solo_seconds": [3.5, 6.0]
+    },
+    "elite": {
+      "hp_basics": 10.0,
+      "hit": 1.5,
+      "regen": true,
+      "solo_seconds": [5.5, 8.5]
+    },
+    "boss": {
+      "hp_basics": 13.62,
+      "hit": 2.0,
+      "regen": true,
+      "solo_seconds": [8.0, 12.0]
+    },
+    "dungeon_boss": {
+      "hp_basics": 60.0,
+      "hit": 2.0,
+      "regen": true,
+      "solo_seconds": [20.0, 100.0]
+    },
+    "named_boss": {
+      "hp_basics": 400.0,
+      "hit": 2.0,
+      "regen": true,
+      "solo_seconds": [200.0, 345.0]
+    },
+    "world_boss": {
+      "hp_basics": 1100.0,
+      "hit": 2.0,
+      "regen": true,
+      "solo_seconds": [600.0, 900.0]
+    }
+  },
+  "group_step": 0.5,
+  "enemy_hit": {
+    "floor_health_share": 0.05,
+    "interval_ms": 2300,
+    "special_factor": 1.5
+  },
+  "enemy_regen_percent": 0.8,
+  "defense": {
+    "piece": [12, 23, 35, 47, 58],
+    "pieces": 6,
+    "half_sets": 1.215
+  },
+  "player": {
+    "damage_multiplier": 1.0,
+    "ability_crit": {
+      "percent": 3,
+      "factor": 1.5
+    },
+    "melee_crit": {
+      "percent": 5,
+      "factor": 1.25
+    },
+    "regen_percent": {
+      "fight": 1.0,
+      "idle": 5.0
+    },
+    "weapon_range": 5.0,
+    "weapon_speed_ms": 1000,
+    "to_hit": 100
+  },
+  "speeds": {
+    "small": [4.5, 9.0, 10.0],
+    "pack": [3.0, 6.0, 10.0],
+    "large": [6.0, 12.0, 10.0]
+  },
+  "stats": [
+    {
+      "id": 1,
+      "name": "Health",
+      "from": "health"
+    },
+    {
+      "id": 3,
+      "name": "Weapon Range",
+      "from": "weapon_range"
+    },
+    {
+      "id": 4,
+      "name": "Health Refill",
+      "from": "regen_idle"
+    },
+    {
+      "id": 7,
+      "name": "Defense",
+      "from": "defense"
+    },
+    {
+      "id": 9,
+      "name": "Melee Crit Chance",
+      "from": "melee_crit_percent"
+    },
+    {
+      "id": 10,
+      "name": "Melee Crit Multiplier",
+      "from": "melee_crit_factor"
+    },
+    {
+      "id": 11,
+      "name": "To Hit",
+      "from": "to_hit"
+    },
+    {
+      "id": 15,
+      "name": "Weapon Speed",
+      "from": "weapon_speed_ms"
+    },
+    {
+      "id": 16,
+      "name": "Absorb Damage",
+      "from": "absorb"
+    },
+    {
+      "id": 20,
+      "name": "Damage Multiplier",
+      "from": "damage_multiplier"
+    },
+    {
+      "id": 33,
+      "name": "Ability Crit Chance",
+      "from": "ability_crit_percent"
+    },
+    {
+      "id": 34,
+      "name": "Ability Crit Multiplier",
+      "from": "ability_crit_factor"
+    },
+    {
+      "id": 65,
+      "name": "Health Regen In Combat",
+      "from": "regen_fight"
+    }
+  ],
   "source": [
     {
       "field": "basic_damage",
@@ -49,6 +217,86 @@
       "field": "enemy_damage_scale",
       "kind": "reconstructed",
       "evidence": "(R) T639: player health halved (1000 -> 500), so enemy damage is halved and each hit takes the same share of health"
+    },
+    {
+      "field": "max_level",
+      "kind": "client",
+      "evidence": "job levels end at 20; the health curve steps once per health_step_levels (video fit, see tier_ratio)"
+    },
+    {
+      "field": "health_step_levels",
+      "kind": "video",
+      "evidence": "the 500 x 1.75^((L-1)/4) fit: 760 read at level 4, 4069 at 16, 7116 at 20 (capture p12 job-switch rows)"
+    },
+    {
+      "field": "ability_damage",
+      "kind": "wiki",
+      "evidence": "combat design 5.1: weapon tooltips and client text 13095-13099 give 254/279 basics and 640/889/1143 supers at tier 1, x1.75 a tier; capture p12 36/13 floats 776 and 2716 and the frame '-1554' agree"
+    },
+    {
+      "field": "plain_basic",
+      "kind": "capture",
+      "evidence": "enemy health is counted in plain basics: all three captured anchors land on it (combat design S11)"
+    },
+    {
+      "field": "ranks",
+      "kind": "capture",
+      "evidence": "p12 and packets_3, March 2014: Bixie Soldier 260 = 279 x 0.932 (minion, tier 1); Frostfang Growler 760 = 279 x 2.724 (normal, tier 1) and its Alpha 3,800 = 5 x 760 (boss); Feathered Drake 16,143 = 2609 x 6.1875 (tough, tier 5)"
+    },
+    {
+      "field": "ranks",
+      "kind": "reconstructed",
+      "evidence": "(R) object 1, elite 10, dungeon_boss 60, named_boss 400, world_boss 1100 basics from video fight lengths; hit x1.5 elite and x2 bosses; solo_seconds are the bands the simulator is held to; no regen on objects"
+    },
+    {
+      "field": "group_step",
+      "kind": "reconstructed",
+      "evidence": "(R) +50 % health per group member after the first; the wiki says only 'somewhat harder'"
+    },
+    {
+      "field": "enemy_hit",
+      "kind": "capture",
+      "evidence": "raw 25 a bite from a starter Bixie Soldier (5 % of 500, tier 1); bites 2.0-2.7 s apart, most 2.3-2.5; a 309 = 1.5 x 206 bite carried effect 5622. The Feathered Drake's raw 206 is 5.06 % of the level-16 player's 4,069 and sits on its enemies.json row; the rule answers 204"
+    },
+    {
+      "field": "enemy_hit",
+      "kind": "reconstructed",
+      "evidence": "(R) every tier is 5 % of player base health at the tier's first level (1, 4, 8, 12, 16): 25 / 38 / 67 / 117 / 204. The design table's 44 / 77 / 133 were levels 5, 9 and 13; the tier floors are what tier_min_levels and both captured hits use"
+    },
+    {
+      "field": "enemy_regen_percent",
+      "kind": "capture",
+      "evidence": "a 260-health Bixie Soldier ticked +2 a second in a fight (0.8 %)"
+    },
+    {
+      "field": "defense",
+      "kind": "capture",
+      "evidence": "one anchor: raw 206 took 113 off a player with Defense 348 (stat block, packets_3 38/7)"
+    },
+    {
+      "field": "defense",
+      "kind": "reconstructed",
+      "evidence": "(R) piece values 12/23/35/47/58 by tier, six pieces a set; taken = raw x (1 - D / (D + K)), K = 1.215 full sets of the tier; Absorb comes off flat afterwards"
+    },
+    {
+      "field": "player",
+      "kind": "capture",
+      "evidence": "packets_3 38/7 level-20 stat block: melee crit 5 % x1.25, ability crit 3 % x1.5, to-hit 100, Weapon Speed 1000, Weapon Range 5.0; regen +71 a second in a fight and +356 out of one on 7116 (1 % and 5 %)"
+    },
+    {
+      "field": "player",
+      "kind": "reconstructed",
+      "evidence": "(R) damage multiplier 1.0 before gear (the captured player had 1.05)"
+    },
+    {
+      "field": "speeds",
+      "kind": "capture",
+      "evidence": "walk / run / return: Bixie 4.5 / 9 / 10, Frostfang pack 3 / 6, Feathered Drake 6 / 12 / 10; (R) 10 for a pack's return"
+    },
+    {
+      "field": "stats",
+      "kind": "client",
+      "evidence": "38/7 stat ids named by the client's stat map (reader ctor 0x008ea870): 1 Health, 3 Weapon Range, 7 Defense, 9-11 melee crit and to-hit, 15 Weapon Speed, 16 Absorb Damage, 20 Damage Multiplier, 33-34 ability crit; 4 and 65 are the refill rows of the captured block"
     }
   ]
 }

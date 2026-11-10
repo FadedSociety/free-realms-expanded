@@ -240,7 +240,9 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 17] = [
+        const CHECKED: [&str; 19] = [
+            "enter_fight",
+            "fight_goal",
             "talk_to_npc",
             "deliver_item",
             "interact_actor",
@@ -356,10 +358,41 @@ impl Catalogue {
                 self.target_violation(violations, owner, goal["npc_id"].as_u64());
             }
             // The click names the runtime actor, which need not be NPC content (a game table).
+            // A guarded step is a captive a fight places: it resolves as an enemy-catalogue
+            // kind, or as a drawn actor when it names one guid (combat design section 12).
+            "interact_actor" if goal["guarded"] == true => {
+                let actor = goal["actor_guid"].as_u64().unwrap_or(0);
+                let kind = as_u32(&goal["actor_kind_id"]).unwrap_or(0);
+                if !self.drawn_actors.contains(&actor) && !self.targets.defeatable.contains(&kind) {
+                    violations.push(format!(
+                        "{owner} (interact_actor, guarded): actor {actor} is not drawn and kind {kind} is not a placed enemy or fight actor"
+                    ));
+                }
+            }
             "interact_actor" => {
                 let actor = goal["actor_guid"].as_u64().unwrap_or(0);
                 if !self.drawn_actors.contains(&actor) {
                     violations.push(format!("{owner}: actor {actor} is not drawn"));
+                }
+            }
+            "enter_fight" | "fight_goal" => {
+                let fight = as_u32(&goal["fight_id"]).unwrap_or(0);
+                if !self.targets.dungeons.contains(&fight) {
+                    violations.push(format!(
+                        "{owner} ({}): fight {fight} is not a shipped field battle, dungeon or fight id",
+                        goal["kind"].as_str().unwrap_or_default()
+                    ));
+                }
+                if goal["kind"] == "fight_goal"
+                    && !self
+                        .targets
+                        .fight_goals
+                        .contains(&(fight, goal["goal"].as_str().unwrap_or_default().to_owned()))
+                {
+                    violations.push(format!(
+                        "{owner} (fight_goal): fight {fight} has no objective named {}",
+                        goal["goal"]
+                    ));
                 }
             }
             "reach_poi" => {
@@ -367,11 +400,33 @@ impl Catalogue {
                     violations.push(format!("{owner}: reach_poi target is not positive"));
                 }
             }
+            // Every kind a defeat names must be an enemy something places: a field row, a camp,
+            // a battle or dungeon row, or a fight actor. A place-only defeat names its fight.
             "defeat" => {
-                if goal["model_id"].as_u64().unwrap_or(0) == 0
-                    || !(1..=MAX_OBJECTIVE_COUNT).contains(&goal["count"].as_u64().unwrap_or(0))
-                {
+                let kinds: Vec<u32> = as_u32(&goal["model_id"])
+                    .into_iter()
+                    .chain(goal["kinds"].as_array().into_iter().flatten().filter_map(as_u32))
+                    .collect();
+                let fight = as_u32(&goal["in_fight"]);
+                let placed =
+                    fight.is_some() || !goal["in_area"].is_null() || !goal["in_zone"].is_null();
+                let count_positive = any_of_leaf
+                    || (1..=MAX_OBJECTIVE_COUNT).contains(&goal["count"].as_u64().unwrap_or(0));
+                if kinds.contains(&0) || (kinds.is_empty() && !placed) || !count_positive {
                     violations.push(format!("{owner}: defeat target and count must be positive"));
+                }
+                for kind in kinds.iter().filter(|kind| **kind != 0) {
+                    if !self.targets.defeatable.contains(kind) {
+                        violations.push(format!(
+                            "{owner} (defeat): enemy kind {kind} is not placed by any field row, camp, battle, dungeon or fight"
+                        ));
+                    }
+                }
+                if fight.is_some_and(|fight| !self.targets.dungeons.contains(&fight)) {
+                    violations.push(format!(
+                        "{owner} (defeat): in_fight {} is not a shipped field battle, dungeon or fight id",
+                        fight.unwrap_or(0)
+                    ));
                 }
             }
             "collect_item" => {
@@ -386,7 +441,11 @@ impl Catalogue {
                         "{owner}: collect_item target and quantity must be positive"
                     ));
                 }
-                if item > 0 && !self.targets.items.contains(&item) {
+                // A quest drop may feed a counter with no bag item (combat design section 12).
+                if item > 0
+                    && !self.targets.items.contains(&item)
+                    && !self.targets.quest_drop_items.contains(&item)
+                {
                     violations.push(format!(
                                 "{owner} (collect_item): item {item} is not defined by the shipped item catalogue"
                             ));
@@ -1077,6 +1136,138 @@ fn patch_fixture_alternative(scratch: &Scratch, quest: u32, index: usize, value:
         serde_json::to_vec_pretty(&document).expect("fixture JSON"),
     )
     .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+}
+
+/// Combat design section 12: a `defeat` step must name enemies something places and, when it
+/// names a fight, a real one; `enter_fight` and `fight_goal` must name a real fight.
+#[test]
+fn combat_step_targets_fail_on_a_scratch_tree() {
+    // Turn the fixture's `complete_dungeon` step into each combat step in turn.
+    let violations_for = |tag: &str, goal: Value| {
+        let scratch = fixture(tag, Defect::None);
+        let path = scratch.path().join("quests/fixture.json");
+        let mut document = read_json(&path);
+        let step = document["records"]
+            .as_array_mut()
+            .expect("fixture records")
+            .iter_mut()
+            .find(|record| as_u32(&record["id"]) == Some(FIXTURE_QUEST))
+            .expect("the fixture quest exists")["objectives"]
+            .as_array_mut()
+            .expect("fixture objectives")
+            .iter_mut()
+            .find(|goal| goal["kind"] == "complete_dungeon")
+            .expect("the fixture quest has a complete_dungeon step");
+        let mut goal = goal;
+        goal["id"] = step["id"].clone();
+        goal["source"] = step["source"].clone();
+        *step = goal;
+        fs::write(&path, serde_json::to_vec_pretty(&document).unwrap()).unwrap();
+        Catalogue::load(scratch.path())
+            .expect("the combat step loads")
+            .target_violations()
+    };
+    let placed = Catalogue::load(fixture("combat-kinds", Defect::None).path())
+        .unwrap()
+        .targets
+        .defeatable
+        .first()
+        .copied();
+
+    // Controls: a place-only defeat and an entry into the fixture's own battle resolve.
+    for (tag, goal) in [
+        (
+            "defeat-in-fight",
+            json!({"kind": "defeat", "in_fight": FIXTURE_BATTLE, "count": 3}),
+        ),
+        (
+            "enter-fight",
+            json!({"kind": "enter_fight", "fight_id": FIXTURE_BATTLE}),
+        ),
+    ] {
+        let violations = violations_for(tag, goal);
+        assert!(violations.is_empty(), "{tag}: {violations:?}");
+    }
+    if let Some(kind) = placed {
+        let violations = violations_for(
+            "defeat-placed",
+            json!({"kind": "defeat", "kinds": [kind], "count": 1}),
+        );
+        assert!(violations.is_empty(), "a placed kind resolves: {violations:?}");
+    }
+
+    // Canaries: each names the kind and the id that does not resolve.
+    for (tag, goal, kind, id) in [
+        (
+            "defeat-unplaced",
+            json!({"kind": "defeat", "model_id": 4_242_424, "count": 1}),
+            "defeat",
+            "4242424",
+        ),
+        (
+            "defeat-kinds",
+            json!({"kind": "defeat", "kinds": [4_242_425], "count": 1}),
+            "defeat",
+            "4242425",
+        ),
+        (
+            "defeat-fight",
+            json!({"kind": "defeat", "in_fight": 99_998, "count": 1}),
+            "defeat",
+            "99998",
+        ),
+        (
+            "enter-missing",
+            json!({"kind": "enter_fight", "fight_id": 99_997}),
+            "enter_fight",
+            "99997",
+        ),
+        (
+            "goal-missing",
+            json!({"kind": "fight_goal", "fight_id": FIXTURE_BATTLE, "goal": "hold", "count": 2}),
+            "fight_goal",
+            "hold",
+        ),
+        (
+            "captive-missing",
+            json!({"kind": "interact_actor", "guarded": true, "actor_kind_id": 4_242_426, "count": 2}),
+            "interact_actor",
+            "4242426",
+        ),
+    ] {
+        let violations = violations_for(tag, goal);
+        assert_eq!(violations.len(), 1, "{tag}: {violations:?}");
+        assert!(
+            violations[0].contains(&format!("quest {FIXTURE_QUEST}"))
+                && violations[0].contains(kind)
+                && violations[0].contains(id),
+            "{tag} did not name the quest, kind and target: {violations:?}"
+        );
+    }
+}
+
+/// Every shipped `defeat` step names a kind something places. Pinned so a later edit to the
+/// enemy files cannot strand a live quest silently.
+#[test]
+fn every_shipped_defeat_step_names_a_placed_enemy() {
+    let catalogue = Catalogue::load(&content_dir()).expect("the shipped split catalogue loads");
+    let mut steps = 0;
+    for quest in catalogue.enabled() {
+        for goal in quest
+            .objectives
+            .iter()
+            .filter(|goal| goal["kind"] == "defeat")
+        {
+            steps += 1;
+            let kind = as_u32(&goal["model_id"]).unwrap_or(0);
+            assert!(
+                catalogue.targets.defeatable.contains(&kind),
+                "quest {}: enemy kind {kind} is not placed",
+                quest.id
+            );
+        }
+    }
+    assert!(steps >= 7, "the shipped defeat steps shrank to {steps}");
 }
 
 #[test]

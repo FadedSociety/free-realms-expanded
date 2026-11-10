@@ -1,5 +1,6 @@
 //! Field content loading, validation and staged reloads (`field_enemies.json`,
 //! `field_battles.json`), and the quest pin's lookups over the loaded rows.
+use super::behaviour::resolve_behaviour;
 use super::*;
 
 impl EncounterEngine {
@@ -280,11 +281,9 @@ impl EncounterEngine {
         let content = Arc::make_mut(&mut self.content);
         let mut battles = file.battles;
         for b in &mut battles {
-            // Enemies scale like a player at the difficulty's level gate, so
-            // each fight keeps the same share of danger (R).
-            let factor = self.scale.health_factor(difficulty_level(b.difficulty));
+            let difficulty = b.difficulty;
             for a in &mut b.enemies {
-                self.scale.scale_enemy(a, factor, factor);
+                self.scale.scale_battle_enemy(a, difficulty);
             }
             b.marker = b
                 .combat_marker

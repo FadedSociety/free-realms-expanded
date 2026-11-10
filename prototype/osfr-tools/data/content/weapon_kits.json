@@ -1,0 +1,5633 @@
+{
+ "schema_version": 1,
+ "source": [
+  {
+   "kind": "capture",
+   "evidence": "p12 36/5 t=546232-547066: eight slots, two filled; slot 0 cost 0, slot 1 cost 100; ranges 5.0 melee basics, 10.0 Wizard basic, 15.0 Archer basic and every super; record type 3, id, cost, icon, name, 4, range f32, 1, id, 0, byte 1"
+  },
+  {
+   "kind": "capture",
+   "evidence": "p12 38/13 t=546306-546330: energy 100, +4 once per second; 36/3 gaps: one basic per 0.65 s"
+  },
+  {
+   "kind": "capture",
+   "evidence": "p12 36/13 effect rows: Flame Flash 2609.2 (id 4895) and 1492.7 (4894); Dragonstrike 10674 (4899) and 6107 (4898); Laser Surgery 10674; Cauterize and Hack 'n' Slash 2 x 1186; a level-scaling definition lists 254/444/776 and 889/1554/2716/4750"
+  },
+  {
+   "kind": "wiki",
+   "evidence": "evidence-abilities section 4.1: damage by weapon Power tier; sections 4.2-4.8 the 150 abilities and 24 traits"
+  },
+  {
+   "kind": "reference",
+   "evidence": "data/reference/weapons.json (wiki weapon pages joined to client item ids): which item carries which pair"
+  },
+  {
+   "kind": "reconstructed",
+   "evidence": "(R) shapes' reach, radius, cone and caps; rider_defaults; super recast; slot of the third ability; every trait number; legacy_ids"
+  }
+ ],
+ "energy": {
+  "max": 100,
+  "per_tick": 4,
+  "tick_ms": 1000
+ },
+ "slots": {
+  "basic": 0,
+  "super": 1,
+  "third": 3,
+  "third_min_level": 20
+ },
+ "classes": {
+  "basic_rider": {
+   "tier_damage": [254, 444, 776, 1357, 2372],
+   "cost": 0,
+   "recast_ms": 650
+  },
+  "basic_plain": {
+   "tier_damage": [279, 488, 853, 1492, 2609],
+   "cost": 0,
+   "recast_ms": 650
+  },
+  "super_utility": {
+   "tier_damage": [640, 1118, 1955, 3420, 5977],
+   "cost": 100,
+   "recast_ms": 1000
+  },
+  "super_standard": {
+   "tier_damage": [889, 1554, 2716, 4750, 8302],
+   "cost": 100,
+   "recast_ms": 1000
+  },
+  "super_heavy": {
+   "tier_damage": [1143, 1998, 3492, 6107, 10674],
+   "cost": 100,
+   "recast_ms": 1000
+  }
+ },
+ "shapes": {
+  "single": {
+   "targets": 1
+  },
+  "self": {
+   "targets": 0
+  },
+  "front": {
+   "cone_deg": 120,
+   "targets": 5
+  },
+  "near": {
+   "radius": 6.0,
+   "targets": 5
+  },
+  "around": {
+   "radius": 8.0,
+   "targets": 8
+  },
+  "chain": {
+   "jumps": 3,
+   "jump_range": 8.0
+  },
+  "at_target": {
+   "radius": 5.0,
+   "targets": 5
+  }
+ },
+ "rider_defaults": {
+  "sometimes_chance": 0.15,
+  "extra_chance": 0.15,
+  "group_radius": 15.0,
+  "taunt_threat_basics": 10.0
+ },
+ "abilities": {
+  "glancing_blow": {
+   "name": "Glancing Blow",
+   "name_id": 420172,
+   "ability_id": 62500,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "knock_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 1: Glancing Blow 2372 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of knock_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "leg_sweep": {
+   "name": "Leg Sweep",
+   "name_id": 442455,
+   "ability_id": 62501,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "around",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "knock_down"
+    }
+   ],
+   "animation": 1001023,
+   "icon_id": 11637,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 1: Leg Sweep 8302 at Power 5, around"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_fight_leg_sweep_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of knock_down; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "wallop": {
+   "name": "Wallop",
+   "name_id": 420389,
+   "ability_id": 62502,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_plain",
+   "shape": "around",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 2: Wallop 2609 at Power 5, around"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "ready_to_rumble": {
+   "name": "Ready to Rumble",
+   "name_id": 420391,
+   "ability_id": 62503,
+   "kind": "super",
+   "job": 43,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "buffs": [
+    {
+     "status": "damage_up",
+     "who": "self"
+    }
+   ],
+   "effect": 16212,
+   "icon_id": 22930,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 2: Ready to Rumble 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_ready_to_rumble_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_up; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "pound": {
+   "name": "Pound",
+   "name_id": 420598,
+   "ability_id": 62504,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 3: Pound 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "pummel": {
+   "name": "Pummel",
+   "name_id": 24097,
+   "ability_id": 62505,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 3522,
+   "hits": 4,
+   "effect": 16084,
+   "icon_id": 22927,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 3: Pummel 3522 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_pummel_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "smack": {
+   "name": "Smack",
+   "name_id": 421036,
+   "ability_id": 62506,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "knock_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 4: Smack 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of knock_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "roundhouse_kick": {
+   "name": "Roundhouse Kick",
+   "name_id": 421038,
+   "ability_id": 62507,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "around",
+   "range": 15.0,
+   "power5": 8302,
+   "effect": 16194,
+   "icon_id": 22933,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 4: Roundhouse Kick 8302 at Power 5, around"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_roundhouse_kick_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "whack": {
+   "name": "Whack",
+   "name_id": 421241,
+   "ability_id": 62508,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "knock_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 5: Whack 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of knock_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "kick_dirt": {
+   "name": "Kick Dirt",
+   "name_id": 422816,
+   "ability_id": 62509,
+   "kind": "super",
+   "job": 43,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "attack_down"
+    }
+   ],
+   "animation": 1001021,
+   "effect": 16206,
+   "icon_id": 22921,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 5: Kick Dirt 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_kick_dirt_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of attack_down; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "wild_swing": {
+   "name": "Wild Swing",
+   "name_id": 38633,
+   "ability_id": 62510,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 6: Wild Swing 2372 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "sucker_punch": {
+   "name": "Sucker Punch",
+   "name_id": 410416,
+   "ability_id": 62511,
+   "kind": "super",
+   "job": 43,
+   "class": "super_utility",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "attack_down"
+    }
+   ],
+   "effect": 16198,
+   "icon_id": 22939,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 6: Sucker Punch 5977 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_sucker_punch_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of attack_down; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "smash": {
+   "name": "Smash",
+   "name_id": 40430,
+   "ability_id": 62512,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 7: Smash 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "slam": {
+   "name": "Slam",
+   "name_id": 73160,
+   "ability_id": 62513,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "icon_id": 22936,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 7: Slam 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_slam_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "crush": {
+   "name": "Crush",
+   "name_id": 141485,
+   "ability_id": 62514,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "root",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 8: Crush 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of root; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "hammer_toss": {
+   "name": "Hammer Toss",
+   "name_id": 421275,
+   "ability_id": 62515,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "animation": 1011043,
+   "effect": 15203,
+   "icon_id": 22918,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 8: Hammer Toss 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_hammer_toss_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "bash": {
+   "name": "Bash",
+   "name_id": 421286,
+   "ability_id": 62516,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 9: Bash 2372 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "enrage": {
+   "name": "Enrage",
+   "name_id": 21374,
+   "ability_id": 62517,
+   "kind": "super",
+   "job": 43,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "buffs": [
+    {
+     "status": "damage_reduction",
+     "who": "self"
+    },
+    {
+     "status": "damage_up",
+     "who": "self"
+    }
+   ],
+   "animation": 1015,
+   "effect": 16145,
+   "icon_id": 11634,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 9: Enrage, self"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_fight_enrage_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_reduction; size and duration of damage_up; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "thump": {
+   "name": "Thump",
+   "name_id": 421287,
+   "ability_id": 62518,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 10: Thump 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "knockout": {
+   "name": "Knockout",
+   "name_id": 421299,
+   "ability_id": 62519,
+   "kind": "super",
+   "job": 43,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16200,
+   "icon_id": 22924,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 10: Knockout 10674 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_knockout_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "power_smash": {
+   "name": "Power Smash",
+   "name_id": 439519,
+   "ability_id": 62520,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 4744,
+   "recast_ms": 1300,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 11: Power Smash 4744 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) recast (wiki: longer than usual); reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "brawler_s_challenge": {
+   "name": "Brawler's Challenge",
+   "name_id": 439525,
+   "ability_id": 62521,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "taunt"
+    }
+   ],
+   "heal": {
+    "who": "self",
+    "power5": 4750,
+    "class": "super_standard"
+   },
+   "icon_id": 39864,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 11: Brawler's Challenge 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_challenge_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of taunt; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "brawler_s_smash": {
+   "name": "Brawler's Smash",
+   "name_id": 442449,
+   "ability_id": 62522,
+   "kind": "basic",
+   "job": 43,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14290,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 12: Brawler's Smash 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "leg_sweep_awakened": {
+   "name": "Leg Sweep",
+   "name_id": 5101083,
+   "ability_id": 62523,
+   "kind": "super",
+   "job": 43,
+   "class": "super_standard",
+   "shape": "around",
+   "range": 15.0,
+   "description_id": 5101084,
+   "power5": 9132,
+   "riders": [
+    {
+     "status": "knock_down"
+    }
+   ],
+   "animation": 1001023,
+   "icon_id": 11637,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 12: Leg Sweep 9132 at Power 5, around"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_brawler_fight_leg_sweep_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of knock_down; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "reckless": {
+   "name": "Reckless",
+   "name_id": 5101085,
+   "ability_id": 62524,
+   "kind": "third",
+   "job": 43,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "description_id": 5101086,
+   "buffs": [
+    {
+     "status": "reckless",
+     "who": "self"
+    }
+   ],
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, brawler row 12: Reckless, self"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of reckless; reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    }
+   ]
+  },
+  "barrage": {
+   "name": "Barrage",
+   "name_id": 420256,
+   "ability_id": 62525,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 2609,
+   "tier_ids": {
+    "5": 5060
+   },
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 1: Barrage 2609 at Power 5, front"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'5': 5060} by weapon tier"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read"
+    }
+   ]
+  },
+  "volley": {
+   "name": "Volley",
+   "name_id": 420258,
+   "ability_id": 62526,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 4732,
+   "hits": 3,
+   "tier_ids": {
+    "5": 5061
+   },
+   "animation": 1106,
+   "effect": 16204,
+   "icon_id": 22802,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 1: Volley 4732 at Power 5, near"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'5': 5061} by weapon tier"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_volley_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "icy_arrow": {
+   "name": "Icy Arrow",
+   "name_id": 420384,
+   "ability_id": 62527,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "freeze",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 2: Icy Arrow 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of freeze; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "blizzard_blast": {
+   "name": "Blizzard Blast",
+   "name_id": 420386,
+   "ability_id": 62528,
+   "kind": "super",
+   "job": 35,
+   "class": "super_utility",
+   "shape": "at_target",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "freeze"
+    }
+   ],
+   "effect": 16116,
+   "icon_id": 22909,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 2: Blizzard Blast 5977 at Power 5, at_target"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_freezing_arrow_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of freeze; reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "charged_shot": {
+   "name": "Charged Shot",
+   "name_id": 420567,
+   "ability_id": 62529,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 3: Charged Shot 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "explosive_shot": {
+   "name": "Explosive Shot",
+   "name_id": 420584,
+   "ability_id": 62530,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "at_target",
+   "range": 15.0,
+   "power5": 8302,
+   "animation": 1108,
+   "icon_id": 22799,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 3: Explosive Shot 8302 at Power 5, at_target"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_explosive_arrows_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "multi_shot": {
+   "name": "Multi-Shot",
+   "name_id": 421006,
+   "ability_id": 62531,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 1186,
+   "hits": 2,
+   "animation": 1106,
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 4: Multi-Shot 1186 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "splitting_arrow": {
+   "name": "Splitting Arrow",
+   "name_id": 421008,
+   "ability_id": 62532,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 8302,
+   "icon_id": 22915,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 4: Splitting Arrow 8302 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_splitting_arrow_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "power_shot": {
+   "name": "Power Shot",
+   "name_id": 421184,
+   "ability_id": 62533,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 5: Power Shot 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "stunning_shot": {
+   "name": "Stunning Shot",
+   "name_id": 24397,
+   "ability_id": 62534,
+   "kind": "super",
+   "job": 35,
+   "class": "super_utility",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "stun"
+    }
+   ],
+   "effect": 16054,
+   "icon_id": 11631,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 5: Stunning Shot 5977 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_stunning_shots_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of stun; reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "smoldering_shot": {
+   "name": "Smoldering Shot",
+   "name_id": 421245,
+   "ability_id": 62535,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2609,
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 6: Smoldering Shot 2609 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "flaming_arrow": {
+   "name": "Flaming Arrow",
+   "name_id": 421244,
+   "ability_id": 62536,
+   "kind": "super",
+   "job": 35,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16121,
+   "icon_id": 22903,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 6: Flaming Arrow 10674 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_fire_arrow_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "sonic_arrow": {
+   "name": "Sonic Arrow",
+   "name_id": 421261,
+   "ability_id": 62537,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "knock_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 7: Sonic Arrow 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of knock_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "sonic_boom": {
+   "name": "Sonic Boom",
+   "name_id": 421273,
+   "ability_id": 62538,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "at_target",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "knock_down"
+    }
+   ],
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 7: Sonic Boom 8302 at Power 5, at_target"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of knock_down; reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "electric_arrow": {
+   "name": "Electric Arrow",
+   "name_id": 421260,
+   "ability_id": 62539,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 8: Electric Arrow 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "lightning_call": {
+   "name": "Lightning Call",
+   "name_id": 421272,
+   "ability_id": 62540,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "around",
+   "range": 15.0,
+   "power5": 8302,
+   "effect": 16117,
+   "icon_id": 22912,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 8: Lightning Call 8302 at Power 5, around"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_lightning_call_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "ember_arrow": {
+   "name": "Ember Arrow",
+   "name_id": 421285,
+   "ability_id": 62541,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 9: Ember Arrow 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "firebomb": {
+   "name": "Firebomb",
+   "name_id": 421297,
+   "ability_id": 62542,
+   "kind": "super",
+   "job": 35,
+   "class": "super_utility",
+   "shape": "around",
+   "range": 15.0,
+   "power5": 2324,
+   "effect": 16118,
+   "icon_id": 22906,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 9: Firebomb 2324 at Power 5, around"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_fire_bomb_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "cover_fire": {
+   "name": "Cover Fire",
+   "name_id": 421284,
+   "ability_id": 62543,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "root",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 10: Cover Fire 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of root; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "ricochet": {
+   "name": "Ricochet",
+   "name_id": 421296,
+   "ability_id": 62544,
+   "kind": "super",
+   "job": 35,
+   "class": "super_heavy",
+   "shape": "chain",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16215,
+   "icon_id": 22573,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 10: Ricochet 10674 at Power 5, chain"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_ricochet_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "perfect_shot": {
+   "name": "Perfect Shot",
+   "name_id": 439518,
+   "ability_id": 62545,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 2372,
+   "bonus": {
+    "when": "lone",
+    "power5": 1186
+   },
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 11: Perfect Shot 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "archer_s_advantage": {
+   "name": "Archer's Advantage",
+   "name_id": 439524,
+   "ability_id": 62546,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "slow"
+    }
+   ],
+   "buffs": [
+    {
+     "status": "speed_up",
+     "who": "group"
+    }
+   ],
+   "icon_id": 39861,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 11: Archer's Advantage 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_advantage_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of slow; size and duration of speed_up; reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "archer_s_shot": {
+   "name": "Archer's Shot",
+   "name_id": 442448,
+   "ability_id": 62547,
+   "kind": "basic",
+   "job": 35,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 2609,
+   "icon_id": 14134,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 12: Archer's Shot 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "focused_volley": {
+   "name": "Focused Volley",
+   "name_id": 5101077,
+   "ability_id": 62548,
+   "kind": "super",
+   "job": 35,
+   "class": "super_standard",
+   "shape": "at_target",
+   "range": 15.0,
+   "description_id": 5101078,
+   "power5": 9132,
+   "riders": [
+    {
+     "status": "slow_heavy"
+    }
+   ],
+   "icon_id": 34,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 12: Focused Volley 9132 at Power 5, at_target"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_rainofarrows_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of slow_heavy; reach, radius and target cap of the shape; ability id in our own range"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) legacy_ids: credits the 2009 skill 62019 that quest 3010011 names"
+    }
+   ],
+   "legacy_ids": [62019]
+  },
+  "sniper_shot": {
+   "name": "Sniper Shot",
+   "name_id": 5101079,
+   "ability_id": 62549,
+   "kind": "third",
+   "job": 35,
+   "class": "super_heavy",
+   "shape": "single",
+   "range": 15.0,
+   "description_id": 5101080,
+   "power5": 11741,
+   "animation": 1107,
+   "icon_id": 22576,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, archer row 12: Sniper Shot 11741 at Power 5, single"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_archer_sniper_shot_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) ability id in our own range"
+    }
+   ]
+  },
+  "incision": {
+   "name": "Incision",
+   "name_id": 420174,
+   "ability_id": 62550,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 1: Incision 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "triage": {
+   "name": "Triage",
+   "name_id": 420186,
+   "ability_id": 62551,
+   "kind": "super",
+   "job": 11,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "heal": {
+    "who": "group",
+    "power5": 2372,
+    "class": "basic_rider"
+   },
+   "animation": 1113,
+   "effect": 16161,
+   "icon_id": 22591,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 1: Triage 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_triage_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "injure": {
+   "name": "Injure",
+   "name_id": 420394,
+   "ability_id": 62552,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 2: Injure 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "target_vitals": {
+   "name": "Target Vitals",
+   "name_id": 3810,
+   "ability_id": 62553,
+   "kind": "super",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "defense_down"
+    }
+   ],
+   "icon_id": 11640,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 2: Target Vitals 5977 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_target_vitals_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of defense_down; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "assist": {
+   "name": "Assist",
+   "name_id": 420612,
+   "ability_id": 62554,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "defense_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 3: Assist 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of defense_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "nurse": {
+   "name": "Nurse!",
+   "name_id": 420627,
+   "ability_id": 62555,
+   "kind": "super",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "summon": {
+    "count": 2,
+    "ms": 15000,
+    "class": "basic_rider",
+    "every_ms": 2000
+   },
+   "icon_id": 22954,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 3: Nurse!, self"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_nurse_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) helpers: two for 15 s, each striking for a rider basic every 2 s; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "bruise": {
+   "name": "Bruise",
+   "name_id": 421040,
+   "ability_id": 62556,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "attack_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 4: Bruise 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of attack_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "immunize": {
+   "name": "Immunize",
+   "name_id": 421043,
+   "ability_id": 62557,
+   "kind": "super",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "buffs": [
+    {
+     "status": "damage_reduction",
+     "who": "group"
+    }
+   ],
+   "effect": 16190,
+   "icon_id": 22948,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 4: Immunize 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_immunize_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_reduction; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "clear": {
+   "name": "Clear!",
+   "name_id": 421247,
+   "ability_id": 62558,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 5: Clear! 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "shock_paddles": {
+   "name": "Shock Paddles",
+   "name_id": 3800,
+   "ability_id": 62559,
+   "kind": "super",
+   "job": 11,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "effect": 16154,
+   "icon_id": 270,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 5: Shock Paddles 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_shockpaddles_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "wound": {
+   "name": "Wound",
+   "name_id": 421246,
+   "ability_id": 62560,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "slow",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 6: Wound 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of slow; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "vitamins": {
+   "name": "Vitamins",
+   "name_id": 24061,
+   "ability_id": 62561,
+   "kind": "super",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "buffs": [
+    {
+     "status": "speed_up",
+     "who": "self"
+    },
+    {
+     "status": "damage_up",
+     "who": "self"
+    }
+   ],
+   "effect": 16184,
+   "icon_id": 22960,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 6: Vitamins, self"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_vitamins_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of speed_up; size and duration of damage_up; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "sedate": {
+   "name": "Sedate",
+   "name_id": 421265,
+   "ability_id": 62562,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 7: Sedate 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "blood_cell": {
+   "name": "Blood Cell",
+   "name_id": 421277,
+   "ability_id": 62563,
+   "kind": "super",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "root"
+    }
+   ],
+   "effect": 16218,
+   "icon_id": 22945,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 7: Blood Cell 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_bloodcell_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of root; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "traumatize": {
+   "name": "Traumatize",
+   "name_id": 421264,
+   "ability_id": 62564,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 8: Traumatize 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "reflex_test": {
+   "name": "Reflex Test",
+   "name_id": 421276,
+   "ability_id": 62565,
+   "kind": "super",
+   "job": 11,
+   "class": "super_heavy",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 10674,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "animation": 1011042,
+   "effect": 16230,
+   "icon_id": 22957,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 8: Reflex Test 10674 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_reflex_test_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "cauterize": {
+   "name": "Cauterize",
+   "name_id": 421289,
+   "ability_id": 62566,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 1186,
+   "hits": 2,
+   "riders": [
+    {
+     "status": "defense_down",
+     "sometimes": true
+    }
+   ],
+   "tier_ids": {
+    "5": 4646
+   },
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 9: Cauterize 1186 at Power 5, single"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'5': 4646} by weapon tier"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of defense_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read"
+    }
+   ]
+  },
+  "laser_surgery": {
+   "name": "Laser Surgery",
+   "name_id": 421301,
+   "ability_id": 62567,
+   "kind": "super",
+   "job": 11,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "tier_ids": {
+    "5": 4645
+   },
+   "effect": 16179,
+   "icon_id": 22951,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 9: Laser Surgery 10674 at Power 5, front"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'5': 4645} by weapon tier"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_laser_surgery_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape"
+    }
+   ]
+  },
+  "heartbreak": {
+   "name": "Heartbreak",
+   "name_id": 421288,
+   "ability_id": 62568,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "charm",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 10: Heartbreak 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of charm; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "antibodies": {
+   "name": "Antibodies",
+   "name_id": 421300,
+   "ability_id": 62569,
+   "kind": "super",
+   "job": 11,
+   "class": "super_heavy",
+   "shape": "chain",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16264,
+   "icon_id": 22942,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 10: Antibodies 10674 at Power 5, chain"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_antibodies_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "revitalizing_slice": {
+   "name": "Revitalizing Slice",
+   "name_id": 439520,
+   "ability_id": 62570,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "energy_gain": {
+    "amount": 1,
+    "chance": 0.1
+   },
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 11: Revitalizing Slice 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) energy amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "medic_s_promise": {
+   "name": "Medic's Promise",
+   "name_id": 439526,
+   "ability_id": 62571,
+   "kind": "super",
+   "job": 11,
+   "class": "super_standard",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 3083,
+   "heal": {
+    "who": "self",
+    "power5": 3083,
+    "class": "super_standard"
+   },
+   "cost": 50,
+   "icon_id": 39867,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 11: Medic's Promise 3083 at Power 5, single"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_medic_promise_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) ability id in our own range"
+    }
+   ]
+  },
+  "medic_s_slice": {
+   "name": "Medic's Slice",
+   "name_id": 442450,
+   "ability_id": 62572,
+   "kind": "basic",
+   "job": 11,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14771,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 12: Medic's Slice 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "mend": {
+   "name": "Mend",
+   "name_id": 5101087,
+   "ability_id": 62573,
+   "kind": "super",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "description_id": 5101088,
+   "heal": {
+    "who": "group",
+    "power5": 2609,
+    "class": "basic_plain"
+   },
+   "cost": 50,
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 12: Mend, self"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    }
+   ]
+  },
+  "vita_booster": {
+   "name": "Vita-booster",
+   "name_id": 5101089,
+   "ability_id": 62574,
+   "kind": "third",
+   "job": 11,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "description_id": 5101090,
+   "buffs": [
+    {
+     "status": "crit_up",
+     "who": "group"
+    }
+   ],
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, medic row 12: Vita-booster, self"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of crit_up; reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    }
+   ]
+  },
+  "flame_flash": {
+   "name": "Flame Flash",
+   "name_id": 419883,
+   "ability_id": 62575,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "tier_ids": {
+    "4": 4894,
+    "5": 4895
+   },
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 1: Flame Flash 2609 at Power 5, front"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'4': 4894, '5': 4895} by weapon tier"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read"
+    }
+   ]
+  },
+  "dragonstrike": {
+   "name": "Dragonstrike",
+   "name_id": 419930,
+   "ability_id": 62576,
+   "kind": "super",
+   "job": 2,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "tier_ids": {
+    "4": 4898,
+    "5": 4899
+   },
+   "animation": 1033,
+   "effect": 16014,
+   "icon_id": 22966,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 1: Dragonstrike 10674 at Power 5, front"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'4': 4898, '5': 4899} by weapon tier"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_dragon_strike_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape"
+    }
+   ]
+  },
+  "lightning_strike": {
+   "name": "Lightning Strike",
+   "name_id": 20217,
+   "ability_id": 62577,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 2: Lightning Strike 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "1000_storms": {
+   "name": "1000 Storms",
+   "name_id": 419521,
+   "ability_id": 62578,
+   "kind": "super",
+   "job": 2,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "animation": 1033,
+   "effect": 16088,
+   "icon_id": 22993,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 2: 1000 Storms 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_thousand_storms_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "cinder_slash": {
+   "name": "Cinder Slash",
+   "name_id": 421045,
+   "ability_id": 62579,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2609,
+   "tier_ids": {
+    "4": 4915
+   },
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 3: Cinder Slash 2609 at Power 5, single"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'4': 4915} by weapon tier"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read"
+    }
+   ]
+  },
+  "flame_wave": {
+   "name": "Flame Wave",
+   "name_id": 421047,
+   "ability_id": 62580,
+   "kind": "super",
+   "job": 2,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "tier_ids": {
+    "4": 4918
+   },
+   "effect": 16140,
+   "icon_id": 22975,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 3: Flame Wave 10674 at Power 5, front"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'4': 4918} by weapon tier"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_flame_wave_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape"
+    }
+   ]
+  },
+  "twisted_edge": {
+   "name": "Twisted Edge",
+   "name_id": 420638,
+   "ability_id": 62581,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2870,
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 4: Twisted Edge 2870 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "shuriken_storm": {
+   "name": "Shuriken Storm",
+   "name_id": 420984,
+   "ability_id": 62582,
+   "kind": "super",
+   "job": 2,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "effect": 4007,
+   "icon_id": 22987,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 4: Shuriken Storm 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_shuriken_storm_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "ashen_strike": {
+   "name": "Ashen Strike",
+   "name_id": 421251,
+   "ability_id": 62583,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2870,
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 5: Ashen Strike 2870 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "flaming_uppercut": {
+   "name": "Flaming Uppercut",
+   "name_id": 421249,
+   "ability_id": 62584,
+   "kind": "super",
+   "job": 2,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "animation": 1017,
+   "effect": 16119,
+   "icon_id": 22978,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 5: Flaming Uppercut 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_flaming_uppercut_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "dark_assault": {
+   "name": "Dark Assault",
+   "name_id": 421250,
+   "ability_id": 62585,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 1304,
+   "hits": 2,
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 6: Dark Assault 1304 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "shadow_army": {
+   "name": "Shadow Army",
+   "name_id": 421248,
+   "ability_id": 62586,
+   "kind": "super",
+   "job": 2,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "summon": {
+    "count": 2,
+    "ms": 15000,
+    "class": "basic_rider",
+    "every_ms": 2000
+   },
+   "icon_id": 22990,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 6: Shadow Army, self"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_summon_army_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) helpers: two for 15 s, each striking for a rider basic every 2 s; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "fiery_slice": {
+   "name": "Fiery Slice",
+   "name_id": 421266,
+   "ability_id": 62587,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2609,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 7: Fiery Slice 2609 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "flame_breath": {
+   "name": "Flame Breath",
+   "name_id": 421278,
+   "ability_id": 62588,
+   "kind": "super",
+   "job": 2,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16129,
+   "icon_id": 22972,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 7: Flame Breath 10674 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_flame_breath_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "mystic_rush": {
+   "name": "Mystic Rush",
+   "name_id": 421267,
+   "ability_id": 62589,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 1304,
+   "hits": 2,
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 8: Mystic Rush 1304 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "mystical_blade": {
+   "name": "Mystical Blade",
+   "name_id": 421279,
+   "ability_id": 62590,
+   "kind": "super",
+   "job": 2,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "buffs": [
+    {
+     "status": "damage_up",
+     "who": "self"
+    }
+   ],
+   "effect": 16169,
+   "icon_id": 22981,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 8: Mystical Blade, self"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_mystical_blade_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_up; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "hidden_strike": {
+   "name": "Hidden Strike",
+   "name_id": 421291,
+   "ability_id": 62591,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2609,
+   "riders": [
+    {
+     "status": "root",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 9: Hidden Strike 2609 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of root; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "fan_of_blades": {
+   "name": "Fan of Blades",
+   "name_id": 421303,
+   "ability_id": 62592,
+   "kind": "super",
+   "job": 2,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "root"
+    }
+   ],
+   "effect": 16185,
+   "icon_id": 22969,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 9: Fan of Blades 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_fan_of_blades_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of root; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "shadowslash": {
+   "name": "Shadowslash",
+   "name_id": 421290,
+   "ability_id": 62593,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2609,
+   "energy_gain": {
+    "amount": 2,
+    "chance": 1.0
+   },
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 10: Shadowslash 2609 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) energy amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "mystical_drain": {
+   "name": "Mystical Drain",
+   "name_id": 421302,
+   "ability_id": 62594,
+   "kind": "super",
+   "job": 2,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "energy_gain": {
+    "amount": 5,
+    "chance": 1.0
+   },
+   "icon_id": 22984,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 10: Mystical Drain 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_mystical_drain_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) energy amount; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "burning_slash": {
+   "name": "Burning Slash",
+   "name_id": 439521,
+   "ability_id": 62595,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 1304,
+   "dot": {
+    "power5": 711,
+    "every_ms": 3000,
+    "ms": 6000,
+    "status": "burn"
+   },
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 11: Burning Slash 1304 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "ninja_s_purge": {
+   "name": "Ninja's Purge",
+   "name_id": 439527,
+   "ability_id": 62596,
+   "kind": "super",
+   "job": 2,
+   "class": "super_standard",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 7471,
+   "bonus": {
+    "when": "burn",
+    "power5": 7471
+   },
+   "icon_id": 39870,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 11: Ninja's Purge 7471 at Power 5, single"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_purge_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) ability id in our own range"
+    }
+   ]
+  },
+  "ninja_s_slash": {
+   "name": "Ninja's Slash",
+   "name_id": 442451,
+   "ability_id": 62597,
+   "kind": "basic",
+   "job": 2,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14813,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 12: Ninja's Slash 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "shuriken_toss": {
+   "name": "Shuriken Toss",
+   "name_id": 5101091,
+   "ability_id": 62598,
+   "kind": "super",
+   "job": 2,
+   "class": "super_standard",
+   "shape": "front",
+   "range": 15.0,
+   "description_id": 5101092,
+   "power5": 8302,
+   "effect": 4007,
+   "icon_id": 44,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 12: Shuriken Toss 8302 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_shuriken_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) damage: the wiki gives no number; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "poisoned_blades": {
+   "name": "Poisoned Blades",
+   "name_id": 5101093,
+   "ability_id": 62599,
+   "kind": "third",
+   "job": 2,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "description_id": 5101094,
+   "buffs": [
+    {
+     "status": "poisoned_blades",
+     "who": "self"
+    }
+   ],
+   "icon_id": 22600,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, ninja row 12: Poisoned Blades, self"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_ninja_shadow_blade_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of poisoned_blades; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "sweeping_slash": {
+   "name": "Sweeping Slash",
+   "name_id": 420252,
+   "ability_id": 62600,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_plain",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 1: Sweeping Slash 2609 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "spinning_attack": {
+   "name": "Spinning Attack",
+   "name_id": 442458,
+   "ability_id": 62601,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 4732,
+   "hits": 3,
+   "effect": 5378,
+   "icon_id": 23008,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 1: Spinning Attack 4732 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_spinning_attack_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "fierce_edge": {
+   "name": "Fierce Edge",
+   "name_id": 420521,
+   "ability_id": 62602,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 2: Fierce Edge 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "cleave": {
+   "name": "Cleave",
+   "name_id": 420527,
+   "ability_id": 62603,
+   "kind": "super",
+   "job": 32,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16202,
+   "icon_id": 23002,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 2: Cleave 10674 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_cleave_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "power_slash": {
+   "name": "Power Slash",
+   "name_id": 420987,
+   "ability_id": 62604,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 3: Power Slash 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "quake": {
+   "name": "Quake",
+   "name_id": 24694,
+   "ability_id": 62605,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "animation": 1001022,
+   "effect": 16072,
+   "icon_id": 11664,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 3: Quake 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_quake_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "dual_strike": {
+   "name": "Dual Strike",
+   "name_id": 421059,
+   "ability_id": 62606,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 1186,
+   "hits": 2,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 4: Dual Strike 1186 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "warcry": {
+   "name": "Warcry",
+   "name_id": 421063,
+   "ability_id": 62607,
+   "kind": "super",
+   "job": 32,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "buffs": [
+    {
+     "status": "damage_up",
+     "who": "group"
+    }
+   ],
+   "animation": 1061143,
+   "effect": 16199,
+   "icon_id": 23014,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 4: Warcry 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_warcry_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_up; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "reckless_strike": {
+   "name": "Reckless Strike",
+   "name_id": 421255,
+   "ability_id": 62608,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 5: Reckless Strike 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "axe_throw": {
+   "name": "Axe Throw",
+   "name_id": 421253,
+   "ability_id": 62609,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "chain",
+   "range": 15.0,
+   "power5": 8302,
+   "animation": 1011043,
+   "icon_id": 22996,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 5: Axe Throw 8302 at Power 5, chain"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_axe_throw_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "gale_axe": {
+   "name": "Gale Axe",
+   "name_id": 421254,
+   "ability_id": 62610,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 6: Gale Axe 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "whirlwind": {
+   "name": "Whirlwind",
+   "name_id": 421252,
+   "ability_id": 62611,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "knock_down"
+    }
+   ],
+   "icon_id": 23017,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 6: Whirlwind 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_whirlwind_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of knock_down; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "hack_n_slash": {
+   "name": "Hack 'n' Slash",
+   "name_id": 35612,
+   "ability_id": 62612,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 1186,
+   "hits": 2,
+   "tier_ids": {
+    "5": 4974
+   },
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 7: Hack 'n' Slash 1186 at Power 5, single"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'5': 4974} by weapon tier"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read"
+    }
+   ]
+  },
+  "berserk": {
+   "name": "Berserk",
+   "name_id": 7933,
+   "ability_id": 62613,
+   "kind": "super",
+   "job": 32,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "buffs": [
+    {
+     "status": "damage_up",
+     "who": "self"
+    }
+   ],
+   "tier_ids": {
+    "5": 4975
+   },
+   "animation": 1038,
+   "effect": 16232,
+   "icon_id": 22999,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 7: Berserk 10674 at Power 5, front"
+    },
+    {
+     "kind": "capture",
+     "evidence": "p12 36/5 and 36/13: ability ids {'5': 4975} by weapon tier"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_berserk_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_up; reach, radius and target cap of the shape"
+    }
+   ]
+  },
+  "crushing_blow": {
+   "name": "Crushing Blow",
+   "name_id": 421269,
+   "ability_id": 62614,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "defense_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 8: Crushing Blow 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of defense_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "frenzy": {
+   "name": "Frenzy",
+   "name_id": 421281,
+   "ability_id": 62615,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 2348,
+   "hits": 5,
+   "animation": 1011041,
+   "effect": 16245,
+   "icon_id": 23005,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 8: Frenzy 2348 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_frenzy_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "dizzying_blow": {
+   "name": "Dizzying Blow",
+   "name_id": 421292,
+   "ability_id": 62616,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 9: Dizzying Blow 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "commanding_shout": {
+   "name": "Commanding Shout",
+   "name_id": 24706,
+   "ability_id": 62617,
+   "kind": "super",
+   "job": 32,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "riders": [
+    {
+     "status": "taunt"
+    }
+   ],
+   "buffs": [
+    {
+     "status": "damage_up",
+     "who": "self"
+    },
+    {
+     "status": "damage_reduction",
+     "who": "self"
+    }
+   ],
+   "effect": 15987,
+   "icon_id": 11655,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 9: Commanding Shout, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_commanding_shout_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of taunt; size and duration of damage_up; size and duration of damage_reduction; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "rampage": {
+   "name": "Rampage",
+   "name_id": 421293,
+   "ability_id": 62618,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 1186,
+   "hits": 2,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 10: Rampage 1186 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "thunderclap": {
+   "name": "Thunderclap",
+   "name_id": 421305,
+   "ability_id": 62619,
+   "kind": "super",
+   "job": 32,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "root"
+    }
+   ],
+   "animation": 1019,
+   "effect": 16280,
+   "icon_id": 23011,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 10: Thunderclap 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_thunderclap_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of root; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "wrathful_strike": {
+   "name": "Wrathful Strike",
+   "name_id": 439522,
+   "ability_id": 62620,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 5.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "crit_vulnerable"
+    }
+   ],
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 11: Wrathful Strike 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of crit_vulnerable; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "warrior_s_boon": {
+   "name": "Warrior's Boon",
+   "name_id": 439528,
+   "ability_id": 62621,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8302,
+   "riders": [
+    {
+     "status": "taunt"
+    }
+   ],
+   "buffs": [
+    {
+     "status": "heal_on_damage",
+     "who": "self"
+    }
+   ],
+   "icon_id": 39873,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 11: Warrior's Boon 8302 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_boon_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of taunt; size and duration of heal_on_damage; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "warrior_s_chop": {
+   "name": "Warrior's Chop",
+   "name_id": 442452,
+   "ability_id": 62622,
+   "kind": "basic",
+   "job": 32,
+   "class": "basic_plain",
+   "shape": "near",
+   "range": 5.0,
+   "power5": 2609,
+   "icon_id": 14104,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 12: Warrior's Chop 2609 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "whirlwind_strike": {
+   "name": "Whirlwind Strike",
+   "name_id": 5101095,
+   "ability_id": 62623,
+   "kind": "super",
+   "job": 32,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "description_id": 5101096,
+   "power5": 3044,
+   "hits": 3,
+   "icon_id": 23017,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 12: Whirlwind Strike 3044 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_warrior_whirlwind_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) damage: the wiki gives no number; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "into_the_fray": {
+   "name": "Into the Fray",
+   "name_id": 5101097,
+   "ability_id": 62624,
+   "kind": "third",
+   "job": 32,
+   "class": "super_utility",
+   "shape": "self",
+   "range": 15.0,
+   "description_id": 5101098,
+   "buffs": [
+    {
+     "status": "into_the_fray",
+     "who": "self"
+    }
+   ],
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, warrior row 12: Into the Fray, self"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of into_the_fray; reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    }
+   ]
+  },
+  "zap": {
+   "name": "Zap",
+   "name_id": 17071,
+   "ability_id": 62625,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 10.0,
+   "power5": 2609,
+   "effect": 5333,
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 1: Zap 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "lightning_blast": {
+   "name": "Lightning Blast",
+   "name_id": 442459,
+   "ability_id": 62626,
+   "kind": "super",
+   "job": 12,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "animation": 1138,
+   "effect": 16305,
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 1: Lightning Blast 10674 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    }
+   ]
+  },
+  "chill": {
+   "name": "Chill",
+   "name_id": 420539,
+   "ability_id": 62627,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 10.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "freeze",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 2: Chill 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of freeze; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "ice_nova": {
+   "name": "Ice Nova",
+   "name_id": 23679,
+   "ability_id": 62628,
+   "kind": "super",
+   "job": 12,
+   "class": "super_utility",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "freeze"
+    }
+   ],
+   "effect": 16172,
+   "icon_id": 284,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 2: Ice Nova 5977 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_icenova_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of freeze; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "burn": {
+   "name": "Burn",
+   "name_id": 7999,
+   "ability_id": 62629,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 10.0,
+   "power5": 2372,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 3: Burn 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "firestorm": {
+   "name": "Firestorm",
+   "name_id": 420995,
+   "ability_id": 62630,
+   "kind": "super",
+   "job": 12,
+   "class": "super_standard",
+   "shape": "around",
+   "range": 15.0,
+   "power5": 4732,
+   "effect": 16026,
+   "icon_id": 22612,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 3: Firestorm 4732 at Power 5, around"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_firestorm_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "splash": {
+   "name": "Splash",
+   "name_id": 421067,
+   "ability_id": 62631,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 10.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "knock_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 4: Splash 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of knock_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "tsunami": {
+   "name": "Tsunami",
+   "name_id": 421073,
+   "ability_id": 62632,
+   "kind": "super",
+   "job": 12,
+   "class": "super_heavy",
+   "shape": "front",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16187,
+   "icon_id": 23035,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 4: Tsunami 10674 at Power 5, front"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_tsunami_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "blast": {
+   "name": "Blast",
+   "name_id": 421258,
+   "ability_id": 62633,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_plain",
+   "shape": "single",
+   "range": 10.0,
+   "power5": 2609,
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 5: Blast 2609 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "energy_vortex": {
+   "name": "Energy Vortex",
+   "name_id": 421256,
+   "ability_id": 62634,
+   "kind": "super",
+   "job": 12,
+   "class": "super_heavy",
+   "shape": "single",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16151,
+   "icon_id": 23026,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 5: Energy Vortex 10674 at Power 5, single"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_energy_vortex_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) ability id in our own range"
+    }
+   ]
+  },
+  "shock": {
+   "name": "Shock",
+   "name_id": 421259,
+   "ability_id": 62635,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 10.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "stun",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 6: Shock 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of stun; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "chain_lightning": {
+   "name": "Chain Lightning",
+   "name_id": 421257,
+   "ability_id": 62636,
+   "kind": "super",
+   "job": 12,
+   "class": "super_heavy",
+   "shape": "chain",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16291,
+   "icon_id": 23020,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 6: Chain Lightning 10674 at Power 5, chain"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_chain_lightning_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "scorch": {
+   "name": "Scorch",
+   "name_id": 421270,
+   "ability_id": 62637,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "single",
+   "range": 10.0,
+   "power5": 2372,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 7: Scorch 2372 at Power 5, single"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "arcane_chain": {
+   "name": "Arcane Chain",
+   "name_id": 421282,
+   "ability_id": 62638,
+   "kind": "super",
+   "job": 12,
+   "class": "super_heavy",
+   "shape": "chain",
+   "range": 15.0,
+   "power5": 10674,
+   "effect": 16036,
+   "icon_id": 22609,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 7: Arcane Chain 10674 at Power 5, chain"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_arcane_chain_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "freeze": {
+   "name": "Freeze",
+   "name_id": 104321,
+   "ability_id": 62639,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 10.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "freeze",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 8: Freeze 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of freeze; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "protective_barrier": {
+   "name": "Protective Barrier",
+   "name_id": 421283,
+   "ability_id": 62640,
+   "kind": "super",
+   "job": 12,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 2324,
+   "buffs": [
+    {
+     "status": "damage_reduction",
+     "who": "group"
+    }
+   ],
+   "effect": 16124,
+   "icon_id": 23032,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 8: Protective Barrier 2324 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_protective_barrier_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of damage_reduction; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "boom": {
+   "name": "Boom",
+   "name_id": 421294,
+   "ability_id": 62641,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 10.0,
+   "power5": 2372,
+   "riders": [
+    {
+     "status": "knock_down",
+     "sometimes": true
+    }
+   ],
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 9: Boom 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) chance and duration of knock_down; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "chaos_explosion": {
+   "name": "Chaos Explosion",
+   "name_id": 421306,
+   "ability_id": 62642,
+   "kind": "super",
+   "job": 12,
+   "class": "super_utility",
+   "shape": "chain",
+   "range": 15.0,
+   "power5": 2324,
+   "effect": 16125,
+   "icon_id": 23023,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 9: Chaos Explosion 2324 at Power 5, chain"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_chaos_explosion_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "flare": {
+   "name": "Flare",
+   "name_id": 421295,
+   "ability_id": 62643,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "near",
+   "range": 10.0,
+   "power5": 2372,
+   "extra": {
+    "sometimes": true,
+    "power5": 1186
+   },
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 10: Flare 2372 at Power 5, near"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) extra damage chance and amount; reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "mass_transfigure": {
+   "name": "Mass Transfigure",
+   "name_id": 421307,
+   "ability_id": 62644,
+   "kind": "super",
+   "job": 12,
+   "class": "super_utility",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 5977,
+   "riders": [
+    {
+     "status": "transfigure"
+    }
+   ],
+   "icon_id": 23029,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 10: Mass Transfigure 5977 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_mass_transfigure_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of transfigure; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "concussive_blast": {
+   "name": "Concussive Blast",
+   "name_id": 439523,
+   "ability_id": 62645,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_rider",
+   "shape": "at_target",
+   "range": 10.0,
+   "power5": 1779,
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 11: Concussive Blast 1779 at Power 5, at_target"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "wizard_s_cunning": {
+   "name": "Wizard's Cunning",
+   "name_id": 439529,
+   "ability_id": 62646,
+   "kind": "super",
+   "job": 12,
+   "class": "super_standard",
+   "shape": "near",
+   "range": 15.0,
+   "power5": 8218,
+   "buffs": [
+    {
+     "status": "energy_regen",
+     "who": "group"
+    }
+   ],
+   "icon_id": 39876,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 11: Wizard's Cunning 8218 at Power 5, near"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_cunning_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) size and duration of energy_regen; reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "wizard_s_blast": {
+   "name": "Wizard's Blast",
+   "name_id": 442453,
+   "ability_id": 62647,
+   "kind": "basic",
+   "job": 12,
+   "class": "basic_plain",
+   "shape": "front",
+   "range": 10.0,
+   "power5": 2609,
+   "icon_id": 14434,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 12: Wizard's Blast 2609 at Power 5, front"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; icon is the starter weapon's until the equipped weapon's icon is read; ability id in our own range"
+    }
+   ]
+  },
+  "fireball": {
+   "name": "Fireball",
+   "name_id": 5101101,
+   "ability_id": 62648,
+   "kind": "super",
+   "job": 12,
+   "class": "super_utility",
+   "shape": "at_target",
+   "range": 15.0,
+   "description_id": 5101102,
+   "power5": 2609,
+   "dot": {
+    "power5": 853,
+    "every_ms": 2000,
+    "ms": 6000,
+    "status": "burn"
+   },
+   "effect": 5479,
+   "icon_id": 281,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 12: Fireball 2609 at Power 5, at_target"
+    },
+    {
+     "kind": "client",
+     "evidence": "Images.txt icon_abil_wizard_fireburst_64"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) reach, radius and target cap of the shape; ability id in our own range"
+    }
+   ]
+  },
+  "frost_snap": {
+   "name": "Frost Snap",
+   "name_id": 5101105,
+   "ability_id": 62649,
+   "kind": "third",
+   "job": 12,
+   "class": "super_utility",
+   "shape": "at_target",
+   "range": 15.0,
+   "description_id": 5101106,
+   "dot": {
+    "power5": 1826,
+    "every_ms": 1000,
+    "ms": 5000,
+    "status": "frost"
+   },
+   "riders": [
+    {
+     "status": "freeze_long"
+    }
+   ],
+   "icon_id": 1030,
+   "source": [
+    {
+     "kind": "wiki",
+     "evidence": "evidence-abilities section 4, wizard row 12: Frost Snap, at_target"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration of freeze_long; reach, radius and target cap of the shape; icon 1030, the one live used for Dragonstrike; ability id in our own range"
+    }
+   ]
+  }
+ },
+ "kits": {
+  "brawler/glancing_blow+leg_sweep": {
+   "job": 43,
+   "basic": "glancing_blow",
+   "super": "leg_sweep",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [7604, 7977, 7978, 7979, 7981, 7984, 7985, 7991, 7992, 7994, 7996, 7997, 7999, 8000, 8005, 8006, 8008, 8009, 8010, 8011, 8012, 8013, 8014, 8016, 8019, 8020, 8026, 8027, 8029, 8031, 8034, 8035, 8040, 8041, 8043, 8044, 8045, 8046, 8047, 8048, 8049, 8051, 8054, 8055, 8061, 8062, 8064, 8066, 8067, 8069, 8070, 8075, 8076, 8078, 8079, 8080, 8081, 8082, 8083, 8084, 8086, 8089, 8090, 8096, 8097, 8099, 8101, 8102, 8104, 8105, 8110, 8111, 8113, 8114, 8115, 8116, 8117, 8118, 8119, 8120, 8121, 8124, 8125, 8126, 8127, 8128, 8129, 8130, 8131, 8132, 8133, 8134, 8135, 8136, 8137, 8138, 8139, 8140, 8141, 8142, 8143, 8144, 8145, 8146, 8147, 8148, 8149, 8150, 8151, 29980, 29981, 29982, 29983, 29984, 29985, 29986, 29987, 29988, 29989, 30280, 30281, 30282, 30283, 30284, 30285, 30286, 30287, 30288, 30289, 37409, 37411, 37413, 37414, 37417, 37419, 37421, 37422, 37425, 37426, 37429, 37432, 37434, 37435, 37438, 37439, 37442, 37444, 37446, 37448, 37449, 37451, 37454, 37456, 37457, 37460],
+    "2": [8032, 8050, 8085, 8091, 8092, 8093, 8094, 8095, 8098, 8100, 8103, 8106, 8107, 8108, 8109, 8112, 22111, 30040, 30041, 30042, 30043, 30044, 30045, 30046, 30047, 30048, 30049, 30340, 30341, 30342, 30343, 30344, 30345, 30346, 30347, 30348, 30349, 37430, 37461, 37462, 37463, 37464, 37466, 37467, 37469, 37470, 37471, 37472, 37473, 37475, 37476, 37478, 37479, 37481, 37482, 37483, 37485, 37486, 37488, 37489, 37490, 37492, 37494, 37495, 37497],
+    "3": [7980, 7986, 7987, 7988, 7989, 7990, 7993, 7995, 7998, 8001, 8002, 8003, 8004, 8007, 22110, 30100, 30101, 30102, 30103, 30104, 30105, 30106, 30107, 30108, 30109, 30402, 37465, 37468, 37474, 37477, 37480, 37484, 37487, 37491, 37493, 37496, 48173, 48179, 48185, 48197],
+    "4": [8052, 8053, 8056, 8057, 8058, 8059, 8060, 8063, 8065, 8068, 8071, 8072, 8073, 8074, 8077, 22212, 30160, 30161, 30162, 30163, 30164, 30165, 30166, 30167, 30168, 30169, 30400, 30401, 30403, 30404, 30405, 30406, 30407, 30408, 30409, 30462, 37498, 37499, 37500, 37501, 37502, 37503, 37504, 37505, 37506, 37507, 37508, 37509, 37511, 37512, 37513, 37514, 37515, 37516, 37517, 37518, 37519, 37520, 37521, 37522, 37523, 37524, 37525, 37526, 37527, 37529, 37530, 37531, 37532, 37533, 37534, 37535],
+    "5": [8015, 8021, 8022, 8023, 8024, 8025, 8028, 8030, 8033, 8036, 8037, 8038, 8039, 8042, 22214, 22215, 23023, 27933, 27939, 29934, 30220, 30221, 30222, 30223, 30224, 30225, 30226, 30227, 30228, 30229, 30460, 30461, 30463, 30464, 30465, 30466, 30467, 30468, 30469, 30520, 30521, 30522, 30523, 30524, 30525, 30526, 30527, 30528, 30529, 37528, 37537, 37540, 37543, 37546, 37549, 37552, 37555, 37559, 37563, 37567, 37571, 37574, 37575, 37576, 37577, 37578, 37579, 37580, 37581, 37582, 37583, 37584, 37585, 37586, 37587, 37588, 37589, 37590, 37591, 37592, 37593, 37594, 37595, 37596, 37597, 37598, 37599, 37600, 37601, 37602, 37603, 37604, 37605, 37606, 37607, 37608, 37609, 48118, 48119, 48120, 48121, 48123, 48167, 48227, 48320, 49376, 49596, 49606, 55820, 75050]
+   }
+  },
+  "brawler/wallop+ready_to_rumble": {
+   "job": 43,
+   "basic": "wallop",
+   "super": "ready_to_rumble",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [75031],
+    "2": [75033],
+    "3": [75037],
+    "4": [75043],
+    "5": [75051]
+   }
+  },
+  "brawler/pound+pummel": {
+   "job": 43,
+   "basic": "pound",
+   "super": "pummel",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75034],
+    "3": [75038],
+    "4": [75044],
+    "5": [75052]
+   }
+  },
+  "brawler/smack+roundhouse_kick": {
+   "job": 43,
+   "basic": "smack",
+   "super": "roundhouse_kick",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75035],
+    "3": [75039],
+    "4": [75045],
+    "5": [75053]
+   }
+  },
+  "brawler/whack+kick_dirt": {
+   "job": 43,
+   "basic": "whack",
+   "super": "kick_dirt",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75041],
+    "4": [75047],
+    "5": [75055]
+   }
+  },
+  "brawler/wild_swing+sucker_punch": {
+   "job": 43,
+   "basic": "wild_swing",
+   "super": "sucker_punch",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75040],
+    "4": [75046],
+    "5": [75054]
+   }
+  },
+  "brawler/smash+slam": {
+   "job": 43,
+   "basic": "smash",
+   "super": "slam",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75048],
+    "5": [75056]
+   }
+  },
+  "brawler/crush+hammer_toss": {
+   "job": 43,
+   "basic": "crush",
+   "super": "hammer_toss",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75049],
+    "5": [75057]
+   }
+  },
+  "brawler/bash+enrage": {
+   "job": 43,
+   "basic": "bash",
+   "super": "enrage",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75058]
+   }
+  },
+  "brawler/thump+knockout": {
+   "job": 43,
+   "basic": "thump",
+   "super": "knockout",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "brawler/power_smash+brawler_s_challenge": {
+   "job": 43,
+   "basic": "power_smash",
+   "super": "brawler_s_challenge",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "brawler/brawler_s_smash+leg_sweep_awakened": {
+   "job": 43,
+   "basic": "brawler_s_smash",
+   "super": "leg_sweep_awakened",
+   "from_power": 5,
+   "min_level": 20,
+   "items": {},
+   "third": "reckless"
+  },
+  "archer/barrage+volley": {
+   "job": 35,
+   "basic": "barrage",
+   "super": "volley",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [4254, 4255, 4256, 4257, 4258, 4261, 4262, 4263, 4264, 4265, 4266, 4267, 4268, 4269, 4270, 4271, 4272, 4273, 4274, 4275, 4276, 4277, 4278, 4279, 4280, 4281, 4282, 4283, 4284, 4285, 4286, 4288, 4289, 4290, 4291, 4293, 4296, 4297, 4303, 4304, 4306, 4308, 4309, 4311, 4312, 4317, 4318, 4320, 4321, 4322, 4323, 6860, 6861, 6862, 6867, 6868, 6874, 6875, 6877, 6879, 6880, 6882, 6883, 6888, 6889, 6891, 6892, 6893, 6894, 6930, 6931, 6932, 6934, 6937, 6938, 6944, 6945, 6947, 6949, 6950, 6952, 6953, 6958, 6959, 6961, 6962, 6963, 6964, 6965, 6966, 6967, 6969, 6972, 6973, 6979, 6980, 6982, 6984, 6985, 6987, 6988, 6993, 6994, 6996, 6997, 6998, 6999, 29950, 29951, 29952, 29953, 29954, 29955, 29956, 29957, 29958, 29959, 37125, 37126, 37127, 37128, 37130, 37131, 37133, 37134, 37135, 37136, 37137, 37139, 37141, 37143, 37144, 37146, 37147, 37148, 37150, 37151, 37153, 37154, 37155, 37157, 37158, 37159, 37161],
+    "2": [6933, 6939, 6940, 6941, 6942, 6943, 6946, 6948, 6951, 6954, 6955, 6956, 6957, 6960, 22114, 30010, 30011, 30012, 30013, 30014, 30015, 30016, 30017, 30018, 30019, 30310, 30311, 30312, 30313, 30314, 30315, 30316, 30317, 30318, 30319, 37129, 37132, 37138, 37140, 37142, 37145, 37149, 37152, 37156, 37160, 37162, 37163, 37164, 37165, 37167, 37168, 37170, 37171, 37172, 37173, 37174, 37176, 37177, 37179, 37180, 37182, 37183, 37184, 37186, 37187, 37189, 37190, 37191, 37193, 37195, 37196, 37198],
+    "3": [6864, 6968, 6974, 6975, 6976, 6977, 6978, 6981, 6983, 6986, 6989, 6990, 6991, 6992, 6995, 22113, 30070, 30071, 30072, 30073, 30074, 30075, 30076, 30077, 30078, 30079, 30372, 37166, 37169, 37175, 37178, 37181, 37185, 37188, 37192, 37194, 37197, 48178, 48184, 48190, 48202],
+    "4": [6863, 6869, 6870, 6871, 6872, 6873, 6876, 6878, 6881, 6884, 6885, 6886, 6887, 6890, 22216, 22217, 30130, 30131, 30132, 30133, 30134, 30135, 30136, 30137, 30138, 30139, 30370, 30371, 30373, 30374, 30375, 30376, 30377, 30378, 30379, 30432, 37199, 37200, 37201, 37202, 37203, 37204, 37205, 37206, 37207, 37208, 37209, 37210, 37212, 37213, 37214, 37215, 37216, 37217, 37218, 37219, 37220, 37221, 37222, 37223, 37224, 37225, 37226, 37227, 37228, 37230, 37231, 37232, 37233, 37234, 37235, 37236],
+    "5": [4287, 4292, 4294, 4295, 4298, 4299, 4300, 4301, 4305, 4307, 4310, 4313, 4314, 4315, 4316, 4319, 22219, 23024, 27934, 27940, 29935, 30190, 30191, 30192, 30193, 30194, 30195, 30196, 30197, 30198, 30199, 30430, 30431, 30433, 30434, 30435, 30436, 30437, 30438, 30439, 30490, 30491, 30492, 30493, 30494, 30495, 30496, 30497, 30498, 30499, 37211, 37229, 37237, 37238, 37239, 37240, 37241, 37242, 37243, 37244, 37245, 37246, 37247, 37248, 37249, 37250, 37251, 37252, 37253, 37254, 37255, 37256, 37257, 37258, 37259, 37260, 37261, 37262, 37263, 37265, 37266, 37267, 37268, 37269, 37270, 37271, 37272, 37273, 37274, 37275, 37276, 37277, 37278, 37279, 37280, 37281, 37282, 37283, 37284, 37285, 37286, 37288, 37289, 37290, 37292, 37293, 37294, 37295, 37296, 37297, 37298, 37299, 37300, 37301, 37302, 37303, 37304, 37305, 37306, 37307, 37308, 37309, 37310, 37311, 48111, 48113, 48114, 48116, 48160, 48166, 48220, 48226, 48232, 48321, 49381, 49601, 49611, 55819]
+   }
+  },
+  "archer/icy_arrow+blizzard_blast": {
+   "job": 35,
+   "basic": "icy_arrow",
+   "super": "blizzard_blast",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {}
+  },
+  "archer/charged_shot+explosive_shot": {
+   "job": 35,
+   "basic": "charged_shot",
+   "super": "explosive_shot",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {}
+  },
+  "archer/multi_shot+splitting_arrow": {
+   "job": 35,
+   "basic": "multi_shot",
+   "super": "splitting_arrow",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75005],
+    "3": [75009],
+    "4": [75015],
+    "5": [75023]
+   }
+  },
+  "archer/power_shot+stunning_shot": {
+   "job": 35,
+   "basic": "power_shot",
+   "super": "stunning_shot",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75010],
+    "4": [75016],
+    "5": [75024]
+   }
+  },
+  "archer/smoldering_shot+flaming_arrow": {
+   "job": 35,
+   "basic": "smoldering_shot",
+   "super": "flaming_arrow",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75011],
+    "4": [75017],
+    "5": [75025]
+   }
+  },
+  "archer/sonic_arrow+sonic_boom": {
+   "job": 35,
+   "basic": "sonic_arrow",
+   "super": "sonic_boom",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75019],
+    "5": [75027]
+   }
+  },
+  "archer/electric_arrow+lightning_call": {
+   "job": 35,
+   "basic": "electric_arrow",
+   "super": "lightning_call",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75018]
+   }
+  },
+  "archer/ember_arrow+firebomb": {
+   "job": 35,
+   "basic": "ember_arrow",
+   "super": "firebomb",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75029]
+   }
+  },
+  "archer/cover_fire+ricochet": {
+   "job": 35,
+   "basic": "cover_fire",
+   "super": "ricochet",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75028]
+   }
+  },
+  "archer/perfect_shot+archer_s_advantage": {
+   "job": 35,
+   "basic": "perfect_shot",
+   "super": "archer_s_advantage",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "archer/archer_s_shot+focused_volley": {
+   "job": 35,
+   "basic": "archer_s_shot",
+   "super": "focused_volley",
+   "from_power": 5,
+   "min_level": 20,
+   "items": {},
+   "third": "sniper_shot"
+  },
+  "medic/incision+triage": {
+   "job": 11,
+   "basic": "incision",
+   "super": "triage",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [4470, 4471, 4472, 4473, 4474, 4477, 4478, 4479, 4480, 4481, 4482, 4483, 4484, 4485, 4486, 4487, 4488, 4489, 4490, 4491, 4492, 4493, 4494, 4495, 4496, 4497, 4498, 4499, 4500, 4501, 4502, 4503, 4504, 4610, 4611, 4612, 4613, 4614, 4617, 4618, 4622, 4624, 4625, 4627, 4629, 4630, 4632, 4633, 4638, 4639, 4641, 4642, 4643, 4644, 4686, 4687, 4688, 4690, 4693, 4694, 4700, 4701, 4703, 4705, 4706, 4708, 4709, 4714, 4715, 4717, 4718, 4719, 4720, 7035, 7036, 7037, 7039, 7042, 7043, 7049, 7050, 7052, 7054, 7055, 7057, 7058, 7063, 7064, 7066, 7067, 7068, 7069, 7105, 7106, 7107, 7109, 7112, 7113, 7119, 7120, 7124, 7125, 7127, 7128, 7133, 7134, 7136, 7137, 7138, 7139, 29970, 29971, 29972, 29973, 29974, 29975, 29976, 29977, 29978, 29979, 30270, 30271, 30272, 30273, 30274, 30275, 30276, 30277, 30278, 30279, 37820, 37821, 37822, 37823, 37825, 37826, 37828, 37829, 37830, 37831, 37832, 37834, 37836, 37838, 37839, 37841, 37842, 37843, 37845, 37846, 37848, 37849, 37850, 37852, 37853, 37854, 37856, 75060],
+    "2": [1431, 4619, 4620, 4621, 4623, 4626, 4628, 4631, 4634, 4635, 4636, 4637, 4640, 22117, 30030, 30031, 30032, 30033, 30034, 30035, 30036, 30037, 30038, 30039, 30330, 30331, 30332, 30333, 30334, 30335, 30336, 30337, 30338, 30339, 37824, 37827, 37833, 37835, 37837, 37840, 37844, 37847, 37851, 37855, 37857, 37858, 37859, 37860, 37862, 37863, 37865, 37866, 37867, 37868, 37869, 37871, 37872, 37874, 37875, 37877, 37878, 37879, 37881, 37882, 37884, 37885, 37886, 37888, 37890, 37891, 37893, 75062],
+    "3": [4689, 4691, 4692, 4695, 4696, 4697, 4698, 4699, 4702, 4704, 4707, 4710, 4711, 4712, 4713, 4716, 7122, 22116, 30090, 30091, 30092, 30093, 30094, 30095, 30096, 30097, 30098, 30099, 30391, 37861, 37864, 37870, 37873, 37876, 37880, 37883, 37887, 37889, 37892, 48174, 48180, 48186, 48192, 48198, 48204, 48216, 75066],
+    "4": [7108, 7114, 7115, 7116, 7117, 7118, 7121, 7123, 7126, 7129, 7130, 7131, 7132, 7135, 22221, 22222, 30150, 30151, 30152, 30153, 30154, 30155, 30156, 30157, 30158, 30159, 30390, 30392, 30393, 30394, 30395, 30396, 30397, 30398, 30399, 30452, 37894, 37895, 37896, 37897, 37898, 37899, 37900, 37901, 37902, 37903, 37904, 37905, 37907, 37908, 37909, 37910, 37911, 37912, 37913, 37914, 37915, 37916, 37917, 37918, 37919, 37920, 37921, 37922, 37923, 37925, 37926, 37927, 37928, 37929, 37930, 37931, 48127, 75072],
+    "5": [7038, 7044, 7045, 7046, 7047, 7048, 7051, 7053, 7056, 7059, 7060, 7061, 7062, 7065, 22223, 23025, 27935, 29936, 30210, 30211, 30212, 30213, 30214, 30215, 30216, 30217, 30218, 30219, 30450, 30451, 30453, 30454, 30455, 30456, 30457, 30458, 30459, 30510, 30511, 30512, 30513, 30514, 30515, 30516, 30517, 30518, 30519, 37906, 37924, 37932, 37933, 37934, 37935, 37936, 37937, 37938, 37939, 37940, 37941, 37942, 37943, 37944, 37945, 37946, 37947, 37948, 37949, 37950, 37951, 37952, 37953, 37954, 37955, 37956, 37957, 37958, 37959, 37960, 37961, 37962, 37963, 37964, 37965, 37966, 37967, 37968, 37969, 37970, 37971, 37972, 37973, 37974, 37975, 37976, 37977, 37978, 37979, 37980, 37981, 37982, 37983, 37985, 37986, 37987, 37988, 37989, 37990, 37991, 37992, 37993, 37994, 37995, 37996, 37997, 37998, 37999, 38000, 38001, 38002, 38003, 38004, 38005, 48128, 48129, 48131, 48162, 48168, 48222, 48228, 48234, 48240, 48323, 49379, 49599, 49609, 55816, 75080]
+   }
+  },
+  "medic/injure+target_vitals": {
+   "job": 11,
+   "basic": "injure",
+   "super": "target_vitals",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {}
+  },
+  "medic/assist+nurse": {
+   "job": 11,
+   "basic": "assist",
+   "super": "nurse",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75064],
+    "3": [75068],
+    "4": [75074],
+    "5": [75082]
+   }
+  },
+  "medic/bruise+immunize": {
+   "job": 11,
+   "basic": "bruise",
+   "super": "immunize",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75065],
+    "3": [75069],
+    "4": [75075],
+    "5": [75083]
+   }
+  },
+  "medic/clear+shock_paddles": {
+   "job": 11,
+   "basic": "clear",
+   "super": "shock_paddles",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75071],
+    "4": [75077],
+    "5": [75085]
+   }
+  },
+  "medic/wound+vitamins": {
+   "job": 11,
+   "basic": "wound",
+   "super": "vitamins",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {}
+  },
+  "medic/sedate+blood_cell": {
+   "job": 11,
+   "basic": "sedate",
+   "super": "blood_cell",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75079],
+    "5": [75087]
+   }
+  },
+  "medic/traumatize+reflex_test": {
+   "job": 11,
+   "basic": "traumatize",
+   "super": "reflex_test",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {}
+  },
+  "medic/cauterize+laser_surgery": {
+   "job": 11,
+   "basic": "cauterize",
+   "super": "laser_surgery",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "medic/heartbreak+antibodies": {
+   "job": 11,
+   "basic": "heartbreak",
+   "super": "antibodies",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "medic/revitalizing_slice+medic_s_promise": {
+   "job": 11,
+   "basic": "revitalizing_slice",
+   "super": "medic_s_promise",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "medic/medic_s_slice+mend": {
+   "job": 11,
+   "basic": "medic_s_slice",
+   "super": "mend",
+   "from_power": 5,
+   "min_level": 20,
+   "items": {},
+   "third": "vita_booster"
+  },
+  "ninja/flame_flash+dragonstrike": {
+   "job": 2,
+   "basic": "flame_flash",
+   "super": "dragonstrike",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [38, 39, 1145, 1152, 1153, 1154, 4073, 4074, 4075, 4077, 4080, 4081, 4087, 4088, 4090, 4092, 4093, 4095, 4096, 4101, 4102, 4104, 4105, 4106, 4107, 4143, 4144, 4145, 4147, 4150, 4151, 4157, 4158, 4160, 4162, 4163, 4165, 4166, 4171, 4172, 4174, 4175, 4177, 4791, 4792, 4793, 4795, 4798, 4799, 4805, 4806, 4808, 4810, 4811, 4813, 4814, 4819, 4820, 4822, 4823, 4825, 4832, 4833, 4834, 4835, 4836, 4839, 4840, 4841, 4842, 4843, 4844, 4845, 4846, 4847, 4848, 4849, 4850, 4851, 4852, 4853, 4854, 4855, 4856, 4857, 4858, 4859, 4860, 4861, 4862, 4863, 4864, 4865, 4866, 4867, 4868, 4869, 4871, 4874, 4875, 4881, 4882, 4884, 4886, 4887, 4889, 4890, 4895, 4896, 4898, 4899, 4900, 4901, 29990, 29991, 29992, 29993, 29994, 29995, 29996, 29997, 29998, 29999, 30290, 30291, 30292, 30293, 30294, 30295, 30296, 30297, 30298, 30299, 38071, 38072, 38073, 38074, 38075, 38077, 38078, 38080, 38081, 38082, 38083, 38085, 38087, 38088, 38090, 38091, 38093, 38094, 38095, 38097, 38098, 38100, 38101, 38102, 38104, 38105, 38106, 38108, 75090],
+    "2": [4168, 4176, 4824, 4870, 4876, 4877, 4878, 4879, 4880, 4883, 4885, 4888, 4891, 4892, 4893, 4894, 4897, 22102, 30050, 30051, 30052, 30053, 30054, 30055, 30056, 30057, 30058, 30059, 30350, 30351, 30352, 30353, 30354, 30355, 30356, 30357, 30358, 30359, 38076, 38079, 38084, 38086, 38089, 38092, 38096, 38099, 38103, 38107, 38109, 38112, 38113, 38114, 38116, 38117, 38119, 38120, 38121, 38122, 38123, 38125, 38126, 38128, 38129, 38131, 38132, 38133, 38135, 38136, 38138, 38139, 38141, 38143, 38144, 38145, 38147],
+    "3": [4076, 4082, 4083, 4084, 4085, 4086, 4089, 4091, 4094, 4097, 4098, 4099, 4100, 4103, 22101, 30110, 30111, 30112, 30113, 30114, 30115, 30116, 30117, 30118, 30119, 38111, 38115, 38118, 38124, 38127, 38130, 38134, 38137, 38142, 38146, 48181, 48187, 48193, 48199, 48205, 48211, 48217, 75096],
+    "4": [4146, 4152, 4153, 4154, 4155, 4156, 4159, 4161, 4164, 4167, 4169, 4170, 4173, 22100, 22201, 30170, 30171, 30172, 30173, 30174, 30175, 30176, 30177, 30178, 30179, 30410, 30411, 30412, 30413, 30414, 30415, 30416, 30417, 30418, 30419, 30473, 38148, 38149, 38150, 38151, 38152, 38153, 38154, 38155, 38156, 38157, 38158, 38159, 38161, 38162, 38163, 38164, 38165, 38166, 38167, 38168, 38169, 38170, 38171, 38172, 38173, 38174, 38175, 38176, 38177, 38179, 38180, 38181, 38182, 38183, 38184, 38185, 48132, 75102],
+    "5": [2269, 4794, 4800, 4801, 4802, 4803, 4804, 4807, 4809, 4812, 4815, 4816, 4817, 4818, 4821, 22202, 22203, 23020, 27930, 27936, 29931, 30230, 30231, 30232, 30233, 30234, 30235, 30236, 30237, 30238, 30239, 30470, 30471, 30472, 30474, 30475, 30476, 30477, 30478, 30479, 30530, 30531, 30532, 30533, 30534, 30535, 30536, 30537, 30538, 30539, 37003, 38160, 38178, 38186, 38187, 38188, 38189, 38190, 38191, 38192, 38193, 38194, 38195, 38196, 38197, 38198, 38199, 38200, 38201, 38202, 38203, 38204, 38205, 38206, 38207, 38208, 38209, 38210, 38211, 38212, 38214, 38215, 38216, 38217, 38218, 38219, 38220, 38221, 38222, 38223, 38224, 38225, 38226, 38228, 38229, 38230, 38231, 38232, 38233, 38234, 38235, 38236, 38237, 38238, 38239, 38240, 38241, 38242, 38243, 38244, 38245, 38246, 38247, 38248, 38249, 38250, 38251, 38252, 38253, 38254, 38255, 38256, 38257, 38258, 38259, 38260, 48133, 48134, 48135, 48136, 48138, 48163, 48169, 48223, 48229, 48322, 49377, 49597, 49607, 55815, 68112, 75110]
+   }
+  },
+  "ninja/lightning_strike+1000_storms": {
+   "job": 2,
+   "basic": "lightning_strike",
+   "super": "1000_storms",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "2": [75093]
+   }
+  },
+  "ninja/cinder_slash+flame_wave": {
+   "job": 2,
+   "basic": "cinder_slash",
+   "super": "flame_wave",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75095],
+    "3": [75099],
+    "4": [75105],
+    "5": [75113]
+   }
+  },
+  "ninja/twisted_edge+shuriken_storm": {
+   "job": 2,
+   "basic": "twisted_edge",
+   "super": "shuriken_storm",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75094],
+    "3": [75098],
+    "4": [75104],
+    "5": [75112]
+   }
+  },
+  "ninja/ashen_strike+flaming_uppercut": {
+   "job": 2,
+   "basic": "ashen_strike",
+   "super": "flaming_uppercut",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75101],
+    "4": [75107],
+    "5": [75115]
+   }
+  },
+  "ninja/dark_assault+shadow_army": {
+   "job": 2,
+   "basic": "dark_assault",
+   "super": "shadow_army",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {}
+  },
+  "ninja/fiery_slice+flame_breath": {
+   "job": 2,
+   "basic": "fiery_slice",
+   "super": "flame_breath",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75108],
+    "5": [75116]
+   }
+  },
+  "ninja/mystic_rush+mystical_blade": {
+   "job": 2,
+   "basic": "mystic_rush",
+   "super": "mystical_blade",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75109],
+    "5": [75117]
+   }
+  },
+  "ninja/hidden_strike+fan_of_blades": {
+   "job": 2,
+   "basic": "hidden_strike",
+   "super": "fan_of_blades",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75119]
+   }
+  },
+  "ninja/shadowslash+mystical_drain": {
+   "job": 2,
+   "basic": "shadowslash",
+   "super": "mystical_drain",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75118]
+   }
+  },
+  "ninja/burning_slash+ninja_s_purge": {
+   "job": 2,
+   "basic": "burning_slash",
+   "super": "ninja_s_purge",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "ninja/ninja_s_slash+shuriken_toss": {
+   "job": 2,
+   "basic": "ninja_s_slash",
+   "super": "shuriken_toss",
+   "from_power": 5,
+   "min_level": 20,
+   "items": {},
+   "third": "poisoned_blades"
+  },
+  "warrior/sweeping_slash+spinning_attack": {
+   "job": 32,
+   "basic": "sweeping_slash",
+   "super": "spinning_attack",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [4108, 4109, 4110, 4112, 4116, 4122, 4123, 4125, 4127, 4128, 4130, 4131, 4136, 4137, 4139, 4140, 4141, 4142, 4213, 4214, 4215, 4217, 4220, 4221, 4227, 4228, 4230, 4232, 4233, 4235, 4236, 4241, 4242, 4244, 4245, 4246, 4247, 4540, 4541, 4542, 4544, 4547, 4548, 4554, 4555, 4557, 4559, 4560, 4562, 4563, 4568, 4569, 4571, 4572, 4573, 4574, 7000, 7001, 7002, 7003, 7004, 7007, 7008, 7009, 7010, 7011, 7012, 7013, 7014, 7015, 7016, 7017, 7018, 7019, 7020, 7021, 7022, 7023, 7024, 7025, 7026, 7027, 7028, 7029, 7030, 7031, 7032, 7033, 7034, 7070, 7071, 7072, 7077, 7078, 7084, 7085, 7087, 7089, 7090, 7092, 7093, 7098, 7099, 7101, 7102, 7103, 7104, 29960, 29961, 29962, 29963, 29964, 29965, 29966, 29967, 29968, 29969, 30260, 30261, 30262, 30263, 30264, 30265, 30266, 30267, 30268, 30269, 38389, 38390, 38391, 38392, 38394, 38395, 38397, 38398, 38399, 38400, 38401, 38403, 38405, 38407, 38408, 38410, 38411, 38412, 38414, 38415, 38417, 38418, 38419, 38421, 38422, 38423, 38425, 75120],
+    "2": [1430, 4111, 4117, 4118, 4119, 4120, 4121, 4124, 4126, 4129, 4132, 4133, 4134, 4135, 4138, 22108, 30020, 30021, 30022, 30023, 30024, 30025, 30026, 30027, 30028, 30029, 38393, 38396, 38402, 38404, 38406, 38409, 38413, 38416, 38420, 38424, 38426, 38427, 38428, 38429, 38431, 38432, 38434, 38435, 38436, 38437, 38438, 38440, 38441, 38443, 38444, 38446, 38447, 38448, 38450, 38451, 38453, 38454, 38455, 38457, 38459, 38460, 38462, 75122],
+    "3": [4543, 4545, 4546, 4549, 4550, 4551, 4552, 4553, 4556, 4558, 4561, 4564, 4565, 4566, 4567, 4570, 7074, 30080, 30081, 30082, 30083, 30084, 30085, 30086, 30087, 30088, 30089, 30382, 38430, 38433, 38439, 38442, 38445, 38449, 38452, 38456, 38458, 38461, 48176, 48182, 48188, 48194, 48200, 48206, 48212, 75126],
+    "4": [7073, 7079, 7080, 7081, 7082, 7083, 7086, 7088, 7091, 7094, 7095, 7096, 7097, 7100, 22106, 22209, 30140, 30141, 30142, 30143, 30144, 30145, 30146, 30147, 30148, 30149, 30380, 30381, 30383, 30384, 30385, 30386, 30387, 30388, 30389, 30442, 38463, 38464, 38465, 38466, 38467, 38468, 38469, 38470, 38471, 38472, 38473, 38474, 38476, 38477, 38478, 38479, 38480, 38481, 38482, 38483, 38484, 38485, 38486, 38487, 38488, 38489, 38490, 38491, 38492, 38494, 38495, 38496, 38497, 38498, 38499, 38500, 48139, 75132],
+    "5": [4216, 4218, 4219, 4222, 4223, 4224, 4225, 4226, 4229, 4231, 4234, 4237, 4238, 4239, 4240, 4243, 6791, 6792, 6793, 6794, 6795, 6796, 6797, 6798, 6799, 6800, 6801, 6802, 6803, 6804, 6805, 6806, 6807, 6808, 6809, 6810, 6811, 6812, 6813, 6814, 6815, 6816, 6817, 6818, 6819, 6820, 6821, 6822, 6823, 6824, 6825, 22210, 22211, 23022, 27932, 27938, 29933, 30200, 30201, 30202, 30203, 30204, 30205, 30206, 30207, 30208, 30209, 30440, 30441, 30443, 30444, 30445, 30446, 30447, 30448, 30449, 30500, 30501, 30502, 30503, 30504, 30505, 30506, 30507, 30508, 30509, 37010, 38475, 38501, 38502, 38503, 38504, 38505, 38506, 38507, 38508, 38509, 38510, 38511, 38512, 38513, 38514, 38515, 38516, 38517, 38518, 38519, 38520, 38521, 38522, 38523, 38524, 38525, 38526, 38528, 38529, 38530, 38531, 38532, 38533, 38534, 38535, 38536, 38537, 38538, 38539, 38541, 38542, 38543, 38544, 38545, 38546, 38547, 38548, 38549, 38550, 38551, 38552, 38553, 38554, 38555, 38556, 38557, 38558, 38559, 38560, 38561, 38562, 38563, 38564, 38565, 38566, 38567, 38568, 38569, 38570, 38571, 38572, 38573, 38574, 38575, 38576, 38577, 38578, 38579, 38580, 38581, 38582, 38583, 38584, 38585, 38586, 38587, 38588, 38589, 38590, 38591, 38592, 45092, 48140, 48141, 48142, 48143, 48145, 48164, 48170, 48236, 48242, 49378, 49598, 49608, 55818, 75140]
+   }
+  },
+  "warrior/fierce_edge+cleave": {
+   "job": 32,
+   "basic": "fierce_edge",
+   "super": "cleave",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [75121],
+    "2": [75123],
+    "3": [75127],
+    "4": [75133],
+    "5": [75141]
+   }
+  },
+  "warrior/power_slash+quake": {
+   "job": 32,
+   "basic": "power_slash",
+   "super": "quake",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75124],
+    "3": [75128],
+    "4": [75134],
+    "5": [75142]
+   }
+  },
+  "warrior/dual_strike+warcry": {
+   "job": 32,
+   "basic": "dual_strike",
+   "super": "warcry",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75125],
+    "3": [75129],
+    "4": [75135],
+    "5": [75143]
+   }
+  },
+  "warrior/reckless_strike+axe_throw": {
+   "job": 32,
+   "basic": "reckless_strike",
+   "super": "axe_throw",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75131],
+    "4": [75137],
+    "5": [75145]
+   }
+  },
+  "warrior/gale_axe+whirlwind": {
+   "job": 32,
+   "basic": "gale_axe",
+   "super": "whirlwind",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75130],
+    "4": [75136],
+    "5": [75144]
+   }
+  },
+  "warrior/hack_n_slash+berserk": {
+   "job": 32,
+   "basic": "hack_n_slash",
+   "super": "berserk",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {}
+  },
+  "warrior/crushing_blow+frenzy": {
+   "job": 32,
+   "basic": "crushing_blow",
+   "super": "frenzy",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75139],
+    "5": [75147]
+   }
+  },
+  "warrior/dizzying_blow+commanding_shout": {
+   "job": 32,
+   "basic": "dizzying_blow",
+   "super": "commanding_shout",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75148]
+   }
+  },
+  "warrior/rampage+thunderclap": {
+   "job": 32,
+   "basic": "rampage",
+   "super": "thunderclap",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75149]
+   }
+  },
+  "warrior/wrathful_strike+warrior_s_boon": {
+   "job": 32,
+   "basic": "wrathful_strike",
+   "super": "warrior_s_boon",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "warrior/warrior_s_chop+whirlwind_strike": {
+   "job": 32,
+   "basic": "warrior_s_chop",
+   "super": "whirlwind_strike",
+   "from_power": 5,
+   "min_level": 20,
+   "items": {},
+   "third": "into_the_fray"
+  },
+  "wizard/zap+lightning_blast": {
+   "job": 12,
+   "basic": "zap",
+   "super": "lightning_blast",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "1": [177, 1198, 1199, 1200, 1201, 1202, 4902, 4903, 4904, 4905, 4906, 4907, 4908, 4909, 4910, 4911, 4912, 4913, 4914, 4915, 4916, 4917, 4918, 4919, 4920, 4921, 4922, 4923, 4924, 4925, 4926, 4927, 4928, 4929, 4930, 4931, 4932, 4933, 4934, 4935, 4936, 4937, 4938, 4939, 4941, 4944, 4945, 4946, 4947, 4949, 4950, 4951, 4952, 4953, 4954, 4956, 4957, 4958, 4959, 4960, 4961, 4963, 4965, 4966, 4967, 4968, 4969, 4970, 4971, 7175, 7176, 7177, 7179, 7182, 7183, 7184, 7185, 7187, 7188, 7189, 7190, 7191, 7192, 7194, 7195, 7196, 7197, 7198, 7199, 7201, 7203, 7204, 7205, 7206, 7207, 7208, 7209, 7210, 7211, 7212, 7214, 7217, 7218, 7219, 7220, 7222, 7223, 7224, 7225, 7226, 7227, 7229, 7230, 7231, 7232, 7233, 7234, 7236, 7238, 7239, 7240, 7241, 7242, 7243, 7244, 7347, 7348, 7349, 7351, 7354, 7355, 7356, 7357, 7359, 7360, 7361, 7362, 7363, 7364, 7366, 7367, 7368, 7369, 7370, 7371, 7373, 7375, 7376, 7377, 7378, 7379, 7381, 9204, 9205, 9206, 9207, 9208, 30000, 30001, 30002, 30003, 30004, 30005, 30006, 30007, 30008, 30009, 30300, 30301, 30302, 30303, 30304, 30305, 30306, 30307, 30308, 30309, 38609, 38610, 38611, 38612, 38614, 38615, 38616, 38617, 38618, 38619, 38620, 38621, 38622, 38623, 38624, 38625, 38626, 38627, 38628, 75150],
+    "2": [7178, 7181, 7186, 7193, 7200, 7202, 7380, 9209, 9210, 9211, 9212, 9213, 22105, 30060, 30061, 30062, 30063, 30064, 30065, 30066, 30067, 30068, 30069, 30360, 30361, 30362, 30363, 30364, 30365, 30366, 30367, 30368, 30369, 38629, 38630, 38631, 38632, 38633, 38634, 38635, 38636, 38637, 38638, 38639, 38640, 38641, 38642, 38643, 38644, 38645, 38646, 38647, 38648, 38649, 75152],
+    "3": [7213, 7221, 7228, 7235, 7237, 30122, 30127, 30422, 38652, 38654, 38655, 38656, 38658, 38660, 38662, 38664, 38666, 38670, 48177, 48183, 48189, 48195, 48201, 48207, 48219, 75156],
+    "4": [7350, 7358, 7365, 7372, 7374, 9214, 9215, 9216, 9217, 9218, 9219, 9220, 22103, 22204, 22205, 30120, 30121, 30123, 30124, 30125, 30126, 30128, 30129, 30180, 30181, 30182, 30188, 30420, 30421, 30423, 30424, 30425, 30426, 30427, 30428, 30429, 38651, 38653, 38657, 38659, 38661, 38663, 38665, 38667, 38668, 38669, 38680, 38682, 38684, 38686, 38688, 38692, 48146, 75162],
+    "5": [4940, 4948, 4955, 4964, 9221, 9222, 9223, 9224, 9225, 9226, 9227, 9228, 9229, 9230, 9231, 9232, 22206, 22207, 23021, 27937, 29932, 30183, 30184, 30185, 30186, 30187, 30189, 30240, 30241, 30242, 30243, 30244, 30245, 30246, 30247, 30248, 30249, 30480, 30481, 30482, 30483, 30484, 30485, 30486, 30487, 30488, 30489, 30540, 30541, 30542, 30543, 30544, 30545, 30546, 30547, 30548, 30549, 38671, 38672, 38673, 38674, 38675, 38676, 38677, 38678, 38679, 38681, 38683, 38685, 38687, 38689, 38690, 38691, 38693, 38694, 38695, 38696, 38697, 38698, 38699, 38700, 38701, 38702, 38703, 38704, 38705, 38706, 38707, 38708, 38709, 38710, 38711, 38712, 38713, 48147, 48149, 48150, 48151, 48153, 48165, 48171, 48225, 48237, 48243, 49380, 49600, 49610, 55821, 75170]
+   }
+  },
+  "wizard/chill+ice_nova": {
+   "job": 12,
+   "basic": "chill",
+   "super": "ice_nova",
+   "from_power": 1,
+   "min_level": 1,
+   "items": {
+    "4": [75163]
+   }
+  },
+  "wizard/burn+firestorm": {
+   "job": 12,
+   "basic": "burn",
+   "super": "firestorm",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75154],
+    "3": [75158],
+    "4": [75164],
+    "5": [48319, 75172]
+   }
+  },
+  "wizard/splash+tsunami": {
+   "job": 12,
+   "basic": "splash",
+   "super": "tsunami",
+   "from_power": 2,
+   "min_level": 4,
+   "items": {
+    "2": [75155],
+    "3": [75159],
+    "4": [75165],
+    "5": [75173]
+   }
+  },
+  "wizard/blast+energy_vortex": {
+   "job": 12,
+   "basic": "blast",
+   "super": "energy_vortex",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75160],
+    "4": [75166],
+    "5": [75174]
+   }
+  },
+  "wizard/shock+chain_lightning": {
+   "job": 12,
+   "basic": "shock",
+   "super": "chain_lightning",
+   "from_power": 3,
+   "min_level": 8,
+   "items": {
+    "3": [75161],
+    "4": [75167],
+    "5": [75175]
+   }
+  },
+  "wizard/scorch+arcane_chain": {
+   "job": 12,
+   "basic": "scorch",
+   "super": "arcane_chain",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75168],
+    "5": [75176]
+   }
+  },
+  "wizard/freeze+protective_barrier": {
+   "job": 12,
+   "basic": "freeze",
+   "super": "protective_barrier",
+   "from_power": 4,
+   "min_level": 12,
+   "items": {
+    "4": [75169],
+    "5": [75177]
+   }
+  },
+  "wizard/boom+chaos_explosion": {
+   "job": 12,
+   "basic": "boom",
+   "super": "chaos_explosion",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75178]
+   }
+  },
+  "wizard/flare+mass_transfigure": {
+   "job": 12,
+   "basic": "flare",
+   "super": "mass_transfigure",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {
+    "5": [75179]
+   }
+  },
+  "wizard/concussive_blast+wizard_s_cunning": {
+   "job": 12,
+   "basic": "concussive_blast",
+   "super": "wizard_s_cunning",
+   "from_power": 5,
+   "min_level": 16,
+   "items": {}
+  },
+  "wizard/wizard_s_blast+fireball": {
+   "job": 12,
+   "basic": "wizard_s_blast",
+   "super": "fireball",
+   "from_power": 5,
+   "min_level": 20,
+   "items": {},
+   "third": "frost_snap"
+  }
+ },
+ "weapons": {
+  "by_suffix": {},
+  "default": {
+   "2": "ninja/flame_flash+dragonstrike",
+   "35": "archer/barrage+volley",
+   "11": "medic/incision+triage",
+   "32": "warrior/sweeping_slash+spinning_attack",
+   "12": "wizard/zap+lightning_blast",
+   "43": "brawler/glancing_blow+leg_sweep"
+  }
+ },
+ "traits": {
+  "43": [
+   {
+    "level": 5,
+    "id": "bruising_strikes",
+    "name_id": 420938,
+    "on": "hit",
+    "chance": 0.25,
+    "status": {
+     "id": "crit_vulnerable",
+     "to": "target",
+     "ms": 4000
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "enemies you hit are more likely to be crit"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 10,
+    "id": "savvy",
+    "name_id": 420939,
+    "passive": {
+     "crit_damage": 0.25
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "crits do additional damage"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 15,
+    "id": "toughness",
+    "name_id": 76943,
+    "passive": {
+     "taken": 0.9
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "withstand more damage"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 20,
+    "id": "resilience",
+    "name_id": 420941,
+    "on": "struck",
+    "chance": 0.25,
+    "heal_pct": 2,
+    "energy": 2,
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "gain health and energy after being hit"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   }
+  ],
+  "35": [
+   {
+    "level": 5,
+    "id": "precision",
+    "name_id": 420934,
+    "passive": {
+     "dealt": 1.05,
+     "crit": 2
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "bonus damage and crit chance"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 10,
+    "id": "marksmanship",
+    "name_id": 420935,
+    "passive": {
+     "crit_damage": 0.25
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "more crit damage"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 15,
+    "id": "reflexes",
+    "name_id": 420936,
+    "passive": {
+     "speed": 1.1,
+     "dodge": 5
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "run speed and dodge"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 20,
+    "id": "lucky_shot",
+    "name_id": 420937,
+    "on": "hit",
+    "chance": 0.1,
+    "energy": 5,
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "sometimes restores energy"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   }
+  ],
+  "11": [
+   {
+    "level": 5,
+    "id": "combat_medicine",
+    "name_id": 420942,
+    "on": "crit",
+    "chance": 1.0,
+    "heal_pct": 2,
+    "group": true,
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "crits heal allies a little"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 10,
+    "id": "preparation",
+    "name_id": 420943,
+    "passive": {
+     "dealt": 1.05,
+     "taken": 0.95
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "more health and attack power"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 15,
+    "id": "surgical_skills",
+    "name_id": 420944,
+    "passive": {
+     "crit": 3
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "crit chance"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 20,
+    "id": "recovery",
+    "name_id": 420945,
+    "on": "kill",
+    "chance": 1.0,
+    "energy": 10,
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "energy per knockout"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   }
+  ],
+  "2": [
+   {
+    "level": 5,
+    "id": "ultimate_power",
+    "name_id": 420946,
+    "on": "crit",
+    "chance": 1.0,
+    "energy": 5,
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "energy per crit"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 10,
+    "id": "shrouded_armor",
+    "name_id": 420947,
+    "passive": {
+     "taken": 0.9
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "less damage taken"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 15,
+    "id": "ninjas_grace",
+    "name_id": 420948,
+    "passive": {
+     "dealt": 1.05,
+     "speed": 1.1
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "run speed, health regen, attack"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 20,
+    "id": "dragons_boon",
+    "name_id": 420949,
+    "on": "struck",
+    "chance": 0.1,
+    "strike": {
+     "class": "basic_rider",
+     "targets": 3,
+     "radius": 8.0
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "on being hit, a chance of lightning that chains to 3"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   }
+  ],
+  "32": [
+   {
+    "level": 5,
+    "id": "instigation",
+    "name_id": 420950,
+    "on": "crit",
+    "chance": 1.0,
+    "status": {
+     "id": "taunt",
+     "to": "near",
+     "ms": 4000
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "a crit makes nearby enemies focus you"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 10,
+    "id": "piercing_strikes",
+    "name_id": 24398,
+    "passive": {
+     "crit": 3
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "crit chance"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 15,
+    "id": "high_morale",
+    "name_id": 420952,
+    "passive": {
+     "energy_per_tick": 1
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "faster energy regen"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 20,
+    "id": "counterattack",
+    "name_id": 420953,
+    "on": "struck",
+    "chance": 1.0,
+    "strike": {
+     "class": "basic_rider",
+     "targets": 1,
+     "radius": 6.0,
+     "factor": 0.1
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "damages the attacker each time you are hit"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   }
+  ],
+  "12": [
+   {
+    "level": 5,
+    "id": "ice_armor",
+    "name_id": 420954,
+    "on": "struck",
+    "chance": 0.15,
+    "status": {
+     "id": "freeze",
+     "to": "attacker",
+     "ms": 3000
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "attackers sometimes frozen 3 s"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 10,
+    "id": "genius",
+    "name_id": 420955,
+    "passive": {
+     "crit": 3
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "crit chance"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 15,
+    "id": "magical_shielding",
+    "name_id": 4048,
+    "passive": {
+     "taken": 0.9
+    },
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "prevents some damage"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   },
+   {
+    "level": 20,
+    "id": "arcane_flare",
+    "name_id": 420957,
+    "on": "crit",
+    "chance": 1.0,
+    "energy": 3,
+    "source": [
+     {
+      "kind": "wiki",
+      "evidence": "crits absorb energy from nearby enemies"
+     },
+     {
+      "kind": "reconstructed",
+      "evidence": "(R) every number of this trait; the wiki gives none"
+     }
+    ]
+   }
+  ]
+ }
+}

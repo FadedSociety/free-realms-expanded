@@ -18,11 +18,12 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 #[test]
 fn unbuffed_critical_damage_keeps_existing_integer_rounding() {
-    let f = Fixture::new(10000, 0);
+    // Crits are 3 % (the captured stat block), so the sample is ten times the old one.
+    let f = Fixture::new(100000, 0);
     let basic = combat_scale::basic(11); // odd, so a crit must round down
     let mut e = f.load(11, 1);
     let mut critical = false;
-    for t in (0..44800).step_by(700) {
+    for t in (0..448000).step_by(700) {
         let damage = hit_damages(&e.attack(100, [0.0; 3], 11, 0, t).unwrap())[0];
         if damage > basic {
             assert_eq!(damage, basic * 3 / 2, "x1.5 rounds down");
@@ -217,8 +218,8 @@ fn target_vitals_debuff_only_increases_damage_on_its_target_and_expires() {
         0,
     );
     e.job_ability(&a, 100, [0.0; 3], 11, 0).unwrap();
-    let marked = hit_damages(&e.attack(100, [0.0; 3], 11, 0, 600).unwrap())[0];
-    let other = hit_damages(&e.attack(101, [0.0; 3], 11, 0, 1200).unwrap())[0];
+    let marked = hit_damages(&e.attack(100, [0.0; 3], 11, 0, 650).unwrap())[0];
+    let other = hit_damages(&e.attack(101, [0.0; 3], 11, 0, 1300).unwrap())[0];
     let hit = combat_scale::strike(11, 5);
     assert!(marked >= 2 * hit && other <= hit * 3 / 2);
     let expired = hit_damages(&e.attack(100, [0.0; 3], 11, 0, 2000).unwrap())[0];
@@ -415,7 +416,7 @@ fn job_wins(profile: i32) {
         let mut e = f.load(profile, level);
         let mut defeated = 0;
         let mut casts = 0;
-        for t in (0..120000).step_by(700) {
+        for t in (0..120000).step_by(500) {
             for a in abilities.job_bar(profile, level).into_iter().flatten() {
                 let out = e.job_ability(a, 0, [0.0; 3], profile, t).unwrap();
                 defeated += out.defeated.len();

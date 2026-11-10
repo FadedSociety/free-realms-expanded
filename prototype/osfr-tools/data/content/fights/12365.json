@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": 12365,
+  "kind": "battle",
+  "title_id": 104170,
+  "description_id": 104171,
+  "difficulty": 1,
+  "entry": {
+    "starter": {"definition": "frostfang_growler", "at": [1210.0, 0.0, -355.0], "roam": 5.0},
+    "battle_row": false,
+    "min_combat_level": 0
+  },
+  "place": {
+    "zone": 9600,
+    "arena": "sg_random_encounter_clearing",
+    "sky": "sky_wilds24.xml",
+    "geometry_id": 214,
+    "arrive": [136.0, -0.5, 155.0],
+    "exit_door": [136.0, -0.6, 170.0]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500,
+      "quick_time_s": 1,
+      "objective_multiplier": 500.0
+    }
+  },
+  "kinds": {
+    "frostfang_growler": {"definition_id": 2529, "name": "Frostfang Growler", "name_id": 104067, "model_id": 176, "rank": "normal"},
+    "frostfang_prowler": {"definition_id": 0, "name": "Frostfang Prowler", "name_id": 116023, "model_id": 177, "rank": "normal"},
+    "frostfang_howler": {"definition_id": 0, "name": "Frostfang Howler", "name_id": 115837, "model_id": 177, "rank": "normal"},
+    "frostfang_alpha": {"definition_id": 0, "name": "Frostfang Alpha", "name_id": 423045, "model_id": 176, "rank": "boss", "scale": 1.7, "boss": true}
+  },
+  "actors": {
+    "howler": {"definition": "frostfang_howler", "at": [136.0, -0.6, 182.0]},
+    "alpha": {"definition": "frostfang_alpha", "boss": true}
+  },
+  "points": {
+    "ring": [[106.0, -0.6, 175.0], [166.0, -0.6, 175.0], [136.0, -0.6, 205.0], [136.0, -0.6, 127.0], [160.0, -0.6, 198.0], [112.0, -0.6, 198.0]]
+  },
+  "waves": [
+    {"id": "w1", "when": {"fight_started": {"after_ms": 7400}},
+     "spawn": [{"definition": "frostfang_growler", "count": 4, "at": "ring"}, {"definition": "frostfang_prowler", "count": 2, "at": "ring"}]},
+    {"id": "w2", "when": {"wave_left": {"wave": "w1", "left": 1}}, "or_after_ms": 16000,
+     "spawn": [{"definition": "frostfang_growler", "count": 7, "at": "ring"}, {"definition": "frostfang_prowler", "count": 2, "at": "ring"}]},
+    {"id": "w3", "when": {"wave_left": {"wave": "w2", "left": 1}}, "or_after_ms": 16000,
+     "spawn": [{"definition": "frostfang_growler", "count": 8, "at": "ring"}, {"definition": "frostfang_prowler", "count": 2, "at": "ring"}]},
+    {"id": "w4", "when": {"wave_left": {"wave": "w3", "left": 1}}, "or_after_ms": 17000,
+     "spawn": [{"definition": "frostfang_growler", "count": 8, "at": "ring"}, {"definition": "frostfang_prowler", "count": 2, "at": "ring"}, {"actor": "alpha", "at": "ring"}]}
+  ],
+  "objectives": [
+    {"id": "wolves", "kind": "defeat", "text_id": 104177, "text": "Defeat all of the Frostfang Growlers.", "target": {"all": true}, "primary": true}
+  ],
+  "script": [],
+  "rewards": {"coins": 25, "job_xp": 50, "wheel": [], "drops": []},
+  "source": [
+    {"kind": "capture", "evidence": "p12.pcap t=546232..546321 (2014-03-31), battle 'Frostfang Growlers': one Howler on arrival, then waves of 6, 9, 10 and 11 (the last with the Frostfang Alpha) 7.4 s after arrival and 15.4, 15.9 and 16.9 s apart; every Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7; names 104067, 116023, 115837, 423045 and models 176 and 177; the Exit door (name 4826, model 846) right after the last kill; packet 62 at t=546240.0 with 500.0, 1, 100000, 500, 300, 25000, 5000."},
+    {"kind": "client", "evidence": "Global.Text 104170 'Frostfang Growlers', 104171 'Dangerous wolves from Frostfang Caverns are in the woods! Defeat them before someone gets bitten!', 104177 'Defeat all of the Frostfang Growlers.'; packet 62 field names in the list at 0x01050DB0; enemies.json frostfang_growler is definition 2529."},
+    {"kind": "reconstructed", "evidence": "(R) The arena (the clearing every battle uses today, not the captured one), the arrival, ring and door positions, the wave trigger (one left, or 16 to 17 s after the wave before), the 10 knockouts, the reward, and definition 0 for the Prowler, Howler and Alpha, which no quest names. Health and damage follow rank and tier, which give the captured 760 and 3,800. The starter is not placed: `entry.starter` is the design's unverified Snowhill spot and `battle_row` stays false until a row with a checked position exists in field_battles.json."}
+  ]
+}

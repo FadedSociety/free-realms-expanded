@@ -15,7 +15,8 @@
     "lab/extracted/client-assets/catalog.tsv SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9.",
     "lab/references/quest-lines/wiring/enemy-rows-needed.json (T699 worklist: 66 kill objectives whose target had no enemies.json row).",
     "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json (reference actor definitions: Id, NameId, ModelId, ModelFileName).",
-    "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua (reference spawn lines cited by each field row)."
+    "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua (reference spawn lines cited by each field row).",
+    "Combat captures of March 2014 (p12, packets_3), as read in the combat design: health, raw hits, speeds and scale of the Bixie, Frostfang and Feathered Drake kinds; these rows carry a rank and take their numbers from combat_scale.json"
   ],
   "definitions": [
     {
@@ -1524,7 +1525,18 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 440712 resolves to 'Bixie Battlemage' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:212 maps model_id=211 to bixie_f_mage.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:16352 contains pack_04/002618.adr (5941 bytes, CRC32 ff3d6ee7, SHA256 de1aca8f9b7e4d5d4dac2e1da09dbc2825096cbf620c7f64472f22fd8ce69d02; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Bixie Battlemages maps to the exact singular client name and the Bixie mage model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 440712 resolves to 'Bixie Battlemage' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:212 maps model_id=211 to bixie_f_mage.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:16352 contains pack_04/002618.adr (5941 bytes, CRC32 ff3d6ee7, SHA256 de1aca8f9b7e4d5d4dac2e1da09dbc2825096cbf620c7f64472f22fd8ce69d02; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Bixie Battlemages maps to the exact singular client name and the Bixie mage model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured. Live catalogue: (R) rank minion like the Bixie Soldiers it stood among (capture p12 t=18..410 (2014-03-25): Bixie Soldier, 260 health, raw 25 a bite every 2.0-2.6 s, speeds 4.5 / 9.0 / 10.0; five Battlemages in the same camp, their own health was not read). max_health and damage here are kept for the dormant loader only.",
+      "rank": "minion",
+      "tier": 1,
+      "speeds": {
+        "walk": 4.5,
+        "run": 9.0,
+        "home": 10.0
+      },
+      "tags": [
+        "bixie",
+        "caster"
+      ]
     },
     {
       "id": "bixie_soldier",
@@ -1550,7 +1562,17 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 440711 resolves to 'Bixie Soldier' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:221 maps model_id=220 to bixie_m_warrior.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:16354 contains pack_04/002620.adr (7769 bytes, CRC32 56920f63, SHA256 35eb40429ab8467484e7561a50af370da42b685bdbb1e43bfc69a7dc7ce80f86; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Bixie Soldiers maps to the exact singular client name and the Bixie warrior model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 440711 resolves to 'Bixie Soldier' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:221 maps model_id=220 to bixie_m_warrior.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:16354 contains pack_04/002620.adr (7769 bytes, CRC32 56920f63, SHA256 35eb40429ab8467484e7561a50af370da42b685bdbb1e43bfc69a7dc7ce80f86; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Bixie Soldiers maps to the exact singular client name and the Bixie warrior model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured. Live catalogue: rank minion measured at tier 1 from capture p12 t=18..410 (2014-03-25): Bixie Soldier, 260 health, raw 25 a bite every 2.0-2.6 s, speeds 4.5 / 9.0 / 10.0; 260 = 279 x 0.932. max_health and damage here are kept for the dormant loader only.",
+      "rank": "minion",
+      "tier": 1,
+      "speeds": {
+        "walk": 4.5,
+        "run": 9.0,
+        "home": 10.0
+      },
+      "tags": [
+        "bixie"
+      ]
     },
     {
       "id": "bone_bog_skeleton",
@@ -2590,7 +2612,19 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was recovered for this quest target; grant no per-kill reward."
       },
-      "source": "(R) actor_kind_id/definition_id 2529 is the FreeRealms-Legacy Npcs.json row 2529 (no NameId, unnamed reference, model 3284 wolf_generic.adr); name_string_id 104067 is the client locale string 'Frostfang Growler' (lab/reports/locale-id-to-text.json); model 3284 maps to wolf_generic.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 and to client-assets catalog.tsv:10255 (pack_03/000417.adr). Kill target of q3030012 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 9, health 260 and damage 23 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults."
+      "source": "(R) actor_kind_id/definition_id 2529 is the FreeRealms-Legacy Npcs.json row 2529 (no NameId, unnamed reference, model 3284 wolf_generic.adr); name_string_id 104067 is the client locale string 'Frostfang Growler' (lab/reports/locale-id-to-text.json); model 3284 maps to wolf_generic.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 and to client-assets catalog.tsv:10255 (pack_03/000417.adr). Kill target of q3030012 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 9, health 260 and damage 23 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. Live catalogue: rank normal measured at tier 1 from capture p12 t=546232..546321 (2014-03-31), battle Frostfang Growlers at difficulty 1: Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7, speeds 3.0 / 6.0; 760 = 279 x 2.724. (R) hit 5 is the bite read on a geared level 20 (5 or 3), its raw value is unknown; (R) home speed 10. The capture's model is 176 (wolf.adr); this row keeps 3284. max_health, damage and level here are kept for the dormant loader only.",
+      "rank": "normal",
+      "tier": 1,
+      "hit": 5,
+      "speeds": {
+        "walk": 3.0,
+        "run": 6.0,
+        "home": 10.0
+      },
+      "tags": [
+        "frostfang",
+        "wolf"
+      ]
     },
     {
       "id": "troll_roughguard",
@@ -2799,6 +2833,195 @@
         "source": "(R) No original per-enemy loot table or reward was recovered for this quest target; grant no per-kill reward."
       },
       "source": "(R) actor_kind_id/definition_id 2714 is the FreeRealms-Legacy Npcs.json row 2714 (NameId 16111 ('Spinnerette'), model 53 blackwidowqueen.adr); name_string_id 3592 is the client locale string 'Queen Arachnia' (lab/reports/locale-id-to-text.json); model 53 maps to blackwidowqueen.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:54 and to client-assets catalog.tsv:24420 (pack_07/000200.adr). Kill target of q3160029 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 13, health 1020 and damage 62 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults."
+    },
+    {
+      "id": "frostfang_prowler",
+      "kind": "Frostfang Prowler",
+      "actor_kind_id": 930080,
+      "definition_id": 930080,
+      "model_id": 177,
+      "name_string_id": 116023,
+      "texture_alias": "",
+      "level": null,
+      "max_health": 760,
+      "damage": 5,
+      "move_speed": 3.0,
+      "aggro_radius": 40.0,
+      "leash_radius": 40.0,
+      "attack_range": 2.5,
+      "attack_cooldown_ms": 2300,
+      "respawn_ms": 30000,
+      "boss": false,
+      "reward": {
+        "coins": 1,
+        "xp": 1,
+        "items": [],
+        "source": "(R) One coin and one active-job XP per kill. No original per-kill reward table was recovered."
+      },
+      "source": "Client locale id 116023 resolves to 'Frostfang Prowler' (lab/reports/locale-id-to-text.json). Models.txt:178 maps model_id=177 to wolf_evil.adr. (R) definition id 930080 is local. Numbers: capture p12 t=546232..546321 (2014-03-31), battle Frostfang Growlers at difficulty 1: Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7, speeds 3.0 / 6.0. max_health and damage repeat the rank's numbers at the measured tier for the dormant loader.",
+      "rank": "normal",
+      "tier": 1,
+      "hit": 5,
+      "speeds": {
+        "walk": 3.0,
+        "run": 6.0,
+        "home": 10.0
+      },
+      "tags": [
+        "frostfang",
+        "wolf"
+      ]
+    },
+    {
+      "id": "frostfang_howler",
+      "kind": "Frostfang Howler",
+      "actor_kind_id": 930081,
+      "definition_id": 930081,
+      "model_id": 177,
+      "name_string_id": 115837,
+      "texture_alias": "",
+      "level": null,
+      "max_health": 760,
+      "damage": 5,
+      "move_speed": 3.0,
+      "aggro_radius": 40.0,
+      "leash_radius": 40.0,
+      "attack_range": 2.5,
+      "attack_cooldown_ms": 2300,
+      "respawn_ms": 30000,
+      "boss": false,
+      "reward": {
+        "coins": 1,
+        "xp": 1,
+        "items": [],
+        "source": "(R) One coin and one active-job XP per kill. No original per-kill reward table was recovered."
+      },
+      "source": "Client locale id 115837 resolves to 'Frostfang Howler' (lab/reports/locale-id-to-text.json). Models.txt:178 maps model_id=177 to wolf_evil.adr. (R) definition id 930081 is local. Numbers: capture p12 t=546232..546321 (2014-03-31), battle Frostfang Growlers at difficulty 1: Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7, speeds 3.0 / 6.0. max_health and damage repeat the rank's numbers at the measured tier for the dormant loader.",
+      "rank": "normal",
+      "tier": 1,
+      "hit": 5,
+      "speeds": {
+        "walk": 3.0,
+        "run": 6.0,
+        "home": 10.0
+      },
+      "tags": [
+        "frostfang",
+        "wolf"
+      ]
+    },
+    {
+      "id": "frostfang_alpha",
+      "kind": "Frostfang Alpha",
+      "actor_kind_id": 930082,
+      "definition_id": 930082,
+      "model_id": 176,
+      "name_string_id": 423045,
+      "texture_alias": "",
+      "level": null,
+      "max_health": 3800,
+      "damage": 9,
+      "move_speed": 3.0,
+      "aggro_radius": 40.0,
+      "leash_radius": 40.0,
+      "attack_range": 2.5,
+      "attack_cooldown_ms": 2300,
+      "respawn_ms": 30000,
+      "boss": true,
+      "reward": {
+        "coins": 1,
+        "xp": 1,
+        "items": [],
+        "source": "(R) One coin and one active-job XP per kill. No original per-kill reward table was recovered."
+      },
+      "source": "Client locale id 423045 resolves to 'Frostfang Alpha' (lab/reports/locale-id-to-text.json). Models.txt:177 maps model_id=176 to wolf.adr. (R) definition id 930082 is local. Numbers: capture p12 t=546232..546321 (2014-03-31), battle Frostfang Growlers at difficulty 1: Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7, speeds 3.0 / 6.0. max_health and damage repeat the rank's numbers at the measured tier for the dormant loader.",
+      "rank": "boss",
+      "tier": 1,
+      "hit": 9,
+      "speeds": {
+        "walk": 3.0,
+        "run": 6.0,
+        "home": 10.0
+      },
+      "scale": 1.7,
+      "tags": [
+        "frostfang",
+        "wolf"
+      ]
+    },
+    {
+      "id": "feathered_drake_defender",
+      "kind": "Feathered Drake Defender",
+      "actor_kind_id": 930083,
+      "definition_id": 930083,
+      "model_id": 3978,
+      "name_string_id": 439211,
+      "texture_alias": "",
+      "level": null,
+      "max_health": 16143,
+      "damage": 206,
+      "move_speed": 3.0,
+      "aggro_radius": 40.0,
+      "leash_radius": 40.0,
+      "attack_range": 2.5,
+      "attack_cooldown_ms": 2300,
+      "respawn_ms": 30000,
+      "boss": false,
+      "reward": {
+        "coins": 1,
+        "xp": 1,
+        "items": [],
+        "source": "(R) One coin and one active-job XP per kill. No original per-kill reward table was recovered."
+      },
+      "source": "Client locale id 439211 resolves to 'Feathered Drake Defender' (lab/reports/locale-id-to-text.json). Models.txt:3160 maps model_id=3978 to feathereddrake_m_drakeling.adr. (R) definition id 930083 is local. Numbers: capture packets_3 (2014-03-31), Sunstone Valley: Feathered Drake Defender and Ambusher 16,143 health, raw 206 a bite (309 special) every 2.0-2.7 s, speeds 6.0 / 12.0 / 10.0. max_health and damage repeat the rank's numbers at the measured tier for the dormant loader.",
+      "rank": "tough",
+      "tier": 5,
+      "hit": 206,
+      "speeds": {
+        "walk": 6.0,
+        "run": 12.0,
+        "home": 10.0
+      },
+      "tags": [
+        "drake"
+      ]
+    },
+    {
+      "id": "feathered_drake_ambusher",
+      "kind": "Feathered Drake Ambusher",
+      "actor_kind_id": 930084,
+      "definition_id": 930084,
+      "model_id": 3976,
+      "name_string_id": 439212,
+      "texture_alias": "",
+      "level": null,
+      "max_health": 16143,
+      "damage": 206,
+      "move_speed": 3.0,
+      "aggro_radius": 40.0,
+      "leash_radius": 40.0,
+      "attack_range": 2.5,
+      "attack_cooldown_ms": 2300,
+      "respawn_ms": 30000,
+      "boss": false,
+      "reward": {
+        "coins": 1,
+        "xp": 1,
+        "items": [],
+        "source": "(R) One coin and one active-job XP per kill. No original per-kill reward table was recovered."
+      },
+      "source": "Client locale id 439212 resolves to 'Feathered Drake Ambusher' (lab/reports/locale-id-to-text.json). Models.txt:3158 maps model_id=3976 to feathereddrake_m_basic.adr. (R) definition id 930084 is local. Numbers: capture packets_3 (2014-03-31), Sunstone Valley: Feathered Drake Defender and Ambusher 16,143 health, raw 206 a bite (309 special) every 2.0-2.7 s, speeds 6.0 / 12.0 / 10.0. max_health and damage repeat the rank's numbers at the measured tier for the dormant loader.",
+      "rank": "tough",
+      "tier": 5,
+      "hit": 206,
+      "speeds": {
+        "walk": 6.0,
+        "run": 12.0,
+        "home": 10.0
+      },
+      "tags": [
+        "drake"
+      ]
     }
   ],
   "spawn_groups": [

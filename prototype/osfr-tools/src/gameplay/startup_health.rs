@@ -19,6 +19,7 @@ impl Gameplay {
             out.replies.extend(encounter.set_player_job(profile, level));
             self.health_synced = true;
         }
+        self.sync_weapon();
     }
 
     /// The encounter's (current, max) health once `sync_player_level` has run. Before the first

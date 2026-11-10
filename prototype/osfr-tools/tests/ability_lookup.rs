@@ -73,8 +73,9 @@ fn every_toolbar_definition_resolves_byte_identical() {
     let abilities = roster();
     for profile in COMBAT_PROFILES {
         let loaded = definitions(&abilities.activation(profile, 20).unwrap());
+        // P2 combat-kits (pin moved): the bar is the weapon's basic and super, as captured.
         assert!(
-            loaded.len() >= 4,
+            loaded.len() >= 2,
             "profile {profile} has a basic and skills"
         );
         for definition in &loaded {
@@ -91,12 +92,19 @@ fn every_toolbar_definition_resolves_byte_identical() {
 #[test]
 fn definitions_above_the_player_level_or_of_another_job_are_not_served() {
     let abilities = roster();
-    // Medic (11) Vitamins-class skill 62002 unlocks at level 10; Warrior-class 62004 is another job.
+    // P2 combat-kits (pin moved): the bar comes from the weapon, so the 2009 ladder ids (Medic
+    // Vitamins-class 62002, Warrior-class 62004) are served at no level; the Medic's own kit
+    // (Incision, Triage) is, and another job's kit ability is not.
+    let kits = osfr_tools::encounter::kits::KitTable::builtin().expect("shipped kits");
+    let id = |key: &str| kits.ability(key).expect("a shipped ability").ability_id;
     let level_1 = definitions(&abilities.activation(11, 1).unwrap());
     let level_20 = definitions(&abilities.activation(11, 20).unwrap());
     assert!(level_1.iter().all(|d| id_of(d) != 62002));
     assert_eq!(definition_reply(&level_1, 62002), None, "level-locked");
-    assert!(definition_reply(&level_20, 62002).is_some());
+    assert_eq!(definition_reply(&level_20, 62002), None, "not on a weapon's bar");
+    assert!(definition_reply(&level_20, id("triage")).is_some());
+    assert!(definition_reply(&level_1, id("incision")).is_some());
+    assert_eq!(definition_reply(&level_20, id("spinning_attack")), None, "other job's id");
     assert_eq!(definition_reply(&level_20, 62004), None, "other job's id");
     // Non-combat profiles have no definitions at all.
     let none = definitions(&abilities.activation(9, 20).unwrap());
@@ -136,7 +144,9 @@ fn missing_ids_are_bounded_and_answer_nothing() {
     ];
     assert_eq!(definition_reply(&poisoned, 7), None);
     poisoned.extend(loaded.iter().cloned());
-    assert!(definition_reply(&poisoned, 4895).is_some());
+    // P2 combat-kits (pin moved): the Medic's basic is its kit's own id, no longer 4895.
+    assert_eq!(definition_reply(&poisoned, 4895), None);
+    assert!(definition_reply(&poisoned, id_of(&loaded[0])).is_some());
 }
 
 #[test]

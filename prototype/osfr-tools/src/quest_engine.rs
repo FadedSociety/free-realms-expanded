@@ -6,6 +6,7 @@
 
 use crate::{
     content::{ContentDb, ContentGoal},
+    encounter::KillFact,
     opening::{OpeningEngine, OpeningTrigger},
     rewards::{
         self, GrantFailure, ItemGrant, RewardBundleRow, RewardDisplay, RewardGrant, RewardState,
@@ -383,6 +384,69 @@ pub enum ObjectiveKind {
     AnyOf {
         alternatives: Vec<ObjectiveKind>,
     },
+    /// (R) Combat design section 12: a kill that also meets a rule (several kinds, a place, a
+    /// condition). A plain one-kind `defeat` stays [`Self::KillActorKind`].
+    Kill {
+        rule: KillRule,
+    },
+    /// (R) Section 12: the player's run of this battle, dungeon or fight began.
+    EnterFight {
+        fight_id: u32,
+    },
+    /// (R) Section 12: a counted goal inside one fight; `goal` is the fight objective's id.
+    FightGoal {
+        fight_id: u32,
+        goal: String,
+    },
+    /// (R) Section 12: a guarded captive. Only the fight's "freed" fact credits it, never a
+    /// click. `guid` 0 means any actor of `actor_kind_id`.
+    FreeCaptive {
+        guid: u64,
+        actor_kind_id: Option<u32>,
+    },
+}
+
+/// (R) What a kill must be for an [`ObjectiveKind::Kill`] step to count it. Every set field
+/// narrows; an empty `kinds` list means any enemy (a place then says which).
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct KillRule {
+    pub kinds: Vec<u32>,
+    pub fight: Option<u32>,
+    pub area: Option<u32>,
+    pub zone: Option<u32>,
+    pub solo: bool,
+    pub job: Option<u32>,
+    pub ability: Option<i32>,
+    pub item: Option<i32>,
+}
+
+impl KillRule {
+    pub fn matches(&self, kill: &KillFact) -> bool {
+        (self.kinds.is_empty() || self.kinds.contains(&kill.kind))
+            && self.fight.is_none_or(|fight| kill.fight == Some(fight))
+            && self.area.is_none_or(|area| kill.area == Some(area))
+            && self.zone.is_none_or(|zone| kill.zone == zone)
+            && (!self.solo || kill.solo)
+            && self.job.is_none_or(|job| kill.job == job)
+            && self.ability.is_none_or(|ability| kill.ability == Some(ability))
+            && self.item.is_none_or(|item| kill.item == Some(item))
+    }
+
+    /// The same bounds `content::validate_defeat` puts on the authored goal, plus "names
+    /// something": a rule that would count every kill anywhere is refused.
+    fn valid(&self) -> bool {
+        self.kinds.len() <= crate::content::MAX_DEFEAT_KINDS
+            && !self.kinds.contains(&0)
+            && self.fight != Some(0)
+            && self.area != Some(0)
+            && self.job != Some(0)
+            && self.ability.is_none_or(|id| id > 0)
+            && self.item.is_none_or(|id| id > 0)
+            && (!self.kinds.is_empty()
+                || self.fight.is_some()
+                || self.area.is_some()
+                || self.zone.is_some())
+    }
 }
 
 impl ObjectiveKind {
@@ -415,6 +479,7 @@ fn any_of_family(kind: &ObjectiveKind) -> Option<crate::content::AnyOfFamily> {
         ObjectiveKind::TalkToNpc { .. } => Some(crate::content::AnyOfFamily::TalkToNpc),
         ObjectiveKind::CollectItem { .. } => Some(crate::content::AnyOfFamily::CollectItem),
         ObjectiveKind::GatherResource { .. } => Some(crate::content::AnyOfFamily::GatherResource),
+        ObjectiveKind::KillActorKind { .. } => Some(crate::content::AnyOfFamily::Defeat),
         _ => None,
     }
 }
@@ -430,6 +495,9 @@ impl From<&crate::content::AnyOfTarget> for ObjectiveKind {
             }
             crate::content::AnyOfTarget::GatherResource { resource_id } => Self::GatherResource {
                 resource_id: *resource_id,
+            },
+            crate::content::AnyOfTarget::Defeat { model_id } => Self::KillActorKind {
+                actor_kind_id: *model_id,
             },
         }
     }
@@ -871,6 +939,28 @@ pub enum QuestEvent {
     /// the dance area. The hook is emitted once per run; the listening quest is separate.
     JoinDanceOff {
         team: DanceTeam,
+    },
+    /// (R) Combat design section 12: one enemy this player is credited for, with everything
+    /// the fight knows about the kill. It counts for a plain [`ObjectiveKind::KillActorKind`]
+    /// step of its kind and for every [`ObjectiveKind::Kill`] step whose rule it meets.
+    Kill {
+        fact: KillFact,
+    },
+    /// (R) Section 12: the player's run of this fight began.
+    EnterFight {
+        fight_id: u32,
+    },
+    /// (R) Section 12: a fight goal stands at `done` of `of`.
+    FightGoal {
+        fight_id: u32,
+        goal: String,
+        done: u32,
+        of: u32,
+    },
+    /// (R) Section 12: the fight let the player free this captive (its guards are dead).
+    Freed {
+        actor_kind_id: u32,
+        guid: u64,
     },
 }
 
@@ -2341,6 +2431,24 @@ impl QuestEngine {
                         ObjectiveKind::EnterArea { area_id },
                         QuestEvent::VisitPosition { zone_id, .. },
                     ) if area_id == zone_id => 1,
+                    // (R) The step follows the fight's own counter, so a repeated fact never
+                    // counts twice. A fight goal smaller than the step ("win the defence
+                    // three times") counts once each time it is finished.
+                    (
+                        ObjectiveKind::FightGoal { fight_id, goal },
+                        QuestEvent::FightGoal {
+                            fight_id: fight,
+                            goal: reached,
+                            done,
+                            of,
+                        },
+                    ) if fight_id == fight && goal == reached => {
+                        if *of >= objective.required {
+                            (*done).min(*of).saturating_sub(progress.counts[index])
+                        } else {
+                            u32::from(done >= of)
+                        }
+                    }
                     (
                         ObjectiveKind::ReachPoi { poi_id },
                         QuestEvent::VisitPosition { zone_id, position },
@@ -2802,12 +2910,41 @@ fn definition_from_content(
                     ));
                 }
             }
-            ContentGoal::InteractActor {
-                actor_guid, source, ..
-            } => {
-                if *actor_guid == 0 || source.is_empty() {
+            ContentGoal::InteractActor { source, .. } => {
+                crate::content::validate_interact_actor(goal).map_err(invalid)?;
+                if source.is_empty() {
                     return Err(invalid(
                         "interact_actor objective requires a positive actor and provenance",
+                    ));
+                }
+            }
+            // Combat design section 12: both content paths share the authored shape rules.
+            ContentGoal::Defeat { .. } => {
+                crate::content::validate_defeat(goal).map_err(invalid)?;
+            }
+            ContentGoal::EnterFight {
+                fight_id, source, ..
+            } => {
+                if *fight_id == 0 || source.is_empty() {
+                    return Err(invalid(
+                        "enter_fight objective requires a positive fight and provenance",
+                    ));
+                }
+            }
+            ContentGoal::FightGoal {
+                fight_id,
+                goal: name,
+                count,
+                source,
+                ..
+            } => {
+                if *fight_id == 0
+                    || !crate::content::valid_fight_goal(name)
+                    || !(1..=MAX_COUNT).contains(count)
+                    || source.is_empty()
+                {
+                    return Err(invalid(
+                        "fight_goal objective requires a positive fight, a goal name, count 1..=MAX_COUNT and provenance",
                     ));
                 }
             }
@@ -2903,15 +3040,70 @@ fn definition_from_content(
             ContentGoal::Defeat {
                 id,
                 model_id,
+                kinds,
+                count,
+                in_fight,
+                in_area,
+                in_zone,
+                with,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *count,
+                description: format!("Objective {}", id),
+                // One plain kind keeps the kind every shipped quest and save was built on;
+                // anything more is a rule over the whole kill fact.
+                kind: if *model_id != 0
+                    && in_fight.is_none()
+                    && in_area.is_none()
+                    && in_zone.is_none()
+                    && with.is_none()
+                {
+                    // (R) Content supplies the enemy definition id as `model_id`.
+                    ObjectiveKind::KillActorKind {
+                        actor_kind_id: *model_id,
+                    }
+                } else {
+                    let with = with.clone().unwrap_or_default();
+                    ObjectiveKind::Kill {
+                        rule: KillRule {
+                            kinds: if *model_id != 0 {
+                                vec![*model_id]
+                            } else {
+                                kinds.clone()
+                            },
+                            fight: *in_fight,
+                            area: *in_area,
+                            zone: *in_zone,
+                            solo: with.solo,
+                            job: with.job,
+                            ability: with.ability_id,
+                            item: with.item_id,
+                        },
+                    }
+                },
+            },
+            ContentGoal::EnterFight { id, fight_id, .. } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::EnterFight {
+                    fight_id: *fight_id,
+                },
+            },
+            ContentGoal::FightGoal {
+                id,
+                fight_id,
+                goal,
                 count,
                 ..
             } => QuestObjective {
                 id: *id,
                 required: *count,
                 description: format!("Objective {}", id),
-                // (R) Content currently supplies model_id; caller must bind it to its actor-kind event.
-                kind: ObjectiveKind::KillActorKind {
-                    actor_kind_id: *model_id,
+                kind: ObjectiveKind::FightGoal {
+                    fight_id: *fight_id,
+                    goal: goal.clone(),
                 },
             },
             ContentGoal::TalkToNpc { id, npc_id, .. } => QuestObjective {
@@ -3072,12 +3264,26 @@ fn definition_from_content(
                     trigger: trigger.clone(),
                 },
             },
-            ContentGoal::InteractActor { id, actor_guid, .. } => QuestObjective {
+            ContentGoal::InteractActor {
+                id,
+                actor_guid,
+                actor_kind_id,
+                count,
+                guarded,
+                ..
+            } => QuestObjective {
                 id: *id,
-                required: 1,
+                required: count.unwrap_or(1),
                 description: format!("Objective {}", id),
-                kind: ObjectiveKind::InteractNpc {
-                    npc_id: *actor_guid,
+                kind: if *guarded {
+                    ObjectiveKind::FreeCaptive {
+                        guid: *actor_guid,
+                        actor_kind_id: *actor_kind_id,
+                    }
+                } else {
+                    ObjectiveKind::InteractNpc {
+                        npc_id: *actor_guid,
+                    }
                 },
             },
             ContentGoal::CompleteDungeon {
@@ -3396,6 +3602,15 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
             quantity,
         } => *npc_id != 0 && *item_id > 0 && (1..=MAX_COUNT).contains(quantity),
         ObjectiveKind::KillActorKind { actor_kind_id } => *actor_kind_id != 0,
+        ObjectiveKind::Kill { rule } => rule.valid(),
+        ObjectiveKind::EnterFight { fight_id } => *fight_id != 0,
+        ObjectiveKind::FightGoal { fight_id, goal } => {
+            *fight_id != 0 && crate::content::valid_fight_goal(goal)
+        }
+        ObjectiveKind::FreeCaptive {
+            guid,
+            actor_kind_id,
+        } => *actor_kind_id != Some(0) && (*guid != 0) != actor_kind_id.is_some(),
         ObjectiveKind::CollectItem { item_id } | ObjectiveKind::UseItem { item_id } => *item_id > 0,
         ObjectiveKind::EnterArea { .. } => true,
         ObjectiveKind::ReachPoi { poi_id } => *poi_id != 0,
@@ -3527,6 +3742,16 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
             npc_id,
         } => *quest_id != 0 && *objective_id != 0 && *npc_id != 0,
         QuestEvent::JoinDanceOff { .. } => true,
+        // The fight engine authors these; the checks are sanity nets, not client checks.
+        QuestEvent::Kill { fact } => fact.kind != 0,
+        QuestEvent::EnterFight { fight_id } => *fight_id != 0,
+        QuestEvent::FightGoal {
+            fight_id, goal, of, ..
+        } => *fight_id != 0 && *of != 0 && crate::content::valid_fight_goal(goal),
+        QuestEvent::Freed {
+            actor_kind_id,
+            guid,
+        } => *actor_kind_id != 0 || *guid != 0,
         QuestEvent::VisitPosition { position, .. } => position
             .iter()
             .all(|value| value.is_finite() && value.abs() <= 1_000_000.0),
@@ -3571,6 +3796,35 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
                 count,
             },
         ) if a == b => *count,
+        // Section 12: one kill fact counts for a plain step of its kind and for a rule it meets.
+        (ObjectiveKind::KillActorKind { actor_kind_id }, QuestEvent::Kill { fact })
+            if *actor_kind_id == fact.kind =>
+        {
+            1
+        }
+        (ObjectiveKind::Kill { rule }, QuestEvent::Kill { fact }) if rule.matches(fact) => 1,
+        (ObjectiveKind::EnterFight { fight_id: a }, QuestEvent::EnterFight { fight_id: b })
+            if a == b =>
+        {
+            1
+        }
+        // A freed captive with a content guid also finishes a plain interact step on it: the
+        // fight only raises the fact once the guards are dead.
+        (ObjectiveKind::InteractNpc { npc_id }, QuestEvent::Freed { guid, .. })
+            if npc_id == guid =>
+        {
+            1
+        }
+        (
+            ObjectiveKind::FreeCaptive {
+                guid: wanted,
+                actor_kind_id: kind,
+            },
+            QuestEvent::Freed {
+                actor_kind_id,
+                guid,
+            },
+        ) if (*wanted != 0 && wanted == guid) || *kind == Some(*actor_kind_id) => 1,
         (
             ObjectiveKind::CollectItem { item_id: a },
             QuestEvent::CollectItem {
@@ -3765,6 +4019,22 @@ impl QuestEngine {
                         ObjectiveKind::CollectNode { node_type: kind } if kind == node_type)
                 })
         })
+    }
+
+    /// (R) Combat design section 12: whether a quest drop of `item_id` for `quest_id` may be
+    /// rolled now. True only while that quest is active and enabled and one of its open steps
+    /// (the one open step of an ordered quest) still collects that item, alone or as an
+    /// `any_of` leaf. A kill before or after the step drops nothing.
+    pub fn wants_quest_drop(&self, quest_id: u32, item_id: i32) -> bool {
+        let wanted = ObjectiveKind::CollectItem { item_id };
+        self.is_enabled(quest_id)
+            && self
+                .current_objectives(quest_id)
+                .into_iter()
+                .any(|objective| match &objective.kind {
+                    ObjectiveKind::AnyOf { alternatives } => alternatives.contains(&wanted),
+                    kind => *kind == wanted,
+                })
     }
 
     /// (R) T786: the hand-over the active step of this NPC's quest waits on, as

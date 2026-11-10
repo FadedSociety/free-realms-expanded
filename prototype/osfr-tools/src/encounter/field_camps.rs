@@ -168,6 +168,7 @@ impl EncounterEngine {
                         scale: None,
                         behaviour: Some(camp.behaviour.clone().into()),
                         power_up_table: camp.power_up_table.clone(),
+                        ..Default::default()
                     },
                     respawn_seconds: Some(camp.respawn_seconds),
                     aggro_range: Some(camp.aggro_range),

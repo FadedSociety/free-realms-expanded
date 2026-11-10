@@ -872,16 +872,10 @@ pub(crate) fn build_energy(current: i32, maximum: i32) -> Vec<u8> {
 }
 
 pub(crate) fn build_hitpoint_delta(source: u64, target: u64, delta: i32) -> Vec<u8> {
-    // Client family-35 reader `008d6c50` consumes two ids, flag, three integers, flag.
-    let mut bytes = header(35, 35);
-    bytes.extend(source.to_le_bytes());
-    bytes.extend(target.to_le_bytes());
-    bytes.push(1); // The client requires the display flag for healing/damage-over-time numbers.
-    put_i32(&mut bytes, delta); // (R) this slice places the signed delta in the first integer field
-    put_i32(&mut bytes, 0); // (R) secondary delta fields
-    put_i32(&mut bytes, 0);
-    bytes.push(0); // (R) trailing flag
-    bytes
+    // 35/35 in the client's order (max, current, delta). This caller knows neither the
+    // target's maximum nor its current health, so both go out as 0; a caller that knows
+    // them uses `encounter::wire::hitpoints` itself.
+    crate::encounter::wire::hitpoints(source, target, true, 0, 0, delta, false)
 }
 
 fn build_character_state(guid: u64, flags: i32) -> Vec<u8> {

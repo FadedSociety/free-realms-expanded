@@ -136,7 +136,7 @@ fn the_new_rows_load_with_unique_actor_kinds_and_client_names_and_models() {
         assert!(level.is_none_or(|level| (1..=20).contains(&level)), "{def}");
         assert!(def["max_health"].as_i64().unwrap() > 0, "{def}");
         assert!(
-            (1..=10_000).contains(&def["max_health"].as_i64().unwrap()),
+            (1..=100_000).contains(&def["max_health"].as_i64().unwrap()),
             "{def}"
         );
         assert!(

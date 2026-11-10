@@ -1002,6 +1002,13 @@ fn a_full_credit_list_drops_the_oldest_and_other_players_continue() {
         })
         .collect();
     let fixture = wolf_fixture(&wolves);
+    // The cap needs 17 kills by one hitter inside the 10 s TTL. The live 650 ms gate admits
+    // 16, so this content directory sets the gate the test was written for.
+    std::fs::write(
+        fixture.path().join("combat_rules.json"),
+        r#"{"basic_gate_ms": 600}"#,
+    )
+    .unwrap();
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let c_at = [0.0, 0.0, 1.0];

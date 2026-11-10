@@ -2604,8 +2604,9 @@ fn player_health_and_damage_scale_with_job_level() {
     );
 }
 
-/// Job identity: Brawler is the tank, Wizard the most fragile; Ninja crits
-/// far more often than Medic (x1.5 hits flagged critical).
+/// The 2014 captures settle job identity: one health curve for every job (7,116 at level
+/// 20 whatever the job) and a 3 % ability crit for all. Jobs differ by weapon kit and traits,
+/// not by these two rows (`combat_rules.json` `jobs`); the test keeps its older name.
 #[test]
 fn combat_jobs_differ_in_health_and_crits() {
     let reference = reference();
@@ -2621,7 +2622,7 @@ fn combat_jobs_differ_in_health_and_crits() {
     let medic = max(encounter, 11);
     let wizard = max(encounter, 12);
     assert!(
-        brawler > ninja && ninja >= medic && medic > wizard,
+        brawler == ninja && ninja == medic && medic == wizard && wizard > 7_000,
         "{brawler} {ninja} {medic} {wizard}"
     );
 
@@ -2631,11 +2632,8 @@ fn combat_jobs_differ_in_health_and_crits() {
     };
     let ninja_crits = crits(encounter, 2);
     let medic_crits = crits(encounter, 11);
-    assert!(
-        (150..=250).contains(&ninja_crits),
-        "ninja ~20%: {ninja_crits}"
-    );
-    assert!((20..=80).contains(&medic_crits), "medic ~5%: {medic_crits}");
+    assert!((10..=60).contains(&ninja_crits), "ninja ~3%: {ninja_crits}");
+    assert!((10..=60).contains(&medic_crits), "medic ~3%: {medic_crits}");
 }
 
 /// Studio cheat console through the normal chat path: sim, battle, win,

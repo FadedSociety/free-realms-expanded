@@ -38,9 +38,15 @@ impl Gameplay {
         now_ms: u64,
         elapsed: u64,
     ) -> Vec<(u64, u32, Vec<Vec<u8>>)> {
-        self.encounter
-            .as_mut()
-            .map_or_else(Vec::new, |e| e.tick_arena_enemies(players, now_ms, elapsed))
+        self.encounter.as_mut().map_or_else(Vec::new, |e| {
+            let mut hits = e.tick_arena_enemies(players, now_ms, elapsed);
+            // A fight file's waves, goals and door advance once for the whole run, here.
+            let fight = e.tick_shared_run(players, now_ms);
+            if let (false, Some(first)) = (fight.is_empty(), players.first()) {
+                hits.push((first.guid, 0, fight));
+            }
+            hits
+        })
     }
 
     /// The shared enemies hit this member: its own health, knockout and results screen.

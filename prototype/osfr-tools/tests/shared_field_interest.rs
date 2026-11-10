@@ -516,7 +516,7 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
     for (who, now, hp) in [
         (101, 0, hp_after(1)),
         (202, 100, hp_after(2)),
-        (101, 600, 0),
+        (101, 650, 0),
     ] {
         let engine = if who == 101 { &mut a } else { &mut b };
         let out = engine
@@ -536,7 +536,7 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
         }
         assert!(out.rewards.is_empty());
     }
-    assert_eq!(field.respawn_at(E), Some(2600));
+    assert_eq!(field.respawn_at(E), Some(2650));
     for engine in [&mut a, &mut b] {
         let out = engine
             .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 1200)
@@ -544,7 +544,7 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
         assert!(out.replies.is_empty());
         assert!(out.defeated.is_empty() && out.rewards.is_empty());
     }
-    assert_eq!(field.respawn_at(E), Some(2600));
+    assert_eq!(field.respawn_at(E), Some(2650));
     for view in &mut views {
         let (next, packets) = visibility
             .shared_view(0, [20., 0., 0.], &field.interest_candidates(false), view)
@@ -557,10 +557,10 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
         assert!(retry.is_empty());
     }
     // Exact boundary uses the existing deterministic simulation clock.
-    a.shared_motion(&mut field, &[], 2599, 100).unwrap();
+    a.shared_motion(&mut field, &[], 2649, 100).unwrap();
     assert_eq!(field.health(E), Some(0));
     assert!(field.initialization(E).unwrap().is_empty());
-    a.shared_motion(&mut field, &[], 2600, 1).unwrap();
+    a.shared_motion(&mut field, &[], 2650, 1).unwrap();
     assert_eq!(field.health(E), Some(hp_full()));
     assert_eq!(field.respawn_at(E), None);
     for view in &mut views {
@@ -581,7 +581,7 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
         assert!(packets.is_empty());
     }
     println!(
-        "W127 exact-clock: death 600; 2599 no spawn; 2600 one AddNpc/full HP per observer; replay no death/credit"
+        "W127 exact-clock: death 650 (the second swing the 650 ms gate admits); 2649 no spawn; 2650 one AddNpc/full HP per observer; replay no death/credit"
     );
 }
 
@@ -653,7 +653,7 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
         assert_eq!(hp_values(&init), vec![hp_after(1)]);
         *view = next;
     }
-    for (who, now, hp) in [(202, 100, hp_after(2)), (101, 600, 0)] {
+    for (who, now, hp) in [(202, 100, hp_after(2)), (101, 650, 0)] {
         let engine = if who == 101 { &mut a } else { &mut b };
         let out = engine
             .shared_attack(&mut field, who, E, [1., 0., 0.], 2, now)

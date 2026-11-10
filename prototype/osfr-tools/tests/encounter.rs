@@ -115,7 +115,7 @@ fn results_count_real_defeats_on_loss_restore_and_retry() {
     e.on_zone_ready(43, 0).unwrap();
     start(&mut e, 200, [0.0; 3], 0);
     e.attack(201, [0.0; 3], 43, 0, 0).unwrap();
-    let kill = e.attack(201, [0.0; 3], 43, 0, 600).unwrap();
+    let kill = e.attack(201, [0.0; 3], 43, 0, 650).unwrap();
     assert!(results_lifecycle(&kill).is_empty()); // A surviving enemy keeps the encounter open.
     let loss = e.tick([0.0; 3], 43, 700).unwrap();
     assert_eq!(
@@ -169,7 +169,7 @@ fn loss_hides_only_surviving_boss_displays_and_retry_registers_them_again() {
     e.begin(411, location(), 43).unwrap();
     e.on_zone_ready(43, 0).unwrap();
     e.attack(201, [0.0; 3], 43, 0, 0).unwrap();
-    let kill = e.attack(201, [0.0; 3], 43, 0, 600).unwrap();
+    let kill = e.attack(201, [0.0; 3], 43, 0, 650).unwrap();
     assert_eq!(displays(&kill), [display(201, false)]);
     let before = e.state().clone();
     let loss = e.tick([0.0; 3], 43, 700).unwrap();
@@ -252,7 +252,7 @@ fn terminal_results_wait_for_native_close_and_remove_ack_never_returns_to_world(
     e.begin(411, location(), 43).unwrap();
     e.on_zone_ready(43, 0).unwrap();
     e.attack(201, [0.0; 3], 43, 0, 0).unwrap();
-    let win = e.attack(201, [0.0; 3], 43, 0, 600).unwrap();
+    let win = e.attack(201, [0.0; 3], 43, 0, 650).unwrap();
     assert_eq!(results_lifecycle(&win), [18, 47, 19]);
     assert!(win.zoning.is_none());
     assert_eq!(win.rewards.len(), 1);
@@ -389,11 +389,11 @@ fn native_bar_one_self_centered_basic_resolves_only_a_live_enemy_in_reach() {
         combat_scale::enemy_health(100) - combat_scale::basic(43)
     );
     assert!(
-        !e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2699)
+        !e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2749)
             .unwrap()
             .changed
     );
-    let win = e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2700).unwrap();
+    let win = e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2750).unwrap();
     assert_eq!(win.defeated, vec![500]);
     assert_eq!(win.rewards.len(), 1);
     assert!(
@@ -691,7 +691,7 @@ fn malformed_requests_are_non_mutating_and_cooldown_cannot_burst() {
     let hit = e.attack(201, [0.0; 3], 1, 0, 0).unwrap();
     assert!(hit.changed);
     assert!(!e.attack(201, [0.0; 3], 1, 0, 599).unwrap().changed);
-    assert!(e.attack(201, [0.0; 3], 1, 0, 600).unwrap().changed);
+    assert!(e.attack(201, [0.0; 3], 1, 0, 650).unwrap().changed);
 }
 
 #[test]
@@ -815,7 +815,7 @@ fn native_results_close_and_terminal_packets_match_compiled_community_writers() 
         e.on_zone_ready(43, 0).unwrap();
         let result = if won {
             e.attack(201, [0.0; 3], 43, 0, 0).unwrap();
-            e.attack(201, [0.0; 3], 43, 0, 600).unwrap()
+            e.attack(201, [0.0; 3], 43, 0, 650).unwrap()
         } else {
             start(&mut e, 200, [0.0; 3], 0);
             e.tick([0.0; 3], 43, 100).unwrap()

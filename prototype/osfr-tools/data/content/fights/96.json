@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": 96,
+  "kind": "battle",
+  "enabled": false,
+  "title_id": 42056,
+  "description_id": 42059,
+  "icon_id": 4543,
+  "difficulty": 1,
+  "entry": {"battle_row": true},
+  "place": {
+    "zone": 9600,
+    "arena": "sg_random_encounter_clearing",
+    "sky": "sky_wilds24.xml",
+    "geometry_id": 214,
+    "arrive": [136.0, -0.5, 155.0],
+    "exit_door": [136.0, -0.6, 163.0]
+  },
+  "rules": {"knockouts": 10, "group_max": 4},
+  "kinds": {
+    "troll_summoner": {"definition_id": 930096, "name": "Troll Summoner", "name_id": 15623, "model_id": 168, "rank": "boss", "boss": true, "behaviour": "skittish"},
+    "troll_scoutling": {"definition_id": 930097, "name": "Troll Scoutling", "name_id": 42038, "model_id": 182, "rank": "minion", "scale": 0.65},
+    "troll_rageling": {"definition_id": 930097, "name": "Troll Rageling", "name_id": 42040, "model_id": 166, "rank": "minion", "scale": 0.65}
+  },
+  "actors": {
+    "summoner": {"definition": "troll_summoner", "at": [136.0, -0.6, 175.0], "boss": true},
+    "a1": {"definition": "troll_scoutling", "at": [133.0, -0.6, 173.0], "dormant": true, "tags": ["t75", "helpers"]},
+    "a2": {"definition": "troll_scoutling", "at": [139.0, -0.6, 173.0], "dormant": true, "tags": ["t75", "helpers"]},
+    "b1": {"definition": "troll_scoutling", "at": [133.0, -0.6, 173.0], "dormant": true, "tags": ["t50", "helpers"]},
+    "b2": {"definition": "troll_rageling", "at": [139.0, -0.6, 173.0], "dormant": true, "tags": ["t50", "helpers"]},
+    "c1": {"definition": "troll_rageling", "at": [133.0, -0.6, 173.0], "dormant": true, "tags": ["t25", "helpers"]},
+    "c2": {"definition": "troll_rageling", "at": [139.0, -0.6, 173.0], "dormant": true, "tags": ["t25", "helpers"]}
+  },
+  "objectives": [
+    {"id": "summoner", "kind": "defeat", "text_id": 42071, "text": "Defeat the troll summoner!", "target": {"actor": "summoner"}, "primary": true}
+  ],
+  "script": [
+    {"id": "ladder75", "when": {"health_below": {"tag": "actor:summoner", "pct": 75}}, "once": true, "do": [{"wake": {"tag": "t75"}}]},
+    {"id": "ladder50", "when": {"health_below": {"tag": "actor:summoner", "pct": 50}}, "once": true, "do": [{"wake": {"tag": "t50"}}]},
+    {"id": "ladder25", "when": {"health_below": {"tag": "actor:summoner", "pct": 25}}, "once": true, "do": [{"wake": {"tag": "t25"}}]}
+  ],
+  "rewards": {"coins": 25},
+  "source": [
+    {"kind": "client", "evidence": "The battle 96 row of field_battles.json: texts 42056, 42059, 42071, picture 4543, models 168, 182 and 166, the clearing arena."},
+    {"kind": "reconstructed", "evidence": "(R) The same roster and 75 / 50 / 25 percent ladder as the row, written as a fight: the helpers are dormant actors a fight rule wakes. Health and damage follow rank and tier instead of the row's authored numbers, and the summoner no longer has the row's shield while helpers stand. Not enabled: taking the live row over changes how the Summoner fights until the behaviour language carries its relocation and ladder, and needs its own native run."}
+  ]
+}

@@ -25,11 +25,13 @@ impl Gameplay {
             .ok_or_else(|| invalid("ability content is not loaded"))?;
         let power_up = self.encounter.as_ref().and_then(|e| e.held_power_up_slot());
         let weapon = abilities.weapon_label(profile, &self.inventory);
-        abilities.activation_with_power_up(
+        let facts = abilities.weapon_facts(profile, &self.inventory);
+        abilities.activation_equipped(
             profile,
             self.job_level(profile),
             power_up.as_ref(),
             weapon,
+            facts.as_ref(),
         )
     }
 
@@ -57,6 +59,29 @@ impl Gameplay {
         }
         out.replies.extend(self.ability_activation_for(profile)?);
         Ok(())
+    }
+
+    /// Tell the encounter engine which weapon the active job holds (`equip_weapon`). Called at
+    /// every job sync and after an inventory request; cheap enough to run unconditionally.
+    /// Combat seam: only the item definition id is filled; the name and Power are P2's to read.
+    pub(crate) fn sync_weapon(&mut self) {
+        let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
+            return;
+        };
+        let state = self.inventory.state();
+        let instance = state.equipped_weapon_item(profile);
+        let item_id = state
+            .items
+            .iter()
+            .find(|item| item.id == instance && item.count > 0)
+            .map_or(0, |item| item.definition_id);
+        if let Some(encounter) = self.encounter.as_mut() {
+            let weapon = crate::encounter::kits::WeaponFacts {
+                item_id,
+                ..Default::default()
+            };
+            encounter.equip_weapon(profile, weapon);
+        }
     }
 
     /// After a world tick, resend the toolbar only when a pickup or a

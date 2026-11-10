@@ -1,6 +1,7 @@
 //! Basic native hotbars from private, pinned community metadata.
 //! This presents one supported basic attack per combat job. Encounter damage,
 //! cooldowns and targeting remain reconstructed; original skills are not implied.
+use crate::encounter::kits::{KitTable, StatusTable, WeaponFacts};
 use crate::power_ups::Slot as PowerUpSlot;
 use serde::Deserialize;
 use std::{
@@ -103,6 +104,11 @@ pub struct JobAbility {
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
+    /// Set on the rows the weapon kits put on the bar: the encounter engine resolves the
+    /// press from the equipped weapon's kit, and the other fields here only describe the
+    /// job's default kit.
+    #[serde(skip)]
+    pub kit_slot: Option<u8>,
 }
 
 impl JobAbility {
@@ -159,6 +165,11 @@ struct JobContent {
 pub struct OpeningAbilities {
     basics: Arc<BTreeMap<i32, Basic>>,
     jobs: Arc<BTreeMap<i32, Vec<JobAbility>>>,
+    /// The weapon kits, when `weapon_kits.json` is in the content directory: the bar then
+    /// comes from the weapon and `jobs` (the 2009 ladder) is no longer shown.
+    kits: Option<Arc<KitTable>>,
+    /// One row per (profile, bar slot) a kit fills beyond the basic.
+    kit_slots: Arc<BTreeMap<(i32, i32), JobAbility>>,
 }
 
 fn invalid(message: &str) -> io::Error {
@@ -228,9 +239,82 @@ impl OpeningAbilities {
                 return Err(invalid("invalid or duplicate opening basic attack"));
             }
         }
+        let statuses = StatusTable::load(directory)?.unwrap_or_default();
+        let kits = KitTable::load(directory, &statuses)?;
+        let mut kit_slots = BTreeMap::new();
+        for (profile, basic) in &basics {
+            let (Some(table), Ok(job)) = (kits.as_ref(), u32::try_from(*profile)) else {
+                continue;
+            };
+            for slot in 1..8u8 {
+                // The job's default kit describes the slot; a slot only some weapons fill
+                // (the third ability) is described by the first kit that has it.
+                let ability = table
+                    .kit_for(job, &WeaponFacts::default())
+                    .and_then(|kit| kit.slot(slot))
+                    .or_else(|| table.kits().filter(|kit| kit.job == job).find_map(|kit| kit.slot(slot)));
+                let Some(ability) = ability else {
+                    continue;
+                };
+                let third = ability.kind == crate::encounter::kits::Kind::Third;
+                kit_slots.insert(
+                    (*profile, slot as i32),
+                    JobAbility {
+                        slot: slot as i32,
+                        definition_id: ability.ability_id,
+                        name_id: ability.name_id,
+                        description_id: ability.description_id,
+                        icon_id: ability.icon_id,
+                        animation_id: ability.animation,
+                        effect_id: ability.effect,
+                        range: ability.range,
+                        effects: Vec::new(),
+                        unavailable: false,
+                        damage_multiplier: 0.0,
+                        heal: 0,
+                        energy_cost: ability.cost,
+                        cooldown_ms: u64::from(ability.recast_ms),
+                        min_level: if third { u32::from(table.slots.third_min_level) } else { 1 },
+                        weapon_class: basic.weapon_class,
+                        source: serde_json::Value::Null,
+                        kit_slot: Some(slot as u8),
+                    },
+                );
+            }
+        }
         Ok(Self {
             basics: Arc::new(basics),
             jobs: Arc::new(BTreeMap::new()),
+            kits,
+            kit_slots: Arc::new(kit_slots),
+        })
+    }
+
+    /// The kit table when the kits decide `profile_id`'s bar.
+    fn kit_table(&self, profile_id: i32) -> Option<&Arc<KitTable>> {
+        let job = u32::try_from(profile_id).ok()?;
+        self.kits
+            .as_ref()
+            .filter(|table| table.supports(job) && self.basics.contains_key(&profile_id))
+    }
+
+    /// Whether the weapon kits are live for this job.
+    pub fn kits_live(&self, profile_id: i32) -> bool {
+        self.kit_table(profile_id).is_some()
+    }
+
+    /// The equipped slot-7 weapon of `profile`, for the kit table. `None` when the job has
+    /// no matching weapon equipped.
+    pub fn weapon_facts(
+        &self,
+        profile: i32,
+        inventory: &crate::inventory::Inventory,
+    ) -> Option<WeaponFacts> {
+        let class = self.basics.get(&profile)?.weapon_class?;
+        let item_id = inventory.equipped_weapon_for_class(profile, class)?;
+        Some(WeaponFacts {
+            item_id,
+            ..Default::default()
         })
     }
 
@@ -305,6 +389,14 @@ impl OpeningAbilities {
     /// level has unlocked it.
     pub fn job_slot(&self, profile_id: i32, slot: i32, level: u32) -> Option<&JobAbility> {
         self.basics.get(&profile_id)?;
+        if self.kits_live(profile_id) {
+            // The weapon decides what the slot casts; the engine refuses a slot the equipped
+            // kit leaves empty.
+            return self
+                .kit_slots
+                .get(&(profile_id, slot))
+                .filter(|ability| ability.min_level <= level);
+        }
         let index = usize::try_from(slot).ok()?.checked_sub(1)?;
         self.job_bar(profile_id, level)
             .get(index)
@@ -358,6 +450,13 @@ impl OpeningAbilities {
 
     /// Whether `level` unlocks a job ability `previous` did not.
     pub fn unlocks_between(&self, profile_id: i32, previous: u32, level: u32) -> bool {
+        if let Some(table) = self.kit_table(profile_id) {
+            // The bar changes when the level opens a weapon tier (the tier's ability ids) or
+            // the third ability.
+            let tier = |level: u32| crate::encounter::kits::table::tier_of_level(level.min(20) as u8);
+            let third = u32::from(table.slots.third_min_level);
+            return tier(previous) != tier(level) || (previous < third && level >= third);
+        }
         self.jobs.get(&profile_id).is_some_and(|slots| {
             slots
                 .iter()
@@ -385,8 +484,65 @@ impl OpeningAbilities {
         power_up: Option<&PowerUpSlot>,
         weapon: WeaponLabel,
     ) -> io::Result<Vec<Vec<u8>>> {
+        self.activation_equipped(profile_id, level, power_up, weapon, None)
+    }
+
+    /// `activation_with_power_up` for a known equipped weapon. With the weapon kits live the
+    /// bar is the captured one: slot 0 the weapon's basic at no cost, slot 1 its super, the
+    /// held power-up on its own key, and a three-ability weapon's third at the level that
+    /// opens it. `facts` of `None` means the job's default kit.
+    pub fn activation_equipped(
+        &self,
+        profile_id: i32,
+        level: u32,
+        power_up: Option<&PowerUpSlot>,
+        weapon: WeaponLabel,
+        facts: Option<&WeaponFacts>,
+    ) -> io::Result<Vec<Vec<u8>>> {
         if profile_id <= 0 {
             return Err(invalid("invalid hotbar profile"));
+        }
+        if let (Some(table), Ok(job)) = (self.kit_table(profile_id), u32::try_from(profile_id)) {
+            let none = WeaponFacts::default();
+            let facts = facts.unwrap_or(&none);
+            let level = level.clamp(1, 20) as u8;
+            let bar = table.bar(job, level, facts);
+            let kit = table.kit_for(job, facts);
+            let mut toolbar = vec![36, 0, 5, 0];
+            put(&mut toolbar, profile_id);
+            put(&mut toolbar, 8);
+            let mut replies = Vec::new();
+            for (index, slot) in bar.slots.iter().enumerate() {
+                if let Some(power_up) = power_up.filter(|_| index as i32 == crate::power_ups::SLOT) {
+                    replies.push(definition(power_up.definition_id, power_up.name_id, 0, power_up.icon_id, 0));
+                    ability_entry(&mut toolbar, power_up.definition_id, 0, power_up.icon_id, power_up.name_id, 0.0);
+                    continue;
+                }
+                let Some(slot) = slot.as_ref().filter(|_| weapon != WeaponLabel::Unarmed) else {
+                    put(&mut toolbar, 0);
+                    continue;
+                };
+                let description_id = kit
+                    .and_then(|kit| kit.slot(index as u8))
+                    .map_or(0, |ability| ability.description_id);
+                replies.push(definition(
+                    slot.ability_id,
+                    slot.name_id,
+                    description_id,
+                    slot.icon_id,
+                    slot.energy_cost,
+                ));
+                ability_entry(
+                    &mut toolbar,
+                    slot.ability_id,
+                    slot.energy_cost,
+                    slot.icon_id,
+                    slot.name_id,
+                    slot.range,
+                );
+            }
+            replies.push(toolbar);
+            return Ok(replies);
         }
         let mut toolbar = vec![36, 0, 5, 0];
         put(&mut toolbar, profile_id);
@@ -411,7 +567,7 @@ impl OpeningAbilities {
                 };
                 // The client resolves this name id and passes it to
                 // HandlerActionBar:setButtonData (native populate 0x008ee3d0).
-                ability_entry(&mut toolbar, basic.definition_id, 0, basic.icon_id, name_id);
+                ability_entry(&mut toolbar, basic.definition_id, 0, basic.icon_id, name_id, 0.0);
             }
             for (index, ability) in self.job_bar(profile_id, level).into_iter().enumerate() {
                 if let Some(power_up) =
@@ -430,6 +586,7 @@ impl OpeningAbilities {
                         0,
                         power_up.icon_id,
                         power_up.name_id,
+                        0.0,
                     );
                     continue;
                 }
@@ -454,6 +611,7 @@ impl OpeningAbilities {
                     ability.energy_cost,
                     ability.icon_id,
                     ability.name_id,
+                    0.0,
                 );
             }
         } else {
@@ -489,27 +647,22 @@ fn definition(
 
 /// One type-3 toolbar entry, byte-for-byte the row the pinned
 /// `CreateToolbarSlot`/36/5 reader already accepts: type, definition id,
-/// energy cost, icon, name, then the self-cast selector pair (4, 0, 1) and the
-/// trailing ForceDismount byte.
+/// energy cost, icon, name, then 4, the range as a float (the live bar carries 5.0, 10.0 or
+/// 15.0 there: p12 36/5 t=546232; 0.0 is the same bytes as the older integer 0), 1, the
+/// id again, 0 and the trailing ForceDismount byte.
 fn ability_entry(
     toolbar: &mut Vec<u8>,
     definition_id: i32,
     energy_cost: i32,
     icon_id: i32,
     name_id: i32,
+    range: f32,
 ) {
-    for value in [
-        3,
-        definition_id,
-        energy_cost,
-        icon_id,
-        name_id,
-        4,
-        0,
-        1,
-        definition_id,
-        0,
-    ] {
+    for value in [3, definition_id, energy_cost, icon_id, name_id, 4] {
+        put(toolbar, value);
+    }
+    toolbar.extend(range.to_le_bytes());
+    for value in [1, definition_id, 0] {
         put(toolbar, value);
     }
     toolbar.push(1);

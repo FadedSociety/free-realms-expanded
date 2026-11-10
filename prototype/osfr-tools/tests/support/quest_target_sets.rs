@@ -158,6 +158,16 @@ pub struct Targets {
     pub enemy_kinds: BTreeSet<u32>,
     /// Single-use `item_bar::Effects` definitions a `use_item` step may name.
     pub consumables: BTreeSet<i32>,
+    /// Enemy definition ids something places, so a `defeat` step can be met: field rows
+    /// (`field_enemies.json`), camps (`field_camps.json`, through the `enemies.json` row each
+    /// names), battle rows (`field_battles.json`), the `encounters.json` world and dungeon
+    /// rows, and the actors and waves of `fights/*.json`.
+    pub defeatable: BTreeSet<u32>,
+    /// `(fight id, objective id)` of every `fights/*.json` objective a `fight_goal` may name.
+    pub fight_goals: BTreeSet<(u32, String)>,
+    /// Items a `field_kill_rewards.json` quest drop feeds. A `collect_item` step may name one
+    /// that is not in the item catalogue: the kill then credits the step with no bag item.
+    pub quest_drop_items: BTreeSet<i32>,
 }
 
 impl Targets {
@@ -423,7 +433,90 @@ impl Targets {
                 .filter(|row| row.single_use)
                 .map(|row| row.definition),
         );
+        targets.load_placed_enemies(root);
         Ok(targets)
+    }
+
+    /// Combat design section 12: what a `defeat`, `enter_fight` or `fight_goal` step can
+    /// name. The encounter engine owns these files and exposes no id list, so the raw rows
+    /// its loaders validate are read here.
+    fn load_placed_enemies(&mut self, root: &Path) {
+        // A camp or fight names its enemy by the catalogue row's string id.
+        let mut by_name = BTreeMap::new();
+        let catalogue = root.join("enemies.json");
+        if catalogue.is_file() {
+            for row in read_json(&catalogue)["definitions"].as_array().into_iter().flatten() {
+                if let (Some(id), Some(kind)) = (row["id"].as_str(), as_u32(&row["definition_id"])) {
+                    by_name.insert(id.to_owned(), kind);
+                }
+            }
+        }
+        self.defeatable.extend(read_ids(root, "field_enemies.json", |document| {
+            array_ids(document, "enemies", "definition_id")
+        }));
+        self.defeatable.extend(read_ids(root, "field_camps.json", |document| {
+            document["camps"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|camp| by_name.get(camp["definition"].as_str()?).copied())
+                .collect()
+        }));
+        self.defeatable.extend(read_ids(root, "field_battles.json", |document| {
+            document["battles"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .flat_map(|battle| array_ids(battle, "enemies", "definition_id"))
+                .collect()
+        }));
+        self.defeatable.extend(read_ids(root, "encounters.json", |document| {
+            let mut kinds = array_ids(document, "world_enemies", "definition_id");
+            for dungeon in document["dungeons"].as_array().into_iter().flatten() {
+                kinds.extend(array_ids(dungeon, "enemies", "definition_id"));
+            }
+            kinds
+        }));
+        let rewards = root.join("field_kill_rewards.json");
+        if rewards.is_file() {
+            self.quest_drop_items.extend(
+                read_json(&rewards)["quest_drops"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|row| i32::try_from(row["item_id"].as_i64()?).ok()),
+            );
+        }
+        // One file per fight (design section 10); the folder is absent until fights ship.
+        let Ok(fights) = fs::read_dir(root.join("fights")) else {
+            return;
+        };
+        for path in fights.flatten().map(|entry| entry.path()) {
+            if path.extension().is_none_or(|extension| extension != "json") {
+                continue;
+            }
+            let fight = read_json(&path);
+            let Some(id) = as_u32(&fight["id"]) else {
+                continue;
+            };
+            self.dungeons.insert(id);
+            for objective in fight["objectives"].as_array().into_iter().flatten() {
+                if let Some(goal) = objective["id"].as_str() {
+                    self.fight_goals.insert((id, goal.to_owned()));
+                }
+            }
+            let actors = fight["actors"].as_object().into_iter().flat_map(|actors| actors.values());
+            let spawned = fight["waves"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .flat_map(|wave| wave["spawn"].as_array().into_iter().flatten());
+            for row in actors.chain(spawned) {
+                if let Some(kind) = row["definition"].as_str().and_then(|name| by_name.get(name)) {
+                    self.defeatable.insert(*kind);
+                }
+            }
+        }
     }
 }
 

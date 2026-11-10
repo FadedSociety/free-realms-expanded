@@ -60,6 +60,14 @@ OPTIONAL_REPOSITORY_CONTENT = (
     "power_ups.json",  # power_ups.rs: combat power-up drop tables (W153)
     "crafting_stations.json",  # recipe_book.rs: world cooking, smelting and anvil models
     "job_trainers.json",  # profiles.rs: trainer NPCs and "Become a <job>" menu labels (W176)
+    # Combat: each is optional, and absent leaves its part of combat as it was.
+    "combat_rules.json",  # encounter/combat_rules.rs: gate, energy, crit, revive (compiled-in copy if absent)
+    "combat_wire.json",  # encounter/wire.rs: packet templates and switches
+    "weapon_kits.json",  # encounter/kits.rs: the weapon-driven action bars
+    "status_effects.json",  # encounter/kits.rs: statuses for players and enemies
+    "attacks.json",  # encounter/acts.rs: enemy attacks
+    "enemies.json",  # encounter/scale.rs: the enemy catalogue
+    "fights/",  # encounter/director.rs: one JSON file per fight
 )
 
 # Frozen activity content tracked in the repository. These files used to be
@@ -838,9 +846,14 @@ def check_runtime_content(bundle: Path) -> list[str]:
     # kart_gates.json is required activity content now; the activity gate checks it.
     for name in OPTIONAL_REPOSITORY_CONTENT:
         path = content / name
-        if path.is_file():
-            if not isinstance(read_json(path), dict) or path.stat().st_size > 1_048_576:
-                raise ValueError(f"content/{name} is not a bounded JSON object")
+        # A name ending in "/" is a folder of such files.
+        files = sorted(path.glob("*.json")) if name.endswith("/") else [path]
+        for file in files:
+            if file.is_file() and (
+                not isinstance(read_json(file), dict) or file.stat().st_size > 1_048_576
+            ):
+                raise ValueError(f"content/{file.name} is not a bounded JSON object")
+        if any(file.is_file() for file in files):
             notes.append(name)
     return notes
 

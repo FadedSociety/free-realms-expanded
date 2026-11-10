@@ -20,54 +20,53 @@ use std::{
     sync::Arc,
 };
 
+mod acts;
 mod arena;
+mod arena_ai;
 mod battle_drops;
 mod battle_items;
+mod behaviour;
+pub mod brain;
+pub mod combat_rules;
 mod combat_scale;
+pub mod director;
+pub mod facts;
 mod field;
 mod field_marker;
 pub mod field_rewards;
+pub mod kits;
 mod power_up_use;
 mod restore;
 mod revive;
+pub mod scale;
 mod shared;
 mod skills;
 mod threat;
-use self::arena::{ArenaSim, ArenaTick};
+pub mod wire;
 pub use self::arena::{MAX_MEMBERS, SharedArena};
+use self::arena_ai::ArenaSim;
+pub use self::behaviour::{Behaviour, Mode};
+use self::combat_rules::CombatRules;
 use self::combat_scale::CombatScale;
+pub use self::facts::{FightFact, KillFact, Rank};
 pub(crate) use self::field::level_refusal;
 use self::field_marker::MarkerSetting;
-use self::revive::{AUTO_REVIVE_MS, respawn_hide};
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
+pub use self::wire::{animation, zone_begin_packet};
+// The packet writers live in `wire`; the sibling modules reach them through `super::*`.
+#[allow(unused_imports)]
+use self::wire::{
+    attack_processed, boss_display, combat_flag, encounter_header, encounter_state, end_scores,
+    end_scores_packet, enemy_hp, game_over, header, menu, minigame, movement, objective,
+    objective_complete, player_hp, relevance, remove, replace_string, respawn_hide, rules,
+    spawn_actor,
+};
 use crate::abilities::effect_packets::encode_play_composite_effect as composite_effect;
 
 /// Upper bound for saved player health (level 20 is about 7,135, 8,205 for a Brawler).
 const PLAYER_HEALTH_CAP: u32 = 20_000;
-
-/// Combat job identity (R; the owner's design, 2026-10-15): Brawler is the
-/// berserker tank (video level 20: Brawler 9821 vs Archer 8540 health),
-/// Ninja hits quick and crits often, Medic and Wizard have small health pools
-/// (Medic heals, Wizard hits hard from range). Profile ids from the profile
-/// definitions: 2 Ninja, 11 Medic, 12 Wizard, 32 Warrior, 35 Archer, 43 Brawler.
-/// Returns (health multiplier, crit chance %).
-fn job_identity(profile: i32) -> (f32, u32) {
-    match profile {
-        43 => (1.15, 8),
-        32 => (1.0, 5),
-        35 => (1.0, 10),
-        2 => (0.9, 20),
-        11 => (0.9, 5),
-        12 => (0.85, 5),
-        _ => (1.0, 0),
-    }
-}
-
-/// Critical hits deal x1.5 (video: an 83 hit critted for 124; client "50 Crit Mult %").
-const CRIT_NUMERATOR: u32 = 3;
-const CRIT_DENOMINATOR: u32 = 2;
 
 /// Lowest job level a battle difficulty admits (wiki: 1 open, 2 recommended
 /// 3+, then 5 / 9 / 13); its enemies scale like a player of that level.
@@ -80,14 +79,9 @@ fn difficulty_level(difficulty: i32) -> u32 {
         _ => 13,
     }
 }
-/// Energy for job abilities (R): the HUD shows 100/100; regeneration of
-/// 2 per 0.5 s follows the community reference's 4 per second.
-const ENERGY_MAX: i32 = 100;
 const BATTLE_JOB_XP: u32 = 50;
 /// Job type of combat jobs in the profile definitions (field 3).
 const COMBAT_PROFILE_TYPE: i32 = 2;
-const ENERGY_STEP: i32 = 2;
-const ENERGY_STEP_MS: u64 = 500;
 pub const GUIDE_GUID: u64 = 0x4f50_454e_0000_f001;
 /// Power-up pickup actors get `"PWUP"` plus a per-player serial (R). They are
 /// personal to the killer, so the serial only has to be unique per engine.
@@ -172,6 +166,9 @@ pub struct ActiveEncounter {
     pub phase: EncounterPhase,
     pub return_location: CharacterState,
     pub enemies: Vec<EnemyState>,
+    /// The director's saved run, so a relog resumes the fight (`director::RunSave`, P5's).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_save: Option<Box<director::RunSave>>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -187,7 +184,7 @@ pub struct EncounterState {
     pub next_instance_id: i32,
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize)]
 struct Actor {
     guid: u64,
     definition_id: i32,
@@ -230,172 +227,21 @@ struct Actor {
     /// be farmed).
     #[serde(default)]
     power_up_table: Option<String>,
-}
-
-/// Summon presentation (R): the arm-swirl cast and the client's troll spawn
-/// puff. troll_shaman.adr has com_cast_01/02 and com_spawn but no
-/// com_cast_special_* (the first native run looped on the missing 1131), so
-/// the summon uses com_cast_02, new minions play com_spawn, and the puff is
-/// PFX_bones_yellow_troll-spawn (ActorCompositeEffectDefinitions.xml 16337).
-/// The live game's choices are not recovered.
-const SUMMON_ANIMATION: i32 = 1112; // com_cast_02
-const SPAWN_ANIMATION: i32 = 1404; // com_spawn
-const SUMMON_EFFECT: i32 = 16337;
-/// How an enemy moves and fights. Named presets live in `behaviours.json`;
-/// an enemy record picks one with `"behaviour": "skittish"` or adjusts one
-/// with `{"preset": "melee", "move_speed": 4.0}`. Without either it is
-/// `melee` (or `skittish` for the older `skittish: true` flag).
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Mode {
-    /// Chase and swing.
-    Melee,
-    /// Fights beside its summoned minions; alone it runs, rests, runs again
-    /// (the Troll Summoner, the owner's design).
-    Skittish,
-    /// Never moves; swings at players within reach.
-    Stationary,
-}
-
-/// (R) Every default is this build's original constant, so content without
-/// presets behaves as before.
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-#[serde(default, deny_unknown_fields)]
-pub struct Behaviour {
-    pub mode: Mode,
-    /// Chase speed in m/s.
-    pub move_speed: f32,
-    /// Melee reach in metres.
-    pub reach: f32,
-    /// Time between attacks in ms.
-    pub attack_ms: u64,
-    /// In arenas, stops chasing a player farther than this (m).
-    pub chase_limit: f32,
-    /// Skittish cycle when alone: run for `run_ms` at `run_speed` (slower
-    /// than a running player), then rest `rest_ms` playing `rest_animation`
-    /// (com_stunned, AnimationTypes.xml 1401) without attacking - the window
-    /// to hit it. Stays within `leash` m of its spawn, sliding along that edge
-    /// when cornered, and only runs while the player is within `run_from` m
-    /// (farther away it stands and watches, and that time does not tire it).
-    /// It follows the terrain grid (`--terrain`); without one it takes the
-    /// player's ground height (a fixed height sank it under the slopes at the
-    /// clearing's edge in run 053415 - "phasing out of reality").
-    pub run_ms: u64,
-    pub rest_ms: u64,
-    pub run_speed: f32,
-    pub leash: f32,
-    pub run_from: f32,
-    pub rest_animation: i32,
-    /// Free text for content authors.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub note: Option<String>,
-}
-
-impl Default for Behaviour {
-    fn default() -> Self {
-        Self {
-            mode: Mode::Melee,
-            move_speed: 3.0,
-            reach: 2.5,
-            attack_ms: 1000,
-            chase_limit: 40.0,
-            run_ms: 4000,
-            rest_ms: 3000,
-            run_speed: 3.5,
-            leash: 12.0,
-            run_from: 10.0,
-            rest_animation: 1401,
-            note: None,
-        }
-    }
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct BehaviourFile {
-    #[allow(dead_code)]
-    schema_version: u32,
-    presets: BTreeMap<String, Behaviour>,
-    /// Evidence entries for the content checker.
+    // The rows below are read by the combat pieces only; the engine itself reads `dormant`.
+    /// The catalogue rank (P4); absent follows `boss` (Boss or Normal).
     #[serde(default)]
     #[allow(dead_code)]
-    source: Vec<serde_json::Value>,
+    rank: Option<Rank>,
+    /// Tags that goals, rules and kill facts name (P3, P5, P6).
+    #[serde(default)]
+    #[allow(dead_code)]
+    tags: Vec<String>,
+    /// Not there when the fight starts, until something wakes it. Unlike a
+    /// `summon_below_percent` row it still counts toward the goal.
+    #[serde(default)]
+    dormant: bool,
 }
 
-/// An enemy's behaviour: its record's `behaviour` (a preset name, or an
-/// object with an optional `preset` plus overrides) over the default preset.
-fn resolve_behaviour(
-    actor: &Actor,
-    presets: &BTreeMap<String, Behaviour>,
-) -> Result<Behaviour, String> {
-    let named = |name: &str| {
-        presets.get(name).cloned().ok_or(format!(
-            "{} ({}): unknown behaviour preset '{name}'",
-            actor.name, actor.guid
-        ))
-    };
-    let base = if actor.skittish {
-        presets.get("skittish").cloned().unwrap_or(Behaviour {
-            mode: Mode::Skittish,
-            ..Behaviour::default()
-        })
-    } else {
-        presets.get("melee").cloned().unwrap_or_default()
-    };
-    match &actor.behaviour {
-        None => Ok(base),
-        Some(serde_json::Value::String(name)) => named(name),
-        Some(serde_json::Value::Object(fields)) => {
-            let start = match fields.get("preset") {
-                Some(serde_json::Value::String(name)) => named(name)?,
-                Some(_) => return Err(format!("{}: behaviour preset must be a name", actor.name)),
-                None => base,
-            };
-            let mut merged = serde_json::to_value(start).map_err(|e| e.to_string())?;
-            for (key, value) in fields.iter().filter(|(key, _)| *key != "preset") {
-                merged[key] = value.clone();
-            }
-            serde_json::from_value(merged)
-                .map_err(|e| format!("{} ({}): behaviour {e}", actor.name, actor.guid))
-        }
-        Some(_) => Err(format!(
-            "{}: behaviour must be a preset name or an object",
-            actor.name
-        )),
-    }
-    .and_then(|b| {
-        b.check()
-            .map(|()| b)
-            .map_err(|e| format!("{} ({}): {e}", actor.name, actor.guid))
-    })
-}
-
-impl Behaviour {
-    /// Any value is tunable, but not nonsense (negative, infinite, or a
-    /// reach past the arena's chase limit).
-    fn check(&self) -> Result<(), String> {
-        let distances = [
-            ("move_speed", self.move_speed),
-            ("reach", self.reach),
-            ("chase_limit", self.chase_limit),
-            ("run_speed", self.run_speed),
-            ("leash", self.leash),
-            ("run_from", self.run_from),
-        ];
-        for (name, value) in distances {
-            if !value.is_finite() || value < 0.0 || value > 1000.0 {
-                return Err(format!("behaviour {name} {value} must be 0..1000"));
-            }
-        }
-        if self.reach > self.chase_limit {
-            return Err(format!(
-                "behaviour reach {} is beyond its chase_limit {}",
-                self.reach, self.chase_limit
-            ));
-        }
-        Ok(())
-    }
-}
 #[derive(Clone, Debug, Deserialize)]
 struct Dungeon {
     id: u32,
@@ -684,6 +530,10 @@ pub struct EncounterOutcome {
     /// T789: accepted job-ability casts as (ability definition id, the primary target's
     /// enemy definition id; `None` for a cast with no enemy target). Refusals add nothing.
     pub abilities_used: Vec<(i32, Option<u32>)>,
+    /// One fact per entry of `defeated`, in the same order.
+    pub kills: Vec<KillFact>,
+    /// What happened in the fight other than kills.
+    pub facts: Vec<FightFact>,
     pub feedback: Option<String>,
     /// A group heal power-up was picked up (the engine heals only its own
     /// player; the gateway heals the rest of the group, once per kill).
@@ -714,6 +564,21 @@ pub struct EncounterEngine {
     heal_over_time: Option<restore::HealOverTime>,
     /// Damage, health and tier levels from `combat_scale.json`.
     scale: CombatScale,
+    /// Timing and chance rules from `combat_rules.json`.
+    rules: Arc<CombatRules>,
+    /// The fight run in progress (`director`).
+    run: director::RunSlot,
+    // One slot per combat piece for its loaded content and session state. Each type is its
+    // owner's to fill; they outlive `reset_session` (clear what must not in your own hooks).
+    // Boxed: the engine is moved by value on threads near their stack limit, so each slot
+    // costs it one pointer however much its owner puts inside.
+    #[allow(dead_code)]
+    wire_state: Box<wire::WireState>,
+    kit_state: Box<kits::KitState>,
+    #[allow(dead_code)]
+    brain_state: Box<acts::BrainState>,
+    #[allow(dead_code)]
+    fight_state: Box<director::FightState>,
     // The player's max health and weapon damage multiplier at the active
     // job's level (set by gameplay; level 1 = the base health and x1).
     max_health: u32,
@@ -943,6 +808,7 @@ impl EncounterEngine {
     pub fn load(directory: impl AsRef<Path>, state: Option<EncounterState>) -> io::Result<Self> {
         let directory = directory.as_ref();
         let scale = CombatScale::load(directory)?;
+        let rules = CombatRules::load(directory)?;
         let bytes = fs::read(directory.join("encounters.json"))?;
         if bytes.len() > 128 * 1024 {
             return Err(invalid("encounter content too large"));
@@ -1097,7 +963,13 @@ impl EncounterEngine {
             field_sim: FieldSim::default(),
             arena: ArenaSim::default(),
             dropped_return,
-            energy: ENERGY_MAX,
+            energy: rules.energy.max,
+            rules,
+            run: director::RunSlot::default(),
+            wire_state: Box::default(),
+            kit_state: Box::default(),
+            brain_state: Box::default(),
+            fight_state: Box::default(),
             energy_regen_at: 0,
             heal_over_time: None,
             max_health: scale.player_base_health(),
@@ -1135,6 +1007,11 @@ impl EncounterEngine {
             pickup_instance: None,
         };
         engine.rebuild_behaviours()?;
+        engine.load_wire(directory)?;
+        engine.load_scale(directory)?;
+        engine.load_kits(directory)?;
+        engine.load_brains(directory)?;
+        engine.load_fights(directory)?;
         Ok(engine)
     }
 
@@ -1161,46 +1038,6 @@ impl EncounterEngine {
         self.held_power_up.as_deref()
     }
 
-    /// Load `behaviours.json` presets (also a hot reload).
-    pub fn load_behaviours(&mut self, path: &Path) -> io::Result<()> {
-        let bytes = fs::read(path)?;
-        if bytes.len() > 256 * 1024 {
-            return Err(invalid("behaviour presets too large"));
-        }
-        let file: BehaviourFile = serde_json::from_slice(&bytes)
-            .map_err(|e| invalid(&format!("behaviours.json: {e}")))?;
-        let previous = std::mem::replace(&mut self.behaviour_presets, file.presets);
-        if let Err(error) = self.rebuild_behaviours() {
-            self.behaviour_presets = previous;
-            self.rebuild_behaviours()?;
-            return Err(error);
-        }
-        Ok(())
-    }
-
-    fn rebuild_behaviours(&mut self) -> io::Result<()> {
-        let actors = self
-            .content
-            .dungeons
-            .iter()
-            .flat_map(|d| d.enemies.iter())
-            .chain(self.content.world_enemies.iter())
-            .chain(self.field_sim.enemies.iter().map(|f| &f.actor));
-        let mut resolved = BTreeMap::new();
-        for actor in actors {
-            let behaviour =
-                resolve_behaviour(actor, &self.behaviour_presets).map_err(|e| invalid(&e))?;
-            resolved.insert(actor.guid, behaviour);
-        }
-        self.behaviour_of = resolved;
-        Ok(())
-    }
-
-    /// An enemy's resolved behaviour (for Studio and tests).
-    pub fn behaviour(&self, guid: u64) -> Option<&Behaviour> {
-        self.behaviour_of.get(&guid)
-    }
-
     /// No weapon-specific refusal message is recovered. (R) The gameplay cast
     /// gate refuses silently and logs at most once per five seconds per session.
     pub(crate) fn refuse_weapon(&mut self, profile: i32, slot: i32, now_ms: u64) {
@@ -1221,7 +1058,7 @@ impl EncounterEngine {
         }
         self.player_profile = profile;
         self.job_level = level.clamp(1, 20);
-        let (health, crit) = job_identity(profile);
+        let (health, crit) = self.rules.job_identity(profile);
         self.crit_percent = crit;
         let max = (self.scale.level_health(level) as f32 * health).round() as u32;
         self.damage_scale = self.scale.tier_factor(level);
@@ -1287,10 +1124,10 @@ impl EncounterEngine {
     pub fn heal_full(&mut self) -> Vec<Vec<u8>> {
         let was_down = self.state.player_health == 0;
         self.state.player_health = self.max_health;
-        self.energy = ENERGY_MAX;
+        self.energy = self.rules.energy.max;
         let mut out = vec![
             player_hp(self.max_health, self.max_health),
-            crate::abilities::build_energy(ENERGY_MAX, ENERGY_MAX),
+            crate::abilities::build_energy(self.energy, self.energy),
         ];
         if was_down {
             out.push(respawn_hide());
@@ -1328,14 +1165,7 @@ impl EncounterEngine {
             let (guid, position, _) = standing[0];
             self.last_attack = None;
             let out = self.strike(guid, position, f32::MAX, u32::MAX / 4, now_ms)?;
-            total.changed |= out.changed;
-            total.replies.extend(out.replies);
-            total.rewards.extend(out.rewards);
-            total.defeated.extend(out.defeated);
-            total.win_completed = total.win_completed.or(out.win_completed);
-            if out.feedback.is_some() {
-                total.feedback = out.feedback;
-            }
+            skills::merge_skill_outcome(&mut total, out);
         }
         // T658 review: `realm win` is a debug shortcut, not a loot route, so it
         // pays no chance drop (`realm give` grants one for inspection).
@@ -1431,6 +1261,7 @@ impl EncounterEngine {
             phase: EncounterPhase::Loading,
             return_location,
             enemies: d.enemies.iter().map(enemy_state).collect(),
+            run_save: None,
         });
         let (zone, guided) = (d.zone.clone(), d.guide.is_some());
         self.state.next_instance_id = next;
@@ -1570,9 +1401,11 @@ impl EncounterEngine {
             }
         }
         out.replies.push(relevance(&guids, true));
-        let (count, goal) = goal_progress(d, active);
-        out.replies.push(objective(1, d.objective_id, goal));
-        out.replies.push(objective(2, d.objective_id, count));
+        if !self.run_goals(&mut out) {
+            let (count, goal) = goal_progress(d, active);
+            out.replies.push(objective(1, d.objective_id, goal));
+            out.replies.push(objective(2, d.objective_id, count));
+        }
         if active.phase == EncounterPhase::Won {
             out.replies.push(objective_complete(d.objective_id));
             out.replies.push(game_over(true, active.instance_id, d.id));
@@ -1587,9 +1420,17 @@ impl EncounterEngine {
             }
         }
         // A battle has no guide to say Start: it begins once the arena loads.
-        if d.guide.is_none() && active.phase == EncounterPhase::Fighting {
+        let fighting = active.phase == EncounterPhase::Fighting;
+        if d.guide.is_none() && fighting {
             self.armed = true;
         }
+        if loading {
+            self.run_begin(now_ms, &mut out);
+        } else if fighting && self.run.run.is_none() {
+            // A relog (or any reload) into a running fight whose run is not in memory.
+            self.run_resume(now_ms, &mut out);
+        }
+        self.enemies_spawned(&guids, now_ms, &mut out);
         self.present_results(&mut out);
         Ok(out)
     }
@@ -1678,7 +1519,7 @@ impl EncounterEngine {
                 if self.is_battle_spawner(guid) {
                     return Ok(self.battle_screen(guid, position, profile_id));
                 }
-                Ok(self.interact(guid, position))
+                Ok(self.interact(guid, position, now_ms))
             }
             (26, 10) => {
                 if inner.len() != 16 {
@@ -1739,55 +1580,13 @@ impl EncounterEngine {
                     return Ok(EncounterOutcome::default());
                 }
                 let guid = crate::le::u64(inner, 16).ok_or_else(|| invalid(SHORT))?;
-                if target_type == 0 && guid == player_guid {
-                    // The original basic toolbar requests a self-centered attack.
-                    // This supported slice resolves one nearby enemy on the server;
-                    // original multi-target sweep effects remain unrecovered.
-                    let states: Vec<&EnemyState> = match &self.state.active {
-                        Some(a) => a.enemies.iter().collect(),
-                        None => self
-                            .state
-                            .world_enemies
-                            .iter()
-                            .chain(
-                                self.field_sim
-                                    .enemies
-                                    .iter()
-                                    .filter(|f| f.present)
-                                    .map(|f| &f.state),
-                            )
-                            .collect(),
-                    };
-                    let range = self.scale.profile_stats(profile_id, slot).0;
-                    let nearest = states
-                        .into_iter()
-                        .filter(|s| {
-                            self.enemy(s.guid).is_some()
-                                && s.health > 0
-                                && distance(position, s.position) <= range
-                        })
-                        // An unshielded enemy in reach first, then the nearest.
-                        .min_by(|a, b| {
-                            (self.shielded(a.guid), distance(position, a.position))
-                                .partial_cmp(&(
-                                    self.shielded(b.guid),
-                                    distance(position, b.position),
-                                ))
-                                .unwrap_or(std::cmp::Ordering::Equal)
-                        })
-                        .map(|s| s.guid);
-                    return match nearest {
-                        Some(target) => self.attack(target, position, profile_id, slot, now_ms),
-                        None => Ok(EncounterOutcome::default()),
-                    };
-                }
-                self.attack(guid, position, profile_id, slot, now_ms)
+                self.basic_cast(guid, player_guid, position, profile_id, slot, now_ms)
             }
             _ => Ok(EncounterOutcome::default()),
         }
     }
 
-    fn interact(&self, guid: u64, position: [f32; 3]) -> EncounterOutcome {
+    fn interact(&mut self, guid: u64, position: [f32; 3], now_ms: u64) -> EncounterOutcome {
         if let Some(guide) = self.dungeon().and_then(|d| d.guide.as_ref())
             && let Some(active) = &self.state.active
             && guid == guide.guid
@@ -1820,7 +1619,10 @@ impl EncounterEngine {
                 }
             };
         }
-        EncounterOutcome::default()
+        // Not the guide and not a standing enemy: a fight actor (door, captive, talker), if any.
+        let mut out = EncounterOutcome::default();
+        self.actor_talked(guid, position, now_ms, &mut out);
+        out
     }
 
     fn enemy(&self, guid: u64) -> Option<(&Actor, &EnemyState)> {
@@ -1871,9 +1673,7 @@ impl EncounterEngine {
         if self.state.player_health == 0 {
             return Ok(EncounterOutcome::default());
         }
-        let (range, damage) = self.scale.profile_stats(profile_id, slot);
-        let damage = (damage as f32 * self.damage_scale).round() as u32;
-        self.strike(guid, position, range, damage, now_ms)
+        self.basic_strike(guid, position, profile_id, slot, now_ms)
     }
 
     /// One hit on `guid` within `range` for `damage`: the basic attack and the
@@ -1920,7 +1720,7 @@ impl EncounterEngine {
             || swing
                 && self
                     .last_attack
-                    .is_some_and(|last| now_ms.saturating_sub(last) < 600)
+                    .is_some_and(|last| now_ms.saturating_sub(last) < self.rules.basic_gate_ms)
         {
             return Ok(EncounterOutcome::default());
         }
@@ -1939,8 +1739,8 @@ impl EncounterEngine {
         let critical = damage > 0 && self.roll_crit();
         let damage = if critical {
             (f64::from(damage)
-                * (f64::from(CRIT_NUMERATOR) / f64::from(CRIT_DENOMINATOR)
-                    + f64::from(self.skills.crit_damage_bonus()))) as u32
+                * (self.rules.crit_multiplier() + f64::from(self.skills.crit_damage_bonus())))
+                as u32
         } else {
             damage
         };
@@ -2002,39 +1802,39 @@ impl EncounterEngine {
         }
         let mut out = EncounterOutcome {
             changed: true,
-            replies: vec![
-                attack_processed(
-                    self.shared_sender.unwrap_or(1),
-                    guid,
-                    dealt,
-                    hp,
-                    max_health,
-                    critical,
-                ),
-                enemy_hp(guid, hp, max_health),
-            ],
+            replies: self.player_hit_packets(wire::PlayerHit {
+                attacker: self.shared_sender.unwrap_or(1),
+                target: guid,
+                dealt,
+                health: hp,
+                max_health,
+                critical,
+                swing,
+                ..Default::default()
+            }),
             ..Default::default()
         };
-        if swing {
-            out.replies
-                .insert(0, animation(self.shared_sender.unwrap_or(1), 1099, false));
-        }
-        if hp > 0 && self.active() {
-            self.summon(guid, hp, max_health, &mut out);
-        }
-        if hp == 0 {
+        self.enemy_hit_taken(guid, dealt, hp, max_health, now_ms, &mut out);
+        // The brain may keep an enemy at zero health alive (`acts::Death`); then nothing below runs.
+        let death = if hp == 0 {
+            self.enemy_died(guid, now_ms, &mut out)
+        } else {
+            acts::Death::Survive
+        };
+        if death != acts::Death::Survive {
             self.skills.forget_target(guid);
-            if self.shared_sender.is_none() {
-                out.replies.push(remove(guid));
+            if self.shared_sender.is_none() && death == acts::Death::Die {
+                let delay = self.rules.death_delay(field_index.is_some());
+                out.replies.push(wire::death(guid, delay));
             }
             if boss {
                 out.replies.push(boss_display(guid, false));
             }
             // T256: the shared field also credits the killer's own quests.
-            if definition > 0 {
-                out.defeated.push(definition);
-            }
+            self.record_kill(definition, guid, boss, false, &mut out);
             self.arena.forget(guid);
+            // A director run owns its goals and its win; without one the single legacy goal runs.
+            let directed = self.run_kill(guid, now_ms, &mut out);
             if let Some(i) = field_index {
                 self.field_sim.moving.remove(&guid);
                 self.field_sim.attacks.remove(&guid);
@@ -2042,8 +1842,10 @@ impl EncounterEngine {
                 f.respawn_at = Some(now_ms.saturating_add(f.respawn_ms));
             } else if let (Some(active), Some(d)) = (&self.state.active, self.dungeon()) {
                 let (count, goal) = goal_progress(d, active);
-                out.replies.push(objective(2, d.objective_id, count));
-                if count >= goal {
+                if !directed {
+                    out.replies.push(objective(2, d.objective_id, count));
+                }
+                if !directed && count >= goal {
                     self.win_run(now_ms, &mut out);
                 }
             } else if !self.world_stage_fighting() && !self.field_combat {
@@ -2054,7 +1856,7 @@ impl EncounterEngine {
                 ]);
             }
         }
-        if hp == 0 {
+        if death != acts::Death::Survive {
             let hitters = self.field_sim.kills.hits.remove(&guid).unwrap_or_default();
             // A won encounter is over: its zone is about to close, nothing to pick up.
             if self
@@ -2091,8 +1893,11 @@ impl EncounterEngine {
         let healed = self.state.player_health.saturating_sub(before) as i32;
         if healed > 0 {
             out.replies.extend(replies);
-            out.replies
-                .push(crate::abilities::build_hitpoint_delta(1, 1, healed));
+            let player = self.shared_sender.unwrap_or(1);
+            let (max, current) = (self.max_health as i32, self.state.player_health as i32);
+            out.replies.push(wire::hitpoints(
+                player, player, true, max, current, healed, false,
+            ));
             out.changed = true;
         }
     }
@@ -2173,6 +1978,7 @@ impl EncounterEngine {
                 scale: kind.scale.map(|s| s as f32),
                 behaviour: None,
                 power_up_table: None,
+                ..Default::default()
             };
             // Disposition 1 (neutral): 0 is hostile and would be Tab-targeted.
             out.replies.push(self.spawn(&actor, position, 1));
@@ -2239,9 +2045,14 @@ impl EncounterEngine {
             }
         }
         if let Some(energy) = kind.energy {
-            self.energy = self.energy.saturating_add(energy as i32).min(ENERGY_MAX);
-            out.replies
-                .push(crate::abilities::build_energy(self.energy, ENERGY_MAX));
+            self.energy = self
+                .energy
+                .saturating_add(energy as i32)
+                .min(self.rules.energy.max);
+            out.replies.push(crate::abilities::build_energy(
+                self.energy,
+                self.rules.energy.max,
+            ));
         }
         out.replies.push(composite_effect(
             self.shared_sender.unwrap_or(1),
@@ -2249,67 +2060,6 @@ impl EncounterEngine {
             drop.position,
         ));
         true
-    }
-
-    /// The summoner was hit down to `hp`: every dormant minion whose
-    /// threshold is now crossed appears around it in a puff, while the
-    /// summoner plays its cast.
-    fn summon(&mut self, summoner: u64, hp: u32, max_health: u32, out: &mut EncounterOutcome) {
-        let Some(d) = self.dungeon() else {
-            return;
-        };
-        let Some(home) = d
-            .enemies
-            .iter()
-            .find(|a| a.guid == summoner && a.summon_below_percent.is_none())
-            .map(|a| a.position)
-        else {
-            return;
-        };
-        if !d.enemies.iter().any(|a| a.summon_below_percent.is_some()) {
-            return;
-        }
-        let percent = (u64::from(hp) * 100 / u64::from(max_health.max(1))) as u32;
-        let content = self.content.clone();
-        let found = content.dungeons.iter().find(|x| x.id == d.id);
-        let (Some(d), Some(active)) = (found, self.state.active.as_mut()) else {
-            return;
-        };
-        let at = active
-            .enemies
-            .iter()
-            .find(|s| s.guid == summoner)
-            .map_or(home, |s| s.position);
-        let mut called = Vec::new();
-        for (a, s) in d.enemies.iter().zip(active.enemies.iter_mut()) {
-            if s.dormant && a.summon_below_percent.is_some_and(|below| percent < below) {
-                s.dormant = false;
-                // Keep the authored offset from the summoner, around where it
-                // stands now.
-                s.position = [
-                    at[0] + (a.position[0] - home[0]),
-                    at[1],
-                    at[2] + (a.position[2] - home[2]),
-                ];
-                called.push((a.clone(), s.position));
-            }
-        }
-        if called.is_empty() {
-            return;
-        }
-        out.replies
-            .push(animation(summoner, SUMMON_ANIMATION, false));
-        let mut guids = Vec::new();
-        for (a, position) in &called {
-            out.replies
-                .push(composite_effect(a.guid, SUMMON_EFFECT, *position));
-            out.replies.push(self.spawn(a, *position, 0));
-            out.replies
-                .push(enemy_hp(a.guid, a.max_health, a.max_health));
-            out.replies.push(animation(a.guid, SPAWN_ANIMATION, false));
-            guids.push(a.guid);
-        }
-        out.replies.push(relevance(&guids, false));
     }
 
     pub fn tick(
@@ -2336,10 +2086,14 @@ impl EncounterEngine {
             self.knocked_out_at = None;
         } else if self.state.active.is_none() {
             let at = *self.knocked_out_at.get_or_insert(now_ms);
-            if now_ms >= at.saturating_add(AUTO_REVIVE_MS) {
+            if now_ms >= at.saturating_add(self.rules.revive.auto_ms) {
                 return Ok(self.revive_at_safe_location(now_ms));
             }
         }
+        // The run's own clock goes first, on every call: a run keeps time while the player is
+        // down, the fight is not armed yet, or less than a tick has passed.
+        let mut energy = EncounterOutcome::default();
+        self.run_tick(position, now_ms, &mut energy);
         if self
             .state
             .active
@@ -2348,14 +2102,13 @@ impl EncounterEngine {
             || (self.active() && !self.armed)
             || self.state.player_health == 0
         {
-            return Ok(EncounterOutcome::default());
+            return Ok(energy);
         }
         let elapsed = self.last_tick.map_or(100, |t| now_ms.saturating_sub(t));
         if elapsed < 100 {
-            return Ok(EncounterOutcome::default());
+            return Ok(energy);
         }
         self.last_tick = Some(now_ms);
-        let mut energy = EncounterOutcome::default();
         self.tick_job_effects(now_ms, &mut energy)?;
         self.tick_heal_over_time(now_ms, &mut energy);
         if self
@@ -2367,46 +2120,14 @@ impl EncounterEngine {
             return Ok(energy);
         }
         self.regenerate_energy(now_ms, &mut energy);
-        let mitigation = self.skills.mitigation();
-        let ground = self.ground();
-        let actors: Vec<Actor> = if let Some(d) = self.dungeon() {
-            d.enemies.clone()
-        } else {
-            self.content
-                .world_enemies
-                .iter()
-                .filter(|a| a.stages.contains(&self.state.world_stage))
-                .cloned()
-                .collect()
-        };
-        let states = if let Some(a) = &mut self.state.active {
-            &mut a.enemies
-        } else {
-            &mut self.state.world_enemies
-        };
         let mut out = EncounterOutcome::default();
         out.changed = energy.changed;
         out.rewards.append(&mut energy.rewards);
         out.defeated.append(&mut energy.defeated);
+        out.kills.append(&mut energy.kills);
+        out.facts.append(&mut energy.facts);
         out.replies.append(&mut energy.replies);
-        let tick = ArenaTick {
-            position,
-            ground: &ground,
-            behaviours: &self.behaviour_of,
-            skills: &self.skills,
-            mitigation,
-            player_health: self.state.player_health,
-            max_health: self.max_health,
-            now_ms,
-            elapsed,
-            backup: arena::summoner_backup(&actors, states),
-        };
-        // A shared run's enemies tick once per instance in the driver (`tick_arena_enemies`).
-        let mut total_damage = if self.arena.acting.is_none() {
-            self.arena.tick_enemies(actors, states, &tick, &mut out)
-        } else {
-            0
-        };
+        let mut total_damage = self.tick_solo_arena(position, now_ms, elapsed, &mut out);
         if !self.active() && self.shared_fields.is_none() {
             self.tick_field(
                 position,
@@ -2479,6 +2200,7 @@ impl EncounterEngine {
         replies.push(player_hp(self.max_health, self.max_health));
         self.state.player_health = self.max_health;
         self.reset_session();
+        self.run_closed();
         Ok(EncounterOutcome {
             changed: true,
             zoning: Some(zone),
@@ -2502,6 +2224,7 @@ impl EncounterEngine {
         a.phase = EncounterPhase::Loading;
         self.state.player_health = self.max_health;
         self.reset_session();
+        self.run_closed();
         Ok(EncounterOutcome {
             changed: true,
             zoning: self.zone(),
@@ -2633,6 +2356,8 @@ fn validate_actor(a: &Actor) -> io::Result<()> {
         || a.power_up_table
             .as_ref()
             .is_some_and(|t| t.is_empty() || t.len() > 64)
+        || a.tags.len() > 16
+        || a.tags.iter().any(|t| t.is_empty() || t.len() > 64)
     {
         return Err(invalid("invalid encounter actor"));
     }
@@ -2658,7 +2383,7 @@ fn enemy_state(a: &Actor) -> EnemyState {
         guid: a.guid,
         health: a.max_health,
         position: a.position,
-        dormant: a.summon_below_percent.is_some(),
+        dormant: a.dormant || a.summon_below_percent.is_some(),
     }
 }
 /// (defeated goal enemies, goal enemies). Summoned minions are not goals.
@@ -2688,239 +2413,3 @@ pub struct FightEvent {
     pub amount: i64,
 }
 const FIGHT_LOG_CAP: usize = 600;
-
-fn header(op: u16, sub: u16) -> Vec<u8> {
-    [op.to_le_bytes(), sub.to_le_bytes()].concat()
-}
-fn encounter_header(sub: u16, id: u32, instance: i32) -> Vec<u8> {
-    let mut b = header(41, sub);
-    b.extend((id as i32).to_le_bytes());
-    b.extend(instance.to_le_bytes());
-    b
-}
-fn encounter_state(id: u32, instance: i32, state: i32) -> Vec<u8> {
-    let mut b = encounter_header(106, id, instance);
-    b.extend(state.to_le_bytes());
-    b
-}
-fn combat_flag(sub: u16, id: u32, instance: i32, on: bool) -> Vec<u8> {
-    let mut b = encounter_header(sub, id, instance);
-    b.push(u8::from(on));
-    b
-}
-fn minigame(sub: u8, _instance: i32, id: u32) -> Vec<u8> {
-    let mut b = 39_u16.to_le_bytes().to_vec();
-    b.push(sub);
-    // Native 41/114 creates its MiniGameState using the FIRST encounter-header
-    // integer (encounter id). All 39 lifecycle messages must use that same key.
-    for v in [id as i32, -1, id as i32] {
-        b.extend(v.to_le_bytes());
-    }
-    b
-}
-fn game_over(won: bool, instance: i32, id: u32) -> Vec<u8> {
-    let mut b = minigame(18, instance, id);
-    b.push(u8::from(won));
-    for v in [0_i32, 0, 1] {
-        b.extend(v.to_le_bytes());
-    }
-    b
-}
-fn end_scores(active: &ActiveEncounter) -> Vec<u8> {
-    end_scores_packet(
-        active.instance_id,
-        active.encounter_id,
-        active.enemies.iter().filter(|e| e.health == 0).count() as i32,
-        active.phase == EncounterPhase::Won,
-    )
-}
-
-fn end_scores_packet(instance: i32, id: u32, defeated: i32, won: bool) -> Vec<u8> {
-    let mut b = minigame(47, instance, id);
-    b.extend(2_i32.to_le_bytes());
-    // These are original localization keys and score types. Only the Order-4
-    // total row changes with the outcome: a won run reports the local
-    // objective award, a loss reports zero. Defeat counts stay actual and no
-    // per-kill points or historical score are invented.
-    let total = if won { OBJECTIVE_AWARD_SCORE } else { 0 };
-    for (name, order, value, points) in [
-        ("scoreEnemiesDefeated", 0_i32, defeated, 0_i32),
-        ("scoreTotalScore", 4_i32, -1, total),
-    ] {
-        b.extend((name.len() as i32).to_le_bytes());
-        b.extend(name.as_bytes());
-        for field in [-1, order, value, -1, points] {
-            b.extend(field.to_le_bytes());
-        }
-    }
-    b
-}
-fn objective(sub: u8, id: i32, value: i32) -> Vec<u8> {
-    let mut b = 45_u16.to_le_bytes().to_vec();
-    b.push(sub);
-    b.extend(id.to_le_bytes());
-    b.extend(value.to_le_bytes());
-    b
-}
-fn objective_complete(id: i32) -> Vec<u8> {
-    let mut b = objective(3, id, 0);
-    b.extend(OBJECTIVE_AWARD_SCORE.to_le_bytes());
-    b
-}
-fn rules(combat: bool) -> Vec<u8> {
-    let mut b = 62_u16.to_le_bytes().to_vec();
-    b.extend([u8::from(combat); 11]);
-    b.extend((-1_i32).to_le_bytes());
-    b.extend(1_f32.to_le_bytes());
-    for v in [3600_i32, 0, 0, 0, 0, 0] {
-        b.extend(v.to_le_bytes());
-    }
-    b
-}
-fn player_hp(hp: u32, max: u32) -> Vec<u8> {
-    let mut b = header(38, 1);
-    b.extend((hp as i32).to_le_bytes());
-    b.extend((max as i32).to_le_bytes());
-    b
-}
-fn enemy_hp(guid: u64, hp: u32, max: u32) -> Vec<u8> {
-    let mut b = header(35, 5);
-    b.extend(guid.to_le_bytes());
-    for v in [hp as i32, max as i32, 0] {
-        b.extend(v.to_le_bytes());
-    }
-    b
-}
-fn boss_display(guid: u64, on: bool) -> Vec<u8> {
-    let mut b = header(32, 9);
-    b.extend(guid.to_le_bytes());
-    b.push(u8::from(on));
-    b
-}
-fn attack_processed(
-    attacker: u64,
-    target: u64,
-    damage: u32,
-    hp: u32,
-    max: u32,
-    critical: bool,
-) -> Vec<u8> {
-    let mut b = header(32, 7);
-    for v in [attacker, attacker, target] {
-        b.extend(v.to_le_bytes());
-    }
-    for v in [damage as i32, max as i32, 0] {
-        b.extend(v.to_le_bytes());
-    }
-    // +0x2c critical-style flag (the client shows "-N!!"), +0x2d suppress reaction.
-    b.extend([u8::from(critical), 0]);
-    for v in [0_i32, hp as i32] {
-        b.extend(v.to_le_bytes());
-    }
-    b
-}
-/// 35/8 SetAnimation (client reader `0x008e5dd0`); also world events' writer.
-/// Public because the gateway binary (and its embedded test harnesses) is a
-/// separate crate from this library and must not add a fourth copy (T507).
-pub fn animation(guid: u64, id: i32, base: bool) -> Vec<u8> {
-    let mut b = header(35, 8);
-    b.extend(guid.to_le_bytes());
-    b.extend(id.to_le_bytes());
-    b.extend(0_i32.to_le_bytes());
-    b.push(u8::from(base));
-    b
-}
-fn movement(guid: u64, p: [f32; 3], heading: [f32; 3]) -> Vec<u8> {
-    // Movement is standalone opcode125, not a BasePlayerUpdate subpacket.
-    let mut b = 125_u16.to_le_bytes().to_vec();
-    b.extend(guid.to_le_bytes());
-    for v in p.into_iter().chain(heading) {
-        b.extend(v.to_le_bytes());
-    }
-    b.extend([1, 0]); // Community NPC movement state; position/heading are authoritative.
-    b
-}
-fn relevance(guids: &[u64], guide: bool) -> Vec<u8> {
-    let mut b = header(35, 12);
-    b.extend((guids.len() as i32).to_le_bytes());
-    for (i, g) in guids.iter().enumerate() {
-        b.extend(g.to_le_bytes());
-        b.extend([1, if guide && i == 0 { 5 } else { 1 }, 0]);
-    }
-    b
-}
-fn remove(guid: u64) -> Vec<u8> {
-    crate::abilities::effect_packets::encode_remove_gracefully(guid, 0)
-}
-fn replace_string(b: &mut Vec<u8>, offset: usize, s: &str) {
-    b.splice(
-        offset..offset + 4,
-        (s.len() as u32).to_le_bytes().into_iter().chain(s.bytes()),
-    );
-}
-fn menu(guid: u64, name: &str, entries: &[(i32, i32)], auto: bool) -> Vec<u8> {
-    let mut b = header(26, 9);
-    b.extend(guid.to_le_bytes());
-    b.push(u8::from(auto));
-    b.extend((entries.len() as i32).to_le_bytes());
-    for (id, label) in entries {
-        for v in [*id, 0, *label, 0, 0, 0, 0] {
-            b.extend(v.to_le_bytes());
-        }
-    }
-    b.extend((name.len() as u32).to_le_bytes());
-    b.extend(name.bytes());
-    b.extend([1, 0]);
-    b
-}
-
-/// Pinned Sanctuary PacketClientBeginZoning field order. Fourth components are
-/// 1 for a point/identity quaternion; saved XYZ fields are retained on return.
-pub fn zone_begin_packet(zone: &ZoneTransition) -> Vec<u8> {
-    let mut b = 31_u16.to_le_bytes().to_vec();
-    b.extend((zone.name.len() as u32).to_le_bytes());
-    b.extend(zone.name.bytes());
-    b.extend(2_i32.to_le_bytes());
-    for v in zone
-        .position
-        .into_iter()
-        .chain([1_f32])
-        .chain(zone.rotation)
-        .chain([1_f32])
-    {
-        b.extend(v.to_le_bytes());
-    }
-    b.extend((zone.sky.len() as u32).to_le_bytes());
-    b.extend(zone.sky.bytes());
-    b.extend([u8::from(zone.tutorial), 0]);
-    b.extend((zone.zone_id as i32).to_le_bytes());
-    b.extend(0_f32.to_le_bytes());
-    b.extend(zone.geometry_id.to_le_bytes());
-    b.extend([1, 0]);
-    b
-}
-
-fn spawn_actor(template: &[u8], a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-    let mut b = template.to_vec();
-    b[4..12].copy_from_slice(&a.guid.to_le_bytes());
-    b[12..16].copy_from_slice(&a.name_id.to_le_bytes());
-    b[16..20].copy_from_slice(&a.model_id.to_le_bytes());
-    if let Some(scale) = a.scale {
-        // AddNpc: unknown flag (20), bubble colours and size (21..33), scale.
-        b[33..37].copy_from_slice(&scale.to_le_bytes());
-    }
-    for (i, v) in position.into_iter().enumerate() {
-        b[37 + i * 4..41 + i * 4].copy_from_slice(&v.to_le_bytes());
-    }
-    b[69..73].copy_from_slice(&0_i32.to_le_bytes());
-    b[77..81].copy_from_slice(&disposition.to_le_bytes());
-    b[128..132].copy_from_slice(&3.0_f32.to_le_bytes());
-    b[133..137].copy_from_slice(&(if disposition == 2 { 12_i32 } else { 3_i32 }).to_le_bytes());
-    b[137..141].copy_from_slice(&2_i32.to_le_bytes());
-    b[141..145].copy_from_slice(&3_i32.to_le_bytes());
-    b[145..149].copy_from_slice(&1_i32.to_le_bytes());
-    b[233..237].copy_from_slice(&2_i32.to_le_bytes());
-    replace_string(&mut b, 106, &a.name);
-    replace_string(&mut b, 81, &a.texture_alias);
-    b
-}

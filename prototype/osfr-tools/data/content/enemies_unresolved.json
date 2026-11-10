@@ -76,8 +76,8 @@
     "existing_model_id_gaps": 0,
     "known_ability_evidence_strings": 28,
     "w58b_definitions_added": 24,
-    "client_model_table_pairs_checked": 107,
-    "catalog_pairs_present": 105,
+    "client_model_table_pairs_checked": 112,
+    "catalog_pairs_present": 110,
     "catalog_pairs_missing": 2,
     "world_rows_resolved": 36,
     "world_rows_partial": 3,
@@ -20928,6 +20928,176 @@
       ],
       "binding_evidence": "T699: reference actor definition 2714 (Npcs.json ModelId 53, blackwidowqueen.adr) shares model 53 with the quest target 'Queen Arachnia' (locale 3592). Kill target of q3160029 objective 1.0.",
       "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930080,
+      "enemy_id": "frostfang_prowler",
+      "kind": "Frostfang Prowler",
+      "model_id": 177,
+      "adr": "wolf_evil.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 178,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 177,
+        "filename": "wolf_evil.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24665,
+        "extracted_path": "pack_07/000445.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "capture_model_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The March 2014 capture sent 'Frostfang Prowler' (locale 116023) on model 177; Models.txt maps 177 to wolf_evil.adr; the catalog contains the asset.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "Model table and catalog rows checked; no ADR closure was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930081,
+      "enemy_id": "frostfang_howler",
+      "kind": "Frostfang Howler",
+      "model_id": 177,
+      "adr": "wolf_evil.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 178,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 177,
+        "filename": "wolf_evil.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24665,
+        "extracted_path": "pack_07/000445.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "capture_model_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The March 2014 capture sent 'Frostfang Howler' (locale 115837) on model 177; Models.txt maps 177 to wolf_evil.adr; the catalog contains the asset.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "Model table and catalog rows checked; no ADR closure was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930082,
+      "enemy_id": "frostfang_alpha",
+      "kind": "Frostfang Alpha",
+      "model_id": 176,
+      "adr": "wolf.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 177,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 176,
+        "filename": "wolf.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 5644,
+        "extracted_path": "pack_01/002214.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "capture_model_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The March 2014 capture sent 'Frostfang Alpha' (locale 423045) on model 176; Models.txt maps 176 to wolf.adr; the catalog contains the asset.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "Model table and catalog rows checked; no ADR closure was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930083,
+      "enemy_id": "feathered_drake_defender",
+      "kind": "Feathered Drake Defender",
+      "model_id": 3978,
+      "adr": "feathereddrake_m_drakeling.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3160,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 3978,
+        "filename": "feathereddrake_m_drakeling.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 18721,
+        "extracted_path": "pack_05/001011.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "capture_model_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The March 2014 capture sent 'Feathered Drake Defender' (locale 439211) on model 3978; Models.txt maps 3978 to feathereddrake_m_drakeling.adr; the catalog contains the asset.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "Model table and catalog rows checked; no ADR closure was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 930084,
+      "enemy_id": "feathered_drake_ambusher",
+      "kind": "Feathered Drake Ambusher",
+      "model_id": 3976,
+      "adr": "feathereddrake_m_basic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3158,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 3976,
+        "filename": "feathereddrake_m_basic.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 18733,
+        "extracted_path": "pack_05/001023.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "capture_model_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The March 2014 capture sent 'Feathered Drake Ambusher' (locale 439212) on model 3976; Models.txt maps 3976 to feathereddrake_m_basic.adr; the catalog contains the asset.",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "Model table and catalog rows checked; no ADR closure was performed."
+      },
       "runtime_scale": null,
       "texture_alias": "",
       "capture": null

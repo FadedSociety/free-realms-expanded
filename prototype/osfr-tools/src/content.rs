@@ -230,6 +230,8 @@ pub(crate) enum AnyOfFamily {
     TalkToNpc,
     CollectItem,
     GatherResource,
+    /// Combat design section 12: "defeat any of these kinds" as plain `defeat` leaves.
+    Defeat,
 }
 
 /// One leaf of a [`ContentGoal::AnyOf`]. The leaf names only the id the event carries;
@@ -241,6 +243,8 @@ pub enum AnyOfTarget {
     TalkToNpc { npc_id: u64 },
     CollectItem { item_id: i32 },
     GatherResource { resource_id: u32 },
+    /// One enemy definition; the leaf has no place or condition of its own.
+    Defeat { model_id: u32 },
 }
 
 impl AnyOfTarget {
@@ -249,12 +253,14 @@ impl AnyOfTarget {
             Self::TalkToNpc { .. } => AnyOfFamily::TalkToNpc,
             Self::CollectItem { .. } => AnyOfFamily::CollectItem,
             Self::GatherResource { .. } => AnyOfFamily::GatherResource,
+            Self::Defeat { .. } => AnyOfFamily::Defeat,
         }
     }
 
-    /// The positive id a matching event must carry, across the three families.
+    /// The positive id a matching event must carry, across the families.
     fn target_id(&self) -> Option<u64> {
         match self {
+            Self::Defeat { model_id } => (*model_id != 0).then_some(u64::from(*model_id)),
             Self::TalkToNpc { npc_id } => (*npc_id != 0).then_some(*npc_id),
             Self::CollectItem { item_id } => u64::try_from(*item_id).ok().filter(|id| *id > 0),
             Self::GatherResource { resource_id } => {
@@ -302,12 +308,165 @@ pub(crate) fn validate_any_of(
     Ok(())
 }
 
+/// (R) Combat design section 12: what must also be true of a kill for a `defeat` goal to count
+/// it. Every field narrows; a goal's `with` names at least one.
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct DefeatWith {
+    /// One name on the kill's credit list.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub solo: bool,
+    /// The credited player's active profile (job) id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job: Option<u32>,
+    /// The ability that landed the kill.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ability_id: Option<i32>,
+    /// The item (a borrowed weapon, a thrown consumable) that landed the kill.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub item_id: Option<i32>,
+}
+
+/// (R) The most enemy kinds one `defeat` goal lists.
+pub(crate) const MAX_DEFEAT_KINDS: usize = 16;
+/// (R) The longest fight goal name a `fight_goal` step may carry.
+pub(crate) const MAX_FIGHT_GOAL_CHARS: usize = 64;
+
+/// The authored `defeat` shape. One kind (`model_id`), several (`kinds`) or, with a place,
+/// none at all ("enemies in Briarheart Caverns 0/30"). Both quest loaders call this.
+pub(crate) fn validate_defeat(goal: &ContentGoal) -> Result<(), &'static str> {
+    let ContentGoal::Defeat {
+        model_id,
+        kinds,
+        count,
+        in_fight,
+        in_area,
+        in_zone,
+        with,
+        ..
+    } = goal
+    else {
+        return Ok(());
+    };
+    if !(1..=crate::quest_engine::MAX_COUNT).contains(count) {
+        return Err("defeat goal count must be 1..=MAX_COUNT");
+    }
+    if *model_id != 0 && !kinds.is_empty() {
+        return Err("defeat goal names model_id or kinds, not both");
+    }
+    if kinds.len() > MAX_DEFEAT_KINDS || kinds.contains(&0) {
+        return Err("defeat goal kinds must be 1 to 16 positive ids");
+    }
+    if kinds
+        .iter()
+        .enumerate()
+        .any(|(index, kind)| kinds[..index].contains(kind))
+    {
+        return Err("defeat goal must not repeat a kind");
+    }
+    if *in_fight == Some(0) || *in_area == Some(0) {
+        return Err("defeat goal in_fight and in_area must be positive");
+    }
+    // Zone 0 is the open world, so `in_zone` has no zero rule.
+    let placed = in_fight.is_some() || in_area.is_some() || in_zone.is_some();
+    if *model_id == 0 && kinds.is_empty() && !placed {
+        return Err("defeat goal needs model_id, kinds or a place");
+    }
+    if let Some(with) = with {
+        if *with == DefeatWith::default() {
+            return Err("defeat goal `with` needs at least one condition");
+        }
+        if with.job == Some(0)
+            || with.ability_id.is_some_and(|id| id <= 0)
+            || with.item_id.is_some_and(|id| id <= 0)
+        {
+            return Err("defeat goal `with` ids must be positive");
+        }
+    }
+    Ok(())
+}
+
+/// The authored `interact_actor` shape. A plain step names one drawn actor. A `guarded` step
+/// is a captive: one actor by guid, or `count` actors of one kind.
+pub(crate) fn validate_interact_actor(goal: &ContentGoal) -> Result<(), &'static str> {
+    let ContentGoal::InteractActor {
+        actor_guid,
+        actor_kind_id,
+        count,
+        guarded,
+        ..
+    } = goal
+    else {
+        return Ok(());
+    };
+    if !*guarded {
+        return if *actor_guid == 0 || actor_kind_id.is_some() || count.is_some() {
+            Err("interact_actor needs a positive actor_guid; actor_kind_id and count need guarded")
+        } else {
+            Ok(())
+        };
+    }
+    if *actor_kind_id == Some(0) || (*actor_guid == 0) == actor_kind_id.is_none() {
+        return Err("guarded interact_actor names one positive actor_guid or one actor_kind_id");
+    }
+    if count.is_some_and(|count| {
+        !(1..=crate::quest_engine::MAX_COUNT).contains(&count) || (*actor_guid != 0 && count != 1)
+    }) {
+        return Err("guarded interact_actor count must be 1..=MAX_COUNT, and 1 for one actor");
+    }
+    Ok(())
+}
+
+/// A fight goal name: 1..=64 printable ASCII characters without spaces (the `id` of a fight
+/// objective, design section 10).
+pub(crate) fn valid_fight_goal(goal: &str) -> bool {
+    (1..=MAX_FIGHT_GOAL_CHARS).contains(&goal.len()) && goal.bytes().all(|b| b.is_ascii_graphic())
+}
+
+fn is_zero(value: &u32) -> bool {
+    *value == 0
+}
+
+fn is_zero_u64(value: &u64) -> bool {
+    *value == 0
+}
+
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ContentGoal {
+    /// Defeat `count` enemies. `model_id` is one enemy definition id (the shape every shipped
+    /// quest uses). (R) Section 12 adds: `kinds` for several definitions, `in_fight` /
+    /// `in_area` / `in_zone` for a place (kinds then optional), and `with` for a condition.
     Defeat {
         id: u32,
+        #[serde(default, skip_serializing_if = "is_zero")]
         model_id: u32,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        kinds: Vec<u32>,
+        count: u32,
+        /// A battle, dungeon or fight id.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        in_fight: Option<u32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        in_area: Option<u32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        in_zone: Option<u32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        with: Option<DefeatWith>,
+        source: Vec<SourceTag>,
+    },
+    /// (R) Section 12: the player's run of this battle, dungeon or fight began.
+    EnterFight {
+        id: u32,
+        fight_id: u32,
+        source: Vec<SourceTag>,
+    },
+    /// (R) Section 12: a counted goal inside one fight ("Defend Darkthorne from the Gloam
+    /// 0/3"). `goal` is the fight objective's id.
+    FightGoal {
+        id: u32,
+        fight_id: u32,
+        goal: String,
         count: u32,
         source: Vec<SourceTag>,
     },
@@ -428,9 +587,20 @@ pub enum ContentGoal {
         source: Vec<SourceTag>,
     },
     /// (R) An accepted, non-talk interaction with one exact runtime actor.
+    /// (R) Section 12: `guarded` makes it a captive ("rescue", "free", "save"). Only the
+    /// fight's own "freed" fact credits it, which the fight raises once the captive's guards
+    /// are dead; a click before that credits nothing. A captive is one `actor_guid`, or
+    /// `count` actors of `actor_kind_id` (fight actors get their guids at run time).
     InteractActor {
         id: u32,
+        #[serde(default, skip_serializing_if = "is_zero_u64")]
         actor_guid: u64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        actor_kind_id: Option<u32>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        count: Option<u32>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        guarded: bool,
         source: Vec<SourceTag>,
     },
     /// (R) The authoritative terminal win of one encounter or field battle.
@@ -471,6 +641,8 @@ impl ContentGoal {
     fn id(&self) -> u32 {
         match self {
             Self::Defeat { id, .. }
+            | Self::EnterFight { id, .. }
+            | Self::FightGoal { id, .. }
             | Self::TalkToNpc { id, .. }
             | Self::DeliverItem { id, .. }
             | Self::CollectItem { id, .. }
@@ -1097,6 +1269,8 @@ impl ContentDb {
 fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentError> {
     let (id, source) = match goal {
         ContentGoal::Defeat { id, source, .. }
+        | ContentGoal::EnterFight { id, source, .. }
+        | ContentGoal::FightGoal { id, source, .. }
         | ContentGoal::TalkToNpc { id, source, .. }
         | ContentGoal::DeliverItem { id, source, .. }
         | ContentGoal::CollectItem { id, source, .. }
@@ -1153,8 +1327,28 @@ fn validate_goal(
     items: &HashSet<String>,
     job_profiles: &HashSet<String>,
 ) -> Result<(), ContentError> {
+    let shape = |detail: &'static str| ContentError::InvalidRecord {
+        record: owner.to_owned(),
+        detail: detail.to_owned(),
+    };
     match goal {
-        ContentGoal::Defeat { .. } => Ok(()),
+        // The reachability gate resolves the kinds and the fight; this pass has no enemy table.
+        ContentGoal::Defeat { .. } => validate_defeat(goal).map_err(shape),
+        ContentGoal::EnterFight { fight_id, .. } => {
+            positive_goal_field(owner, "goal.fight_id", u64::from(*fight_id))
+        }
+        ContentGoal::FightGoal {
+            fight_id,
+            goal: name,
+            count,
+            ..
+        } => {
+            positive_goal_field(owner, "goal.fight_id", u64::from(*fight_id))?;
+            if !valid_fight_goal(name) {
+                return Err(shape("goal.goal must be 1..=64 printable characters"));
+            }
+            use_goal_count(owner, count)
+        }
         ContentGoal::TalkToNpc {
             npc_id,
             lines,
@@ -1332,8 +1526,9 @@ fn validate_goal(
                         item_id,
                         items.contains(&item_id.to_string()),
                     )?,
-                    // The quest engine validates the resource binding, like gather_resource.
-                    AnyOfTarget::GatherResource { .. } => {}
+                    // The quest engine validates the resource binding, like gather_resource;
+                    // the reachability gate resolves a defeat leaf's kind.
+                    AnyOfTarget::GatherResource { .. } | AnyOfTarget::Defeat { .. } => {}
                 }
             }
             Ok(())
@@ -1343,9 +1538,7 @@ fn validate_goal(
         | ContentGoal::CraftRecipe { .. }
         | ContentGoal::VisitPosition { .. }
         | ContentGoal::ClientReported { .. } => Ok(()),
-        ContentGoal::InteractActor { actor_guid, .. } => {
-            positive_goal_field(owner, "goal.actor_guid", *actor_guid)
-        }
+        ContentGoal::InteractActor { .. } => validate_interact_actor(goal).map_err(shape),
         ContentGoal::CompleteDungeon { encounter_id, .. } => {
             positive_goal_field(owner, "goal.encounter_id", u64::from(*encounter_id))
         }

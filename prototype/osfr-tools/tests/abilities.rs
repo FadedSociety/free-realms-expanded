@@ -311,9 +311,9 @@ fn healing_emits_hitpoint_delta_and_health_energy_updates() {
     delta.extend(CASTER.to_le_bytes());
     delta.extend(TARGET.to_le_bytes());
     delta.push(1);
+    push_i32(&mut delta, 0);
+    push_i32(&mut delta, 0);
     push_i32(&mut delta, 60);
-    push_i32(&mut delta, 0);
-    push_i32(&mut delta, 0);
     delta.push(0);
     let mut hp = packet(38, 1, &[]);
     push_i32(&mut hp, 100);
@@ -343,9 +343,9 @@ fn first_aid_can_select_the_caster_as_its_target() {
     delta.extend(CASTER.to_le_bytes());
     delta.extend(CASTER.to_le_bytes());
     delta.push(1);
+    push_i32(&mut delta, 0);
+    push_i32(&mut delta, 0);
     push_i32(&mut delta, 60);
-    push_i32(&mut delta, 0);
-    push_i32(&mut delta, 0);
     delta.push(0);
     let mut hp = packet(38, 1, &[]);
     push_i32(&mut hp, 100);

@@ -1,0 +1,714 @@
+[
+ {
+  "name": "hitpoints_damage",
+  "packet": "35/35",
+  "capture": "p12.pcap",
+  "t": 408.1,
+  "hex": "2300230071bcce2f13ca544b520000003009500001040100002d00000029ffffff00",
+  "fields": {
+   "source": 5428185634643557489,
+   "target": 22528099899932754,
+   "show": true,
+   "max": 260,
+   "current": 45,
+   "delta": -215,
+   "crit": false
+  },
+  "note": "a player hit on a Bixie Soldier: max 260, current 45, delta -215"
+ },
+ {
+  "name": "hitpoints_overkill",
+  "packet": "35/35",
+  "capture": "p12.pcap",
+  "t": 408.8,
+  "hex": "2300230071bcce2f13ca544b5200000030095000010401000058ffffff29ffffff00",
+  "fields": {
+   "source": 5428185634643557489,
+   "target": 22528099899932754,
+   "show": true,
+   "max": 260,
+   "current": -168,
+   "delta": -215,
+   "crit": false
+  },
+  "note": "the lethal hit: current is not clamped at zero"
+ },
+ {
+  "name": "hitpoints_regen",
+  "packet": "35/35",
+  "capture": "p12.pcap",
+  "t": 408.1,
+  "hex": "230023005200000030095000520000003009500000040100002f0000000200000000",
+  "fields": {
+   "source": 22528099899932754,
+   "target": 22528099899932754,
+   "show": false,
+   "max": 260,
+   "current": 47,
+   "delta": 2,
+   "crit": false
+  },
+  "note": "the soldier in-fight regeneration tick, show 0, source = target"
+ },
+ {
+  "name": "hitpoints_statement",
+  "packet": "35/35",
+  "capture": "p12.pcap",
+  "t": 389.3,
+  "hex": "23002300c15fd02f13ca544bc15fd02f13ca544b0090010000900100000000000000",
+  "fields": {
+   "source": 5428185634643664833,
+   "target": 5428185634643664833,
+   "show": false,
+   "max": 400,
+   "current": 400,
+   "delta": 0,
+   "crit": false
+  },
+  "note": "the player health statement after a job switch: (max, current, 0), show 0"
+ },
+ {
+  "name": "hitpoints_crit",
+  "packet": "35/35",
+  "capture": "p12.pcap",
+  "t": 546274.5,
+  "hex": "2300230091ca73956acc524b020650022001000001f80200004aeeffff52ebffff01",
+  "fields": {
+   "source": 5427625259080862353,
+   "target": 1236989380098,
+   "show": true,
+   "max": 760,
+   "current": -4534,
+   "delta": -5294,
+   "crit": true
+  },
+  "note": "the only crit row: trailing byte 1"
+ },
+ {
+  "name": "hitpoints_heal",
+  "packet": "35/35",
+  "capture": "packets_3.pcapng",
+  "t": 163.5,
+  "hex": "2300230091ca73956acc524b91ca73956acc524b01c4090000c40900008a01000000",
+  "fields": {
+   "source": 5427625259080862353,
+   "target": 5427625259080862353,
+   "show": true,
+   "max": 2500,
+   "current": 2500,
+   "delta": 394,
+   "crit": false
+  },
+  "note": "a shown self heal: +394 on a 2,500 health player"
+ },
+ {
+  "name": "hitpoints_player_regen",
+  "packet": "35/35",
+  "capture": "packets_3.pcapng",
+  "t": 37.9,
+  "hex": "2300230091ca73956acc524b91ca73956acc524b00941e00006a1e00004700000000",
+  "fields": {
+   "source": 5427625259080862353,
+   "target": 5427625259080862353,
+   "show": false,
+   "max": 7828,
+   "current": 7786,
+   "delta": 71,
+   "crit": false
+  },
+  "note": "in-fight regeneration of the player, +71 a second, show 0"
+ },
+ {
+  "name": "state_idle",
+  "packet": "35/20",
+  "capture": "p12.pcap",
+  "t": 18.6,
+  "hex": "23001400d13886f81cad544b01000000",
+  "fields": {
+   "guid": 5428153790828525777,
+   "bits": 1
+  },
+  "note": "a live actor at rest"
+ },
+ {
+  "name": "state_fighting",
+  "packet": "35/20",
+  "capture": "p12.pcap",
+  "t": 384.8,
+  "hex": "23001400520000003009500001800000",
+  "fields": {
+   "guid": 22528099899932754,
+   "bits": 32769
+  },
+  "note": "from the moment it goes for a player"
+ },
+ {
+  "name": "state_going_home",
+  "packet": "35/20",
+  "capture": "p12.pcap",
+  "t": 393.9,
+  "hex": "23001400520000003009500001400000",
+  "fields": {
+   "guid": 22528099899932754,
+   "bits": 16385
+  },
+  "note": "running home; the client shows Immune"
+ },
+ {
+  "name": "state_nonattackable",
+  "packet": "35/20",
+  "capture": "p12.pcap",
+  "t": 546069.8,
+  "hex": "23001400b10373bb545c534b01010000",
+  "fields": {
+   "guid": 5427783494903464881,
+   "bits": 257
+  },
+  "note": "bit 8, Nonattackable"
+ },
+ {
+  "name": "state_knocked_out_fighting",
+  "packet": "35/20",
+  "capture": "packets_3.pcapng",
+  "t": 114.5,
+  "hex": "2300140091ca73956acc524b80800000",
+  "fields": {
+   "guid": 5427625259080862353,
+   "bits": 32896
+  },
+  "note": "bit 7 on the wire: knocked out, fighting bit kept, bit 0 dropped"
+ },
+ {
+  "name": "state_knocked_out",
+  "packet": "35/20",
+  "capture": "packets_3.pcapng",
+  "t": 114.5,
+  "hex": "2300140091ca73956acc524b81000000",
+  "fields": {
+   "guid": 5427625259080862353,
+   "bits": 129
+  },
+  "note": "bit 7 with bit 0"
+ },
+ {
+  "name": "speed_walk",
+  "packet": "35/23",
+  "capture": "p12.pcap",
+  "t": 384.8,
+  "hex": "23001700520000003009500000009040",
+  "fields": {
+   "guid": 22528099899932754,
+   "metres_per_s": 4.5
+  },
+  "note": "Bixie Soldier walk speed, sent with state 0x8001"
+ },
+ {
+  "name": "speed_run",
+  "packet": "35/23",
+  "capture": "p12.pcap",
+  "t": 387.2,
+  "hex": "23001700520000003009500000001041",
+  "fields": {
+   "guid": 22528099899932754,
+   "metres_per_s": 9.0
+  },
+  "note": "run speed while following"
+ },
+ {
+  "name": "speed_home",
+  "packet": "35/23",
+  "capture": "p12.pcap",
+  "t": 393.9,
+  "hex": "23001700520000003009500000002041",
+  "fields": {
+   "guid": 22528099899932754,
+   "metres_per_s": 10.0
+  },
+  "note": "speed while returning home"
+ },
+ {
+  "name": "death_field",
+  "packet": "35/3",
+  "capture": "p12.pcap",
+  "t": 408.8,
+  "hex": "230003000100520000003009500001881300000000000099130000e8030000",
+  "fields": {
+   "guid": 22528099899932754,
+   "animate": true,
+   "delay_ms": 5000,
+   "effect_delay_ms": 0,
+   "effect_id": 5017,
+   "duration_ms": 1000
+  },
+  "note": "open world: animate 1, delay 5000, effect 5017, duration 1000"
+ },
+ {
+  "name": "death_battle",
+  "packet": "35/3",
+  "capture": "p12.pcap",
+  "t": 546253.2,
+  "hex": "230003000100020650023000000001d00700000000000099130000e8030000",
+  "fields": {
+   "guid": 206197229058,
+   "animate": true,
+   "delay_ms": 2000,
+   "effect_delay_ms": 0,
+   "effect_id": 5017,
+   "duration_ms": 1000
+  },
+  "note": "battle: delay 2000"
+ },
+ {
+  "name": "enemy_hit",
+  "packet": "32/7",
+  "capture": "p12.pcap",
+  "t": 384.8,
+  "hex": "200007005200000030095000520000003009500071bcce2f13ca544b19000000900100002115000000000000000090010000",
+  "fields": {
+   "attacker": 22528099899932754,
+   "target": 5428185634643557489,
+   "damage": 25,
+   "target_max": 400,
+   "effect": 5409,
+   "special": false,
+   "knockout": false,
+   "target_current": 400
+  },
+  "note": "a Bixie bite: raw damage 25 on a 400 health player"
+ },
+ {
+  "name": "enemy_hit_special",
+  "packet": "32/7",
+  "capture": "p12.pcap",
+  "t": 546304.8,
+  "hex": "200007000206500240020000020650024002000091ca73956acc524b0c000000941e0000f6150000010000000000941e0000",
+  "fields": {
+   "attacker": 2473939961346,
+   "target": 5427625259080862353,
+   "damage": 12,
+   "target_max": 7828,
+   "effect": 5622,
+   "special": true,
+   "knockout": false,
+   "target_current": 7828
+  },
+  "note": "a 1.5x hit: effect 5622, first flag byte"
+ },
+ {
+  "name": "enemy_hit_knockout",
+  "packet": "32/7",
+  "capture": "packets_3.pcapng",
+  "t": 114.5,
+  "hex": "200007004200000070ad6b014200000070ad6b0191ca73956acc524bce000000c4090000ff15000000010000000063000000",
+  "fields": {
+   "attacker": 102366113093910594,
+   "target": 5427625259080862353,
+   "damage": 206,
+   "target_max": 2500,
+   "effect": 5631,
+   "special": false,
+   "knockout": true,
+   "target_current": 99
+  },
+  "note": "the hit that knocked the player out: effect 5631, second flag byte"
+ },
+ {
+  "name": "dodge",
+  "packet": "32/6",
+  "capture": "p12.pcap",
+  "t": 546288.2,
+  "hex": "2000060002065002b001000091ca73956acc524b",
+  "fields": {
+   "attacker": 1855464670722,
+   "target": 5427625259080862353
+  },
+  "note": "a hit that did no damage"
+ },
+ {
+  "name": "cast_player_basic",
+  "packet": "36/3",
+  "capture": "p12.pcap",
+  "t": 546246.6,
+  "hex": "2400030091ca73956acc524b91ca73956acc524b00000000000000001f1300000000000000",
+  "fields": {
+   "caster": 5427625259080862353,
+   "target": 5427625259080862353,
+   "ability": 4895
+  },
+  "note": "a player basic: the second id is the caster again"
+ },
+ {
+  "name": "cast_enemy",
+  "packet": "36/3",
+  "capture": "p12.pcap",
+  "t": 388.3,
+  "hex": "2400030082000000d0d70000c15fd02f13ca544b00000000000000004a0e00000000000000",
+  "fields": {
+   "caster": 237288353169538,
+   "target": 5428185634643664833,
+   "ability": 3658
+  },
+  "note": "an enemy cast at a player: the second id is the target"
+ },
+ {
+  "name": "reaction_recoil",
+  "packet": "36/14",
+  "capture": "p12.pcap",
+  "t": 546306.6,
+  "hex": "24000e0002065002f0010000600400000000000000004040",
+  "fields": {
+   "guid": 2130342577666,
+   "animation": 1120,
+   "seconds": 3.0
+  },
+  "note": "com_recoil for 3 s"
+ },
+ {
+  "name": "reaction_knock_down",
+  "packet": "36/14",
+  "capture": "p12.pcap",
+  "t": 546160.5,
+  "hex": "24000e006199045f4380544b7a0500000000000000000000",
+  "fields": {
+   "guid": 5428104477733591393,
+   "animation": 1402,
+   "seconds": 0.0
+  },
+  "note": "com_knock_down"
+ },
+ {
+  "name": "attach_going_home",
+  "packet": "35/41",
+  "capture": "p12.pcap",
+  "t": 393.9,
+  "hex": "230029005200000030095000020000000500000052000000300950000000000000000000",
+  "fields": {
+   "guid": 22528099899932754,
+   "tag": 2,
+   "effect": 5,
+   "source": 22528099899932754
+  },
+  "note": "the return-home glow, sent with state 0x4001 and speed 10"
+ },
+ {
+  "name": "detach_going_home",
+  "packet": "35/42",
+  "capture": "p12.pcap",
+  "t": 395.8,
+  "hex": "23002a00520000003009500002000000",
+  "fields": {
+   "guid": 22528099899932754,
+   "tag": 2
+  },
+  "note": "home again: the glow ends"
+ },
+ {
+  "name": "disposition",
+  "packet": "35/28",
+  "capture": "p12.pcap",
+  "t": 546306.7,
+  "hex": "23001c0002065002a002000001000000",
+  "fields": {
+   "guid": 2886256821762,
+   "value": 1
+  },
+  "note": "the battle Exit door made friendly"
+ },
+ {
+  "name": "respawn_window",
+  "packet": "41/125",
+  "capture": "packets_3.pcapng",
+  "t": 114.5,
+  "hex": "29007d00000000000000000000000000e8030000",
+  "fields": {
+   "timer_ms": 0,
+   "cost": 1000
+  },
+  "note": "timer 0 (client default), 1,000 coins"
+ },
+ {
+  "name": "settings_world",
+  "packet": "62",
+  "capture": "p12.pcap",
+  "t": 18.7,
+  "hex": "3e000000000000000000000000ffffffff0000803f100e00000000000000000000010000000000000000000000",
+  "fields": {
+   "flags": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "int_a": -1,
+   "float_b": 1.0,
+   "ints": [
+    3600,
+    0,
+    0,
+    1,
+    0,
+    0
+   ]
+  },
+  "note": "outside a battle"
+ },
+ {
+  "name": "settings_battle",
+  "packet": "62",
+  "capture": "p12.pcap",
+  "t": 546240.0,
+  "hex": "3e000101010101010101010101ffffffff0000fa4301000000a0860100f40100002c010000a861000088130000",
+  "fields": {
+   "flags": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   "int_a": -1,
+   "float_b": 500.0,
+   "ints": [
+    1,
+    100000,
+    500,
+    300,
+    25000,
+    5000
+   ]
+  },
+  "note": "the Frostfang Growlers battle"
+ },
+ {
+  "name": "stats_level_20",
+  "packet": "38/7",
+  "capture": "packets_3.pcapng",
+  "t": 13.6,
+  "hex": "2600070091ca73956acc524b190000000100000000000000941e00000200000001000000cdcc1c4103000000010000000000a04004000000000000006401000005000000000000006400000006000000000000000400000007000000000000005c0100000900000000000000050000000a000000010000000000a03f0b00000000000000640000000c000000010000000000803f0d00000000000000080000000f00000000000000e803000010000000000000000a00000014000000010000006666863f16000000010000000000803f21000000000000000300000022000000010000000000c03f24000000000000006400000025000000000000006400000035000000010000000000803f38000000010000000000803f39000000010000000000803f410000000000000047000000420000000000000004000000",
+  "fields": {
+   "guid": 5427625259080862353,
+   "rows": [
+    [
+     1,
+     "int",
+     7828
+    ],
+    [
+     2,
+     "float",
+     9.800000190734863
+    ],
+    [
+     3,
+     "float",
+     5.0
+    ],
+    [
+     4,
+     "int",
+     356
+    ],
+    [
+     5,
+     "int",
+     100
+    ],
+    [
+     6,
+     "int",
+     4
+    ],
+    [
+     7,
+     "int",
+     348
+    ],
+    [
+     9,
+     "int",
+     5
+    ],
+    [
+     10,
+     "float",
+     1.25
+    ],
+    [
+     11,
+     "int",
+     100
+    ],
+    [
+     12,
+     "float",
+     1.0
+    ],
+    [
+     13,
+     "int",
+     8
+    ],
+    [
+     15,
+     "int",
+     1000
+    ],
+    [
+     16,
+     "int",
+     10
+    ],
+    [
+     20,
+     "float",
+     1.0499999523162842
+    ],
+    [
+     22,
+     "float",
+     1.0
+    ],
+    [
+     33,
+     "int",
+     3
+    ],
+    [
+     34,
+     "float",
+     1.5
+    ],
+    [
+     36,
+     "int",
+     100
+    ],
+    [
+     37,
+     "int",
+     100
+    ],
+    [
+     53,
+     "float",
+     1.0
+    ],
+    [
+     56,
+     "float",
+     1.0
+    ],
+    [
+     57,
+     "float",
+     1.0
+    ],
+    [
+     65,
+     "int",
+     71
+    ],
+    [
+     66,
+     "int",
+     4
+    ]
+   ]
+  },
+  "note": "a level 20 stat block, 25 rows"
+ },
+ {
+  "name": "tag_remove",
+  "packet": "38/17",
+  "capture": "p12.pcap",
+  "t": 18.7,
+  "hex": "2600110002000000",
+  "fields": {
+   "id": 2
+  },
+  "note": "remove one buff icon"
+ },
+ {
+  "name": "energy",
+  "packet": "38/13",
+  "capture": "p12.pcap",
+  "t": 18.7,
+  "hex": "26000d00640000006400000000",
+  "fields": {
+   "current": 100,
+   "max": 100,
+   "flag": 0
+  },
+  "note": "energy 100 of 100"
+ },
+ {
+  "name": "speech",
+  "packet": "15/4",
+  "capture": "p12.pcap",
+  "t": 264.3,
+  "hex": "0f00040052000000302100003db700000000000000000091ca73956acc524b000000000000000000000000",
+  "fields": {
+   "speaker": 36490042146898,
+   "string_id": 46909,
+   "flags": [
+    0,
+    0,
+    0
+   ],
+   "listener": 5427625259080862353
+  },
+  "note": "an NPC line by string id: all three flag bytes clear, the listener in the first trailing id"
+ },
+ {
+  "name": "launch_4895_second",
+  "packet": "36/4",
+  "capture": "p12.pcap",
+  "t": 546253.1,
+  "hex": "2400040091ca73956acc524b0100000004000000000000000000000000000000000000000206500230000000ffffffff00000000000000004b0400000000000058020000000060040000943b0000000000000000000000000000000000000000803f0000000000000000140000000100000000000000dd3e0000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000803f000000000000000000000000000000000000803f000000000000000000000000000000803f0000803f00000000943b000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+  "fields": {
+   "template": "4895",
+   "caster": 5427625259080862353,
+   "target": 206197229058
+  },
+  "note": "a second row of the template: only the guids and the cast counter differ"
+ },
+ {
+  "name": "launch_5994_second",
+  "packet": "36/4",
+  "capture": "p12.pcap",
+  "t": 546253.2,
+  "hex": "2400040091ca73956acc524b0100000004000000000000000000000000000000000000000206500230000000ffffffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000803f00000000000000001500000000000000ffffffff00000000000000000000000001000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000803f000000000000000000000000000000000000803f000000000000000000000000000000803f0000803f000000000000000000000000000000000000000000000000000000000000000000000000000000000000484200000000",
+  "fields": {
+   "template": "5994",
+   "caster": 5427625259080862353,
+   "target": 206197229058
+  },
+  "note": "a second row of the template: only the guids and the cast counter differ"
+ },
+ {
+  "name": "launch_5060_second",
+  "packet": "36/4",
+  "capture": "packets_3.pcapng",
+  "t": 139.6,
+  "hex": "2400040091ca73956acc524b0100000004000000000000000000000000000000000000004200000070ad6b01ffffffff0e000000000000004b0400000000000058020000000060040000923b0000000000000000000000000000000000000000803f0000000000000000b5da32000100000000000000e13e000000000000000000000000000000000000000000f041000000000000000000000000000000000000000000000000000000000000000000000000000000000000803f140000006172726f775f70726f6a656374696c652e6164720000000000000000000000000000803f000000000000000000000000000000803f0000803fe13e0000923b000000000000000000000000000000000000000000000000000000000000000000000000704100000000",
+  "fields": {
+   "template": "5060",
+   "caster": 5427625259080862353,
+   "target": 102366113093910594
+  },
+  "note": "a second row of the template: only the guids and the cast counter differ"
+ }
+]

@@ -45,6 +45,8 @@ pub(super) struct SkillEffects {
     pub(super) holds: BTreeMap<u64, Hold>,
     pub(super) caster_buffs: BTreeMap<i32, SkillBuff>,
     pub(super) target_buffs: BTreeMap<(u64, i32), SkillBuff>,
+    /// The weapon kits and the status book (`kits.rs`).
+    pub(super) kit: kits::KitRun,
 }
 
 impl SkillEffects {
@@ -54,6 +56,7 @@ impl SkillEffects {
         self.holds.clear();
         self.caster_buffs.clear();
         self.target_buffs.clear();
+        self.kit.reset();
     }
 
     /// A defeated or evaded incarnation ends: drop every effect on it.
@@ -62,6 +65,7 @@ impl SkillEffects {
         self.stuns.remove(&guid);
         self.holds.remove(&guid);
         self.target_buffs.retain(|(target, _), _| *target != guid);
+        self.kit.book.forget(guid);
     }
 
     pub(super) fn expire(&mut self, now_ms: u64) {
@@ -82,6 +86,7 @@ impl SkillEffects {
         self.holds
             .get(&guid)
             .is_some_and(|hold| hold.root && now_ms < hold.until)
+            || self.kit.book.blocked(guid, "move", now_ms)
     }
 
     /// L092: where a scared enemy runs from, while it is scared.
@@ -95,6 +100,10 @@ impl SkillEffects {
     /// L089: a hit that deals damage ends a sleep or a root; a scare runs its course, and so does
     /// any stun (L101).
     pub(super) fn wake(&mut self, guid: u64, dealt: u32) {
+        // A status that breaks on damage (sleep) ends here too, with its hold on the enemy.
+        if dealt > 0 && self.kit.book.broken_by_damage(guid) {
+            self.stuns.remove(&guid);
+        }
         if dealt > 0
             && self
                 .holds
@@ -118,7 +127,9 @@ impl SkillEffects {
             .filter(|((guid, _), _)| *guid == target)
             .map(|(_, buff)| buff.taken)
             .fold(1.0_f32, f32::max);
-        (damage as f32 * outgoing * taken).round() as u32
+        let kit = &self.kit;
+        let statuses = kit.book.dealt(kits::status::ME) * kit.book.taken(target) * kit.passive.dealt;
+        (damage as f32 * outgoing * taken * statuses).round() as u32
     }
 
     pub(super) fn mitigation(&self) -> f32 {
@@ -126,6 +137,8 @@ impl SkillEffects {
             .values()
             .map(|buff| buff.taken)
             .fold(1.0_f32, f32::min)
+            * self.kit.book.taken(kits::status::ME)
+            * self.kit.passive.taken
     }
 
     pub(super) fn crit_bonus(&self) -> u32 {
@@ -134,6 +147,8 @@ impl SkillEffects {
             .map(|buff| buff.crit)
             .max()
             .unwrap_or(0)
+            .saturating_add(self.kit.passive.crit + self.kit.crit_against)
+            .saturating_add_signed(self.kit.book.crit(kits::status::ME))
     }
 
     pub(super) fn crit_damage_bonus(&self) -> f32 {
@@ -141,6 +156,8 @@ impl SkillEffects {
             .values()
             .map(|buff| buff.crit_damage)
             .fold(0.0_f32, f32::max)
+            + self.kit.passive.crit_damage
+            + self.kit.book.crit_damage(kits::status::ME)
     }
 }
 
@@ -149,6 +166,8 @@ pub(super) fn merge_skill_outcome(out: &mut EncounterOutcome, other: EncounterOu
     out.replies.extend(other.replies);
     out.rewards.extend(other.rewards);
     out.defeated.extend(other.defeated);
+    out.kills.extend(other.kills);
+    out.facts.extend(other.facts);
     out.abilities_used.extend(other.abilities_used);
     out.completed = other.completed.or(out.completed);
     out.win_completed = other.win_completed.or(out.win_completed);
@@ -173,7 +192,10 @@ impl EncounterEngine {
         profile_id: i32,
         now_ms: u64,
     ) -> io::Result<EncounterOutcome> {
-        use crate::abilities::{build_energy, build_failure, build_hitpoint_delta};
+        use crate::abilities::{build_energy, build_failure};
+        if let Some(slot) = ability.kit_slot.filter(|_| self.kit_applies(profile_id)) {
+            return self.kit_cast(slot, target, position, profile_id, now_ms);
+        }
         if !valid_position(position) {
             return Err(invalid("invalid job ability position"));
         }
@@ -256,7 +278,7 @@ impl EncounterEngine {
             }
             if self
                 .last_attack
-                .is_some_and(|last| now_ms.saturating_sub(last) < 600)
+                .is_some_and(|last| now_ms.saturating_sub(last) < self.rules.basic_gate_ms)
             {
                 return Ok(refuse(287));
             }
@@ -309,7 +331,16 @@ impl EncounterEngine {
             self.state.player_health = before.saturating_add(heal).min(self.max_health);
             let healed = self.state.player_health.saturating_sub(before) as i32;
             self.log_fight(now_ms, "heal", "you", "you", i64::from(healed));
-            out.replies.push(build_hitpoint_delta(1, 1, healed));
+            let me = self.shared_sender.unwrap_or(1);
+            out.replies.push(wire::hitpoints(
+                me,
+                me,
+                true,
+                self.max_health as i32,
+                self.state.player_health as i32,
+                healed,
+                false,
+            ));
             out.replies
                 .push(player_hp(self.state.player_health, self.max_health));
             out.changed = true;
@@ -382,8 +413,9 @@ impl EncounterEngine {
         }
         self.energy -= ability.energy_cost;
         if ability.energy_cost > 0 {
-            out.replies.push(build_energy(self.energy, ENERGY_MAX));
-            self.energy_regen_at = now_ms.saturating_add(ENERGY_STEP_MS);
+            out.replies
+                .push(build_energy(self.energy, self.rules.energy.max));
+            self.energy_regen_at = now_ms.saturating_add(self.rules.energy.step_ms);
         }
         self.ability_ready.insert(
             ability.definition_id,
@@ -393,6 +425,10 @@ impl EncounterEngine {
         // for 285/286/287/288.
         out.abilities_used
             .push((ability.definition_id, target_actor_kind_id));
+        out.facts.push(FightFact::Used {
+            ability: ability.definition_id,
+            on_kind: target_actor_kind_id,
+        });
         Ok(out)
     }
 
@@ -513,11 +549,15 @@ impl EncounterEngine {
         out: &mut EncounterOutcome,
     ) -> io::Result<()> {
         self.skills.expire(now_ms);
+        self.tick_kits(now_ms, out)?;
         // At most 60 ticks per definition/target (30 s / 500 ms); delayed
         // calls catch up only the authored window, never extend its lifetime.
         let pending = std::mem::take(&mut self.skills.dots);
         for (key, mut dot) in pending {
-            let (guid, _) = key;
+            let (guid, definition) = key;
+            self.kit_state.cast = Some(definition)
+                .filter(|id| *id > 0)
+                .map(|ability| kits::Cast { ability, effect: None });
             while dot.next_ms <= now_ms && dot.next_ms <= dot.until_ms {
                 let Some(at) = self
                     .enemy(guid)
@@ -555,29 +595,28 @@ impl EncounterEngine {
                 self.skills.dots.insert(key, dot);
             }
         }
+        self.kit_state.cast = None;
         Ok(())
     }
 
     pub(super) fn regenerate_energy(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
-        if self.energy < ENERGY_MAX && now_ms >= self.energy_regen_at {
-            self.energy = (self.energy + ENERGY_STEP).min(ENERGY_MAX);
-            self.energy_regen_at = now_ms.saturating_add(ENERGY_STEP_MS);
-            out.replies
-                .push(crate::abilities::build_energy(self.energy, ENERGY_MAX));
-        }
-    }
-
-    /// The encounter's summoner while any of its summoned minions stands
-    /// (The owner: "you kill those, then keep attacking the summoner") (R).
-    pub(super) fn shielded(&self, guid: u64) -> bool {
-        let (Some(d), Some(active)) = (self.dungeon(), self.state.active.as_ref()) else {
-            return false;
+        // With the kits live the captured rhythm applies (+4 once a second), plus what
+        // traits and statuses add; otherwise the rules' own step.
+        let (max, step, step_ms) = match &self.skills.kit.table {
+            Some(table) if self.kit_applies(self.player_profile) => (
+                table.energy.max,
+                table.energy.per_tick
+                    + self.skills.kit.passive.energy_per_tick
+                    + self.skills.kit.book.energy_per_tick(kits::status::ME),
+                table.energy.tick_ms,
+            ),
+            _ => (self.rules.energy.max, self.rules.energy.step, self.rules.energy.step_ms),
         };
-        d.enemies.iter().any(|a| a.guid == guid && a.skittish)
-            && d.enemies
-                .iter()
-                .zip(&active.enemies)
-                .any(|(a, s)| a.summon_below_percent.is_some() && s.health > 0 && !s.dormant)
+        if self.energy < max && now_ms >= self.energy_regen_at {
+            self.energy = (self.energy + step).min(max);
+            self.energy_regen_at = now_ms.saturating_add(step_ms);
+            out.replies.push(crate::abilities::build_energy(self.energy, max));
+        }
     }
 
     /// One critical-hit roll for the player at the active job's chance.
@@ -587,6 +626,10 @@ impl EncounterEngine {
             .wrapping_mul(6_364_136_223_846_793_005)
             .wrapping_add(1_442_695_040_888_963_407);
         let bonus = self.skills.crit_bonus();
-        ((self.crit_seed >> 33) % 100) < u64::from((self.crit_percent + bonus).min(100))
+        let critical = ((self.crit_seed >> 33) % 100) < u64::from((self.crit_percent + bonus).min(100));
+        if critical {
+            self.skills.kit.crits = self.skills.kit.crits.wrapping_add(1);
+        }
+        critical
     }
 }

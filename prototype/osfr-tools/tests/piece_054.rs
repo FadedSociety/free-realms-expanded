@@ -74,7 +74,9 @@ fn production_melee_reach_is_still_the_reviewed_three_units() {
     // if the far-hit and repeat gates disappear.
     let encounter = normalized(include_str!("../src/encounter.rs"));
     // The enemy contact rule moved into the arena simulation (T439).
-    let arena = normalized(include_str!("../src/encounter/arena.rs"));
+    // The combat seam moved the tick to `arena_ai.rs` and the default to `behaviour.rs`.
+    let arena = normalized(include_str!("../src/encounter/arena_ai.rs"));
+    let behaviour = normalized(include_str!("../src/encounter/behaviour.rs"));
     // Reach is code; damage per job moved to `combat_scale.json` (T639), so only
     // the reach rows are pinned here: melee 3.0 for every job but the two ranged kits.
     let scale = normalized(include_str!("../src/encounter/combat_scale.rs"));
@@ -87,14 +89,14 @@ fn production_melee_reach_is_still_the_reviewed_three_units() {
         "the production attack no longer rejects a target beyond reach"
     );
     assert!(
-        encounter.contains("saturating_sub(last) < 600"),
+        encounter.contains("saturating_sub(last) < self.rules.basic_gate_ms"),
         "the production repeat gate changed"
     );
     // Enemy reach is tunable data (behaviours.json, the owner 2026-10-15: "change
     // reach on the fly"); only the code default keeps the reviewed 2.5 m.
     assert!(
         arena.contains("distance(position, s.position) <= b.reach")
-            && encounter.contains("reach: 2.5,"),
+            && behaviour.contains("reach: 2.5,"),
         "the reconstructed enemy contact rule changed"
     );
 

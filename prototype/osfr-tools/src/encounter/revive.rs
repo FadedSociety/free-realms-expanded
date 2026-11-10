@@ -15,16 +15,6 @@
 //! the server fallback, the price and the paid revive in place.
 use super::*;
 
-/// (R) Overworld knockout window, in ms: the ten-second recovery of the wiki
-/// Combat page (research piece 058). The client counts it down only when it
-/// does not show the two-button dialog, and then sends the free revive itself.
-const REVIVE_TIMER_MS: i32 = 10_000;
-/// (R) Field enemies ignore a freshly revived or recovered player this long.
-const FIELD_GRACE_MS: u64 = 8_000;
-/// (R) Server fallback: an overworld knockout with no 41/122 by then is revived
-/// at the safe location anyway, so a client that never shows the window (its
-/// 41/125 field order is inferred, not captured) cannot leave a player down.
-pub(super) const AUTO_REVIVE_MS: u64 = 15_000;
 /// (R) The retail spot-revive price, 1,000 coins (the window's own default
 /// `setReviveCost_lua(1000)` in `UI/revive_window.gfx`; the wiki's Sunstone
 /// Valley page says 1,000). The shipped value lives in `field_enemies.json`
@@ -73,6 +63,12 @@ impl EncounterEngine {
         }
         if self.state.player_health != 0 {
             return Ok(EncounterOutcome::default());
+        }
+        if self.down_in_fight() {
+            // (R) A fight with knockouts left: stand up where you fell.
+            let mut out = EncounterOutcome::default();
+            self.stand_up(&mut out);
+            return Ok(out);
         }
         if let Some(a) = &self.state.active {
             // A lost instance revives through its existing exit (return
@@ -144,7 +140,7 @@ impl EncounterEngine {
     /// window hidden.
     fn revive(&mut self, now_ms: u64) -> EncounterOutcome {
         self.state.player_health = self.max_health;
-        self.field_grace_until = now_ms.saturating_add(FIELD_GRACE_MS);
+        self.field_grace_until = now_ms.saturating_add(self.rules.revive.field_grace_ms);
         self.knocked_out_at = None;
         EncounterOutcome {
             changed: true,
@@ -153,21 +149,8 @@ impl EncounterEngine {
         }
     }
 
-    /// 41/125 EncounterShowRespawnWindowPacket: dispatcher `0090d830`, ctor
-    /// `008a33b0`, reader `008d6730`. Family header (ids zero: the overworld has
-    /// no instance) then two i32 handed to `DisplayRespawnWindow` `00904300`,
-    /// which takes (timer ms, revive cost). The field order is inferred from
-    /// that handler, not captured.
+    /// The knockout window (41/125) with this engine's timer and price.
     pub(super) fn respawn_window(&self) -> Vec<u8> {
-        let mut b = encounter_header(125, 0, 0);
-        b.extend(REVIVE_TIMER_MS.to_le_bytes());
-        // Bounded by MAX_REVIVE_COST at load, so it fits the wire i32.
-        b.extend((self.paid_revive_cost as i32).to_le_bytes());
-        b
+        wire::respawn_window(self.rules.revive.timer_ms, self.paid_revive_cost)
     }
-}
-
-/// 41/126: the dispatcher runs `RespawnWindow:Hide` (family header only).
-pub(super) fn respawn_hide() -> Vec<u8> {
-    encounter_header(126, 0, 0)
 }

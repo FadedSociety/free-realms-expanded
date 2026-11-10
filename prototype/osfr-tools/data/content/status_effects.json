@@ -1,0 +1,494 @@
+{
+ "schema_version": 1,
+ "source": [
+  {
+   "kind": "client",
+   "evidence": "35/20 state word: bit 6 stunned, 7 knocked out, 8 non-attackable (debug dump sub_8DE1E4); 35/41 and 35/42 attach a composite effect to a tag (008c4d50, 008b51c0); 38/16 buff bar (0089e410)"
+  },
+  {
+   "kind": "capture",
+   "evidence": "p12 35/20 values 0x1 idle, 0x8001 fighting, 0x4001 going home"
+  },
+  {
+   "kind": "reconstructed",
+   "evidence": "(R) the wire switches are off until the 35/20 status bits and 35/41 are proven in the client (native checks N2, N7); the clip (animation) is sent either way"
+  }
+ ],
+ "wire": {
+  "state_bits": false,
+  "attached_effects": false,
+  "base_bits": {
+   "enemy": 32769,
+   "player": 1
+  },
+  "first_tag": 9000
+ },
+ "statuses": {
+  "stun": {
+   "bit": 6,
+   "effect_id": 2,
+   "animation": 1401,
+   "blocks": [
+    "move",
+    "act"
+   ],
+   "default_ms": 3000,
+   "immune_ms": 3000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "flags bit 6 stunned (client debug dump sub_8DE1E4); composite effect 2 stun stars; animation com_stunned 1401; orb stun 5 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 3 s default, 3 s immunity after it ends"
+    }
+   ]
+  },
+  "freeze": {
+   "bit": 16,
+   "effect_id": 5337,
+   "blocks": [
+    "move",
+    "act"
+   ],
+   "default_ms": 3000,
+   "immune_ms": 3000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 5337 freeze; Ice Armor freezes 3 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) bit 16 from the design's table, unproven; 3 s"
+    }
+   ]
+  },
+  "freeze_long": {
+   "bit": 16,
+   "effect_id": 5337,
+   "blocks": [
+    "move",
+    "act"
+   ],
+   "default_ms": 5000,
+   "immune_ms": 3000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Frost Snap: 5 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) same visual as freeze"
+    }
+   ]
+  },
+  "knock_down": {
+   "animation": 1402,
+   "blocks": [
+    "move",
+    "act"
+   ],
+   "default_ms": 2000,
+   "immune_ms": 2000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "animation com_knock_down 1402 (live 36/14 rows carry 1402)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 2 s; no status bit is known"
+    }
+   ]
+  },
+  "root": {
+   "bit": 5,
+   "effect_id": 15,
+   "blocks": [
+    "move"
+   ],
+   "default_ms": 4000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 15 root; orb root 7 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) bit 5 from the design's table, unproven; 4 s"
+    }
+   ]
+  },
+  "slow": {
+   "effect_id": 1104,
+   "speed": 0.7,
+   "default_ms": 4000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 1104 snare; Archer's Advantage -30% (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 4 s"
+    }
+   ]
+  },
+  "slow_heavy": {
+   "effect_id": 1104,
+   "speed": 0.5,
+   "default_ms": 4000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Focused Volley -50% move speed (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 4 s"
+    }
+   ]
+  },
+  "sleep": {
+   "bit": 2,
+   "effect_id": 3,
+   "blocks": [
+    "move",
+    "act"
+   ],
+   "breaks_on_damage": true,
+   "default_ms": 10000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 3 sleep; orb sleep 10 s, breaks on a hit (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) bit 2 from the design's table, unproven"
+    }
+   ]
+  },
+  "fear": {
+   "bit": 1,
+   "effect_id": 464,
+   "blocks": [
+    "act"
+   ],
+   "default_ms": 5000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 464 fear"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) bit 1 from the design's table, unproven; 5 s"
+    }
+   ]
+  },
+  "silence": {
+   "bit": 3,
+   "blocks": [
+    "cast"
+   ],
+   "default_ms": 5000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "client refuses a slot press while silenced (ClientActionBar_ActivateSlot 00c44160)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) bit 3 from the design's table, unproven; 5 s"
+    }
+   ]
+  },
+  "charm": {
+   "effect_id": 5441,
+   "blocks": [
+    "act"
+   ],
+   "default_ms": 4000,
+   "immune_ms": 4000,
+   "immune_bosses": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 5441 confuse; Heartbreak 'sometimes charms' (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) a charmed enemy stops attacking for 4 s"
+    }
+   ]
+  },
+  "taunt": {
+   "effect_id": 4003,
+   "default_ms": 6000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 4003 taunt"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 6 s; threat is raised when it lands"
+    }
+   ]
+  },
+  "transfigure": {
+   "effect_id": 5332,
+   "blocks": [
+    "move",
+    "act"
+   ],
+   "default_ms": 5000,
+   "immune_ms": 5000,
+   "immune_bosses": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 5332 transfiguration landing; Mass Transfigure (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 5 s, cannot move or attack, bosses immune"
+    }
+   ]
+  },
+  "burn": {
+   "effect_id": 5220,
+   "default_ms": 6000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Burning Slash and Fireball burn for 6 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) marker only; the ticks are the ability's own"
+    }
+   ]
+  },
+  "frost": {
+   "default_ms": 5000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Frost Snap 5 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) marker only"
+    }
+   ]
+  },
+  "poison": {
+   "effect_id": 52,
+   "default_ms": 6000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "composite effect 52 poison; Poisoned Blades (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) marker only; 6 s"
+    }
+   ]
+  },
+  "defense_down": {
+   "taken": 1.2,
+   "default_ms": 6000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Target Vitals lowers defense (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration and size: takes 20% more for 6 s"
+    }
+   ]
+  },
+  "attack_down": {
+   "dealt": 0.8,
+   "default_ms": 6000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Kick Dirt lowers enemy attack (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration and size: deals 20% less for 6 s"
+    }
+   ]
+  },
+  "crit_vulnerable": {
+   "crit_against": 10,
+   "default_ms": 4000,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Wrathful Strike: more likely to be crit for 4 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) +10 crit chance against it"
+    }
+   ]
+  },
+  "damage_up": {
+   "effect_id": 16147,
+   "dealt": 1.2,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Ready to Rumble raises overall damage (wiki); 'Increases ability damage by 20%' (AbilityEffectTypeSettings row 42)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 10 s"
+    }
+   ]
+  },
+  "damage_reduction": {
+   "effect_id": 5334,
+   "taken": 0.8,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Immunize: take less damage for a short time (wiki); composite effect 5334 shield"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration and size: 20% less for 10 s"
+    }
+   ]
+  },
+  "speed_up": {
+   "speed": 1.3,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Archer's Advantage: allies +30% move speed (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 10 s; not yet sent as a stat"
+    }
+   ]
+  },
+  "crit_up": {
+   "effect_id": 5302,
+   "crit": 10,
+   "crit_damage": 0.25,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Vita-booster: crit chance and crit damage of nearby allies (wiki); composite effect 5302 critical-strike glow"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration and size: +10 chance, +0.25 multiplier, 10 s"
+    }
+   ]
+  },
+  "energy_regen": {
+   "energy_per_tick": 3,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Wizard's Cunning: allies gain 3 energy per second for 10 s (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) none"
+    }
+   ]
+  },
+  "heal_on_damage": {
+   "heal_on_damage": 0.3,
+   "default_ms": 8000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Warrior's Boon: healed when damaged for 8 seconds (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) heals 30% of each hit taken"
+    }
+   ]
+  },
+  "reckless": {
+   "dealt_add_power5": 1186,
+   "taken": 1.33,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Reckless: +1186 damage, +33% damage taken (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) 10 s"
+    }
+   ]
+  },
+  "into_the_fray": {
+   "crit": 25,
+   "taken": 0.7,
+   "crit_damage": -0.1,
+   "default_ms": 10000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Into the Fray: crit chance and defense up, crit damage bonus down (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) duration and size: +25 chance, 30% less taken, -0.1 multiplier, 10 s"
+    }
+   ]
+  },
+  "poisoned_blades": {
+   "on_hit_dot": {
+    "power5": 711,
+    "every_ms": 3000,
+    "ms": 6000,
+    "status": "poison"
+   },
+   "default_ms": 15000,
+   "helpful": true,
+   "source": [
+    {
+     "kind": "client",
+     "evidence": "Poisoned Blades: attacks do additional damage over time (wiki)"
+    },
+    {
+     "kind": "reconstructed",
+     "evidence": "(R) each hit adds a 6 s poison of 711 at Power 5 every 3 s, for 15 s"
+    }
+   ]
+  }
+ }
+}

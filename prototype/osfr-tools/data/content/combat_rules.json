@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "basic_gate_ms": 650,
+  "energy": {"max": 100, "step": 4, "step_ms": 1000},
+  "crit": {"numerator": 3, "denominator": 2},
+  "jobs": {
+    "2": {"health": 1.0, "crit_percent": 3},
+    "11": {"health": 1.0, "crit_percent": 3},
+    "12": {"health": 1.0, "crit_percent": 3},
+    "32": {"health": 1.0, "crit_percent": 3},
+    "35": {"health": 1.0, "crit_percent": 3},
+    "43": {"health": 1.0, "crit_percent": 3}
+  },
+  "revive": {"timer_ms": 10000, "field_grace_ms": 8000, "auto_ms": 15000},
+  "death_delay_ms": {"field": 0, "battle": 0},
+  "player_hit_wire": false,
+  "source": [
+    {
+      "field": "basic_gate_ms",
+      "kind": "capture",
+      "evidence": "650 ms: the gaps between the live server's own 36/3 for one caster and one basic, minimum 0.64 s, median 0.66 s over 281 rows (capture p12, March 2014); the client asked every 0.17-0.55 s and one a 0.65 s went through"
+    },
+    {
+      "field": "energy",
+      "kind": "video",
+      "evidence": "the HUD shows 100/100"
+    },
+    {
+      "field": "energy",
+      "kind": "capture",
+      "evidence": "+4 exactly once a second, 0 to 100 in 25 s after a super (38/13 rows, capture p12 t=546306.5-546330.6)"
+    },
+    {
+      "field": "crit",
+      "kind": "video",
+      "evidence": "an 83 hit critted for 124 (x1.5); client text \"50 Crit Mult %\""
+    },
+    {
+      "field": "jobs",
+      "kind": "capture",
+      "evidence": "one health curve for every job: the server's own health statements on job switches read 7116 at level 20 and 4069 at 16 whatever the job, and a level-4 Brawler frame reads 760; ability crit chance 3 in the captured level-20 stat block (38/7, x1.5). Gear and traits add on top. Profile ids 2 Ninja, 11 Medic, 12 Wizard, 32 Warrior, 35 Archer, 43 Brawler"
+    },
+    {
+      "field": "revive",
+      "kind": "wiki",
+      "evidence": "Combat page: a ten-second recovery after an overworld knockout"
+    },
+    {
+      "field": "revive",
+      "kind": "reconstructed",
+      "evidence": "(R) 8 s of field grace after a revive and the 15 s server fallback revive"
+    },
+    {
+      "field": "death_delay_ms",
+      "kind": "reconstructed",
+      "evidence": "(R) 0 and 0: the engine removed a defeated enemy at once before the combat seam"
+    }
+  ]
+}
