@@ -48,7 +48,10 @@ const BURT: u64 = 9_500_000_731;
 const RIP: u64 = 9_000_000_183;
 /// A real Tangletrack NPC that is not a derby gate.
 const NOT_A_GATE: u64 = 9_000_000_048;
-const DERBY_LABEL: u32 = 3053;
+/// "Demo Derby": the solo match's row on a gate that also lists the lobby (`derby_lobby.json`).
+const DERBY_LABEL: u32 = 382_789;
+/// "Demo Derby Lobby": `derby_gates.json`'s own label, the lobby's row on the shipped gates.
+const GATE_LABEL: u32 = 3053;
 const COMPLETION_COINS: u32 = 25;
 const COMPLETION_XP: u32 = 10;
 /// L931: the live human 34/10 create's `ReadVehicleDefinition` byte count (the derby car, captured
@@ -110,6 +113,7 @@ impl Shipped {
             "derby_entry.json",
             "derby_rows.json",
             "derby_minigames.json",
+            "derby_lobby.json",
         ] {
             let source = data().join(file);
             // `derby_entry.json` is what makes the route playable; a missing package must reach
@@ -549,7 +553,7 @@ fn the_shipped_package_loads_and_offers_from_all_four_drivers() {
         shipped.gate_npcs(),
         &[DERBY_GATE, MAD_JACK, CRASH, BURT, RIP][..]
     );
-    assert_eq!(shipped.menu_string_id(), DERBY_LABEL);
+    assert_eq!(shipped.menu_string_id(), GATE_LABEL);
     let gates: DerbyGates =
         serde_json::from_slice(&fs::read(data().join("derby_gates.json")).unwrap()).unwrap();
     assert_eq!(gates.npcs, vec![DERBY_GATE, MAD_JACK, CRASH, BURT, RIP]);
@@ -1003,7 +1007,7 @@ fn malformed_content_is_refused_and_the_shipped_definition_is_real() {
         restored.gate_npcs(),
         &[DERBY_GATE, MAD_JACK, CRASH, BURT, RIP][..]
     );
-    assert_eq!(restored.menu_string_id(), DERBY_LABEL);
+    assert_eq!(restored.menu_string_id(), GATE_LABEL);
     assert_eq!(fs::read(&entry).unwrap(), original_entry);
     assert_eq!(fs::read(&gates_path).unwrap(), original_gates);
 

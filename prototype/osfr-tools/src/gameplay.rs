@@ -61,6 +61,7 @@ mod crafting;
 mod daily_wheel;
 mod dance_off;
 mod derby_rows;
+mod derby_room;
 mod derby_session;
 mod encounter_rewards;
 mod field_battle;
@@ -1141,6 +1142,7 @@ impl Gameplay {
         let derby = crate::derby_gateway::DerbyGateway::load(directory, saved_derby.as_ref())?;
         if let (Some(derby), Some(interaction)) = (&derby, &mut npc_interaction) {
             let unknown = interaction.set_derby_gates(derby.gate_npcs(), derby.menu_string_id());
+            if let Some(l) = derby.lobby() { interaction.set_derby_lobby(l.lobby_type, l.menu_string_id, l.solo_menu_string_id); }
             for npc in unknown {
                 npc_event(
                     serde_json::json!({"event": "derby_gate_unknown_npc", "content_key": npc}),

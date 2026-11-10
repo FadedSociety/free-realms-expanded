@@ -20,6 +20,8 @@ use std::{
     fmt,
 };
 
+mod room;
+
 pub const DEMO_DERBY_TYPE_ID: i32 = 11;
 pub const DEMO_DERBY_LOBBY_NAME_ID: i32 = 3053;
 pub const DEMO_DERBY_INNER_OPCODE: u16 = 34;
@@ -1008,6 +1010,11 @@ pub struct DerbyService {
     npc_drivers: Vec<DerbyDriver>,
     /// (R) The row's goal; empty for free play.
     goal: DerbyGoal,
+    /// (R) A room's bound on how far a human's car may move between poses (m/s), and how long a
+    /// car that broke it may not hit another human (`room.rs`). None in a solo match.
+    pose_guard: Option<(f32, u64)>,
+    /// Humans whose last pose jumped, and until when their hits on humans are refused.
+    pose_jumps: BTreeMap<ParticipantKey, u64>,
 }
 
 /// A fresh driver's facts before the match.
@@ -1155,6 +1162,8 @@ impl DerbyService {
             npc_vehicles: Vec::new(),
             npc_drivers: Vec::new(),
             goal: DerbyGoal::default(),
+            pose_guard: None,
+            pose_jumps: BTreeMap::new(),
         })
     }
 
@@ -1343,6 +1352,12 @@ impl DerbyService {
         if self.phase != DerbyPhase::Lobby {
             return Err(DerbyError::InvalidPhase);
         }
+        Ok(self.offer_bytes(false))
+    }
+
+    /// The 39/16 body. `hidden` is the record's `+621` byte: the client keeps the offer window
+    /// shut (`009beb70`), as a lobby game's countdown has already been its Go.
+    fn offer_bytes(&self, hidden: bool) -> Vec<u8> {
         let mut packet = vec![39, 0, 16];
         put_i32(&mut packet, self.instance_id);
         put_i32(&mut packet, -1);
@@ -1358,10 +1373,10 @@ impl DerbyService {
         put_i32(&mut packet, 1);
         packet.push(1);
         put_i32(&mut packet, self.game_id);
-        packet.extend([0; 4]);
+        packet.extend([0, 0, 0, u8::from(hidden)]);
         put_i32(&mut packet, 0);
         put_i32(&mut packet, 0);
-        Ok(packet)
+        packet
     }
 
     /// T889: the 41/107 ready sent right after the offer. A type-11 offer has no preload list, so
@@ -1600,6 +1615,14 @@ impl DerbyService {
             return Ok(Vec::new());
         }
         self.phase_acks.insert(sender);
+        self.advance_phase()
+    }
+
+    /// The next state once every human has acknowledged this one.
+    fn advance_phase(&mut self) -> Result<Vec<DerbyAction>, DerbyError> {
+        let DerbyPhase::WaitingForState(waiting) = self.phase else {
+            return Ok(Vec::new());
+        };
         if self.phase_acks.len() != self.human_count() {
             return Ok(Vec::new());
         }
@@ -1627,9 +1650,15 @@ impl DerbyService {
             return Ok(Vec::new());
         }
         self.countdown_acks.insert(sender);
-        if self.countdown_acks.len() != self.human_count() {
+        self.advance_countdown(now_ms)
+    }
+
+    /// The next count, or the race, once every human has shown this count.
+    fn advance_countdown(&mut self, now_ms: u64) -> Result<Vec<DerbyAction>, DerbyError> {
+        if self.phase != DerbyPhase::Countdown || self.countdown_acks.len() != self.human_count() {
             return Ok(Vec::new());
         }
+        let count = self.countdown_value;
         self.countdown_acks.clear();
         if count == 0 {
             self.phase = DerbyPhase::Running;
@@ -1682,6 +1711,7 @@ impl DerbyService {
         if pose_position(&pose).is_none() {
             return Ok(Vec::new());
         }
+        self.guard_pose(sender, &pose, now_ms);
         let driver = self.drivers.get_mut(&sender).ok_or(UNKNOWN_DRIVER)?;
         driver.pose = Some(pose);
         driver.pose_at_ms = Some(now_ms);
@@ -1715,6 +1745,9 @@ impl DerbyService {
         }
         let impact = f32::from_bits(report.impact_bits);
         if !impact.is_finite() || impact <= 0.0 || impact > self.rules.max_impact {
+            return Ok(Vec::new());
+        }
+        if self.pose_jumped(sender, report.other, now_ms) {
             return Ok(Vec::new());
         }
         let Some(attacker_position) = self.drivers[&sender].pose.as_ref().and_then(pose_position)

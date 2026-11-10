@@ -410,6 +410,8 @@ struct NpcContent {
     /// (R) NPCs whose menu lists the demolition derby, and the label's locale id.
     derby_gates: BTreeSet<u64>,
     derby_string_id: u32,
+    /// The derby's game lobby on its gates: the lobby type and the option's label.
+    derby_lobby: Option<(u32, u32)>,
     /// (R) The mechanics whose menu opens the garage, and the label's locale id.
     garage_gates: BTreeSet<u64>,
     garage_string_id: u32,
@@ -554,6 +556,7 @@ impl NpcInteraction {
                 race_string_id: 0,
                 derby_gates: BTreeSet::new(),
                 derby_string_id: 0,
+                derby_lobby: None,
                 garage_gates: BTreeSet::new(),
                 garage_string_id: 0,
                 soccer_gates: BTreeSet::new(),
@@ -597,6 +600,15 @@ impl NpcInteraction {
         content.derby_gates = known.into_iter().collect();
         content.derby_string_id = string_id;
         unknown
+    }
+
+    /// List the derby's game lobby under the derby on its gates ("click on the demo derby icon at
+    /// the turnstiles and choose the 'Demo Derby Lobby'", freerealms.com 2009); none lists none.
+    /// With a lobby beside it the solo match takes its own label, `solo_name`.
+    pub fn set_derby_lobby(&mut self, lobby_type: u32, name: u32, solo_name: u32) {
+        let content = Arc::make_mut(&mut self.content);
+        content.derby_lobby = Some((lobby_type, name));
+        content.derby_string_id = solo_name;
     }
 
     /// (R) List the garage in these mechanics' menus. Returns unknown content keys like
@@ -1252,6 +1264,8 @@ impl NpcInteraction {
         }
         if self.content.derby_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Derby, self.content.derby_string_id));
+            let lobby = self.content.derby_lobby;
+            options.extend(lobby.map(|(lobby_type, name)| (NpcAction::Lobby { lobby_type }, name)));
         }
         if self.content.garage_gates.contains(&npc.npc_id) {
             options.push((NpcAction::Garage, self.content.garage_string_id));

@@ -761,9 +761,6 @@ impl SharedWorld {
 
     fn leave_player(&mut self, session_id: SessionId) -> Vec<Delivery> {
         let mut deliveries = Vec::new();
-        if let Some(guid) = self.players.get(session_id).map(|player| player.character_guid) {
-            deliveries.extend(self.leave_rooms(guid));
-        }
         if let Some(player) = self.players.get(session_id) {
             self.public_looks.remove(&player.character_guid);
             if let Some(view) = self.rides.remove(&player.character_guid) {
@@ -2465,8 +2462,10 @@ impl Session {
         let mut staged_gateway = self.gateway.clone();
         let mut held =
             group_arena::Held::enter(&mut staged_gateway, membership, self.character_guid);
+        room_routing::lend(&mut staged_gateway, world);
         let outcome = staged_gateway.tick_at(now_ms)?;
         held.leave(&mut staged_gateway, &outcome, true);
+        let table = staged_gateway.reclaim_table();
         let committed = self.commit_outcome(
             staged_gateway,
             previous,
@@ -2477,6 +2476,7 @@ impl Session {
             now_ms,
         )?;
         committed.then(|| held.publish(self, sessions, world, membership));
+        committed.then(|| room_routing::publish(self, sessions, world, table, now_ms));
         self.flush_position(now_ms)
     }
 
@@ -4387,6 +4387,10 @@ impl Server {
         let mut deliveries = self.world.leave_player(session.id);
         let owns_active =
             self.world.active_sessions.get(&session.character_guid) == Some(&session.id);
+        if owns_active {
+            // Only the end of the character's own session gives up a lobby seat; zoning does not.
+            deliveries.extend(self.world.leave_rooms(session.character_guid));
+        }
         if owns_active && self.world.social.profile(session.character_guid).is_some() {
             match self.world.social_disconnect(session.character_guid) {
                 Ok(more) => deliveries.extend(more),

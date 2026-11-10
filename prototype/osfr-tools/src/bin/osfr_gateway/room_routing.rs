@@ -12,12 +12,13 @@ use super::*;
 use osfr_tools::{
     checkers_lobby::HostedGame,
     chess::{ChessMessage, ChessParticipant},
-    game_room::{Addressed, Seat},
+    game_room::{Addressed, Limits, Seat},
     hosted_table::HostedTable,
     lobby_wire::{self, Request},
 };
 
-/// (R) Chess and checkers seat two, and they are the only lobby games so far.
+/// Chess and checkers seat two (the captured 102/2 rows fix Max Players at 2); a derby room's
+/// seats come from its host's options.
 const SEATS: usize = 2;
 /// (R) A seat this long without a move loses: neither movie has a clock, and the other player
 /// would otherwise wait for ever, then pay the idle seat by quitting.
@@ -57,7 +58,11 @@ pub(super) fn application(
     let guid = session.character_guid;
     let seated = seat(world, guid);
     let result = match request {
-        Request::Join { game, .. } => seated.map(|seat| world.rooms.join(game, seat)),
+        Request::Join { game, .. } => seated.map(|seat| {
+            let mut out = world.rooms.join(game, seat)?;
+            out.extend(world.rooms.auto_start(guid, now_ms)?);
+            Ok(out)
+        }),
         Request::Leave { .. } if world.rooms.committed(guid) => None,
         Request::Leave { .. } => Some(world.rooms.leave(guid)),
         Request::Start { .. } => Some(world.rooms.start(guid, now_ms)),
@@ -67,7 +72,17 @@ pub(super) fn application(
             match (seated, world.rooms.watching(guid), options) {
                 (Some(host), Some(lobby_type), Ok(options)) => {
                     event(json!({"event": "lobby_created", "options": options}));
-                    Some(world.rooms.create(lobby_type, SEATS, host, options))
+                    match session.gateway.lobby_limits(lobby_type, &options) {
+                        Ok(limits) => {
+                            let limits = limits.unwrap_or(Limits::full(SEATS));
+                            Some(world.rooms.create_with(lobby_type, limits, host, options))
+                        }
+                        // Options the catalogue does not list: the client's Unable to Create.
+                        Err(()) => {
+                            let bytes = lobby_wire::error(lobby_wire::ERROR_CREATE);
+                            Some(Ok(vec![Addressed { to: guid, bytes }]))
+                        }
+                    }
                 }
                 _ => None,
             }
@@ -100,9 +115,12 @@ pub(super) fn open(session: &mut Session, world: &mut SharedWorld, lobby_type: u
 
 /// Before a seat's message: its game's table, on loan to the staged gateway.
 pub(super) fn lend(gateway: &mut Gateway, world: &SharedWorld) {
-    let table = gateway.hosted_table().and_then(|id| world.tables.get(&(id as u32)));
-    if let Some(table) = table.cloned() {
-        gateway.lend_table(table);
+    let Some(id) = gateway.hosted_table() else {
+        return;
+    };
+    match world.tables.get(&(id as u32)).cloned() {
+        Some(table) => gateway.lend_table(table),
+        None => gateway.orphan_table(),
     }
 }
 
@@ -199,6 +217,7 @@ pub(super) fn tick(server: &mut Server, now_ms: u64) {
         }
     }
     time_out_idle(server, now_ms);
+    watch(server, now_ms);
     for id in server.world.rooms.due(now_ms) {
         if let Err(error) = open_game(server, id, now_ms) {
             event(json!({"event": "lobby_game_failed", "room": id, "reason": error.to_string()}));
@@ -227,6 +246,28 @@ fn time_out_idle(server: &mut Server, now_ms: u64) {
     tell(server, packets.collect());
 }
 
+/// Games with their own clock: a derby's start goes on without a driver who never loaded.
+fn watch(server: &mut Server, now_ms: u64) {
+    let (mut told, mut over) = (Vec::new(), Vec::new());
+    for (id, table) in server.world.tables.iter_mut() {
+        match table.watch(now_ms) {
+            Ok(messages) => told.extend(messages),
+            Err(error) => event(json!({"event": "lobby_refused", "reason": error.to_string()})),
+        }
+        // A start that cut its last driver has nobody left to publish its end.
+        if table.all_settled() {
+            over.push(*id);
+        }
+    }
+    for id in over {
+        server.world.tables.remove(&id);
+        server.world.table_moved.remove(&id);
+        server.world.rooms.close(id);
+    }
+    let packets = told.into_iter().map(|message| Addressed { to: message.player_id, bytes: message.packet });
+    tell(server, packets.collect());
+}
+
 fn ready(server: &Server, guid: u64) -> bool {
     let session = group_arena::key_of(server, guid).and_then(|key| server.sessions.get(&key));
     session.is_some_and(|session| session.gateway.can_host())
@@ -248,6 +289,10 @@ fn open_game(server: &mut Server, id: u32, now_ms: u64) -> io::Result<()> {
     let room = server.world.rooms.room(id);
     let seats: Vec<u64> = room.map(|room| room.members().collect()).unwrap_or_default();
     let lobby_type = room.map_or(0, |room| room.lobby_type);
+    let session = |guid: &u64| group_arena::key_of(server, *guid).and_then(|key| server.sessions.get(&key));
+    if seats.iter().filter_map(session).any(|seat| seat.gateway.is_derby_lobby(lobby_type)) {
+        return open_derby(server, id);
+    }
     let mut taken = Vec::new();
     for guid in seats {
         let Some(key) = group_arena::key_of(server, guid) else {
@@ -281,9 +326,41 @@ fn open_game(server: &mut Server, id: u32, now_ms: u64) -> io::Result<()> {
     Ok(())
 }
 
+/// A derby room's match: built once with every seat in it, then each driver's own gateway takes
+/// its seat and starts on its next tick (the job, the arena, the offer). The first seat's content
+/// builds it; every session loads the same content.
+fn open_derby(server: &mut Server, id: u32) -> io::Result<()> {
+    let room = server.world.rooms.room(id).ok_or_else(|| io::Error::other("no such room"))?;
+    let (options, names) = (room.options.clone(), room.seats.clone());
+    let (mut seats, mut keys) = (Vec::new(), Vec::new());
+    for seat in names {
+        let key = group_arena::key_of(server, seat.guid);
+        let Some((key, session)) = key.and_then(|key| Some((key, server.sessions.get(&key)?))) else {
+            continue;
+        };
+        let name = format!("{} {}", seat.first, seat.last).trim().to_owned();
+        if let Some(driver) = session.gateway.derby_seat(name) {
+            seats.push(driver);
+            keys.push(key);
+        }
+    }
+    let host = keys.first().and_then(|key| server.sessions.get(key));
+    let host = host.ok_or_else(|| io::Error::other("a derby room needs a driver"))?;
+    let table = host.gateway.host_derby(id, &options, &seats)?;
+    for key in keys {
+        if let Some(session) = server.sessions.get_mut(&key) {
+            session.gateway.sit_derby(&table);
+        }
+    }
+    server.world.tables.insert(id, HostedTable::Derby(Box::new(table)));
+    Ok(())
+}
+
 impl SharedWorld {
-    /// A player left the world: their seat and their place on any list go. A game they were
-    /// playing is theirs to lose, and the other seat hears it.
+    /// A player's session ended: their seat and their place on any list go. A game they were
+    /// playing is theirs to lose, and the other seat hears it. A zone change is not this: a derby
+    /// zones its drivers into the arena and back, and the client keeps its lobby across zones
+    /// (`LoadZone` `009386f0` shows it again), so only `end_session` calls it.
     pub(super) fn leave_rooms(&mut self, guid: u64) -> Vec<Delivery> {
         let mut told = Vec::new();
         let mut finished = Vec::new();

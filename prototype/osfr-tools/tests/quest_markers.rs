@@ -45,7 +45,8 @@ const KART_PROFILE: i32 = 48;
 /// A derby arena driver; `derby_gates.json` lists it and it stands in `wilds.json` beside the
 /// Rules of the Road giver, whose quest is gated on the Demo Derby Driver job.
 const CRASH: u64 = ROAD_NEXT_GIVER;
-const DERBY_LABEL: u32 = 3053;
+/// "Demo Derby": the solo match's row beside the lobby's (`derby_lobby.json`).
+const DERBY_LABEL: u32 = 382_789;
 /// A kart race gate (`kart_gates.json`) in `wilds.json`, with its menu label.
 const KART_GATE: u64 = 9_000_000_273;
 const KART_LABEL: u32 = 3052;
@@ -384,6 +385,7 @@ fn race_fixture(active: i32, stands_at: u64) -> (Fixture, Gameplay, CharacterSta
         "kart_lobby.json",
         "derby_entry.json",
         "derby_gates.json",
+        "derby_lobby.json",
     ] {
         std::fs::copy(
             archer_entry::content_dir().join(file),

@@ -82,6 +82,11 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         let mut staged = self.clone();
+        // A lobby room's match: its start records, or a seat lost from under this driver.
+        if let Some(out) = staged.hosted_derby_step(character)? {
+            *self = staged;
+            return Ok(out);
+        }
         let Some(derby) = staged.derby.as_mut() else {
             return Ok(Outcome::default());
         };
@@ -118,6 +123,33 @@ impl Gameplay {
         now_ms: u64,
         row: Option<i32>,
     ) -> io::Result<Outcome> {
+        let mut out = self.derby_job(character)?;
+        // Both callers stage this call, so a refusal here discards the job switch above.
+        let derby = self
+            .derby
+            .as_mut()
+            .ok_or_else(|| invalid("derby entry requires the derby service"))?;
+        // L936: the player stays a Demo Derby Driver after the match (client 101319).
+        // The garage's chosen derby car rides in (`vehicle_looks.json`); none keeps the package's.
+        derby.set_player_vehicle(self.kart_entry.as_ref().and_then(|kart| kart.chosen_look(2)));
+        let offer = derby.begin_row(character, now_ms, row)?;
+        let mut start = vec![offer];
+        start.extend(derby.ready_packet());
+        // L931: a row with an arena zones the player in; the offer waits for the arena's Loaded.
+        match derby.scene().cloned() {
+            Some(scene) => {
+                derby.enter_arena(character.clone(), start);
+                out.scene_zoning = Some(scene);
+            }
+            None => out.replies.extend(start),
+        }
+        out.changed = true;
+        Ok(out)
+    }
+
+    /// The switch to Demo Derby Driver a match starts with: the job, its outfit and the
+    /// activation, for a solo offer and a lobby room's start alike.
+    pub(super) fn derby_job(&mut self, character: &CharacterState) -> io::Result<Outcome> {
         let mut out = Outcome::default();
         let profiles = self
             .profiles
@@ -153,26 +185,6 @@ impl Gameplay {
             previous_job != crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE,
             &mut out,
         )?;
-        // Both callers stage this call, so a refusal here discards the job switch above.
-        let derby = self
-            .derby
-            .as_mut()
-            .ok_or_else(|| invalid("derby entry requires the derby service"))?;
-        // L936: the player stays a Demo Derby Driver after the match (client 101319).
-        // The garage's chosen derby car rides in (`vehicle_looks.json`); none keeps the package's.
-        derby.set_player_vehicle(self.kart_entry.as_ref().and_then(|kart| kart.chosen_look(2)));
-        let offer = derby.begin_row(character, now_ms, row)?;
-        let mut start = vec![offer];
-        start.extend(derby.ready_packet());
-        // L931: a row with an arena zones the player in; the offer waits for the arena's Loaded.
-        match derby.scene().cloned() {
-            Some(scene) => {
-                derby.enter_arena(character.clone(), start);
-                out.scene_zoning = Some(scene);
-            }
-            None => out.replies.extend(start),
-        }
-        out.changed = true;
         Ok(out)
     }
 
@@ -341,7 +353,10 @@ impl Gameplay {
 
     /// L931: every way out of an arena match zones the player back to the pose kept at entry,
     /// once (the visit is consumed here).
-    fn leave_derby_arena(&mut self, out: &mut Outcome) -> io::Result<()> {
+    pub(super) fn leave_derby_arena(&mut self, out: &mut Outcome) -> io::Result<()> {
+        // A lobby room's driver: the client's lobby drops the game before the way back.
+        let lobby = self.derby.as_mut().and_then(|derby| derby.take_lobby_exit());
+        out.replies.extend(lobby);
         let back = self
             .derby
             .as_mut()

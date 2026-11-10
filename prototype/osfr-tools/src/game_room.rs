@@ -28,6 +28,24 @@ pub struct Seat {
     pub last: String,
 }
 
+/// What a lobby type's options make of a room. A board game seats exactly two; a derby's host
+/// picks its seats and may start short of them.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Limits {
+    pub capacity: usize,
+    /// Seats the host needs taken before START answers.
+    pub min_seats: usize,
+    /// The host's Auto-Start: the countdown begins when the last seat fills.
+    pub auto_start: bool,
+}
+
+impl Limits {
+    /// Every seat taken, and the host presses START.
+    pub fn full(capacity: usize) -> Self {
+        Self { capacity, min_seats: capacity, auto_start: false }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Phase {
     Open,
@@ -41,6 +59,8 @@ pub struct Room {
     pub id: u32,
     pub lobby_type: u32,
     pub capacity: usize,
+    pub min_seats: usize,
+    pub auto_start: bool,
     pub phase: Phase,
     /// The host first.
     pub seats: Vec<Seat>,
@@ -148,14 +168,28 @@ impl Rooms {
         host: Seat,
         options: Vec<(u32, u32)>,
     ) -> io::Result<Vec<Addressed>> {
+        self.create_with(lobby_type, Limits::full(capacity), host, options)
+    }
+
+    /// As [`Self::create`], with the limits the lobby type read from the host's options.
+    pub fn create_with(
+        &mut self,
+        lobby_type: u32,
+        limits: Limits,
+        host: Seat,
+        options: Vec<(u32, u32)>,
+    ) -> io::Result<Vec<Addressed>> {
         let guid = host.guid;
-        if self.room_of(guid).is_some() || self.rooms.len() >= MAX_ROOMS || capacity < 2 {
+        let Limits { capacity, min_seats, auto_start } = limits;
+        let sound = capacity >= 2 && (1..=capacity).contains(&min_seats);
+        if self.room_of(guid).is_some() || self.rooms.len() >= MAX_ROOMS || !sound {
             return Ok(refused(guid, lobby_wire::ERROR_CREATE));
         }
         self.next_id = self.next_id.checked_add(1).ok_or_else(|| invalid("room ids spent"))?;
         let id = self.next_id;
         let phase = Phase::Open;
-        let room = Room { id, lobby_type, capacity, phase, seats: vec![host], options };
+        let seats = vec![host];
+        let room = Room { id, lobby_type, capacity, min_seats, auto_start, phase, seats, options };
         let mut out = vec![Addressed { to: guid, bytes: lobby_wire::joined(id, lobby_type) }];
         out.extend(self.row_update(&room)?);
         self.rooms.insert(id, room);
@@ -230,11 +264,23 @@ impl Rooms {
         Ok(out)
     }
 
-    /// The host starts a full game: 101/3 to every seat, and the list loses its row.
+    /// A room whose last seat just filled starts itself when its host asked for Auto-Start.
+    pub fn auto_start(&mut self, guid: u64, now_ms: u64) -> io::Result<Vec<Addressed>> {
+        let full = |room: &&Room| {
+            room.auto_start && room.phase == Phase::Open && room.seats.len() == room.capacity
+        };
+        match self.room_of(guid).filter(full).and_then(|room| room.seats.first()) {
+            Some(host) => self.start(host.guid, now_ms),
+            None => Ok(Vec::new()),
+        }
+    }
+
+    /// The host starts a game with enough seats taken: 101/3 to every seat, and the list loses
+    /// its row.
     pub fn start(&mut self, guid: u64, now_ms: u64) -> io::Result<Vec<Addressed>> {
         let Some(room) = (self.rooms.values_mut())
             .find(|room| room.seats.first().is_some_and(|seat| seat.guid == guid))
-            .filter(|room| room.phase == Phase::Open && room.seats.len() == room.capacity)
+            .filter(|room| room.phase == Phase::Open && room.seats.len() >= room.min_seats)
         else {
             return Ok(refused(guid, lobby_wire::ERROR_START));
         };
@@ -428,6 +474,31 @@ mod tests {
         let out = rooms.close_list(GUEST).unwrap();
         assert_eq!(to(&out, GUEST), [lobby_wire::close()]);
         assert_eq!(rooms.room_of(GUEST).unwrap().id, id);
+    }
+
+    /// A derby host starts alone with AI on, and Auto-Start begins the countdown on the last seat.
+    #[test]
+    fn a_short_room_starts_at_its_minimum_and_a_full_one_by_itself() {
+        let mut rooms = Rooms::default();
+        let limits = Limits { capacity: 3, min_seats: 1, auto_start: true };
+        rooms.create_with(2, limits, seat(HOST), Vec::new()).unwrap();
+        let id = rooms.room_of(HOST).unwrap().id;
+        rooms.join(id, seat(GUEST)).unwrap();
+        assert!(rooms.auto_start(GUEST, 1_000).unwrap().is_empty(), "a seat is still free");
+        rooms.join(id, seat(WATCHER)).unwrap();
+        let out = rooms.auto_start(WATCHER, 1_000).unwrap();
+        assert_eq!(to(&out, GUEST), [lobby_wire::starting(id, 2)]);
+        assert_eq!(rooms.seats_due(6_000), [HOST, GUEST, WATCHER]);
+
+        let mut rooms = Rooms::default();
+        let alone = Limits { capacity: 5, min_seats: 1, auto_start: false };
+        rooms.create_with(2, alone, seat(HOST), Vec::new()).unwrap();
+        let id = rooms.room_of(HOST).unwrap().id;
+        assert_eq!(to(&rooms.start(HOST, 0).unwrap(), HOST), [lobby_wire::starting(id, 2)]);
+
+        let unsound = Limits { capacity: 5, min_seats: 6, auto_start: false };
+        let refused = rooms.create_with(2, unsound, seat(GUEST), Vec::new()).unwrap();
+        assert_eq!(to(&refused, GUEST), [lobby_wire::error(lobby_wire::ERROR_CREATE)]);
     }
 
     #[test]

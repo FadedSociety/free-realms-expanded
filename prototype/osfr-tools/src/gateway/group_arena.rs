@@ -4,6 +4,7 @@
 use super::Gateway;
 use crate::chess::{ChessMessage, ChessParticipant, ChessTable};
 use crate::hosted_table::HostedTable;
+use crate::{derby_gateway::{DerbySeat, HostedDerby}, game_room::Limits};
 use crate::encounter::{EncounterPhase, FieldParticipant, SharedArena};
 use crate::gameplay::Outcome;
 use std::io;
@@ -50,6 +51,47 @@ impl Gateway {
 
     pub fn hosted_table(&self) -> Option<u64> {
         self.gameplay.as_deref()?.hosted_table()
+    }
+
+    /// The World no longer holds the game this player sits in.
+    pub fn orphan_table(&mut self) {
+        if let Some(game) = self.gameplay.as_mut() {
+            game.orphan_table();
+        }
+    }
+
+    /// A new room's limits from its host's options: `Ok(None)` a two-seat board game, `Err` a
+    /// derby room whose options make no match.
+    pub fn lobby_limits(&self, lobby_type: u32, options: &[(u32, u32)]) -> Result<Option<Limits>, ()> {
+        self.gameplay.as_ref().map_or(Ok(None), |game| game.lobby_limits(lobby_type, options))
+    }
+
+    pub fn is_derby_lobby(&self, lobby_type: u32) -> bool {
+        self.gameplay.as_ref().is_some_and(|game| game.is_derby_lobby(lobby_type))
+    }
+
+    /// This player as a driver of a room's derby.
+    pub fn derby_seat(&self, name: String) -> Option<DerbySeat> {
+        self.gameplay.as_ref()?.derby_seat(self.state.guid, name)
+    }
+
+    /// A room's derby with every seat in it, for the World to own.
+    pub fn host_derby(
+        &self,
+        room: u32,
+        options: &[(u32, u32)],
+        seats: &[DerbySeat],
+    ) -> io::Result<HostedDerby> {
+        let game = self.gameplay.as_ref().ok_or_else(|| io::Error::other("no gameplay"))?;
+        game.host_derby(room, options, seats)
+    }
+
+    /// Take this player's seat in a room's derby; their next tick starts it for them.
+    pub fn sit_derby(&mut self, table: &HostedDerby) {
+        let guid = self.state.guid;
+        if let Some(game) = self.gameplay.as_mut() {
+            game.sit_derby(table, guid);
+        }
     }
 
     pub fn lend_table(&mut self, table: HostedTable) {

@@ -290,6 +290,7 @@ impl Content {
             "kart_entry.json",
             "kart_gates.json",
             "derby_gates.json",
+            "derby_lobby.json",
             "vehicles.json",
             "vehicle_looks.json",
             "kart_garage.json",
@@ -849,7 +850,9 @@ fn the_derby_driver_offers_the_derby_when_a_package_exists() {
     let position = npc_position(MAD_JACK);
     let mut gateway = gateway_at(&content, content.state(), position);
     let menu = bodies(&click(&mut gateway, MAD_JACK, NOW));
-    let option = menu_option(&menu, 3053).expect("Demo Derby Lobby option");
+    // The shipped menu: "Demo Derby" (382789) is the match, "Demo Derby Lobby" (3053) the lobby.
+    assert!(menu_option(&menu, 3053).is_some(), "Demo Derby Lobby option");
+    let option = menu_option(&menu, 382_789).expect("Demo Derby option");
     let started = choose(&mut gateway, MAD_JACK, option, NOW + 100);
     assert!(started.gameplay_changed);
     assert!(
@@ -962,7 +965,7 @@ fn a_derby_driver_offers_nothing_while_the_derby_package_is_absent() {
     let mut gateway = gateway_at(&content, content.state(), position);
     let menu = bodies(&click(&mut gateway, MAD_JACK, NOW));
     assert!(
-        menu_option(&menu, 3053).is_none(),
+        menu_option(&menu, 3053).is_none() && menu_option(&menu, 382_789).is_none(),
         "a dormant derby must not be listed"
     );
     let before = save_bytes(&gateway);

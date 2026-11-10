@@ -40,6 +40,9 @@ use std::{
     sync::Arc,
 };
 
+mod hosted;
+pub use hosted::{DerbyLobby, DerbySeat, HostedDerby, LOBBY_FILE, RoomPlan};
+
 /// ORIGINAL: profile 49 is the Demo Derby Driver job (`Piece 041`).
 pub const DEMO_DERBY_DRIVER_PROFILE: i32 = 49;
 
@@ -259,6 +262,10 @@ pub struct DerbyGateway {
     row_names: BTreeMap<i32, i32>,
     /// The player's chosen car for the next match (`vehicle_looks.json`); never saved.
     player_vehicle: Option<Vec<u8>>,
+    /// `derby_lobby.json`: the game lobby's rooms; none keeps the derby solo.
+    lobby: Option<Arc<DerbyLobby>>,
+    /// This driver's seat in a lobby room's match; never saved.
+    hosting: hosted::Hosting,
 }
 
 impl DerbyGateway {
@@ -507,6 +514,7 @@ impl DerbyGateway {
             minigames.as_deref(),
         )?;
         gateway.restore_ledger(saved)?;
+        gateway.lobby = hosted::load_lobby(directory)?;
         Ok(Some(gateway))
     }
 
@@ -628,6 +636,8 @@ impl DerbyGateway {
             arena: None,
             row_names,
             player_vehicle: None,
+            lobby: None,
+            hosting: hosted::Hosting::default(),
         })
     }
 
@@ -657,9 +667,12 @@ impl DerbyGateway {
     }
 
     pub fn active(&self) -> bool {
-        self.service.as_ref().is_some_and(|service| {
-            !matches!(service.phase(), DerbyPhase::Closed | DerbyPhase::Aborted)
-        })
+        // A seat in a room's match stays active until this driver's own gateway has left it,
+        // whatever became of the match: its tick is what takes them out (`hosted_lost`).
+        self.hosted_room().is_some()
+            || self.service.as_ref().is_some_and(|service| {
+                !matches!(service.phase(), DerbyPhase::Closed | DerbyPhase::Aborted)
+            })
     }
 
     /// L931: where a car of the live match is now (its last pose).
@@ -827,7 +840,7 @@ impl DerbyGateway {
         let actions = staged
             .handle_client(owner, inner, now_ms)
             .map_err(|error| invalid(error.to_string()))?;
-        let replies = packets_for_owner(&actions, owner)?;
+        let replies = self.deliver(&actions, owner)?;
         self.service = Some(staged);
         Ok(replies)
     }
@@ -843,7 +856,7 @@ impl DerbyGateway {
         let actions = staged
             .tick(now_ms)
             .map_err(|error| invalid(error.to_string()))?;
-        let replies = packets_for_owner(&actions, owner)?;
+        let replies = self.deliver(&actions, owner)?;
         self.service = Some(staged);
         Ok(replies)
     }
@@ -851,6 +864,9 @@ impl DerbyGateway {
     /// L958: a quit in the race, ended through the results screen (`DerbyService::forfeit`).
     /// `None` when the packet is not a forfeit.
     pub fn forfeit(&mut self, inner: &[u8], now_ms: u64) -> io::Result<Option<Vec<Vec<u8>>>> {
+        if self.hosted_room().is_some() {
+            return self.hosted_forfeit(inner, now_ms);
+        }
         let Some(service) = &self.service else {
             return Ok(None);
         };
@@ -873,6 +889,9 @@ impl DerbyGateway {
     /// [`Self::forfeit`]). Malformed, foreign and stale cancellation
     /// requests return no packets and leave the live service untouched.
     pub fn cancel(&mut self, packet: &[u8]) -> io::Result<Vec<Vec<u8>>> {
+        if self.hosted_room().is_some() {
+            return self.hosted_cancel(packet);
+        }
         let Some(service) = &self.service else {
             return Ok(Vec::new());
         };
@@ -1039,6 +1058,7 @@ impl DerbyGateway {
 
     /// Retire the live match and return the job to restore.
     pub fn exit(&mut self) -> Option<i32> {
+        self.leave_room();
         self.service = None;
         self.owner = None;
         self.previous_job.take()

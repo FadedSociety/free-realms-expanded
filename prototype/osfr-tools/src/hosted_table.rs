@@ -3,6 +3,7 @@
 use crate::{
     checkers_lobby::HostedGame,
     chess::{ChessMessage, ChessTable},
+    derby_gateway::HostedDerby,
 };
 use std::io;
 
@@ -13,6 +14,14 @@ pub const CHECKERS_LOBBY: u32 = 5;
 pub enum HostedTable {
     Chess(ChessTable),
     Checkers(HostedGame),
+    /// A derby room's match: several drivers, and its own clock rather than turns.
+    Derby(Box<HostedDerby>),
+}
+
+/// Addressed packets as the relay carries them.
+pub fn messages(packets: Vec<(u64, Vec<u8>)>) -> Vec<ChessMessage> {
+    let message = |(player_id, packet): (u64, Vec<u8>)| ChessMessage { player_id, text: String::new(), packet };
+    packets.into_iter().map(message).collect()
 }
 
 impl HostedTable {
@@ -20,6 +29,7 @@ impl HostedTable {
         match self {
             Self::Chess(table) => table.id() as u32,
             Self::Checkers(game) => game.id(),
+            Self::Derby(derby) => derby.id(),
         }
     }
 
@@ -27,6 +37,7 @@ impl HostedTable {
         match self {
             Self::Chess(table) => table.seated(guid),
             Self::Checkers(game) => game.seated(guid),
+            Self::Derby(derby) => derby.seated(guid),
         }
     }
 
@@ -35,6 +46,7 @@ impl HostedTable {
         match self {
             Self::Chess(table) => Ok(table.forfeit(guid)?.messages),
             Self::Checkers(game) => game.forfeit(guid),
+            Self::Derby(derby) => derby.forfeit(guid).map(messages),
         }
     }
 
@@ -43,6 +55,16 @@ impl HostedTable {
         match self {
             Self::Chess(table) => table.waiting_on(),
             Self::Checkers(game) => game.waiting_on(),
+            // A derby waits on nobody's turn; its start has its own watch.
+            Self::Derby(_) => None,
+        }
+    }
+
+    /// Once a tick: what a game with its own clock owes its seats.
+    pub fn watch(&mut self, now_ms: u64) -> io::Result<Vec<ChessMessage>> {
+        match self {
+            Self::Derby(derby) => derby.watch(now_ms).map(messages),
+            _ => Ok(Vec::new()),
         }
     }
 
@@ -63,6 +85,7 @@ impl HostedTable {
         match self {
             Self::Chess(table) => table.release(guid),
             Self::Checkers(game) => game.release(guid),
+            Self::Derby(derby) => derby.release(guid),
         }
     }
 
@@ -70,6 +93,7 @@ impl HostedTable {
         match self {
             Self::Chess(table) => table.is_settled(guid),
             Self::Checkers(game) => game.is_settled(guid),
+            Self::Derby(derby) => derby.is_settled(guid),
         }
     }
 
@@ -77,6 +101,7 @@ impl HostedTable {
         match self {
             Self::Chess(table) => table.all_settled(),
             Self::Checkers(game) => game.all_settled(),
+            Self::Derby(derby) => derby.all_settled(),
         }
     }
 }
