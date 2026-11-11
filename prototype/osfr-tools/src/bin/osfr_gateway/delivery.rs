@@ -371,7 +371,11 @@ impl SharedWorld {
     /// read before a zone transfer removes the player.
     pub(super) fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
         let is_joined = self.joined.contains(&session);
-        let Some(player) = self.players.get(session).filter(|_| is_joined) else {
+        // G5: a hidden staff character's emotes, ride and pet reach nobody.
+        let shown = |player: &&osfr_tools::players::PlayerSession| {
+            is_joined && !self.players.is_hidden(player.character_guid)
+        };
+        let Some(player) = self.players.get(session).filter(shown) else {
             return Vec::new();
         };
         let mut deliveries = Vec::new();

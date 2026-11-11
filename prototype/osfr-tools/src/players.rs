@@ -229,6 +229,10 @@ pub struct PlayerRegistry {
     // list the client reader `0091aa10` drains into +328; the name tag asks 129/14 for the
     // name). Session-only: the guild store owns membership, the gateway mirrors it here.
     guilds: BTreeMap<SessionId, u64>,
+    // G5: staff characters no other viewer may select (`gm_powers` invisible and spectate).
+    // Keyed by character, not session, so it survives zoning (leave then join); the host
+    // clears it when the session ends.
+    hidden: BTreeSet<u64>,
 }
 
 impl PlayerRegistry {
@@ -243,7 +247,43 @@ impl PlayerRegistry {
             mounts: BTreeMap::new(),
             temporary_models: BTreeMap::new(),
             guilds: BTreeMap::new(),
+            hidden: BTreeSet::new(),
         }
+    }
+
+    /// G5: hide `character_guid` from every other viewer, or show it again. A viewer that saw
+    /// it gets the 35/3 removal now (a hidden subject never ranks); one in range gets the AddPc
+    /// when it is shown. The character keeps its own view of everyone else.
+    pub fn set_hidden(&mut self, character_guid: u64, hidden: bool) -> Vec<OutboundMessage> {
+        let changed = if hidden {
+            self.hidden.insert(character_guid)
+        } else {
+            self.hidden.remove(&character_guid)
+        };
+        let Some(subject) = self.character_owners.get(&character_guid).copied() else {
+            return Vec::new();
+        };
+        let Some(player) = self.sessions.get(&subject).filter(|_| changed) else {
+            return Vec::new();
+        };
+        let affected = self.nearby(player.zone, player.position);
+        self.refresh_views(subject, &affected, None, false)
+    }
+
+    /// G5: drop the flag without telling anyone, for a session about to `leave`: nobody holds
+    /// the hidden character in view, so the leave has nothing to remove either.
+    pub fn forget_hidden(&mut self, character_guid: u64) {
+        self.hidden.remove(&character_guid);
+    }
+
+    pub fn is_hidden(&self, character_guid: u64) -> bool {
+        self.hidden.contains(&character_guid)
+    }
+
+    fn hidden_session(&self, id: SessionId) -> bool {
+        self.sessions
+            .get(&id)
+            .is_some_and(|player| self.hidden.contains(&player.character_guid))
     }
 
     pub fn get(&self, session_id: SessionId) -> Option<&PlayerSession> {
@@ -286,7 +326,7 @@ impl PlayerRegistry {
         self.nearby_sessions(zone, position)
             .into_iter()
             .filter_map(|id| self.sessions.get(&id))
-            .filter(|player| accept(player))
+            .filter(|player| !self.hidden.contains(&player.character_guid) && accept(player))
             .map(|player| (distance_squared(position, player.position), player))
             .filter(|(distance, _)| *distance <= limit)
             .min_by(|(left, a), (right, b)| {
@@ -627,7 +667,7 @@ impl PlayerRegistry {
         let mut candidates: Vec<_> = self
             .nearby(viewer.zone, viewer.position)
             .into_iter()
-            .filter(|id| *id != viewer.session_id)
+            .filter(|id| *id != viewer.session_id && !self.hidden_session(*id))
             .map(|id| {
                 (
                     distance_squared(viewer.position, self.sessions[&id].position),
@@ -664,6 +704,7 @@ impl PlayerRegistry {
                 .sessions
                 .get(&subject)
                 .filter(|p| p.zone == viewer.zone && p.session_id != id)
+                .filter(|p| !self.hidden.contains(&p.character_guid))
                 .map(|p| (distance_squared(viewer.position, p.position), subject))
                 .filter(|(distance, _)| *distance <= f64::from(self.policy.radius).powi(2));
             // Only this subject changed. Invisible subjects outside the cutoff,

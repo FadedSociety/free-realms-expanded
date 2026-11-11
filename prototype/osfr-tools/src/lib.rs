@@ -47,6 +47,7 @@ pub mod game_store;
 pub mod gameplay;
 pub mod gateway;
 pub mod gm_panel;
+pub mod gm_powers;
 pub mod player_gm_menu;
 pub mod redeem_codes;
 pub mod loot_tables;

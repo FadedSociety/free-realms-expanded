@@ -698,3 +698,8 @@ fn l081_gm_wheel_mutes_gifts_moves_and_sets_a_role() {
     assert!(lines.iter().any(|l| l == "Player kicked."), "{lines:?}");
     assert!(rig.session(bravo).kicked);
 }
+
+/// G5's gateway tests use this rig (`gm_powers_tests.rs`).
+#[cfg(test)]
+#[path = "gm_powers_tests.rs"]
+mod g5_gm_powers;

@@ -124,7 +124,7 @@ fn online(sessions: &SessionMap, guid: u64) -> Option<SessionKey> {
 }
 
 /// Move the admin to the other player, both in the open world.
-fn go_to(
+pub(super) fn go_to(
     session: &mut Session,
     target: u64,
     sessions: &mut SessionMap,

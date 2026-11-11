@@ -6,7 +6,7 @@ use super::{Gateway, GatewayOutcome, invalid, wrapped};
 use crate::{
     character_store::CharacterState,
     dev_teleport,
-    movement::{ExpectedDiscontinuity, MovementState},
+    movement::{ExpectedDiscontinuity, MovementState, StaffMotion},
 };
 use std::io;
 
@@ -61,6 +61,85 @@ impl Gateway {
             gameplay_changed: true,
             ..GatewayOutcome::default()
         })
+    }
+
+    /// G5: put this character where a staff power drives it (spectate, follow, the way back),
+    /// in its current zone. Unlike `stage_admin_relocation` nothing refuses a busy or
+    /// non-open-world character: the power has checked who may be moved. `motion` is the
+    /// standing exemption left in force; `None` leaves the one-use developer-teleport token,
+    /// so ordinary movement resumes from here. A pose-only change: the commit defers its save.
+    pub fn stage_staff_pose(
+        &mut self,
+        position: [f32; 3],
+        rotation: [f32; 3],
+        motion: Option<StaffMotion>,
+        now_ms: u64,
+    ) -> io::Result<GatewayOutcome> {
+        if !self.loaded {
+            return Err(invalid("it is still loading"));
+        }
+        let state = CharacterState {
+            position,
+            rotation,
+            ..self.state.clone()
+        };
+        state.validate()?;
+        let mut replies = vec![wrapped(&dev_teleport::location_packet(position, rotation))];
+        if let Some(game) = self.gameplay.as_deref_mut() {
+            let seen = game.update_npc_visibility(&state)?;
+            replies.extend(seen.iter().map(|reply| wrapped(reply)));
+        }
+        self.state = state;
+        self.movement_state = MovementState::new(self.state.zone_id, position, rotation);
+        self.expected_discontinuity = Some(match motion {
+            Some(motion) => ExpectedDiscontinuity::staff(motion, self.state.zone_id, position),
+            None => ExpectedDiscontinuity::developer_teleport(self.state.zone_id, position),
+        });
+        self.last_movement_ms = Some(now_ms);
+        Ok(GatewayOutcome {
+            replies,
+            state_changed: true,
+            ..GatewayOutcome::default()
+        })
+    }
+
+    /// G5: put back the pose a spectating session left from, before its logout save, so it
+    /// is not saved wherever its target was. Nothing is sent: the session is ending.
+    pub fn restore_saved_pose(
+        &mut self,
+        zone_id: u32,
+        position: [f32; 3],
+        rotation: [f32; 3],
+    ) -> io::Result<()> {
+        let state = CharacterState {
+            zone_id,
+            position,
+            rotation,
+            ..self.state.clone()
+        };
+        state.validate()?;
+        self.state = state;
+        Ok(())
+    }
+
+    /// G5: the standing movement exemption in force, if any.
+    pub fn staff_motion(&self) -> Option<StaffMotion> {
+        self.expected_discontinuity.as_ref()?.staff_motion()
+    }
+
+    /// G5: set the standing exemption at this character's pose, or clear it (`None`). A
+    /// pending one-use relocation or zone token is left alone (the client has not arrived);
+    /// the result says whether the exemption now matches the request, so a tick can retry.
+    pub fn set_staff_motion(&mut self, motion: Option<StaffMotion>) -> bool {
+        let pending = self.expected_discontinuity.as_ref();
+        if pending.is_some_and(|token| token.staff_motion().is_none()) {
+            return motion.is_none();
+        }
+        self.movement_state.position = self.state.position;
+        self.expected_discontinuity = motion.map(|motion| {
+            ExpectedDiscontinuity::staff(motion, self.state.zone_id, self.state.position)
+        });
+        true
     }
 
     /// L081: an admin GM wheel gift of coins or Station Cash to this character, staged like a

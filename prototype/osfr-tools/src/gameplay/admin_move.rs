@@ -54,12 +54,14 @@ impl Gameplay {
         let Some(command) = lower.strip_prefix("realm ") else {
             return Ok(None);
         };
-        if command.split_whitespace().next() != Some("move") || !self.may_run(command) {
+        // G5: `realm send <character> <place>` is the staff panel's name for the same move.
+        let word = command.split_whitespace().next().unwrap_or_default();
+        if !matches!(word, "move" | "send") || !self.may_run(command) {
             return Ok(None);
         }
         // ASCII lowercasing keeps byte offsets, so this slice keeps a name's typed case.
         let raw = text["realm ".len()..].trim_start();
-        let words: Vec<&str> = raw["move".len()..].split_whitespace().collect();
+        let words: Vec<&str> = raw[word.len()..].split_whitespace().collect();
         let staged = self.resolve_move(&words);
         Ok(Some(match staged {
             Ok(request) => Outcome {
@@ -130,6 +132,29 @@ impl Gameplay {
         let mut out = Outcome::default();
         self.apply_relocation(relocation, character, &mut out)?;
         Ok(out)
+    }
+
+    /// G5: why a staff power may not start moving this character now (knocked out, in an
+    /// encounter, or busy by the occupation table, as a 122 rescue is refused); `None` if free.
+    pub fn staff_move_block(&self, character: &CharacterState) -> Option<&'static str> {
+        self.warp_context(character)
+            .blocked
+            .map(|_| "you are knocked out, in an encounter or busy with an activity")
+    }
+
+    /// G5: whether a watcher may follow this character into its zone by an instance transfer:
+    /// the open world, a cave, a house or a battle instance. A match, race, fishing hole or
+    /// other minigame scene (and the opening) is this session's own; a watcher waits outside.
+    pub fn staff_followable(&self, character: &CharacterState) -> bool {
+        let kart = self
+            .kart_entry
+            .as_ref()
+            .is_some_and(|k| k.scene().is_some());
+        !(self.soccer.is_some()
+            || kart
+            || self.minigame_scene().is_some()
+            || self.in_minigame_scene(character)
+            || self.is_opening())
     }
 
     /// L081: the gifted player's side of an admin GM wheel Coins or Station Cash, staged on a

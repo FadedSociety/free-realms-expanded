@@ -148,7 +148,25 @@ impl SpeedModifiers {
 pub enum DiscontinuityKind {
     ZoneChange,
     DeveloperTeleport,
+    /// G5: a standing staff exemption (`gm_powers`), never consumed by a report.
+    Staff(StaffMotion),
 }
+
+/// G5: who owns a staff-exempt character's pose while the exemption stands. The validator hands
+/// the token back unchanged, so the speed checks never snap the character back or log a reject.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StaffMotion {
+    /// The server drives the pose (spectate, follow): every report is ignored.
+    Driven,
+    /// The pose is held where the token stands (a frozen player): a report that strays more
+    /// than `HELD_SLACK` from it is clamped back, which sends the 38/12 correction.
+    Held,
+    /// Staff flight: any finite, in-bounds report is accepted as it is.
+    Flight,
+}
+
+/// (R) How far a held report may sit from its hold before it is corrected.
+const HELD_SLACK: f64 = 0.5;
 
 /// Opaque, server-issued one-use authorization for a known relocation.
 /// Construct this only from a server-controlled zone transition or relocation
@@ -180,8 +198,25 @@ impl ExpectedDiscontinuity {
         }
     }
 
+    /// G5: a standing staff exemption at `position` (the hold for `Held`).
+    pub fn staff(motion: StaffMotion, zone_id: u32, position: [f32; 3]) -> Self {
+        Self {
+            kind: DiscontinuityKind::Staff(motion),
+            zone_id,
+            position,
+            elapsed: Duration::ZERO,
+        }
+    }
+
     pub fn kind(&self) -> DiscontinuityKind {
         self.kind
+    }
+
+    pub fn staff_motion(&self) -> Option<StaffMotion> {
+        match self.kind {
+            DiscontinuityKind::Staff(motion) => Some(motion),
+            _ => None,
+        }
     }
 }
 
@@ -210,6 +245,10 @@ pub enum Reason {
     GrossHorizontalOverspeed,
     GrossVerticalOverspeed,
     GrossHorizontalAndVerticalOverspeed,
+    /// G5 standing exemptions (`StaffMotion`).
+    StaffDriven,
+    StaffHeld,
+    StaffFlight,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -259,6 +298,36 @@ pub fn validate(
     if update.direction.iter().any(|v| !v.is_finite()) {
         return rejected(previous, Reason::NonFiniteDirection, expected_discontinuity);
     }
+    // G5: the one staff check every caller routes through. It answers before the zone and
+    // speed checks and hands its token back, so it lasts until the server clears it.
+    if let Some((motion, token)) = expected_discontinuity
+        .clone()
+        .filter(|token| token.zone_id == server_zone_id)
+        .and_then(|token| Some((token.staff_motion()?, token)))
+    {
+        let held = MovementState {
+            position: token.position,
+            ..*previous
+        };
+        let (decision, state, reason) = match motion {
+            StaffMotion::Driven => (Decision::Ignore, *previous, Reason::StaffDriven),
+            StaffMotion::Held if within_radius(token.position, update.position, HELD_SLACK) => {
+                (Decision::Ignore, held, Reason::StaffHeld)
+            }
+            StaffMotion::Held => (Decision::Clamp, held, Reason::StaffHeld),
+            StaffMotion::Flight => (
+                Decision::Accept,
+                accepted_state(server_zone_id, update, previous.direction),
+                Reason::StaffFlight,
+            ),
+        };
+        return ValidationResult {
+            decision,
+            state,
+            reason,
+            expected_discontinuity: Some(token),
+        };
+    }
 
     if let Some(token) = expected_discontinuity
         .clone()
@@ -266,7 +335,10 @@ pub fn validate(
     {
         let reason = match token.kind() {
             DiscontinuityKind::ZoneChange => Reason::ExpectedZoneChange,
-            DiscontinuityKind::DeveloperTeleport => Reason::ExpectedDeveloperTeleport,
+            // A staff token answered above.
+            DiscontinuityKind::DeveloperTeleport | DiscontinuityKind::Staff(_) => {
+                Reason::ExpectedDeveloperTeleport
+            }
         };
         // (R) The location/zone packet may overtake a queued stale pose. Keep
         // the one-use token and silently drop far reports until target arrival

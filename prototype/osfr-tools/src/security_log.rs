@@ -203,6 +203,17 @@ impl SecurityLog {
         }))
     }
 
+    /// G5: one row per staff power use (`gm_powers::AuditRow`), written at once. Numbers and
+    /// the closed action name only.
+    pub fn record_gm_power(&mut self, row: &crate::gm_powers::AuditRow) -> io::Result<()> {
+        self.append(serde_json::json!({
+            "timestamp_ms": row.timestamp_ms, "kind": "gm_power",
+            "account_id": row.account_id, "character_guid": row.character_guid,
+            "action": row.action, "target_guid": row.target_guid,
+            "outcome": if row.applied { "applied" } else { "refused" },
+        }))
+    }
+
     /// The one write path for every row (refusal batches, admin moves, moderation): append one
     /// JSON row, rotating to `.previous` first when the row would pass the cap.
     fn append(&mut self, row: serde_json::Value) -> io::Result<()> {

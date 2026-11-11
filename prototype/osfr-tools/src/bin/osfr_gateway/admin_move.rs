@@ -26,7 +26,7 @@ pub(super) fn run(
     Ok(())
 }
 
-fn move_character(
+pub(super) fn move_character(
     admin: &Session,
     options: &Options,
     sessions: &mut SessionMap,

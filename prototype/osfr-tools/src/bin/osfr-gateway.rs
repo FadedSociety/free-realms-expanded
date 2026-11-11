@@ -51,6 +51,8 @@ mod encounter_invites;
 mod friends_routing;
 #[path = "osfr_gateway/gm_menu_routing.rs"]
 mod gm_menu_routing;
+#[path = "osfr_gateway/gm_powers_routing.rs"]
+mod gm_powers_routing;
 #[path = "osfr_gateway/group_arena.rs"]
 mod group_arena;
 #[path = "osfr_gateway/house_visits.rs"]
@@ -589,6 +591,7 @@ struct SharedWorld {
     cakes: cake_routing::Cakes,
     /// L071: the uploaded portraits folder (`portrait_http.rs`); 156/2 answers with its images.
     portraits: Option<Arc<Path>>,
+    gm: Box<osfr_tools::gm_powers::GmPowers>, // G5: staff powers, never inside a commit.
 }
 
 /// Live chat identity for one session. Zone, position and group are derived from the player
@@ -676,6 +679,7 @@ impl SharedWorld {
             boomboxes: Default::default(),
             cakes: Default::default(),
             portraits: None,
+            gm: Default::default(),
         }
     }
 
@@ -1685,19 +1689,8 @@ impl Session {
                 return Ok(());
             }
         }
-        for _ in 0..self.gateway.denied_dev_commands(message)? {
-            world
-                .security
-                .lock()
-                .unwrap_or_else(|e| e.into_inner())
-                .record(
-                    EventKind::DevCommandDenial,
-                    options
-                        .account_store
-                        .as_ref()
-                        .and(self.selected_character.then_some(self.account_guid)),
-                    Some(self.id.0),
-                );
+        if gm_powers_routing::chat(self, message, options, now_ms, world, membership, sessions)? {
+            return Ok(());
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
@@ -2487,6 +2480,7 @@ impl Session {
         )?;
         committed.then(|| held.publish(self, sessions, world, membership));
         committed.then(|| room_routing::publish(self, sessions, world, table, now_ms));
+        gm_powers_routing::tick(self, sessions, world, membership, now_ms)?;
         self.flush_position(now_ms)
     }
 
@@ -4373,6 +4367,7 @@ impl Server {
             .active_sessions
             .get(&session.character_guid)
             .is_some_and(|owner| *owner != session.id);
+        gm_powers_routing::end(&mut self.world, &mut session);
         if session.selected_character && !another_owns {
             let saved = contain(|| Ok(save(&session.state_path, &session.gateway.snapshot())?));
             if let Err(error) = saved {

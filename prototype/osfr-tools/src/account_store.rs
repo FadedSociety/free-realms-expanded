@@ -91,17 +91,51 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
                 | "reload power_ups"
                 | "reload placements"
         ),
-        // (R) L042: moderators get the moderation commands and nothing else; gm-panel G2 adds
-        // staff mail (`realm mail <to> | ...`, PLAN 4.8: "moderators get moderation, mail").
-        AccountRole::Moderator => {
-            matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "gm" | "mail")
-        }
+        // (R) L042: moderators get the moderation commands; gm-panel G2 adds staff mail
+        // (`realm mail <to> | ...`, PLAN 4.8: "moderators get moderation, mail") and G5 the
+        // watching powers (spectate, freeze, goto), nothing that moves another player.
+        AccountRole::Moderator => matches!(
+            command,
+            "mute"
+                | "unmute"
+                | "kick"
+                | "ban"
+                | "unban"
+                | "gm"
+                | "mail"
+                | "spectate"
+                | "unspectate"
+                | "freeze"
+                | "unfreeze"
+                | "goto"
+        ),
         // `season` is an event toggle (`gameplay/live_events.rs`): it changes the world for every
-        // player, so it stays with the admins (owner 2026-11-09). Staff mail reaches every
-        // player too, so it stays with the staff roles.
+        // player, so it stays with the admins (owner 2026-11-09). Staff mail reaches every player,
+        // and G5's staff powers act on or watch other players, so they stay with staff too (a
+        // tester keeps `goto`).
         AccountRole::Tester => !matches!(
             command,
-            "mute" | "unmute" | "kick" | "ban" | "unban" | "role" | "code" | "season" | "mail"
+            "mute"
+                | "unmute"
+                | "kick"
+                | "ban"
+                | "unban"
+                | "role"
+                | "code"
+                | "season"
+                | "mail"
+                | "spectate"
+                | "unspectate"
+                | "invisible"
+                | "visible"
+                | "freeze"
+                | "unfreeze"
+                | "follow"
+                | "unfollow"
+                | "bring"
+                | "send"
+                | "waypoint"
+                | "fly"
         ),
         AccountRole::Player => false,
     }
