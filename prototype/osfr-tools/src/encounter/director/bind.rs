@@ -15,6 +15,9 @@ const EXIT_REACH: f32 = 3.0;
 const REACH_RADIUS: f32 = 5.0;
 /// (R) How near a player must be for an escorted actor to keep walking.
 const FOLLOW_M: f32 = 8.0;
+/// (R) A freed captive's run for the way out: how far, and how long until it is gone.
+const FLEE_M: f32 = 6.0;
+const FLEE_MS: u64 = 3_000;
 /// Score row types on the results card (39/47). 0 and 4 are the two rows the engine has
 /// always sent; (R) the others' order.
 const SCORE_ROWS: [(&str, i32); 6] = [
@@ -868,8 +871,23 @@ impl EncounterEngine {
                 if run.bind.shown.insert(guid) {
                     self.send_extra(&def, guid, out);
                 }
-            } else if run.bind.shown.remove(&guid) {
-                out.replies.push(remove(guid));
+            } else if run.bind.shown.contains(&guid) {
+                // (R) A freed captive runs a few steps for the way in and is gone FLEE_MS later
+                // (the guide: "tell them it is safe to leave"); any other ally goes at once.
+                let since = *run.bind.clocks.entry(format!("fled:{i}")).or_insert(now_ms);
+                let gone = run.lives[i] == Life::Gone;
+                if gone && since == now_ms {
+                    let (from, to) = (def.roster[i].spot, def.place.arrive);
+                    let gap = horizontal_distance(from, to).max(0.01);
+                    let way = [(to[0] - from[0]) / gap, 0.0, (to[2] - from[2]) / gap];
+                    let step = FLEE_M.min(gap);
+                    let at = [from[0] + way[0] * step, from[1], from[2] + way[2] * step];
+                    out.replies.push(movement(guid, at, way));
+                }
+                if !gone || now_ms >= since + FLEE_MS {
+                    run.bind.shown.remove(&guid);
+                    out.replies.push(remove(guid));
+                }
             }
         }
     }

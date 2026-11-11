@@ -106,6 +106,10 @@ pub struct Entrance {
     /// 0 stands still (a door).
     pub roam: f32,
     pub fight: Option<u32>,
+    /// The battle a fight file's run still counts as for quests, kills and results (a door
+    /// whose `field_battles.json` row was replaced by the dungeon's own fight).
+    #[serde(default)]
+    pub counts_as: Option<u32>,
     pub scene: Option<String>,
     #[serde(default)]
     pub enter_scene: bool,
@@ -465,6 +469,9 @@ impl EncounterEngine {
             } else {
                 // A fight file's starter, or a closed entrance (no arena row: nothing can
                 // begin). The card is the fight's.
+                if let Some(old) = row.counts_as.filter(|_| dungeon.is_some()) {
+                    doors.counts_as.insert(id, old);
+                }
                 FieldBattle {
                     id,
                     title_id: dungeon.map_or(0, |d| d.title_id),

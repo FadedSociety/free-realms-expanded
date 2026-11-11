@@ -817,9 +817,14 @@ impl Run {
                     }
                     match (on, &mut plain) {
                         (Some(tag), _) => {
+                            // A captive just freed may still say its thanks as it leaves.
+                            let says = matches!(act, Act::Say(_));
                             let targets: Vec<u64> = self
                                 .tagged(&tag)
-                                .filter(|&s| self.lives[s] == Life::Alive)
+                                .filter(|&s| {
+                                    self.lives[s] == Life::Alive
+                                        || (says && self.lives[s] == Life::Gone)
+                                })
                                 .map(|s| self.def.guid(Some(s)))
                                 .collect();
                             out.extend(targets.into_iter().map(|guid| DirectorAct::Actor {

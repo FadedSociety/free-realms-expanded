@@ -287,17 +287,19 @@ fn the_shipped_fights_load() {
     let fights = director::load_dir(&content()).unwrap_or_else(|e| panic!("{e}"));
     let ids: Vec<(u32, bool)> = fights.iter().map(|f| (f.id, f.is_enabled())).collect();
     // File order: the names sort as text. 12365 is the captured battle, 96 the conversion that
-    // waits for its native run; the 14xxx files are the fights the combat quests stand on.
+    // waits for its native run; the 14xxx files are the fights the combat quests stand on. Fix
+    // F5: the 13xxx files are dungeon doors' own fights (they ran clearing battles before), and
+    // 14008, 14029, 14037, 14043 and 14045 are dungeons built from their fork battles.
     assert_eq!(ids.first(), Some(&(12365, true)));
     assert_eq!(ids.last(), Some(&(96, false)));
     let quest_fights: Vec<u32> = ids[1..ids.len() - 1].iter().map(|(id, _)| *id).collect();
     assert_eq!(
         quest_fights,
         [
-            14001, 14003, 14006, 14007, 14010, 14011, 14013, 14016, 14018, 14019, 14021, 14022,
-            14023, 14025, 14027, 14030, 14033, 14034, 14038, 14039, 14040, 14041, 14042, 14049,
-            14050, 14052, 14055, 14057, 14059, 14061, 14069, 14070, 14072, 14073, 14074, 14076,
-            14077, 14078, 14079
+            13002, 13003, 13035, 13041, 14001, 14003, 14006, 14007, 14008, 14010, 14011, 14013,
+            14016, 14018, 14019, 14021, 14022, 14023, 14025, 14027, 14029, 14030, 14033, 14034,
+            14037, 14038, 14039, 14040, 14041, 14042, 14043, 14045, 14049, 14050, 14052, 14055,
+            14057, 14059, 14061, 14069, 14070, 14072, 14073, 14074, 14076, 14077, 14078, 14079
         ]
     );
     assert!(ids[1..ids.len() - 1].iter().all(|(_, enabled)| *enabled));

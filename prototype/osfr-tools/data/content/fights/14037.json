@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "id": 14037,
+  "kind": "dungeon",
+  "title_id": 5705,
+  "description_id": 15789,
+  "icon_id": 668,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3
+  },
+  "place": {
+    "zone": 1223,
+    "arena": "sg_floren_forest",
+    "arrive": [
+      233.54,
+      -1.08,
+      91.46
+    ],
+    "exit_door": [
+      376.41,
+      11.11,
+      198.88
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "vile_floren": {
+      "definition_id": 1403701,
+      "name": "Vile Floren",
+      "name_id": 15801,
+      "model_id": 134,
+      "rank": "normal"
+    },
+    "withering_floren": {
+      "definition_id": 1403702,
+      "name": "Withering Floren",
+      "name_id": 15961,
+      "model_id": 134,
+      "rank": "normal"
+    },
+    "twisted_serpent": {
+      "definition_id": 1403703,
+      "name": "Twisted Serpent",
+      "name_id": 15802,
+      "model_id": 180,
+      "rank": "normal"
+    },
+    "blighted_floren": {
+      "definition_id": 1403713,
+      "name": "Blighted Floren",
+      "name_id": 16040,
+      "model_id": 134,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "vile_floren",
+      "at": [
+        269.91,
+        9.99,
+        93.37
+      ],
+      "heading": -1.216,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "withering_floren",
+      "at": [
+        269.65,
+        9.89,
+        90.37
+      ],
+      "heading": -0.961,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "twisted_serpent",
+      "at": [
+        272.91,
+        11.09,
+        90.01
+      ],
+      "heading": -1.07,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "withering_floren",
+      "at": [
+        298.73,
+        11.27,
+        105.01
+      ],
+      "heading": -1.787,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "twisted_serpent",
+      "at": [
+        302.38,
+        11.35,
+        105.12
+      ],
+      "heading": -1.727,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "vile_floren",
+      "at": [
+        295.1,
+        11.08,
+        102.01
+      ],
+      "heading": -1.232,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "twisted_serpent",
+      "at": [
+        328.13,
+        10.14,
+        137.29
+      ],
+      "heading": -2.1,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "vile_floren",
+      "at": [
+        331.76,
+        9.05,
+        142.52
+      ],
+      "heading": -2.285,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "withering_floren",
+      "at": [
+        324.67,
+        11.11,
+        132.64
+      ],
+      "heading": -1.489,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "vile_floren",
+      "at": [
+        353.25,
+        11.17,
+        172.97
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "withering_floren",
+      "at": [
+        349.97,
+        11.11,
+        171.01
+      ],
+      "heading": 1.032,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "twisted_serpent",
+      "at": [
+        357.41,
+        11.27,
+        172.61
+      ],
+      "heading": -1.485,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "blighted_floren",
+      "at": [
+        373.36,
+        11.11,
+        193.41
+      ],
+      "heading": -2.078,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.7
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        376.08,
+        11.11,
+        195.05
+      ],
+      [
+        370.39,
+        11.11,
+        190.95
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "withering_floren",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "vile_floren",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 16507,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 24 ('Floren Forest (the live dungeon: corrupted floren and twisted serpents from the '): scene sg_floren_forest, 4 groups standing at the start, 1 coming later, the boss Blighted Floren last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5705, 15789, icon 668 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_floren_forest needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14037*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/floren_forest.json, its notes page and the fork battle; under the id (14037) quests name."
+    }
+  ]
+}

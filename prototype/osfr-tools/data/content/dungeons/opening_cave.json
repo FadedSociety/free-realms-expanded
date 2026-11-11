@@ -39,6 +39,10 @@
               {
                 "kind": "reconstructed",
                 "evidence": "(R) Local reconstructed cave config copied from lab/references/opening-journal-text-v2/content/encounters.json dungeons[id=411]; not an original server record."
+              },
+              {
+                "kind": "reconstructed",
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): no entrance is placed for it (entrances.json lists it held, parked or not at all)."
               }
             ]
           }

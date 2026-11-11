@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14045,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14045.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Deep Mines."
+                "evidence": "(R) Goals map onto fights/14045.json (scripts/dungeon_fights.py); not mapped: bonus 'Find and defeat the Robgoblin Pyromancer!' is not a free-the-captives goal the mapping places."
               }
             ]
           }

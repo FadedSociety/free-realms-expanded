@@ -1,0 +1,723 @@
+{
+  "schema_version": 1,
+  "id": 13003,
+  "kind": "dungeon",
+  "title_id": 5702,
+  "description_id": 15336,
+  "icon_id": 662,
+  "difficulty": 1,
+  "entry": {
+    "min_combat_level": 0
+  },
+  "place": {
+    "zone": 1203,
+    "arena": "sg_bixie_hive",
+    "arrive": [
+      358.94,
+      84.69,
+      233.94
+    ],
+    "exit_door": [
+      134.42,
+      79.34,
+      418.06
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bixie_soldier": {
+      "definition_id": 930053,
+      "name": "Bixie Soldier",
+      "name_id": 440711,
+      "model_id": 220,
+      "rank": "normal"
+    },
+    "bixie_battlemage": {
+      "definition_id": 930052,
+      "name": "Bixie Battlemage",
+      "name_id": 440712,
+      "model_id": 211,
+      "rank": "normal"
+    },
+    "drone_fauzz": {
+      "definition_id": 1300319,
+      "name": "Drone Fauzz",
+      "name_id": 38510,
+      "model_id": 218,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "bixie_queen": {
+      "definition_id": 1300350,
+      "name": "Bixie Queen",
+      "name_id": 16234,
+      "model_id": 217,
+      "rank": "normal",
+      "side": "ally"
+    },
+    "frightened_bixie_worker": {
+      "definition_id": 1300351,
+      "name": "Frightened Bixie Worker",
+      "name_id": 130479,
+      "model_id": 219,
+      "rank": "normal",
+      "side": "ally"
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "bixie_soldier",
+      "at": [
+        331.9,
+        80.09,
+        253.75
+      ],
+      "heading": 1.902,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "bixie_battlemage",
+      "at": [
+        334.86,
+        80.1,
+        254.76
+      ],
+      "heading": 2.057,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "bixie_soldier",
+      "at": [
+        329.58,
+        80.03,
+        251.56
+      ],
+      "heading": 1.729,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "bixie_battlemage",
+      "at": [
+        293.89,
+        83.88,
+        261.18
+      ],
+      "heading": 1.396,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "bixie_soldier",
+      "at": [
+        291.32,
+        83.57,
+        259.07
+      ],
+      "heading": 1.295,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "bixie_battlemage",
+      "at": [
+        296.57,
+        83.86,
+        262.33
+      ],
+      "heading": 1.46,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "bixie_soldier",
+      "at": [
+        257.42,
+        79.97,
+        293.36
+      ],
+      "heading": 3.014,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "bixie_battlemage",
+      "at": [
+        258.15,
+        79.98,
+        290.47
+      ],
+      "heading": 3.06,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "bixie_soldier",
+      "at": [
+        254.12,
+        79.92,
+        292.28
+      ],
+      "heading": 2.685,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "bixie_battlemage",
+      "at": [
+        242.65,
+        81.37,
+        322.29
+      ],
+      "heading": -2.972,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "bixie_soldier",
+      "at": [
+        245.08,
+        81.51,
+        321.26
+      ],
+      "heading": -2.751,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "bixie_battlemage",
+      "at": [
+        244.59,
+        81.46,
+        324.68
+      ],
+      "heading": -2.869,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "bixie_soldier",
+      "at": [
+        214.07,
+        80.0,
+        347.31
+      ],
+      "heading": 1.126,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "bixie_battlemage",
+      "at": [
+        210.43,
+        80.02,
+        346.95
+      ],
+      "heading": 1.245,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "bixie_soldier",
+      "at": [
+        217.11,
+        80.03,
+        348.19
+      ],
+      "heading": 0.994,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "bixie_battlemage",
+      "at": [
+        179.75,
+        79.67,
+        374.71
+      ],
+      "heading": 0.069,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "bixie_soldier",
+      "at": [
+        182.04,
+        79.79,
+        376.03
+      ],
+      "heading": -1.931,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "bixie_battlemage",
+      "at": [
+        175.89,
+        79.54,
+        375.81
+      ],
+      "heading": 1.731,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "drone_fauzz",
+      "at": [
+        143.9,
+        79.76,
+        423.08
+      ],
+      "heading": 0.626,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.3
+    },
+    "speaker": {
+      "definition": "bixie_queen",
+      "at": [
+        143.69,
+        79.88,
+        424.64
+      ],
+      "tags": [
+        "speaker"
+      ]
+    },
+    "captive_1": {
+      "definition": "frightened_bixie_worker",
+      "at": [
+        329.37,
+        80.1,
+        251.95
+      ],
+      "tags": [
+        "captive",
+        "captive_1"
+      ]
+    },
+    "captive_2": {
+      "definition": "frightened_bixie_worker",
+      "at": [
+        259.01,
+        79.92,
+        291.79
+      ],
+      "tags": [
+        "captive",
+        "captive_2"
+      ]
+    },
+    "captive_3": {
+      "definition": "frightened_bixie_worker",
+      "at": [
+        245.56,
+        81.37,
+        323.2
+      ],
+      "tags": [
+        "captive",
+        "captive_3"
+      ]
+    },
+    "captive_4": {
+      "definition": "frightened_bixie_worker",
+      "at": [
+        176.41,
+        79.79,
+        375.0
+      ],
+      "tags": [
+        "captive",
+        "captive_4"
+      ]
+    }
+  },
+  "points": {
+    "speaker": [
+      [
+        143.69,
+        79.88,
+        424.64
+      ]
+    ],
+    "finale": [
+      [
+        146.33,
+        79.86,
+        425.19
+      ],
+      [
+        140.83,
+        80.03,
+        425.66
+      ],
+      [
+        143.9,
+        79.76,
+        423.08
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "player_within": {
+          "point": "speaker",
+          "m": 12.0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bixie_soldier",
+          "count": 2,
+          "at": "finale"
+        },
+        {
+          "definition": "bixie_battlemage",
+          "count": 1,
+          "at": "finale"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bixie_soldier",
+          "count": 2,
+          "at": "finale"
+        },
+        {
+          "definition": "bixie_battlemage",
+          "count": 1,
+          "at": "finale"
+        }
+      ],
+      "or_after_ms": 30000
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bixie_soldier",
+          "count": 2,
+          "at": "finale"
+        },
+        {
+          "definition": "bixie_battlemage",
+          "count": 1,
+          "at": "finale"
+        }
+      ],
+      "or_after_ms": 30000
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 16791,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    },
+    {
+      "id": "bonus",
+      "kind": "free",
+      "text_id": 430337,
+      "target": {
+        "tag": "captive"
+      },
+      "count": 4,
+      "bonus": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        },
+        {
+          "say": {
+            "text_id": 38627
+          },
+          "on": "speaker",
+          "wait_ms": 500
+        }
+      ]
+    },
+    {
+      "id": "thanks_1",
+      "when": {
+        "talked": {
+          "tag": "captive_1"
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 130474
+          },
+          "on": "captive_1"
+        }
+      ]
+    },
+    {
+      "id": "thanks_2",
+      "when": {
+        "talked": {
+          "tag": "captive_2"
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 130474
+          },
+          "on": "captive_2"
+        }
+      ]
+    },
+    {
+      "id": "thanks_3",
+      "when": {
+        "talked": {
+          "tag": "captive_3"
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 130474
+          },
+          "on": "captive_3"
+        }
+      ]
+    },
+    {
+      "id": "thanks_4",
+      "when": {
+        "talked": {
+          "tag": "captive_4"
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 130474
+          },
+          "on": "captive_4"
+        }
+      ]
+    },
+    {
+      "id": "meet",
+      "when": {
+        "player_within": {
+          "point": "speaker",
+          "m": 12.0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 38625
+          },
+          "on": "speaker"
+        },
+        {
+          "say": {
+            "text_id": 421146
+          },
+          "on": "speaker",
+          "wait_ms": 4000
+        }
+      ]
+    },
+    {
+      "id": "line_w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 14787
+          },
+          "on": "speaker"
+        }
+      ]
+    },
+    {
+      "id": "line_w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 38626
+          },
+          "on": "speaker"
+        }
+      ]
+    },
+    {
+      "id": "saved",
+      "when": {
+        "objective_done": {
+          "id": "main"
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "say": {
+            "text_id": 38629
+          },
+          "on": "speaker"
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 68,
+    "job_xp": 50,
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      },
+      {
+        "item_id": 3023,
+        "name_id": 422907,
+        "icon_id": 544
+      },
+      {
+        "item_id": 75354,
+        "name_id": 131098,
+        "icon_id": 3721
+      },
+      {
+        "item_id": 11002,
+        "name_id": 422909,
+        "icon_id": 730
+      }
+    ],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 4 ('Bixie Hive (the live dungeon: Drone Fauzz's bixie soldiers and battlemages throu'): scene sg_bixie_hive, 6 groups standing at the start, 1 coming later, the boss Drone Fauzz last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5702, 15336, icon 662 (the field_battles.json row 12370 this entrance ran before); rewards: its 68 coins and prize rows."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_bixie_hive needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13003*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Bixie Queen: Global.Text 16234; body Resources/Models.txt 217 bixie_f_queen.adr is described as 'Bixie Queen'"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Bixie Queen stands at the middle of the fork's last group (where its boss waits) and speaks the notes page's lines in order"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Frightened Bixie Worker: Global.Text 130479; body (R) the client model table's 'Bixie Male Gatherer' (bixie_m_gatherer.adr), the hive's worker bixie; no client or reference row names the worker's body"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Bonus: 4 Frightened Bixie Workers, each mirrored inside one of the fork's guard groups along the way; a talk frees one, it says its line and runs."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Finale: 3 waves of bixie_soldier, bixie_battlemage, bixie_soldier at the fork's last group, the first when a player comes within 12 m of Bixie Queen, each next one when the one before is down or 30 s after it; one wave per line of hers that calls more in."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/bixie_hive.json, its notes page and the fork battle; the entrance counts as battle 12370 for quests."
+    }
+  ]
+}

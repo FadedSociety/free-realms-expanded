@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "id": 13035,
+  "kind": "battle",
+  "title_id": 93274,
+  "description_id": 116757,
+  "icon_id": -1,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 0
+  },
+  "place": {
+    "zone": 1240,
+    "arena": "sh_random_encounter_01",
+    "arrive": [
+      139.56,
+      0.65,
+      141.72
+    ],
+    "exit_door": [
+      131.53,
+      1.63,
+      151.78
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "petty_yeti": {
+      "definition_id": 1303501,
+      "name": "Petty Yeti",
+      "name_id": 116756,
+      "model_id": 51,
+      "rank": "normal"
+    },
+    "yeti": {
+      "definition_id": 930073,
+      "name": "Yeti",
+      "name_id": 2245,
+      "model_id": 4547,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1": [
+      [
+        129.46,
+        1.05,
+        112.22
+      ],
+      [
+        113.9,
+        1.88,
+        137.14
+      ],
+      [
+        124.17,
+        2.4,
+        117.88
+      ]
+    ],
+    "w2": [
+      [
+        116.21,
+        0.07,
+        174.44
+      ],
+      [
+        142.39,
+        -0.3,
+        173.95
+      ],
+      [
+        120.46,
+        -0.73,
+        179.87
+      ],
+      [
+        98.52,
+        1.46,
+        152.97
+      ]
+    ],
+    "w3": [
+      [
+        170.31,
+        0.7,
+        141.59
+      ],
+      [
+        149.51,
+        -0.89,
+        178.75
+      ],
+      [
+        152.77,
+        -0.25,
+        175.41
+      ],
+      [
+        147.49,
+        -0.14,
+        164.54
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "petty_yeti",
+          "count": 3,
+          "at": "w1"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "petty_yeti",
+          "count": 2,
+          "at": "w2"
+        },
+        {
+          "definition": "yeti",
+          "count": 2,
+          "at": "w2"
+        }
+      ],
+      "or_after_ms": 16000
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "petty_yeti",
+          "count": 4,
+          "at": "w3"
+        }
+      ],
+      "or_after_ms": 16000
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 116824,
+      "target": {
+        "all_waves": true
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      },
+      {
+        "item_id": 3023,
+        "name_id": 422907,
+        "icon_id": 544
+      },
+      {
+        "item_id": 75354,
+        "name_id": 131098,
+        "icon_id": 3721
+      },
+      {
+        "item_id": 11002,
+        "name_id": 422909,
+        "icon_id": 730
+      }
+    ],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 82 ('Petty Yetis! (the live random encounter: yeti thieves; the Frosty Yetis in Snowh'): scene sh_random_encounter_01, 0 groups standing at the start, 3 coming later, no boss; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 93274, 116757, icon -1 (the field_battles.json row 12310 this entrance ran before); rewards: its 25 coins and prize rows."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sh_random_encounter_01 needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13035*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 3 later group(s) of the fork come as waves at their own spots: the first 1.5 s in, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the last waves are down. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/petty_yetis.json, its notes page and the fork battle; the entrance counts as battle 12310 for quests."
+    }
+  ]
+}

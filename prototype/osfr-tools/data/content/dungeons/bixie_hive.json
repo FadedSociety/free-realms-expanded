@@ -10,12 +10,39 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 13003,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/13003.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              },
+              {
+                "kind": "fight_goal",
+                "id": 2,
+                "fight_id": 13003,
+                "goal": "bonus",
+                "count": 4,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/13003.json goal 'bonus' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Bixie Hive."
+                "evidence": "(R) Goals map onto fights/13003.json (scripts/dungeon_fights.py)."
               }
             ]
           }

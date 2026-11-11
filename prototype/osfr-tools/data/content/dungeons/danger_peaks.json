@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14001,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14001.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Danger Peaks."
+                "evidence": "(R) Goals map onto fights/14001.json (scripts/dungeon_fights.py); not mapped: bonus 'Release the 10 Caged Birds.': its actors are not in the fork's roster (the notes page names no friendly NPC; none is a captive freed by a talk)."
               }
             ]
           }

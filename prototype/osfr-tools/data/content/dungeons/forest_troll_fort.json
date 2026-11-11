@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14008,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14008.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Forest Troll Fort."
+                "evidence": "(R) Goals map onto fights/14008.json (scripts/dungeon_fights.py); not mapped: bonus 'Find and defeat all the Elite Sneak Scouts!' is not a free-the-captives goal the mapping places."
               }
             ]
           }

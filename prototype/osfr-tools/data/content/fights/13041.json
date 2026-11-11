@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "id": 13041,
+  "kind": "dungeon",
+  "title_id": 30404,
+  "description_id": 92659,
+  "icon_id": -1,
+  "difficulty": 1,
+  "entry": {
+    "min_combat_level": 0
+  },
+  "place": {
+    "zone": 1238,
+    "arena": "sg_sheep_watch",
+    "arrive": [
+      383.95,
+      -57.0,
+      545.62
+    ],
+    "exit_door": [
+      386.81,
+      -57.0,
+      554.84
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "wolf": {
+      "definition_id": 930071,
+      "name": "Wolf",
+      "name_id": 374,
+      "model_id": 3284,
+      "rank": "normal"
+    },
+    "hooligan_wolf": {
+      "definition_id": 3156,
+      "name": "Hooligan Wolf",
+      "name_id": 5100200,
+      "model_id": 3284,
+      "rank": "normal"
+    },
+    "female_alpha_wolf": {
+      "definition_id": 1304112,
+      "name": "Female Alpha Wolf",
+      "name_id": 92655,
+      "model_id": 3284,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "male_alpha_wolf": {
+      "definition_id": 1304113,
+      "name": "Male Alpha Wolf",
+      "name_id": 92652,
+      "model_id": 3317,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "female_alpha_wolf",
+      "at": [
+        390.64,
+        -57.0,
+        562.12
+      ],
+      "heading": -2.756,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.5
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        366.11,
+        -57.0,
+        539.01
+      ],
+      [
+        367.06,
+        -57.0,
+        543.24
+      ],
+      [
+        362.23,
+        -57.0,
+        542.94
+      ]
+    ],
+    "w2": [
+      [
+        372.87,
+        -57.0,
+        555.72
+      ],
+      [
+        387.4,
+        -57.0,
+        559.54
+      ],
+      [
+        369.74,
+        -57.0,
+        553.69
+      ],
+      [
+        365.11,
+        -57.0,
+        548.16
+      ]
+    ],
+    "w3": [
+      [
+        400.07,
+        -57.0,
+        562.97
+      ],
+      [
+        404.36,
+        -57.0,
+        557.57
+      ],
+      [
+        396.94,
+        -57.0,
+        548.67
+      ],
+      [
+        403.56,
+        -57.0,
+        543.3
+      ]
+    ],
+    "w4": [
+      [
+        370.81,
+        -56.96,
+        560.56
+      ],
+      [
+        375.55,
+        -57.0,
+        557.46
+      ],
+      [
+        377.85,
+        -57.0,
+        561.1
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "wolf",
+          "count": 3,
+          "at": "w1"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "wolf",
+          "count": 2,
+          "at": "w2"
+        },
+        {
+          "definition": "hooligan_wolf",
+          "count": 2,
+          "at": "w2"
+        }
+      ],
+      "or_after_ms": 16000
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "wolf",
+          "count": 3,
+          "at": "w3"
+        },
+        {
+          "definition": "hooligan_wolf",
+          "count": 1,
+          "at": "w3"
+        }
+      ],
+      "or_after_ms": 16000
+    },
+    {
+      "id": "w4",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "male_alpha_wolf",
+          "count": 1,
+          "at": "w4"
+        },
+        {
+          "definition": "wolf",
+          "count": 2,
+          "at": "w4"
+        }
+      ],
+      "or_after_ms": 16000
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 388319,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w4",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      },
+      {
+        "item_id": 3023,
+        "name_id": 422907,
+        "icon_id": 544
+      },
+      {
+        "item_id": 75354,
+        "name_id": 131098,
+        "icon_id": 3721
+      },
+      {
+        "item_id": 11002,
+        "name_id": 422909,
+        "icon_id": 730
+      }
+    ],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 39 ('Sheep Watch (the live dungeon: wolves come for the sheep in the pen at Farnum Fa'): scene sg_sheep_watch, 0 groups standing at the start, 4 coming later, the boss Female Alpha Wolf last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 30404, 92659, icon -1 (the field_battles.json row 12350 this entrance ran before); rewards: its 25 coins and prize rows."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_sheep_watch needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13041*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 4 later group(s) of the fork come as waves at their own spots: the first 1.5 s in, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/sheep_watch.json, its notes page and the fork battle; the entrance counts as battle 12350 for quests."
+    }
+  ]
+}

@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14043,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14043.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Tavern Cellar."
+                "evidence": "(R) Goals map onto fights/14043.json (scripts/dungeon_fights.py); not mapped: bonus 'Find and destroy all the brawl club rules!' is not a free-the-captives goal the mapping places."
               }
             ]
           }

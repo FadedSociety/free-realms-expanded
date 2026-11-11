@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Treeleaf's Retreat."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Treeleaf Hedge: model 75 is in no client pack; held: treeleaf_hedge: model 75 is forestgiantboss.adr, which no client pack holds."
               }
             ]
           }

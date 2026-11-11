@@ -1,0 +1,320 @@
+{
+  "schema_version": 1,
+  "id": 14043,
+  "kind": "dungeon",
+  "title_id": 5493,
+  "description_id": 7066,
+  "icon_id": 679,
+  "difficulty": 1,
+  "entry": {
+    "min_combat_level": 0
+  },
+  "place": {
+    "zone": 1202,
+    "arena": "sg_tavern_cellar",
+    "arrive": [
+      111.35,
+      18.77,
+      108.64
+    ],
+    "exit_door": [
+      176.75,
+      7.44,
+      -28.26
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "hooligan_brawler": {
+      "definition_id": 1404301,
+      "name": "Hooligan Brawler",
+      "name_id": 6686,
+      "model_id": 203,
+      "rank": "normal"
+    },
+    "w58_hooligan_archer_l3_enemy": {
+      "definition_id": 930012,
+      "name": "Hooligan Archer",
+      "name_id": 5100400,
+      "model_id": 520,
+      "rank": "normal"
+    },
+    "cal": {
+      "definition_id": 1404313,
+      "name": "Cal",
+      "name_id": 7273,
+      "model_id": 202,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "hooligan_brawler",
+      "at": [
+        125.75,
+        19.4,
+        79.74
+      ],
+      "heading": 0.205,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "w58_hooligan_archer_l3_enemy",
+      "at": [
+        127.63,
+        19.66,
+        82.49
+      ],
+      "heading": 0.046,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "hooligan_brawler",
+      "at": [
+        122.41,
+        19.4,
+        79.83
+      ],
+      "heading": 0.481,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "w58_hooligan_archer_l3_enemy",
+      "at": [
+        130.15,
+        20.23,
+        45.3
+      ],
+      "heading": 0.326,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "hooligan_brawler",
+      "at": [
+        133.33,
+        20.15,
+        46.26
+      ],
+      "heading": -0.326,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "w58_hooligan_archer_l3_enemy",
+      "at": [
+        130.93,
+        19.72,
+        48.24
+      ],
+      "heading": 0.406,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "hooligan_brawler",
+      "at": [
+        139.55,
+        17.41,
+        19.84
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "w58_hooligan_archer_l3_enemy",
+      "at": [
+        142.42,
+        18.1,
+        20.93
+      ],
+      "heading": -1.934,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "hooligan_brawler",
+      "at": [
+        136.02,
+        16.44,
+        21.44
+      ],
+      "heading": 1.995,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "w58_hooligan_archer_l3_enemy",
+      "at": [
+        156.65,
+        15.67,
+        0.99
+      ],
+      "heading": 0.236,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "hooligan_brawler",
+      "at": [
+        154.89,
+        16.87,
+        4.28
+      ],
+      "heading": 0.511,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "w58_hooligan_archer_l3_enemy",
+      "at": [
+        156.57,
+        14.33,
+        -3.26
+      ],
+      "heading": 0.177,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "cal",
+      "at": [
+        161.98,
+        8.73,
+        -26.75
+      ],
+      "heading": -0.333,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.15
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        163.05,
+        8.73,
+        -30.69
+      ],
+      [
+        166.45,
+        8.67,
+        -26.79
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_brawler",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "w58_hooligan_archer_l3_enemy",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 5495,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 3 ('Tavern Cellar (the live dungeon: hooligans down the cellar's passages, Cal in th'): scene sg_tavern_cellar, 4 groups standing at the start, 1 coming later, the boss Cal last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5493, 7066, icon 679 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_tavern_cellar needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14043*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/tavern_cellar.json, its notes page and the fork battle; under the id (14043) quests name."
+    }
+  ]
+}

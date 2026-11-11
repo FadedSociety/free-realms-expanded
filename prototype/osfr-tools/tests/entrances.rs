@@ -11,21 +11,30 @@
 //! walk the real entry path through the gateway (they need the private fixture, like the other
 //! field-battle suites).
 use osfr_tools::{
+    account_store::AccountRole,
     character_store::CharacterState,
     encounter::{
         EncounterEngine, EncounterPhase, FightFact,
-        director::entrances::{EntranceKind, Launch, Table},
+        director::{
+            self,
+            entrances::{EntranceKind, Launch, Table},
+        },
     },
+    gateway::{Gateway, GatewayOutcome},
+    quest_engine::{CharacterEligibility, QuestEngine},
     startup_world::parse_add_npc,
 };
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, fs, path::PathBuf};
 
+#[path = "common/content_copy.rs"]
+mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
 use field_battle_fixture::{
     Fixture, active_profile, arena_spawned, assert_returned, available, battle, battles, chat_text,
-    content_dir, details, fight_to_win, go, i32_at, interact, npc_select, send, unframe, won_flag,
+    content_dir, details, go, i32_at, interact, melee, move_to, npc_select, quest_counts, send,
+    unframe, won_flag,
 };
 
 const BRAWLER: i32 = 43;
@@ -230,7 +239,8 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             );
         }
         let ready = engine.on_zone_ready(BRAWLER, 2_000).unwrap();
-        let fight = row.fight.unwrap();
+        // A door that runs its dungeon's own fight still counts as the battle it ran before.
+        let fight = row.counts_as.or(row.fight).unwrap();
         assert!(
             ready.facts.contains(&FightFact::Entered { fight }),
             "{} counts as fight {fight}: {:?}",
@@ -258,6 +268,7 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
     assert_eq!(
         open,
         // Lead 2026-11-11: the combat quests' fight files (fights/14xxx.json) open 21 more.
+        // Fix F5: the dungeon guides' fights built from the fork battles open five more.
         [
             "arachnia_s_lair",
             "bandit_hideout",
@@ -268,6 +279,9 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             "cursed_graveyard",
             "danger_peaks",
             "darvon_s_descent",
+            "deep_mines",
+            "floren_forest",
+            "forest_troll_fort",
             "frostfang_caverns",
             "frostfang_growler",
             "frostfang_snarlers",
@@ -282,7 +296,9 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             "shady_smugglers",
             "sheep_watch",
             "snowy_canyon",
+            "sweetwater_climb",
             "tanglewood_fort",
+            "tavern_cellar",
             "tormented_spirits",
             "troll_summoner_madness",
             "vulture_watch"
@@ -365,6 +381,8 @@ fn scratch(name: &str) -> PathBuf {
         "field_battles.json",
         "enemies.json",
         "fights/12365.json",
+        // The Bixie Hive door's own fight (fix F5): its door opens only with it.
+        "fights/13003.json",
     ] {
         fs::copy(content_dir().join(file), dir.join(file)).unwrap();
     }
@@ -519,9 +537,96 @@ fn packets<'a>(replies: &'a [Vec<u8>], head: [u8; 4]) -> Vec<&'a [u8]> {
         .collect()
 }
 
+const ROYAL_HONEY: u32 = 3_957_507;
+
+/// The private fixture with the repository's fight files and kill rewards beside its content:
+/// the engine reads `fights/` and `field_kill_rewards.json` (its quest drops) from the session's
+/// content directory (production: `data/content`), while the doors come from the shipped
+/// `entrances.json`, so a door that runs a fight file needs both.
+fn fixture_with_fights() -> Fixture {
+    let mut fixture = Fixture::new();
+    let content = fixture.root.join("content");
+    content_copy::copy_tree(&fixture.content, &content);
+    content_copy::copy_tree(&content_dir().join("fights"), &content.join("fights"));
+    let rewards = "field_kill_rewards.json";
+    fs::copy(content_dir().join(rewards), content.join(rewards)).unwrap();
+    fixture.content = content;
+    fixture
+}
+
+/// A world entry at `position` whose save holds "Royal Honey" (Yuri Petaldancer's "Recover some
+/// Royal Honey from Fauzz") accepted, through the production bind a reconnect uses.
+fn session_with_honey(fixture: &Fixture, position: [f32; 3], guid: u64) -> (Gateway, GatewayOutcome) {
+    let seed = fixture.gateway(position, guid);
+    let mut engine = QuestEngine::from_split_content(
+        &content_dir(),
+        guid,
+        CharacterEligibility {
+            player_level: 20,
+            member: true,
+            nonmember_quest_limit: 30,
+            member_quest_limit: 30,
+            ..Default::default()
+        },
+        None,
+    )
+    .unwrap();
+    assert!(engine.offer(ROYAL_HONEY, 9_500_000_544).changed);
+    assert!(engine.accept(ROYAL_HONEY).changed);
+    let mut snapshot = seed.snapshot();
+    snapshot.gameplay.as_mut().unwrap().npc_quests = Some(engine.state().clone());
+    let mut gateway = Gateway::load_gameplay(
+        &fixture.reference,
+        seed.state().clone(),
+        &fixture.content,
+        snapshot.gameplay,
+    )
+    .unwrap();
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    fixture.login(&mut gateway);
+    send(&mut gateway, &13_u16.to_le_bytes(), 100);
+    let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 200);
+    assert_eq!(quest_counts(&gateway, ROYAL_HONEY), [0, 0]);
+    (gateway, loaded)
+}
+
+/// Walk in 8 m steps with the server's tick between them, as a client would.
+fn walk_to(gateway: &mut Gateway, to: [f32; 3], now: &mut u64) -> Vec<Vec<u8>> {
+    let (guid, from) = (gateway.state().guid, gateway.state().position);
+    let far = (to[0] - from[0]).hypot(to[2] - from[2]);
+    let steps = (far / 8.0).ceil().max(1.0) as usize;
+    let mut replies = Vec::new();
+    for step in 1..=steps {
+        let t = step as f32 / steps as f32;
+        *now += 400;
+        let p = [0, 1, 2].map(|a| from[a] + (to[a] - from[a]) * t);
+        replies.extend(send(gateway, &move_to(guid, p), *now).replies);
+        replies.extend(gateway.tick_at(*now).unwrap().replies);
+    }
+    replies
+}
+
+/// The run's enemies that stand now (alive and called in): guid and spot.
+fn standing(gateway: &Gateway) -> Vec<(u64, [f32; 3])> {
+    let state = gateway.snapshot().gameplay.unwrap().encounter.unwrap();
+    (state.active.unwrap().enemies.iter())
+        .filter(|e| e.health > 0 && !e.dormant)
+        .map(|e| (e.guid, e.position))
+        .collect()
+}
+
+/// A 15/4 line said by `speaker` with client text `text`.
+fn said(replies: &[Vec<u8>], speaker: u64, text: i32) -> bool {
+    packets(replies, [15, 0, 4, 0])
+        .iter()
+        .any(|p| p.len() >= 16 && p[4..12] == speaker.to_le_bytes() && p[12..16] == text.to_le_bytes())
+}
+
 /// The Bixie Hive door, end to end: drawn at its point of interest, the click opens the hive's
-/// card, Go switches the job with the live notice, zones into `sg_bixie_hive`, the battle is
-/// won through real attacks and the close returns the player to the door.
+/// card, Go switches the job with the live notice, zones into `sg_bixie_hive`, the workers go
+/// free, the Queen's waves and then Drone Fauzz fall to real attacks, Royal Honey counts only
+/// then, the exit gives the results and the close returns the player to the door.
 #[test]
 fn the_bixie_hive_door_runs_the_whole_route() {
     if !available() {
@@ -531,8 +636,8 @@ fn the_bixie_hive_door_runs_the_whole_route() {
     let table = table();
     let hive = row(&table, "bixie_hive");
     let scene = table.scene("sg_bixie_hive").unwrap();
-    let fixture = Fixture::new();
-    let (mut gateway, loaded) = fixture.session(hive.at, 2901);
+    let fixture = fixture_with_fights();
+    let (mut gateway, loaded) = session_with_honey(&fixture, hive.at, 2901);
 
     // The door is in the world: the invisible cube over the hive's own door prop, facing the
     // way the point of interest does.
@@ -579,22 +684,79 @@ fn the_bixie_hive_door_runs_the_whole_route() {
         "the zone load names the hive"
     );
 
+    // Fix F5: the door runs the hive's own script (fights/13003.json), not the clearing battle.
+    // 18 guards in the tunnels, the Queen and four workers stand; Drone Fauzz does not.
+    let fight = (director::load_dir(&content_dir()).unwrap().into_iter())
+        .find(|f| Some(f.id) == hive.fight)
+        .expect("the hive's fight ships");
     let ready = arena_spawned(&mut gateway, 600);
-    let spawned = packets(&ready.replies, [35, 0, 2, 0]).len();
-    let roster = base["enemies"].as_array().unwrap();
-    let standing = roster
-        .iter()
-        .filter(|e| e["summon_below_percent"].is_null())
-        .count();
-    assert!(
-        spawned >= standing,
-        "{spawned} of {standing} enemies spawned"
-    );
-
+    let key = |name: &str| fight.roster.iter().position(|s| s.key == name);
+    let guid = |name: &str| fight.guid(key(name));
+    let spot = |name: &str| fight.roster[key(name).unwrap()].spot;
+    let spawned: Vec<u64> = (packets(&ready.replies, [35, 0, 2, 0]).iter())
+        .map(|p| u64::from_le_bytes(p[4..12].try_into().unwrap()))
+        .collect();
+    assert!(spawned.contains(&guid("speaker")) && !spawned.contains(&guid("boss")));
     let mut now = 1_000;
-    let arena = json!({"zone": {"position": scene.arrive}});
-    let replies = fight_to_win(&mut gateway, &mut now, &arena);
+
+    // The bonus: each worker goes free with a talk (26/8) and says its thanks.
+    for n in 1..=4 {
+        let worker = format!("captive_{n}");
+        let at = spot(&worker);
+        walk_to(&mut gateway, [at[0] + 1.0, at[1], at[2]], &mut now);
+        now += 300;
+        let out = send(&mut gateway, &interact(guid(&worker)), now);
+        assert!(said(&out.replies, guid(&worker), 130474), "worker {n} thanks the player");
+    }
+    // The Queen's call brings three waves; the quest that needs the hive waits.
+    let mut heard = walk_to(&mut gateway, spot("speaker"), &mut now);
+    let guards: Vec<u64> = (0..fight.roster.len())
+        .filter(|&i| fight.roster[i].tags.iter().any(|t| t == "guards"))
+        .map(|i| fight.guid(Some(i)))
+        .collect();
+    for _ in 0..600 {
+        let targets: Vec<(u64, [f32; 3])> = (standing(&gateway).into_iter())
+            .filter(|(g, _)| !guards.contains(g))
+            .collect();
+        if targets.iter().any(|(g, _)| *g == guid("boss")) {
+            break;
+        }
+        assert_eq!(quest_counts(&gateway, ROYAL_HONEY), [0, 0], "no honey in a wave");
+        now += 700;
+        let Some((target, at)) = targets.first().copied() else {
+            heard.extend(gateway.tick_at(now).unwrap().replies);
+            continue;
+        };
+        heard.extend(walk_to(&mut gateway, [at[0] + 1.5, at[1], at[2]], &mut now));
+        now += 700;
+        heard.extend(send(&mut gateway, &melee(target), now).replies);
+    }
+    assert!(said(&heard, guid("speaker"), 38625), "the Queen calls for help");
+    assert!(
+        packets(&heard, [32, 0, 9, 0])
+            .iter()
+            .any(|p| p[4..12] == guid("boss").to_le_bytes()),
+        "Drone Fauzz arrives after the waves, with his boss bar"
+    );
+    // Drone Fauzz falls: Royal Honey counts now, and the exit opens.
+    let mut replies = Vec::new();
+    for _ in 0..200 {
+        let Some((_, at)) = standing(&gateway).into_iter().find(|(g, _)| *g == guid("boss")) else {
+            break;
+        };
+        replies.extend(walk_to(&mut gateway, [at[0] + 1.5, at[1], at[2]], &mut now));
+        now += 700;
+        replies.extend(send(&mut gateway, &melee(guid("boss")), now).replies);
+    }
+    assert_eq!(quest_counts(&gateway, ROYAL_HONEY), [1, 0], "Fauzz's honey, at the end");
+    assert_eq!(won_flag(&replies), None, "no results before the exit");
+    // The exit door: the results card.
+    replies.extend(walk_to(&mut gateway, fight.exit_spot(), &mut now));
     assert_eq!(won_flag(&replies), Some(1), "the results say won");
+    assert!(
+        replies.iter().any(|r| unframe(r).starts_with(&[39, 0, 47])),
+        "the score card"
+    );
     let closed = send(&mut gateway, &[26, 0, 42, 0], now + 1_000);
     assert!(closed.began_zoning, "the close leaves the hive");
     send(&mut gateway, &13_u16.to_le_bytes(), now + 1_100);
@@ -614,7 +776,7 @@ fn a_battle_starter_enters_its_scene_and_a_closed_one_refuses() {
     let table = table();
     let yeti = row(&table, "petty_yetis");
     let scene = table.scene("sh_random_encounter_01").unwrap();
-    let fixture = Fixture::new();
+    let fixture = fixture_with_fights();
     let (mut gateway, loaded) = fixture.session(yeti.at, 2902);
     assert!(
         (packets(&loaded.replies, [35, 0, 2, 0]).iter())
@@ -639,9 +801,11 @@ fn a_battle_starter_enters_its_scene_and_a_closed_one_refuses() {
         "a combat job is not switched, so there is no notice"
     );
     assert_eq!(gateway.state().zone_id, scene.zone_id);
-    let ready = arena_spawned(&mut gateway, 600);
+    // Fix F5: the fork's battle, whose first yetis come 1.5 s in.
+    let mut ready = arena_spawned(&mut gateway, 600).replies;
+    ready.extend(gateway.tick_at(2_600).unwrap().replies);
     assert!(
-        !packets(&ready.replies, [35, 0, 2, 0]).is_empty(),
+        !packets(&ready, [35, 0, 2, 0]).is_empty(),
         "the yetis stand in the arena"
     );
 
@@ -689,7 +853,8 @@ fn pb2_a_member_in_any_job_joins_the_leaders_entrance_run() {
     let table = table();
     let hive = row(&table, "bixie_hive");
     let scene = table.scene("sg_bixie_hive").unwrap();
-    let fixture = Fixture::new();
+    // Fix F5: the hive's door runs its own fight file, which the fixture needs beside its content.
+    let fixture = fixture_with_fights();
     let (mut leader, _) = fixture.session(hive.at, 2901);
     let (mut member, _) = fixture.session(hive.at, 2902);
     let card = details(&send(&mut leader, &interact(hive.guid), 400))

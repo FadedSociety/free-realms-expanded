@@ -25,6 +25,7 @@ mod arena;
 mod arena_ai;
 mod battle_drops;
 mod battle_items;
+mod card;
 mod behaviour;
 pub mod brain;
 pub mod combat_rules;
@@ -50,7 +51,7 @@ use self::combat_rules::CombatRules;
 use self::combat_scale::CombatScale;
 pub use self::facts::{FightFact, KillFact, Rank};
 pub(crate) use self::field::level_refusal;
-use self::field_marker::MarkerSetting;
+use self::{card::details_packet, field_marker::MarkerSetting};
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
@@ -1336,7 +1337,7 @@ impl EncounterEngine {
         outcome
     }
 
-    pub fn on_zone_ready(&mut self, profile_id: i32, now_ms: u64) -> io::Result<EncounterOutcome> {
+    pub fn on_zone_ready(&mut self, _profile_id: i32, now_ms: u64) -> io::Result<EncounterOutcome> {
         let Some(active) = self.state.active.as_mut() else {
             let mut replies = self.world_initialization();
             replies.extend(self.field_initialization());
@@ -1363,7 +1364,7 @@ impl EncounterEngine {
             changed: loading,
             ..Default::default()
         };
-        out.replies.push(details(d, active, true, profile_id));
+        out.replies.push(self.details(d, active, true));
         out.replies
             .push(encounter_state(d.id, active.instance_id, 4));
         out.replies
@@ -2234,88 +2235,6 @@ impl EncounterEngine {
 
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
         spawn_actor(&self.content.template, a, position, disposition)
-    }
-}
-
-fn details(d: &Dungeon, a: &ActiveEncounter, launch: bool, profile: i32) -> Vec<u8> {
-    details_packet(
-        d.id,
-        a.instance_id,
-        [d.title_id, d.icon_id, d.description_id, d.objective_id, 1],
-        d.enemies.len(),
-        profile,
-        launch,
-        &d.prizes,
-    )
-}
-
-/// 41/114 EncounterDetailsResponse. `launch = false` opens the minigame start
-/// screen (HandleMiniGameStart); `true` only refreshes a running encounter.
-/// `text` is [title, icon, description, objective, difficulty] (MiniGameInfo
-/// NameId, IconId, DescriptionId, Difficulty per the community layout and
-/// the native reader 009bdd70); the cave's difficulty was a constant 1.
-fn details_packet(
-    id: u32,
-    instance: i32,
-    text: [i32; 5],
-    enemy_count: usize,
-    _profile: i32,
-    launch: bool,
-    prizes: &[Prize],
-) -> Vec<u8> {
-    let [title_id, icon_id, description_id, objective_id, difficulty] = text;
-    {
-        let mut b = encounter_header(114, id, instance);
-        for v in [0_i32, 0, 0, 0, 8, 0] {
-            b.extend(v.to_le_bytes());
-        }
-        b.extend([1, 0, 1]);
-        for v in [0_i32, 0] {
-            b.extend(v.to_le_bytes());
-        }
-        // Original Lua MiniGameTypes.COMBAT_TYPE is 4. SAMPLE_TYPE (1)
-        // disables native combat target selection despite combat rules being on.
-        // MiniGameInfo.ProfileType is the job TYPE the game needs, not the
-        // player's job id: the start screen's Switch Jobs picker lists owned
-        // jobs of this type whose rank meets the difficulty (00c8ff30), and
-        // only enables at all when it is non-zero. Combat jobs are type 2
-        // (profile definitions: Brawler, Medic, Wizard, Ninja, ...).
-        for v in [
-            title_id,
-            icon_id,
-            description_id,
-            difficulty,
-            COMBAT_PROFILE_TYPE,
-            4,
-        ] {
-            b.extend(v.to_le_bytes());
-        }
-        b.push(0);
-        // Reward bundles: base and member empty; the third ("preview") lists
-        // the prizes on the start screen and hides its placeholder art.
-        b.extend([0; 138]);
-        b.extend(prize_bundle(prizes));
-        b.extend(1_i32.to_le_bytes());
-        for v in [objective_id, 4419610, 4419610] {
-            b.extend(v.to_le_bytes());
-        }
-        b.push(0);
-        b.extend([0; 69]);
-        for v in [0_i32, 0, enemy_count as i32, 0] {
-            b.extend(v.to_le_bytes());
-        }
-        b.push(0);
-        b.extend(0_i32.to_le_bytes());
-        b.extend([1; 5]);
-        b.extend(0_i32.to_le_bytes());
-        b.extend(1_i32.to_le_bytes());
-        b.push(1);
-        b.extend(0_i32.to_le_bytes());
-        b.extend([0; 4]);
-        b.extend(0_i32.to_le_bytes());
-        b.extend([0, 1, u8::from(launch)]);
-        b.extend([0; 8]);
-        b
     }
 }
 

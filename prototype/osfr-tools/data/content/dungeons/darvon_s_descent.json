@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14079,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14079.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Darvon's Descent."
+                "evidence": "(R) Goals map onto fights/14079.json (scripts/dungeon_fights.py); not mapped: bonus 'Free the captured Pixies': its actors are not in the fork's roster (the notes page names no friendly NPC; none is a captive freed by a talk)."
               }
             ]
           }

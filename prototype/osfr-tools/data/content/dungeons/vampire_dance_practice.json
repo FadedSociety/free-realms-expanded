@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Vampire Dance Practice."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): no entrance is placed for it (entrances.json lists it held, parked or not at all)."
               }
             ]
           }

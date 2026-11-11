@@ -289,7 +289,7 @@
       ]
     },
     {
-      "definition_id": 1237001,
+      "definition_id": 1300319,
       "item_id": 96000003,
       "chance": 100,
       "quest_id": 3957507,
@@ -301,6 +301,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) chance 100: one boss, one item wanted, so every win of the fight hands it over (50 would ask for the whole fight twice on average)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The boss's drop follows him into the dungeon's own fight (scripts/dungeon_fights.py): definition 1237001 was the clearing battle's copy, which met the player in its first and only wave."
         }
       ]
     },

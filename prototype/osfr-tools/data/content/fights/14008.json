@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "id": 14008,
+  "kind": "dungeon",
+  "title_id": 5708,
+  "description_id": 16380,
+  "icon_id": 669,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13
+  },
+  "place": {
+    "zone": 1225,
+    "arena": "sg_troll_fort",
+    "arrive": [
+      264.88,
+      27.41,
+      208.24
+    ],
+    "exit_door": [
+      19.11,
+      76.74,
+      65.86
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "forest_troll": {
+      "definition_id": 1400801,
+      "name": "Forest Troll",
+      "name_id": 4171,
+      "model_id": 77,
+      "rank": "normal"
+    },
+    "verda_s_guardian_seerdoctor": {
+      "definition_id": 1400802,
+      "name": "Verda's Guardian Seerdoctor",
+      "name_id": 36097,
+      "model_id": 168,
+      "rank": "normal"
+    },
+    "forest_troll_ritualist": {
+      "definition_id": 1400803,
+      "name": "Forest Troll Ritualist",
+      "name_id": 40425,
+      "model_id": 168,
+      "rank": "normal"
+    },
+    "w58b_queen_verda": {
+      "definition_id": 930045,
+      "name": "Queen Verda",
+      "name_id": 17075,
+      "model_id": 408,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "forest_troll",
+      "at": [
+        234.8,
+        28.25,
+        179.8
+      ],
+      "heading": 0.983,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        232.27,
+        28.72,
+        177.88
+      ],
+      "heading": 0.975,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        237.54,
+        27.78,
+        181.35
+      ],
+      "heading": 0.97,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "forest_troll",
+      "at": [
+        237.15,
+        28.17,
+        178.52
+      ],
+      "heading": 0.863,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        159.5,
+        43.92,
+        107.0
+      ],
+      "heading": -0.246,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        158.86,
+        42.98,
+        109.7
+      ],
+      "heading": -0.25,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "forest_troll",
+      "at": [
+        163.0,
+        41.89,
+        111.7
+      ],
+      "heading": -0.612,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        163.03,
+        42.85,
+        109.0
+      ],
+      "heading": -0.51,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        214.6,
+        46.61,
+        87.7
+      ],
+      "heading": -2.486,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "forest_troll",
+      "at": [
+        216.67,
+        46.59,
+        85.39
+      ],
+      "heading": -2.313,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        213.88,
+        46.55,
+        83.57
+      ],
+      "heading": -2.351,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        220.36,
+        46.63,
+        89.44
+      ],
+      "heading": -2.334,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "forest_troll",
+      "at": [
+        216.8,
+        45.63,
+        201.8
+      ],
+      "heading": 2.214,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        220.75,
+        45.74,
+        200.5
+      ],
+      "heading": 2.36,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        217.19,
+        46.07,
+        199.13
+      ],
+      "heading": 2.045,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "forest_troll",
+      "at": [
+        220.07,
+        46.24,
+        197.41
+      ],
+      "heading": 2.017,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        175.42,
+        45.72,
+        236.34
+      ],
+      "heading": 1.375,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        172.03,
+        45.97,
+        240.3
+      ],
+      "heading": 1.926,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "forest_troll",
+      "at": [
+        175.14,
+        45.82,
+        239.92
+      ],
+      "heading": 2.054,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        177.73,
+        45.52,
+        237.96
+      ],
+      "heading": 1.846,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        72.38,
+        64.26,
+        188.57
+      ],
+      "heading": 0.823,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g22": {
+      "definition": "forest_troll",
+      "at": [
+        75.19,
+        63.88,
+        188.65
+      ],
+      "heading": 0.563,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g23": {
+      "definition": "verda_s_guardian_seerdoctor",
+      "at": [
+        74.0,
+        64.59,
+        185.87
+      ],
+      "heading": 0.515,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g24": {
+      "definition": "forest_troll_ritualist",
+      "at": [
+        77.91,
+        63.3,
+        190.89
+      ],
+      "heading": 0.28,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "w58b_queen_verda",
+      "at": [
+        25.9,
+        70.37,
+        79.42
+      ],
+      "heading": 0.328,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.2
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        29.0,
+        70.09,
+        79.74
+      ],
+      [
+        29.74,
+        69.07,
+        83.3
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "verda_s_guardian_seerdoctor",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "forest_troll",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 16381,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 26 ('Forest Troll Fort (the live dungeon: forest trolls and their seerdoctors from th'): scene sg_troll_fort, 6 groups standing at the start, 1 coming later, the boss Queen Verda last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5708, 16380, icon 669 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_troll_fort needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14008*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/forest_troll_fort.json, its notes page and the fork battle; under the id (14008) quests name."
+    }
+  ]
+}

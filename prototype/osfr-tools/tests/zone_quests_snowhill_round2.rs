@@ -407,22 +407,67 @@ fn warrior_weapon_stays_off_until_the_cudgel_can_be_forged() {
     );
 }
 
-/// Steele is Useful needs Fastvi's weapon pieces and a Chillblaine fight in Frostfang Caverns,
-/// whose dungeon record has no encounter goals. It stays off, and Asking Old Folks follows the
-/// last enabled Warrior step while the game-table lesson (3150018) is off too.
+/// Steele is Useful needs Fastvi's weapon pieces, four named Warrior moves on Chillblaine (quest
+/// table: Fight Chillblaine; Use Kick, Spinning Blade, Quake and Commanding Shout on him) and a
+/// Chillblaine fight in Frostfang Caverns. Fix F5 (2026-11-11) gave the caverns that fight: the
+/// door runs `fights/14027.json`, whose main goal is Chillblaine himself. The quest still stays
+/// off for what is missing, and each missing piece is asserted here, so this test fails (and asks
+/// for the re-check) the day one of them lands:
+/// - its record has no steps, and no item row or pickup places the pieces of Fastvi's weapon;
+/// - the 2014 kits have Quake and Commanding Shout but no "Kick" and no "Spinning Blade".
+/// The game-table lesson (3150018) has no caverns step: its one step is the "Weed Killing!"
+/// tower-defense table (text 15135), which `tower_defense.json` does not hold. Asking Old Folks
+/// follows the last enabled Warrior step while both are off.
 #[test]
 fn steele_is_useful_stays_off_until_frostfang_caverns_has_an_encounter() {
+    const CAVERNS_FIGHT: u64 = 14027;
+    const CHILLBLAINE: u64 = 950_060;
+    const WEED_KILLING: u64 = 15135;
     assert!(!shipped_quest(STEELE_IS_USEFUL).enabled);
     assert!(!shipped_quest(FASTVI_LEGEND).enabled);
+
+    // The caverns part is ready: the record maps onto the fight its door runs, and that fight's
+    // main goal is Chillblaine.
     let caverns = read_json(&content_dir().join("dungeons/frostfang_caverns.json"));
-    for dungeon in caverns["records"].as_array().unwrap() {
-        for encounter in dungeon["record"]["encounters"].as_array().unwrap() {
-            assert!(
-                encounter["goals"].as_array().unwrap().is_empty(),
-                "Frostfang Caverns now has encounter goals: re-check quest 3150020"
-            );
-        }
-    }
+    let goals = caverns["records"][0]["record"]["encounters"][0]["goals"]
+        .as_array()
+        .unwrap();
+    assert!(
+        goals
+            .iter()
+            .any(|g| g["fight_id"] == CAVERNS_FIGHT && g["goal"] == "main"),
+        "Frostfang Caverns maps onto fight {CAVERNS_FIGHT}: {goals:?}"
+    );
+    let entrances = read_json(&content_dir().join("entrances.json"));
+    let door = (entrances["entrances"].as_array().unwrap().iter())
+        .find(|row| row["id"] == "frostfang_caverns")
+        .expect("the caverns door");
+    assert_eq!(door["fight"], CAVERNS_FIGHT, "the door runs the caverns fight");
+    let fight = read_json(&content_dir().join("fights/14027.json"));
+    assert_eq!(fight["objectives"][0]["id"], "main");
+    assert_eq!(fight["objectives"][0]["target"]["actor"], "boss");
+    let boss = fight["actors"]["boss"]["definition"].as_str().unwrap();
+    assert_eq!(fight["kinds"][boss]["definition_id"], CHILLBLAINE);
+
+    // What is still missing.
+    assert!(
+        shipped_quest(STEELE_IS_USEFUL).objectives.is_empty(),
+        "Steele is Useful has steps now: re-check quest 3150020 (weapon pieces, moves, caverns)"
+    );
+    let kits = read_json(&content_dir().join("weapon_kits.json"));
+    let moves: Vec<&str> = (kits["abilities"].as_object().unwrap().values())
+        .filter_map(|ability| ability["name"].as_str())
+        .collect();
+    assert!(moves.contains(&"Quake") && moves.contains(&"Commanding Shout"));
+    assert!(
+        !moves.contains(&"Kick") && !moves.contains(&"Spinning Blade"),
+        "the kits have Kick or Spinning Blade now: re-check quest 3150020"
+    );
+    let tables = read_json(&content_dir().join("tower_defense.json"));
+    assert!(
+        !(tables["games"].as_array().unwrap().iter()).any(|game| game["name_id"] == WEED_KILLING),
+        "the Weed Killing! table ships now: re-check quest 3150018"
+    );
     assert_eq!(
         shipped_quest(ASKING_OLD_FOLKS).prerequisite_quest_ids,
         [WARRIOR_W16]

@@ -313,8 +313,9 @@
     {
       "id": "w1",
       "when": {
-        "objective_done": {
-          "id": "guards"
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
         }
       },
       "spawn": [
@@ -333,27 +334,7 @@
   ],
   "objectives": [
     {
-      "id": "guards",
-      "kind": "defeat",
-      "text_id": 42066,
-      "target": {
-        "tag": "guards"
-      },
-      "primary": true
-    },
-    {
-      "id": "waves",
-      "kind": "defeat",
-      "text_id": 0,
-      "target": {
-        "waves": [
-          "w1"
-        ]
-      },
-      "primary": true
-    },
-    {
-      "id": "boss",
+      "id": "main",
       "kind": "defeat",
       "text_id": 7012,
       "target": {
@@ -411,6 +392,14 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046191: reference Npcs.json Id 46191, model 267, name 5697, at [-537.53, 26.04, 772.46]."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done with the fork's last goal; the steps before it stay, as the triggers of its waves and boss."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/robgoblin_treasure_trove.json."
     }
   ]
 }

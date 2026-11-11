@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Dark Spore Depths."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Dark Spore Knight: model 478 is in no client pack; Mushroom Shambler: model 478 is in no client pack; Necrolaceous: model 478 is in no client pack; held: dark_spore_knight: model 478 is treesoldier_mushroom.adr, which no client pack holds."
               }
             ]
           }

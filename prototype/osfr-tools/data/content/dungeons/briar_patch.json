@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Briar Patch."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Mutated Tree Soldier: model 478 is in no client pack; Azure: model 383 is in no client pack; held: azure: model 383 is human_briarpatchboss_m.adr, which no client pack holds."
               }
             ]
           }

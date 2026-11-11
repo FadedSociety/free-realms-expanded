@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Misty Mountain."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Elemental Guardian: model 3933 is in no client pack; Snowface: model 3956 is in no client pack."
               }
             ]
           }

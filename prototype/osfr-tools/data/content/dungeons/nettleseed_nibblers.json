@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Nettleseed Nibblers."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): fight 14066 is not shipped and no single fork battle exists for the scene (held: mushroom_shambler: model 478 is treesoldier_mushroom.adr, which no client pack holds)."
               }
             ]
           }

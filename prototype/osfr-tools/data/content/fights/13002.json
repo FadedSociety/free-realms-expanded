@@ -1,0 +1,413 @@
+{
+  "schema_version": 1,
+  "id": 13002,
+  "kind": "dungeon",
+  "title_id": 30422,
+  "description_id": 6995,
+  "icon_id": 660,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9
+  },
+  "place": {
+    "zone": 1201,
+    "arena": "sg_bandit_hideout",
+    "arrive": [
+      276.42,
+      7.26,
+      83.45
+    ],
+    "exit_door": [
+      51.09,
+      19.15,
+      210.27
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bandit_patrolman": {
+      "definition_id": 3460,
+      "name": "Bandit Patrolman",
+      "name_id": 440716,
+      "model_id": 199,
+      "rank": "normal"
+    },
+    "thugawug_stomper": {
+      "definition_id": 950013,
+      "name": "Thugawug Stomper",
+      "name_id": 440717,
+      "model_id": 200,
+      "rank": "normal"
+    },
+    "muggenstomp": {
+      "definition_id": 1300219,
+      "name": "Muggenstomp",
+      "name_id": 7058,
+      "model_id": 200,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "bandit_patrolman",
+      "at": [
+        247.96,
+        11.29,
+        93.97
+      ],
+      "heading": 2.771,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "thugawug_stomper",
+      "at": [
+        248.21,
+        10.52,
+        91.09
+      ],
+      "heading": 2.683,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "bandit_patrolman",
+      "at": [
+        246.66,
+        12.64,
+        98.24
+      ],
+      "heading": 2.791,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "thugawug_stomper",
+      "at": [
+        232.51,
+        17.61,
+        124.22
+      ],
+      "heading": 1.536,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "bandit_patrolman",
+      "at": [
+        229.79,
+        16.97,
+        121.98
+      ],
+      "heading": 1.358,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "thugawug_stomper",
+      "at": [
+        235.52,
+        18.38,
+        127.91
+      ],
+      "heading": 2.074,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "bandit_patrolman",
+      "at": [
+        202.51,
+        16.3,
+        101.42
+      ],
+      "heading": 0.965,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "thugawug_stomper",
+      "at": [
+        206.17,
+        15.83,
+        101.85
+      ],
+      "heading": 0.103,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "bandit_patrolman",
+      "at": [
+        200.07,
+        16.51,
+        99.77
+      ],
+      "heading": 0.97,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "thugawug_stomper",
+      "at": [
+        157.84,
+        19.99,
+        115.47
+      ],
+      "heading": -3.023,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "bandit_patrolman",
+      "at": [
+        160.49,
+        20.0,
+        115.03
+      ],
+      "heading": -2.816,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "thugawug_stomper",
+      "at": [
+        155.29,
+        19.98,
+        116.45
+      ],
+      "heading": 3.068,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "bandit_patrolman",
+      "at": [
+        143.11,
+        22.04,
+        153.82
+      ],
+      "heading": 2.868,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "thugawug_stomper",
+      "at": [
+        141.82,
+        22.07,
+        157.52
+      ],
+      "heading": 2.849,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "bandit_patrolman",
+      "at": [
+        143.91,
+        21.94,
+        150.51
+      ],
+      "heading": 2.845,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "thugawug_stomper",
+      "at": [
+        122.11,
+        18.74,
+        204.92
+      ],
+      "heading": -3.087,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "bandit_patrolman",
+      "at": [
+        119.78,
+        18.6,
+        203.66
+      ],
+      "heading": 2.966,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "thugawug_stomper",
+      "at": [
+        121.18,
+        19.38,
+        200.65
+      ],
+      "heading": 3.093,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "muggenstomp",
+      "at": [
+        48.55,
+        19.05,
+        213.82
+      ],
+      "heading": 2.066,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.5
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        44.83,
+        19.05,
+        214.85
+      ],
+      [
+        46.65,
+        19.05,
+        218.01
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "thugawug_stomper",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "bandit_patrolman",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 6997,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 60,
+    "job_xp": 50,
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      },
+      {
+        "item_id": 3023,
+        "name_id": 422907,
+        "icon_id": 544
+      },
+      {
+        "item_id": 75354,
+        "name_id": 131098,
+        "icon_id": 3721
+      },
+      {
+        "item_id": 11002,
+        "name_id": 422909,
+        "icon_id": 730
+      }
+    ],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 2 ('Bandit Hideout (the live dungeon: thugawug bandits along the tunnels, Muggenstom'): scene sg_bandit_hideout, 6 groups standing at the start, 1 coming later, the boss Muggenstomp last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 30422, 6995, icon 660 (the field_battles.json row 12360 this entrance ran before); rewards: its 60 coins and prize rows."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_bandit_hideout needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13002*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/bandit_hideout.json, its notes page and the fork battle; the entrance counts as battle 12360 for quests."
+    }
+  ]
+}

@@ -208,7 +208,7 @@ impl EncounterEngine {
 
     /// Show a battle's start screen again (e.g. after Go was refused: the
     /// screen hid the HUD, so the player needs it back to use Switch Jobs).
-    pub fn reopen_battle_screen(&mut self, battle: u32, profile: i32) -> Vec<Vec<u8>> {
+    pub fn reopen_battle_screen(&mut self, battle: u32, _profile: i32) -> Vec<Vec<u8>> {
         let Some(b) = self.battles.iter().find(|b| b.id == battle) else {
             return Vec::new();
         };
@@ -217,17 +217,11 @@ impl EncounterEngine {
             details_packet(
                 b.id,
                 instance,
-                [
-                    b.title_id,
-                    b.icon_id,
-                    b.description_id,
-                    b.objective_id,
-                    b.difficulty,
-                ],
+                [b.title_id, b.icon_id, b.description_id, b.difficulty],
                 b.enemies.len(),
-                profile,
                 false,
                 &b.prizes,
+                &self.card_goals(b.id, b.objective_id),
             ),
             encounter_header(107, b.id, instance),
         ];
@@ -308,7 +302,7 @@ impl EncounterEngine {
         &mut self,
         guid: u64,
         position: [f32; 3],
-        profile: i32,
+        _profile: i32,
     ) -> EncounterOutcome {
         if self.active() {
             return EncounterOutcome::default();
@@ -344,11 +338,11 @@ impl EncounterEngine {
                 details_packet(
                     id,
                     instance,
-                    [title, icon, description, objective, difficulty],
+                    [title, icon, description, difficulty],
                     count,
-                    profile,
                     false,
                     &prizes,
+                    &self.card_goals(id, objective),
                 ),
                 // 41/107 ZoneIsReady: the battle is in place, nothing to load.
                 // DispatchEncounterPacket case 107 calls SetMiniGameReady

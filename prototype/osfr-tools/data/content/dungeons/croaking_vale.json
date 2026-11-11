@@ -15,7 +15,7 @@
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) Page goals remain in dungeon_data because model/objective keys are not fully mapped for Croaking Vale."
+                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Belching Toad: model 1648 is in no client pack; Black Swamp Frog: model 1648 is in no client pack; held: belching_toad: model 1648 is toad_black.adr, which no client pack holds."
               }
             ]
           }

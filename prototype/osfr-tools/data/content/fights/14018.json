@@ -183,22 +183,9 @@
   ],
   "objectives": [
     {
-      "id": "waves",
+      "id": "main",
       "kind": "defeat",
       "text_id": 115968,
-      "target": {
-        "waves": [
-          "w1",
-          "w2",
-          "w3"
-        ]
-      },
-      "primary": true
-    },
-    {
-      "id": "boss",
-      "kind": "defeat",
-      "text_id": 0,
       "target": {
         "actor": "boss"
       },
@@ -254,6 +241,14 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done with the fork's last goal; the steps before it stay, as the triggers of its waves and boss."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/cursed_graveyard.json."
     }
   ]
 }

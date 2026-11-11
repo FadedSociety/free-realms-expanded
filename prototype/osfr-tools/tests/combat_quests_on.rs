@@ -15,7 +15,7 @@ mod fight_kit;
 
 use fight_kit::*;
 use osfr_tools::{
-    encounter::{EncounterPhase, FightFact, KillFact, Rank, director},
+    encounter::{EncounterPhase, FightFact, KillFact, Rank, director, director::fight::Side},
     quest_engine::{
         CharacterEligibility, QuestEngine, QuestEvent, QuestProgress, QuestStatus,
     },
@@ -59,12 +59,16 @@ fn play(file: &Value) -> BTreeSet<u32> {
         .clone();
     engine.toggle_god();
     let arrive = fight.place.arrive;
+    // With nothing standing the player walks the fight's named points, so a wave that waits
+    // for a player there (a dungeon's finale) is called in.
+    let points: Vec<[f32; 3]> = fight.points.values().flatten().copied().collect();
     let (mut now, mut kinds, mut kills) = (1_000, BTreeSet::new(), 0);
-    for _ in 0..MOST_SWINGS {
+    for step in 0..MOST_SWINGS {
         if engine.fight_run().is_some_and(|run| run.exit_is_open()) {
             break;
         }
         now += 700;
+        let mut at_tick = arrive;
         if let Some((guid, at, _)) = engine.standing_enemies().first().copied() {
             let hit = engine.attack(guid, at, BRAWLER, 0, now).unwrap();
             for kill in &hit.kills {
@@ -72,8 +76,10 @@ fn play(file: &Value) -> BTreeSet<u32> {
                 kinds.insert(kill.kind);
             }
             kills += hit.kills.len();
+        } else if !points.is_empty() {
+            at_tick = points[step % points.len()];
         }
-        let tick = engine.tick(arrive, BRAWLER, now + 100).unwrap();
+        let tick = engine.tick(at_tick, BRAWLER, now + 100).unwrap();
         assert!(tick.kills.is_empty(), "fight {id}: only attacks kill here");
         assert_eq!(
             engine.run_phase(),
@@ -87,17 +93,19 @@ fn play(file: &Value) -> BTreeSet<u32> {
         "fight {id}: the exit door never opened ({kills} kills, {} standing)",
         engine.standing_enemies().len()
     );
+    // Allies (a dungeon's captives and the NPC it is fought for) are not fought.
+    let enemies = (fight.roster.iter())
+        .filter(|slot| slot.side == Side::Enemy)
+        .count();
     assert_eq!(
-        run.kills as usize,
-        fight.roster.len(),
-        "fight {id}: every actor of the roster was fought"
+        run.kills as usize, enemies,
+        "fight {id}: every enemy of the roster was fought"
     );
     // A kind with no kill-credit id reports no kill (the captured battle's Prowlers); the
     // quest fights give every kind one.
     assert!(
-        kills == fight.roster.len() || id == 12365,
-        "fight {id}: {kills} kills reported for {} actors",
-        fight.roster.len()
+        kills == enemies || id == 12365,
+        "fight {id}: {kills} kills reported for {enemies} enemies"
     );
     let exit = fight.exit_spot();
     let won = engine
