@@ -208,6 +208,8 @@ pub(super) fn apply_view(
             0,
         );
     }
+    // Coins keep their names: the 2014 table lists 121 Rare/Elite Exploration Coin rows and hides
+    // none (Sanctuary@10f129e `Npcs.json`). A client may still choose to show them on hover.
     visibility.hide_actor_guids(
         world.coins.replaced().chain(
             world

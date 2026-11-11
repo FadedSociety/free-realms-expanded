@@ -27,6 +27,7 @@ use crate::{
     harvesting::{CHEF_PROFILE_ID, region},
     inventory::Inventory,
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
+    nameplate::{self, Kind},
     npc_notifications::{self, Notification},
     power_ups::{Rng, pick_weighted},
     startup_world::NpcSpawn,
@@ -968,6 +969,8 @@ fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
         spawn.terrain_object_id = terrain;
     }
     spawn.is_interactable = u8::from(interactable);
+    let hide = nameplate::hidden(spawn.model_id, &node.name, Kind::Pickup, None);
+    spawn.hide_nameplate = u8::from(hide);
     if let Some(name) = node.presentation.name_id {
         spawn.name_string_id = name;
         spawn.rotation = [0.0, 0.0, 0.0, 1.0];

@@ -97,6 +97,7 @@ pub mod spot_game;
 pub mod sword_game;
 pub mod mystery_chest;
 pub mod mystery_chest_loot;
+pub mod nameplate;
 pub mod net_policy;
 pub mod offer_boosts;
 pub mod npc_ambient;

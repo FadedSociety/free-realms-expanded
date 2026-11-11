@@ -5,6 +5,7 @@
 
 use crate::{
     content::{ContentDb, Dungeon, NpcSpawn as ContentNpcSpawn, Rotation, Zone},
+    nameplate::{self, Kind},
     npc_notifications::{self, Notification},
     npc_presentation::{self, Cursor, Presentation},
     startup_messages::{self, ZoneDetails},
@@ -143,8 +144,8 @@ pub struct NpcInterest {
 }
 
 #[derive(Deserialize)]
-struct Rows<T> {
-    records: Vec<T>,
+pub(crate) struct Rows<T> {
+    pub(crate) records: Vec<T>,
 }
 
 #[derive(Deserialize)]
@@ -186,6 +187,12 @@ struct RegionalNpc {
     /// label the content tables group the row by.
     #[serde(default)]
     house_zone_id: Option<u32>,
+    /// `vendor` keeps the name shown (`nameplate::Named`).
+    #[serde(default)]
+    roles: Vec<String>,
+    /// The row's own AddNpc `hide_nameplate`, over `nameplate::hidden`'s rules.
+    #[serde(default)]
+    hide_nameplate: Option<bool>,
 }
 
 /// `placement_confidence` classes the loader spawns for a `video_index` row (T896, (R)): the
@@ -264,6 +271,9 @@ struct ExtraNpc {
     /// zone does not hold leaves the actor with no body at all.
     #[serde(default)]
     terrain_object_id: Option<i32>,
+    /// The row's own AddNpc `hide_nameplate`, over `nameplate::hidden`'s rules.
+    #[serde(default)]
+    hide_nameplate: Option<bool>,
 }
 
 impl ExtraNpc {
@@ -464,6 +474,10 @@ impl NpcVisibility {
             ..Self::default()
         };
         let presentation = read_presentation(content_dir)?;
+        let vendors = regional
+            .iter()
+            .filter(|npc| npc.roles.iter().any(|role| role == "vendor"));
+        let named = nameplate::Named::load(content_dir, vendors.map(|npc| npc.npc_id))?;
         let extras: Rows<ExtraNpc> = read_rows(&content_dir.join("npc_spawns_extra.json"))?;
         // L924: a regional row whose NPC already has a bound extra spawn (its content key) is
         // drawn by that spawn; drawing the row too would create the NPC twice.
@@ -519,6 +533,8 @@ impl NpcVisibility {
             ];
             spawn.rotation = rotation;
             spawn.scale = npc.scale.unwrap_or(1.0);
+            let name = npc.name.as_deref();
+            named.mark(&mut spawn, npc.npc_id, name, npc.hide_nameplate);
             result.content_keys.insert(npc.npc_id, npc.npc_id);
             let mut notifications = Vec::new();
             let cursor = presentation.apply(&mut spawn, &mut notifications);
@@ -571,6 +587,8 @@ impl NpcVisibility {
                 npc.position_w.unwrap_or(1.0),
             ];
             spawn.rotation = facing(npc.heading.unwrap_or(0.0));
+            let key = npc.content_key.unwrap_or(npc.spawn_guid);
+            named.mark(&mut spawn, key, npc.name.as_deref(), npc.hide_nameplate);
             if npc.boombox_item_id.is_some() {
                 crate::boombox::stand_as_box(&mut spawn);
             }
@@ -749,6 +767,8 @@ impl NpcVisibility {
         // AddNpc's literal name; whether the nameplate shows it without a
         // locale id is the World Builder native text check.
         spawn.npc_name = placement.name.clone().unwrap_or_default();
+        let hide = nameplate::hidden(model_id, &spawn.npc_name, Kind::Npc, None);
+        spawn.hide_nameplate = u8::from(hide);
         apply_reach(&self.station_reach, &mut spawn);
         let npcs = Arc::make_mut(&mut self.by_zone)
             .entry(OPEN_WORLD_ZONE)
@@ -888,6 +908,7 @@ impl NpcVisibility {
             npc.notifications = notifications;
         }
     }
+
 
     /// (R) Station models (`crafting_stations.json`) carry the station radius as
     /// their client prompt reach: AddNpc float `unknown_float_51` (reader
@@ -1212,7 +1233,7 @@ fn read_presentation(content_dir: &Path) -> io::Result<Presentation> {
     Presentation::new(rows).map_err(|reason| invalid(format!("NPC presentation: {reason}")))
 }
 
-fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {
+pub(crate) fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {
     if !fs::metadata(path)?.is_file() {
         return Err(invalid("NPC content file is not a regular file"));
     }
