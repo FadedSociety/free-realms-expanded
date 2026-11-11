@@ -23,7 +23,7 @@ mod json;
 #[path = "support/npc_visibility.rs"]
 mod npc_visibility;
 
-use gateway_packets::{login_with_version, wrap};
+use gateway_packets::{body, interact, login_with_version, wrap};
 use npc_visibility::content_dir;
 use osfr_tools::{
     gateway::Gateway,
@@ -350,8 +350,9 @@ fn framed_stones(replies: &[Vec<u8>]) -> Vec<(usize, u64, [f32; 3])> {
 }
 
 /// The real entry path: login, the client's ready signal, then its loaded signal, standing
-/// 7 m from a stone. Returns the stones sent before the world loaded and after it.
-fn enter_beside(content: &Path, stone: [f32; 3]) -> (Vec<u64>, Vec<u64>) {
+/// 7 m from a stone. Returns the stones sent before the world loaded and after it, and the
+/// gateway in the world.
+fn enter_beside(content: &Path, stone: [f32; 3]) -> (Vec<u64>, Vec<u64>, Gateway) {
     let mut state = Gateway::content_state(content).unwrap();
     state.zone_id = 0;
     state.position = [stone[0] + 6.0, stone[1], stone[2] - 3.0];
@@ -374,7 +375,11 @@ fn enter_beside(content: &Path, stone: [f32; 3]) -> (Vec<u64>, Vec<u64>) {
             .map(|(_, guid, _)| guid)
             .collect::<Vec<_>>()
     };
-    (near(framed_stones(&early)), near(framed_stones(&world.replies)))
+    (
+        near(framed_stones(&early)),
+        near(framed_stones(&world.replies)),
+        gateway,
+    )
 }
 
 #[test]
@@ -389,13 +394,39 @@ fn entering_the_world_beside_a_stone_sends_its_rock_once_after_the_world_loads()
     ] {
         let row = rows.iter().find(|row| row["name"] == name).unwrap();
         let content = release_content(&name.replace(' ', "-"), opening);
-        let (early, loaded) = enter_beside(&content, spot(row));
+        let (early, loaded, _) = enter_beside(&content, spot(row));
         let _ = fs::remove_dir_all(&content);
         assert!(early.is_empty(), "{name}: sent before the world loaded: {early:?}");
         assert_eq!(
             loaded,
             vec![row["spawn_guid"].as_u64().unwrap()],
             "{name}: the stone's actor, once"
+        );
+    }
+}
+
+/// X on the stone the player entered beside: the gateway answers the client's 26/8 with the
+/// BaseUi 47/7 `Atlas.Show` (no ints), framed like every reply. A rock of its own and one that
+/// is part of the zone answer alike.
+#[test]
+fn pressing_x_on_a_stone_after_entering_beside_it_opens_the_atlas() {
+    let mut atlas = vec![47, 0, 7, 10, 0, 0, 0];
+    atlas.extend(b"Atlas.Show");
+    atlas.extend([0, 0, 0, 0]);
+    let rows = stone_rows();
+    for name in ["Sanctuary Warpstone", "Sunstone Valley Warpstone"] {
+        let row = rows.iter().find(|row| row["name"] == name).unwrap();
+        let guid = row["spawn_guid"].as_u64().unwrap();
+        let content = release_content(&format!("x-{}", name.replace(' ', "-")), false);
+        let (_, loaded, mut gateway) = enter_beside(&content, spot(row));
+        assert_eq!(loaded, [guid], "{name}: the stone is drawn");
+        let pressed = gateway.handle(&wrap(&interact(guid))).unwrap();
+        let _ = fs::remove_dir_all(&content);
+        let sent: Vec<&[u8]> = pressed.replies.iter().map(|reply| body(reply)).collect();
+        assert_eq!(sent, [atlas.as_slice()], "{name}");
+        assert!(
+            !pressed.state_changed && !pressed.gameplay_changed,
+            "{name}"
         );
     }
 }

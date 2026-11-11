@@ -77,6 +77,30 @@ fn text(out: &Outcome) -> String {
 
 const START: [f32; 3] = [-1904.0, -42.0, 420.0];
 
+/// Client 26/8 (`008b6bc0`): the actor guid and a zero flag. Pressing X on an actor sends it.
+fn click(guid: u64) -> Vec<u8> {
+    [&[26, 0, 8, 0][..], &guid.to_le_bytes(), &[0]].concat()
+}
+
+/// BaseUi 47/7 `Atlas.Show` with no ints: the answer Sanctuary's warpstone gives a click.
+fn atlas_script() -> Vec<u8> {
+    let mut packet = vec![47, 0, 7, 10, 0, 0, 0];
+    packet.extend(b"Atlas.Show");
+    packet.extend([0, 0, 0, 0]);
+    packet
+}
+
+/// The shipped `npc_spawns_extra.json` rows of one model.
+fn extra_rows(model_id: i64) -> Vec<Value> {
+    let file: Value =
+        serde_json::from_slice(&fs::read(content().join("npc_spawns_extra.json")).unwrap())
+            .unwrap();
+    (file["records"].as_array().unwrap().iter())
+        .filter(|row| row["model_id"] == model_id)
+        .cloned()
+        .collect()
+}
+
 #[test]
 fn world_entry_sends_the_whole_atlas_and_walking_to_a_stone_finds_it() {
     let mut game = game();
@@ -236,6 +260,69 @@ fn a_stone_not_found_yet_refuses_and_nothing_forged_moves_anyone() {
             .is_err(),
         "a short body"
     );
+}
+
+/// Bug of 2026-11-10: X on a warpstone got no answer, because the click router dropped every
+/// actor without a content key. Every stone row now opens the Atlas, and a row picked on it
+/// travels through the same op 90.
+#[test]
+fn pressing_x_on_any_warpstone_opens_the_atlas_and_a_found_row_then_teleports() {
+    let stones = extra_rows(280);
+    assert_eq!(
+        stones.len(),
+        18,
+        "the warpstone actors (sg_warpstone_01.adr)"
+    );
+    let mut game = game();
+    let mut now = 1_000;
+    for stone in &stones {
+        let name = stone["name"].as_str().unwrap();
+        assert!(
+            stone["content_key"].is_null(),
+            "{name}: no content key to route by"
+        );
+        let guid = stone["spawn_guid"].as_u64().unwrap();
+        let spot = vec3(&stone["position"]);
+        now += 1_000;
+        let out = game
+            .handle_in_world(&click(guid), &at([spot[0] + 3.0, spot[1], spot[2]]), now)
+            .unwrap();
+        assert_eq!(out.replies, [atlas_script()], "{name}");
+        assert!(!out.changed && out.relocation.is_none(), "{name}");
+        // Beyond the 12 m NPC reach, or off the open world: no answer, as any NPC click.
+        let mut away = at(spot);
+        away.zone_id = 77;
+        for refused in [at([spot[0] + 13.0, spot[1], spot[2]]), away] {
+            let out = game.handle_in_world(&click(guid), &refused, now).unwrap();
+            assert!(out.replies.is_empty() && out.relocation.is_none(), "{name}");
+        }
+    }
+    // The opened map's "Teleport Now": Snowhill (row 3) was found by walking, so the Sanctuary
+    // stone's Atlas travels there by op 90.
+    game.on_location(&at([51.391, 30.987, 363.156]), now + 1)
+        .unwrap();
+    let beside = at([-1415.3, -27.0, 347.8]);
+    let out = game
+        .handle_in_world(&click(100000033167), &beside, now + 2)
+        .unwrap();
+    assert_eq!(out.replies, [atlas_script()]);
+    let out = game.handle_in_world(&op90(3), &beside, now + 3).unwrap();
+    let to = out.relocation.expect("a found row teleports");
+    assert_eq!([to.position[0], to.position[2]], [51.391, 363.156]);
+}
+
+#[test]
+fn a_keyless_actor_that_is_not_a_warpstone_is_still_dropped() {
+    let mut game = game();
+    let squirrel = &extra_rows(402)[0];
+    assert!(squirrel["content_key"].is_null());
+    let guid = squirrel["spawn_guid"].as_u64().unwrap();
+    assert_eq!(game.npc_model(guid), Some(402), "a drawn, passive actor");
+    let spot = vec3(&squirrel["position"]);
+    let out = game
+        .handle_in_world(&click(guid), &at([spot[0] + 3.0, spot[1], spot[2]]), 5_000)
+        .unwrap();
+    assert!(out.replies.is_empty() && out.relocation.is_none() && !out.changed);
 }
 
 #[test]

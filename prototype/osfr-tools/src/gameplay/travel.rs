@@ -16,6 +16,14 @@
 //!   client sends it by itself below the world floor (`00bf9430`). The 2009 help article: outside
 //!   it goes to the nearest warpstone already activated, inside a combat instance back to the
 //!   beginning of the encounter.
+//! - Pressing X on a warpstone (26/8 on the stone actor) opens the Atlas: the server sends the
+//!   BaseUi 47/7 script `Atlas.Show`, as Sanctuary's `OpenAtlasInteraction` does. The client's
+//!   case-7 reader (`BaseUiPacketDispatch` `00a91bf0`) splits the script at the dot and calls
+//!   `Atlas:Show` as a method through `ClientLuaCallByName` (`009797a0`). With no argument the
+//!   Lua `Atlas:Show` opens the player's current atlas page (`Ui.GetAtlasName`), and it does
+//!   nothing in a minigame, a tutorial or the starting zone. A stone's AddNpc carries no prompt
+//!   reach, so the client offers X within the session's 7 m (dispatch `0092f997`); the server
+//!   keeps the NPC reach of 12 m.
 //!
 //! `data/content/travel.json` holds the rows and the tunable rules. A content set without the
 //! file keeps the nine curated hubs of W142 (dormant default).
@@ -42,6 +50,11 @@ const MAX_COORD: f32 = 100_000.0;
 const EXIT_MINIGAME: &str = "You cannot teleport now. Exit the current minigame.";
 /// The housing family's leave request (127/10, no body).
 const LEAVE_HOUSE: [u8; 4] = [127, 0, 10, 0];
+/// `sg_warpstone_01.adr`: the body of all 18 stone actors of `npc_spawns_extra.json`, and of
+/// no other content actor.
+const STONE_MODEL: u32 = 280;
+/// The client's own Atlas opener (Lua `Atlas:Show`).
+const ATLAS_SCRIPT: &str = "Atlas.Show";
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -283,13 +296,10 @@ impl Gameplay {
             }));
         }
         let mut context = self.warp_context(character);
-        // A field fight closes Atlas and friend travel, as `travel_presence` reports it to
-        // others. (R) Op 122 stays open: it is the rescue for a fall through the world, which a
-        // fight does not prevent, and its own five-minute cooldown bounds it as an escape.
-        if opcode != Some(ZONE_SAFE_TELEPORT_REQUEST_OPCODE)
-            && self.is_occupied(occupation::Occupation::FieldEngaged)
-        {
-            context.blocked = context.blocked.or(Some(piece_077::Blocker::Encounter));
+        // (R) Op 122 stays open in a field fight: it is the rescue for a fall through the world,
+        // which a fight does not prevent, and its own five-minute cooldown bounds it as an escape.
+        if opcode != Some(ZONE_SAFE_TELEPORT_REQUEST_OPCODE) {
+            context.blocked = self.atlas_blocker();
         }
         let terrain = self.terrain.clone();
         let zone = character.zone_id;
@@ -332,6 +342,58 @@ impl Gameplay {
         }
         out.replies
             .extend(reply.notices.iter().map(|text| chat::system(text)));
+        Ok(Some(out))
+    }
+
+    /// What closes the Atlas and its travel (ops 90 and 58): the warp blocker, and a field fight,
+    /// as `travel_presence` reports it to others.
+    fn atlas_blocker(&self) -> Option<piece_077::Blocker> {
+        let fight = self.is_occupied(occupation::Occupation::FieldEngaged);
+        (self.warp_blocker()).or(fight.then_some(piece_077::Blocker::Encounter))
+    }
+
+    /// A click (26/8) on any warpstone actor opens the Atlas. Out of reach or off the open world
+    /// it answers nothing, as any NPC click (T836); where Atlas travel is closed it answers that
+    /// refusal's line instead, so the map never opens on a teleport it would refuse.
+    pub(super) fn warpstone_click_26_8(
+        &self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
+        if !inner.starts_with(&[26, 0, 8, 0]) {
+            return Ok(None);
+        }
+        let target = npc_interaction::decode_npc_interact_26_8(inner)
+            .map_err(|_| invalid("invalid NPC interaction request"))?
+            .target;
+        let Some(table) = (self.npc_visibility.as_ref())
+            .filter(|table| table.model_of(target) == Some(STONE_MODEL))
+        else {
+            return Ok(None);
+        };
+        let in_reach = table.actor_position(target).is_some_and(|at| {
+            let squared: f64 = (at.iter().zip(character.position))
+                .map(|(a, b)| (f64::from(*a) - f64::from(b)).powi(2))
+                .sum();
+            squared <= npc_interaction::INTERACTION_RADIUS.powi(2)
+        });
+        let mut out = Outcome::default();
+        let reason = if character.zone_id != OPEN_WORLD_ZONE {
+            Some("wrong_zone")
+        } else if !in_reach {
+            Some("out_of_range")
+        } else if let Some(blocker) = self.atlas_blocker() {
+            (out.replies).extend(WarpRejection::Blocked(blocker).notice().map(chat::system));
+            Some("travel_closed")
+        } else {
+            out.replies
+                .push(crate::base_ui::execute_script(ATLAS_SCRIPT, &[])?);
+            None
+        };
+        npc_event(serde_json::json!({
+            "event": "npc_interact", "guid": target, "content_key": null,
+            "outcome": if reason.is_some() { "refused" } else { "atlas" }, "reason": reason
+        }));
         Ok(Some(out))
     }
 
@@ -577,6 +639,44 @@ mod tests {
         assert!(
             out.relocation.is_some(),
             "after the fight the same request moves"
+        );
+    }
+
+    #[test]
+    fn a_stone_click_in_a_field_fight_answers_the_atlas_refusal_and_opens_after_it() {
+        let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut game = Gameplay::load(&content, None).unwrap();
+        // 3 m from the Sanctuary Warpstone actor (`npc_spawns_extra.json` 100000033167).
+        let here = CharacterState {
+            guid: 1,
+            zone_id: OPEN_WORLD_ZONE,
+            position: [-1415.3, -27.0, 347.8],
+            rotation: [0.0, 0.0, 1.0],
+        };
+        let click = [&[26, 0, 8, 0][..], &100000033167u64.to_le_bytes(), &[0]].concat();
+        game.field_engaged = true;
+        let out = game.handle_in_world(&click, &here, 10_000).unwrap();
+        let line = WarpRejection::Blocked(piece_077::Blocker::Encounter).notice();
+        assert_eq!(
+            out.replies,
+            [chat::system(line.unwrap())],
+            "the Atlas teleport's own line"
+        );
+        let out = game
+            .handle_warp(&travel(155), &here, 10_000)
+            .unwrap()
+            .unwrap();
+        assert!(
+            out.relocation.is_none(),
+            "and the teleport itself stays closed"
+        );
+        game.field_engaged = false;
+        let out = game.handle_in_world(&click, &here, 20_000).unwrap();
+        let atlas = crate::base_ui::execute_script(ATLAS_SCRIPT, &[]).unwrap();
+        assert_eq!(
+            out.replies,
+            [atlas],
+            "after the fight the same click opens the Atlas"
         );
     }
 

@@ -213,6 +213,10 @@ impl Gameplay {
         if let Some(out) = self.station_interaction_26_8(inner, character)? {
             return Ok(Some(out));
         }
+        // A warpstone has no content key: every stone opens the Atlas here (`travel.rs`).
+        if let Some(out) = self.warpstone_click_26_8(inner, character)? {
+            return Ok(Some(out));
+        }
         if let Some(out) = self.npc_interact_26_8(inner, character)? {
             return Ok(Some(out));
         }
