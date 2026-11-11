@@ -5920,7 +5920,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 79442,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "The quest's reward is the ride Gloamstone Hoverboard (fanbyte wiki page fr_quest:Baron_von_Darkcheat, quests.json); its item row is data/release/item-table-supplement.json 79442 (Type 19, mount id in Unknown36)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -6580,7 +6591,18 @@
       "rewards": [
         {
           "coins": 2500,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 79435,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "The quest's reward is the ride Sparky (fanbyte wiki page fr_quest:Card_Duelist:_Meet_the_Boss, quests.json); its item row is data/release/item-table-supplement.json 79435 (Type 19, mount id in Unknown36)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -7392,7 +7414,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 79448,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "The quest's reward is the ride Skullz Chopper (fanbyte wiki page FR_Quest:Card_Duelist:_Return_from_the_Rumbledome, quests.json); its item row is data/release/item-table-supplement.json 79448 (Type 19, mount id in Unknown36)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {

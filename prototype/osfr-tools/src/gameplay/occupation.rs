@@ -135,18 +135,23 @@ impl Occupation {
             }
             Derby | Soccer | Kart | Pirates | Garage => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
-            // (R) A lot is its own scene: leave it before travelling, riding or starting an
-            // activity; pets may follow (the lot's pet autospawn flag); housing owns movement.
-            Housing => (true, true, true, false, true),
+            // (R) A lot is its own scene: leave it before travelling or starting an activity; pets
+            // may follow (the lot's pet autospawn flag); housing owns movement. Rides work on a lot:
+            // the client keeps its ride button on in a house instance (`GameDock:SetState`,
+            // `Housing.isInInstance`) and 2014 video shows riders on lots and inside a cave house.
+            // Edit mode alone refuses them (`Gameplay::ride_restrictions`).
+            Housing => (true, true, false, false, true),
             // T488: a groom session closes the start gate, so no craft, gather, fight or minigame
             // begins mid-session. It keeps the pets gate open (its own 53/22 strokes are pet
             // packets, and a dismissed or wet pet already ends it with kind 4) and travel, riding
             // and movement open; zoning and water end it.
             Groom => (true, false, false, false, false),
             // T560 (R): the open wheel movie closes the start gate (no craft, gather, fight or other
-            // minigame begins under it) and warpstone travel, like the other Flash movies; riding,
-            // pets and movement stay open because the wheel is a window, not a scene.
-            Wheel => (true, true, false, false, false),
+            // minigame begins under it) and warpstone travel, like the other Flash movies; pets and
+            // movement stay open because the wheel is a window, not a scene. It closes the ride
+            // gate: the client greys the ride button for WHEEL_TYPE (`GameDock:SetState`) and
+            // dismounts when a Flash minigame starts (`StartFlashMiniGameUi` 0x009bd650).
+            Wheel => (true, true, true, false, false),
             // L937 (R): a challenge closes the start gate and warpstone travel and ends a ride (the
             // run is on foot); pets and movement stay open, the player runs the course.
             Challenge => (true, true, true, false, false),
@@ -244,7 +249,8 @@ mod tests {
 
     /// Pins the table; changing a gate is a deliberate, tested edit. The start and warp rows
     /// include kart and derby since the owner closed those gaps (2026-10-19). Housing (lead,
-    /// 2026-10-20) closes start, warp and ride, keeps pets, and owns location. T488/F796: a groom
+    /// 2026-10-20) closes start and warp, keeps pets, and owns location; since the mounts piece it
+    /// keeps rides (client evidence) and the prize wheel closes them. T488/F796: a groom
     /// session closes start (and so style cards) but keeps pets, travel, riding and movement open.
     #[test]
     fn gates_reproduce_the_replaced_busy_lists() {
@@ -339,7 +345,7 @@ mod tests {
                 Soccer,
                 Kart,
                 FieldEngaged,
-                Housing,
+                Wheel,
                 Challenge
             ]
         );

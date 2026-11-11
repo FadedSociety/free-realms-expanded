@@ -658,3 +658,85 @@ fn mounted_allowance_uses_the_ride_speed() {
     );
     assert!(one_second_dash(None) < 450.0, "clamped on foot");
 }
+
+/// Mounts piece: the allowance follows the ride's own top speed. A ride that glides is sent a
+/// glide top speed above its ground speed, so that is what the movement check allows, and a
+/// ride that cannot glide gets its ground speed and nothing more.
+#[test]
+fn a_gliding_ride_is_allowed_its_glide_speed_and_no_other_ride_is() {
+    let document = bundled();
+    let row = |id: i32| {
+        document["mounts"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|mount| mount["id"] == id)
+            .unwrap()
+            .clone()
+    };
+    let hawk = row(FIRE_HAWK);
+    let ground = hawk["max_movement_speed"].as_f64().unwrap() as f32;
+    let glide = hawk["stats"]["glide_max_forward_speed"].as_f64().unwrap() as f32;
+    assert!(hawk["stats"]["glide_enabled"].as_bool().unwrap() && glide > ground);
+    let mut service = MountService::new(MountCatalog::load(mounts_json()).unwrap());
+    board_with(&mut service, FIRE_HAWK, FIRE_HAWK_ITEM);
+    assert_eq!(service.mounted_speed(), Some(glide));
+    assert_eq!(
+        SpeedModifiers::riding(service.mounted_speed()).mount_multiplier,
+        glide / 10.0
+    );
+
+    let mut service = MountService::new(MountCatalog::load(mounts_json()).unwrap());
+    board_with(&mut service, WOLF, WOLF_ITEM);
+    let wolf = row(WOLF)["max_movement_speed"].as_f64().unwrap() as f32;
+    assert_eq!(service.mounted_speed(), Some(wolf), "untrained: ground speed");
+}
+
+/// Mounts piece: a quest's ride (the Gloamstone Hoverboard item, which only the supplement
+/// defines) goes through the 168 requests like a bought one: summoned and boarded at its own speed.
+/// The gameplay fixture's lab catalogue lacks the item, so this drives the service.
+#[test]
+fn a_quest_reward_ride_is_summoned_and_boarded() {
+    const GLOAMSTONE: i32 = 13571;
+    const GLOAMSTONE_ITEM: i32 = 79442;
+    let mut service = MountService::new(MountCatalog::load(mounts_json()).unwrap());
+    assert_eq!(service.mounted_speed(), None);
+    board_with(&mut service, GLOAMSTONE, GLOAMSTONE_ITEM);
+    assert!(service.is_mounted());
+    assert_eq!(service.mounted_speed(), Some(12.5));
+}
+
+/// The Gloamstone Hoverboard item (a supplement row; a quest pays it) boards at its ground speed
+/// through the mount service's 168 requests. No quest turn-in is involved here.
+#[test]
+fn the_gloamstone_hoverboard_item_boards_at_its_ground_speed_through_the_mount_service() {
+    let mut service = MountService::new(MountCatalog::load(mounts_json()).unwrap());
+    board_with(&mut service, 13_571, 79_442);
+    assert!(service.is_mounted());
+    assert_eq!(service.mounted_speed(), Some(12.5));
+}
+
+/// The trained-glide branch of `mounted_speed`: an upgradable ride is allowed the trained glide's
+/// top speed only once it is trained; untrained it keeps its ground speed.
+#[test]
+fn a_trained_ride_is_allowed_the_trained_glide_speed_and_an_untrained_one_is_not() {
+    let trained_top = bundled()["trained_glide"]["stats"]["glide_max_forward_speed"]
+        .as_f64()
+        .unwrap() as f32;
+    assert!(trained_top > 12.5);
+    for (trained, speed) in [(false, 12.5), (true, trained_top)] {
+        let catalog = load_edited("trained-speed", |document| {
+            let row = wolf_row(document);
+            row["is_upgradable"] = true.into();
+            row["is_upgraded"] = trained.into();
+        })
+        .unwrap();
+        let mut service = MountService::new(catalog);
+        board_with(&mut service, WOLF, WOLF_ITEM);
+        assert_eq!(service.mounted_speed(), Some(speed), "trained: {trained}");
+        assert_eq!(
+            SpeedModifiers::riding(service.mounted_speed()).mount_multiplier,
+            speed / 10.0
+        );
+    }
+}

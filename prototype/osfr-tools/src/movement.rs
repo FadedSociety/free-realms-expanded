@@ -27,6 +27,13 @@ const VERTICAL_HARD_MULTIPLIER: f64 = 12.0;
 const DISCONTINUITY_RADIUS: f64 = 16.0;
 /// Let client zone/teleport state settle before normal checks resume (R).
 const DISCONTINUITY_TIMEOUT: Duration = Duration::from_secs(5);
+/// The largest ride factor (R): 24 units/s over the 10 units/s base, the fastest glide any
+/// known ride data sends (the shipped rows top out at 22, the community's at 24). The wiki's "up
+/// to 150%" is a ground figure and a gliding ride is sent faster stats than that, so the factor
+/// follows each ride's own data, and this cap keeps a bad data row from widening a stalled
+/// client's allowance. Opcode 125 has no verified gliding bit, so the server cannot tell a glide
+/// from a run: a ride that can glide is allowed its glide speed for as long as it is boarded.
+pub const MAX_MOUNT_MULTIPLIER: f32 = 2.4;
 /// Native opcode-125 bit 4 selects the 0.25 entity-speed scale at 0090e0f4;
 /// sender 00934a20 sources it from the entity flag at +0x650.
 const NATIVE_SLOW_SPEED_BIT: u8 = 1 << 4;
@@ -75,7 +82,7 @@ pub struct MovementUpdate {
 pub struct SpeedModifiers {
     /// Configured base speed in world units per second (R).
     pub base_speed_per_second: f32,
-    /// Mount speed factor (R; the 1.5 maximum is wiki-derived, not client code).
+    /// Mount speed factor (R): the boarded ride's own top speed over the base.
     pub mount_multiplier: f32,
     /// Active buff factor (R).
     pub buff_multiplier: f32,
@@ -84,14 +91,15 @@ pub struct SpeedModifiers {
 impl SpeedModifiers {
     /// (R) Base speed and buff modifiers are not server-owned yet; 10 units/s with the
     /// validator's generous capture-tested envelope preserves W53b reports while rejecting gross
-    /// jumps. A boarded ride (`ride_speed`) scales the base by its speed over the base, held to
-    /// the validator's 1.0..=1.5 mount range, so a ride that stands still (the Lawn Chair, 0)
-    /// keeps the on-foot allowance.
+    /// jumps. A boarded ride (`ride_speed`, its top ground or glide speed) scales the base by
+    /// its speed over the base and nothing more, floored at 1.0 so a ride that stands still (the
+    /// Lawn Chair, 0) keeps the on-foot allowance, and held to `MAX_MOUNT_MULTIPLIER`.
     pub fn riding(ride_speed: Option<f32>) -> Self {
         const BASE: f32 = 10.0;
         Self {
             base_speed_per_second: BASE,
-            mount_multiplier: ride_speed.map_or(1.0, |speed| (speed / BASE).clamp(1.0, 1.5)),
+            mount_multiplier: ride_speed
+                .map_or(1.0, |speed| (speed / BASE).clamp(1.0, MAX_MOUNT_MULTIPLIER)),
             buff_multiplier: 1.0,
         }
     }
@@ -118,8 +126,7 @@ impl SpeedModifiers {
             || mount < 1.0
             || buff < 1.0
             || base > 10_000.0
-            // The 1.5 mount cap is wiki-derived; the client exposes no constant.
-            || mount > 1.5
+            || mount > f64::from(MAX_MOUNT_MULTIPLIER)
             || buff > 10.0
         {
             return None;

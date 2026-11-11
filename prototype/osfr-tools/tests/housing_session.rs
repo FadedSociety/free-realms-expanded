@@ -2051,3 +2051,51 @@ fn a_broken_housing_settings_file_fails_the_load_instead_of_reading_as_off() {
     fs::write(content.0.join("housing_settings.json"), "{").unwrap();
     assert!(Gameplay::load(&content.0, None).is_err());
 }
+
+/// Mounts piece: rides on a lot. The client keeps its ride button on in a house instance and
+/// greys it in edit mode (`GameDock:SetState`), so a ride is summoned and boarded on the lot,
+/// edit mode ends it and refuses another, and leaving edit mode allows rides again.
+#[test]
+fn a_ride_works_on_a_lot_and_edit_mode_ends_and_refuses_it() {
+    const WOLF: i32 = 993;
+    const WOLF_ITEM: i32 = 14_289;
+    let spawn = [vec![168, 0, 6], WOLF.to_le_bytes().to_vec()].concat();
+    let ride = osfr_tools::mounts::MountService::ride_guid(character().guid);
+    let board = [
+        vec![168, 0, 1],
+        ride.to_le_bytes().to_vec(),
+        vec![1, 0, 0, 0, 0, 0],
+    ]
+    .concat();
+
+    let content = Content::with_houses();
+    let mut state = content.game().state();
+    state.inventory.items.push(single(WOLF, WOLF_ITEM));
+    let mut game = Gameplay::load(&content.0, Some(state)).unwrap();
+    let lot = granted(&mut game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    game.initialize_world(&character(), 3_000).unwrap();
+
+    game.handle_in_world(&spawn, &character(), 10_000).unwrap();
+    assert!(game.ride_view(OWNER).is_some(), "summoned on the lot");
+    game.handle_in_world(&board, &character(), 10_010).unwrap();
+    assert!(game.is_mounted(), "boarded on the lot");
+    game.settle_mounts(&character(), false);
+    assert!(game.is_mounted(), "a lot alone does not end the ride");
+
+    // The gateway settles rides after every handled message.
+    game.handle_in_world(&edit(true), &character(), 12_000)
+        .unwrap();
+    game.settle_mounts(&character(), false);
+    assert!(!game.is_mounted(), "edit mode ends the ride");
+    assert!(game.ride_view(OWNER).is_none(), "and puts it away");
+
+    game.handle_in_world(&spawn, &character(), 14_000).unwrap();
+    assert!(game.ride_view(OWNER).is_none(), "no summon in edit mode");
+
+    game.handle_in_world(&edit(false), &character(), 16_000)
+        .unwrap();
+    game.handle_in_world(&spawn, &character(), 18_000).unwrap();
+    assert!(game.ride_view(OWNER).is_some(), "allowed again after edit mode");
+}

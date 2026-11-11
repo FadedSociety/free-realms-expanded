@@ -324,6 +324,60 @@ fn the_shipped_content_loads_and_a_malformed_file_is_refused() {
     }
 }
 
+/// Mounts piece: the wheel closes the ride gate (the client greys the ride button for the wheel's
+/// minigame type and dismounts when a Flash minigame starts), so opening it ends a boarded ride
+/// and no ride is summoned under it.
+#[test]
+fn opening_the_wheel_ends_a_boarded_ride_and_refuses_a_summon() {
+    const WOLF: i32 = 993;
+    const WOLF_ITEM: i32 = 14_289;
+    let spawn = [vec![168, 0, 6], WOLF.to_le_bytes().to_vec()].concat();
+    let ride = osfr_tools::mounts::MountService::ride_guid(character().guid);
+    let board = [
+        vec![168, 0, 1],
+        ride.to_le_bytes().to_vec(),
+        vec![1, 0, 0, 0, 0, 0],
+    ]
+    .concat();
+
+    let scratch = Scratch::new("daily-wheel-ride");
+    let mut state = Gameplay::load(scratch.path(), None).unwrap().state();
+    state
+        .inventory
+        .items
+        .push(osfr_tools::inventory::InventoryItem {
+            definition_id: WOLF_ITEM,
+            tint: 0,
+            id: WOLF,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+    let mut game = Gameplay::load(scratch.path(), Some(state)).unwrap();
+    game.seed_wheel_clock(CLOCK);
+    game.initialize_world(&character(), 500).unwrap();
+
+    game.handle_in_world(&spawn, &character(), 10_000).unwrap();
+    game.handle_in_world(&board, &character(), 10_010).unwrap();
+    assert!(game.is_mounted(), "boarded before the wheel");
+
+    open(&mut game);
+    // The gateway settles rides after every handled message.
+    game.settle_mounts(&character(), false);
+    assert!(!game.is_mounted(), "the wheel ends the ride");
+    assert!(game.ride_view(character().guid).is_none());
+
+    game.handle_in_world(&spawn, &character(), 14_000).unwrap();
+    assert!(
+        game.ride_view(character().guid).is_none(),
+        "no summon under the wheel"
+    );
+}
+
 // ---- The movie's messages, the spin and its prize (piece daily-wheel) ----
 
 /// A 39/14 movie message from the client for `instance`.

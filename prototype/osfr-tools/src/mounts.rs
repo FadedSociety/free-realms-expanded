@@ -325,13 +325,7 @@ impl MountCatalog {
         instance_id: i32,
         upgraded: &BTreeSet<i32>,
     ) -> Vec<CharacterStat> {
-        let glide = if mount.stats.glide_enabled {
-            mount.stats
-        } else if mount.is_upgradable && trained(mount, instance_id, upgraded) {
-            self.trained_glide
-        } else {
-            RideStats::default()
-        };
+        let glide = self.glide(mount, instance_id, upgraded);
         vec![
             float_stat(MAX_MOVEMENT_SPEED, mount.max_movement_speed),
             float_stat(59, glide.glide_default_forward_speed),
@@ -343,6 +337,22 @@ impl MountCatalog {
             float_stat(67, glide.glide_accel),
             float_stat(JUMP_HEIGHT, mount.stats.jump_height),
         ]
+    }
+
+    /// The glide block this ride instance flies with; all zero (off) when it cannot glide.
+    fn glide(
+        &self,
+        mount: &MountDefinition,
+        instance_id: i32,
+        upgraded: &BTreeSet<i32>,
+    ) -> RideStats {
+        if mount.stats.glide_enabled {
+            mount.stats
+        } else if mount.is_upgradable && trained(mount, instance_id, upgraded) {
+            self.trained_glide
+        } else {
+            RideStats::default()
+        }
     }
 
     /// (R) What a ride's end restores: on-foot speed, glide off and no jump bonus. Both community
@@ -633,12 +643,18 @@ impl MountService {
         matches!(self.state, MountState::Mounted { .. })
     }
 
-    /// The boarded ride's speed; `None` while on foot or beside a summoned ride.
+    /// The boarded ride's top speed, for the movement allowance: its ground speed, or its glide's
+    /// top forward speed when this instance can glide and that is faster (the stats the rider was
+    /// sent, so the client moves no faster). The server cannot tell gliding from running, so a
+    /// ride that can glide gets its glide speed while boarded; `SpeedModifiers::riding` caps it.
+    /// `None` while on foot or beside a summoned ride.
     pub fn mounted_speed(&self) -> Option<f32> {
         let MountState::Mounted { ride, .. } = &self.state else {
             return None;
         };
-        Some(self.catalog.mount(ride.mount_id)?.max_movement_speed)
+        let mount = self.catalog.mount(ride.mount_id)?;
+        let glide = self.catalog.glide(mount, ride.instance_id, &self.upgraded);
+        Some(mount.max_movement_speed.max(glide.glide_max_forward_speed))
     }
 
     /// T532: the character speed stat the client's own motion reads (38/7, stat id 2), as the

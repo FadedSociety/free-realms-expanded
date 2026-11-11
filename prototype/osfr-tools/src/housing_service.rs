@@ -1634,6 +1634,12 @@ impl HousingService {
         Ok(())
     }
 
+    /// Whether this session's player has the lot in edit mode (op 6): the client greys its ride
+    /// button then (`GameDock:SetState`, `Housing.editMode`), so the server refuses rides too.
+    pub fn editing(&self) -> bool {
+        self.edit_mode.values().any(|on| *on)
+    }
+
     /// The house a visitor's copy is of, if any: the gateway refreshes only copies it handed out.
     pub fn has_foreign_lot(&self, house_guid: u64) -> bool {
         self.foreign.contains(&house_guid)

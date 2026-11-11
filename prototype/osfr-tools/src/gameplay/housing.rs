@@ -75,6 +75,11 @@ impl HousingSession {
         self.return_to.is_some()
     }
 
+    /// Decorating a lot (edit mode), where the client allows no ride.
+    pub(super) fn editing(&self) -> bool {
+        self.in_house() && self.service.editing()
+    }
+
     /// L046: the lot for a paid Marketplace deed. Staged on a copy and committed only once its
     /// replies encode and `commit` is set (a preview only asks), so `None` (no enabled lot for
     /// the deed, already owned) changes nothing.

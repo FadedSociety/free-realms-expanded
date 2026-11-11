@@ -1039,6 +1039,8 @@ fn a_ride_scales_the_allowance_within_the_mount_range() {
     assert_eq!(multiplier(None), 1.0);
     assert_eq!(multiplier(Some(0.0)), 1.0, "a ride that stands still");
     assert_eq!(multiplier(Some(12.5)), 1.25);
-    assert_eq!(multiplier(Some(64.0)), 1.5, "capped");
+    assert_eq!(multiplier(Some(22.0)), 2.2, "a gliding ride's top speed");
+    assert_eq!(multiplier(Some(24.0)), 2.4, "the fastest known glide");
+    assert_eq!(multiplier(Some(64.0)), 2.4, "capped at the fastest known glide");
     assert_eq!(SpeedModifiers::riding(None).base_speed_per_second, 10.0);
 }

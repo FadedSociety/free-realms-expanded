@@ -118,12 +118,15 @@ impl Gameplay {
         }
     }
 
-    /// (R) No per-zone riding data was recovered, so every zone allows rides; fights (an instance
-    /// battle or a field enemy chasing the player), kart races and a knockout do not.
+    /// Where the client itself greys the ride button (`GameDock:SetState` in the client's UI
+    /// script): every minigame type, the prize wheel included, overworld combat, and a house lot
+    /// in edit mode; a house lot otherwise allows rides. Those are the ride gate and `editing`.
+    /// The client has no per-zone ride flag, so every zone allows rides (R: its starting-zone
+    /// rule is not enforced here; a new character owns no ride). A knockout also refuses (R).
     fn ride_restrictions(&self) -> crate::mounts::RideRestrictions {
         let in_minigame = self.blocks(|gates| gates.ride);
         crate::mounts::RideRestrictions {
-            zone_allows_riding: true,
+            zone_allows_riding: !self.housing.as_ref().is_some_and(|h| h.editing()),
             in_minigame,
             ability_active: false,
             knocked_out: self
@@ -284,7 +287,10 @@ impl Gameplay {
         let Some(mounts) = self.mounts.as_mut() else {
             return Outcome::default();
         };
-        let end = zoned || restrictions.in_minigame || restrictions.knocked_out;
+        let end = zoned
+            || restrictions.in_minigame
+            || restrictions.knocked_out
+            || !restrictions.zone_allows_riding;
         let ended = mounts.settle(character.guid, self.inventory.state(), end);
         let pose = crate::mounts::RidePose {
             position: character.position,
