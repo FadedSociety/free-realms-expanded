@@ -23,6 +23,13 @@ pub(super) struct FieldSim {
     pub(super) moving: BTreeSet<u64>,
     /// Hit times and unclaimed credits for shared-field kills.
     pub(super) kills: KillLedger,
+    /// What each field enemy's brain remembers, from the moment it notices a player until
+    /// it is home again or dead (`field.rs`).
+    pub(super) brains: BTreeMap<u64, super::brain::Memory>,
+    /// Where each player stood at the last field tick (a relocation faces its target).
+    pub(super) seen: BTreeMap<u64, [f32; 3]>,
+    /// Enemies the client was told are running home, until it is told they arrived.
+    pub(super) homing: BTreeSet<u64>,
 }
 
 /// (R) Shared-field kill bookkeeping for power-up drops (W158 slice 2b).

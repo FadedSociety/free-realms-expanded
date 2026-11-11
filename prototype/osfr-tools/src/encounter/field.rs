@@ -1,4 +1,9 @@
 //! Overworld field enemies and battle markers at runtime: wander and chase AI and the battle start screen.
+//!
+//! Noticing, the leash, giving up, the run home and the respawn are the built-in field rules
+//! (combat design 5.4). Inside them an enemy moves and attacks by its behaviour's stance, and
+//! its rules run through `brain::step` from the moment it has a target until it is home.
+use super::brain::{Act, Memory, Move, View};
 use super::*;
 
 // Content loading and staged reloads. `#[path]` keeps the `encounter` hub
@@ -50,6 +55,11 @@ impl FieldEnemy {
         self.target = None;
         self.reset_serial = self.reset_serial.wrapping_add(1);
         self.threat.clear();
+    }
+
+    /// The enemy's nominal hit times an attack's multiplier, after the victim's mitigation.
+    fn attack_damage(&self, hit: f32, mitigation: f32) -> u32 {
+        (self.actor.damage as f32 * hit * mitigation).round() as u32
     }
 
     /// (R) Per-actor deterministic random stream, same LCG as combat crits.
@@ -525,6 +535,16 @@ impl EncounterEngine {
         let shared = participants.is_some();
         let mut engaged = false;
         let mut respawned = Vec::new();
+        // The field rules that are data (absent: nothing new is sent), the acts the brains
+        // leave for the engine, and who got a target this tick (their neighbours join).
+        let field_rules = self.brain_data().field.clone();
+        let mut decided: Vec<(u64, Act)> = Vec::new();
+        let mut joined: Vec<(u64, [f32; 3], u64)> = Vec::new();
+        let plain = Behaviour::default();
+        let no_tags = BTreeMap::new();
+        for p in players {
+            self.field_sim.seen.insert(p.guid, p.position);
+        }
         for (i, f) in self.field_sim.enemies.iter_mut().enumerate() {
             let guid = f.actor.guid;
             if f.state.health == 0 {
@@ -532,13 +552,16 @@ impl EncounterEngine {
                     f.respawn_at = None;
                     f.state = enemy_state(&f.actor);
                     f.reset_motion();
+                    self.field_sim.brains.remove(&guid);
+                    self.field_sim.homing.remove(&guid);
                     if f.present {
                         respawned.push(i);
                     }
                 }
                 continue;
             }
-            let b = self.behaviour_of.get(&guid).cloned().unwrap_or_default();
+            let b = self.behaviour_of.get(&guid).unwrap_or(&plain);
+            let program = &b.brain.program;
             let home = ground.snapped(f.actor.position);
             let leash = f.leash_radius.unwrap_or(b.leash);
             if !f.present {
@@ -599,6 +622,91 @@ impl EncounterEngine {
                 f.motion = FieldMotion::Chasing;
                 f.roam_goal = None;
             }
+            // Giving up ends what the brain remembers; the client is told once that the
+            // enemy is running home.
+            if f.motion == FieldMotion::Returning
+                && self
+                    .field_sim
+                    .brains
+                    .remove(&guid)
+                    .is_some_and(|memory| memory.is_engaged())
+            {
+                if let Some(rules) = &field_rules {
+                    self.field_sim.homing.insert(guid);
+                    out.replies.extend([
+                        wire::state(guid, rules.home_state),
+                        wire::speed(guid, rules.home_speed),
+                        wire::attach(guid, rules.home_tag, rules.home_effect, guid),
+                    ]);
+                }
+            }
+            // The decision: every tick for an enemy with a target, and for an idle one whose
+            // rules can answer a player coming near.
+            let nearest = players
+                .iter()
+                .filter(|p| p.health > 0)
+                .map(|p| distance(p.position, f.state.position))
+                .min_by(f32::total_cmp);
+            let chasing = f.motion == FieldMotion::Chasing;
+            let idle_rules = f.motion == FieldMotion::Idle
+                && program.wakes_idle()
+                && nearest.is_some_and(|d| d <= 40.0);
+            if chasing || idle_rules {
+                let memory = self
+                    .field_sim
+                    .brains
+                    .entry(guid)
+                    .or_insert_with(|| Memory::seeded(guid));
+                memory.spawned(now_ms);
+                if chasing && !memory.is_engaged() {
+                    memory.engaged(now_ms);
+                    if let Some(rules) = &field_rules {
+                        out.replies.push(wire::state(guid, rules.fight_state));
+                    }
+                    if let Some(target) = f.target {
+                        joined.push((guid, f.state.position, target));
+                    }
+                }
+                if !program.rules.is_empty() && !memory.yielded {
+                    let view = View {
+                        now_ms,
+                        health_pct: super::arena_ai::health_pct(f.state.health, f.actor.max_health),
+                        position: f.state.position,
+                        home,
+                        target: f.target,
+                        target_distance: player.map(|_| delta),
+                        nearest_player: nearest,
+                        tags_alive: &no_tags,
+                        signals: &[],
+                        phase: memory.phase(),
+                        night: false,
+                    };
+                    let mut acts = Vec::new();
+                    brain::step(program, memory, &view, &mut acts);
+                    for act in acts {
+                        match act {
+                            Act::Stance(_) | Act::Phase(_) => {}
+                            Act::Attack(id) => memory.ordered = Some(id),
+                            other => decided.push((guid, other)),
+                        }
+                    }
+                }
+            }
+            let (stance, ordered, pace) = match self.field_sim.brains.get_mut(&guid) {
+                Some(memory) if memory.yielded => continue,
+                Some(memory) => (
+                    memory.stance(program).clone(),
+                    memory.ordered.take(),
+                    memory.flags.speed,
+                ),
+                None => (program.stance.clone(), None, None),
+            };
+            let holds = stance.movement == Move::Hold;
+            let attack = ordered
+                .as_deref()
+                .or(stance.attack.as_deref())
+                .and_then(|id| program.attack(id));
+            let reach = attack.map_or(b.reach, brain::Attack::reach);
             if self.skills.stunned(guid, now_ms) && f.motion != FieldMotion::Returning {
                 engaged |= f.motion == FieldMotion::Chasing;
                 continue;
@@ -607,7 +715,7 @@ impl EncounterEngine {
                 && f.roam_goal.is_none()
                 && now_ms >= f.pause_until
                 && f.roam_radius > 0.0
-                && b.mode != Mode::Stationary
+                && !holds
             {
                 // (R) Uniform disc samples, stable per GUID; no band/level roll.
                 let angle = f.random() * std::f32::consts::TAU;
@@ -626,6 +734,10 @@ impl EncounterEngine {
                 .skills
                 .fleeing_from(guid, now_ms)
                 .filter(|_| f.motion != FieldMotion::Returning);
+            let (backing, hold_at) = match stance.movement {
+                Move::KeepAway { min, max } if player.is_some() => (delta < min, max.max(reach)),
+                _ => (false, reach),
+            };
             let goal = match f.motion {
                 _ if flee.is_some() => {
                     flee.map(|from| super::battle_items::away_from(f.state.position, from, 10.0))
@@ -633,31 +745,41 @@ impl EncounterEngine {
                 // L089: a rooted enemy does not walk; it still strikes what is in reach.
                 _ if f.motion != FieldMotion::Returning && self.skills.rooted(guid, now_ms) => None,
                 FieldMotion::Returning => Some(home),
-                FieldMotion::Chasing if delta > b.reach => Some(position),
+                // Keeping its distance: back off when the target is too close, close in
+                // when it is too far, stand in between.
+                FieldMotion::Chasing if backing => {
+                    Some(super::battle_items::away_from(f.state.position, position, 10.0))
+                }
+                FieldMotion::Chasing if delta > hold_at => Some(position),
                 FieldMotion::Idle if now_ms >= f.pause_until => f.roam_goal,
                 _ => None,
             };
             if let Some(goal) = goal {
                 let left = distance(f.state.position, goal);
                 let speed = if f.motion == FieldMotion::Returning {
-                    b.run_speed
+                    field_rules.as_ref().map_or(b.run_speed, |r| r.home_speed)
                 } else {
-                    b.move_speed
+                    pace.unwrap_or(b.move_speed)
                 };
-                let stop = if f.motion == FieldMotion::Chasing {
-                    (b.reach - 0.1).max(0.0)
+                let stop = if f.motion == FieldMotion::Chasing && !backing {
+                    (hold_at - 0.1).max(0.0)
                 } else {
                     0.0
                 };
                 let step = (speed * elapsed.min(250) as f32 / 1000.0).min((left - stop).max(0.0));
-                if left > 0.001 && step > 0.0 && b.mode != Mode::Stationary {
+                if left > 0.001 && step > 0.0 && !holds {
                     let (next, grounded) =
                         match advance(f.state.position, goal, left, step, &ground) {
                             Ok(next) => (next, true),
                             Err(next) => (next, false),
                         };
                     // Check BEFORE moving. Never take even one step outside home leash.
-                    if f.motion == FieldMotion::Chasing && horizontal_distance(next, home) > leash {
+                    if backing && horizontal_distance(next, home) > leash {
+                        // Cornered at the leash while backing off: it stands its ground.
+                        stand(guid, &mut self.field_sim.moving, out);
+                    } else if f.motion == FieldMotion::Chasing
+                        && horizontal_distance(next, home) > leash
+                    {
                         f.motion = FieldMotion::Returning;
                         f.roam_goal = None;
                     } else if grounded {
@@ -686,6 +808,15 @@ impl EncounterEngine {
                         }
                         self.field_sim.attacks.remove(&guid);
                         self.skills.forget_target(guid);
+                        if let (Some(rules), true) =
+                            (&field_rules, self.field_sim.homing.remove(&guid))
+                        {
+                            out.replies.extend([
+                                wire::detach(guid, rules.home_tag),
+                                wire::state(guid, rules.idle_state),
+                                wire::speed(guid, b.move_speed),
+                            ]);
+                        }
                         f.motion = FieldMotion::Idle;
                         f.target = None;
                         f.reset_serial = f.reset_serial.wrapping_add(1);
@@ -706,18 +837,31 @@ impl EncounterEngine {
             let Some(victim) = player else {
                 continue;
             };
-            if distance(position, f.state.position) <= b.reach {
-                stand(guid, &mut self.field_sim.moving, out);
-                if self
-                    .field_sim
-                    .attacks
-                    .get(&guid)
-                    .is_some_and(|last| now_ms.saturating_sub(*last) < b.attack_ms)
+            // (R) In the open world an attack lands at once: wind-up and flight are an
+            // arena matter until field attacks get their own landing clock.
+            let Some(attack) = attack else {
+                continue;
+            };
+            if distance(position, f.state.position) <= reach {
+                if !backing {
+                    stand(guid, &mut self.field_sim.moving, out);
+                }
+                if ordered.is_none()
+                    && self
+                        .field_sim
+                        .attacks
+                        .get(&guid)
+                        .is_some_and(|last| now_ms.saturating_sub(*last) < attack.interval_ms)
                 {
                     continue;
                 }
                 self.field_sim.attacks.insert(guid, now_ms);
-                out.replies.push(animation(guid, 1001, false));
+                out.replies.push(animation(guid, attack.animation, false));
+                let special = match &attack.special {
+                    Some(special) if f.random() < special.chance => Some(special),
+                    _ => None,
+                };
+                let hit = special.map_or(attack.hit, |s| s.hit);
                 let prior = if shared {
                     hits.iter()
                         .filter(|(guid, _)| *guid == victim.guid)
@@ -727,22 +871,55 @@ impl EncounterEngine {
                     *total_damage
                 };
                 let left = victim.health.saturating_sub(prior);
-                let attack_damage = (f.actor.damage as f32 * mitigation).round() as u32;
+                let attack_damage = f.attack_damage(hit, mitigation);
                 let damage = attack_damage.min(left);
-                out.replies.push(attack_processed(
-                    guid,
-                    victim.guid,
+                out.replies.push(wire::enemy_hit(&wire::EnemyHit {
+                    attacker: guid,
+                    target: victim.guid,
                     damage,
-                    left.saturating_sub(damage),
-                    victim.max_health,
-                    false,
-                ));
+                    target_max: victim.max_health,
+                    target_current: left.saturating_sub(damage),
+                    effect: special.map_or(attack.effect, |s| s.effect),
+                    special: special.is_some(),
+                    knockout: damage > 0 && damage == left,
+                }));
                 if shared {
                     hits.push((victim.guid, damage));
                 } else {
                     *total_damage = total_damage.saturating_add(attack_damage);
                 }
             }
+        }
+        // Neighbours join (design 5.4): an idle enemy close to one that just got a target
+        // takes up the same target at its next tick, and its own rules hear `ally_engaged`.
+        if let Some(rules) = &field_rules {
+            for (first, at, target) in joined {
+                let tags = self
+                    .behaviour_of
+                    .get(&first)
+                    .map(|b| b.brain.tags.clone())
+                    .unwrap_or_default();
+                for f in &mut self.field_sim.enemies {
+                    let near = distance(f.state.position, at);
+                    if f.actor.guid == first
+                        || !f.present
+                        || f.state.health == 0
+                        || f.motion != FieldMotion::Idle
+                        || near > rules.join_radius
+                    {
+                        continue;
+                    }
+                    f.threat.add(target, 0);
+                    self.field_sim
+                        .brains
+                        .entry(f.actor.guid)
+                        .or_insert_with(|| Memory::seeded(f.actor.guid))
+                        .ally_engaged(near, &tags);
+                }
+            }
+        }
+        for (guid, act) in decided {
+            self.apply_act(guid, &act, now_ms, out);
         }
         for i in respawned {
             let f = &self.field_sim.enemies[i];

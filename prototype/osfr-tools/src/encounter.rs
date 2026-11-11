@@ -626,9 +626,9 @@ pub struct EncounterEngine {
     // heights they interpolate.
     terrain: Option<Arc<Terrain>>,
     // Named behaviour presets and every enemy's resolved behaviour by GUID
-    // (rebuilt whenever content or presets load).
+    // (rebuilt whenever content or presets load; shared, as the engine is cloned every tick).
     behaviour_presets: BTreeMap<String, Behaviour>,
-    behaviour_of: BTreeMap<u64, Behaviour>,
+    behaviour_of: Arc<BTreeMap<u64, Behaviour>>,
     // Combat power-ups (session only, never saved: a pickup lasts seconds and
     // the held kind is not a bag item, so it cannot be traded or duplicated).
     power_ups: Option<Arc<PowerUps>>,
@@ -996,7 +996,7 @@ impl EncounterEngine {
             pending_battle: None,
             terrain: None,
             behaviour_presets: BTreeMap::new(),
-            behaviour_of: BTreeMap::new(),
+            behaviour_of: Arc::default(),
             power_ups: None,
             power_up_rng: None,
             pickups: Vec::new(),

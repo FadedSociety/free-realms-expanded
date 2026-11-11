@@ -1,24 +1,21 @@
 //! The behaviour language's runtime: one stance plus when / if / do rules per enemy (combat
 //! design section 8). Pure: no packets and no engine types, so it is tested without a client.
 //! Piece P3 (`combat-brain`) owns the bodies, the loader and everything inside `Program` and
-//! `Memory`; further files go under `brain/`.
+//! `Memory`: `brain/program.rs` reads and checks the language, `brain/step.rs` runs it.
 //!
 //! Frozen by the combat seam: `step`'s signature, `View`'s fields and the `Act` variants with
-//! their fields (the director emits and applies the same acts). P3 may add to `Program` and
-//! `Memory`, which no other piece looks inside. Until P3 lands, `step` decides nothing and the
-//! engine's own enemy code runs as before.
+//! their fields (the director emits and applies the same acts). `Program` and `Memory` are
+//! P3's own; no other piece looks inside them.
 use super::wire::Line;
 use std::collections::BTreeMap;
 
-/// A loaded behaviour: its stance and rules. Built by P3's loader.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct Program {}
+mod program;
+mod step;
 
-/// What one enemy (or one fight script) remembers between steps: phase, rule fire counts and
-/// next-allowed times, the hit counter, crossed thresholds, the stance and pending timed acts.
-/// Events (spawned, engaged, hit, died, talked) are written here by the owner before a step.
-#[derive(Clone, Debug, Default, PartialEq)]
-pub struct Memory {}
+pub use program::{
+    Attack, AttackKind, Cond, Limits, Program, Rider, Rule, Special, Trigger, parse_attacks,
+};
+pub use step::Memory;
 
 /// What a step may read about its enemy and the fight around it.
 #[derive(Clone, Copy, Debug)]
@@ -165,5 +162,18 @@ pub enum Act {
     Target(TargetRule),
 }
 
+/// Every preset of the `behaviours.json` at `path` as its checked program (`attacks.json`
+/// beside it supplies the attacks). The engine loads the same way; this is for Studio's
+/// check and for tests, which need no engine.
+pub fn presets(path: &std::path::Path) -> std::io::Result<BTreeMap<String, Program>> {
+    Ok(super::behaviour::read_presets(path)?
+        .0
+        .into_iter()
+        .map(|(name, behaviour)| (name, behaviour.program().clone()))
+        .collect())
+}
+
 /// One decision: read the view, update the memory, push what the enemy does now.
-pub fn step(_p: &Program, _m: &mut Memory, _v: &View, _out: &mut Vec<Act>) {}
+pub fn step(p: &Program, m: &mut Memory, v: &View, out: &mut Vec<Act>) {
+    step::run(p, m, v, out);
+}

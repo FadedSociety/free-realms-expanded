@@ -1,11 +1,32 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "source": [
     {
       "kind": "reconstructed",
       "evidence": "(R) Local enemy behaviour: the melee values are this build's original constants; the skittish cycle is the owner's 2026-10-15 design for the Troll Summoner (Research/Owner Field Notes); no original server AI parameters are recovered."
+    },
+    {
+      "kind": "video",
+      "evidence": "Troll Summoner in 'Troll Summoner Madness!' (three archived runs): stands far off under its boss bar, is far away again after one to three hits, raises helpers from earth mounds that already carry a health bar, never attacks itself. Robgoblin Adept: teleports away at low health and restores about half its bar, twice. The other presets follow the pattern table of the combat evidence (enemies 4.3)."
+    },
+    {
+      "kind": "capture",
+      "evidence": "Live capture, March 2014: an open-world enemy gives up, runs home at speed 10.0 under state 0x4001 with effect tag 2 / effect 5; idle is state 0x1 and fighting 0x8001; battle wolves rush 2.2 s after they spawn."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every threshold, distance, timer, count and line of speech in the rules below, the join radius of 6 m and the effect ids under `visuals`. Battle 96's roster has Scoutlings and Ragelings only, so `troll_summoner` raises those; `troll_summoner_2009` is the older five-kind ladder for a fight that has those actors."
     }
   ],
+  "visuals": {
+    "summon_animation": 1112,
+    "spawn_animation": 1404,
+    "mound_effect": 16337,
+    "reuse_after_ms": 6000,
+    "effects": {"smoke": 21, "flash": 46},
+    "note": "(R) com_cast_02, com_spawn, PFX_bones_yellow_troll-spawn, PFX_smoke_black_explosion, PFX_Teleport_Flash. The live game's choices are not recovered."
+  },
+  "attach": {},
   "presets": {
     "field_roamer": {
       "mode": "melee",
@@ -14,7 +35,12 @@
       "attack_ms": 1000,
       "chase_limit": 12.0,
       "leash": 12.0,
-      "note": "(R) Starting-region field population: idle roam, chase and melee. The 12 m leash is the same local boundary as W105/W102; no original overworld AI parameters were recovered."
+      "stance": {"move": "roam", "m": 4, "attack": "melee"},
+      "rules": [
+        {"id": "notice", "when": {"player_within": {"m": 8}}, "do": [{"stance": {"move": "chase", "attack": "melee"}}]},
+        {"id": "join", "when": {"ally_engaged": {"m": 6}}, "do": [{"stance": {"move": "chase", "attack": "melee"}}]}
+      ],
+      "note": "(R) Starting-region field population: idle roam, chase and melee. The 12 m leash is the same local boundary as W105/W102; no original overworld AI parameters were recovered. Noticing, the leash, the run home and the respawn are the field's own rules; each row's aggro range decides when it gets a target."
     },
     "melee": {
       "mode": "melee",
@@ -22,6 +48,7 @@
       "reach": 2.5,
       "attack_ms": 1000,
       "chase_limit": 40.0,
+      "stance": {"move": "chase", "attack": "melee"},
       "note": "(R) Chase and swing; the build's original enemy constants. The default for enemies without a behaviour."
     },
     "skittish": {
@@ -36,13 +63,136 @@
       "leash": 12.0,
       "run_from": 10.0,
       "rest_animation": 1401,
-      "note": "(R) Troll Summoner, the owner's design 2026-10-15: fights beside its summoned minions; alone it runs 4 s (slower than a running player), rests 3 s playing com_stunned (the window to hit it), then runs again, within 12 m of its spawn."
+      "stance": {"move": "flee", "ms": 4000, "speed": 3.5, "attack": null},
+      "note": "(R) The owner's first design for the Troll Summoner, 2026-10-15: fights beside its summoned minions; alone it runs 4 s (slower than a running player), rests 3 s playing com_stunned (the window to hit it), then runs again, within 12 m of its spawn. In a battle whose helpers carry summon_below_percent the loader adds the ladder: wake the helpers and fight beside them, flee again when they are gone."
     },
     "stationary": {
       "mode": "stationary",
       "reach": 2.5,
       "attack_ms": 1000,
+      "stance": {"move": "hold", "attack": "melee"},
       "note": "(R) Never moves; swings at players within reach. For turrets, totems and guards that hold a doorway."
+    },
+    "troll_summoner": {
+      "mode": "stationary",
+      "leash": 12.0,
+      "stance": {"move": "hold", "attack": null},
+      "rules": [
+        {"id": "start", "when": {"spawned": {"after_ms": 0}}, "do": [{"summon": {"kind": "troll_scoutling", "count": 2, "at": "self", "radius": 4, "tag": "helper", "visual": "mound"}}], "once": true},
+        {"id": "slip", "when": {"hit": {"count": 2}}, "do": [{"relocate": {"to": "away", "min": 8, "max": 18, "effect": "smoke"}}, {"summon": {"kind": "troll_scoutling", "count": 1, "at": "self", "radius": 3, "tag": "helper", "visual": "mound", "wait_ms": 3000}}], "cooldown_ms": 4000},
+        {"id": "half", "when": {"health_below": {"pct": 50}}, "do": [{"summon": {"kind": "troll_rageling", "count": 1, "at": "self", "radius": 3, "tag": "helper", "visual": "mound"}}], "once": true},
+        {"id": "rage", "when": {"health_below": {"pct": 25}}, "do": [{"summon": {"kind": "troll_rageling", "count": 2, "at": "target", "radius": 3, "tag": "helper", "visual": "mound"}}], "once": true}
+      ],
+      "note": "The owner's example (the 'goblin summoner'): keeps its distance, is somewhere else after two hits, raises helpers from earth mounds and repeats; it never attacks, and its helpers outlive it. Written for battle 96's roster (Scoutlings and Ragelings); a fallen helper can be raised again."
+    },
+    "troll_summoner_2009": {
+      "mode": "stationary",
+      "leash": 30.0,
+      "stance": {"move": "hold", "attack": null},
+      "rules": [
+        {"id": "start", "when": {"spawned": {"after_ms": 0}}, "do": [{"summon": {"kind": "troll_runtling", "count": 2, "at": "self", "radius": 5, "tag": "helper", "visual": "mound"}}], "once": true},
+        {"id": "slip", "when": {"hit": {"count": 2}}, "do": [{"relocate": {"to": "away", "min": 15, "max": 30, "effect": "smoke"}}, {"summon": {"kind": "troll_runtling", "count": 2, "at": "self", "radius": 4, "tag": "helper", "visual": "mound", "wait_ms": 3000}}], "cooldown_ms": 4000},
+        {"id": "scout", "when": {"health_below": {"pct": 70}}, "do": [{"summon": {"kind": "troll_scoutling", "count": 1, "at": "self", "tag": "helper", "visual": "mound"}}], "once": true},
+        {"id": "archer", "when": {"health_below": {"pct": 50}}, "do": [{"summon": {"kind": "troll_novice_archer", "count": 1, "at": "self", "tag": "helper", "visual": "mound"}}], "once": true},
+        {"id": "rage", "when": {"health_below": {"pct": 40}}, "do": [{"summon": {"kind": "troll_rageling", "count": 2, "at": "self", "tag": "helper", "visual": "mound"}}], "once": true},
+        {"id": "guards", "when": {"health_below": {"pct": 17}}, "do": [{"summon": {"kind": "troll_young_guardian", "count": 2, "at": "target", "radius": 3, "tag": "helper", "visual": "mound"}}], "once": true}
+      ],
+      "note": "The 2009-10 ladder read from video: Runtlings out at the start, then Scoutling, Novice Archer, Ragelings and Young Guardians as its health falls. Needs a fight that has those actors asleep."
+    },
+    "robgoblin_adept": {
+      "move_speed": 4.0,
+      "leash": 30.0,
+      "stance": {"move": "keep_away", "min": 8, "max": 14, "attack": "adept_firebolt"},
+      "rules": [
+        {"id": "blink1", "when": {"health_below": {"pct": 45}}, "do": [{"relocate": {"to": "away", "min": 20, "max": 30, "effect": "flash"}}, {"heal": {"who": "self", "pct": 50, "wait_ms": 1500}}], "once": true},
+        {"id": "blink2", "when": {"health_below": {"pct": 22}}, "do": [{"relocate": {"to": "away", "min": 20, "max": 30, "effect": "flash"}}, {"heal": {"who": "self", "pct": 48, "wait_ms": 1500}}], "once": true},
+        {"id": "hop", "when": {"every": {"ms": 9000}}, "if": [{"target_within": 5}], "do": [{"relocate": {"to": "away", "min": 10, "max": 16, "effect": "flash"}}]}
+      ],
+      "note": "Flee, heal, return: casts fast at range, teleports out of reach at low health and restores about half its bar, twice."
+    },
+    "bixie_soldier": {
+      "use": "field_roamer",
+      "stance": {"move": "roam", "m": 4, "attack": "bite"},
+      "rules": [
+        {"id": "bite", "when": {"engaged": {}}, "do": [{"stance": {"move": "chase", "attack": "bite"}}]}
+      ],
+      "note": "Open-world notice, chase, give up (captured): the field roamer with the captured bite rhythm."
+    },
+    "frostfang_wave_wolf": {
+      "stance": {"move": "hold", "attack": "bite"},
+      "rules": [
+        {"id": "rush", "when": {"spawned": {"after_ms": 2200}}, "do": [{"set": {"speed": 6.0}}, {"target": {"rule": "nearest"}}, {"stance": {"move": "chase", "attack": "bite"}}], "once": true}
+      ],
+      "chase_limit": 150.0,
+      "note": "Rush from anywhere (captured): 2.2 s after it spawns it runs straight at the nearest player."
+    },
+    "robgoblin_boomer": {
+      "chase_limit": 40.0,
+      "stance": {"move": "hold", "attack": "boomer_bomb"},
+      "rules": [
+        {"id": "see", "when": {"player_within": {"m": 25}}, "do": [{"target": {"rule": "nearest"}}], "once": true}
+      ],
+      "note": "Stand and throw: does not move, lobs a bomb on a fixed rhythm at where its target stands, no retreat."
+    },
+    "rowdy_hooligan": {
+      "use": "melee",
+      "rules": [
+        {"id": "shout", "when": {"engaged": {}}, "do": [{"say": {"text": "Hey! Over here!", "how": "bubble"}}, {"wake": {"tag": "hooligan_pack", "wait_ms": 2000}}], "once": true}
+      ],
+      "note": "Call for help by speech: helpers tagged hooligan_pack arrive two seconds after the shout."
+    },
+    "drone_fauzz": {
+      "use": "melee",
+      "rules": [
+        {"id": "big", "when": {"every": {"ms": 25000, "first_ms": 12000}}, "do": [{"telegraph": {"say": {"text": "Drone Fauzz prepares for a big attack!", "how": "system"}, "ms": 3000, "attack": "big_slam"}}]}
+      ],
+      "note": "Announced special: a system line, three seconds, then a knock-down around it."
+    },
+    "necronomicus": {
+      "use": "melee",
+      "rules": [
+        {"id": "stun", "when": {"every": {"ms": 20000}}, "if": [{"phase": 1}], "do": [{"attack": {"id": "necro_stun"}}]},
+        {"id": "portal", "when": {"health_below": {"pct": 5}}, "if": [{"phase": 0}], "do": [{"say": {"text": "Rise, my servants!", "how": "red"}}, {"set": {"untargetable": true, "invulnerable": true}}, {"summon": {"kind": "zombie_portal", "count": 1, "at": "points", "tag": "portal"}}, {"phase": {"n": 1}}], "once": true},
+        {"id": "return", "when": {"tag_dead": {"tag": "portal", "left": 0}}, "do": [{"become": {"definition": "necronomicus_risen", "health_pct": 100}}], "once": true}
+      ],
+      "note": "Phase, intermission object, second form. (R) The intermission starts just before zero health, so the first form is never seen falling; the spoken line is ours."
+    },
+    "grave_elemental": {
+      "use": "melee",
+      "rules": [
+        {"id": "feed", "when": {"every": {"ms": 4000}}, "if": [{"tag_alive": {"tag": "bone_cluster", "min": 1}}], "do": [{"heal": {"who": "self", "pct": 6}}]},
+        {"id": "slam", "when": {"every": {"ms": 18000}}, "do": [{"status": {"id": "stun", "to": "target", "ms": 3000}}]}
+      ],
+      "note": "Feeds on objects: draws health from bone clusters while any stands."
+    },
+    "spawner_object": {
+      "mode": "stationary",
+      "stance": {"move": "hold", "attack": null},
+      "rules": [
+        {"id": "hatch", "when": {"every": {"ms": 8000, "first_ms": 2000}}, "if": [{"tag_alive": {"tag": "spawn_of_this", "max": 3}}], "do": [{"summon": {"kind": "cave_bat", "count": 1, "at": "self", "radius": 3, "tag": "spawn_of_this"}}]}
+      ],
+      "note": "Bat Spawner, Zombie Portal, spider eggs: an object that releases small enemies until destroyed. A row changes the kind."
+    },
+    "wizard_hildegarde": {
+      "mode": "stationary",
+      "stance": {"move": "hold", "attack": null},
+      "rules": [
+        {"id": "intro", "when": {"spawned": {"after_ms": 0}}, "do": [{"set": {"disposition": 2, "invulnerable": true}}], "once": true},
+        {"id": "stage1", "when": {"talked": {}}, "if": [{"phase": 0}], "do": [{"say": {"text": "Get them!", "how": "bubble"}}, {"wake": {"tag": "pack1"}}, {"phase": {"n": 1}}]},
+        {"id": "move1", "when": {"tag_dead": {"tag": "pack1", "left": 0}}, "do": [{"relocate": {"to": "point:stage2"}}]},
+        {"id": "stage2", "when": {"talked": {}}, "if": [{"phase": 1}], "do": [{"wake": {"tag": "medics"}}, {"phase": {"n": 2}}]},
+        {"id": "fight", "when": {"tag_dead": {"tag": "medics", "left": 0}}, "do": [{"set": {"disposition": 0, "invulnerable": false}}, {"stance": {"move": "keep_away", "min": 6, "max": 12, "attack": "hildegarde_bolt"}}], "once": true}
+      ],
+      "note": "Boss as stage host: a talk-to character who releases a pack per talk and is attackable only at the end."
+    },
+    "zandro_rageracer": {
+      "chase_limit": 150.0,
+      "stance": {"move": "chase", "attack": "boss_light", "leash": false},
+      "rules": [
+        {"id": "adds", "when": {"every": {"ms": 48000, "first_ms": 4000}}, "do": [{"say": {"text": "Commanders, to me!", "how": "red"}}, {"summon": {"kind": "skullz_commander", "count": 2, "at": "ring", "radius": 10, "tag": "adds"}}]},
+        {"id": "heavy", "when": {"every": {"ms": 22000, "first_ms": 10000}}, "do": [{"attack": {"id": "boss_heavy_stun"}}]}
+      ],
+      "note": "Timed adds and a stunning heavy hit; sticks to its target."
     }
   }
 }

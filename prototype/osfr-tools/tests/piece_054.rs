@@ -93,9 +93,12 @@ fn production_melee_reach_is_still_the_reviewed_three_units() {
         "the production repeat gate changed"
     );
     // Enemy reach is tunable data (behaviours.json, the owner 2026-10-15: "change
-    // reach on the fly"); only the code default keeps the reviewed 2.5 m.
+    // reach on the fly"); only the code default keeps the reviewed 2.5 m. Since the
+    // combat brain (2026-11-10) an attack row may carry its own reach; the behaviour's
+    // reach is the fallback and contact is still "within reach".
     assert!(
-        arena.contains("distance(position, s.position) <= b.reach")
+        arena.contains("map_or(b.reach, Attack::reach)")
+            && arena.contains("distance(position, states[i].position) > reach")
             && behaviour.contains("reach: 2.5,"),
         "the reconstructed enemy contact rule changed"
     );
