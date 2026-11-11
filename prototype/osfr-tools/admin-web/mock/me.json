@@ -1,0 +1,1 @@
+{"name":"Marigold Sunvale","account":49,"role":"admin","permissions":["view","mute","unmute","kick","ban","unban","warn","jail","release","note","mail","announce","inventory","coins","quests","move","powers"],"csrf":"mock-csrf","expires_s":28800}

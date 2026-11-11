@@ -1,0 +1,127 @@
+/* Design tokens for the admin panel: every colour, size, radius and timing lives here, so the look can be
+   iterated in this one file. Dark is the default; [data-theme="light"] on <html> switches. */
+:root {
+  color-scheme: dark;
+
+  /* Ground, surfaces (a tone step each), lines (tables and fields only) */
+  --bg: #0e1113;
+  --surface: #151a1d;
+  --surface-2: #1c2226;
+  --surface-3: #252c31;
+  --line: #2a3237;
+  --scrim: rgba(4, 6, 8, 0.62);
+
+  /* Ink */
+  --ink: #e8edef;
+  --ink-2: #abb5bb;
+  --ink-3: #7d8990;
+
+  /* Accent (actions, live state) and status colours, each with a soft fill */
+  --accent: #52d18e;
+  --accent-ink: #052414;
+  --accent-soft: rgba(82, 209, 142, 0.14);
+  --warn: #f2bb52;
+  --warn-soft: rgba(242, 187, 82, 0.14);
+  --danger: #ff6f6b;
+  --danger-ink: #2b0605;
+  --danger-soft: rgba(255, 111, 107, 0.14);
+  --info: #66b6f5;
+  --info-soft: rgba(102, 182, 245, 0.14);
+  --focus: #8ee6b8;
+
+  /* Item tiles and map */
+  --tile: #20272b;
+  --tile-ink: #8d989e;
+  --map-ground: #172024;
+  --map-ink: rgba(232, 237, 239, 0.06);
+  --dot: #52d18e;
+  --dot-ring: #0e1113;
+
+  /* Type */
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --fs-1: 12px;   /* meta, badges */
+  --fs-2: 13px;   /* secondary text, table cells on phone */
+  --fs-3: 14px;   /* body */
+  --fs-4: 16px;   /* card titles */
+  --fs-5: 20px;   /* drawer name */
+  --fs-6: 26px;   /* page title */
+  --fs-7: 38px;   /* big numbers */
+  --lh: 1.5;
+  --track-display: -0.02em;
+
+  /* Space and shape */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --r-card: 16px;
+  --r-ctl: 10px;
+  --r-pill: 999px;
+  --r-tile: 12px;
+
+  /* Layout */
+  --sidebar-w: 232px;
+  --topbar-h: 60px;
+  --drawer-w: 620px;
+  --content-max: 1440px;
+  --gutter: 28px;
+
+  /* Floating things only (dialogs, drawer, menus, toasts) */
+  --shadow-float: 0 24px 64px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  /* Motion */
+  --dur-1: 120ms;
+  --dur-2: 220ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --surface-2: #eef1f0;
+  --surface-3: #e2e7e5;
+  --line: #dbe1df;
+  --scrim: rgba(20, 28, 26, 0.38);
+  --ink: #12181a;
+  --ink-2: #4a565c;
+  --ink-3: #66737a;
+  --accent: #12804b;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(18, 128, 75, 0.11);
+  --warn: #9a6400;
+  --warn-soft: rgba(196, 132, 0, 0.13);
+  --danger: #c8322f;
+  --danger-ink: #ffffff;
+  --danger-soft: rgba(200, 50, 47, 0.1);
+  --info: #1d6fb3;
+  --info-soft: rgba(29, 111, 179, 0.1);
+  --focus: #12804b;
+  --tile: #e7ecea;
+  --tile-ink: #5f6b70;
+  --map-ground: #e4ebe8;
+  --map-ink: rgba(18, 24, 26, 0.07);
+  --dot: #12804b;
+  --dot-ring: #ffffff;
+  --shadow-float: 0 24px 64px rgba(20, 30, 28, 0.18), 0 2px 8px rgba(20, 30, 28, 0.1);
+}
+
+@media (max-width: 760px) {
+  :root {
+    --gutter: 16px;
+    --fs-3: 15px;
+    --fs-6: 22px;
+    --fs-7: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0ms;
+    --dur-2: 0ms;
+  }
+}
