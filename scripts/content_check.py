@@ -197,7 +197,10 @@ ROW_TEXT_MAX = 4096           # model / texture / tint_alias
 LIMIT_WARN = 0.85             # report a limit as near once a file is this full
 ITEM_CANDIDATE_KEYS = {"item_definition_id_candidates", "candidate_item_ids",
                        "candidate_recipe_item_definition_id", "candidate_output_definition_id"}
-DEFINITION_FILES = ("inventory.json", "item-catalogue.json")
+# The release item tables Inventory::parse_content also reads beside inventory.json, after the
+# catalogue (src/inventory.rs; rows decoded by src/inventory_item_table.rs `load`).
+ITEM_TABLE_FILES = ("item-table.json", "item-table-supplement.json")
+DEFINITION_FILES = ("inventory.json", "item-catalogue.json") + ITEM_TABLE_FILES
 # Runtime-package files that hold saved states, proofs or definition rows, not consumers.
 # `startup/` is the gateway's typed startup snapshot (tests/startup_content.rs), not authored records.
 NOT_CONSUMERS = re.compile(r"(^startup/|prior|before-default|quest-inventory|proof|report|repairs|item-definitions)")
@@ -295,6 +298,14 @@ def limit_report(inventory_size, inventory_rows, catalogue_size, catalogue_rows,
             for k, v in values.items()}
 
 
+def item_table_ids(path):
+    """The ids of an item-table.json-shaped file: `rows` of [id, fields, ...] (inventory_item_table.rs)."""
+    document = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    if not isinstance(document, dict) or document.get("schema_version") != 1 or not isinstance(document.get("rows"), list):
+        raise ValueError("needs schema_version 1 and a rows array")
+    return {row[0] for row in document["rows"] if isinstance(row, list) and row and type(row[0]) is int and row[0] > 0}
+
+
 def load_item_definitions(inventory_path, catalogue_path):
     """What Inventory::load would accept from these two files (either may be None).
 
@@ -325,7 +336,18 @@ def load_item_definitions(inventory_path, catalogue_path):
         except ValueError as exc:
             problems = [f"item-catalogue.json is not JSON: {exc}"]
         out["problems"] += problems
-    defined = out["inventory_ids"] | out["catalogue_ids"]
+    # The release item tables beside inventory.json fill what both lack (a bundle or release
+    # carries them from data/release; a lab package may not).
+    out["table_ids"] = set()
+    if inventory_path is not None:
+        for name in ITEM_TABLE_FILES:
+            table = Path(inventory_path).parent / name
+            if table.is_file():
+                try:
+                    out["table_ids"] |= item_table_ids(table)
+                except ValueError as exc:
+                    out["problems"].append(f"{name}: {exc}")
+    defined = out["inventory_ids"] | out["catalogue_ids"] | out["table_ids"]
     state = document.get("default_state") if isinstance(document, dict) else None
     if isinstance(state, dict):
         out["default_state_undefined"] = sorted({i.get("definition_id") for i in state.get("items") or []
@@ -391,11 +413,27 @@ def item_references(content_dir):
     return refs
 
 
+def quest_drop_counters(content_dir):
+    """Quest-drop item ids (field_kill_rewards.json `quest_drops`). One the item tables do not
+    define is a counter with no bag item: the kill credits the quest step directly
+    (src/encounter/field_rewards.rs QuestDrop), so it is not a missing definition."""
+    path = Path(content_dir) / "field_kill_rewards.json"
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8-sig")).get("quest_drops") or []
+    except (OSError, ValueError, AttributeError):
+        return set()
+    return {row["item_id"] for row in rows if isinstance(row, dict) and type(row.get("item_id")) is int}
+
+
 def item_coverage(content_dir, definitions):
     """Per-consumer coverage of a content folder against load_item_definitions' result."""
-    inventory_ids, defined = definitions["inventory_ids"], definitions["inventory_ids"] | definitions["catalogue_ids"]
+    inventory_ids = definitions["inventory_ids"]
+    defined = inventory_ids | definitions["catalogue_ids"] | definitions.get("table_ids", set())
+    counters = quest_drop_counters(content_dir) - defined
     groups = {}
     for ref in item_references(content_dir):
+        if ref["id"] in counters:
+            continue  # a quest counter by design, not a bag item (see quest_drop_counters)
         g = groups.setdefault((ref["file"], ref["field"]),
                               {"file": ref["file"], "field": ref["field"], "candidate": ref["candidate"],
                                "unresolved": ref["unresolved"], "refs": 0, "ids": set()})
@@ -515,7 +553,8 @@ IMAGE_KEY = re.compile(r"^(icon_id|image_id|legacy_icon_id)$|_image_id$")
 ITEM_KEYS = {"item_id", "item_ids", "item_definition_id", "recipe_item_definition_id",
              "adoption_item_ids", "store_item_id", "startup_item_id", "resolved_item_ids"}
 ITEM_CONTEXT = re.compile(r"(items|ingredients|output|prize|reward|drop)", re.I)
-NON_ITEM_CONTEXT = re.compile(r"(enem|boss|spawner|guide|npc)", re.I)
+# `quest_drops[].definition_id` is the enemy kind that drops the item (field_rewards.rs QuestDrop).
+NON_ITEM_CONTEXT = re.compile(r"(enem|boss|spawner|guide|npc|quest_drops)", re.I)
 # Consumers known to display these via Global.Text.<id> (npc_interaction.rs quest_dialogue_choice,
 # quest_engine name_id, ShowDialog body), so a raw hash there renders blank.
 GLOBAL_TEXT_FIELDS = {"title_string_id", "description_string_id", "intro_text_string_id",

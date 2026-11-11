@@ -96,12 +96,25 @@ def copy_repository_content(target: Path, source_dir: Path | None) -> int:
             raise ValueError("--content-source contains no files")
         return count
 
-    prefix = "prototype/osfr-tools/data/content/"
+    # Like a release (lab/release/build_release.py SOURCES): data/content with the publishable
+    # gameplay overlay data/release laid over it, the overlay last so its files win. The item
+    # tables (item-table.json, item-table-supplement.json) that Inventory::parse_content reads
+    # live only in the overlay.
+    count = 0
+    for tree in REPOSITORY_CONTENT_TREES:
+        count += archive_tree(target, tree)
+    if not count:
+        raise ValueError("HEAD repository content directory is empty")
+    return count
+
+
+REPOSITORY_CONTENT_TREES = ("prototype/osfr-tools/data/content", "prototype/osfr-tools/data/release")
+
+
+def archive_tree(target: Path, tree: str) -> int:
+    prefix = tree + "/"
     process = subprocess.Popen(
-        [
-            "git", "-C", str(PROJECT), "archive", "--format=tar", "HEAD",
-            "prototype/osfr-tools/data/content",
-        ],
+        ["git", "-C", str(PROJECT), "archive", "--format=tar", "HEAD", tree],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -145,8 +158,6 @@ def copy_repository_content(target: Path, source_dir: Path | None) -> int:
             process.kill()
         process.wait()
         raise
-    if not count:
-        raise ValueError("HEAD repository content directory is empty")
     return count
 
 
