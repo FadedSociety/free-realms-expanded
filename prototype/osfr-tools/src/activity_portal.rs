@@ -407,6 +407,8 @@ pub struct Catalogue {
     cards: Option<Arc<card_game::Content>>,
     /// L095: the live Games window rows and what starts each one.
     live: Vec<(LiveRow, Runner)>,
+    /// Whether the Treasure War row starts a game (`treasure_war.json` `open`).
+    treasure_war: bool,
 }
 
 impl Catalogue {
@@ -517,6 +519,12 @@ impl Catalogue {
         Ok(catalogue)
     }
 
+    /// Opens or closes the Treasure War row; a rebuilt catalogue starts closed.
+    pub fn with_treasure_war(mut self, open: bool) -> Self {
+        self.treasure_war = open;
+        self
+    }
+
     /// The card-game content behind the card rows, so a rebuild can publish them again.
     pub fn cards(&self) -> Option<&Arc<card_game::Content>> {
         self.cards.as_ref()
@@ -622,13 +630,13 @@ impl Catalogue {
         self.cards.as_ref()?.row(id)
     }
 
-    /// (R) Treasure War has no service; a Trading Card Game row starts only when the card content
-    /// has a launch block (T765) and its data row is joinable.
+    /// Treasure War starts when its own content says it is open; a Trading Card Game row starts
+    /// only when the card content has a launch block (T765) and its data row is joinable.
     fn card_refusal(&self, id: u32) -> Option<Refusal> {
         let launching = (self.cards.as_ref()).is_some_and(|cards| cards.launch().is_some());
         match self.card(id) {
             Some(card) if card.category == card_game::TREASURE_WAR_CATEGORY => {
-                Some(Refusal::TreasureWarClosed)
+                (!self.treasure_war).then_some(Refusal::TreasureWarClosed)
             }
             Some(card) if launching && card.can_player_join => None,
             Some(_) => Some(Refusal::CardGameClosed),

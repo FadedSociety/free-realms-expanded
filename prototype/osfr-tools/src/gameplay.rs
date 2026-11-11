@@ -49,6 +49,7 @@ mod hosted_chess;
 mod music_table;
 mod outcome_merge;
 mod spot_table;
+mod treasure_war_table;
 mod sword_table;
 mod identity;
 mod kart_garage;
@@ -290,6 +291,8 @@ pub struct Gameplay {
     music: Option<crate::music_game::MusicGame>,
     sword: Option<Box<crate::sword_game::SwordGame>>,
     spot: Option<Box<crate::spot_game::SpotGame>>,
+    /// This session's Treasure War table (session-local); `None` without its content.
+    treasure_war: Option<Box<crate::treasure_war_table::TreasureWarTable>>,
     /// L962: this session's Tower Defense run (session-local); `None` without its content. Boxed:
     /// `Gameplay` is cloned on the stack per packet, and inline it overflowed a deep test's 2 MB stack.
     tower_defense: Option<Box<crate::tower_defense::TowerDefense>>,
@@ -1195,9 +1198,10 @@ impl Gameplay {
         let music = music_table::load_music(npc_content)?;
         let (sword, spot) = (sword_table::load_sword(npc_content)?, spot_table::load_spot(npc_content)?);
         let tower_defense = tower_defense_table::load_tower_defense(npc_content)?;
+        let treasure_war = treasure_war_table::load_treasure_war(npc_content)?;
         let ship_combat = crate::ship_combat::Content::load(npc_content)?.map(Arc::new);
         let (menus, drawn) = (&mut npc_interaction, &mut npc_visibility);
-        let bound = (&tower_defense, &ship_combat, &sword, &spot, &music);
+        let bound = (&tower_defense, &ship_combat, &sword, &spot, &music, &treasure_war);
         tower_defense_table::bind_tables(npc_content, bound, menus, drawn)?;
         let games = portal_games::games(
             kart,
@@ -1210,7 +1214,8 @@ impl Gameplay {
             tower_defense.as_deref(),
             ship_combat.is_some(),
         );
-        let activities = portal_games::with_live(activities, folders, &daily_wheel, games)?;
+        let activities = portal_games::with_live(activities, folders, &daily_wheel, games)?
+            .with_treasure_war(treasure_war_table::is_open(&treasure_war));
         if let (Some(spots), Some(interaction)) = (&fishing_spots, &mut npc_interaction) {
             let unknown = interaction.set_fish_gates(&spots.gate_npcs(), spots.menu_string_id());
             for npc in unknown {
@@ -1340,6 +1345,7 @@ impl Gameplay {
             music,
             sword,
             spot,
+            treasure_war,
             tower_defense,
             ship_combat,
             pirates: None,
@@ -2216,16 +2222,7 @@ impl Gameplay {
         if let Some(out) = self.handle_checkers(inner, character.guid, now_ms)? {
             return Ok(out);
         }
-        if let Some(out) = self.handle_music(inner, character.guid, now_ms)? {
-            return Ok(out);
-        }
-        if let Some(out) = self.handle_sword(inner, character.guid, now_ms)? {
-            return Ok(out);
-        }
-        if let Some(out) = self.handle_spot(inner, character.guid, now_ms)? {
-            return Ok(out);
-        }
-        if let Some(out) = self.handle_tower_defense(inner, character.guid, now_ms)? {
+        if let Some(out) = self.handle_table_games(inner, character.guid, now_ms)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_pirates(inner, now_ms)? {

@@ -15,12 +15,13 @@ pub(super) fn load_tower_defense(content: &Path) -> io::Result<Option<Box<TowerD
 /// under its own guid.
 pub(super) fn bind_tables(
     content: &Path,
-    (td, ships, sword, spot, music): (
+    (td, ships, sword, spot, music, treasure_war): (
         &Option<Box<TowerDefense>>,
         &Option<Arc<crate::ship_combat::Content>>,
         &Option<Box<crate::sword_game::SwordGame>>,
         &Option<Box<crate::spot_game::SpotGame>>,
         &Option<crate::music_game::MusicGame>,
+        &Option<Box<crate::treasure_war_table::TreasureWarTable>>,
     ),
     interaction: &mut Option<NpcInteraction>,
     visibility: &mut Option<crate::world::NpcVisibility>,
@@ -30,6 +31,7 @@ pub(super) fn bind_tables(
     boards.extend(super::sword_table::dummy_menus(sword));
     boards.extend(super::spot_table::telescope_menus(spot));
     boards.extend(super::music_table::stand_menus(music));
+    boards.extend(super::treasure_war_table::arena_menus(treasure_war));
     if let Some(interaction) = interaction {
         interaction.set_pirates_stands(&stands);
         interaction.set_board_tables(&boards);
@@ -66,6 +68,28 @@ impl Gameplay {
             },
             None => refused("Finish your Tower Defense game first."),
         })
+    }
+
+    /// One packet for whichever table game is open, in the order the hub used to ask them one by one.
+    pub(super) fn handle_table_games(
+        &mut self,
+        inner: &[u8],
+        player_id: u64,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        if let Some(out) = self.handle_music(inner, player_id, now_ms)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.handle_sword(inner, player_id, now_ms)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.handle_spot(inner, player_id, now_ms)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.handle_tower_defense(inner, player_id, now_ms)? {
+            return Ok(Some(out));
+        }
+        self.handle_treasure_war(inner, player_id, now_ms)
     }
 
     /// One packet while a game is open (`None` otherwise). As for the songs (L961), only the lifecycle

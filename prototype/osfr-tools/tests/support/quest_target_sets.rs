@@ -26,6 +26,7 @@
 //!   | won Hack 'n' Slash (`Gameplay::handle_sword` -> `npc_minigame_win_id_only`) | game id | `sword_game.json` `game_id` |
 //!   | won Spot the Difference (`Gameplay::handle_spot` -> `npc_minigame_win_id_only`) | game id | `spot_game.json` `games[].game_id` |
 //!   | finished Pirate's Plunder match (`Gameplay::settle_pirates`) | arena's row | `ship_combat.json` `arenas[].minigame_id` |
+//!   | won Treasure War game (`Gameplay::handle_treasure_war` -> `npc_minigame_win_id_only`) | game id | `treasure_war.json` `game_id`, while `open` |
 //!   | won Tower Defense game (`Gameplay::handle_tower_defense` -> `npc_minigame_win_id_only`, L962) | game id | `tower_defense.json` `games[].game_id` |
 //!   | in-world challenge win (`Gameplay::settle_world_challenge` -> `npc_minigame_win`) | row id | `world_challenges.json` `challenges[].id` |
 //!
@@ -93,7 +94,7 @@ use osfr_tools::{
     music_game,
     pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
-    ship_combat, soccer_entry, spot_game, sword_game, tower_defense,
+    ship_combat, soccer_entry, spot_game, sword_game, tower_defense, treasure_war,
     world_challenge::Challenges,
 };
 use serde_json::Value;
@@ -255,6 +256,14 @@ impl Targets {
         if root.join(spot_game::CONTENT_FILE).is_file() {
             for game in spot_game::SpotContent::load(root)?.games {
                 targets.producer(u32::try_from(game.game_id).map_err(io::Error::other)?, []);
+            }
+        }
+        // Treasure War's one game, only while `treasure_war.json` is open: a closed game
+        // credits nothing, so no quest step may count on it. No fact.
+        if root.join(treasure_war::CONTENT_FILE).is_file() {
+            let content = treasure_war::Content::load(root)?;
+            if content.open {
+                targets.producer(u32::try_from(content.game_id).map_err(io::Error::other)?, []);
             }
         }
         // L962: every `tower_defense.json` game; the 39/18 total is the client's, so no fact.

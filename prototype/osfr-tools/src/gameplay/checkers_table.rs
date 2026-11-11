@@ -72,6 +72,9 @@ impl Gameplay {
         if (self.spot.as_ref()).is_some_and(|spot| spot.game_ids().any(|id| id as u32 == game)) {
             return self.begin_spot(game);
         }
+        if self.is_treasure_war(game) {
+            return self.begin_treasure_war();
+        }
         if (self.music.as_ref()).is_some_and(|music| music.game_ids().any(|id| id as u32 == game)) {
             return self.begin_music(game);
         }

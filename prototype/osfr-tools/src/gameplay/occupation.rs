@@ -187,10 +187,12 @@ impl Gameplay {
                 .is_some_and(crate::tower_defense::TowerDefense::is_active),
             Occupation::Pirates => self.pirates.is_some(),
             Occupation::Garage => self.garage.is_some(),
-            Occupation::CardGame => self
-                .card_launches
-                .as_ref()
-                .is_some_and(crate::card_game::Launches::is_active),
+            // Treasure War is a card game too, and closes the same gates.
+            Occupation::CardGame => {
+                (self.card_launches.as_ref()).is_some_and(crate::card_game::Launches::is_active)
+                    || (self.treasure_war.as_deref())
+                        .is_some_and(crate::treasure_war_table::TreasureWarTable::is_active)
+            }
             Occupation::Encounter => self.encounter.as_ref().is_some_and(EncounterEngine::active),
             Occupation::Derby => self
                 .derby

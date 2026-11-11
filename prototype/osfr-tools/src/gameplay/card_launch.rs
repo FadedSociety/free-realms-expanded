@@ -16,6 +16,13 @@ impl Gameplay {
         let Some(cards) = self.activities.cards().cloned() else {
             return Ok(());
         };
+        // `admit` let a Treasure War row through, so its own table is open.
+        if cards.row(activity).is_some_and(|row| row.category == crate::card_game::TREASURE_WAR_CATEGORY) {
+            let begun = self.begin_treasure_war()?;
+            out.changed |= begun.changed;
+            out.replies.extend(begun.replies);
+            return Ok(());
+        }
         let (Some(row), Some(launches)) = (cards.row(activity), self.card_launches.as_mut()) else {
             return Ok(());
         };

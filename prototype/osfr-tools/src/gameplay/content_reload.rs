@@ -87,7 +87,8 @@ impl Gameplay {
                             self.tower_defense.as_deref(),
                             self.ship_combat.is_some(),
                         ),
-                    )?;
+                    )?
+                    .with_treasure_war(super::treasure_war_table::is_open(&self.treasure_war));
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         visibility.add_battle_spawners(encounter);
                     }

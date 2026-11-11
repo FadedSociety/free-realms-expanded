@@ -149,6 +149,8 @@ pub mod studio;
 pub mod style_cards;
 pub mod terrain;
 pub mod tower_defense;
+pub mod treasure_war;
+pub mod treasure_war_table;
 pub mod trace;
 pub mod trade;
 pub mod world;
