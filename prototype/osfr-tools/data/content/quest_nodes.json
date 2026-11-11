@@ -4925,6 +4925,54 @@
         "drop_table": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool"
       },
       "name_id": 390816
+    },
+    {
+      "key": "quest-junk-q3957432",
+      "name": "Junk",
+      "model_id": 333,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 23318
+    },
+    {
+      "key": "quest-sap-samples-q3010008",
+      "name": "Sap Samples",
+      "model_id": 3832,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 77081
     }
   ],
   "pools": [
@@ -8001,6 +8049,36 @@
         "node_type": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
         "max_active_nodes": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
         "respawn_seconds": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool"
+      }
+    },
+    {
+      "key": "quest-junk-q3957432",
+      "zone_definition_id": 1,
+      "node_type": "quest-junk-q3957432",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-sap-samples-q3010008",
+      "zone_definition_id": 1,
+      "node_type": "quest-sap-samples-q3010008",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       }
     }
   ],
@@ -21394,6 +21472,102 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100022,
+      "pool_key": "quest-junk-q3957432",
+      "zone_definition_id": 1,
+      "position": [
+        576.22,
+        88.93,
+        1957.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100023,
+      "pool_key": "quest-junk-q3957432",
+      "zone_definition_id": 1,
+      "position": [
+        582.22,
+        89.19,
+        1955.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100024,
+      "pool_key": "quest-junk-q3957432",
+      "zone_definition_id": 1,
+      "position": [
+        588.22,
+        89.4,
+        1957.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100025,
+      "pool_key": "quest-sap-samples-q3010008",
+      "zone_definition_id": 1,
+      "position": [
+        -1558.55,
+        -33.24,
+        -658.1
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it; height set on the measured ground under it (world editor probe, 2026-11-10)",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100026,
+      "pool_key": "quest-sap-samples-q3010008",
+      "zone_definition_id": 1,
+      "position": [
+        -1562.25,
+        -34.08,
+        -652.56
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it; height set on the measured ground under it (world editor probe, 2026-11-10)",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100027,
+      "pool_key": "quest-sap-samples-q3010008",
+      "zone_definition_id": 1,
+      "position": [
+        -1568.79,
+        -33.66,
+        -653.86
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it; height set on the measured ground under it (world editor probe, 2026-11-10)",
         "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       }
     }

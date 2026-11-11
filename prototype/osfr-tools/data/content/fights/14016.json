@@ -1,0 +1,459 @@
+{
+  "schema_version": 1,
+  "id": 14016,
+  "kind": "dungeon",
+  "title_id": 6488,
+  "description_id": 92500,
+  "icon_id": 28605,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5,
+    "interact": {
+      "npc_guid": 100000046204
+    }
+  },
+  "place": {
+    "zone": 1218,
+    "arena": "sh_howling_hills",
+    "arrive": [
+      135.13,
+      50.2,
+      192.14
+    ],
+    "exit_door": [
+      39.92,
+      21.7,
+      59.74
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "ice_troll": {
+      "definition_id": 930061,
+      "name": "Ice Troll",
+      "name_id": 4212,
+      "model_id": 100,
+      "rank": "boss"
+    },
+    "ice_wolf_trainer": {
+      "definition_id": 950036,
+      "name": "Ice Wolf Trainer",
+      "name_id": 92194,
+      "model_id": 100,
+      "rank": "normal"
+    },
+    "snognosh": {
+      "definition_id": 950037,
+      "name": "Snognosh",
+      "name_id": 5044,
+      "model_id": 100,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "snow_wolf": {
+      "definition_id": 950035,
+      "name": "Snow Wolf",
+      "name_id": 103604,
+      "model_id": 176,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "ice_troll",
+      "at": [
+        163.85,
+        41.44,
+        172.79
+      ],
+      "heading": -1.336,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "snow_wolf",
+      "at": [
+        162.89,
+        42.26,
+        176.25
+      ],
+      "heading": -1.703,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        160.32,
+        42.21,
+        172.57
+      ],
+      "heading": -1.178,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "snow_wolf",
+      "at": [
+        211.49,
+        38.4,
+        158.33
+      ],
+      "heading": -1.626,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        208.13,
+        38.05,
+        158.16
+      ],
+      "heading": -1.628,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "ice_troll",
+      "at": [
+        214.34,
+        38.59,
+        158.94
+      ],
+      "heading": -1.651,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        226.3,
+        37.04,
+        118.9
+      ],
+      "heading": 0.199,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "ice_troll",
+      "at": [
+        224.44,
+        37.04,
+        116.24
+      ],
+      "heading": 0.287,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "snow_wolf",
+      "at": [
+        226.34,
+        37.06,
+        122.05
+      ],
+      "heading": 0.266,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "ice_troll",
+      "at": [
+        192.79,
+        37.03,
+        95.62
+      ],
+      "heading": 1.808,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "snow_wolf",
+      "at": [
+        188.28,
+        37.01,
+        93.14
+      ],
+      "heading": 1.422,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        197.4,
+        37.01,
+        94.5
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "snow_wolf",
+      "at": [
+        135.4,
+        36.93,
+        78.04
+      ],
+      "heading": 0.577,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        133.17,
+        37.06,
+        76.06
+      ],
+      "heading": 0.626,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "ice_troll",
+      "at": [
+        135.71,
+        37.23,
+        74.49
+      ],
+      "heading": 0.444,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        94.36,
+        24.28,
+        88.48
+      ],
+      "heading": 1.59,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "ice_troll",
+      "at": [
+        89.44,
+        23.11,
+        88.78
+      ],
+      "heading": 1.599,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "snow_wolf",
+      "at": [
+        99.25,
+        25.69,
+        89.8
+      ],
+      "heading": 1.694,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "ice_troll",
+      "at": [
+        57.1,
+        21.33,
+        79.15
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "snow_wolf",
+      "at": [
+        59.56,
+        21.95,
+        80.07
+      ],
+      "heading": -1.927,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "ice_wolf_trainer",
+      "at": [
+        56.94,
+        21.07,
+        82.18
+      ],
+      "heading": 3.088,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "snognosh",
+      "at": [
+        46.15,
+        21.45,
+        55.75
+      ],
+      "heading": 1.178,
+      "boss": true,
+      "scale": 1.6,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_ice_wolf_trainer": [
+      [
+        44.81,
+        21.68,
+        52.39
+      ]
+    ],
+    "w1_snow_wolf": [
+      [
+        49.9,
+        21.39,
+        54.5
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "ice_wolf_trainer",
+          "count": 1,
+          "at": "w1_ice_wolf_trainer"
+        },
+        {
+          "definition": "snow_wolf",
+          "count": 1,
+          "at": "w1_snow_wolf"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 141088,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 5055,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 6488 'Howling Hills' (title), 92500 (card), objective 141088; icon 28605."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/howling_hills.json: difficulty 3, zone 'Snowhill', enemies ['Snognosh', 'Ice Trolls', 'Wolves', 'Big Mean Ice Trolls', 'Snognosh']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [387.37, 117.92, -16.93]: BJX fork Battles.lua:25 (Npcs.json Id 46204, sh_gates_01.adr). (R) the fork's own placement, not a captured one. Region Snowhill, place Snowhill."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 19 ('Howling Hills (the live dungeon: ice trolls and their snow wolves from the cave mouth past the troll standards'): scene sh_howling_hills, entry, exit, 8 waves, 24 spawns ({'Ice Troll': 7, 'Snow Wolf': 8, 'Ice Wolf Trainer': 8, 'Snognosh': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1218 is the fork's; ours must be assigned and the scene sh_howling_hills has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 45 coins / 180 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046204: reference Npcs.json Id 46204, model 111, name 6488, at [387.37, 117.92, -16.93]."
+    }
+  ]
+}

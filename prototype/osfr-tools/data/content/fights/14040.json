@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "id": 14040,
+  "kind": "battle",
+  "title_id": 141043,
+  "description_id": 385617,
+  "icon_id": 12616,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5,
+    "starter": {
+      "definition": "pca_trickster",
+      "at": [
+        24.38,
+        24.71,
+        -387.57
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1239,
+    "arena": "sg_random_encounter_01",
+    "arrive": [
+      239.42,
+      3.31,
+      186.49
+    ],
+    "exit_door": [
+      242.19,
+      0.46,
+      197.62
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "pca_operative": {
+      "definition_id": 950107,
+      "name": "PCA Operative",
+      "name_id": 383059,
+      "model_id": 519,
+      "rank": "boss",
+      "boss": true
+    },
+    "pca_trickster": {
+      "definition_id": 950106,
+      "name": "PCA Trickster",
+      "name_id": 130764,
+      "model_id": 489,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "pca_operative",
+      "at": [
+        228.78,
+        0.71,
+        233.01
+      ],
+      "heading": 2.917,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_pca_trickster": [
+      [
+        207.54,
+        2.92,
+        160.0
+      ],
+      [
+        226.54,
+        4.28,
+        153.76
+      ],
+      [
+        201.23,
+        1.49,
+        177.44
+      ]
+    ],
+    "w2_pca_operative": [
+      [
+        224.89,
+        1.11,
+        221.9
+      ],
+      [
+        205.99,
+        1.96,
+        200.68
+      ],
+      [
+        229.46,
+        1.63,
+        217.72
+      ]
+    ],
+    "w3_pca_trickster": [
+      [
+        280.09,
+        5.45,
+        173.39
+      ],
+      [
+        263.95,
+        1.13,
+        213.93
+      ]
+    ],
+    "w3_pca_operative": [
+      [
+        274.52,
+        4.66,
+        178.9
+      ],
+      [
+        286.9,
+        8.44,
+        180.93
+      ]
+    ],
+    "w4_pca_trickster": [
+      [
+        239.28,
+        2.42,
+        219.25
+      ],
+      [
+        247.19,
+        1.89,
+        225.61
+      ],
+      [
+        220.88,
+        0.58,
+        222.86
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "pca_trickster",
+          "count": 3,
+          "at": "w1_pca_trickster"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "pca_operative",
+          "count": 3,
+          "at": "w2_pca_operative"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "pca_trickster",
+          "count": 2,
+          "at": "w3_pca_trickster"
+        },
+        {
+          "definition": "pca_operative",
+          "count": 2,
+          "at": "w3_pca_operative"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "pca_trickster",
+          "count": 3,
+          "at": "w4_pca_trickster"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3",
+          "w4"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w4",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 141043 'Return to Sender!' (title), 385617 (card), objective 76355; icon 12616."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/return_to_sender.json: difficulty 3, zone 'Wilds (northeast / northern Wilds)', enemies ['Evil Postman', 'Mailbit', 'Mailbit']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [24.38, 24.71, -387.57]: BJX fork Battles.lua:88 (Npcs.json Id 46261, fairy_m_hooligan_brawler_01.agr). (R) the fork's own placement, not a captured one. Region Wugachug, place Wugachug."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 96 ('Return to Sender! (the live random encounter: the Postal Chaos Alliance by Wugachug's post office)'): scene sg_random_encounter_01, entry, exit, 4 waves, 14 spawns ({'PCA Trickster': 8, 'PCA Operative': 6})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1239 is the fork's; ours must be assigned and the scene sg_random_encounter_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 45 coins / 180 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

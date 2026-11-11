@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "id": 14025,
+  "kind": "battle",
+  "title_id": 75999,
+  "description_id": 76363,
+  "icon_id": 313,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "starter": {
+      "definition": "w58b_tormented_spirit",
+      "at": [
+        -2376.57,
+        -23.96,
+        1224.16
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1249,
+    "arena": "bs_random_encounter_01",
+    "arrive": [
+      143.66,
+      2.9,
+      135.52
+    ],
+    "exit_door": [
+      145.43,
+      3.78,
+      143.75
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "ghostly_digger": {
+      "definition_id": 950057,
+      "name": "Ghostly Digger",
+      "name_id": 414852,
+      "model_id": 10,
+      "rank": "normal"
+    },
+    "w58b_tormented_spirit": {
+      "definition_id": 930044,
+      "name": "Tormented Spirit",
+      "name_id": 76190,
+      "model_id": 10,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1_w58b_tormented_spirit": [
+      [
+        120.6,
+        3.26,
+        130.26
+      ],
+      [
+        117.31,
+        2.87,
+        133.89
+      ],
+      [
+        118.64,
+        3.04,
+        127.44
+      ]
+    ],
+    "w2_w58b_tormented_spirit": [
+      [
+        118.66,
+        3.31,
+        160.17
+      ],
+      [
+        116.16,
+        1.92,
+        142.21
+      ]
+    ],
+    "w2_ghostly_digger": [
+      [
+        124.13,
+        3.36,
+        150.81
+      ],
+      [
+        141.15,
+        2.78,
+        177.67
+      ]
+    ],
+    "w3_w58b_tormented_spirit": [
+      [
+        148.18,
+        4.03,
+        160.29
+      ],
+      [
+        155.19,
+        4.1,
+        150.67
+      ],
+      [
+        166.77,
+        4.89,
+        134.0
+      ],
+      [
+        152.18,
+        2.14,
+        168.11
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58b_tormented_spirit",
+          "count": 3,
+          "at": "w1_w58b_tormented_spirit"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58b_tormented_spirit",
+          "count": 2,
+          "at": "w2_w58b_tormented_spirit"
+        },
+        {
+          "definition": "ghostly_digger",
+          "count": 2,
+          "at": "w2_ghostly_digger"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58b_tormented_spirit",
+          "count": 4,
+          "at": "w3_w58b_tormented_spirit"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 75999 'Tormented Spirits!' (title), 76363 (card), objective 76355; icon 313."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-2376.57, -23.96, 1224.16]: BJX fork Battles.lua:62 (Npcs.json Id 46237, graveelemental_m_ghost.adr). (R) the fork's own placement, not a captured one. Region Blackspore, place Blackspore."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 64 ('Tormented Spirits! (the live random encounter: tormented spirits near Bone Bog Cemetery)'): scene bs_random_encounter_01, entry, exit, 3 waves, 11 spawns ({'Tormented Spirit': 9, 'Ghostly Digger': 2})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1249 is the fork's; ours must be assigned and the scene bs_random_encounter_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

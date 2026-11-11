@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "id": 14038,
+  "kind": "battle",
+  "title_id": 93264,
+  "description_id": 115960,
+  "icon_id": 311,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "forest_snake",
+      "at": [
+        -724.3,
+        -50.0,
+        1763.64
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1246,
+    "arena": "bw_random_encounter_02",
+    "arrive": [
+      138.48,
+      1.35,
+      138.04
+    ],
+    "exit_door": [
+      151.89,
+      0.26,
+      144.61
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "forest_snake": {
+      "definition_id": 950100,
+      "name": "Forest Snake",
+      "name_id": 15847,
+      "model_id": 180,
+      "rank": "normal"
+    },
+    "maze_viper": {
+      "definition_id": 950101,
+      "name": "Maze Viper",
+      "name_id": 4230,
+      "model_id": 180,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1_forest_snake": [
+      [
+        137.17,
+        2.0,
+        118.9
+      ],
+      [
+        116.34,
+        2.29,
+        123.92
+      ],
+      [
+        122.33,
+        2.84,
+        128.26
+      ]
+    ],
+    "w2_maze_viper": [
+      [
+        147.7,
+        -0.86,
+        176.8
+      ],
+      [
+        119.71,
+        1.2,
+        141.03
+      ]
+    ],
+    "w2_forest_snake": [
+      [
+        149.88,
+        -1.65,
+        183.28
+      ]
+    ],
+    "w3_forest_snake": [
+      [
+        156.35,
+        0.4,
+        146.09
+      ],
+      [
+        179.96,
+        1.49,
+        156.01
+      ],
+      [
+        160.14,
+        1.18,
+        157.96
+      ],
+      [
+        157.45,
+        0.45,
+        149.48
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "forest_snake",
+          "count": 3,
+          "at": "w1_forest_snake"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "maze_viper",
+          "count": 2,
+          "at": "w2_maze_viper"
+        },
+        {
+          "definition": "forest_snake",
+          "count": 1,
+          "at": "w2_forest_snake"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "forest_snake",
+          "count": 4,
+          "at": "w3_forest_snake"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 115954,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 93264 'Snakes in a Maze!' (title), 115960 (card), objective 115954; icon 311."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/snakes_in_a_maze.json: difficulty 1, zone 'Briarwood (Thistlerow hedge maze)', enemies ['Amazing Asp', 'Killer Cobra']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-724.3, -50.0, 1763.64]: BJX fork Battles.lua:74 (Npcs.json Id 46247, snake.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 76 ('Snakes in a Maze! (the live random encounter: venomous snakes in the hedge maze)'): scene bw_random_encounter_02, entry, exit, 3 waves, 10 spawns ({'Forest Snake': 8, 'Maze Viper': 2})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1246 is the fork's; ours must be assigned and the scene bw_random_encounter_02 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

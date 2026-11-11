@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "id": 14001,
+  "kind": "dungeon",
+  "title_id": 5711,
+  "description_id": 16024,
+  "icon_id": 665,
+  "difficulty": 1,
+  "entry": {
+    "interact": {
+      "npc_guid": 100000046195
+    }
+  },
+  "place": {
+    "zone": 1235,
+    "arena": "sg_cliffs_of_insanity",
+    "arrive": [
+      154.34,
+      45.37,
+      52.42
+    ],
+    "exit_door": [
+      247.97,
+      30.27,
+      189.4
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "shadow_talon_blade": {
+      "definition_id": 950002,
+      "name": "Shadow Talon Blade",
+      "name_id": 15567,
+      "model_id": 394,
+      "rank": "normal"
+    },
+    "shadow_talon_master": {
+      "definition_id": 950004,
+      "name": "Shadow Talon Master",
+      "name_id": 39871,
+      "model_id": 4094,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "shadow_talon_ninja": {
+      "definition_id": 950001,
+      "name": "Shadow Talon Ninja",
+      "name_id": 15568,
+      "model_id": 396,
+      "rank": "elite"
+    },
+    "trained_eagle": {
+      "definition_id": 950003,
+      "name": "Trained Eagle",
+      "name_id": 15572,
+      "model_id": 127,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "shadow_talon_ninja",
+      "at": [
+        155.2,
+        47.78,
+        83.92
+      ],
+      "heading": -2.519,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "shadow_talon_blade",
+      "at": [
+        152.76,
+        47.81,
+        84.98
+      ],
+      "heading": -3.099,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "trained_eagle",
+      "at": [
+        151.59,
+        47.79,
+        81.11
+      ],
+      "heading": 2.303,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "shadow_talon_blade",
+      "at": [
+        158.58,
+        36.63,
+        122.91
+      ],
+      "heading": 2.957,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "trained_eagle",
+      "at": [
+        155.22,
+        37.44,
+        121.7
+      ],
+      "heading": 2.704,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "shadow_talon_ninja",
+      "at": [
+        156.99,
+        38.22,
+        118.31
+      ],
+      "heading": 2.72,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "trained_eagle",
+      "at": [
+        157.37,
+        33.48,
+        148.73
+      ],
+      "heading": 2.66,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "shadow_talon_ninja",
+      "at": [
+        155.76,
+        33.54,
+        146.1
+      ],
+      "heading": 0.922,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "shadow_talon_blade",
+      "at": [
+        159.02,
+        33.15,
+        145.19
+      ],
+      "heading": -0.416,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "shadow_talon_ninja",
+      "at": [
+        186.27,
+        32.17,
+        149.04
+      ],
+      "heading": 2.619,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "shadow_talon_blade",
+      "at": [
+        187.95,
+        32.02,
+        146.39
+      ],
+      "heading": -0.568,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "trained_eagle",
+      "at": [
+        189.15,
+        32.54,
+        151.02
+      ],
+      "heading": -2.246,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "shadow_talon_blade",
+      "at": [
+        222.52,
+        30.4,
+        170.62
+      ],
+      "heading": -1.985,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "trained_eagle",
+      "at": [
+        219.65,
+        30.43,
+        169.69
+      ],
+      "heading": -2.027,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "shadow_talon_ninja",
+      "at": [
+        220.76,
+        30.05,
+        166.78
+      ],
+      "heading": -1.606,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "shadow_talon_master",
+      "at": [
+        244.72,
+        30.54,
+        188.96
+      ],
+      "heading": -2.287,
+      "boss": true,
+      "scale": 1.15,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_shadow_talon_blade": [
+      [
+        246.09,
+        30.68,
+        186.13
+      ]
+    ],
+    "w1_trained_eagle": [
+      [
+        239.73,
+        31.13,
+        187.81
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "shadow_talon_blade",
+          "count": 1,
+          "at": "w1_shadow_talon_blade"
+        },
+        {
+          "definition": "trained_eagle",
+          "count": 1,
+          "at": "w1_trained_eagle"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 22250,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 5711 'Danger Peaks' (title), 16024 (card), objective 22250; icon 665."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/danger_peaks.json: difficulty 2, zone 'Wilds (Southern Wilds)', enemies ['Taka the Shadow', 'Shadow Talon Ninja(s)', 'Shadow Talon Master(s)', 'Hawks / giant birds', 'Taka the Shadow']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-1433.58, -13.73, -904.22]: BJX fork Battles.lua:16 (Npcs.json Id 46195, sh_corral_gate_01.adr). (R) the fork's own placement, not a captured one. Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 36 ('Danger Peaks (the live dungeon: Shadow Talon ninjas and their trained eagles from the south camp round the pea'): scene sg_cliffs_of_insanity, entry, exit, 6 waves, 18 spawns ({'Shadow Talon Ninja': 5, 'Shadow Talon Blade': 6, 'Trained Eagle': 6, 'Shadow Talon Master': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1235 is the fork's; ours must be assigned and the scene sg_cliffs_of_insanity has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046195: reference Npcs.json Id 46195, model 15208, name 5711, at [-1433.58, -13.73, -904.22]."
+    }
+  ]
+}

@@ -664,10 +664,62 @@
       "prerequisite_quest_ids": [
         3110007
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 91274,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Frostfang Snarlers - 0/36 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_trouble_in_snowhill_d00590)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'frostfang snarler' is definition [3592]"
+            }
+          ],
+          "model_id": 3592,
+          "count": 36
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 388422,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Frostfang Growlers - 0/22 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_trouble_in_snowhill_d00590)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'frostfang growler' is definition [2529]"
+            }
+          ],
+          "model_id": 2529,
+          "count": 22
+        },
+        {
+          "kind": "defeat",
+          "id": 3,
+          "text_string_id": 388631,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Yetis - 0/36 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_trouble_in_snowhill_d00590)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'yeti' is definition [930073]"
+            }
+          ],
+          "model_id": 930073,
+          "count": 36
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 20,
           "items": [],
           "job_xp": {
             "2": 75
@@ -676,6 +728,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 75 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110008)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "20 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_trouble_in_snowhill_d00590)."
             }
           ]
         }
@@ -716,12 +772,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 388401,
       "intro_text_string_id": 388399,
       "end_text_string_id": 388402,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110009,
@@ -1888,10 +1948,70 @@
       "prerequisite_quest_ids": [
         3110024
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 388448,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Stealthy Despoilers - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_spirits_and_spider_trainers_e32f74)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'stealthy despoiler' is definition [930021]"
+            }
+          ],
+          "model_id": 930021,
+          "count": 8
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 388839,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Troll Naturalists - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_spirits_and_spider_trainers_e32f74)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'troll naturalist' is definition [3135]"
+            }
+          ],
+          "model_id": 3135,
+          "count": 10
+        },
+        {
+          "kind": "defeat",
+          "id": 3,
+          "text_string_id": 388842,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Spider Trainers - 0/20 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_spirits_and_spider_trainers_e32f74)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'Grexan's Camp' is fight 14050"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the enemy is kind 3148 of fight 14050 (lab quest-fights table, 2026-11-09): only that kind counts."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) kind 3148 also stands in the open world (field_enemies.json), so the step is not tied to fight 14050."
+            }
+          ],
+          "count": 20,
+          "model_id": 3148
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "2": 350
@@ -1900,6 +2020,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 350 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110025)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_spirits_and_spider_trainers_e32f74)."
             }
           ]
         }
@@ -1940,12 +2064,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 388413,
       "intro_text_string_id": 388411,
       "end_text_string_id": 388414,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110026,

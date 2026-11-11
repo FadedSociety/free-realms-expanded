@@ -1,0 +1,469 @@
+{
+  "schema_version": 1,
+  "id": 14019,
+  "kind": "battle",
+  "title_id": 93276,
+  "description_id": 104171,
+  "icon_id": 28605,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "frostfang_growler",
+      "at": [
+        -84.62,
+        8.75,
+        393.1
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1200,
+    "arena": "sg_random_encounter_clearing",
+    "arrive": [
+      130.11,
+      0.69,
+      120.04
+    ],
+    "exit_door": [
+      145.0,
+      0.0,
+      173.35
+    ],
+    "sky": "sky_wilds24.xml",
+    "geometry_id": 214
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "frostfang_alpha": {
+      "definition_id": 930082,
+      "name": "Frostfang Alpha",
+      "name_id": 423045,
+      "model_id": 176,
+      "rank": "boss",
+      "scale": 1.7,
+      "boss": true
+    },
+    "frostfang_growler": {
+      "definition_id": 2529,
+      "name": "Frostfang Growler",
+      "name_id": 104067,
+      "model_id": 3284,
+      "rank": "normal"
+    },
+    "frostfang_howler": {
+      "definition_id": 930081,
+      "name": "Frostfang Howler",
+      "name_id": 115837,
+      "model_id": 177,
+      "rank": "normal"
+    },
+    "frostfang_prowler": {
+      "definition_id": 930080,
+      "name": "Frostfang Prowler",
+      "name_id": 116023,
+      "model_id": 177,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "frostfang_alpha",
+      "at": [
+        154.32,
+        1.96,
+        209.35
+      ],
+      "heading": -2.818,
+      "boss": true,
+      "scale": 1.7,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_frostfang_howler": [
+      [
+        129.33,
+        -0.73,
+        171.81
+      ]
+    ],
+    "w2_frostfang_growler": [
+      [
+        166.08,
+        0.35,
+        197.34
+      ],
+      [
+        122.4,
+        0.56,
+        114.63
+      ],
+      [
+        102.58,
+        0.73,
+        203.86
+      ],
+      [
+        104.37,
+        1.56,
+        131.93
+      ]
+    ],
+    "w2_frostfang_prowler": [
+      [
+        139.08,
+        1.64,
+        113.27
+      ],
+      [
+        160.33,
+        1.69,
+        137.58
+      ]
+    ],
+    "w3_frostfang_growler": [
+      [
+        99.96,
+        0.78,
+        138.62
+      ],
+      [
+        157.86,
+        0.72,
+        127.6
+      ],
+      [
+        102.5,
+        1.44,
+        131.17
+      ],
+      [
+        169.48,
+        0.63,
+        153.74
+      ],
+      [
+        120.73,
+        1.59,
+        111.62
+      ],
+      [
+        140.46,
+        1.76,
+        113.18
+      ],
+      [
+        97.46,
+        0.24,
+        173.99
+      ]
+    ],
+    "w3_frostfang_prowler": [
+      [
+        197.86,
+        2.03,
+        173.21
+      ],
+      [
+        166.08,
+        0.35,
+        197.34
+      ]
+    ],
+    "w4_frostfang_growler": [
+      [
+        101.83,
+        -0.09,
+        190.66
+      ],
+      [
+        111.27,
+        0.8,
+        125.0
+      ],
+      [
+        111.35,
+        -0.19,
+        210.22
+      ],
+      [
+        158.58,
+        1.58,
+        137.1
+      ],
+      [
+        97.55,
+        1.72,
+        160.75
+      ],
+      [
+        138.88,
+        2.02,
+        115.44
+      ],
+      [
+        111.35,
+        -0.19,
+        210.22
+      ],
+      [
+        138.88,
+        2.02,
+        115.44
+      ]
+    ],
+    "w4_frostfang_prowler": [
+      [
+        170.8,
+        0.48,
+        191.63
+      ],
+      [
+        136.48,
+        -0.36,
+        209.45
+      ]
+    ],
+    "w5_frostfang_growler": [
+      [
+        97.03,
+        0.26,
+        174.44
+      ],
+      [
+        108.96,
+        0.02,
+        209.94
+      ],
+      [
+        118.6,
+        0.94,
+        118.9
+      ],
+      [
+        97.03,
+        0.26,
+        174.44
+      ],
+      [
+        108.96,
+        0.02,
+        209.94
+      ],
+      [
+        108.96,
+        0.02,
+        209.94
+      ],
+      [
+        118.6,
+        0.94,
+        118.9
+      ],
+      [
+        118.6,
+        0.94,
+        118.9
+      ]
+    ],
+    "w5_frostfang_prowler": [
+      [
+        183.62,
+        1.1,
+        183.02
+      ],
+      [
+        183.2,
+        0.85,
+        163.49
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_howler",
+          "count": 1,
+          "at": "w1_frostfang_howler"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_growler",
+          "count": 4,
+          "at": "w2_frostfang_growler"
+        },
+        {
+          "definition": "frostfang_prowler",
+          "count": 2,
+          "at": "w2_frostfang_prowler"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_growler",
+          "count": 7,
+          "at": "w3_frostfang_growler"
+        },
+        {
+          "definition": "frostfang_prowler",
+          "count": 2,
+          "at": "w3_frostfang_prowler"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_growler",
+          "count": 8,
+          "at": "w4_frostfang_growler"
+        },
+        {
+          "definition": "frostfang_prowler",
+          "count": 2,
+          "at": "w4_frostfang_prowler"
+        }
+      ]
+    },
+    {
+      "id": "w5",
+      "when": {
+        "wave_left": {
+          "wave": "w4",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_growler",
+          "count": 8,
+          "at": "w5_frostfang_growler"
+        },
+        {
+          "definition": "frostfang_prowler",
+          "count": 2,
+          "at": "w5_frostfang_prowler"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 104176,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3",
+          "w4",
+          "w5"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w5",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 93276 'Frostfang Growler!' (title), 104171 (card), objective 104176; icon 28605."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-84.62, 8.75, 393.1]: BJX fork FabledRealms.lua:4101 (Npcs.json Id 33936, wolf.adr). (R) the fork's own placement, not a captured one. Region None, place None."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 1 ('Frostfang Growler! (the live battle: Frostfang Growlers in Snowhill start it)'): scene sg_random_encounter_clearing, entry, exit, 5 waves, 37 spawns ({'Frostfang Howler': 1, 'Frostfang Growler': 27, 'Frostfang Prowler': 8, 'Frostfang Alpha': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Wave spots are the fork's claim of a live capture (battle 1). Zone number 1200 is the fork's; ours must be assigned and the scene sg_random_encounter_clearing has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

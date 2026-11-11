@@ -3758,11 +3758,66 @@
       "prerequisite_quest_ids": [
         3000039
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 90878,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Fungus Golems - 0/15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_there_s_fungus_among_us_87e0c4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'Fungus Golem' is definition [2660]"
+            }
+          ],
+          "model_id": 2660,
+          "count": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90882,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lieutenant Snibug at the Tanglewood Fort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_there_s_fungus_among_us_87e0c4)."
+            }
+          ],
+          "npc_id": 9500000163
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 3021,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Health Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_there_s_fungus_among_us_87e0c4)."
+                }
+              ]
+            },
+            {
+              "definition_id": 32437,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Heart T-Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_there_s_fungus_among_us_87e0c4)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -3770,6 +3825,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000040)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_there_s_fungus_among_us_87e0c4)."
             }
           ]
         }
@@ -3814,12 +3873,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 90873,
       "intro_text_string_id": 90871,
       "end_text_string_id": 90874,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000041,

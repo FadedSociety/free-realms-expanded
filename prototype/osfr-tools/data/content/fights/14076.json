@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "id": 14076,
+  "kind": "battle",
+  "title_id": 74377,
+  "description_id": 75456,
+  "icon_id": 310,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "thugawug_bumbler",
+      "at": [
+        -1877.32,
+        -29.35,
+        -632.98
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1242,
+    "arena": "sg_random_encounter_02",
+    "arrive": [
+      139.68,
+      1.12,
+      147.24
+    ],
+    "exit_door": [
+      143.59,
+      0.31,
+      157.32
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bandit_patrolman": {
+      "definition_id": 3460,
+      "name": "Bandit Patrolman",
+      "name_id": 440716,
+      "model_id": 199,
+      "rank": "normal"
+    },
+    "thugawug_bumbler": {
+      "definition_id": 3491,
+      "name": "Thugawug Bumbler!",
+      "name_id": 75453,
+      "model_id": 200,
+      "rank": "boss"
+    },
+    "thugawug_stomper": {
+      "definition_id": 950013,
+      "name": "Thugawug Stomper",
+      "name_id": 440717,
+      "model_id": 200,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "thugawug_bumbler",
+      "at": [
+        122.97,
+        -0.84,
+        179.5
+      ],
+      "heading": 2.664,
+      "boss": true,
+      "scale": 1.3,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_bandit_patrolman": [
+      [
+        112.88,
+        0.74,
+        144.99
+      ],
+      [
+        115.44,
+        1.35,
+        133.2
+      ]
+    ],
+    "w2_thugawug_stomper": [
+      [
+        114.48,
+        -0.3,
+        181.6
+      ],
+      [
+        139.47,
+        -0.76,
+        175.29
+      ]
+    ],
+    "w2_bandit_patrolman": [
+      [
+        123.8,
+        0.13,
+        153.98
+      ]
+    ],
+    "w3_bandit_patrolman": [
+      [
+        121.07,
+        0.0,
+        190.4
+      ],
+      [
+        149.34,
+        0.6,
+        160.6
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bandit_patrolman",
+          "count": 2,
+          "at": "w1_bandit_patrolman"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "thugawug_stomper",
+          "count": 2,
+          "at": "w2_thugawug_stomper"
+        },
+        {
+          "definition": "bandit_patrolman",
+          "count": 1,
+          "at": "w2_bandit_patrolman"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bandit_patrolman",
+          "count": 2,
+          "at": "w3_bandit_patrolman"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 75457,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 74377 'Thugawug Bumbler!' (title), 75456 (card), objective 75457; icon 310."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-1877.32, -29.35, -632.98]: BJX fork Battles.lua:54 (Npcs.json Id 46230, chugawug_m_bandit_01.adr). (R) the fork's own placement, not a captured one. Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 55 ('Thugawug Bumbler! (the live random encounter: a thieving thugawug bumbler)'): scene sg_random_encounter_02, entry, exit, 3 waves, 8 spawns ({'Bandit Patrolman': 5, 'Thugawug Stomper': 2, 'Thugawug Bumbler': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1242 is the fork's; ours must be assigned and the scene sg_random_encounter_02 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

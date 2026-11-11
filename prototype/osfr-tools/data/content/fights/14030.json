@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "id": 14030,
+  "kind": "battle",
+  "title_id": 103031,
+  "description_id": 103748,
+  "icon_id": 310,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5,
+    "starter": {
+      "definition": "thugamug",
+      "at": [
+        -1831.37,
+        -54.35,
+        -45.58
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1243,
+    "arena": "sg_random_encounter_creek",
+    "arrive": [
+      136.35,
+      0.04,
+      145.72
+    ],
+    "exit_door": [
+      127.15,
+      0.38,
+      155.54
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bandit_patrolman": {
+      "definition_id": 3460,
+      "name": "Bandit Patrolman",
+      "name_id": 440716,
+      "model_id": 199,
+      "rank": "normal"
+    },
+    "thugamug": {
+      "definition_id": 1234001,
+      "name": "Thugamug",
+      "name_id": 103031,
+      "model_id": 199,
+      "rank": "boss",
+      "boss": true
+    },
+    "thugamug_henchman": {
+      "definition_id": 1234002,
+      "name": "Thugamug Henchman",
+      "name_id": 103726,
+      "model_id": 199,
+      "rank": "normal"
+    },
+    "thugamug_s_left_hand": {
+      "definition_id": 950078,
+      "name": "Thugamug's Left Hand",
+      "name_id": 389699,
+      "model_id": 200,
+      "rank": "boss",
+      "boss": true
+    },
+    "thugamug_s_right_hand": {
+      "definition_id": 950077,
+      "name": "Thugamug's Right Hand",
+      "name_id": 389678,
+      "model_id": 199,
+      "rank": "boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "thugamug",
+      "at": [
+        119.43,
+        -0.86,
+        181.96
+      ],
+      "heading": 2.705,
+      "boss": true,
+      "scale": 1.6,
+      "dormant": true
+    },
+    "a2": {
+      "definition": "thugamug_s_right_hand",
+      "at": [
+        102.22,
+        1.28,
+        178.38
+      ],
+      "heading": 2.334,
+      "boss": true,
+      "scale": 1.2,
+      "dormant": true
+    },
+    "a3": {
+      "definition": "thugamug_s_left_hand",
+      "at": [
+        112.67,
+        0.39,
+        184.27
+      ],
+      "heading": 2.591,
+      "boss": true,
+      "scale": 1.2,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_thugamug_henchman": [
+      [
+        126.32,
+        2.41,
+        117.25
+      ],
+      [
+        130.78,
+        2.16,
+        127.35
+      ],
+      [
+        130.37,
+        1.84,
+        116.61
+      ]
+    ],
+    "w2_bandit_patrolman": [
+      [
+        121.8,
+        0.74,
+        160.67
+      ],
+      [
+        116.54,
+        -0.31,
+        171.66
+      ]
+    ],
+    "w2_thugamug_henchman": [
+      [
+        144.73,
+        -1.79,
+        191.41
+      ],
+      [
+        103.93,
+        0.9,
+        165.39
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "thugamug_henchman",
+          "count": 3,
+          "at": "w1_thugamug_henchman"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bandit_patrolman",
+          "count": 2,
+          "at": "w2_bandit_patrolman"
+        },
+        {
+          "definition": "thugamug_henchman",
+          "count": 2,
+          "at": "w2_thugamug_henchman"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 103750,
+      "target": {
+        "waves": [
+          "w1",
+          "w2"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    },
+    {
+      "id": "wake_a2",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:a2"
+          }
+        }
+      ],
+      "once": true
+    },
+    {
+      "id": "wake_a3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:a3"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 103031 'Thugamug' (title), 103748 (card), objective 103750; icon 310."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-1831.37, -54.35, -45.58]: BJX fork Battles.lua:78 (Npcs.json Id 46251, chugawug_m_bandit_01.adr). (R) the fork's own placement, not a captured one. Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 85 ('Thugamug (the live random encounter: Thugamug's toll bridge)'): scene sg_random_encounter_creek, entry, exit, 3 waves, 10 spawns ({'Thugamug Henchman': 5, 'Bandit Patrolman': 2, 'Thugamug': 1, \"Thugamug's Right Hand\": 1, \"Thugamug's Left Hand\": 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1243 is the fork's; ours must be assigned and the scene sg_random_encounter_creek has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 45 coins / 180 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

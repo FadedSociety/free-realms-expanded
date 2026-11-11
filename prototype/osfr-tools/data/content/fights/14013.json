@@ -1,0 +1,459 @@
+{
+  "schema_version": 1,
+  "id": 14013,
+  "kind": "dungeon",
+  "title_id": 3269,
+  "description_id": 204,
+  "icon_id": 316,
+  "difficulty": 1,
+  "entry": {
+    "interact": {
+      "npc_guid": 100000046185
+    }
+  },
+  "place": {
+    "zone": 1206,
+    "arena": "sh_yeti_cave",
+    "arrive": [
+      250.82,
+      88.77,
+      209.76
+    ],
+    "exit_door": [
+      124.22,
+      79.87,
+      436.41
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "cave_yeti": {
+      "definition_id": 950032,
+      "name": "Cave Yeti",
+      "name_id": 6475,
+      "model_id": 51,
+      "rank": "normal"
+    },
+    "umari": {
+      "definition_id": 950033,
+      "name": "Umari",
+      "name_id": 6502,
+      "model_id": 146,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "yeti": {
+      "definition_id": 930073,
+      "name": "Yeti",
+      "name_id": 2245,
+      "model_id": 4547,
+      "rank": "normal"
+    },
+    "yeti_bouncer": {
+      "definition_id": 950031,
+      "name": "Yeti Bouncer",
+      "name_id": 6501,
+      "model_id": 51,
+      "rank": "boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "yeti",
+      "at": [
+        223.97,
+        89.28,
+        221.01
+      ],
+      "heading": 2.212,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "cave_yeti",
+      "at": [
+        221.37,
+        88.97,
+        221.43
+      ],
+      "heading": 2.128,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "yeti_bouncer",
+      "at": [
+        226.73,
+        89.54,
+        219.6
+      ],
+      "heading": 2.268,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "cave_yeti",
+      "at": [
+        249.52,
+        81.15,
+        242.14
+      ],
+      "heading": -2.702,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "yeti_bouncer",
+      "at": [
+        253.07,
+        81.68,
+        242.62
+      ],
+      "heading": -2.432,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "yeti",
+      "at": [
+        250.83,
+        82.03,
+        245.78
+      ],
+      "heading": -2.731,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "yeti_bouncer",
+      "at": [
+        269.89,
+        80.07,
+        261.33
+      ],
+      "heading": -2.164,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "yeti",
+      "at": [
+        271.17,
+        80.01,
+        264.46
+      ],
+      "heading": -2.328,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "cave_yeti",
+      "at": [
+        270.19,
+        80.04,
+        267.04
+      ],
+      "heading": -2.529,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "yeti",
+      "at": [
+        239.42,
+        80.7,
+        297.06
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "cave_yeti",
+      "at": [
+        236.36,
+        80.66,
+        296.07
+      ],
+      "heading": 1.257,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "yeti_bouncer",
+      "at": [
+        237.48,
+        80.86,
+        300.34
+      ],
+      "heading": 2.605,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "cave_yeti",
+      "at": [
+        192.82,
+        81.78,
+        323.06
+      ],
+      "heading": -2.981,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "yeti_bouncer",
+      "at": [
+        195.62,
+        81.55,
+        323.49
+      ],
+      "heading": -2.768,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "yeti",
+      "at": [
+        195.32,
+        81.4,
+        319.04
+      ],
+      "heading": -2.612,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "yeti_bouncer",
+      "at": [
+        171.92,
+        79.65,
+        379.41
+      ],
+      "heading": 1.871,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "yeti",
+      "at": [
+        170.42,
+        79.8,
+        383.31
+      ],
+      "heading": 2.083,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "cave_yeti",
+      "at": [
+        175.44,
+        79.56,
+        379.88
+      ],
+      "heading": 2.027,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "yeti",
+      "at": [
+        157.8,
+        80.05,
+        430.8
+      ],
+      "heading": 2.108,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "cave_yeti",
+      "at": [
+        154.15,
+        80.04,
+        428.75
+      ],
+      "heading": 1.608,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "yeti_bouncer",
+      "at": [
+        161.72,
+        79.79,
+        428.46
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "umari",
+      "at": [
+        131.3,
+        79.72,
+        425.94
+      ],
+      "heading": 1.334,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_yeti_bouncer": [
+      [
+        128.82,
+        79.77,
+        429.05
+      ]
+    ],
+    "w1_cave_yeti": [
+      [
+        131.51,
+        79.8,
+        430.79
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "yeti_bouncer",
+          "count": 1,
+          "at": "w1_yeti_bouncer"
+        },
+        {
+          "definition": "cave_yeti",
+          "count": 1,
+          "at": "w1_cave_yeti"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 6851,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 3269 'Hot Springs Haven' (title), 204 (card), objective 76355; icon 316."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/hot_springs_haven.json: difficulty 1, zone 'Snowhill', enemies ['Umari', 'Champion Pengubowler', 'Yeti Bouncer', 'Yeti Jam Boxes', 'Umari', 'Champion Pengubowler']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [263.66, 51.69, 164.31]: BJX fork Battles.lua:6 (Npcs.json Id 46185, cave_entrance_facade_01_ice.adr). (R) the fork's own placement, not a captured one. Region Snowhill, place Snowhill."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 7 ('Hot Springs Haven (the live dungeon: yetis lounging through the resort, Umari in the far lounge)'): scene sh_yeti_cave, entry, exit, 8 waves, 24 spawns ({'Yeti': 7, 'Cave Yeti': 8, 'Yeti Bouncer': 8, 'Umari': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1206 is the fork's; ours must be assigned and the scene sh_yeti_cave has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046185: reference Npcs.json Id 46185, model 10907, name 3269, at [263.66, 51.69, 164.31]."
+    }
+  ]
+}

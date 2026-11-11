@@ -24785,10 +24785,44 @@
               "evidence": "A Beautiful Friendship (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
             }
           ]
+        },
+        {
+          "quest_id": 3957433,
+          "title": "Ka-Boom or Not To Boom",
+          "title_string_id": 29633,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ka-Boom or Not To Boom (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ka_boom_or_not_to_boom_4d56c9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957432,
+          "title": "Junk or Bust",
+          "title_string_id": 29637,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Junk or Bust (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_junk_or_bust_cade31)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3953012
+        3953012,
+        3957433,
+        3957432
       ],
       "quests_given_text": [
         "The five-quest chain A Beautiful Friendship, Ka-Boom or Not To Boom, Junk or Bust, Robot Woes (repeatable per the wiki), The Legendary Sunstone; hand-in of Wheelie Pete's For Rizzle. Gate: a level 8 combat job (wiki; client 2365384286 by wording)."

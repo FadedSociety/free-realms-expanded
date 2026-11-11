@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "id": 14007,
+  "kind": "dungeon",
+  "title_id": 71771,
+  "description_id": 76413,
+  "icon_id": 310,
+  "difficulty": 1,
+  "entry": {
+    "interact": {
+      "npc_guid": 100000046215
+    }
+  },
+  "place": {
+    "zone": 1204,
+    "arena": "bs_cracked_claw_caverns",
+    "arrive": [
+      115.99,
+      41.24,
+      229.02
+    ],
+    "exit_door": [
+      160.72,
+      42.27,
+      328.43
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "cracked_claw": {
+      "definition_id": 950016,
+      "name": "Cracked Claw",
+      "name_id": 76410,
+      "model_id": 677,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "elder_swamp_cray": {
+      "definition_id": 930078,
+      "name": "Elder Swamp Cray",
+      "name_id": 75949,
+      "model_id": 677,
+      "rank": "boss"
+    },
+    "ocean_cray": {
+      "definition_id": 930074,
+      "name": "Cray",
+      "name_id": 90007,
+      "model_id": 470,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "ocean_cray",
+      "at": [
+        139.87,
+        40.34,
+        243.23
+      ],
+      "heading": -2.159,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "elder_swamp_cray",
+      "at": [
+        136.95,
+        40.0,
+        244.4
+      ],
+      "heading": -2.438,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "ocean_cray",
+      "at": [
+        134.65,
+        40.06,
+        242.13
+      ],
+      "heading": -2.484,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "elder_swamp_cray",
+      "at": [
+        158.33,
+        40.0,
+        263.11
+      ],
+      "heading": -0.627,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "ocean_cray",
+      "at": [
+        157.54,
+        40.0,
+        266.16
+      ],
+      "heading": 2.96,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "elder_swamp_cray",
+      "at": [
+        153.85,
+        40.0,
+        264.86
+      ],
+      "heading": 1.879,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "ocean_cray",
+      "at": [
+        144.61,
+        40.35,
+        297.73
+      ],
+      "heading": -3.121,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "elder_swamp_cray",
+      "at": [
+        143.91,
+        40.04,
+        293.92
+      ],
+      "heading": 3.121,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "ocean_cray",
+      "at": [
+        141.9,
+        40.38,
+        296.48
+      ],
+      "heading": 3.013,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "cracked_claw",
+      "at": [
+        160.24,
+        40.5,
+        319.11
+      ],
+      "heading": -2.468,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_elder_swamp_cray": [
+      [
+        157.87,
+        40.18,
+        317.11
+      ]
+    ],
+    "w1_swamp_cray": [
+      [
+        164.17,
+        39.89,
+        316.42
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "elder_swamp_cray",
+          "count": 1,
+          "at": "w1_elder_swamp_cray"
+        },
+        {
+          "definition": "ocean_cray",
+          "count": 1,
+          "at": "w1_swamp_cray"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 76424,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 71771 'Cracked Claw Caverns' (title), 76413 (card), objective 76355; icon 310."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/cracked_claw_caverns.json: difficulty 1, zone 'Blackspore Swamp', enemies ['Cracked Claw', 'Giant Toads', 'Cray', 'Lost Explorers', 'Elder Swamp Cray', 'Cracked Claw']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-2267.7, -29.35, 896.02]: BJX fork Battles.lua:36 (Npcs.json Id 46215, sh_cave_entrance_bat_cave_01.adr). (R) the fork's own placement, not a captured one. Region Blackspore, place Blackspore."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 5 ('Cracked Claw Caverns (the live dungeon: swamp cray up the cavern, Cracked Claw among the bones at the top)'): scene bs_cracked_claw_caverns, entry, exit, 4 waves, 12 spawns ({'Swamp Cray': 6, 'Elder Swamp Cray': 5, 'Cracked Claw': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1204 is the fork's; ours must be assigned and the scene bs_cracked_claw_caverns has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Cray' in this fight; the fork's layout had 'swamp_cray' there. (R) 'Cray' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046215: reference Npcs.json Id 46215, model 251, name 71771, at [-2267.7, -29.35, 896.02]."
+    }
+  ]
+}

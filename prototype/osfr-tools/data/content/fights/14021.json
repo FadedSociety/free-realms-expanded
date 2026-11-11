@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "id": 14021,
+  "kind": "battle",
+  "title_id": 74754,
+  "description_id": 74755,
+  "icon_id": 310,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "hooligan_bullies",
+      "at": [
+        -1924.36,
+        -52.16,
+        275.29
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1239,
+    "arena": "sg_random_encounter_01",
+    "arrive": [
+      239.42,
+      3.31,
+      186.49
+    ],
+    "exit_door": [
+      242.37,
+      1.09,
+      195.02
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "hooligan_bullies": {
+      "definition_id": 4162,
+      "name": "Hooligan Bullies!",
+      "name_id": 74753,
+      "model_id": 1913,
+      "rank": "normal"
+    },
+    "hooligan_scrapper": {
+      "definition_id": 950040,
+      "name": "Hooligan Scrapper",
+      "name_id": 37614,
+      "model_id": 489,
+      "rank": "boss",
+      "boss": true
+    },
+    "w58_hooligan_archer_l3_enemy": {
+      "definition_id": 930012,
+      "name": "Hooligan Archer",
+      "name_id": 5100400,
+      "model_id": 520,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "hooligan_scrapper",
+      "at": [
+        230.79,
+        1.21,
+        230.72
+      ],
+      "heading": 2.949,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_hooligan": [
+      [
+        207.54,
+        2.92,
+        160.0
+      ],
+      [
+        226.54,
+        4.28,
+        153.76
+      ],
+      [
+        201.23,
+        1.49,
+        177.44
+      ]
+    ],
+    "w2_hooligan": [
+      [
+        224.89,
+        1.11,
+        221.9
+      ],
+      [
+        205.99,
+        1.96,
+        200.68
+      ]
+    ],
+    "w2_w58_hooligan_archer_l3_enemy": [
+      [
+        229.46,
+        1.63,
+        217.72
+      ],
+      [
+        209.78,
+        0.22,
+        191.97
+      ]
+    ],
+    "w3_hooligan": [
+      [
+        206.23,
+        1.93,
+        215.5
+      ],
+      [
+        222.69,
+        0.73,
+        224.27
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_bullies",
+          "count": 3,
+          "at": "w1_hooligan"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_bullies",
+          "count": 2,
+          "at": "w2_hooligan"
+        },
+        {
+          "definition": "w58_hooligan_archer_l3_enemy",
+          "count": 2,
+          "at": "w2_w58_hooligan_archer_l3_enemy"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_bullies",
+          "count": 2,
+          "at": "w3_hooligan"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 74757,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 74754 'Hooligan Bullies!' (title), 74755 (card), objective 74757; icon 310."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 4162 drawn at [-1924.36, -52.16, 275.29] (npc_spawns_extra.json spawn_guid 100000004162, FreeRealms-Legacy FabledRealms.lua). Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 58 ('Hooligan Bullies! (the live random encounter: hooligan bullies)'): scene sg_random_encounter_01, entry, exit, 3 waves, 10 spawns ({'Hooligan': 7, 'Hooligan Archer': 2, 'Hooligan Scrapper': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1239 is the fork's; ours must be assigned and the scene sg_random_encounter_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Hooligan Bullies!' in this fight; the fork's layout had 'hooligan' there. (R) 'Hooligan Bullies!' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

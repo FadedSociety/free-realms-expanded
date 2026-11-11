@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "id": 14049,
+  "kind": "battle",
+  "title_id": 74637,
+  "description_id": 95061,
+  "icon_id": 11409,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "starter": {
+      "definition": "w58_stealthy_despoiler_l9_enemy",
+      "at": [
+        -923.23,
+        -43.95,
+        -1166.13
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1242,
+    "arena": "sg_random_encounter_02",
+    "arrive": [
+      139.68,
+      1.12,
+      147.24
+    ],
+    "exit_door": [
+      143.59,
+      0.31,
+      157.32
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "ghost_ninja": {
+      "definition_id": 4218,
+      "name": "Ghost Ninja",
+      "name_id": 5101517,
+      "model_id": 945,
+      "rank": "normal"
+    },
+    "ghost_ninja_striker": {
+      "definition_id": 4228,
+      "name": "Ghost Ninja Striker",
+      "name_id": 5101519,
+      "model_id": 945,
+      "rank": "boss",
+      "boss": true
+    },
+    "w58_stealthy_despoiler_l9_enemy": {
+      "definition_id": 930021,
+      "name": "Stealthy Despoiler",
+      "name_id": 93120,
+      "model_id": 945,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "ghost_ninja_striker",
+      "at": [
+        151.99,
+        -1.57,
+        182.89
+      ],
+      "heading": -2.809,
+      "boss": true,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_ghost_ninja": [
+      [
+        112.88,
+        0.74,
+        144.99
+      ],
+      [
+        115.44,
+        1.35,
+        133.2
+      ],
+      [
+        115.55,
+        0.26,
+        148.23
+      ]
+    ],
+    "w2_w58_stealthy_despoiler_l9_enemy": [
+      [
+        114.48,
+        -0.3,
+        181.6
+      ],
+      [
+        139.47,
+        -0.76,
+        175.29
+      ]
+    ],
+    "w2_ghost_ninja": [
+      [
+        123.8,
+        0.13,
+        153.98
+      ],
+      [
+        124.25,
+        -0.56,
+        177.91
+      ]
+    ],
+    "w3_w58_stealthy_despoiler_l9_enemy": [
+      [
+        121.07,
+        0.0,
+        190.4
+      ],
+      [
+        149.34,
+        0.6,
+        160.6
+      ],
+      [
+        154.88,
+        0.02,
+        173.93
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "ghost_ninja",
+          "count": 3,
+          "at": "w1_ghost_ninja"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58_stealthy_despoiler_l9_enemy",
+          "count": 2,
+          "at": "w2_w58_stealthy_despoiler_l9_enemy"
+        },
+        {
+          "definition": "ghost_ninja",
+          "count": 2,
+          "at": "w2_ghost_ninja"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58_stealthy_despoiler_l9_enemy",
+          "count": 3,
+          "at": "w3_w58_stealthy_despoiler_l9_enemy"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 417012,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 74637 'Stealthy Despoilers' (title), 95061 (card), objective 417012; icon 11409."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/stealthy_despoilers.json: difficulty 4, zone 'Seaside (south beach, Luxurious Oceanfront Homes path and Flying Dragon Dojo)', enemies ['Stealthy Despoiler']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-923.23, -43.95, -1166.13]: BJX fork Battles.lua:56 (Npcs.json Id 46232, human_m_ninja_ghost.adr). (R) the fork's own placement, not a captured one. Region None, place None."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 57 ('Stealthy Despoilers (the live random encounter: ghost ninjas attacking tourists)'): scene sg_random_encounter_02, entry, exit, 3 waves, 11 spawns ({'Ghost Ninja': 5, 'Stealthy Despoiler': 5, 'Ghost Ninja Striker': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1242 is the fork's; ours must be assigned and the scene sg_random_encounter_02 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

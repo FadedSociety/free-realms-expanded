@@ -16981,13 +16981,62 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3010005,
+          "title": "Archer: Taking Aim",
+          "title_string_id": 76956,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 3; name 'Archer: Taking Aim'; title id cell ucdt 1592318659 / ugdt 1621075573"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0: unlocking the job (Lugabow, Greenwood Camp), row 3; name 'Archer: Taking Aim'; title id cell ucdt 1592318659 / ugdt 1621075573"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3010005 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3010003,
         3010006,
         3010035,
-        3010004
+        3010004,
+        3010005
       ],
       "quests_given_text": [
         "Full line on Archer: Path of the Archer (unlocks the job), Archer: Test of Agility, Archer: Taking Aim, Archer: Oath of Honor; entry quests \"Being a Better Archer\" and \"Aiming For Archery\" point to her. The wiki also lists the quest Thugawugs under her and names her in Lofty Letter (an Adventurer side quest); a letter to her from a guard named Trusty is in the client (3739059730, 2181619100) and is not tied to a title. Weapon-testing text: \"Help Lugabow with her weapons testing in the Greenwood Camp.\" (3032659489, title not found). Related: Miner: Arrowheads for Lugabow; blacksmith bow orders (2576706017)."

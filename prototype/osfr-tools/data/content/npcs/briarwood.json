@@ -40202,8 +40202,63 @@
       "location_evidence": [
         "\"In front of the Tanglewood Fort in Nettleseed\" (client 2735144727)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3000040,
+          "title": "Chapter 1: There's Fungus Among Us!",
+          "title_string_id": 90872,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E12; name \"Chapter 1: There's Fungus Among Us!\"; title id cell ucdt 88863956 / ugdt 811064050"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E12; name \"Chapter 1: There's Fungus Among Us!\"; title id cell ucdt 88863956 / ugdt 811064050"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3000040 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row E11; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3000040
+      ],
       "quests_given_text": [
         "Chapter 1: The Small Wooden Box (holds the box, client 1708418077); greets the player (\"Lieutenant Snibug?! That's me!\", client 3299356165)."
       ],
@@ -54051,8 +54106,27 @@
       "location_evidence": [
         "Western edge of Nettleseed (client 1721348300)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957451,
+          "title": "Nettleseed Nibblers",
+          "title_string_id": 46602,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Nettleseed Nibblers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nettleseed_nibblers_0d4bcc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957451
+      ],
       "quests_given_text": [
         "Nettleseed Nibblers."
       ],
@@ -54430,11 +54504,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1591; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2848 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=45171)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.609463,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000194,
@@ -65758,8 +65839,27 @@
       "location_evidence": [
         "\"Southern Bristlewood\" near the entrance to Thistlerow (client 715016349, 2498469370)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957335,
+          "title": "Corrupted Spiders",
+          "title_string_id": 16239,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Corrupted Spiders (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_corrupted_spiders_d3e777)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957335
+      ],
       "quests_given_text": [
         "Untamed Spirit (wiki; free her son from the cage in Grexan's Camp, client 183411461). Wiki also lists Corrupted Soldiers (no client title). Defeated for Gorg in Spinnerette."
       ],
@@ -72466,10 +72566,27 @@
               "evidence": "Cargug, Cargug, Let Me In! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
             }
           ]
+        },
+        {
+          "quest_id": 3957514,
+          "title": "Safety First",
+          "title_string_id": 47260,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Safety First (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_safety_first_98f601)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950084
+        3950084,
+        3957514
       ],
       "quests_given_text": [
         "Safety First (Moldy Shamblers)."

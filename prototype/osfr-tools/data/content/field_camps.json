@@ -1554,6 +1554,36 @@
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
         }
       ]
+    },
+    {
+      "id": "qf-robgoblin_kaboomer-1",
+      "definition": "robgoblin_kaboomer",
+      "level": 3,
+      "respawn_seconds": 30,
+      "aggro_range": 8.0,
+      "leash_radius": 14.0,
+      "behaviour": "field_roamer",
+      "power_up_table": "standard",
+      "members": [
+        100000003954,
+        100000003936,
+        100000003952,
+        100000003937,
+        100000003953,
+        100000003951,
+        100000003944,
+        100000003945
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "npc_spawns_extra.json: 8 drawn bodies of reference Npcs.json Id [3936, 3937, 3944, 3945, 3951, 3952, 3953, 3954] (robgoblin_m_junkmaster.adr), spawn_guid 100000003954..100000003945, from FreeRealms-Legacy FabledRealms.lua. Today they stand as friendly NPC actors."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 3 (median of the shipped camps in Sunstone Valley); respawn 30 s, aggro 8 m, leash 14 m are the design's field rules (5.4). The positions are the reference spawns, so they stand where the original bodies stood."
+        }
+      ]
     }
   ]
 }

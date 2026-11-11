@@ -20513,10 +20513,116 @@
               "evidence": "title_string_id corrected from raw locale hash 4188888238 to Global.Text id 72746 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3030035,
+          "title": "Brawler: Achieve Level 15",
+          "title_string_id": 387375,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M16; name 'Brawler: Achieve Level 15'; title id cell ucdt 3618962003 / ugdt 2146334259"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M16; name 'Brawler: Achieve Level 15'; title id cell ucdt 3618962003 / ugdt 2146334259"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M16; name 'Brawler: Achieve Level 15'; title id cell ucdt 3618962003 / ugdt 2146334259"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3030035 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3030037,
+          "title": "Brawler: Providing Proof",
+          "title_string_id": 72801,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M18; name 'Brawler: Providing Proof'; title id cell ucdt 1376350525 / ugdt 831993972"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M18; name 'Brawler: Providing Proof'; title id cell ucdt 1376350525 / ugdt 831993972"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 4: level 15 to 20 (the Sampson showdown and Brawler Club), row M18; name 'Brawler: Providing Proof'; title id cell ucdt 1376350525 / ugdt 831993972"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3030037 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row M16; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3030033
+        3030033,
+        3030035,
+        3030037
       ],
       "quests_given_text": [
         "Brawler: Fraudulent Brawler, Brawler: Achieve Level 15, Brawler: Providing Proof."
@@ -21049,11 +21155,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.220287,
       "model_id": 548,
-      "model_file_name": "human_f_freestyle_06.agr"
+      "model_file_name": "human_f_freestyle_06.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000753,
@@ -21170,11 +21283,45 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             }
           ]
+        },
+        {
+          "quest_id": 3957586,
+          "title": "The Wolf Menace",
+          "title_string_id": 93358,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Wolf Menace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_wolf_menace_a3873f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957410,
+          "title": "Harassing the Harassers",
+          "title_string_id": 389427,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harassing the Harassers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_harassing_the_harassers_f1c1b2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040046,
-        3040047
+        3040047,
+        3957586,
+        3957410
       ],
       "quests_given_text": [
         "Defend-Snowhill-from-wolves medal quest (client 2369415669, 2430170184; completion \"dubbed Protector of Snowhill\" 1997264351); Ice Troll Scout follow-up to Howling Hills (client 4058148193); toppled snowmen (3659103661). Titles uncertain: candidates Snowhill Protector (1209734640)."
@@ -32139,10 +32286,59 @@
               "evidence": "title_string_id corrected from raw locale hash 172639783 to Global.Text id 388400 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3110025,
+          "title": "Contract: Spirits and Spider Trainers",
+          "title_string_id": 388412,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Level 20 and later, row G1; name 'Contract: Spirits and Spider Trainers'; title id cell ucdt 3240081657 / ugdt 63652993"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Ninja.md: Quest line > Level 20 and later, row G1; name 'Contract: Spirits and Spider Trainers'; title id cell ucdt 3240081657 / ugdt 63652993"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3110025 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row F6; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3110008
+        3110008,
+        3110025
       ],
       "quests_given_text": [
         "Contract: Trouble in Snowhill, Contract: Sharp Claws and Sharper Swords, Contract: Fending off the Floren, Contract: Spirits and Spider Trainers (all repeatable)."
@@ -32579,9 +32775,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3996 spawnNpcWithGuid(33834); src/Resources/Npcs.json Id=33834"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.33056104
+      "heading": 1.33056104,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000764,
@@ -33809,8 +34012,59 @@
       "location_evidence": [
         "\"South of Snowhill\" (client 3842204484); \"outside Snowhill\" (2826198928). [video: boss fight, vokALCeGZqY/00020]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3030034,
+          "title": "Brawler: I Want My Money",
+          "title_string_id": 39711,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M15; name 'Brawler: I Want My Money! (wiki: \"I Want My Money\")'; title id cell ucdt 3807785477 / ugdt 477733253"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M15; name 'Brawler: I Want My Money! (wiki: \"I Want My Money\")'; title id cell ucdt 3807785477 / ugdt 477733253"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3030034 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row M14; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3030034
+      ],
       "quests_given_text": [
         "Brawler: I Want My Money!; boss of Brawler: Confronting the Crook."
       ],
@@ -34268,10 +34522,17 @@
             "kind": "reconstructed",
             "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46075 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 836,
-      "model_file_name": "human_m_sampson_idlefist.agr"
+      "model_file_name": "human_m_sampson_idlefist.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000195,

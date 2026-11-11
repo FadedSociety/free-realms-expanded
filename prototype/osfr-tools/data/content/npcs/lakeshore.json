@@ -2251,8 +2251,44 @@
       "location_evidence": [
         "\"Lakeshore Fishing Village\" (2087382628); \"in Lakeshore\" (459411207). Also a chess opponent: \"Beat Chaz Strongarm at a game of chess\" (4143409940). No video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957299,
+          "title": "Brawler: Fit to Fight",
+          "title_string_id": 73018,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Fit to Fight (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_fit_to_fight_ef6579)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957300,
+          "title": "Brawler: Night Fights",
+          "title_string_id": 73006,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Night Fights (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_night_fights_aaa352)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957299,
+        3957300
+      ],
       "quests_given_text": [
         "Brawler Club work after level 20: \"Check in with Chaz and he should have some work for you\" (4024416966); defeat his list (282491522); hooligan bullies near Farnum Farmstead (2825469905, 4036179728); Mugwort, Necrolaceous and Snognosh (2431923117); \"several villains\" (3720229457). Titles not mapped (see Brawler). Client title \"Arm Wrestling\" (1040608945): Carlos Brazenfist sends the player to him (3599197409), by wording."
       ],
@@ -2628,9 +2664,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3688 spawnNpcWithGuid(33466); src/Resources/Npcs.json Id=33466"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.052078003
+      "heading": -0.052078003,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000342,

@@ -176,7 +176,6 @@ fn every_named_enemy_body_is_routed_unless_it_belongs_elsewhere() {
         "The Pumpkin Prince",
         "Stone Heart's Hideaway",
         "Ninja Apprentice",
-        "Robgoblin Kaboomer",
         "Robgoblin Tinkerer",
         "Robgoblin Mechanic",
         "Robgoblin Shinyseeker",
@@ -217,6 +216,8 @@ fn every_named_enemy_body_is_routed_unless_it_belongs_elsewhere() {
         "Brutus the Brute",
         "Thugawug Thug!",
         "Snake",
+        // Has its definition since the combat quests went on (Ka-Boom or Not To Boom).
+        "Robgoblin Kaboomer",
     ];
     let camps = camps();
     let taken: BTreeSet<u64> = camps.iter().flat_map(members).collect();

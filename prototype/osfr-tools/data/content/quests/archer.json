@@ -480,11 +480,62 @@
       "prerequisite_quest_ids": [
         3010004
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 77004,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Thugawug Fumblers - 0/9 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_taking_aim_29af69)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'Thugawug Fumbler' is definition [1638]"
+            }
+          ],
+          "model_id": 1638,
+          "count": 9
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 22083,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lugabow (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_taking_aim_29af69)."
+            }
+          ],
+          "npc_id": 9000000387
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75224,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Archer's Power Shard of Vitality I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_taking_aim_29af69)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75734,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hen Feather Archer Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_taking_aim_29af69)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "35": 100
           },
@@ -532,12 +583,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 76957,
       "intro_text_string_id": 76955,
       "end_text_string_id": 76958,
-      "enabled": false
+      "enabled": true,
+      "job": 35
     },
     {
       "id": 3010006,
@@ -630,11 +686,62 @@
       "prerequisite_quest_ids": [
         3010006
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 383049,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat 10 Robgoblin Pondblasters! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_pondblaster_target_practice_023610)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin pondblaster' is definition [1294]"
+            }
+          ],
+          "model_id": 1294,
+          "count": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 383054,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Hilforn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_pondblaster_target_practice_023610)."
+            }
+          ],
+          "npc_id": 9000000106
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75736,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hen Feather Archer Leggings (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_pondblaster_target_practice_023610)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75195,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Archer's Ring of Energy I (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_pondblaster_target_practice_023610)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "35": 71
           },
@@ -682,12 +789,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 383046,
       "intro_text_string_id": 383044,
       "end_text_string_id": 383047,
-      "enabled": false
+      "enabled": true,
+      "job": 35
     },
     {
       "id": 3010008,
@@ -696,11 +808,75 @@
       "prerequisite_quest_ids": [
         3010007
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 93145,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat 30 Robgoblin Pondblasters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_explosive_expedition_3642ac)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'Robgoblin Pondblaster' is definition [1294]"
+            }
+          ],
+          "model_id": 1294,
+          "count": 30
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 93147,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Obtain 6 sap samples (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_explosive_expedition_3642ac)."
+            }
+          ],
+          "node_type": "quest-sap-samples-q3010008",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 93151,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Hilforn in the Greenwood Forest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_explosive_expedition_3642ac)."
+            }
+          ],
+          "npc_id": 9000000106
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75738,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Point Blank Archer Tunic (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_explosive_expedition_3642ac)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75002,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Archer's Horse Bow of Volleys (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_archer_explosive_expedition_3642ac)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "35": 63
           },
@@ -748,12 +924,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 77082,
       "intro_text_string_id": 77080,
       "end_text_string_id": 77083,
-      "enabled": false
+      "enabled": true,
+      "job": 35
     },
     {
       "id": 3010009,

@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "id": 14033,
+  "kind": "battle",
+  "title_id": 93277,
+  "description_id": 116829,
+  "icon_id": 12615,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "starter": {
+      "definition": "ice_troll_scout",
+      "at": [
+        68.58,
+        73.93,
+        541.98
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1240,
+    "arena": "sh_random_encounter_01",
+    "arrive": [
+      139.56,
+      0.65,
+      141.72
+    ],
+    "exit_door": [
+      131.53,
+      1.63,
+      151.78
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "ice_troll": {
+      "definition_id": 930061,
+      "name": "Ice Troll",
+      "name_id": 4212,
+      "model_id": 100,
+      "rank": "boss"
+    },
+    "ice_troll_scout": {
+      "definition_id": 3593,
+      "name": "Ice Troll Scout",
+      "name_id": 116741,
+      "model_id": 4546,
+      "rank": "boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "ice_troll",
+      "at": [
+        149.74,
+        -1.63,
+        182.34
+      ],
+      "heading": -2.896,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_yeti": [
+      [
+        129.46,
+        1.05,
+        112.22
+      ],
+      [
+        113.9,
+        1.88,
+        137.14
+      ],
+      [
+        124.17,
+        2.4,
+        117.88
+      ]
+    ],
+    "w2_ice_troll": [
+      [
+        116.21,
+        0.07,
+        174.44
+      ],
+      [
+        142.39,
+        -0.3,
+        173.95
+      ]
+    ],
+    "w2_yeti": [
+      [
+        120.46,
+        -0.73,
+        179.87
+      ]
+    ],
+    "w3_yeti": [
+      [
+        145.4,
+        -1.22,
+        180.07
+      ],
+      [
+        162.51,
+        0.01,
+        169.12
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "ice_troll_scout",
+          "count": 3,
+          "at": "w1_yeti"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "ice_troll",
+          "count": 2,
+          "at": "w2_ice_troll"
+        },
+        {
+          "definition": "ice_troll_scout",
+          "count": 1,
+          "at": "w2_yeti"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "ice_troll_scout",
+          "count": 2,
+          "at": "w3_yeti"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 116830,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 93277 'Ice Troll Scout!' (title), 116829 (card), objective 116830; icon 12615."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/ice_troll_scout.json: difficulty 2, zone 'Snowhill', enemies ['Ice Troll Scout', 'Ice Troll Scout']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [68.58, 73.93, 541.98]: BJX fork FabledRealms.lua:3993 (Npcs.json Id 33822, sg_troll_hut_02_snow.adr). (R) the fork's own placement, not a captured one. Region Snowhill, place Snowhill."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 83 ('Ice Troll Scout! (the live random encounter: an ice troll scout's hut in Snowhill)'): scene sh_random_encounter_01, entry, exit, 3 waves, 9 spawns ({'Yeti': 6, 'Ice Troll': 3})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1240 is the fork's; ours must be assigned and the scene sh_random_encounter_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Ice Troll Scout' in this fight; the fork's layout had 'yeti' there. (R) 'Ice Troll Scout' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

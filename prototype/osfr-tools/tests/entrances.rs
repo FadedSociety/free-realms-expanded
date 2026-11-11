@@ -257,13 +257,35 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
     open.sort_unstable();
     assert_eq!(
         open,
+        // Lead 2026-11-11: the combat quests' fight files (fights/14xxx.json) open 21 more.
         [
+            "arachnia_s_lair",
             "bandit_hideout",
             "bixie_hive",
+            "briarheart_caverns",
+            "cracked_claw_caverns",
+            "cray_marauders",
+            "cursed_graveyard",
+            "danger_peaks",
+            "darvon_s_descent",
+            "frostfang_caverns",
             "frostfang_growler",
+            "frostfang_snarlers",
+            "grexan_s_camp",
+            "hot_springs_haven",
+            "howling_hills",
+            "ice_troll_scout",
+            "moldy_shamblers",
+            "mugwort_s_hollow",
             "petty_yetis",
+            "robgoblin_treasure_trove",
+            "shady_smugglers",
             "sheep_watch",
-            "troll_summoner_madness"
+            "snowy_canyon",
+            "tanglewood_fort",
+            "tormented_spirits",
+            "troll_summoner_madness",
+            "vulture_watch"
         ],
         "the entrances whose fight exists today; a new fight file opens its door by itself"
     );

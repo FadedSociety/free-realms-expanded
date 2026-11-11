@@ -262,5 +262,59 @@
         }
       ]
     }
+  ],
+  "quest_drops": [
+    {
+      "definition_id": 930050,
+      "item_id": 96000002,
+      "chance": 50,
+      "quest_id": 3957502,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: 'hooligan' drops the item this step counts; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 930060,
+      "item_id": 96000002,
+      "chance": 50,
+      "quest_id": 3957502,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: 'hooligan' drops the item this step counts; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 1237001,
+      "item_id": 96000003,
+      "chance": 100,
+      "quest_id": 3957507,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: 'Drone Fauzz' drops the item this step counts; the chance is a local value."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) chance 100: one boss, one item wanted, so every win of the fight hands it over (50 would ask for the whole fight twice on average)."
+        }
+      ]
+    },
+    {
+      "definition_id": 930072,
+      "item_id": 96000004,
+      "chance": 50,
+      "quest_id": 3957541,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: 'Wraith' drops the item this step counts; the chance is a local value."
+        }
+      ]
+    }
   ]
 }

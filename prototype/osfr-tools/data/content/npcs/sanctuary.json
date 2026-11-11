@@ -14524,8 +14524,44 @@
       "location_evidence": [
         "Sanctuary (729705476)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957319,
+          "title": "Changeling Bounty",
+          "title_string_id": 74510,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Changeling Bounty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_changeling_bounty_96981f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957416,
+          "title": "Hooligan Hassles",
+          "title_string_id": 74527,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hooligan Hassles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hooligan_hassles_49f399)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957319,
+        3957416
+      ],
       "quests_given_text": [
         "Downing Cakenstein (Birthday Bash, continuously repeatable per wiki; client 789397826 says Cakenstein can only be beaten by launching fireworks at him); Memorial Caverns changeling task (138983778, title unknown)"
       ],
@@ -28407,10 +28443,27 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3957541,
+          "title": "Spectral Spectacles",
+          "title_string_id": 119241,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Spectral Spectacles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spectral_spectacles_1a8bf9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3957009
+        3957009,
+        3957541
       ],
       "quests_given_text": [
         "Medic: House Call (visit); Medic: Palatable Pills; Medic: Take Your Vitamins (Medic); A Trip to the Swamp and Spectral Spectacles (Super Spooktacular, wiki; client titles 464712624, 3010912441)"
@@ -33948,10 +34001,17 @@
             "kind": "legacy-data",
             "evidence": "data/content/npcs/snowhill.json npc_id=9000000115 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 548,
-      "model_file_name": "human_f_freestyle_06.agr"
+      "model_file_name": "human_f_freestyle_06.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000499,
@@ -53464,10 +53524,17 @@
             "kind": "reconstructed",
             "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46075 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 836,
-      "model_file_name": "human_m_sampson_idlefist.agr"
+      "model_file_name": "human_m_sampson_idlefist.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000190,
@@ -61471,8 +61538,27 @@
       "location_evidence": [
         "Not stated; the quest is played at the Bixie Hive"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957507,
+          "title": "Royal Honey",
+          "title_string_id": 390329,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Royal Honey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_honey_18d904)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957507
+      ],
       "quests_given_text": [
         "Royal Honey (title 2360985440; Yuri's text 1199202751, 3639832850)"
       ],
@@ -61850,11 +61936,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3161; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4497 (ModelId=573, ModelFileName=fairy_f_freestyle_11.agr, NameId=390483)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.712924,
       "model_id": 573,
-      "model_file_name": "fairy_f_freestyle_11.agr"
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000545,

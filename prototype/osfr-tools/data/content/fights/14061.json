@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "id": 14061,
+  "kind": "battle",
+  "title_id": 42062,
+  "description_id": 42057,
+  "icon_id": 4541,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "starter": {
+      "definition": "robgoblin_adept_trouble",
+      "at": [
+        -1593.01,
+        -28.14,
+        662.44
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1242,
+    "arena": "sg_random_encounter_02",
+    "arrive": [
+      139.68,
+      1.12,
+      147.24
+    ],
+    "exit_door": [
+      143.59,
+      0.31,
+      157.32
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "robgoblin_adept": {
+      "definition_id": 950154,
+      "name": "Robgoblin Adept",
+      "name_id": 41955,
+      "model_id": 188,
+      "rank": "boss",
+      "boss": true
+    },
+    "robgoblin_knuckle_head": {
+      "definition_id": 950065,
+      "name": "Robgoblin Knuckle Head",
+      "name_id": 6471,
+      "model_id": 4,
+      "rank": "normal"
+    },
+    "robgoblin_wiz_ord": {
+      "definition_id": 950109,
+      "name": "Robgoblin Wiz-ord",
+      "name_id": 6945,
+      "model_id": 191,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "robgoblin_adept",
+      "at": [
+        151.99,
+        -1.57,
+        182.89
+      ],
+      "heading": -2.809,
+      "boss": true,
+      "scale": 1.25,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_robgoblin_wiz_ord": [
+      [
+        112.88,
+        0.74,
+        144.99
+      ],
+      [
+        115.44,
+        1.35,
+        133.2
+      ],
+      [
+        115.55,
+        0.26,
+        148.23
+      ]
+    ],
+    "w2_robgoblin_knuckle_head": [
+      [
+        114.48,
+        -0.3,
+        181.6
+      ],
+      [
+        139.47,
+        -0.76,
+        175.29
+      ],
+      [
+        123.8,
+        0.13,
+        153.98
+      ],
+      [
+        124.25,
+        -0.56,
+        177.91
+      ]
+    ],
+    "w3_robgoblin_wiz_ord": [
+      [
+        121.07,
+        0.0,
+        190.4
+      ],
+      [
+        149.34,
+        0.6,
+        160.6
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_wiz_ord",
+          "count": 3,
+          "at": "w1_robgoblin_wiz_ord"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_knuckle_head",
+          "count": 4,
+          "at": "w2_robgoblin_knuckle_head"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_wiz_ord",
+          "count": 2,
+          "at": "w3_robgoblin_wiz_ord"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 42063,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 42062 'Robgoblin Adept Trouble!' (title), 42057 (card), objective 42063; icon 4541."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 3565 drawn at [-1593.01, -28.14, 662.44] (npc_spawns_extra.json spawn_guid 100000003565, FreeRealms-Legacy FabledRealms.lua). Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 43 ('Robgoblin Adept Trouble! (the live random encounter: a robgoblin adept and her friends)'): scene sg_random_encounter_02, entry, exit, 3 waves, 10 spawns ({'Robgoblin Wiz-ord': 5, 'Robgoblin Knuckle Head': 4, 'Robgoblin Adept': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1242 is the fork's; ours must be assigned and the scene sg_random_encounter_02 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

@@ -2599,10 +2599,27 @@
               "evidence": "title_string_id corrected from raw locale hash 622643944 to Global.Text id 407412 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3957607,
+          "title": "Unmasking the Bandits",
+          "title_string_id": 37995,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Unmasking the Bandits (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unmasking_the_bandits_3bb675)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3140013
+        3140013,
+        3957607
       ],
       "quests_given_text": [
         "Farnum's Free Advice (wiki: Henry Farnum gives it; client 409884327 and 2346967042 \"Henry Farnum has seen something special in you, and recommends that you offer your services to Queen Valerian\", both †). Soccer Star: Sidekicks Steal (steal the hooligans' soccer balls from Highroad Hijinx, 2068833246). A hooligan-trouble quest started by a Sanctuary guard: \"Henry at Farnum Farmstead has been complaining about a problem with some local Hooligans\" (1379065920), \"Commander Kiggle wants you to help Henry out with his his Hooligan trouble.\" (757525356), \"Visit Farnum Farmstead and help out Henry with his Hooligan problem.\" (57420792), \"Talk to Henry\" (1175135747); title not found. A prank errand (likely his): \"Go into the hooligan camp in Highroad Hijinx and sneak up on their leader Cal's tent and turn on his radio.\" (925272355; candidate title \"Cal's Tent\", ucdt 3099843788, by wording only). The crate-thief report goes to him (\"go tell Henry what you've found out about the chugawug thief!\" 737956380) and the Wompugg thread starts with him (below)."

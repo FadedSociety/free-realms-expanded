@@ -1,0 +1,547 @@
+{
+  "schema_version": 1,
+  "id": 14023,
+  "kind": "dungeon",
+  "title_id": 5704,
+  "description_id": 91647,
+  "icon_id": 897,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "interact": {
+      "npc_guid": 100000046201
+    }
+  },
+  "place": {
+    "zone": 1222,
+    "arena": "sg_mugworts_hollow",
+    "arrive": [
+      435.98,
+      -3.49,
+      69.18
+    ],
+    "exit_door": [
+      146.82,
+      -27.0,
+      455.38
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "elder_mugwort": {
+      "definition_id": 930057,
+      "name": "Elder Mugwort",
+      "name_id": 16811,
+      "model_id": 512,
+      "rank": "boss",
+      "boss": true
+    },
+    "ghostly_raven": {
+      "definition_id": 950050,
+      "name": "Ghostly Raven",
+      "name_id": 118942,
+      "model_id": 1010,
+      "rank": "normal"
+    },
+    "ghostly_snake": {
+      "definition_id": 950051,
+      "name": "Ghostly Snake",
+      "name_id": 118984,
+      "model_id": 1011,
+      "rank": "normal"
+    },
+    "warthog_spirit": {
+      "definition_id": 950049,
+      "name": "Warthog Spirit",
+      "name_id": 16874,
+      "model_id": 266,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "warthog_spirit",
+      "at": [
+        406.59,
+        -3.06,
+        77.7
+      ],
+      "heading": 1.314,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "ghostly_raven",
+      "at": [
+        406.14,
+        -2.97,
+        80.44
+      ],
+      "heading": 1.557,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "ghostly_snake",
+      "at": [
+        403.69,
+        -2.88,
+        77.2
+      ],
+      "heading": 1.332,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "warthog_spirit",
+      "at": [
+        409.76,
+        -3.25,
+        77.07
+      ],
+      "heading": 1.15,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "ghostly_raven",
+      "at": [
+        305.89,
+        -2.53,
+        109.0
+      ],
+      "heading": 1.295,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "ghostly_snake",
+      "at": [
+        304.66,
+        -2.23,
+        106.27
+      ],
+      "heading": 1.124,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "warthog_spirit",
+      "at": [
+        304.05,
+        -2.25,
+        110.86
+      ],
+      "heading": 1.474,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "ghostly_raven",
+      "at": [
+        308.72,
+        -2.77,
+        109.84
+      ],
+      "heading": 1.299,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "ghostly_snake",
+      "at": [
+        205.79,
+        -8.97,
+        126.1
+      ],
+      "heading": 2.758,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "warthog_spirit",
+      "at": [
+        203.02,
+        -9.59,
+        128.98
+      ],
+      "heading": 2.687,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "ghostly_raven",
+      "at": [
+        199.78,
+        -8.98,
+        129.27
+      ],
+      "heading": 2.566,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "ghostly_snake",
+      "at": [
+        198.68,
+        -7.45,
+        126.19
+      ],
+      "heading": 2.443,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "warthog_spirit",
+      "at": [
+        187.49,
+        -15.47,
+        226.3
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "ghostly_raven",
+      "at": [
+        189.13,
+        -15.03,
+        228.58
+      ],
+      "heading": -2.517,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "ghostly_snake",
+      "at": [
+        184.81,
+        -15.49,
+        226.46
+      ],
+      "heading": 1.63,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "warthog_spirit",
+      "at": [
+        187.98,
+        -16.12,
+        223.28
+      ],
+      "heading": -0.163,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "ghostly_raven",
+      "at": [
+        283.59,
+        -13.76,
+        304.4
+      ],
+      "heading": -2.588,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "ghostly_snake",
+      "at": [
+        283.85,
+        -13.97,
+        307.98
+      ],
+      "heading": -2.71,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "warthog_spirit",
+      "at": [
+        282.03,
+        -13.57,
+        300.53
+      ],
+      "heading": -2.473,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "ghostly_raven",
+      "at": [
+        281.01,
+        -13.64,
+        307.63
+      ],
+      "heading": -2.909,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "ghostly_snake",
+      "at": [
+        250.33,
+        -21.04,
+        381.28
+      ],
+      "heading": 2.702,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "warthog_spirit",
+      "at": [
+        248.16,
+        -20.89,
+        383.3
+      ],
+      "heading": 2.599,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "ghostly_raven",
+      "at": [
+        251.3,
+        -20.97,
+        378.46
+      ],
+      "heading": 2.636,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "ghostly_snake",
+      "at": [
+        249.07,
+        -20.19,
+        377.05
+      ],
+      "heading": 2.132,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a25": {
+      "definition": "warthog_spirit",
+      "at": [
+        159.34,
+        -31.22,
+        424.7
+      ],
+      "heading": 3.031,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a26": {
+      "definition": "ghostly_raven",
+      "at": [
+        158.83,
+        -31.58,
+        421.05
+      ],
+      "heading": 2.916,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a27": {
+      "definition": "ghostly_snake",
+      "at": [
+        158.3,
+        -30.99,
+        427.21
+      ],
+      "heading": 2.978,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a28": {
+      "definition": "warthog_spirit",
+      "at": [
+        155.3,
+        -31.01,
+        425.55
+      ],
+      "heading": 2.732,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "elder_mugwort",
+      "at": [
+        147.9,
+        -27.67,
+        450.34
+      ],
+      "heading": 2.624,
+      "boss": true,
+      "scale": 1.2,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_warthog_spirit": [
+      [
+        147.17,
+        -28.0,
+        446.34
+      ]
+    ],
+    "w1_ghostly_raven": [
+      [
+        144.64,
+        -27.15,
+        452.11
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "warthog_spirit",
+          "count": 1,
+          "at": "w1_warthog_spirit"
+        },
+        {
+          "definition": "ghostly_raven",
+          "count": 1,
+          "at": "w1_ghostly_raven"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 16174,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 5704 'Mugwort's Hollow' (title), 91647 (card), objective 76355; icon 897."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/mugwort_s_hollow.json: difficulty 4, zone 'Northern Wilds (near Shrouded Glade)', enemies ['Elder Mugwort', 'Elder Mugwort']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-115.6, 20.98, 800.97]: BJX fork Battles.lua:22 (Npcs.json Id 46201, sh_gates_01.adr). (R) the fork's own placement, not a captured one. Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 23 ('Mugwort's Hollow (the live dungeon: the glade's ghostly warthogs, ravens and snakes along the river, Mugwort b'): scene sg_mugworts_hollow, entry, exit, 8 waves, 31 spawns ({'Warthog Spirit': 11, 'Ghostly Raven': 10, 'Ghostly Snake': 9, 'Elder Druid Mugwort': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1222 is the fork's; ours must be assigned and the scene sg_mugworts_hollow has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Elder Mugwort' in this fight; the fork's layout had 'elder_druid_mugwort' there. (R) 'Elder Mugwort' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046201: reference Npcs.json Id 46201, model 111, name 5704, at [-115.6, 20.98, 800.97]."
+    }
+  ]
+}

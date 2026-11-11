@@ -1488,11 +1488,12 @@ fn node_content_is_bounded_and_unique() {
     // P-quest-npcs: 60 spots for 17 more quest pick-ups (983).
     // P-quest-crate: Somewhere in Storage's three crates leave the quest-crate pool (nine spots, max 6)
     // for their own pool of three, so all nine crates are live (1,051 -> 1,054); collections' 14 on top.
-    assert_eq!(actors.len(), 1068);
+    // Combat quests on: 6 spots for 2 pick-ups behind combat quests (sap samples, junk) (1,074).
+    assert_eq!(actors.len(), 1074);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 1068);
+    assert_eq!(ids.len(), 1074);
     assert!(
         actors
             .iter()

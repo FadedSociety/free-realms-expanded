@@ -1,0 +1,560 @@
+{
+  "schema_version": 1,
+  "id": 14057,
+  "kind": "dungeon",
+  "title_id": 2273,
+  "description_id": 70161,
+  "icon_id": 903,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "interact": {
+      "npc_guid": 100000046184
+    }
+  },
+  "place": {
+    "zone": 1216,
+    "arena": "bw_spider_lair",
+    "arrive": [
+      460.13,
+      -5.28,
+      50.24
+    ],
+    "exit_door": [
+      81.05,
+      -32.38,
+      409.23
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bristlewood_arachnid": {
+      "definition_id": 2723,
+      "name": "Bristlewood Arachnid",
+      "name_id": 73655,
+      "model_id": 52,
+      "rank": "normal"
+    },
+    "queen_arachnia": {
+      "definition_id": 2714,
+      "name": "Queen Arachnia",
+      "name_id": 3592,
+      "model_id": 53,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "spiderling": {
+      "definition_id": 950144,
+      "name": "Spiderling",
+      "name_id": 3594,
+      "model_id": 743,
+      "rank": "normal"
+    },
+    "w58b_black_widow": {
+      "definition_id": 930028,
+      "name": "Black Widow",
+      "name_id": 118963,
+      "model_id": 52,
+      "rank": "boss"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        430.72,
+        -4.3,
+        77.45
+      ],
+      "heading": 1.721,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "w58b_black_widow",
+      "at": [
+        433.63,
+        -3.57,
+        80.3
+      ],
+      "heading": 1.948,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "spiderling",
+      "at": [
+        435.45,
+        -3.87,
+        77.99
+      ],
+      "heading": 1.824,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "w58b_black_widow",
+      "at": [
+        353.95,
+        -1.72,
+        101.59
+      ],
+      "heading": 2.179,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "spiderling",
+      "at": [
+        355.1,
+        -1.28,
+        99.11
+      ],
+      "heading": 2.034,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        353.62,
+        -2.76,
+        105.01
+      ],
+      "heading": 2.364,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "spiderling",
+      "at": [
+        277.41,
+        -4.36,
+        96.32
+      ],
+      "heading": 1.228,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        279.99,
+        -2.82,
+        93.44
+      ],
+      "heading": 0.856,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "w58b_black_widow",
+      "at": [
+        271.92,
+        -3.85,
+        96.26
+      ],
+      "heading": 1.34,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        220.45,
+        -3.34,
+        109.81
+      ],
+      "heading": 2.597,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "w58b_black_widow",
+      "at": [
+        217.36,
+        -4.47,
+        110.17
+      ],
+      "heading": 2.273,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "spiderling",
+      "at": [
+        216.1,
+        -4.96,
+        105.5
+      ],
+      "heading": 1.615,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "w58b_black_widow",
+      "at": [
+        186.95,
+        -14.79,
+        179.59
+      ],
+      "heading": 2.341,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "spiderling",
+      "at": [
+        186.16,
+        -14.64,
+        182.26
+      ],
+      "heading": 2.46,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        190.32,
+        -14.59,
+        179.47
+      ],
+      "heading": 2.674,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "spiderling",
+      "at": [
+        212.98,
+        -15.67,
+        242.81
+      ],
+      "heading": -1.171,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        215.19,
+        -15.67,
+        244.84
+      ],
+      "heading": -1.595,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "w58b_black_widow",
+      "at": [
+        217.73,
+        -14.83,
+        243.13
+      ],
+      "heading": -1.403,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        267.62,
+        -14.31,
+        287.67
+      ],
+      "heading": -2.99,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "w58b_black_widow",
+      "at": [
+        266.95,
+        -12.72,
+        283.29
+      ],
+      "heading": -2.992,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "spiderling",
+      "at": [
+        269.41,
+        -12.76,
+        285.21
+      ],
+      "heading": -2.718,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "w58b_black_widow",
+      "at": [
+        271.35,
+        -15.91,
+        364.89
+      ],
+      "heading": 2.644,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "spiderling",
+      "at": [
+        271.74,
+        -16.5,
+        361.63
+      ],
+      "heading": 2.509,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        274.8,
+        -14.74,
+        364.36
+      ],
+      "heading": 2.92,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a25": {
+      "definition": "spiderling",
+      "at": [
+        196.25,
+        -32.73,
+        395.74
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a26": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        195.08,
+        -32.18,
+        393.3
+      ],
+      "heading": 0.446,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a27": {
+      "definition": "w58b_black_widow",
+      "at": [
+        199.29,
+        -32.12,
+        394.58
+      ],
+      "heading": -1.207,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a28": {
+      "definition": "bristlewood_arachnid",
+      "at": [
+        121.01,
+        -34.79,
+        401.95
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a29": {
+      "definition": "w58b_black_widow",
+      "at": [
+        123.81,
+        -35.02,
+        402.15
+      ],
+      "heading": -1.644,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a30": {
+      "definition": "spiderling",
+      "at": [
+        122.35,
+        -35.04,
+        399.05
+      ],
+      "heading": -0.433,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "queen_arachnia",
+      "at": [
+        93.14,
+        -33.1,
+        406.39
+      ],
+      "heading": 1.288,
+      "boss": true,
+      "scale": 1.3,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_w58b_black_widow": [
+      [
+        89.69,
+        -33.01,
+        407.78
+      ],
+      [
+        96.79,
+        -32.42,
+        405.56
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58b_black_widow",
+          "count": 2,
+          "at": "w1_w58b_black_widow"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 2288,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 2273 'Arachnia's Lair' (title), 70161 (card), objective 76355; icon 903."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/arachnia_s_lair.json: difficulty 2, zone 'Briarwood (Bristlewood)', enemies ['Queen Arachnia', 'Black Widows', 'Spiderling Mothers', 'Large Webspinners', 'Webspinner Princesses', 'Queen Arachnia']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-801.81, -70.3, 2153.67]: BJX fork Battles.lua:5 (Npcs.json Id 46184, bw_spiderweb_gate_01.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 17 ('Arachnia's Lair (the live dungeon: spiders along the webbed trail from the gate up to the plateau, Queen Arach'): scene bw_spider_lair, entry, exit, 11 waves, 33 spawns ({'Bristlewood Arachnid': 10, 'Black Widow': 12, 'Spiderling': 10, 'Queen Arachnia': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1216 is the fork's; ours must be assigned and the scene bw_spider_lair has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046184: reference Npcs.json Id 46184, model 413, name 2273, at [-801.81, -70.3, 2153.67]."
+    }
+  ]
+}

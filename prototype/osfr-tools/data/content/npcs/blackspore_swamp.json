@@ -5633,6 +5633,22 @@
               "evidence": "title_string_id corrected from raw locale hash 2002704819 to Global.Text id 78865 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3957565,
+          "title": "The Hunt for Mudshell",
+          "title_string_id": 140224,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Hunt for Mudshell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hunt_for_mudshell_bf172c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -5640,7 +5656,8 @@
         3110006,
         3110007,
         3110009,
-        3110010
+        3110010,
+        3957565
       ],
       "quests_given_text": [
         "Ninja: Silence is Golden... and Deadly (target): E4 continues the stealth training with Chloe in Blackspore (1346410582); Ninja: Strike from the Shadows; Ninja: Handle with Care (timed hidden-bag test, 2 of 3 difficulty icons); Ninja: Achieve Level 5; Ninja: Nothing to Sneeze At; Ninja: That's the Spirit; plus Mudshell turn-in (The Hunt for Mudshell) and probably the Bergram hunt turn-in (Ninja, Mudshell, Bergram Stumpfinger's Ghost)"
@@ -19164,10 +19181,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Lucinda"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000042,
@@ -39576,10 +39600,27 @@
               "evidence": "title_string_id corrected from raw locale hash 3750868535 to Global.Text id 130861 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3957562,
+          "title": "The Ghost of Bergram Stumpfinger",
+          "title_string_id": 383025,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Ghost of Bergram Stumpfinger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_ghost_of_bergram_stumpfinger_f87bac)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3030019
+        3030019,
+        3957562
       ],
       "quests_given_text": [
         "Brawler: Rightful Owner (target, headstones returned); Brawler: Cemetery Security (job offer to Petra, 296481797); ghost-haunting errand \"Put an end to his haunting of Virgil Veilmont!\" (2226250087) (Brawler)"
@@ -40018,11 +40059,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:309; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1542 (ModelId=663, ModelFileName=human_m_greg_veilmont.agr, NameId=45304)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.018148,
       "model_id": 663,
-      "model_file_name": "human_m_greg_veilmont.agr"
+      "model_file_name": "human_m_greg_veilmont.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000078,
@@ -40551,8 +40599,27 @@
       "location_evidence": [
         "\"Near Mire's Edge\" (\"Return to Vysha near Mire's Edge\", 693547420)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957622,
+          "title": "Who's the Boss",
+          "title_string_id": 76115,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Who's the Boss (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_who_s_the_boss_c16791)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957622
+      ],
       "quests_given_text": [
         "One delivery errand, title unknown (719892436 \"Deliver to Vysha\")"
       ],
@@ -40858,11 +40925,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3282; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4648 (ModelId=178, ModelFileName=changeling_f.adr, NameId=78524)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.089707,
       "model_id": 178,
-      "model_file_name": "changeling_f.adr"
+      "model_file_name": "changeling_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000080,

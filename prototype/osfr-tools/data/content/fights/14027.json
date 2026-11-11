@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "id": 14027,
+  "kind": "dungeon",
+  "title_id": 5698,
+  "description_id": 7071,
+  "icon_id": 670,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "interact": {
+      "npc_guid": 100000033823
+    }
+  },
+  "place": {
+    "zone": 1212,
+    "arena": "sh_frostfang_cavern",
+    "arrive": [
+      257.99,
+      88.71,
+      218.7
+    ],
+    "exit_door": [
+      289.45,
+      88.25,
+      436.16
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "chillblaine": {
+      "definition_id": 950060,
+      "name": "Chillblaine",
+      "name_id": 6477,
+      "model_id": 176,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "elder_rock_crawler": {
+      "definition_id": 950063,
+      "name": "Elder Rock Crawler",
+      "name_id": 6479,
+      "model_id": 412,
+      "rank": "normal"
+    },
+    "frostfang_wolf": {
+      "definition_id": 950061,
+      "name": "Frostfang Wolf",
+      "name_id": 6468,
+      "model_id": 177,
+      "rank": "normal"
+    },
+    "rock_crawler": {
+      "definition_id": 950062,
+      "name": "Rock Crawler",
+      "name_id": 6478,
+      "model_id": 412,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "frostfang_wolf",
+      "at": [
+        223.83,
+        89.29,
+        219.26
+      ],
+      "heading": 2.191,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "rock_crawler",
+      "at": [
+        228.81,
+        89.88,
+        216.24
+      ],
+      "heading": 2.246,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        220.15,
+        88.84,
+        221.28
+      ],
+      "heading": 2.163,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "frostfang_wolf",
+      "at": [
+        227.08,
+        89.66,
+        218.47
+      ],
+      "heading": 2.307,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "rock_crawler",
+      "at": [
+        257.03,
+        83.53,
+        250.46
+      ],
+      "heading": -2.311,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        259.07,
+        83.5,
+        248.84
+      ],
+      "heading": -1.848,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "frostfang_wolf",
+      "at": [
+        254.81,
+        82.77,
+        247.05
+      ],
+      "heading": -1.407,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "rock_crawler",
+      "at": [
+        252.42,
+        82.84,
+        248.74
+      ],
+      "heading": 2.495,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        276.93,
+        80.29,
+        269.36
+      ],
+      "heading": -3.014,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "frostfang_wolf",
+      "at": [
+        278.53,
+        80.51,
+        266.62
+      ],
+      "heading": -2.794,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "rock_crawler",
+      "at": [
+        272.3,
+        80.08,
+        272.34
+      ],
+      "heading": 2.917,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        274.8,
+        80.2,
+        270.89
+      ],
+      "heading": 3.085,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "frostfang_wolf",
+      "at": [
+        257.18,
+        79.94,
+        292.0
+      ],
+      "heading": 2.785,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "rock_crawler",
+      "at": [
+        257.85,
+        79.97,
+        294.7
+      ],
+      "heading": 2.902,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        256.88,
+        80.12,
+        297.17
+      ],
+      "heading": 2.88,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "frostfang_wolf",
+      "at": [
+        255.9,
+        79.96,
+        288.98
+      ],
+      "heading": 2.53,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "rock_crawler",
+      "at": [
+        257.48,
+        80.16,
+        350.46
+      ],
+      "heading": -2.793,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        260.78,
+        80.1,
+        348.84
+      ],
+      "heading": -2.592,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "frostfang_wolf",
+      "at": [
+        258.17,
+        80.2,
+        354.04
+      ],
+      "heading": -2.819,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "rock_crawler",
+      "at": [
+        261.03,
+        80.04,
+        351.86
+      ],
+      "heading": -2.657,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        264.8,
+        82.82,
+        411.44
+      ],
+      "heading": 3.041,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "frostfang_wolf",
+      "at": [
+        262.56,
+        82.6,
+        409.7
+      ],
+      "heading": 2.88,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "rock_crawler",
+      "at": [
+        265.68,
+        82.27,
+        408.54
+      ],
+      "heading": 3.085,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        269.42,
+        82.17,
+        408.61
+      ],
+      "heading": -2.921,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a25": {
+      "definition": "frostfang_wolf",
+      "at": [
+        282.95,
+        88.25,
+        447.9
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a26": {
+      "definition": "rock_crawler",
+      "at": [
+        286.08,
+        88.2,
+        449.45
+      ],
+      "heading": -2.031,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a27": {
+      "definition": "elder_rock_crawler",
+      "at": [
+        285.84,
+        88.22,
+        445.87
+      ],
+      "heading": -0.957,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a28": {
+      "definition": "frostfang_wolf",
+      "at": [
+        279.61,
+        88.29,
+        451.23
+      ],
+      "heading": 2.355,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "chillblaine",
+      "at": [
+        299.56,
+        88.23,
+        428.56
+      ],
+      "heading": -0.2,
+      "boss": true,
+      "scale": 2.2,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_frostfang_wolf": [
+      [
+        300.11,
+        88.29,
+        425.56
+      ],
+      [
+        302.55,
+        88.46,
+        428.28
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_wolf",
+          "count": 2,
+          "at": "w1_frostfang_wolf"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 20653,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 5698 'Frostfang Caverns' (title), 7071 (card), objective 76355; icon 670."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/frostfang_caverns.json: difficulty 4, zone 'Snowhill', enemies ['Chillblaine', 'Wolves', 'Bats', 'Ice Crawlers', 'Mammoth Crawlers', 'Giant Bat', 'Chillblaine']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [92.82, 66.34, 554.86]: BJX fork FabledRealms.lua:3994 (Npcs.json Id 33823, sh_cave_entrance_bat_cave_01.adr). (R) the fork's own placement, not a captured one. Region Snowhill, place Snowhill."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 13 ('Frostfang Caverns (the live dungeon: wolves and rock crawlers from the fenced ledge to the north cave, Chillbl'): scene sh_frostfang_cavern, entry, exit, 8 waves, 31 spawns ({'Frostfang Wolf': 12, 'Rock Crawler': 9, 'Elder Rock Crawler': 9, 'Chillblaine': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1212 is the fork's; ours must be assigned and the scene sh_frostfang_cavern has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000033823: reference Npcs.json Id 33823, model 251, name 5698, at [92.82, 66.34, 554.86]."
+    }
+  ]
+}

@@ -1,0 +1,392 @@
+{
+  "schema_version": 1,
+  "id": 14039,
+  "kind": "dungeon",
+  "title_id": 23555,
+  "description_id": 91651,
+  "icon_id": 311,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13,
+    "interact": {
+      "npc_guid": 100000046216
+    }
+  },
+  "place": {
+    "zone": 1227,
+    "arena": "bw_tanglewood_fort",
+    "arrive": [
+      428.55,
+      -86.37,
+      357.9
+    ],
+    "exit_door": [
+      446.86,
+      -52.94,
+      477.79
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "commander_kluggenkrush": {
+      "definition_id": 950105,
+      "name": "Commander Kluggenkrush",
+      "name_id": 90308,
+      "model_id": 65,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "tanglewood_guard": {
+      "definition_id": 950104,
+      "name": "Tanglewood Guard",
+      "name_id": 94370,
+      "model_id": 1016,
+      "rank": "normal"
+    },
+    "tanglewood_soldier": {
+      "definition_id": 950103,
+      "name": "Tanglewood Soldier",
+      "name_id": 3892,
+      "model_id": 65,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        416.45,
+        -86.59,
+        378.7
+      ],
+      "heading": 2.226,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "tanglewood_guard",
+      "at": [
+        413.61,
+        -86.9,
+        378.63
+      ],
+      "heading": 2.079,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        412.89,
+        -86.82,
+        381.58
+      ],
+      "heading": 2.234,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "tanglewood_guard",
+      "at": [
+        413.73,
+        -87.06,
+        375.73
+      ],
+      "heading": 1.851,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "tanglewood_guard",
+      "at": [
+        386.86,
+        -77.33,
+        439.01
+      ],
+      "heading": -1.882,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        385.78,
+        -77.37,
+        441.42
+      ],
+      "heading": -2.196,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "tanglewood_guard",
+      "at": [
+        382.48,
+        -77.87,
+        442.39
+      ],
+      "heading": -2.596,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        389.07,
+        -76.99,
+        435.85
+      ],
+      "heading": -1.513,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        467.1,
+        -62.05,
+        401.25
+      ],
+      "heading": -1.209,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "tanglewood_guard",
+      "at": [
+        466.29,
+        -62.18,
+        398.58
+      ],
+      "heading": -0.979,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        464.21,
+        -62.47,
+        400.91
+      ],
+      "heading": -1.063,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "tanglewood_guard",
+      "at": [
+        466.52,
+        -62.02,
+        404.16
+      ],
+      "heading": -1.452,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "tanglewood_guard",
+      "at": [
+        461.79,
+        -52.5,
+        465.96
+      ],
+      "heading": -2.532,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        460.18,
+        -52.54,
+        468.2
+      ],
+      "heading": -2.824,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "tanglewood_guard",
+      "at": [
+        461.06,
+        -52.47,
+        462.84
+      ],
+      "heading": -2.289,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "tanglewood_soldier",
+      "at": [
+        465.5,
+        -52.53,
+        462.5
+      ],
+      "heading": -1.912,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "commander_kluggenkrush",
+      "at": [
+        444.11,
+        -52.83,
+        474.21
+      ],
+      "heading": 1.594,
+      "boss": true,
+      "scale": 1.45,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_tanglewood_soldier": [
+      [
+        440.42,
+        -52.78,
+        472.71
+      ]
+    ],
+    "w1_tanglewood_guard": [
+      [
+        445.56,
+        -52.7,
+        470.77
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "tanglewood_soldier",
+          "count": 1,
+          "at": "w1_tanglewood_soldier"
+        },
+        {
+          "definition": "tanglewood_guard",
+          "count": 1,
+          "at": "w1_tanglewood_guard"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 91709,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 23555 'Tanglewood Fort' (title), 91651 (card), objective 76355; icon 311."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/tanglewood_fort.json: difficulty 5, zone 'Briarwood (Nettleseed)', enemies ['Commander Kluggenkrush', 'Blacksmith Brix', 'Chugawug Soldiers', 'Chugawug Archers', 'Battle Warthogs', 'Nettleseed Pests', 'Commander Kluggenkrush', 'Blacksmith Brix']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-360.28, -83.08, 2403.68]: BJX fork Battles.lua:37 (Npcs.json Id 46216, sh_gates_01.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 28 ('Tanglewood Fort (the live dungeon: the commander's chugawug soldiers up through the fort, Commander Kluggenkru'): scene bw_tanglewood_fort, entry, exit, 5 waves, 19 spawns ({'Tanglewood Soldier': 9, 'Tanglewood Guard': 9, 'Commander Kluggenkrush': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1227 is the fork's; ours must be assigned and the scene bw_tanglewood_fort has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 75 coins / 260 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046216: reference Npcs.json Id 46216, model 111, name 23555, at [-360.28, -83.08, 2403.68]."
+    }
+  ]
+}

@@ -76,8 +76,8 @@
     "existing_model_id_gaps": 0,
     "known_ability_evidence_strings": 28,
     "w58b_definitions_added": 24,
-    "client_model_table_pairs_checked": 112,
-    "catalog_pairs_present": 110,
+    "client_model_table_pairs_checked": 186,
+    "catalog_pairs_present": 184,
     "catalog_pairs_missing": 2,
     "world_rows_resolved": 36,
     "world_rows_partial": 3,
@@ -115,7 +115,8 @@
     },
     "t015_definitions_added": 30,
     "t015_model_id_to_adr_pairs_checked": 30,
-    "total_definitions": 107
+    "total_definitions": 107,
+    "combat_quest_definitions_added": 74
   },
   "definition_field_sources": {
     "3156": {
@@ -21100,6 +21101,2078 @@
       },
       "runtime_scale": null,
       "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3460,
+      "enemy_id": "bandit_patrolman",
+      "kind": "Bandit Patrolman",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 440716 reads 'Bandit Patrolman', Models.txt line 200 maps 199 to chugawug_m_bandit_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 2723,
+      "enemy_id": "bristlewood_arachnid",
+      "kind": "Bristlewood Arachnid",
+      "model_id": 52,
+      "adr": "blackwidow_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 53,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 52,
+        "filename": "blackwidow_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24473,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 73655 reads 'Bristlewood Arachnid', Models.txt line 53 maps 52 to blackwidow_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 3102,
+      "enemy_id": "brugo",
+      "kind": "Brugo",
+      "model_id": 314,
+      "adr": "troll_hogosh_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 315,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 314,
+        "filename": "troll_hogosh_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21174,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 45247 reads 'Brugo', Models.txt line 315 maps 314 to troll_hogosh_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950032,
+      "enemy_id": "cave_yeti",
+      "kind": "Cave Yeti",
+      "model_id": 51,
+      "adr": "sasquatch_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 52,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 51,
+        "filename": "sasquatch_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 19361,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6475 reads 'Cave Yeti', Models.txt line 52 maps 51 to sasquatch_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950010,
+      "enemy_id": "changeling_berserker",
+      "kind": "Changeling Berserker",
+      "model_id": 238,
+      "adr": "changeling_fighter_f.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 239,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 238,
+        "filename": "changeling_fighter_f.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1374,
+        "extracted_path": "AssetsW_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15997 reads 'Changeling Berserker', Models.txt line 239 maps 238 to changeling_fighter_f.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950190,
+      "enemy_id": "changeling_bruiser",
+      "kind": "Changeling Bruiser",
+      "model_id": 239,
+      "adr": "changeling_fighter_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 240,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 239,
+        "filename": "changeling_fighter_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 35759,
+        "extracted_path": "AssetsW_009.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 16785 reads 'Changeling Bruiser', Models.txt line 240 maps 239 to changeling_fighter_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950189,
+      "enemy_id": "changeling_defiler",
+      "kind": "Changeling Defiler",
+      "model_id": 234,
+      "adr": "changeling_m_mage.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 235,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 234,
+        "filename": "changeling_m_mage.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1366,
+        "extracted_path": "AssetsW_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 16237 reads 'Changeling Defiler', Models.txt line 235 maps 234 to changeling_m_mage.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950008,
+      "enemy_id": "changeling_hacker",
+      "kind": "Changeling Hacker",
+      "model_id": 240,
+      "adr": "changeling_ninja_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 241,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 240,
+        "filename": "changeling_ninja_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 19979,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15995 reads 'Changeling Hacker', Models.txt line 241 maps 240 to changeling_ninja_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950009,
+      "enemy_id": "changeling_marauder",
+      "kind": "Changeling Marauder",
+      "model_id": 239,
+      "adr": "changeling_fighter_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 240,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 239,
+        "filename": "changeling_fighter_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 35759,
+        "extracted_path": "AssetsW_009.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15996 reads 'Changeling Marauder', Models.txt line 240 maps 239 to changeling_fighter_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950191,
+      "enemy_id": "changeling_thief",
+      "kind": "Changeling Thief",
+      "model_id": 278,
+      "adr": "changeling_scoutthief_f.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 279,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 278,
+        "filename": "changeling_scoutthief_f.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1352,
+        "extracted_path": "AssetsW_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 17008 reads 'Changeling Thief', Models.txt line 279 maps 278 to changeling_scoutthief_f.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950060,
+      "enemy_id": "chillblaine",
+      "kind": "Chillblaine",
+      "model_id": 176,
+      "adr": "wolf.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 177,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 176,
+        "filename": "wolf.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 5644,
+        "extracted_path": "AssetsW_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6477 reads 'Chillblaine', Models.txt line 177 maps 176 to wolf.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950105,
+      "enemy_id": "commander_kluggenkrush",
+      "kind": "Commander Kluggenkrush",
+      "model_id": 65,
+      "adr": "chugawug_m_greenwood_soldier.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 66,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 65,
+        "filename": "chugawug_m_greenwood_soldier.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 5101,
+        "extracted_path": "AssetsW_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 90308 reads 'Commander Kluggenkrush', Models.txt line 66 maps 65 to chugawug_m_greenwood_soldier.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950016,
+      "enemy_id": "cracked_claw",
+      "kind": "Cracked Claw",
+      "model_id": 677,
+      "adr": "cray_boss_swamp.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 678,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 677,
+        "filename": "cray_boss_swamp.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 20186,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 76410 reads 'Cracked Claw', Models.txt line 678 maps 677 to cray_boss_swamp.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950015,
+      "enemy_id": "cray_marauder_captain",
+      "kind": "Cray Marauder Captain",
+      "model_id": 676,
+      "adr": "cray_boss_ocean.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 677,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 676,
+        "filename": "cray_boss_ocean.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 27389,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 76574 reads 'Cray Marauder Captain', Models.txt line 677 maps 676 to cray_boss_ocean.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950192,
+      "enemy_id": "darvon",
+      "kind": "Darvon",
+      "model_id": 240,
+      "adr": "changeling_ninja_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 241,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 240,
+        "filename": "changeling_ninja_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 19979,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 17031 reads 'Darvon', Models.txt line 241 maps 240 to changeling_ninja_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950063,
+      "enemy_id": "elder_rock_crawler",
+      "kind": "Elder Rock Crawler",
+      "model_id": 412,
+      "adr": "shaggyspider_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 413,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 412,
+        "filename": "shaggyspider_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24775,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6479 reads 'Elder Rock Crawler', Models.txt line 413 maps 412 to shaggyspider_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950177,
+      "enemy_id": "enraged_shambler",
+      "kind": "Enraged Shambler",
+      "model_id": 71,
+      "adr": "necrowartzombie_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 72,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 71,
+        "filename": "necrowartzombie_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 8553,
+        "extracted_path": "AssetsW_002.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 71201 reads 'Enraged Shambler', Models.txt line 72 maps 71 to necrowartzombie_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950100,
+      "enemy_id": "forest_snake",
+      "kind": "Forest Snake",
+      "model_id": 180,
+      "adr": "snake.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 181,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 180,
+        "filename": "snake.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 8731,
+        "extracted_path": "AssetsW_002.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15847 reads 'Forest Snake', Models.txt line 181 maps 180 to snake.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950061,
+      "enemy_id": "frostfang_wolf",
+      "kind": "Frostfang Wolf",
+      "model_id": 177,
+      "adr": "wolf_evil.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 178,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 177,
+        "filename": "wolf_evil.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24665,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6468 reads 'Frostfang Wolf', Models.txt line 178 maps 177 to wolf_evil.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950132,
+      "enemy_id": "general_grexan",
+      "kind": "General Grexan",
+      "model_id": 99,
+      "adr": "troll_stone_grey.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 100,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 99,
+        "filename": "troll_stone_grey.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 27577,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 5357 reads 'General Grexan', Models.txt line 100 maps 99 to troll_stone_grey.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950011,
+      "enemy_id": "geomancer_hailstorm",
+      "kind": "Geomancer Hailstorm",
+      "model_id": 254,
+      "adr": "changeling_elder_m_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 255,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 254,
+        "filename": "changeling_elder_m_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51420,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 16000 reads 'Geomancer Hailstorm', Models.txt line 255 maps 254 to changeling_elder_m_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 4218,
+      "enemy_id": "ghost_ninja",
+      "kind": "Ghost Ninja",
+      "model_id": 945,
+      "adr": "human_m_ninja_ghost.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 946,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 945,
+        "filename": "human_m_ninja_ghost.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51466,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 5101517 reads 'Ghost Ninja', Models.txt line 946 maps 945 to human_m_ninja_ghost.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 4228,
+      "enemy_id": "ghost_ninja_striker",
+      "kind": "Ghost Ninja Striker",
+      "model_id": 945,
+      "adr": "human_m_ninja_ghost.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 946,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 945,
+        "filename": "human_m_ninja_ghost.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51466,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 5101519 reads 'Ghost Ninja Striker', Models.txt line 946 maps 945 to human_m_ninja_ghost.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950179,
+      "enemy_id": "ghost_pirate",
+      "kind": "Ghost Pirate",
+      "model_id": 10,
+      "adr": "ghostdwarf_m_miner_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 11,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 10,
+        "filename": "ghostdwarf_m_miner_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 23867,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 426878 reads 'Ghost Pirate', Models.txt line 11 maps 10 to ghostdwarf_m_miner_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950057,
+      "enemy_id": "ghostly_digger",
+      "kind": "Ghostly Digger",
+      "model_id": 10,
+      "adr": "ghostdwarf_m_miner_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 11,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 10,
+        "filename": "ghostdwarf_m_miner_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 23867,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 414852 reads 'Ghostly Digger', Models.txt line 11 maps 10 to ghostdwarf_m_miner_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950050,
+      "enemy_id": "ghostly_raven",
+      "kind": "Ghostly Raven",
+      "model_id": 1010,
+      "adr": "birds_raven_ghost.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1011,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1010,
+        "filename": "birds_raven_ghost.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 27536,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 118942 reads 'Ghostly Raven', Models.txt line 1011 maps 1010 to birds_raven_ghost.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950051,
+      "enemy_id": "ghostly_snake",
+      "kind": "Ghostly Snake",
+      "model_id": 1011,
+      "adr": "snake_ghost.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1012,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1011,
+        "filename": "snake_ghost.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 29071,
+        "extracted_path": "AssetsW_008.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 118984 reads 'Ghostly Snake', Models.txt line 1012 maps 1011 to snake_ghost.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950042,
+      "enemy_id": "graveyard_wraith",
+      "kind": "Graveyard Wraith",
+      "model_id": 751,
+      "adr": "wraith_m_cloakedskelly.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 752,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 751,
+        "filename": "wraith_m_cloakedskelly.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 17562,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 115827 reads 'Graveyard Wraith', Models.txt line 752 maps 751 to wraith_m_cloakedskelly.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950130,
+      "enemy_id": "grexan_s_wood_spider",
+      "kind": "Grexan's Wood Spider",
+      "model_id": 412,
+      "adr": "shaggyspider_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 413,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 412,
+        "filename": "shaggyspider_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24775,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 23044 reads 'Grexan's Wood Spider', Models.txt line 413 maps 412 to shaggyspider_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950112,
+      "enemy_id": "hedge_knight",
+      "kind": "Hedge Knight",
+      "model_id": 74,
+      "adr": "treesoldier.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 75,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 74,
+        "filename": "treesoldier.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21019,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4215 reads 'Hedge Knight', Models.txt line 75 maps 74 to treesoldier.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 4162,
+      "enemy_id": "hooligan_bullies",
+      "kind": "Hooligan Bullies!",
+      "model_id": 1913,
+      "adr": "sg_spawner_human_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1887,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1913,
+        "filename": "sg_spawner_human_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 68308,
+        "extracted_path": "Assets_003.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 74753 reads 'Hooligan Bullies!', Models.txt line 1887 maps 1913 to sg_spawner_human_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950040,
+      "enemy_id": "hooligan_scrapper",
+      "kind": "Hooligan Scrapper",
+      "model_id": 489,
+      "adr": "human_m_hooligan_brawler_02.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 490,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 489,
+        "filename": "human_m_hooligan_brawler_02.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 65141,
+        "extracted_path": "Assets_003.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 37614 reads 'Hooligan Scrapper', Models.txt line 490 maps 489 to human_m_hooligan_brawler_02.agr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950178,
+      "enemy_id": "hulking_shambler",
+      "kind": "Hulking Shambler",
+      "model_id": 73,
+      "adr": "necrowartzombie_03.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 74,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 73,
+        "filename": "necrowartzombie_03.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 25448,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 71202 reads 'Hulking Shambler', Models.txt line 74 maps 73 to necrowartzombie_03.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 3593,
+      "enemy_id": "ice_troll_scout",
+      "kind": "Ice Troll Scout",
+      "model_id": 4546,
+      "adr": "sg_troll_hut_02_snow.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3528,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4546,
+        "filename": "sg_troll_hut_02_snow.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 68417,
+        "extracted_path": "Assets_003.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 116741 reads 'Ice Troll Scout', Models.txt line 3528 maps 4546 to sg_troll_hut_02_snow.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950036,
+      "enemy_id": "ice_wolf_trainer",
+      "kind": "Ice Wolf Trainer",
+      "model_id": 100,
+      "adr": "troll_ice.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 101,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 100,
+        "filename": "troll_ice.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22582,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 92194 reads 'Ice Wolf Trainer', Models.txt line 101 maps 100 to troll_ice.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950041,
+      "enemy_id": "lesser_grave_elemental",
+      "kind": "Lesser Grave Elemental",
+      "model_id": 767,
+      "adr": "graveelemental_m_skullwgraves.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 768,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 767,
+        "filename": "graveelemental_m_skullwgraves.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 23364,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 115850 reads 'Lesser Grave Elemental', Models.txt line 768 maps 767 to graveelemental_m_skullwgraves.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950101,
+      "enemy_id": "maze_viper",
+      "kind": "Maze Viper",
+      "model_id": 180,
+      "adr": "snake.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 181,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 180,
+        "filename": "snake.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 8731,
+        "extracted_path": "AssetsW_002.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4230 reads 'Maze Viper', Models.txt line 181 maps 180 to snake.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 2813,
+      "enemy_id": "moldering_fungaloid",
+      "kind": "Moldering Fungaloid",
+      "model_id": 71,
+      "adr": "necrowartzombie_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 72,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 71,
+        "filename": "necrowartzombie_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 8553,
+        "extracted_path": "AssetsW_002.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 46015 reads 'Moldering Fungaloid', Models.txt line 72 maps 71 to necrowartzombie_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950169,
+      "enemy_id": "moldy_shambler",
+      "kind": "Moldy Shambler",
+      "model_id": 72,
+      "adr": "necrowartzombie_02.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 73,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 72,
+        "filename": "necrowartzombie_02.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 15657,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 73980 reads 'Moldy Shambler', Models.txt line 73 maps 72 to necrowartzombie_02.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950113,
+      "enemy_id": "nogg_the_cruel",
+      "kind": "Nogg the Cruel",
+      "model_id": 1682,
+      "adr": "robgoblin_m_master.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1656,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1682,
+        "filename": "robgoblin_m_master.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 18758,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4093 reads 'Nogg the Cruel', Models.txt line 1656 maps 1682 to robgoblin_m_master.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950107,
+      "enemy_id": "pca_operative",
+      "kind": "PCA Operative",
+      "model_id": 519,
+      "adr": "human_m_hooligan_brawler_03.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 520,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 519,
+        "filename": "human_m_hooligan_brawler_03.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 57546,
+        "extracted_path": "Assets_002.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 383059 reads 'PCA Operative', Models.txt line 520 maps 519 to human_m_hooligan_brawler_03.agr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950106,
+      "enemy_id": "pca_trickster",
+      "kind": "PCA Trickster",
+      "model_id": 489,
+      "adr": "human_m_hooligan_brawler_02.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 490,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 489,
+        "filename": "human_m_hooligan_brawler_02.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 65141,
+        "extracted_path": "Assets_003.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 130764 reads 'PCA Trickster', Models.txt line 490 maps 489 to human_m_hooligan_brawler_02.agr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950154,
+      "enemy_id": "robgoblin_adept",
+      "kind": "Robgoblin Adept",
+      "model_id": 188,
+      "adr": "robgoblin_f_mage.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 189,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 188,
+        "filename": "robgoblin_f_mage.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22887,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 41955 reads 'Robgoblin Adept', Models.txt line 189 maps 188 to robgoblin_f_mage.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950022,
+      "enemy_id": "robgoblin_boomer",
+      "kind": "Robgoblin Boomer",
+      "model_id": 4,
+      "adr": "robgoblin_m_basic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 5,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4,
+        "filename": "robgoblin_m_basic.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1362,
+        "extracted_path": "AssetsW_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 42034 reads 'Robgoblin Boomer', Models.txt line 5 maps 4 to robgoblin_m_basic.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950108,
+      "enemy_id": "robgoblin_bruiser",
+      "kind": "Robgoblin Bruiser",
+      "model_id": 189,
+      "adr": "robgoblin_m_bruiser.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 190,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 189,
+        "filename": "robgoblin_m_bruiser.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 49261,
+        "extracted_path": "Assets_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6944 reads 'Robgoblin Bruiser', Models.txt line 190 maps 189 to robgoblin_m_bruiser.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950187,
+      "enemy_id": "robgoblin_geomancer",
+      "kind": "Robgoblin Geomancer!",
+      "model_id": 1914,
+      "adr": "sg_spawner_robgoblin_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1888,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1914,
+        "filename": "sg_spawner_robgoblin_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 52654,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 42053 reads 'Robgoblin Geomancer!', Models.txt line 1888 maps 1914 to sg_spawner_robgoblin_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 3936,
+      "enemy_id": "robgoblin_kaboomer",
+      "kind": "Robgoblin Kaboomer",
+      "model_id": 4202,
+      "adr": "robgoblin_m_junkmaster.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3384,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4202,
+        "filename": "robgoblin_m_junkmaster.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51480,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6720 reads 'Robgoblin Kaboomer', Models.txt line 3384 maps 4202 to robgoblin_m_junkmaster.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950065,
+      "enemy_id": "robgoblin_knuckle_head",
+      "kind": "Robgoblin Knuckle Head",
+      "model_id": 4,
+      "adr": "robgoblin_m_basic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 5,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4,
+        "filename": "robgoblin_m_basic.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1362,
+        "extracted_path": "AssetsW_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6471 reads 'Robgoblin Knuckle Head', Models.txt line 5 maps 4 to robgoblin_m_basic.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950048,
+      "enemy_id": "robgoblin_prankster",
+      "kind": "Robgoblin Prankster",
+      "model_id": 721,
+      "adr": "robgoblin_jester_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 722,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 721,
+        "filename": "robgoblin_jester_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 49260,
+        "extracted_path": "Assets_000.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 101932 reads 'Robgoblin Prankster', Models.txt line 722 maps 721 to robgoblin_jester_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950047,
+      "enemy_id": "robgoblin_troublemakers",
+      "kind": "Robgoblin Troublemakers!",
+      "model_id": 1914,
+      "adr": "sg_spawner_robgoblin_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1888,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1914,
+        "filename": "sg_spawner_robgoblin_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 52654,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 93268 reads 'Robgoblin Troublemakers!', Models.txt line 1888 maps 1914 to sg_spawner_robgoblin_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950109,
+      "enemy_id": "robgoblin_wiz_ord",
+      "kind": "Robgoblin Wiz-ord",
+      "model_id": 191,
+      "adr": "robgoblin_m_mage.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 192,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 191,
+        "filename": "robgoblin_m_mage.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 15461,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6945 reads 'Robgoblin Wiz-ord', Models.txt line 192 maps 191 to robgoblin_m_mage.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950062,
+      "enemy_id": "rock_crawler",
+      "kind": "Rock Crawler",
+      "model_id": 412,
+      "adr": "shaggyspider_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 413,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 412,
+        "filename": "shaggyspider_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24775,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6478 reads 'Rock Crawler', Models.txt line 413 maps 412 to shaggyspider_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950002,
+      "enemy_id": "shadow_talon_blade",
+      "kind": "Shadow Talon Blade",
+      "model_id": 394,
+      "adr": "human_m_ninja_shadowtalon_02.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 395,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 394,
+        "filename": "human_m_ninja_shadowtalon_02.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 88497,
+        "extracted_path": "Assets_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15567 reads 'Shadow Talon Blade', Models.txt line 395 maps 394 to human_m_ninja_shadowtalon_02.agr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950004,
+      "enemy_id": "shadow_talon_master",
+      "kind": "Shadow Talon Master",
+      "model_id": 4094,
+      "adr": "human_m_ninja_shadowtalon_jintaka.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3276,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4094,
+        "filename": "human_m_ninja_shadowtalon_jintaka.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 65159,
+        "extracted_path": "Assets_003.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 39871 reads 'Shadow Talon Master', Models.txt line 3276 maps 4094 to human_m_ninja_shadowtalon_jintaka.agr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950001,
+      "enemy_id": "shadow_talon_ninja",
+      "kind": "Shadow Talon Ninja",
+      "model_id": 396,
+      "adr": "human_m_ninja_shadowtalon_01.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 397,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 396,
+        "filename": "human_m_ninja_shadowtalon_01.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 69938,
+        "extracted_path": "Assets_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15568 reads 'Shadow Talon Ninja', Models.txt line 397 maps 396 to human_m_ninja_shadowtalon_01.agr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950023,
+      "enemy_id": "smuggler",
+      "kind": "Smuggler",
+      "model_id": 669,
+      "adr": "human_blackspore_thief_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 670,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 669,
+        "filename": "human_blackspore_thief_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21426,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 91865 reads 'Smuggler', Models.txt line 670 maps 669 to human_blackspore_thief_m.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950037,
+      "enemy_id": "snognosh",
+      "kind": "Snognosh",
+      "model_id": 100,
+      "adr": "troll_ice.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 101,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 100,
+        "filename": "troll_ice.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22582,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 5044 reads 'Snognosh', Models.txt line 101 maps 100 to troll_ice.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950035,
+      "enemy_id": "snow_wolf",
+      "kind": "Snow Wolf",
+      "model_id": 176,
+      "adr": "wolf.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 177,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 176,
+        "filename": "wolf.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 5644,
+        "extracted_path": "AssetsW_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 103604 reads 'Snow Wolf', Models.txt line 177 maps 176 to wolf.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950144,
+      "enemy_id": "spiderling",
+      "kind": "Spiderling",
+      "model_id": 743,
+      "adr": "blackwidow_baby_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 744,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 743,
+        "filename": "blackwidow_baby_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51488,
+        "extracted_path": "Assets_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 3594 reads 'Spiderling', Models.txt line 744 maps 743 to blackwidow_baby_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950054,
+      "enemy_id": "spore_shambler",
+      "kind": "Spore Shambler",
+      "model_id": 72,
+      "adr": "necrowartzombie_02.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 73,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 72,
+        "filename": "necrowartzombie_02.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 15657,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4456 reads 'Spore Shambler', Models.txt line 73 maps 72 to necrowartzombie_02.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950104,
+      "enemy_id": "tanglewood_guard",
+      "kind": "Tanglewood Guard",
+      "model_id": 1016,
+      "adr": "chugawug_m_greenwood_soldierarcher_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1017,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1016,
+        "filename": "chugawug_m_greenwood_soldierarcher_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21435,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 94370 reads 'Tanglewood Guard', Models.txt line 1017 maps 1016 to chugawug_m_greenwood_soldierarcher_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950103,
+      "enemy_id": "tanglewood_soldier",
+      "kind": "Tanglewood Soldier",
+      "model_id": 65,
+      "adr": "chugawug_m_greenwood_soldier.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 66,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 65,
+        "filename": "chugawug_m_greenwood_soldier.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 5101,
+        "extracted_path": "AssetsW_001.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 3892 reads 'Tanglewood Soldier', Models.txt line 66 maps 65 to chugawug_m_greenwood_soldier.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 1234001,
+      "enemy_id": "thugamug",
+      "kind": "Thugamug",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 103031 reads 'Thugamug', Models.txt line 200 maps 199 to chugawug_m_bandit_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 1234002,
+      "enemy_id": "thugamug_henchman",
+      "kind": "Thugamug Henchman",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 103726 reads 'Thugamug Henchman', Models.txt line 200 maps 199 to chugawug_m_bandit_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950078,
+      "enemy_id": "thugamug_s_left_hand",
+      "kind": "Thugamug's Left Hand",
+      "model_id": 200,
+      "adr": "chugawug_f_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 201,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 200,
+        "filename": "chugawug_f_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14628,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 389699 reads 'Thugamug's Left Hand', Models.txt line 201 maps 200 to chugawug_f_bandit_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950077,
+      "enemy_id": "thugamug_s_right_hand",
+      "kind": "Thugamug's Right Hand",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 389678 reads 'Thugamug's Right Hand', Models.txt line 200 maps 199 to chugawug_m_bandit_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950013,
+      "enemy_id": "thugawug_stomper",
+      "kind": "Thugawug Stomper",
+      "model_id": 200,
+      "adr": "chugawug_f_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 201,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 200,
+        "filename": "chugawug_f_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14628,
+        "extracted_path": "AssetsW_004.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 440717 reads 'Thugawug Stomper', Models.txt line 201 maps 200 to chugawug_f_bandit_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950003,
+      "enemy_id": "trained_eagle",
+      "kind": "Trained Eagle",
+      "model_id": 127,
+      "adr": "birds_eagle.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 128,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 127,
+        "filename": "birds_eagle.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 12533,
+        "extracted_path": "AssetsW_003.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 15572 reads 'Trained Eagle', Models.txt line 128 maps 127 to birds_eagle.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950033,
+      "enemy_id": "umari",
+      "kind": "Umari",
+      "model_id": 146,
+      "adr": "sasquatch_boss.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 147,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 146,
+        "filename": "sasquatch_boss.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 43310,
+        "extracted_path": "AssetsW_011.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6502 reads 'Umari', Models.txt line 147 maps 146 to sasquatch_boss.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950088,
+      "enemy_id": "unga_frostclaw",
+      "kind": "Unga Frostclaw",
+      "model_id": 146,
+      "adr": "sasquatch_boss.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 147,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 146,
+        "filename": "sasquatch_boss.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 43310,
+        "extracted_path": "AssetsW_011.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4218 reads 'Unga Frostclaw', Models.txt line 147 maps 146 to sasquatch_boss.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950049,
+      "enemy_id": "warthog_spirit",
+      "kind": "Warthog Spirit",
+      "model_id": 266,
+      "adr": "warthog_ghost.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 267,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 266,
+        "filename": "warthog_ghost.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 27922,
+        "extracted_path": "AssetsW_007.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 16874 reads 'Warthog Spirit', Models.txt line 267 maps 266 to warthog_ghost.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950110,
+      "enemy_id": "wizard_hildegarde",
+      "kind": "Wizard Hildegarde",
+      "model_id": 188,
+      "adr": "robgoblin_f_mage.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 189,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 188,
+        "filename": "robgoblin_f_mage.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22887,
+        "extracted_path": "AssetsW_006.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6946 reads 'Wizard Hildegarde', Models.txt line 189 maps 188 to robgoblin_f_mage.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950031,
+      "enemy_id": "yeti_bouncer",
+      "kind": "Yeti Bouncer",
+      "model_id": 51,
+      "adr": "sasquatch_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 52,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 51,
+        "filename": "sasquatch_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 19361,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6501 reads 'Yeti Bouncer', Models.txt line 52 maps 51 to sasquatch_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 950087,
+      "enemy_id": "yeti_sentry",
+      "kind": "Yeti Sentry",
+      "model_id": 51,
+      "adr": "sasquatch_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 52,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 51,
+        "filename": "sasquatch_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 19361,
+        "extracted_path": "AssetsW_005.pack",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4448 reads 'Yeti Sentry', Models.txt line 52 maps 51 to sasquatch_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
       "capture": null
     }
   ],

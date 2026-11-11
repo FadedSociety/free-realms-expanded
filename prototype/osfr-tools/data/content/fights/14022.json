@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "id": 14022,
+  "kind": "battle",
+  "title_id": 93268,
+  "description_id": 103603,
+  "icon_id": 4540,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "starter": {
+      "definition": "robgoblin_troublemakers",
+      "at": [
+        -1495.18,
+        -53.35,
+        930.89
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1241,
+    "arena": "sg_random_encounter_skullcamp",
+    "arrive": [
+      139.44,
+      7.54,
+      114.63
+    ],
+    "exit_door": [
+      137.71,
+      3.77,
+      128.19
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "robgoblin_prankster": {
+      "definition_id": 950048,
+      "name": "Robgoblin Prankster",
+      "name_id": 101932,
+      "model_id": 721,
+      "rank": "normal"
+    },
+    "robgoblin_troublemakers": {
+      "definition_id": 950047,
+      "name": "Robgoblin Troublemakers!",
+      "name_id": 93268,
+      "model_id": 1914,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1_robgoblin_troublemakers": [
+      [
+        132.98,
+        13.77,
+        92.58
+      ],
+      [
+        123.04,
+        15.09,
+        83.22
+      ],
+      [
+        131.36,
+        15.16,
+        68.82
+      ]
+    ],
+    "w2_robgoblin_prankster": [
+      [
+        136.59,
+        0.81,
+        156.06
+      ],
+      [
+        131.51,
+        0.8,
+        140.14
+      ],
+      [
+        147.98,
+        0.21,
+        146.3
+      ]
+    ],
+    "w3_robgoblin_troublemakers": [
+      [
+        173.06,
+        0.54,
+        144.64
+      ],
+      [
+        158.44,
+        0.45,
+        149.59
+      ]
+    ],
+    "w3_robgoblin_prankster": [
+      [
+        152.24,
+        1.1,
+        135.1
+      ],
+      [
+        171.05,
+        1.09,
+        149.71
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_troublemakers",
+          "count": 3,
+          "at": "w1_robgoblin_troublemakers"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_prankster",
+          "count": 3,
+          "at": "w2_robgoblin_prankster"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_troublemakers",
+          "count": 2,
+          "at": "w3_robgoblin_troublemakers"
+        },
+        {
+          "definition": "robgoblin_prankster",
+          "count": 2,
+          "at": "w3_robgoblin_prankster"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 103600,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 93268 'Robgoblin Troublemakers!' (title), 103603 (card), objective 103600; icon 4540."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 4303 drawn at [-1495.18, -53.35, 930.89] (npc_spawns_extra.json spawn_guid 100000004303, FreeRealms-Legacy FabledRealms.lua). Region The Wilds, place Stillwater Crossing."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 78 ('Robgoblin Troublemakers! (the live random encounter: robgoblin troublemakers and pranksters)'): scene sg_random_encounter_skullcamp, entry, exit, 3 waves, 10 spawns ({'Robgoblin Troublemaker': 5, 'Robgoblin Prankster': 5})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1241 is the fork's; ours must be assigned and the scene sg_random_encounter_skullcamp has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

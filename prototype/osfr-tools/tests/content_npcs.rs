@@ -542,12 +542,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
-    assert_eq!(db.quests.len(), 1056); // P-quest-npcs: 31 more wiki quests (quest_wire.py); 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
+    assert_eq!(db.quests.len(), 1079); // combat quests on: 23 new wiki records (quest_wire.py --combat); P-quest-npcs: 31 more wiki quests (quest_wire.py); 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
     assert_eq!(resolved_reference_ids.len(), 298);
     assert_eq!(unresolved_ids.len(), 167);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        1056
+        1079
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

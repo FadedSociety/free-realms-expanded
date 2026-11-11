@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "id": 14010,
+  "kind": "battle",
+  "title_id": 94365,
+  "description_id": 95048,
+  "icon_id": 11209,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "robgoblin_pondblaster",
+      "at": [
+        -1038.8,
+        -55.87,
+        1089.62
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1243,
+    "arena": "sg_random_encounter_creek",
+    "arrive": [
+      136.35,
+      0.04,
+      145.72
+    ],
+    "exit_door": [
+      127.36,
+      -0.07,
+      153.69
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "robgoblin_boomer": {
+      "definition_id": 950022,
+      "name": "Robgoblin Boomer",
+      "name_id": 42034,
+      "model_id": 4,
+      "rank": "normal"
+    },
+    "robgoblin_pondblaster": {
+      "definition_id": 1294,
+      "name": "Robgoblin Pondblasters",
+      "name_id": 95047,
+      "model_id": 4,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1_robgoblin_pondblaster": [
+      [
+        126.32,
+        2.41,
+        117.25
+      ],
+      [
+        130.78,
+        2.16,
+        127.35
+      ],
+      [
+        130.37,
+        1.84,
+        116.61
+      ]
+    ],
+    "w2_robgoblin_pondblaster": [
+      [
+        121.8,
+        0.74,
+        160.67
+      ],
+      [
+        116.54,
+        -0.31,
+        171.66
+      ]
+    ],
+    "w2_robgoblin_boomer": [
+      [
+        144.73,
+        -1.79,
+        191.41
+      ]
+    ],
+    "w3_robgoblin_pondblaster": [
+      [
+        166.15,
+        0.55,
+        150.32
+      ],
+      [
+        161.81,
+        0.71,
+        157.0
+      ],
+      [
+        157.52,
+        0.7,
+        153.29
+      ],
+      [
+        176.71,
+        1.5,
+        168.27
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_pondblaster",
+          "count": 3,
+          "at": "w1_robgoblin_pondblaster"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_pondblaster",
+          "count": 2,
+          "at": "w2_robgoblin_pondblaster"
+        },
+        {
+          "definition": "robgoblin_boomer",
+          "count": 1,
+          "at": "w2_robgoblin_boomer"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_pondblaster",
+          "count": 4,
+          "at": "w3_robgoblin_pondblaster"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 103235,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 94365 'Robgoblin Pondblasters!' (title), 95048 (card), objective 103235; icon 11209."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 4499 drawn at [-1038.8, -55.87, 1089.62] (npc_spawns_extra.json spawn_guid 100000004499, FreeRealms-Legacy FabledRealms.lua). Region The Wilds, place Stillwater Crossing."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 84 ('Robgoblin Pondblasters! (the live random encounter: robgoblins fishing with dynamite)'): scene sg_random_encounter_creek, entry, exit, 3 waves, 10 spawns ({'Robgoblin Pondblaster': 9, 'Robgoblin Boomer': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1243 is the fork's; ours must be assigned and the scene sg_random_encounter_creek has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

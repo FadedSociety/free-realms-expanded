@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "id": 14079,
+  "kind": "dungeon",
+  "title_id": 7697,
+  "description_id": 94598,
+  "icon_id": 888,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "interact": {
+      "npc_guid": 100000046211
+    }
+  },
+  "place": {
+    "zone": 1213,
+    "arena": "sg_changeling_caverns",
+    "arrive": [
+      509.26,
+      29.14,
+      336.81
+    ],
+    "exit_door": [
+      233.28,
+      20.56,
+      332.55
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "changeling_bruiser": {
+      "definition_id": 950190,
+      "name": "Changeling Bruiser",
+      "name_id": 16785,
+      "model_id": 239,
+      "rank": "normal"
+    },
+    "changeling_defiler": {
+      "definition_id": 950189,
+      "name": "Changeling Defiler",
+      "name_id": 16237,
+      "model_id": 234,
+      "rank": "normal"
+    },
+    "changeling_thief": {
+      "definition_id": 950191,
+      "name": "Changeling Thief",
+      "name_id": 17008,
+      "model_id": 278,
+      "rank": "normal"
+    },
+    "darvon": {
+      "definition_id": 950192,
+      "name": "Darvon",
+      "name_id": 17031,
+      "model_id": 240,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "changeling_defiler",
+      "at": [
+        491.22,
+        24.47,
+        377.22
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "changeling_bruiser",
+      "at": [
+        489.61,
+        24.49,
+        374.4
+      ],
+      "heading": 0.516,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "changeling_thief",
+      "at": [
+        493.09,
+        24.54,
+        380.36
+      ],
+      "heading": -2.603,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "changeling_defiler",
+      "at": [
+        488.9,
+        24.33,
+        379.35
+      ],
+      "heading": 2.313,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "changeling_bruiser",
+      "at": [
+        459.24,
+        19.5,
+        360.72
+      ],
+      "heading": 0.579,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "changeling_thief",
+      "at": [
+        461.63,
+        20.26,
+        358.08
+      ],
+      "heading": 0.264,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "changeling_defiler",
+      "at": [
+        458.8,
+        20.13,
+        364.98
+      ],
+      "heading": 0.98,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "changeling_bruiser",
+      "at": [
+        455.38,
+        19.98,
+        362.66
+      ],
+      "heading": 0.978,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "changeling_thief",
+      "at": [
+        410.85,
+        23.79,
+        384.42
+      ],
+      "heading": 1.811,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "changeling_defiler",
+      "at": [
+        413.21,
+        23.3,
+        386.63
+      ],
+      "heading": 2.504,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "changeling_bruiser",
+      "at": [
+        405.35,
+        24.81,
+        384.96
+      ],
+      "heading": 1.736,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "changeling_thief",
+      "at": [
+        414.52,
+        22.17,
+        382.31
+      ],
+      "heading": 0.925,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "changeling_defiler",
+      "at": [
+        374.94,
+        21.37,
+        376.62
+      ],
+      "heading": 1.313,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "changeling_bruiser",
+      "at": [
+        373.35,
+        21.17,
+        379.03
+      ],
+      "heading": 1.662,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "changeling_thief",
+      "at": [
+        377.64,
+        21.62,
+        374.92
+      ],
+      "heading": 0.825,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "changeling_defiler",
+      "at": [
+        370.9,
+        20.93,
+        374.86
+      ],
+      "heading": 1.251,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "changeling_bruiser",
+      "at": [
+        329.94,
+        19.82,
+        374.34
+      ],
+      "heading": 1.671,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "changeling_thief",
+      "at": [
+        333.15,
+        20.4,
+        377.16
+      ],
+      "heading": 1.902,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "changeling_defiler",
+      "at": [
+        325.97,
+        20.0,
+        376.57
+      ],
+      "heading": 1.76,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "changeling_bruiser",
+      "at": [
+        324.96,
+        19.97,
+        374.14
+      ],
+      "heading": 1.638,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "changeling_thief",
+      "at": [
+        295.67,
+        20.07,
+        363.99
+      ],
+      "heading": 1.08,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "changeling_defiler",
+      "at": [
+        292.61,
+        20.25,
+        363.07
+      ],
+      "heading": 1.14,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "changeling_bruiser",
+      "at": [
+        293.01,
+        20.15,
+        365.87
+      ],
+      "heading": 1.397,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "changeling_thief",
+      "at": [
+        299.69,
+        20.28,
+        361.43
+      ],
+      "heading": 0.392,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a25": {
+      "definition": "changeling_defiler",
+      "at": [
+        253.56,
+        20.21,
+        353.08
+      ],
+      "heading": 1.042,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a26": {
+      "definition": "changeling_bruiser",
+      "at": [
+        255.5,
+        20.09,
+        355.36
+      ],
+      "heading": 1.201,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a27": {
+      "definition": "changeling_thief",
+      "at": [
+        258.05,
+        20.12,
+        351.62
+      ],
+      "heading": 0.501,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a28": {
+      "definition": "changeling_defiler",
+      "at": [
+        252.16,
+        20.12,
+        350.23
+      ],
+      "heading": 0.893,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "darvon",
+      "at": [
+        230.19,
+        20.56,
+        338.22
+      ],
+      "heading": 1.731,
+      "boss": true,
+      "scale": 1.3,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_changeling_bruiser": [
+      [
+        233.97,
+        20.6,
+        340.64
+      ]
+    ],
+    "w1_changeling_defiler": [
+      [
+        227.94,
+        20.71,
+        341.26
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "changeling_bruiser",
+          "count": 1,
+          "at": "w1_changeling_bruiser"
+        },
+        {
+          "definition": "changeling_defiler",
+          "count": 1,
+          "at": "w1_changeling_defiler"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 17033,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 7697 'Darvon's Descent' (title), 94598 (card), objective 76355; icon 888."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/darvon_s_descent.json: difficulty 4, zone 'Sanctuary (Memorial Caverns)', enemies ['Darvon', 'Changelings', 'Changeling Bruisers', 'Changeling Arcanus', 'Bats', 'Changeling Bruiser', 'Changeling Arcanus', 'Darvon']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-903.48, -47.87, 239.34]: BJX fork Battles.lua:32 (Npcs.json Id 46211, sh_cave_entrance_bat_cave_01.adr). (R) the fork's own placement, not a captured one. Region Sanctuary, place Sanctuary."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 14 ('Darvon's Descent (the live dungeon: Darvon's changelings across the root caverns, Darvon at the wing shrine at'): scene sg_changeling_caverns, entry, exit, 8 waves, 31 spawns ({'Changeling Defiler': 11, 'Changeling Bruiser': 10, 'Changeling Thief': 9, 'Darvon': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1213 is the fork's; ours must be assigned and the scene sg_changeling_caverns has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046211: reference Npcs.json Id 46211, model 251, name 7697, at [-903.48, -47.87, 239.34]."
+    }
+  ]
+}

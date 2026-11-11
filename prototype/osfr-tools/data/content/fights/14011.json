@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "id": 14011,
+  "kind": "battle",
+  "title_id": 90148,
+  "description_id": 91880,
+  "icon_id": 12614,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "starter": {
+      "definition": "w58_shady_smuggler_l9_enemy",
+      "at": [
+        -299.48,
+        -82.9,
+        2273.95
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1249,
+    "arena": "bs_random_encounter_01",
+    "arrive": [
+      143.66,
+      2.9,
+      135.52
+    ],
+    "exit_door": [
+      146.62,
+      3.66,
+      145.86
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "smuggler": {
+      "definition_id": 950023,
+      "name": "Smuggler",
+      "name_id": 91865,
+      "model_id": 669,
+      "rank": "normal"
+    },
+    "smuggler_boss": {
+      "definition_id": 930068,
+      "name": "Smuggler Boss",
+      "name_id": 91885,
+      "model_id": 669,
+      "rank": "boss",
+      "boss": true
+    },
+    "w58_shady_smuggler_l9_enemy": {
+      "definition_id": 930020,
+      "name": "Shady Smuggler",
+      "name_id": 140959,
+      "model_id": 669,
+      "rank": "normal",
+      "texture_alias": "03"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "smuggler_boss",
+      "at": [
+        130.47,
+        3.52,
+        180.03
+      ],
+      "heading": 2.854,
+      "boss": true,
+      "scale": 1.4,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_smuggler": [
+      [
+        120.6,
+        3.26,
+        130.26
+      ],
+      [
+        117.31,
+        2.87,
+        133.89
+      ],
+      [
+        118.64,
+        3.04,
+        127.44
+      ]
+    ],
+    "w2_w58_shady_smuggler_l9_enemy": [
+      [
+        118.66,
+        3.31,
+        160.17
+      ],
+      [
+        116.16,
+        1.92,
+        142.21
+      ]
+    ],
+    "w2_smuggler": [
+      [
+        124.13,
+        3.36,
+        150.81
+      ],
+      [
+        141.15,
+        2.78,
+        177.67
+      ]
+    ],
+    "w3_smuggler": [
+      [
+        148.18,
+        4.03,
+        160.29
+      ],
+      [
+        155.19,
+        4.1,
+        150.67
+      ],
+      [
+        166.77,
+        4.89,
+        134.0
+      ],
+      [
+        152.18,
+        2.14,
+        168.11
+      ]
+    ],
+    "w4_smuggler": [
+      [
+        134.41,
+        3.08,
+        182.3
+      ],
+      [
+        130.55,
+        3.39,
+        171.18
+      ],
+      [
+        109.05,
+        3.93,
+        162.98
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "smuggler",
+          "count": 3,
+          "at": "w1_smuggler"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58_shady_smuggler_l9_enemy",
+          "count": 2,
+          "at": "w2_w58_shady_smuggler_l9_enemy"
+        },
+        {
+          "definition": "smuggler",
+          "count": 2,
+          "at": "w2_smuggler"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "smuggler",
+          "count": 4,
+          "at": "w3_smuggler"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "smuggler",
+          "count": 3,
+          "at": "w4_smuggler"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 91883,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3",
+          "w4"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w4",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 90148 'Shady Smugglers' (title), 91880 (card), objective 91883; icon 12614."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/shady_smugglers.json: difficulty 4, zone 'Briarwood (Nettleseed)', enemies ['Shady Smuggler', 'Smuggler Boss', 'Smuggler Boss']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 2834 drawn at [-299.48, -82.9, 2273.95] (npc_spawns_extra.json spawn_guid 100000002834, FreeRealms-Legacy FabledRealms.lua). Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 72 ('Shady Smugglers (the live random encounter: the smugglers' camp)'): scene bs_random_encounter_01, entry, exit, 4 waves, 15 spawns ({'Smuggler': 12, 'Shady Smuggler': 2, 'Smuggler Boss': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1249 is the fork's; ours must be assigned and the scene bs_random_encounter_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

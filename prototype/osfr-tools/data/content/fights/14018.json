@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "id": 14018,
+  "kind": "battle",
+  "title_id": 115822,
+  "description_id": 115823,
+  "icon_id": 313,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "cursed_graveyard",
+      "at": [
+        -1160.37,
+        -40.69,
+        744.35
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1249,
+    "arena": "bs_random_encounter_01",
+    "arrive": [
+      143.66,
+      2.9,
+      135.52
+    ],
+    "exit_door": [
+      147.9,
+      3.74,
+      145.69
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "graveyard_wraith": {
+      "definition_id": 950042,
+      "name": "Graveyard Wraith",
+      "name_id": 115827,
+      "model_id": 751,
+      "rank": "boss",
+      "boss": true
+    },
+    "lesser_grave_elemental": {
+      "definition_id": 950041,
+      "name": "Lesser Grave Elemental",
+      "name_id": 115850,
+      "model_id": 767,
+      "rank": "normal"
+    },
+    "w58b_tormented_spirit": {
+      "definition_id": 930044,
+      "name": "Tormented Spirit",
+      "name_id": 76190,
+      "model_id": 10,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "graveyard_wraith",
+      "at": [
+        149.08,
+        3.69,
+        180.69
+      ],
+      "heading": -3.022,
+      "boss": true,
+      "scale": 1.2,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_lesser_grave_elemental": [
+      [
+        120.6,
+        3.26,
+        130.26
+      ],
+      [
+        117.31,
+        2.87,
+        133.89
+      ]
+    ],
+    "w2_w58b_tormented_spirit": [
+      [
+        118.66,
+        3.31,
+        160.17
+      ],
+      [
+        116.16,
+        1.92,
+        142.21
+      ]
+    ],
+    "w2_lesser_grave_elemental": [
+      [
+        124.13,
+        3.36,
+        150.81
+      ]
+    ],
+    "w3_w58b_tormented_spirit": [
+      [
+        148.19,
+        3.56,
+        176.97
+      ],
+      [
+        140.13,
+        2.95,
+        182.38
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "lesser_grave_elemental",
+          "count": 2,
+          "at": "w1_lesser_grave_elemental"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58b_tormented_spirit",
+          "count": 2,
+          "at": "w2_w58b_tormented_spirit"
+        },
+        {
+          "definition": "lesser_grave_elemental",
+          "count": 1,
+          "at": "w2_lesser_grave_elemental"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58b_tormented_spirit",
+          "count": 2,
+          "at": "w3_w58b_tormented_spirit"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 115968,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 115822 'Cursed Graveyard!' (title), 115823 (card), objective 115968; icon 313."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/cursed_graveyard.json: difficulty 1, zone 'Stillwater Crossing', enemies ['Graveyard Wraith', 'Graveyard Wraith']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-1160.37, -40.69, 744.35]: BJX fork Battles.lua:42 (Npcs.json Id 46221, bs_gate_01.adr). (R) the fork's own placement, not a captured one. Region Sanctuary, place Sanctuary."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 86 ('Cursed Graveyard! (the live random encounter: the graveyard's ominous presence; its gate in Blackspore starts '): scene bs_random_encounter_01, entry, exit, 3 waves, 8 spawns ({'Lesser Grave Elemental': 3, 'Tormented Spirit': 4, 'Graveyard Wraith': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1249 is the fork's; ours must be assigned and the scene bs_random_encounter_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

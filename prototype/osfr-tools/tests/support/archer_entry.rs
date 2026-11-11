@@ -223,10 +223,18 @@ pub fn assert_enabled_archer_chapter_records() {
         // T542 enables the ungated Become an Archer (3010035): the Jobs-window record,
         // not part of the Path/Oath chapter shape this check pins. T671 enables Hilforn's
         // Archer 5 and Archer Departure (tests/zone_quests_greenwood_round2.rs); T895 enables
-        // Pondblaster Payback (tests/quest_use_events.rs).
+        // Pondblaster Payback (tests/quest_use_events.rs). Hilforn's Pondblaster Target Practice
+        // (3010007) and Explosive Expedition (3010008) went live with the combat quests.
         .filter(|record| {
-            ![u64::from(BECOME_A_ARCHER), 3_010_009, 3_010_011, 3_010_012]
-                .contains(&record["id"].as_u64().unwrap())
+            ![
+                u64::from(BECOME_A_ARCHER),
+                3_010_007,
+                3_010_008,
+                3_010_009,
+                3_010_011,
+                3_010_012,
+            ]
+            .contains(&record["id"].as_u64().unwrap())
         })
         .collect();
     let enabled_ids: Vec<u64> = enabled
@@ -234,10 +242,11 @@ pub fn assert_enabled_archer_chapter_records() {
         .map(|record| record["id"].as_u64().unwrap())
         .collect();
     // Lugabow's chapter: Path (3010003), Test of Agility (3010004, live since d7b0b831 "55 more
-    // quests", 2026-11-09) and Oath (3010006); Marksmanship (3010005) stays off.
+    // quests", 2026-11-09), Taking Aim (3010005, live with the combat quests: nine Thugawug
+    // Fumblers the field already places) and Oath (3010006).
     assert_eq!(
         enabled_ids,
-        vec![u64::from(PATH), 3_010_004, u64::from(OATH)]
+        vec![u64::from(PATH), 3_010_004, 3_010_005, u64::from(OATH)]
     );
 
     for record in &enabled {
@@ -314,15 +323,17 @@ pub fn assert_enabled_archer_chapter_records() {
     );
     assert_eq!(oath["rewards"][0]["items"], serde_json::json!([]));
 
-    // The chapter deliberately leaves the minigame/field-enemy records disabled. Test of
-    // Agility (3010004) left this list when d7b0b831 wired it as six pick-ups and a Return to
-    // Lugabow talk, with no minigame step.
+    // The chapter left its field-enemy records disabled until quests could count field kills.
+    // Test of Agility (3010004) left this list when d7b0b831 wired it as six pick-ups and a
+    // Return to Lugabow talk; Taking Aim (3010005) and Pondblaster Target Practice (3010007)
+    // left it with the combat quests: each is now a `defeat` of a kind the field places.
     for quest_id in [3_010_005_u64, 3_010_007] {
         let record = records
             .iter()
             .find(|record| record["id"].as_u64() == Some(quest_id))
             .unwrap();
-        assert_eq!(record["enabled"].as_bool(), Some(false));
+        assert_eq!(record["enabled"].as_bool(), Some(true));
+        assert_eq!(record["objectives"][0]["kind"], "defeat");
     }
 
     // Lugabow (the Path giver and fourth objective) and Hilforn (the Oath

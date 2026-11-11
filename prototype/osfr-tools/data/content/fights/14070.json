@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "id": 14070,
+  "kind": "battle",
+  "title_id": 73712,
+  "description_id": 73986,
+  "icon_id": 313,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "starter": {
+      "definition": "moldy_shambler",
+      "at": [
+        -538.31,
+        -81.93,
+        2352.44
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1246,
+    "arena": "bw_random_encounter_02",
+    "arrive": [
+      138.48,
+      1.35,
+      138.04
+    ],
+    "exit_door": [
+      152.05,
+      0.31,
+      145.19
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "moldering_fungaloid": {
+      "definition_id": 2813,
+      "name": "Moldering Fungaloid",
+      "name_id": 46015,
+      "model_id": 71,
+      "rank": "normal"
+    },
+    "moldy_shambler": {
+      "definition_id": 950169,
+      "name": "Moldy Shambler",
+      "name_id": 73980,
+      "model_id": 72,
+      "rank": "normal"
+    },
+    "spore_shambler": {
+      "definition_id": 950054,
+      "name": "Spore Shambler",
+      "name_id": 4456,
+      "model_id": 72,
+      "rank": "boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "spore_shambler",
+      "at": [
+        140.63,
+        -0.08,
+        173.4
+      ],
+      "heading": -3.081,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_moldy_shambler": [
+      [
+        137.17,
+        2.0,
+        118.9
+      ],
+      [
+        116.34,
+        2.29,
+        123.92
+      ],
+      [
+        122.33,
+        2.84,
+        128.26
+      ]
+    ],
+    "w2_moldy_shambler": [
+      [
+        147.7,
+        -0.86,
+        176.8
+      ],
+      [
+        119.71,
+        1.2,
+        141.03
+      ]
+    ],
+    "w2_moldering_fungaloid": [
+      [
+        149.88,
+        -1.65,
+        183.28
+      ],
+      [
+        143.95,
+        -0.19,
+        168.66
+      ]
+    ],
+    "w3_moldy_shambler": [
+      [
+        156.35,
+        0.4,
+        146.09
+      ],
+      [
+        179.96,
+        1.49,
+        156.01
+      ],
+      [
+        160.14,
+        1.18,
+        157.96
+      ],
+      [
+        157.45,
+        0.45,
+        149.48
+      ]
+    ],
+    "w4_moldy_shambler": [
+      [
+        144.03,
+        -0.75,
+        176.94
+      ],
+      [
+        120.21,
+        0.52,
+        156.43
+      ],
+      [
+        138.75,
+        -0.74,
+        176.05
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "moldy_shambler",
+          "count": 3,
+          "at": "w1_moldy_shambler"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "moldy_shambler",
+          "count": 2,
+          "at": "w2_moldy_shambler"
+        },
+        {
+          "definition": "moldering_fungaloid",
+          "count": 2,
+          "at": "w2_moldering_fungaloid"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "moldy_shambler",
+          "count": 4,
+          "at": "w3_moldy_shambler"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "moldy_shambler",
+          "count": 3,
+          "at": "w4_moldy_shambler"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 73984,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3",
+          "w4"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w4",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 73712 'Moldy Shamblers!' (title), 73986 (card), objective 73984; icon 313."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/moldy_shamblers.json: difficulty 4, zone 'Briarwood (Nettleseed, eastern)', enemies ['Moldy Shambler', 'Rotten Shambler']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-538.31, -81.93, 2352.44]: BJX fork Battles.lua:50 (Npcs.json Id 46227, necrowartzombie_02.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 52 ('Moldy Shamblers! (the live random encounter: moldy shamblers and the fungaloids they make)'): scene bw_random_encounter_02, entry, exit, 4 waves, 15 spawns ({'Moldy Shambler': 12, 'Moldering Fungaloid': 2, 'Spore Shambler': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1246 is the fork's; ours must be assigned and the scene bw_random_encounter_02 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "id": 14034,
+  "kind": "dungeon",
+  "title_id": 4229,
+  "description_id": 77961,
+  "icon_id": 678,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13,
+    "interact": {
+      "npc_guid": 100000046189
+    }
+  },
+  "place": {
+    "zone": 1231,
+    "arena": "sh_canyon_combat",
+    "arrive": [
+      42.9,
+      21.47,
+      56.0
+    ],
+    "exit_door": [
+      237.3,
+      40.62,
+      164.9
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "ice_troll": {
+      "definition_id": 930061,
+      "name": "Ice Troll",
+      "name_id": 4212,
+      "model_id": 100,
+      "rank": "boss"
+    },
+    "unga_frostclaw": {
+      "definition_id": 950088,
+      "name": "Unga Frostclaw",
+      "name_id": 4218,
+      "model_id": 146,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "yeti": {
+      "definition_id": 930073,
+      "name": "Yeti",
+      "name_id": 2245,
+      "model_id": 4547,
+      "rank": "normal"
+    },
+    "yeti_sentry": {
+      "definition_id": 950087,
+      "name": "Yeti Sentry",
+      "name_id": 4448,
+      "model_id": 51,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "ice_troll",
+      "at": [
+        64.6,
+        21.76,
+        76.0
+      ],
+      "heading": -1.313,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "yeti_sentry",
+      "at": [
+        63.16,
+        22.53,
+        78.7
+      ],
+      "heading": -1.541,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "yeti",
+      "at": [
+        61.06,
+        22.26,
+        75.01
+      ],
+      "heading": -1.101,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "ice_troll",
+      "at": [
+        66.63,
+        21.82,
+        79.46
+      ],
+      "heading": -1.605,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "yeti_sentry",
+      "at": [
+        99.01,
+        25.57,
+        92.92
+      ],
+      "heading": -1.754,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "yeti",
+      "at": [
+        96.42,
+        24.79,
+        91.29
+      ],
+      "heading": -1.675,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "ice_troll",
+      "at": [
+        97.2,
+        25.02,
+        88.53
+      ],
+      "heading": -1.486,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "yeti_sentry",
+      "at": [
+        102.99,
+        26.55,
+        91.82
+      ],
+      "heading": -1.668,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "yeti",
+      "at": [
+        129.35,
+        34.21,
+        95.81
+      ],
+      "heading": -2.005,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "ice_troll",
+      "at": [
+        127.32,
+        33.57,
+        92.74
+      ],
+      "heading": -1.834,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "yeti_sentry",
+      "at": [
+        124.67,
+        33.14,
+        93.96
+      ],
+      "heading": -2.037,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "yeti",
+      "at": [
+        132.48,
+        35.14,
+        97.97
+      ],
+      "heading": -2.041,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "ice_troll",
+      "at": [
+        155.91,
+        36.19,
+        94.8
+      ],
+      "heading": -1.276,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "yeti_sentry",
+      "at": [
+        152.8,
+        37.04,
+        94.9
+      ],
+      "heading": -1.12,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "yeti",
+      "at": [
+        160.0,
+        35.39,
+        94.6
+      ],
+      "heading": -1.359,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "ice_troll",
+      "at": [
+        152.77,
+        36.74,
+        89.5
+      ],
+      "heading": -0.543,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "yeti_sentry",
+      "at": [
+        183.55,
+        37.08,
+        93.56
+      ],
+      "heading": -1.512,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "yeti",
+      "at": [
+        186.2,
+        37.03,
+        93.49
+      ],
+      "heading": -1.52,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "ice_troll",
+      "at": [
+        189.13,
+        37.01,
+        93.52
+      ],
+      "heading": -1.534,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "yeti_sentry",
+      "at": [
+        187.43,
+        37.04,
+        96.2
+      ],
+      "heading": -1.761,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "yeti",
+      "at": [
+        214.25,
+        37.05,
+        104.63
+      ],
+      "heading": -2.697,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "ice_troll",
+      "at": [
+        208.39,
+        37.04,
+        100.26
+      ],
+      "heading": 2.442,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "yeti_sentry",
+      "at": [
+        215.07,
+        37.04,
+        100.74
+      ],
+      "heading": -2.234,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "yeti",
+      "at": [
+        216.11,
+        37.04,
+        98.13
+      ],
+      "heading": -1.708,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "unga_frostclaw",
+      "at": [
+        229.5,
+        41.29,
+        154.0
+      ],
+      "heading": 2.913,
+      "boss": true,
+      "scale": 1.1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_yeti_sentry": [
+      [
+        232.24,
+        41.29,
+        152.75
+      ]
+    ],
+    "w1_ice_troll": [
+      [
+        229.43,
+        41.29,
+        150.0
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "yeti_sentry",
+          "count": 1,
+          "at": "w1_yeti_sentry"
+        },
+        {
+          "definition": "ice_troll",
+          "count": 1,
+          "at": "w1_ice_troll"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 4443,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 4229 'Snowy Canyon' (title), 77961 (card), objective 76355; icon 678."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/snowy_canyon.json: difficulty 5, zone 'Snowhill', enemies ['Unga Frostclaw', 'Ice Crawlers', 'Ice Trolls', 'Icetroll Champion', 'Yetis', 'Yeti Pounders', 'Elusive Tranquil Sasquatch', 'Unga Frostclaw']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [421.33, 84.55, 643.13]: BJX fork Battles.lua:10 (Npcs.json Id 46189, sh_gates_01.adr). (R) the fork's own placement, not a captured one. Region Snowhill, place Snowhill."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 32 ('Snowy Canyon (the live dungeon: ice trolls and yetis fighting over the canyon from the west end, Unga Frostcla'): scene sh_canyon_combat, entry, exit, 7 waves, 27 spawns ({'Ice Troll': 9, 'Yeti Sentry': 9, 'Yeti': 8, 'Unga Frostclaw': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1231 is the fork's; ours must be assigned and the scene sh_canyon_combat has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 75 coins / 260 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046189: reference Npcs.json Id 46189, model 111, name 4229, at [421.33, 84.55, 643.13]."
+    }
+  ]
+}

@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "id": 14055,
+  "kind": "battle",
+  "title_id": 78089,
+  "description_id": 78097,
+  "icon_id": 314,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "frostfang_snarler",
+      "at": [
+        458.11,
+        42.04,
+        447.68
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1200,
+    "arena": "sg_random_encounter_clearing",
+    "arrive": [
+      137.47,
+      -0.18,
+      142.33
+    ],
+    "exit_door": [
+      140.79,
+      0.34,
+      149.7
+    ],
+    "sky": "sky_wilds24.xml",
+    "geometry_id": 214
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "frostfang_snarler": {
+      "definition_id": 3592,
+      "name": "Frostfang Snarler",
+      "name_id": 78096,
+      "model_id": 1938,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1_frostfang_wolf": [
+      [
+        115.99,
+        0.74,
+        142.46
+      ],
+      [
+        132.26,
+        0.74,
+        126.43
+      ]
+    ],
+    "w2_frostfang_wolf": [
+      [
+        144.21,
+        -0.8,
+        163.45
+      ],
+      [
+        116.95,
+        -0.24,
+        168.69
+      ],
+      [
+        98.48,
+        1.24,
+        152.81
+      ]
+    ],
+    "w3_frostfang_wolf": [
+      [
+        174.16,
+        1.72,
+        152.93
+      ],
+      [
+        176.68,
+        0.97,
+        169.63
+      ],
+      [
+        176.24,
+        0.58,
+        159.57
+      ],
+      [
+        165.81,
+        0.18,
+        165.39
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_snarler",
+          "count": 2,
+          "at": "w1_frostfang_wolf"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_snarler",
+          "count": 3,
+          "at": "w2_frostfang_wolf"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "frostfang_snarler",
+          "count": 4,
+          "at": "w3_frostfang_wolf"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 78092,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 78089 'Frostfang Snarlers!' (title), 78097 (card), objective 78092; icon 314."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/frostfang_snarlers.json: difficulty 1, zone 'Snowhill (mountains south-east of Snowhill)', enemies ['Frostfang Wolf', 'Frostfang Alpha', 'Frostfang Snarler']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 3592 drawn at [458.11, 42.04, 447.68] (npc_spawns_extra.json spawn_guid 100000003592, FreeRealms-Legacy FabledRealms.lua). Region Snowhill, place Snowhill."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 67 ('Frostfang Snarlers! (the live random encounter: the Frostfang Snarlers' dens in Snowhill)'): scene sg_random_encounter_clearing, entry, exit, 3 waves, 9 spawns ({'Frostfang Wolf': 9})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1200 is the fork's; ours must be assigned and the scene sg_random_encounter_clearing has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 15 coins / 100 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Frostfang Snarler' in this fight; the fork's layout had 'frostfang_wolf' there. (R) 'Frostfang Snarler' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

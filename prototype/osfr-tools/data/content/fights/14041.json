@@ -1,0 +1,416 @@
+{
+  "schema_version": 1,
+  "id": 14041,
+  "kind": "dungeon",
+  "title_id": 5697,
+  "description_id": 7067,
+  "icon_id": 677,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3,
+    "interact": {
+      "npc_guid": 100000046191
+    }
+  },
+  "place": {
+    "zone": 1208,
+    "arena": "sg_robgoblin_trove",
+    "arrive": [
+      344.84,
+      39.33,
+      150.09
+    ],
+    "exit_door": [
+      85.0,
+      30.0,
+      159.46
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "robgoblin_bruiser": {
+      "definition_id": 950108,
+      "name": "Robgoblin Bruiser",
+      "name_id": 6944,
+      "model_id": 189,
+      "rank": "normal"
+    },
+    "robgoblin_wiz_ord": {
+      "definition_id": 950109,
+      "name": "Robgoblin Wiz-ord",
+      "name_id": 6945,
+      "model_id": 191,
+      "rank": "normal"
+    },
+    "wizard_hildegarde": {
+      "definition_id": 950110,
+      "name": "Wizard Hildegarde",
+      "name_id": 6946,
+      "model_id": 188,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        312.68,
+        38.71,
+        142.23
+      ],
+      "heading": 1.067,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        313.61,
+        38.43,
+        144.93
+      ],
+      "heading": 1.201,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        308.09,
+        38.46,
+        145.5
+      ],
+      "heading": 1.331,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        271.16,
+        31.16,
+        125.85
+      ],
+      "heading": 1.718,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        273.82,
+        32.83,
+        122.49
+      ],
+      "heading": 1.528,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        274.76,
+        32.21,
+        125.12
+      ],
+      "heading": 1.705,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        249.55,
+        30.0,
+        152.7
+      ],
+      "heading": 2.464,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        245.69,
+        30.0,
+        152.66
+      ],
+      "heading": 2.237,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        247.66,
+        30.0,
+        155.31
+      ],
+      "heading": 2.476,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        246.32,
+        31.51,
+        192.21
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        244.3,
+        32.67,
+        194.9
+      ],
+      "heading": 2.496,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        250.12,
+        31.01,
+        190.33
+      ],
+      "heading": -1.112,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        192.53,
+        30.4,
+        189.41
+      ],
+      "heading": 1.815,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        192.98,
+        30.13,
+        184.18
+      ],
+      "heading": 1.376,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        194.83,
+        30.54,
+        192.48
+      ],
+      "heading": 2.131,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        149.54,
+        30.03,
+        184.2
+      ],
+      "heading": 0.801,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "robgoblin_bruiser",
+      "at": [
+        153.0,
+        29.94,
+        183.65
+      ],
+      "heading": 0.517,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "robgoblin_wiz_ord",
+      "at": [
+        145.58,
+        30.05,
+        182.32
+      ],
+      "heading": 0.89,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "wizard_hildegarde",
+      "at": [
+        92.19,
+        30.0,
+        164.45
+      ],
+      "heading": -0.142,
+      "boss": true,
+      "scale": 1.3,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_robgoblin_wiz_ord": [
+      [
+        91.64,
+        30.0,
+        168.3
+      ]
+    ],
+    "w1_robgoblin_bruiser": [
+      [
+        89.01,
+        30.13,
+        162.8
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_wiz_ord",
+          "count": 1,
+          "at": "w1_robgoblin_wiz_ord"
+        },
+        {
+          "definition": "robgoblin_bruiser",
+          "count": 1,
+          "at": "w1_robgoblin_bruiser"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 42066,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 7012,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 5697 'Robgoblin Treasure Trove' (title), 7067 (card), objective 42066; icon 677."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/robgoblin_treasure_trove.json: difficulty 2, zone 'Wilds (Robgoblin Camp, northern Wilds)', enemies ['Wizard Hildegarde', 'Robgoblins', 'Robgoblin Mages', 'Armored Robgoblins', 'Robgoblin Medics', 'Wizard Hildegarde']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-537.53, 26.04, 772.46]: BJX fork Battles.lua:12 (Npcs.json Id 46191, bw_hedge_door_01.adr). (R) the fork's own placement, not a captured one. Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 9 ('Robgoblin Treasure Trove (the live dungeon: robgoblin bruisers and wiz-ords through the trove, Wizard Hildegar'): scene sg_robgoblin_trove, entry, exit, 7 waves, 21 spawns ({'Robgoblin Bruiser': 10, 'Robgoblin Wiz-ord': 10, 'Wizard Hildegarde': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1208 is the fork's; ours must be assigned and the scene sg_robgoblin_trove has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 30 coins / 140 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046191: reference Npcs.json Id 46191, model 267, name 5697, at [-537.53, 26.04, 772.46]."
+    }
+  ]
+}

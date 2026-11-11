@@ -3527,9 +3527,27 @@
       "location_evidence": [
         "Pixie Nursery (the errands are all there); standing spot not stated."
       ],
-      "quests_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957391,
+          "title": "Fishy Business",
+          "title_string_id": 38043,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fishy Business (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fishy_business_0a64eb)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
       "quest_ids_given": [
-        3000332
+        3000332,
+        3957391
       ],
       "quests_given_text": [
         "See Flax."
@@ -3836,11 +3854,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2123; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3380 (ModelId=241, ModelFileName=fairychild_f_pigtailsdress.adr, NameId=38027)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.240082,
       "model_id": 241,
-      "model_file_name": "fairychild_f_pigtailsdress.adr"
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000875,
@@ -5594,10 +5619,27 @@
               "evidence": "Find \"The Handy Boys\" (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_find_the_handy_boys_41f482)."
             }
           ]
+        },
+        {
+          "quest_id": 3957337,
+          "title": "Cruisin' for a Bruisin'",
+          "title_string_id": 20853,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cruisin' for a Bruisin' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cruisin_for_a_bruisin_3e757c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3955403
+        3955403,
+        3957337
       ],
       "quests_given_text": [
         "\"Boss Biggins has asked you to find the stagehands, 'The Handy Boys'. Tell them to stop slackin'\" (2881314966); receives Grosh's sunflowers (1524624793); the Trove text \"Knock out 5 Robgoblin Bruisers in the Robgoblin Trove\" for him (1310294086, 924349008, 679511723). Titles not found."
@@ -30218,8 +30260,27 @@
       "location_evidence": [
         "By the river north of Brugo's spot (\"the river south of Mungo\", 1878336158). [video: green marker 103 m, huZ4Hl_YSIc/00020, Ml2qwkrJtR4/00038]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957357,
+          "title": "Down by the River",
+          "title_string_id": 45615,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Down by the River (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_down_by_the_river_07b1f2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957357
+      ],
       "quests_given_text": [
         "Asks the player to bonk the bully Brugo: \"Mungo and his brothers just want to go fishing\" (1539776191, 2251500076). Title not found."
       ],
@@ -30597,11 +30658,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1841; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3098 (ModelId=166, ModelFileName=troll_peasant_01.adr, NameId=45249)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.801147,
       "model_id": 166,
-      "model_file_name": "troll_peasant_01.adr"
+      "model_file_name": "troll_peasant_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000923,
@@ -38199,8 +38267,27 @@
       "location_evidence": [
         "\"Serge can be found at The Roadhouse\" (414453220)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957502,
+          "title": "Return to Sender",
+          "title_string_id": 46225,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sender (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_return_to_sender_f2a80d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957502
+      ],
       "quests_given_text": [
         "Stolen-mail rescue: hooligans took his letters, retrieve them in the Tavern Cellar (2104536113, 3505099100, 2925961911; \"Return to Serge\", 2270672414). Title not found."
       ],
@@ -38506,11 +38593,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2075; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3332 (ModelId=435, ModelFileName=human_m_courier_rudolfo.agr, NameId=46223)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -3.128638,
       "model_id": 435,
-      "model_file_name": "human_m_courier_rudolfo.agr"
+      "model_file_name": "human_m_courier_rudolfo.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000941,

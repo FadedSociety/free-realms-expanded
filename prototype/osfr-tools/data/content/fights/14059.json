@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "id": 14059,
+  "kind": "battle",
+  "title_id": 93260,
+  "description_id": 139445,
+  "icon_id": 12049,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "starter": {
+      "definition": "corrupted_vulture",
+      "at": [
+        -731.54,
+        -65.5,
+        1978.21
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1250,
+    "arena": "bw_random_encounter_bristlewood_01",
+    "arrive": [
+      136.49,
+      2.02,
+      136.46
+    ],
+    "exit_door": [
+      131.55,
+      0.99,
+      145.77
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bristlewood_vulture": {
+      "definition_id": 930055,
+      "name": "Bristlewood Vulture",
+      "name_id": 73654,
+      "model_id": 343,
+      "rank": "normal"
+    }
+  },
+  "actors": {},
+  "points": {
+    "w1_corrupted_vulture": [
+      [
+        122.13,
+        1.82,
+        109.04
+      ],
+      [
+        109.75,
+        1.2,
+        125.9
+      ],
+      [
+        120.49,
+        1.89,
+        126.79
+      ]
+    ],
+    "w2_corrupted_vulture": [
+      [
+        152.25,
+        -0.17,
+        175.42
+      ],
+      [
+        122.99,
+        1.99,
+        162.65
+      ],
+      [
+        139.53,
+        -0.75,
+        182.07
+      ],
+      [
+        136.05,
+        -0.91,
+        178.7
+      ]
+    ],
+    "w3_corrupted_vulture": [
+      [
+        149.84,
+        0.61,
+        166.05
+      ],
+      [
+        155.25,
+        -0.05,
+        172.08
+      ],
+      [
+        145.46,
+        1.73,
+        155.67
+      ],
+      [
+        149.38,
+        0.93,
+        152.19
+      ],
+      [
+        163.85,
+        0.88,
+        143.65
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bristlewood_vulture",
+          "count": 3,
+          "at": "w1_corrupted_vulture"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bristlewood_vulture",
+          "count": 4,
+          "at": "w2_corrupted_vulture"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bristlewood_vulture",
+          "count": 5,
+          "at": "w3_corrupted_vulture"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 139447,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "script": [],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 93260 'Vulture Watch!' (title), 139445 (card), objective 139447; icon 12049."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-731.54, -65.5, 1978.21]: BJX fork Battles.lua:70 (Npcs.json Id 46244, vulture.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 73 ('Vulture Watch! (the live random encounter: aggressive vultures in Bristlewood)'): scene bw_random_encounter_bristlewood_01, entry, exit, 3 waves, 12 spawns ({'Corrupted Vulture': 12})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1250 is the fork's; ours must be assigned and the scene bw_random_encounter_bristlewood_01 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Bristlewood Vulture' in this fight; the fork's layout had 'corrupted_vulture' there. (R) 'Bristlewood Vulture' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

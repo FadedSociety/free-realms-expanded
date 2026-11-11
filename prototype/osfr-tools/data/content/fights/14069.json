@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "id": 14069,
+  "kind": "battle",
+  "title_id": 42055,
+  "description_id": 42058,
+  "icon_id": 4542,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13,
+    "starter": {
+      "definition": "explosive_robgoblins",
+      "at": [
+        -1545.52,
+        -57.75,
+        1215.97
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1241,
+    "arena": "sg_random_encounter_skullcamp",
+    "arrive": [
+      139.44,
+      7.54,
+      114.63
+    ],
+    "exit_door": [
+      140.95,
+      4.03,
+      126.15
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "robgoblin_boomer": {
+      "definition_id": 950022,
+      "name": "Robgoblin Boomer",
+      "name_id": 42034,
+      "model_id": 4,
+      "rank": "normal"
+    },
+    "robgoblin_bruiser": {
+      "definition_id": 950108,
+      "name": "Robgoblin Bruiser",
+      "name_id": 6944,
+      "model_id": 189,
+      "rank": "normal"
+    },
+    "robgoblin_kaboomer": {
+      "definition_id": 3936,
+      "name": "Robgoblin Kaboomer",
+      "name_id": 6720,
+      "model_id": 4202,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "robgoblin_kaboomer",
+      "at": [
+        127.53,
+        0.43,
+        157.56
+      ],
+      "heading": 2.871,
+      "boss": true,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_robgoblin_boomer": [
+      [
+        132.98,
+        13.77,
+        92.58
+      ],
+      [
+        123.04,
+        15.09,
+        83.22
+      ],
+      [
+        131.36,
+        15.16,
+        68.82
+      ],
+      [
+        128.87,
+        14.41,
+        87.74
+      ]
+    ],
+    "w2_robgoblin_boomer": [
+      [
+        136.59,
+        0.81,
+        156.06
+      ],
+      [
+        131.51,
+        0.8,
+        140.14
+      ],
+      [
+        147.98,
+        0.21,
+        146.3
+      ]
+    ],
+    "w2_robgoblin_bruiser": [
+      [
+        138.47,
+        0.29,
+        161.62
+      ],
+      [
+        109.99,
+        1.98,
+        133.78
+      ]
+    ],
+    "w3_robgoblin_boomer": [
+      [
+        173.06,
+        0.54,
+        144.64
+      ],
+      [
+        158.44,
+        0.45,
+        149.59
+      ],
+      [
+        152.24,
+        1.1,
+        135.1
+      ],
+      [
+        171.05,
+        1.09,
+        149.71
+      ],
+      [
+        154.45,
+        1.74,
+        131.72
+      ]
+    ],
+    "w4_robgoblin_boomer": [
+      [
+        147.84,
+        0.2,
+        161.01
+      ],
+      [
+        128.12,
+        0.64,
+        139.86
+      ],
+      [
+        164.69,
+        0.51,
+        153.0
+      ],
+      [
+        129.54,
+        1.04,
+        148.68
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_boomer",
+          "count": 4,
+          "at": "w1_robgoblin_boomer"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_boomer",
+          "count": 3,
+          "at": "w2_robgoblin_boomer"
+        },
+        {
+          "definition": "robgoblin_bruiser",
+          "count": 2,
+          "at": "w2_robgoblin_bruiser"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_boomer",
+          "count": 5,
+          "at": "w3_robgoblin_boomer"
+        }
+      ]
+    },
+    {
+      "id": "w4",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "robgoblin_boomer",
+          "count": 4,
+          "at": "w4_robgoblin_boomer"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 42067,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3",
+          "w4"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w4",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 42055 'Explosive Robgoblins!' (title), 42058 (card), objective 42067; icon 4542."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter: reference Npcs.json Id 4099 drawn at [-1545.52, -57.75, 1215.97] (npc_spawns_extra.json spawn_guid 100000004099, FreeRealms-Legacy FabledRealms.lua). Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 44 ('Explosive Robgoblins! (the live random encounter: robgoblin boomers tossing dynamite)'): scene sg_random_encounter_skullcamp, entry, exit, 4 waves, 19 spawns ({'Robgoblin Boomer': 16, 'Robgoblin Bruiser': 2, 'Robgoblin Kaboomer': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1241 is the fork's; ours must be assigned and the scene sg_random_encounter_skullcamp has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 75 coins / 260 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

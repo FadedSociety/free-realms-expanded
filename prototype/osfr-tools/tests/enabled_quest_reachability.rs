@@ -1266,12 +1266,26 @@ fn every_shipped_defeat_step_names_a_placed_enemy() {
             .filter(|goal| goal["kind"] == "defeat")
         {
             steps += 1;
-            let kind = as_u32(&goal["model_id"]).unwrap_or(0);
-            assert!(
-                catalogue.targets.defeatable.contains(&kind),
-                "quest {}: enemy kind {kind} is not placed",
-                quest.id
-            );
+            // One kind, several (`kinds`), or none at all for "anything inside this fight".
+            let kinds: Vec<u32> = as_u32(&goal["model_id"])
+                .into_iter()
+                .chain(goal["kinds"].as_array().into_iter().flatten().filter_map(as_u32))
+                .collect();
+            if kinds.is_empty() {
+                let fight = as_u32(&goal["in_fight"]).unwrap_or(0);
+                assert!(
+                    catalogue.targets.dungeons.contains(&fight),
+                    "quest {}: a defeat with no kind names a real fight, not {fight}",
+                    quest.id
+                );
+            }
+            for kind in kinds {
+                assert!(
+                    catalogue.targets.defeatable.contains(&kind),
+                    "quest {}: enemy kind {kind} is not placed",
+                    quest.id
+                );
+            }
         }
     }
     assert!(steps >= 7, "the shipped defeat steps shrank to {steps}");

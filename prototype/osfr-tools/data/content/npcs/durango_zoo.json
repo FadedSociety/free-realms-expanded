@@ -2133,12 +2133,29 @@
               "evidence": "Extending an Invite (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
             }
           ]
+        },
+        {
+          "quest_id": 3957612,
+          "title": "Wands a Blazin'",
+          "title_string_id": 71406,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wands a Blazin' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wands_a_blazin_8df7e1)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3955191,
         3955313,
-        3955141
+        3955141,
+        3957612
       ],
       "quests_given_text": [
         "The well chain: \"Could you check out that well for me?\" (1530040842); \"Check out the well for Old Gregory. He might not be just hearing things...\" (1077296856). The voice is Lorna, a chess player in the Memorial Caverns, who wants quiet: \"Break the news to Old Gregory that his magical, talking well is nothing more than an angry lady in the Memorial Caverns, and ask him to keep it down.\" (1841258661); his reply \"You mean to tell me my well is alive and well? She plays chess too, you say? Maybe if I had a table in my camp she'd be willing to visit...\" (160616205). Next link: Scoring a Chess Table (client title 1086900492; fetch a table from Fedrick in Shrouded Glade; \"Did you get that chess table from Shrouded Glade yet? I'm an impatient old man.\", 2557626828) and \"Go fetch Lorna\" (3333957292). Separate job: Robgoblin Adept Trouble! (client title 1655477556; \"Robgoblin Adepts have been running around Old Gregory's campsite, waving their fiery wands all over the place...\", 2582277123). Hand-ins \"Return to Old Gregory\" (2880660657, 973743465). Chain titles other than the two named are not found."
@@ -2507,9 +2524,27 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Durango Zoo.md#Part A. Zoo staff, row 31; source cell: [client][video]"
             }
           ]
+        },
+        {
+          "quest_id": 3957511,
+          "title": "Run off the Robgoblins",
+          "title_string_id": 384828,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Run off the Robgoblins (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_run_off_the_robgoblins_588dfb)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3957511
+      ],
       "quests_given_text": [
         "Run off the Robgoblins (client title 2406439360; \"Shana wants you to teach the Robgoblin Boomers near the Durango Zoo a lesson!\", 725556903; offer text 1699017891: Boomers \"keep blowing stuff up and scaring the animals\"). Video quest panel: 25 boomers in one recording, 10 in another (see Conflicts)."
       ],
@@ -2887,11 +2922,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:57; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1258 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=101636)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.956162,
       "model_id": 548,
-      "model_file_name": "human_f_freestyle_06.agr"
+      "model_file_name": "human_f_freestyle_06.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000263,

@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "id": 14072,
+  "kind": "dungeon",
+  "title_id": 5700,
+  "description_id": 71726,
+  "icon_id": 892,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13,
+    "interact": {
+      "npc_guid": 100000046218
+    }
+  },
+  "place": {
+    "zone": 1214,
+    "arena": "sg_haunted_mines_150",
+    "arrive": [
+      146.21,
+      17.61,
+      150.23
+    ],
+    "exit_door": [
+      33.14,
+      10.36,
+      77.65
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "enraged_shambler": {
+      "definition_id": 950177,
+      "name": "Enraged Shambler",
+      "name_id": 71201,
+      "model_id": 71,
+      "rank": "normal"
+    },
+    "foreman_ironfist": {
+      "definition_id": 1495,
+      "name": "Foreman Ironfist",
+      "name_id": 71199,
+      "model_id": 10,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "hulking_shambler": {
+      "definition_id": 950178,
+      "name": "Hulking Shambler",
+      "name_id": 71202,
+      "model_id": 73,
+      "rank": "normal"
+    },
+    "w58b_ghost_miner": {
+      "definition_id": 930033,
+      "name": "Ghost Miner",
+      "name_id": 6481,
+      "model_id": 10,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        159.16,
+        19.6,
+        115.97
+      ],
+      "heading": -0.04,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "enraged_shambler",
+      "at": [
+        156.31,
+        20.0,
+        119.65
+      ],
+      "heading": 0.236,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "hulking_shambler",
+      "at": [
+        162.1,
+        19.72,
+        116.93
+      ],
+      "heading": -0.276,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        160.47,
+        20.0,
+        119.86
+      ],
+      "heading": -0.195,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "enraged_shambler",
+      "at": [
+        163.91,
+        18.06,
+        68.09
+      ],
+      "heading": 0.198,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "hulking_shambler",
+      "at": [
+        165.49,
+        19.58,
+        71.19
+      ],
+      "heading": 0.052,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        161.84,
+        16.78,
+        65.03
+      ],
+      "heading": 0.307,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "enraged_shambler",
+      "at": [
+        157.78,
+        16.57,
+        64.32
+      ],
+      "heading": 0.545,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "hulking_shambler",
+      "at": [
+        146.99,
+        16.07,
+        28.2
+      ],
+      "heading": -0.183,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        146.63,
+        16.0,
+        30.85
+      ],
+      "heading": -0.241,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "enraged_shambler",
+      "at": [
+        144.28,
+        16.23,
+        32.52
+      ],
+      "heading": 1.349,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "hulking_shambler",
+      "at": [
+        150.21,
+        15.78,
+        27.06
+      ],
+      "heading": -0.608,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        91.15,
+        19.91,
+        29.71
+      ],
+      "heading": 2.506,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "enraged_shambler",
+      "at": [
+        87.45,
+        20.11,
+        28.87
+      ],
+      "heading": 2.016,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "hulking_shambler",
+      "at": [
+        88.27,
+        19.6,
+        33.64
+      ],
+      "heading": 2.507,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        89.03,
+        21.36,
+        26.07
+      ],
+      "heading": 1.646,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "enraged_shambler",
+      "at": [
+        54.12,
+        15.72,
+        34.54
+      ],
+      "heading": 1.967,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "hulking_shambler",
+      "at": [
+        55.84,
+        15.71,
+        37.2
+      ],
+      "heading": 2.618,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        56.79,
+        15.74,
+        33.62
+      ],
+      "heading": 2.065,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "enraged_shambler",
+      "at": [
+        50.03,
+        15.61,
+        35.44
+      ],
+      "heading": 1.882,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "hulking_shambler",
+      "at": [
+        60.52,
+        18.36,
+        77.19
+      ],
+      "heading": -1.553,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        62.8,
+        18.36,
+        79.17
+      ],
+      "heading": -1.676,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "enraged_shambler",
+      "at": [
+        56.29,
+        18.19,
+        75.3
+      ],
+      "heading": -1.358,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "hulking_shambler",
+      "at": [
+        53.58,
+        18.11,
+        76.32
+      ],
+      "heading": -1.416,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a25": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        42.6,
+        10.84,
+        103.03
+      ],
+      "heading": 0.502,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a26": {
+      "definition": "enraged_shambler",
+      "at": [
+        39.53,
+        10.52,
+        102.23
+      ],
+      "heading": 1.064,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a27": {
+      "definition": "hulking_shambler",
+      "at": [
+        43.07,
+        10.36,
+        99.75
+      ],
+      "heading": 0.055,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a28": {
+      "definition": "w58b_ghost_miner",
+      "at": [
+        40.32,
+        10.36,
+        99.62
+      ],
+      "heading": 0.566,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "foreman_ironfist",
+      "at": [
+        29.52,
+        10.36,
+        79.44
+      ],
+      "heading": 0.744,
+      "boss": true,
+      "scale": 1.6,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_hulking_shambler": [
+      [
+        29.64,
+        10.36,
+        83.87
+      ]
+    ],
+    "w1_w58b_ghost_miner": [
+      [
+        29.62,
+        10.36,
+        75.27
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hulking_shambler",
+          "count": 1,
+          "at": "w1_hulking_shambler"
+        },
+        {
+          "definition": "w58b_ghost_miner",
+          "count": 1,
+          "at": "w1_w58b_ghost_miner"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 76349,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 5700 'Haunted Mines' (title), 71726 (card), objective 76355; icon 892."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/haunted_mines.json: difficulty 5, zone 'Blackspore Swamp', enemies ['Foreman Ironfist', 'Necrosis', 'Black Widows', 'Ghost Dwarves', 'Necrowart Zombies', 'Hulking Shamblers', 'Ghost Dwarf', 'Hulking Shambler', 'Shambler Miner', 'Ghost Miner', 'Foreman Ironfist', 'Necrosis']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-2587.95, -19.11, 1024.19]: BJX fork Battles.lua:39 (Npcs.json Id 46218, sh_cave_entrance_bat_cave_01.adr). (R) the fork's own placement, not a captured one. Region Blackspore, place Blackspore."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 15 ('Haunted Mines (the live dungeon: ghost miners and shamblers down the shafts, Foreman Ironfist at the end of th'): scene sg_haunted_mines_150, entry, exit, 8 waves, 31 spawns ({'Ghost Miner': 11, 'Enraged Shambler': 9, 'Hulking Shambler': 10, 'Foreman Ironfist': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1214 is the fork's; ours must be assigned and the scene sg_haunted_mines_150 has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 75 coins / 260 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046218: reference Npcs.json Id 46218, model 251, name 5700, at [-2587.95, -19.11, 1024.19]."
+    }
+  ]
+}

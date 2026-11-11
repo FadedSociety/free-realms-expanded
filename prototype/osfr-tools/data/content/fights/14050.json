@@ -1,0 +1,503 @@
+{
+  "schema_version": 1,
+  "id": 14050,
+  "kind": "dungeon",
+  "title_id": 162,
+  "description_id": 5667,
+  "icon_id": 673,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "interact": {
+      "npc_guid": 100000046210
+    }
+  },
+  "place": {
+    "zone": 1233,
+    "arena": "bw_hidden_valley",
+    "arrive": [
+      145.23,
+      -31.15,
+      440.92
+    ],
+    "exit_door": [
+      331.15,
+      -4.45,
+      145.77
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "general_grexan": {
+      "definition_id": 950132,
+      "name": "General Grexan",
+      "name_id": 5357,
+      "model_id": 99,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "grexan_s_wood_spider": {
+      "definition_id": 950130,
+      "name": "Grexan's Wood Spider",
+      "name_id": 23044,
+      "model_id": 412,
+      "rank": "normal"
+    },
+    "troll_naturalist": {
+      "definition_id": 3135,
+      "name": "Troll Naturalist",
+      "name_id": 5234,
+      "model_id": 77,
+      "rank": "normal"
+    },
+    "troll_spider_trainer": {
+      "definition_id": 3148,
+      "name": "Troll Spider Trainer",
+      "name_id": 5135,
+      "model_id": 77,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        157.25,
+        -34.1,
+        400.13
+      ],
+      "heading": 2.093,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        160.43,
+        -33.85,
+        399.13
+      ],
+      "heading": -1.323,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "troll_naturalist",
+      "at": [
+        154.95,
+        -33.65,
+        397.07
+      ],
+      "heading": 0.818,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        157.73,
+        -33.57,
+        397.03
+      ],
+      "heading": 0.044,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        250.65,
+        -21.25,
+        379.19
+      ],
+      "heading": -1.86,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "troll_naturalist",
+      "at": [
+        248.83,
+        -21.4,
+        382.03
+      ],
+      "heading": -2.33,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        251.8,
+        -21.1,
+        382.01
+      ],
+      "heading": -2.112,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        246.62,
+        -20.53,
+        379.14
+      ],
+      "heading": -2.17,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "troll_naturalist",
+      "at": [
+        281.0,
+        -13.89,
+        296.18
+      ],
+      "heading": 0.154,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        278.76,
+        -13.79,
+        294.59
+      ],
+      "heading": 0.309,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        283.3,
+        -14.74,
+        301.7
+      ],
+      "heading": -0.128,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "troll_naturalist",
+      "at": [
+        284.85,
+        -12.93,
+        296.39
+      ],
+      "heading": -0.208,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        211.85,
+        -15.51,
+        243.19
+      ],
+      "heading": 0.785,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        209.99,
+        -15.03,
+        241.35
+      ],
+      "heading": 0.787,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "troll_naturalist",
+      "at": [
+        208.62,
+        -14.63,
+        244.29
+      ],
+      "heading": 1.255,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        215.26,
+        -15.65,
+        244.37
+      ],
+      "heading": -0.103,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        193.4,
+        -14.65,
+        155.1
+      ],
+      "heading": -0.082,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "troll_naturalist",
+      "at": [
+        195.13,
+        -14.11,
+        157.33
+      ],
+      "heading": -0.239,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        197.72,
+        -12.82,
+        158.98
+      ],
+      "heading": -0.492,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        191.23,
+        -14.9,
+        157.68
+      ],
+      "heading": 0.088,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "troll_naturalist",
+      "at": [
+        245.07,
+        -3.02,
+        87.86
+      ],
+      "heading": -1.234,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a22": {
+      "definition": "troll_spider_trainer",
+      "at": [
+        242.7,
+        -2.04,
+        92.9
+      ],
+      "heading": -1.498,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a23": {
+      "definition": "grexan_s_wood_spider",
+      "at": [
+        239.77,
+        -2.02,
+        91.54
+      ],
+      "heading": -1.357,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a24": {
+      "definition": "troll_naturalist",
+      "at": [
+        240.51,
+        -1.88,
+        88.02
+      ],
+      "heading": -1.102,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "general_grexan",
+      "at": [
+        320.29,
+        -5.15,
+        135.62
+      ],
+      "heading": -2.687,
+      "boss": true,
+      "scale": 1.5,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_grexan_s_noxious_spider": [
+      [
+        319.67,
+        -4.97,
+        132.61
+      ]
+    ],
+    "w1_forest_troll_handler": [
+      [
+        323.89,
+        -5.33,
+        135.47
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "troll_naturalist",
+          "count": 1,
+          "at": "w1_grexan_s_noxious_spider"
+        },
+        {
+          "definition": "troll_spider_trainer",
+          "count": 1,
+          "at": "w1_forest_troll_handler"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 76355,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 18948,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 162 'Grexan's Camp' (title), 5667 (card), objective 76355; icon 673."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/grexan_s_camp.json: difficulty 4, zone 'Northern Wilds (client text says Briarwood)', enemies ['General Grexan', 'General Grexan']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-680.38, 44.23, 1489.32]: BJX fork Battles.lua:31 (Npcs.json Id 46210, bw_spiderweb_gate_01.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 34 ('Grexan's Camp (the live dungeon: the trolls' spiders and their handlers down the valley, General Grexan at the'): scene bw_hidden_valley, entry, exit, 7 waves, 27 spawns ({'Forest Troll Handler': 9, \"Grexan's Wood Spider\": 8, \"Grexan's Noxious Spider\": 9, 'General Grexan': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1233 is the fork's; ours must be assigned and the scene bw_hidden_valley has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Troll Naturalist' in this fight; the fork's layout had 'grexan_s_noxious_spider' there. (R) 'Troll Naturalist' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "The quest step and the wiki put 'Troll Spider Trainer' in this fight; the fork's layout had 'forest_troll_handler' there. (R) 'Troll Spider Trainer' takes those spots (wiki over the fork's roster)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046210: reference Npcs.json Id 46210, model 413, name 162, at [-680.38, 44.23, 1489.32]."
+    }
+  ]
+}

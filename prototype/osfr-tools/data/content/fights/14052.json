@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "id": 14052,
+  "kind": "battle",
+  "title_id": 130341,
+  "description_id": 130342,
+  "icon_id": 11418,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9,
+    "starter": {
+      "definition": "brugo",
+      "at": [
+        -1911.49,
+        -36.73,
+        -637.76
+      ],
+      "roam": 5
+    }
+  },
+  "place": {
+    "zone": 1243,
+    "arena": "sg_random_encounter_creek",
+    "arrive": [
+      136.35,
+      0.04,
+      145.72
+    ],
+    "exit_door": [
+      127.15,
+      0.38,
+      155.54
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bandit_patrolman": {
+      "definition_id": 3460,
+      "name": "Bandit Patrolman",
+      "name_id": 440716,
+      "model_id": 199,
+      "rank": "normal"
+    },
+    "brugo": {
+      "definition_id": 3102,
+      "name": "Brugo",
+      "name_id": 45247,
+      "model_id": 314,
+      "rank": "boss",
+      "boss": true
+    },
+    "thugawug_stomper": {
+      "definition_id": 950013,
+      "name": "Thugawug Stomper",
+      "name_id": 440717,
+      "model_id": 200,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "brugo",
+      "at": [
+        119.43,
+        -0.86,
+        181.96
+      ],
+      "heading": 2.705,
+      "boss": true,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_bandit_patrolman": [
+      [
+        126.32,
+        2.41,
+        117.25
+      ],
+      [
+        130.78,
+        2.16,
+        127.35
+      ],
+      [
+        130.37,
+        1.84,
+        116.61
+      ]
+    ],
+    "w2_thugawug_stomper": [
+      [
+        121.8,
+        0.74,
+        160.67
+      ],
+      [
+        116.54,
+        -0.31,
+        171.66
+      ],
+      [
+        144.73,
+        -1.79,
+        191.41
+      ]
+    ],
+    "w3_bandit_patrolman": [
+      [
+        102.22,
+        1.28,
+        178.38
+      ],
+      [
+        112.67,
+        0.39,
+        184.27
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bandit_patrolman",
+          "count": 3,
+          "at": "w1_bandit_patrolman"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "thugawug_stomper",
+          "count": 3,
+          "at": "w2_thugawug_stomper"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bandit_patrolman",
+          "count": 2,
+          "at": "w3_bandit_patrolman"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 130377,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w3",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 130341 'Brugo's Fishing Spot' (title), 130342 (card), objective 130377; icon 11418."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Starter at [-1911.49, -36.73, -637.76]: BJX fork Battles.lua:83 (Npcs.json Id 46256, chugawug_m_02.adr). (R) the fork's own placement, not a captured one. Region The Wilds, place The Wilds."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 91 ('Brugo's Fishing Spot (the live random encounter: selfish Brugo's fishing hole)'): scene sg_random_encounter_creek, entry, exit, 3 waves, 9 spawns ({'Bandit Patrolman': 5, 'Thugawug Stomper': 3, 'Brugo': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1243 is the fork's; ours must be assigned and the scene sg_random_encounter_creek has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 60 coins / 220 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    }
+  ]
+}

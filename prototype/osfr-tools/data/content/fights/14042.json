@@ -1,0 +1,460 @@
+{
+  "schema_version": 1,
+  "id": 14042,
+  "kind": "dungeon",
+  "title_id": 21188,
+  "description_id": 100827,
+  "icon_id": 900,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5,
+    "interact": {
+      "npc_guid": 100000046188
+    }
+  },
+  "place": {
+    "zone": 1217,
+    "arena": "bw_snarling_hedges",
+    "arrive": [
+      631.0,
+      -28.72,
+      207.2
+    ],
+    "exit_door": [
+      625.01,
+      0.08,
+      794.33
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "hedge_guardian": {
+      "definition_id": 2644,
+      "name": "Hedge Guardian",
+      "name_id": 4084,
+      "model_id": 74,
+      "rank": "normal"
+    },
+    "hedge_knight": {
+      "definition_id": 950112,
+      "name": "Hedge Knight",
+      "name_id": 4215,
+      "model_id": 74,
+      "rank": "boss",
+      "boss": true
+    },
+    "maze_viper": {
+      "definition_id": 950101,
+      "name": "Maze Viper",
+      "name_id": 4230,
+      "model_id": 180,
+      "rank": "normal"
+    },
+    "nogg_the_cruel": {
+      "definition_id": 950113,
+      "name": "Nogg the Cruel",
+      "name_id": 4093,
+      "model_id": 1682,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "a1": {
+      "definition": "maze_viper",
+      "at": [
+        654.02,
+        -29.71,
+        233.53
+      ],
+      "heading": -1.715,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a2": {
+      "definition": "hedge_guardian",
+      "at": [
+        652.19,
+        -29.4,
+        230.7
+      ],
+      "heading": -1.532,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a3": {
+      "definition": "hedge_knight",
+      "at": [
+        655.02,
+        -29.83,
+        236.18
+      ],
+      "heading": -1.858,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a4": {
+      "definition": "hedge_guardian",
+      "at": [
+        670.32,
+        -30.0,
+        323.92
+      ],
+      "heading": 1.49,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a5": {
+      "definition": "hedge_knight",
+      "at": [
+        671.81,
+        -30.0,
+        321.06
+      ],
+      "heading": -0.178,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a6": {
+      "definition": "maze_viper",
+      "at": [
+        670.68,
+        -30.0,
+        328.09
+      ],
+      "heading": 2.996,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a7": {
+      "definition": "hedge_knight",
+      "at": [
+        685.77,
+        -3.15,
+        411.12
+      ],
+      "heading": -0.367,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a8": {
+      "definition": "maze_viper",
+      "at": [
+        682.26,
+        -2.54,
+        411.65
+      ],
+      "heading": 1.257,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a9": {
+      "definition": "hedge_guardian",
+      "at": [
+        686.29,
+        -2.31,
+        414.46
+      ],
+      "heading": -2.611,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a10": {
+      "definition": "maze_viper",
+      "at": [
+        678.51,
+        -2.58,
+        517.95
+      ],
+      "heading": 1.718,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a11": {
+      "definition": "hedge_guardian",
+      "at": [
+        681.0,
+        -2.45,
+        518.79
+      ],
+      "heading": -2.15,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a12": {
+      "definition": "hedge_knight",
+      "at": [
+        681.3,
+        -2.61,
+        515.56
+      ],
+      "heading": -0.677,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a13": {
+      "definition": "hedge_guardian",
+      "at": [
+        662.4,
+        -0.0,
+        623.8
+      ],
+      "heading": -2.935,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a14": {
+      "definition": "hedge_knight",
+      "at": [
+        662.41,
+        -0.02,
+        620.73
+      ],
+      "heading": -2.892,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a15": {
+      "definition": "maze_viper",
+      "at": [
+        658.35,
+        -0.0,
+        623.21
+      ],
+      "heading": 3.115,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a16": {
+      "definition": "hedge_knight",
+      "at": [
+        652.98,
+        0.2,
+        713.73
+      ],
+      "heading": 2.881,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a17": {
+      "definition": "maze_viper",
+      "at": [
+        656.71,
+        -0.07,
+        716.04
+      ],
+      "heading": -3.121,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a18": {
+      "definition": "hedge_guardian",
+      "at": [
+        653.45,
+        0.12,
+        717.48
+      ],
+      "heading": 2.966,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a19": {
+      "definition": "maze_viper",
+      "at": [
+        637.53,
+        0.19,
+        769.0
+      ],
+      "heading": 1.644,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a20": {
+      "definition": "hedge_guardian",
+      "at": [
+        635.58,
+        0.13,
+        773.22
+      ],
+      "heading": 2.134,
+      "tags": [
+        "guards"
+      ]
+    },
+    "a21": {
+      "definition": "hedge_knight",
+      "at": [
+        638.77,
+        0.09,
+        771.55
+      ],
+      "heading": 2.19,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "nogg_the_cruel",
+      "at": [
+        627.2,
+        0.12,
+        796.68
+      ],
+      "heading": -3.038,
+      "boss": true,
+      "scale": 1.5,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_hedge_knight": [
+      [
+        630.47,
+        0.08,
+        798.2
+      ]
+    ],
+    "w1_maze_viper": [
+      [
+        630.25,
+        0.16,
+        794.0
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "objective_done": {
+          "id": "guards"
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hedge_knight",
+          "count": 1,
+          "at": "w1_hedge_knight"
+        },
+        {
+          "definition": "maze_viper",
+          "count": 1,
+          "at": "w1_maze_viper"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "guards",
+      "kind": "defeat",
+      "text_id": 21202,
+      "target": {
+        "tag": "guards"
+      },
+      "primary": true
+    },
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "waves": [
+          "w1"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [],
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 21188 'The Snarling Hedges' (title), 100827 (card), objective 21202; icon 900."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "data/content/dungeons/the_snarling_hedges.json: difficulty 3, zone 'Briarwood (Thistlerow)', enemies ['Nogg the Cruel', 'Hedge Knight', 'Vine Bears', 'Ghost Snakes', 'Snake Statues', 'Hedge Guardians', 'Hedge Knights', 'Nogg the Cruel', 'Hedge Knight']."
+    },
+    {
+      "kind": "reference",
+      "evidence": "Door at [-901.38, -49.96, 1835.92]: BJX fork Battles.lua:9 (Npcs.json Id 46188, bw_hedge_door_01.adr). (R) the fork's own placement, not a captured one. Region Briarwood, place Briarwood."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 18 ('The Snarling Hedges (the live dungeon: maze vipers and hedge guardians up the walled lane from the thorn gate,'): scene bw_snarling_hedges, entry, exit, 8 waves, 24 spawns ({'Maze Viper': 8, 'Hedge Guardian': 7, 'Hedge Knight': 8, 'Nogg the Cruel': 1})."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Every spot inside the scene is the fork's generated layout, not an original one. Zone number 1217 is the fork's; ours must be assigned and the scene bw_snarling_hedges has not been loaded by our server yet (the eleven shipped battles all use sg_random_encounter_clearing). Triggers: at-start spawns are actors, later waves follow the one before (the fork's 1.5 s delay is dropped). Knockouts and score are the design's defaults; coins and XP are the shipped battles' values, not the fork's 45 coins / 180 stars."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046188: reference Npcs.json Id 46188, model 267, name 21188, at [-901.38, -49.96, 1835.92]."
+    }
+  ]
+}

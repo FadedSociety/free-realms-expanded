@@ -2113,8 +2113,61 @@
       "prerequisite_quest_ids": [
         3030027
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 141023,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Robgoblin Troublemakers - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_one_man_s_junk_f9bd86)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin troublemaker' is definition [950047]"
+            }
+          ],
+          "model_id": 950047,
+          "count": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 141021,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Nurble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_one_man_s_junk_f9bd86)."
+            }
+          ],
+          "npc_id": 9000000415
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 8050,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Brawler Hammer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_one_man_s_junk_f9bd86)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: One Man's Junk... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_one_man_s_junk_f9bd86)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2151,12 +2204,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 141011,
       "intro_text_string_id": 141009,
       "end_text_string_id": 141012,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030029,
@@ -2165,8 +2223,44 @@
       "prerequisite_quest_ids": [
         3030028
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 141074,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the key to Mayor Crystalline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_curious_key_08420e)."
+            }
+          ],
+          "npc_id": 9000000143
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 7739,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Brawler Pauldrons (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_curious_key_08420e)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Curious Key (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_curious_key_08420e)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2203,20 +2297,81 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 141066,
       "intro_text_string_id": 141064,
       "end_text_string_id": 141067,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030030,
       "title_string_id": 387371,
       "giver_npc_id": 9000000143,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3030029
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "text_string_id": 387382,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Level 10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_10_72171c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 387382 is this step; profile 43 from live record 3030021 (brawler.json job_level)"
+            }
+          ],
+          "profile_id": 43,
+          "level": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 388651,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Fernando Flexsteel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_10_72171c)."
+            }
+          ],
+          "npc_id": 9500000785
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 73840,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mayor Crystalline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_10_72171c)."
+            }
+          ],
+          "npc_id": 9000000143
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Achieve Level 10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_10_72171c)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2253,12 +2408,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 387372,
       "intro_text_string_id": 387370,
       "end_text_string_id": 387373,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030031,
@@ -2326,11 +2486,64 @@
       "prerequisite_quest_ids": [
         3030030
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 141086,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Jeni Shortfuse (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_an_honest_mistake_89618a)."
+            }
+          ],
+          "npc_id": 9500000498
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 141088,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Ice Trolls in the Howling Hills - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_an_honest_mistake_89618a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'ice troll' is definition [930061]"
+            }
+          ],
+          "model_id": 930061,
+          "count": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 141090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jeni Shortfuse (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_an_honest_mistake_89618a)."
+            }
+          ],
+          "npc_id": 9500000498
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75880,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rubber Match Brawler Helmet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_an_honest_mistake_89618a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 184
           },
@@ -2378,12 +2591,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 141081,
       "intro_text_string_id": 141079,
       "end_text_string_id": 141082,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030033,
@@ -2392,7 +2610,44 @@
       "prerequisite_quest_ids": [
         3030032
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72753,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Sampson Idlefist (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_fraudulent_buyer_3de8e6)."
+            }
+          ],
+          "npc_id": 9500000530
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 39835,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jeni Shortfuse in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_fraudulent_buyer_3de8e6)."
+            }
+          ],
+          "npc_id": 9500000498
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 104178,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Sampson (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_fraudulent_buyer_3de8e6)."
+            }
+          ],
+          "npc_id": 9500000530
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2444,12 +2699,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 72747,
       "intro_text_string_id": 72745,
       "end_text_string_id": 72748,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030034,
@@ -2458,10 +2718,71 @@
       "prerequisite_quest_ids": [
         3030033
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72767,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Loryn in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_i_want_my_money_826666)."
+            }
+          ],
+          "npc_id": 9000000132
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72769,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Therin in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_i_want_my_money_826666)."
+            }
+          ],
+          "npc_id": 9000000217
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 72771,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Murphy in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_i_want_my_money_826666)."
+            }
+          ],
+          "npc_id": 9000000158
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 72773,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sampson (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_i_want_my_money_826666)."
+            }
+          ],
+          "npc_id": 9500000530
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 39835,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jeni Shortfuse in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_i_want_my_money_826666)."
+            }
+          ],
+          "npc_id": 9500000498
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 26,
           "items": [],
           "job_xp": {
             "43": 396
@@ -2470,6 +2791,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 396 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030034)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "26 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_i_want_my_money_826666)."
             }
           ]
         }
@@ -2510,19 +2835,84 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 39712,
       "intro_text_string_id": 39710,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030035,
       "title_string_id": 387375,
       "giver_npc_id": 9000000115,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3030034
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "text_string_id": 117863,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Achieve Level 15 as a Brawler (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_15_0d0c1c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: objective text 'Achieve Level 15 as a Brawler'; jobs.json profile 43 = Brawler."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: job_level goal (content.rs JobLevel; 25 shipped records use it); the report's VERBS regex only catches 'reach level', so 'Achieve level N' was misfiled here."
+            }
+          ],
+          "profile_id": 43,
+          "level": 15
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 388651,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Fernando Flexsteel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_15_0d0c1c)."
+            }
+          ],
+          "npc_id": 9500000785
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 141090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jeni Shortfuse (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_15_0d0c1c)."
+            }
+          ],
+          "npc_id": 9500000498
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Achieve Level 15 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_achieve_level_15_0d0c1c)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2563,12 +2953,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 387376,
       "intro_text_string_id": 387374,
       "end_text_string_id": 387377,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030036,
@@ -2636,11 +3031,35 @@
       "prerequisite_quest_ids": [
         3030035
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72647,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Mayor Crystalline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_providing_proof_f34291)."
+            }
+          ],
+          "npc_id": 9000000143
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9736,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Brawler Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_providing_proof_f34291)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "43": 360
           },
@@ -2692,12 +3111,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 72802,
       "intro_text_string_id": 72800,
       "end_text_string_id": 72803,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030038,
