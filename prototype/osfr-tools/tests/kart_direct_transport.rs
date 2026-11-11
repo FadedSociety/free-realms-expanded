@@ -155,3 +155,24 @@ fn tunnels_out_of_multi_frames_keep_to_the_admitted_shapes() {
     assert!(admit_direct(tunnel(&fire[..23])).is_err(), "the wrong length");
     assert!(admit_direct(vec![0; 300]).is_err(), "over the bound");
 }
+
+/// F3 (rc-0136 m-derby): the derby car's 34/5 pose comes direct every frame (writer `009f0ce0`,
+/// sender `009f1a70`), 132 bytes. Refused, the server never had the player's car: the AI could not
+/// hunt it and every hit the player reported failed the fresh-pose check (0 damage on the tally).
+#[test]
+fn the_derby_car_pose_is_admitted_direct_at_its_one_size() {
+    let tunnel = |inner: &[u8]| {
+        let mut out = vec![0, 1];
+        out.extend(u32::try_from(inner.len()).unwrap().to_le_bytes());
+        out.extend(inner);
+        out
+    };
+    let mut pose = vec![34, 0, 5, 0];
+    pose.resize(132, 0);
+    let message = admit_direct(tunnel(&pose)).unwrap();
+    assert_eq!(message[7..], pose[..], "the pose reaches the application intact");
+    assert!(admit_direct(tunnel(&pose[..131])).is_err(), "only the client's own size");
+    let mut other = vec![34, 0, 16, 0];
+    other.resize(132, 0);
+    assert!(admit_direct(tunnel(&other)).is_err(), "a hit report stays reliable");
+}

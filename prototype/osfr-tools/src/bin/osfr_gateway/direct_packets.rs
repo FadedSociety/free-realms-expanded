@@ -1,6 +1,9 @@
 //! Direct (unreliable) application packets: alone, or batched into a Multi frame.
 use super::*;
 
+/// F3: the derby car's pose head (34/5), held per session for the tick like `SHIP_REPORT`.
+const DERBY_POSE: [u8; 4] = [34, 0, 5, 0];
+
 impl Session {
     /// A direct application packet, alone or out of a Multi frame.
     pub(super) fn take_direct(
@@ -24,15 +27,19 @@ impl Session {
             }))?;
         }
         // L965: the ship report comes every client frame; once a character is selected, keep the
-        // newest for the tick (before that it is refused at once, as any message is).
+        // newest for the tick (before that it is refused at once, as any message is). F3: so does
+        // the derby car's pose (34/5), whose stamp is its last 8 bytes (`009f0ce0`).
         let selected = self.selected_character || options.account_store.is_none();
-        if selected
-            && message
-                .get(7..)
-                .is_some_and(|inner| inner.starts_with(&SHIP_REPORT))
-        {
-            let stamp = |report: &[u8]| osfr_tools::le::u64(report, 20);
-            let held = self.ship_report.as_deref();
+        let inner = message.get(7..).unwrap_or_default();
+        if selected && (inner.starts_with(&SHIP_REPORT) || inner.starts_with(&DERBY_POSE)) {
+            let stamp = |report: &[u8]| match report.get(7..11) {
+                Some(head) if head == DERBY_POSE => {
+                    osfr_tools::le::u64(report, report.len().saturating_sub(8))
+                }
+                _ => osfr_tools::le::u64(report, 20),
+            };
+            let same_kind = |held: &&[u8]| held.get(7..11) == inner.get(..4);
+            let held = self.ship_report.as_deref().filter(same_kind);
             if held.is_none_or(|held| stamp(held) <= stamp(&message)) {
                 self.ship_report = Some(message);
             }

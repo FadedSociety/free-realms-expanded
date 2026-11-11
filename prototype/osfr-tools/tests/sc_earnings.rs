@@ -540,6 +540,7 @@ fn wallet_save_round_trips_the_earned_ledger_and_prunes_it() {
         orders: Vec::new(),
         earned_rides: vec![CHROME_DRAKE as u32],
         last_activity_day: Some(DAY),
+        welcomed: true,
     };
     let bytes = serde_json::to_vec(&wallet).unwrap();
     let decoded: Wallet = serde_json::from_slice(&bytes).unwrap();

@@ -1827,6 +1827,11 @@ mod stack_room;
 #[path = "style_card_use.rs"]
 mod style_card_use;
 
+/// F3 (rc-0136): a solo derby driven with the client's direct car pose.
+#[cfg(test)]
+#[path = "f3_derby_pose.rs"]
+mod f3_derby_pose;
+
 /// L965: a ship report comes every client frame. The session keeps only the newest (by its
 /// stamp, not the first or the last to arrive) and hands it on once at the tick, never one
 /// transaction per frame.

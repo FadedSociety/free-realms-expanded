@@ -18,6 +18,8 @@ mod fishing_packets;
 mod json;
 #[path = "support/scratch.rs"]
 mod scratch;
+#[path = "common/content_copy.rs"]
+mod content_copy;
 use field_battle_fixture::portal_play as play;
 use fishing_packets::lifecycle;
 use scratch::Scratch;
@@ -735,4 +737,41 @@ fn a_player_online_across_utc_midnight_is_sent_the_new_days_count_once() {
     assert_eq!(*published(&midnight, &[143, 0, 1])[0], spins(2, 82_800));
     assert_eq!(counts(game.pet_tick(&character(), 4_000)), 0, "once");
     assert_eq!(offers(&send(&mut game, &START_WHEEL)).len(), 1, "and the wheel opens");
+}
+
+/// F3 (rc-0136 m-wheel, owner: "Says I'm out of spins for the day even though I never got one"):
+/// a fresh character is in the opening campaign, whose world entry sent the Games window lists
+/// (the wheel row live) but never the 143/1 count, so the client read no spin and refused it
+/// itself; a start that did reach the server was refused for the opening too. The released
+/// content (data/content + data/release, the opening included), a fresh character at its opening
+/// checkpoint: world entry publishes both spins, the first spin of each wheel pays, and the next
+/// start that day is the out-of-spins refusal.
+#[test]
+fn a_fresh_character_in_the_opening_gets_its_first_spins_then_the_refusal() {
+    let scratch = Scratch::new("daily-wheel-opening");
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    content_copy::copy_tree(&root.join("data/content"), scratch.path());
+    content_copy::copy_tree(&root.join("data/release"), scratch.path());
+    let fresh = Gameplay::initial_character(scratch.path(), character()).unwrap();
+    let mut game = Gameplay::load(scratch.path(), None).unwrap();
+    assert!(game.state().opening.is_some(), "a fresh character starts in the opening campaign");
+    game.seed_wheel_clock(CLOCK);
+    let entry = game.initialize_world(&fresh, 500).unwrap();
+    assert_eq!(published(&entry, &[143, 0, 1]), [&spins(2, 82_800)], "the count is published");
+
+    let (instance, _) = connected(&mut game);
+    let (_, coin_stop) = turn(&mut game, instance, 2, 0, 0);
+    assert!(!said(&coin_stop).is_empty(), "the coin wheel's first spin stops and pays");
+    let (_, daily_stop) = turn(&mut game, instance, 1, 0, 0);
+    assert!(!said(&daily_stop).is_empty(), "the daily wheel's first spin stops and pays");
+    send(&mut game, &movie(instance, "FRServer_GameClose"));
+    assert_eq!(game.state().last_spin_day, Some(TODAY));
+
+    let refused = send(&mut game, &START_WHEEL);
+    assert!(offers(&refused).is_empty(), "no second run today");
+    let line = published(&refused, &[15, 0, 3, 0]);
+    assert!(
+        line.len() == 1 && line[0].windows(NO_SPIN.len()).any(|part| part == NO_SPIN.as_bytes()),
+        "\"{NO_SPIN}\""
+    );
 }

@@ -4,6 +4,7 @@ use super::*;
 
 mod bank;
 mod mailbox;
+mod sc_display;
 
 impl Gameplay {
     pub fn exclude_startup_npcs(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
@@ -141,6 +142,19 @@ impl Gameplay {
         Ok(out)
     }
 
+    /// F3: the login 165/1 lists the gateway sends this client (its startup snapshot), so a
+    /// merchant's 165/9 adds only what the client lacks (`CoinShop::open_merchant`).
+    pub fn adopt_coin_store_lists(&mut self, lists: &crate::startup_snapshot::CoinStoreSnapshot) {
+        if let Some(shop) = self.npc_coin_shop.as_mut() {
+            shop.set_store_lists(crate::coin_shop::StoreLists {
+                static_ids: lists.static_items.iter().map(|entry| entry.id).collect(),
+                dynamic: (lists.dynamic_items.iter())
+                    .map(|entry| (entry.id, entry.unknown_words, entry.unknown_flags))
+                    .collect(),
+            });
+        }
+    }
+
     /// Route one NPC-family packet, then raise the item events its inventory change earned, so a
     /// bought item counts for a "collect item" objective. This is the one raise: the buy paths
     /// themselves raise nothing, or a purchase would count twice.
@@ -226,6 +240,9 @@ impl Gameplay {
         }
         // P-banking: banker and vault clicks, 26/44, 42/17 and the Coin Shop's bank upgrades.
         if let Some(out) = self.bank_packet(inner, character)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.sc_display_26_8(inner, character, now_ms)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_interact_26_8(inner, character)? {
@@ -947,12 +964,16 @@ impl Gameplay {
                     // definition; the displayed price is the definition's coin purchase price,
                     // so a stale definition is updated from stores.json first.
                     let shop = self.npc_coin_shop.as_ref();
-                    let (packets, rows) =
+                    let (packets, stock) =
                         coin_merchant_packets(&window, &self.inventory, shop, now_ms)
                             .map_err(|_| invalid("NPC merchant list could not be encoded"))?;
                     out.replies.extend(packets);
                     npc_event(select_event(runtime_guid, Some(key), option_id, "shop"));
-                    npc_event(shop_open_event(runtime_guid, key, rows));
+                    npc_event(shop_open_event(runtime_guid, key, stock.len()));
+                    // F3: the window's 165/8 asks for these to be buyable (`dynamic_list_update`).
+                    if let Some(shop) = self.npc_coin_shop.as_mut() {
+                        shop.open_merchant(stock);
+                    }
                 }
                 Ok(NpcSelection::Race) => {
                     consume_menu = true;
@@ -1208,12 +1229,18 @@ impl Gameplay {
                             "result": outcome.result_code
                         }));
                         self.inventory = shop.inventory().clone();
-                        return Ok(Some(Outcome {
+                        let mut out = Outcome {
                             replies: outcome.replies,
                             changed: outcome.changed,
                             granted_items: outcome.granted,
                             ..Outcome::default()
-                        }));
+                        };
+                        // F3: a kart bought in a mechanic's window is a loadout at once (66/43's
+                        // rule), not only at the next garage visit.
+                        if out.changed {
+                            self.adopt_vehicles(&mut out);
+                        }
+                        return Ok(Some(out));
                     }
                     Err(error) => {
                         npc_event(serde_json::json!({
@@ -1306,6 +1333,28 @@ impl Gameplay {
             let item_id = i32::try_from(request.initial_dwords[0]).unwrap_or(-1);
             let quantity = request.trailing_dwords[0];
             let transaction_id = request.trailing_dwords[2];
+            // F3: the Station Cash window a display opened buys its bundle with Station Cash.
+            let busy = self.activity_busy();
+            let housing = &mut self.housing;
+            if let Some(shop) = self.npc_coin_shop.as_mut()
+                && let Some(paid) = shop.buy_open_bundle(
+                    request.initial_dwords[0],
+                    quantity,
+                    transaction_id,
+                    busy,
+                    &mut |deed, commit| housing.as_mut()?.grant_deed(character.guid, deed, commit),
+                )
+            {
+                if paid.changed {
+                    self.inventory = shop.inventory().clone();
+                }
+                return Ok(Some(Outcome {
+                    replies: paid.replies,
+                    changed: paid.changed,
+                    granted_items: paid.granted,
+                    ..Outcome::default()
+                }));
+            }
             let Some(interaction) = &self.npc_interaction else {
                 return Ok(Some(Outcome {
                     replies: vec![crate::coin_shop::merchant_buy_result_packet(false)],
@@ -1868,7 +1917,8 @@ fn dialogue_packet_rows(
 }
 
 /// Build the coin merchant window: the 35/37 definition updates the client needs, then the
-/// 165/10 merchant list. Returns the packets and the row count for the shop-open event.
+/// 165/10 merchant list. Returns the packets and the listed item ids (the shop-open event's count,
+/// and the stock the window's 165/8 asks for).
 ///
 /// The client's `MerchantSellInventoryDataSource` resolves every row through its item definition
 /// cache and displays the definition's coin purchase price (`+0x24`, serialized dword 7), not a
@@ -1885,7 +1935,7 @@ fn coin_merchant_packets(
     inventory: &Inventory,
     shop: Option<&crate::coin_shop::CoinShop>,
     now_ms: u64,
-) -> Result<(Vec<Vec<u8>>, usize), npc_interaction::NpcInteractionError> {
+) -> Result<(Vec<Vec<u8>>, Vec<i32>), npc_interaction::NpcInteractionError> {
     let mut definitions = BTreeMap::new();
     let mut entries = Vec::new();
     for item in &window.items {
@@ -1947,7 +1997,7 @@ fn coin_merchant_packets(
         crate::inventory::set_resell_value(record, worth)
             .ok_or(npc_interaction::NpcInteractionError::InvalidPacket)?;
     }
-    let rows = entries.len();
+    let stock: Vec<i32> = entries.iter().map(|entry| entry.item_id.cast_signed()).collect();
     let mut packets = Vec::new();
     if !definitions.is_empty() {
         let definitions: Vec<_> = definitions.into_values().collect();
@@ -1964,7 +2014,7 @@ fn coin_merchant_packets(
             entries,
         },
     )?);
-    Ok((packets, rows))
+    Ok((packets, stock))
 }
 
 pub(super) fn quest_offer_packet(

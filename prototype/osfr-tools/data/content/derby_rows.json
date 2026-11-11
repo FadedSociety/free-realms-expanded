@@ -143,7 +143,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the seven cars stand on probed floor spots (north band z 200-210, south band z 290-310), 2 m up. F3 (rc-0136, run 161606Z): the player's car first stood at (240, 106, 215); that floor (y 103.6) falls to y 101.6 at z 245 and the car rolled 41 m into the central pile while the arena loaded and stuck there, so the player's car and the seventh AI car swapped slots: the player now starts at (240, 102, 310) facing the centre, in the hollow where the client's own 125/1 reports of that run show the car settle at y 99.9-100.9 (R); the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
         },
         {
           "kind": "video",
@@ -154,7 +154,7 @@
         "envelope_flag": 1,
         "scene": "sh_dm_arena",
         "type_id": 2,
-        "position": [240.0, 106.0, 215.0, 1.0],
+        "position": [240.0, 102.0, 310.0, 1.0],
         "rotation": [0.0, 0.0, 1.0, 0.0],
         "sky": "sky_snowhill24.xml",
         "tutorial": false,
@@ -165,7 +165,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "start_transform_bits": [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216],
       "npc_start_transform_bits": [
         [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
         [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
@@ -173,7 +173,7 @@
         [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
         [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
         [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
-        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+        [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216]
       ],
       "npc_drivers": [
         {
@@ -506,7 +506,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the seven cars stand on probed floor spots (north band z 200-210, south band z 290-310), 2 m up. F3 (rc-0136, run 161606Z): the player's car first stood at (240, 106, 215); that floor (y 103.6) falls to y 101.6 at z 245 and the car rolled 41 m into the central pile while the arena loaded and stuck there, so the player's car and the seventh AI car swapped slots: the player now starts at (240, 102, 310) facing the centre, in the hollow where the client's own 125/1 reports of that run show the car settle at y 99.9-100.9 (R); the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
         },
         {
           "kind": "video",
@@ -525,7 +525,7 @@
         "envelope_flag": 1,
         "scene": "sh_dm_arena",
         "type_id": 2,
-        "position": [240.0, 106.0, 215.0, 1.0],
+        "position": [240.0, 102.0, 310.0, 1.0],
         "rotation": [0.0, 0.0, 1.0, 0.0],
         "sky": "sky_snowhill24.xml",
         "tutorial": false,
@@ -536,7 +536,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "start_transform_bits": [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216],
       "npc_start_transform_bits": [
         [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
         [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
@@ -544,7 +544,7 @@
         [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
         [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
         [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
-        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+        [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216]
       ],
       "npc_drivers": [
         {
@@ -650,7 +650,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the seven cars stand on probed floor spots (north band z 200-210, south band z 290-310), 2 m up. F3 (rc-0136, run 161606Z): the player's car first stood at (240, 106, 215); that floor (y 103.6) falls to y 101.6 at z 245 and the car rolled 41 m into the central pile while the arena loaded and stuck there, so the player's car and the seventh AI car swapped slots: the player now starts at (240, 102, 310) facing the centre, in the hollow where the client's own 125/1 reports of that run show the car settle at y 99.9-100.9 (R); the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
         },
         {
           "kind": "video",
@@ -669,7 +669,7 @@
         "envelope_flag": 1,
         "scene": "sh_dm_arena",
         "type_id": 2,
-        "position": [240.0, 106.0, 215.0, 1.0],
+        "position": [240.0, 102.0, 310.0, 1.0],
         "rotation": [0.0, 0.0, 1.0, 0.0],
         "sky": "sky_snowhill24.xml",
         "tutorial": false,
@@ -680,7 +680,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "start_transform_bits": [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216],
       "npc_start_transform_bits": [
         [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
         [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
@@ -688,7 +688,7 @@
         [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
         [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
         [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
-        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+        [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216]
       ],
       "npc_drivers": [
         {
@@ -928,7 +928,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the seven cars stand on probed floor spots (north band z 200-210, south band z 290-310), 2 m up. F3 (rc-0136, run 161606Z): the player's car first stood at (240, 106, 215); that floor (y 103.6) falls to y 101.6 at z 245 and the car rolled 41 m into the central pile while the arena loaded and stuck there, so the player's car and the seventh AI car swapped slots: the player now starts at (240, 102, 310) facing the centre, in the hollow where the client's own 125/1 reports of that run show the car settle at y 99.9-100.9 (R); the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
         },
         {
           "kind": "video",
@@ -939,7 +939,7 @@
         "envelope_flag": 1,
         "scene": "sh_dm_arena",
         "type_id": 2,
-        "position": [240.0, 106.0, 215.0, 1.0],
+        "position": [240.0, 102.0, 310.0, 1.0],
         "rotation": [0.0, 0.0, 1.0, 0.0],
         "sky": "sky_snowhill24.xml",
         "tutorial": false,
@@ -950,7 +950,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "start_transform_bits": [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216],
       "npc_start_transform_bits": [
         [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
         [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
@@ -958,7 +958,7 @@
         [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
         [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
         [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
-        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+        [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216]
       ],
       "npc_drivers": [
         {
@@ -1373,7 +1373,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the player's car starts at (240, 104 + 2, 215) on the north band facing +z and the seven AI cars on probed floor spots (north band z 200-210, south band z 290-310), 2 m up; the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
+          "evidence": "(R) Frost Ridge's arena is the client's sh_dm_arena (the snow arena in afyPqIZqD-U_250.00; sheet C8; maps.md 5.2). No capture holds its start slots: Studio POST /api/probe (mesh floors, 2026-11-09) shows a raised pile at y 116 over x 220-270, z 240-260 (sh_dm_boulders and crystals at 242, 242) and the drivable snow floor at y 100-106 around it; the seven cars stand on probed floor spots (north band z 200-210, south band z 290-310), 2 m up. F3 (rc-0136, run 161606Z): the player's car first stood at (240, 106, 215); that floor (y 103.6) falls to y 101.6 at z 245 and the car rolled 41 m into the central pile while the arena loaded and stuck there, so the player's car and the seventh AI car swapped slots: the player now starts at (240, 102, 310) facing the centre, in the hollow where the client's own 125/1 reports of that run show the car settle at y 99.9-100.9 (R); the client's physics settles them. Sky as the Snowhill soccer arena (soccer.json). geometry_id 102 is the Wildwood arena's and is unverified here. Native item 14 corrects these. Power-ups: the capture's four kinds and definitions at four probed floor spots, 1 m up (R)."
         },
         {
           "kind": "video",
@@ -1392,7 +1392,7 @@
         "envelope_flag": 1,
         "scene": "sh_dm_arena",
         "type_id": 2,
-        "position": [240.0, 106.0, 215.0, 1.0],
+        "position": [240.0, 102.0, 310.0, 1.0],
         "rotation": [0.0, 0.0, 1.0, 0.0],
         "sky": "sky_snowhill24.xml",
         "tutorial": false,
@@ -1403,7 +1403,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "start_transform_bits": [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216],
+      "start_transform_bits": [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216],
       "npc_start_transform_bits": [
         [1055193390, 0, 3211065646, 0, 0, 1065353216, 0, 0, 1063581998, 0, 1055193390, 0, 1130758144, 1121320960, 1129447424, 1065353216],
         [1055193390, 0, 1063581998, 0, 0, 1065353216, 0, 0, 3211065646, 0, 1055193390, 0, 1132068864, 1121189888, 1129447424, 1065353216],
@@ -1411,7 +1411,7 @@
         [1058642330, 0, 3209481421, 0, 0, 1065353216, 0, 0, 1061997773, 0, 1058642330, 0, 1130102784, 1121583104, 1128792064, 1065353216],
         [3212689693, 0, 3188151789, 0, 0, 1065353216, 0, 0, 1040668141, 0, 3212689693, 0, 1130758144, 1120927744, 1133576192, 1065353216],
         [3212689693, 0, 1040668141, 0, 0, 1065353216, 0, 0, 3188151789, 0, 3212689693, 0, 1132068864, 1120927744, 1133576192, 1065353216],
-        [3212836864, 0, 2769105202, 0, 0, 1065353216, 0, 0, 621621554, 0, 3212836864, 0, 1131413504, 1120665600, 1134231552, 1065353216]
+        [1065353216, 0, 2147483648, 0, 0, 1065353216, 0, 0, 0, 0, 1065353216, 0, 1131413504, 1121189888, 1129775104, 1065353216]
       ],
       "npc_drivers": [
         {

@@ -15,6 +15,7 @@
   "quest_complete": 1,
   "quest_overrides": {},
   "daily_first_activity": 5,
+  "welcome_grant": 50,
   "first_clear_ride": {
     "dungeon_id": 12303,
     "item_id": 79454
@@ -27,6 +28,10 @@
     }
   ],
   "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) F3 (rc-0136 m-booster, owner: 'No sc to buy a scroll'): the economy is free and Station Cash is earned from activities, so a new character had 0 SC and could buy nothing until it had played several. welcome_grant pays 50 SC once per character, the first time the wallet is read (66/10, every world entry asks for it), and the wallet keeps a welcomed flag so it is never paid twice. 50 is one Super Star or Super Coin Booster at its listed price (200 SC x station_cash.sc_price_scale 0.25 in stores.json). Live-tunable; 0 turns it off."
+    },
     {
       "kind": "reconstructed",
       "evidence": "(R) Chess pays Station Cash only for a game that reached a result through play (The owner 2026-10-24: rewards gated on real completion): a win, a draw, or a loss after at least chess_min_plies plies (half-moves, both sides, default 20, sane bound 0..=400, live-tunable). An instant resign pays nothing, neither the chess amount nor the daily bonus. The ply threshold is a local economy choice, not a recovered client value."

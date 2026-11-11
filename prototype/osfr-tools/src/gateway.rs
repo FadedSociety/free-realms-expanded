@@ -879,8 +879,7 @@ impl Gateway {
                     .iter()
                     .map(|npc| npc.actor_id),
             );
-        }
-        if let Some(game) = &mut gameplay {
+            game.adopt_coin_store_lists(&startup_snapshot.catalogues.coin_store);
             if let Some(return_location) = game.abandon_battle_for_reconnect() {
                 if state.guid != return_location.guid {
                     return Err(invalid("battle reconnect character ownership differs"));

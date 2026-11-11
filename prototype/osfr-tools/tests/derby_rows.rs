@@ -1138,7 +1138,9 @@ fn arena_rows_play_in_their_own_arena_with_their_roster() {
     // is the client's one unplaced Tangletrack driver name (R).
     let tangletrack = [19_337, 19_340, 19_338, 19_343, 19_341, 19_339, 19_342];
     for (offset, (live_row, game, arena, start, names)) in [
-        (67_u32, 40_i32, "sh_dm_arena", [240.0_f32, 106.0, 215.0], &frost_ridge[..]),
+        // F3 (rc-0136): Frost Ridge's player start moved off the slope that rolled the car into the
+        // central pile while the arena loaded (240, 106, 215 is now AI slot 7's).
+        (67_u32, 40_i32, "sh_dm_arena", [240.0_f32, 102.0, 310.0], &frost_ridge[..]),
         (68, 41, "bw_dm_arena", [305.0, 3.0, 265.0], &tangletrack[..]),
     ]
     .into_iter()

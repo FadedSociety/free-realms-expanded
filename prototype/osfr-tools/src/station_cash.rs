@@ -606,6 +606,10 @@ pub struct EarnTable {
     pub quest_overrides: BTreeMap<u32, u32>,
     /// Added once per character per UTC day on the first qualifying completion.
     pub daily_first_activity: u32,
+    /// F3 (R): paid once per character the first time the wallet is read (66/10), so a new
+    /// player can buy a booster before earning any. 0 is off.
+    #[serde(default)]
+    pub welcome_grant: u32,
     pub first_clear_ride: Option<FirstClearRide>,
     /// Dormant event rides; every row must be disabled until a seasonal event trigger exists.
     pub seasonal_rides: Vec<SeasonalRide>,
@@ -649,6 +653,7 @@ impl EarnTable {
             self.hardest_dungeon_clear,
             self.quest_complete,
             self.daily_first_activity,
+            self.welcome_grant,
         ];
         if amounts.iter().any(|amount| *amount > MAX_EARN_SC)
             || self.hardest_dungeons.len() > MAX_EARN_OVERRIDES
@@ -1123,6 +1128,9 @@ pub struct Wallet {
     /// UTC day index (`activity_day`) of the last paid first-completion bonus.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_activity_day: Option<u64>,
+    /// F3: the one-time welcome grant (`EarnTable::welcome_grant`) was paid.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub welcomed: bool,
 }
 
 impl Wallet {
@@ -1157,6 +1165,7 @@ impl Wallet {
             && self.orders.is_empty()
             && self.earned_rides.is_empty()
             && self.last_activity_day.is_none()
+            && !self.welcomed
     }
 
     fn replay(&self, order: &OrderDetail, tracking_id: u32) -> Option<u32> {

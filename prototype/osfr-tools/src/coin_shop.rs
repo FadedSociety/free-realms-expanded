@@ -246,6 +246,20 @@ pub struct CoinShop {
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
+    /// F3: the login 165/1 lists the client holds, shared by every staged clone.
+    store_lists: Arc<StoreLists>,
+    /// F3: the stock of the merchant window last opened (165/10), which its 165/8 asks for.
+    open_stock: Vec<i32>,
+    /// F3: the Marketplace bundles of the Station Cash window last opened (66/42, a display).
+    open_bundles: Vec<u32>,
+}
+
+/// F3: what the client's coin store already knows from the login 165/1 (`00c75fc0`): the static
+/// ids and the dynamic records (id, three dwords, three flags), kept for the 165/9 answer.
+#[derive(Debug, Default)]
+pub struct StoreLists {
+    pub static_ids: BTreeSet<i32>,
+    pub dynamic: Vec<(i32, [u32; 3], [u8; 3])>,
 }
 
 impl CoinShop {
@@ -318,7 +332,105 @@ impl CoinShop {
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
+            store_lists: Arc::default(),
+            open_stock: Vec::new(),
+            open_bundles: Vec::new(),
         })
+    }
+
+    /// F3: the login 165/1 lists this session's client was sent (the gateway's startup snapshot).
+    pub fn set_store_lists(&mut self, lists: StoreLists) {
+        self.store_lists = Arc::new(lists);
+    }
+
+    /// F3: a merchant window (165/10) listing `stock` was just sent; its 165/8 follows.
+    pub fn open_merchant(&mut self, stock: Vec<i32>) {
+        self.open_stock = stock;
+        self.open_bundles.clear();
+    }
+
+    /// F3: a Station Cash window (66/42) listing `bundles` was just sent, a display's shop.
+    pub fn open_sc_merchant(&mut self, bundles: Vec<u32>) {
+        self.open_bundles = bundles;
+        self.open_stock.clear();
+    }
+
+    /// F3: the 66/43 buy from the open Station Cash window (`00b43310` puts the window row's
+    /// bundle first). It is paid as the Marketplace order 66/3 would be (`place_order`: listed,
+    /// priced, wallet, bag, replay window), then answered with the window's own 66/44 result and
+    /// the new balance (66/11). `None` when the bundle is not on the open window.
+    pub fn buy_open_bundle(
+        &mut self,
+        bundle: u32,
+        quantity: u32,
+        tracking_id: u32,
+        busy: bool,
+        grant_lot: station_cash::LotGrant,
+    ) -> Option<CoinShopOutcome> {
+        if !self.open_bundles.contains(&bundle) {
+            return None;
+        }
+        let store_id = self.sc_catalogue.config().store_id;
+        let order = station_cash::OrderRequest {
+            tracking_id,
+            details: vec![station_cash::OrderDetail {
+                bundle_id: bundle,
+                store_id,
+                quantity,
+                tint: 0,
+            }],
+            coupon: false,
+            gift: false,
+        };
+        let outcome = station_cash::place_order(
+            &self.sc_catalogue,
+            &mut self.sc_wallet,
+            &mut self.inventory,
+            &order,
+            self.bag_capacity,
+            busy,
+            grant_lot,
+        );
+        let paid = outcome.changed && outcome.result_code == station_cash::ORDER_SUCCESS;
+        Some(CoinShopOutcome {
+            result_code: if paid { RESULT_SUCCESS } else { RESULT_FAILURE },
+            replies: vec![
+                merchant_buy_result_packet(paid),
+                station_cash::wallet_packet(self.sc_wallet.balance),
+            ],
+            transaction_id: tracking_id,
+            changed: outcome.changed,
+            granted: outcome.granted,
+        })
+    }
+
+    /// F3: the 165/9 dynamic list update (`00c76100`, records read by `00c74200`/`00c71510`). The
+    /// client swaps its whole dynamic list for this one, and the merchant window's CanBuy column
+    /// (`00cff140` case 31) is 0 for an item in neither list or whose first flag is set
+    /// (`00c70fe0`), so the Buy button stays grey. So: the login dynamic records, each the open
+    /// merchant stocks made buyable, then the merchant's other items the static list lacks, with
+    /// the third flag set so the gamedock store keeps them unlisted (`00cf1ac0`), as the 18 such
+    /// static rows are (R). A static id is never repeated: the next update unlinks by id.
+    fn dynamic_list_update(&self) -> Vec<u8> {
+        let lists = &self.store_lists;
+        let stocks = |id: i32| self.open_stock.contains(&id);
+        let mut records: Vec<(i32, [u32; 3], [u8; 3])> = (lists.dynamic.iter())
+            .map(|&(id, words, [first, second, third])| {
+                (id, words, [u8::from(first != 0 && !stocks(id)), second, third])
+            })
+            .collect();
+        let known: BTreeSet<i32> = records.iter().map(|record| record.0).collect();
+        let fresh = |id: &&i32| !lists.static_ids.contains(id) && !known.contains(id);
+        let extra: BTreeSet<i32> = self.open_stock.iter().filter(fresh).copied().collect();
+        records.extend(extra.into_iter().map(|id| (id, [id.cast_unsigned(), 0, 0], [0, 0, 1])));
+        let mut reply = header(COIN_FAMILY, 9);
+        put_i32(&mut reply, records.len() as i32);
+        for (id, words, flags) in records {
+            put_i32(&mut reply, id);
+            words.iter().for_each(|word| put_u32(&mut reply, *word));
+            reply.extend(flags);
+        }
+        reply
     }
 
     /// Build the session's shop when the NPC package provides one. A saved Station Cash wallet
@@ -489,9 +601,11 @@ impl CoinShop {
                 read_u64(inner, 4)?,
             ),
             2 => self.item_definitions(inner),
-            // (R) The dynamic list is always empty; the client clears and refills it from 165/9.
+            // F3: the client clears and refills its dynamic list from 165/9; the open merchant's
+            // stock goes in, or its Buy stays grey (`dynamic_list_update`).
             8 if inner.len() == 4 => Ok(CoinShopOutcome {
-                replies: vec![counted_empty(COIN_FAMILY, 9)],
+                replies: vec![self.dynamic_list_update()],
+                result_code: RESULT_SUCCESS,
                 ..CoinShopOutcome::default()
             }),
             12 if inner.len() == 12 => {
@@ -677,7 +791,7 @@ impl CoinShop {
                 ));
             }
         };
-        if staged.state().items.len() > self.bag_capacity {
+        if staged.state().bag_stacks() > self.bag_capacity {
             return Ok(self.failure(
                 1,
                 RESULT_SERVICE_UNAVAILABLE,
@@ -1079,7 +1193,7 @@ impl CoinShop {
                 ));
             }
         };
-        if staged.state().items.len() > self.bag_capacity {
+        if staged.state().bag_stacks() > self.bag_capacity {
             return Ok(buy_back_result(
                 sale_transaction_id,
                 RESULT_SERVICE_UNAVAILABLE,
@@ -1179,6 +1293,23 @@ impl CoinShop {
         self.marketplace_enabled() && self.sc_catalogue.listing(bundle).is_some()
     }
 
+    /// F3 (rc-0136 m-booster): a new character had no Station Cash for a booster until activities
+    /// paid some. The earn table's welcome grant is paid once per character, at the first wallet
+    /// read, and the wallet remembers it (`Wallet::welcomed`). Returns whether it was paid now.
+    fn welcome(&mut self) -> bool {
+        let config = self.sc_catalogue.config();
+        let grant = (self.sc_earn.as_ref())
+            .filter(|table| table.enabled)
+            .map_or(0, |table| table.welcome_grant);
+        if grant == 0 || !config.enabled || self.sc_wallet.welcomed {
+            return false;
+        }
+        self.sc_wallet.welcomed = true;
+        let balance = self.sc_wallet.balance.saturating_add(grant);
+        self.sc_wallet.balance = balance.min(config.max_balance);
+        true
+    }
+
     fn marketplace_enabled(&self) -> bool {
         self.sc_catalogue.config().enabled && self.catalogue.marketplace.enabled_on_handshake
     }
@@ -1265,6 +1396,7 @@ impl CoinShop {
                 }
             }
             10 => {
+                changed = self.welcome();
                 let mut replies = vec![station_cash::wallet_packet(self.sc_wallet.balance)];
                 // The native store screen sends this wallet request when it opens
                 // (`00b43bc0`, Lua `RequestWalletInfo`) and never the 66/12 status
@@ -1440,12 +1572,6 @@ fn definition_outcome(complete: bool, known: &[u32]) -> CoinShopOutcome {
         replies: vec![reply],
         ..CoinShopOutcome::default()
     }
-}
-
-fn counted_empty(family: u16, opcode: u16) -> Vec<u8> {
-    let mut bytes = header(family, opcode);
-    put_i32(&mut bytes, 0);
-    bytes
 }
 
 fn account_info_packet() -> Vec<u8> {

@@ -1933,8 +1933,13 @@ fn gateway_definitions_list_update_and_gifts_are_answered_without_state_change()
     assert_eq!(replies.len(), 1);
     assert_eq!(parse_definitions(&replies[0]), (false, vec![8, 75060]));
 
+    // F3: with no merchant window open the 165/9 is the login dynamic list, back unchanged (the
+    // client swaps its list for it, so an empty one dropped those rows). 19 bytes a record.
     let replies = send(&mut gateway, &[165, 0, 8, 0]);
-    assert_eq!(replies, vec![vec![165, 0, 9, 0, 0, 0, 0, 0]]);
+    assert_eq!(replies.len(), 1);
+    assert_eq!(&replies[0][..4], &[165, 0, 9, 0]);
+    let count = u32::from_le_bytes(replies[0][4..8].try_into().unwrap()) as usize;
+    assert_eq!(replies[0].len(), 8 + count * 19, "the login dynamic records, nothing else");
 
     let replies = send(&mut gateway, &gift_packet());
     assert_eq!(replies.len(), 1);

@@ -990,6 +990,12 @@ impl NpcVisibility {
         self.shown(actor_id).map(|npc| npc.position)
     }
 
+    /// F3: the nameplate text id and position of a shown actor (a Station Cash display is known
+    /// by the name of the item it shows).
+    pub fn actor_name_at(&self, actor_id: u64) -> Option<(i32, [f32; 3])> {
+        self.shown(actor_id).map(|npc| (npc.spawn.name_string_id, npc.position))
+    }
+
     fn shown(&self, actor_id: u64) -> Option<&VisibleNpc> {
         if self.excluded.contains(&actor_id) {
             return None;

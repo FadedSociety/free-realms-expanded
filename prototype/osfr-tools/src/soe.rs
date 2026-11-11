@@ -21,9 +21,11 @@ const MAX_DATAGRAM: usize = 65_507;
 /// The direct (unreliable) application packets the client sends, by inner header and exact length:
 /// the kart pose (C33/6) and Pirate's Plunder's UpdateShipPhysics (94/16: guid, a flag, a stamp, the
 /// ship's transform and velocity; `ShipCombatFrameUpdate` 00ca7480 sends it unreliable every frame)
-/// and FireAtLocation (94/20: a vec4 and the side, 00ca7050).
+/// and FireAtLocation (94/20: a vec4 and the side, 00ca7050), and the derby car's pose (34/5: key,
+/// matrix, two vec4, controls, flags, stamp; writer 009f0ce0, sent every frame by 009f1a70).
 const DIRECT_SHAPES: &[([u8; 4], usize)] = &[
     ([33, 0, 6, 0], 89),
+    ([34, 0, 5, 0], 132),
     ([94, 0, 16, 0], 117),
     ([94, 0, 20, 0], 24),
 ];

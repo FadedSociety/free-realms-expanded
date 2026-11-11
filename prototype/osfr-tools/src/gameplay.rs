@@ -1842,8 +1842,7 @@ impl Gameplay {
             self.npc_location_event(character, &mut out)?;
             self.sync_tracked_target(character, &mut out);
             self.append_warp_definitions(character, &mut out);
-            self.append_activity_list(&mut out);
-            self.append_daily_wheel(&mut out);
+            self.append_games_lists(&mut out);
             self.append_item_bar(character.guid, now_ms, &mut out)?;
             self.enter_world(character, now_ms, &mut out);
             self.sync_client_objectives(&mut out);
@@ -1922,7 +1921,7 @@ impl Gameplay {
         self.npc_location_event(character, &mut out)?;
         self.sync_tracked_target(character, &mut out);
         self.append_warp_definitions(character, &mut out);
-        self.append_activity_list(&mut out);
+        self.append_games_lists(&mut out);
         self.append_item_bar(character.guid, now_ms, &mut out)?;
         self.teach_quest_recipes(&mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);

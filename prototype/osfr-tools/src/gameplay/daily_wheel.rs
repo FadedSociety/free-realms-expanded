@@ -14,8 +14,15 @@ const BAG_FULL: &str = "Your bag is too full for the wheel's prizes. Make room a
 const CANNOT: &str = "The wheel could not pay its prize. Your spin has been kept.";
 
 impl Gameplay {
-    /// World entry: end a stale run and publish today's spin count (143/1). The opening campaign
-    /// has no activity list either, so it never offers the wheel.
+    /// World entry, the opening campaign's included: the Games window lists (167/1) and the
+    /// wheel's state. F3 (rc-0136 m-wheel): the opening's world entry sent the lists, whose wheel
+    /// row is live, but never the 143/1, so the client read no spin and said "out of spins".
+    pub(super) fn append_games_lists(&mut self, out: &mut Outcome) {
+        self.append_activity_list(out);
+        self.append_daily_wheel(out);
+    }
+
+    /// World entry: end a stale run and publish today's spin count (143/1).
     pub(super) fn append_daily_wheel(&mut self, out: &mut Outcome) {
         out.replies.extend(self.daily_wheel.world_entry());
     }
@@ -57,10 +64,7 @@ impl Gameplay {
             replies: vec![chat::system(text)],
             ..Outcome::default()
         };
-        // A forged request can name the wheel in the opening campaign, which never offered it.
-        if self.opening.is_some() {
-            return Ok(refuse("The wheel is not available right now."));
-        }
+        // F3: the opening campaign offers the wheel too (`append_games_lists`).
         if !self.daily_wheel.is_active() && (self.activity_busy() || self.warp_blocker().is_some())
         {
             return Ok(refuse(
