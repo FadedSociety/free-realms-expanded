@@ -366,6 +366,9 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // L925 appended twelve fanbyte-wiki quest givers (poi_anchor, 1,223).
     // L932 appended the two Snowhill soccer gates (client_object, 1,225).
     // P-housing appended Farmer Chug on the Wilds Farm lot (house_lot, 1,299).
-    assert_eq!(npc_count, 1299);
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    // P-quest-npcs appended seven quest people bound to spawns the world already drew (unanchored, 1,306).
+    assert_eq!(npc_count, 1312);
     println!("NPC placement sources: {counts:?}");
 }

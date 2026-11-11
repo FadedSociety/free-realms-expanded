@@ -9175,8 +9175,27 @@
       "location_evidence": [
         "South of Madam Zelda's camp (\"catch the chicken south of here\", 2698134754)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957089,
+          "title": "First Bite",
+          "title_string_id": 432222,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "First Bite (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_bite_9c56fa)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957089
+      ],
       "quests_given_text": [
         "First Bite; Pre-Emptive Bite (titles 1776941631, 754696091); \"give the stray chicken to Drake Sullenfangs\" (1181296564)"
       ],
@@ -9187,9 +9206,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2137.706845,
-        -32.948,
-        1046.865143
+        -2438.0,
+        -31.8,
+        1186.0
       ],
       "position_w": null,
       "rotation": [
@@ -9487,12 +9506,12 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 16 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "video",
+            "evidence": "The anchor of this spot: quest-research/npcs.json (2026-11-08): wiki puts this person in the Sinking Graveyard; the only solved point there is Lord William IV ('in the Sinking Graveyard, not far from the large stand-alone tombstone'; video index x=-2446.6 z=1191.8), so this spot is beside him"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) quest-research/npcs.json (2026-11-08): wiki puts this person in the Sinking Graveyard; the only solved point there is Lord William IV ('in the Sinking Graveyard, not far from the large stand-alone tombstone'; video index x=-2446.6 z=1191.8), so this spot is beside him"
           }
         ],
         "position_reason": [
@@ -9546,8 +9565,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 3312,
+      "model_file_name": "human_m_vampire_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000021,
@@ -10939,10 +10979,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AEthan"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000023,
@@ -18182,8 +18229,22 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
         ]
-      }
+      },
+      "model_id": 945,
+      "model_file_name": "human_m_ninja_ghost.adr"
     },
     {
       "npc_id": 9500000040,
@@ -30225,10 +30286,27 @@
               "evidence": "title_string_id corrected from raw locale hash 1580419041 to Global.Text id 390255 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3957135,
+          "title": "Mystery Meat Mystery",
+          "title_string_id": 428709,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mystery Meat Mystery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mystery_meat_mystery_45b960)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3000025
+        3000025,
+        3957135
       ],
       "quests_given_text": [
         "Sal's Suggestion (Adventurer entry quest, Adventurer); Sal Monella Special (hand out stew samples, 3344178159; timed delivery \"before time runs out\", 3336083770); Fresh Ingredients; Mystery Meat Mystery (Birthday Bash; 678214266); Helping the Local Chef (repeatable, Chef); Birthday Cake Bake-off (wiki appearance; Crispy Choychoy Delight request 3095854355, 1800940290); Farmer's Market shopping list (2691725208)"
@@ -30743,8 +30821,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 4,
+      "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000062,
@@ -38011,11 +38110,109 @@
               "evidence": "Access Granted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
             }
           ]
+        },
+        {
+          "quest_id": 3040044,
+          "title": "Dark Deal",
+          "title_string_id": 436478,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 43; name 'Card Duelist: Dark Deal'; title id cell 3555356684 ucdt; 2821186970 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 43; name 'Card Duelist: Dark Deal'; title id cell 3555356684 ucdt; 2821186970 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040044 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3040045,
+          "title": "In Search of The Baron",
+          "title_string_id": 2569,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 44; name 'Card Duelist: In Search of The Baron'; title id cell 3066807454 ucdt; 457577169 ugdt"
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 44; name 'Card Duelist: In Search of The Baron'; title id cell 3066807454 ucdt; 457577169 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040045 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3952686,
-        3952640
+        3952640,
+        3040044,
+        3040045
       ],
       "quests_given_text": [
         "Card Duelist: Final Dig (\"dig up some artifacts\", 680240603); Shattered Past final chapter; Four Round Challenge (2849007790); \"Win a Duel in Blackspore Swamp\" (4065779925) (Card Duelist)"

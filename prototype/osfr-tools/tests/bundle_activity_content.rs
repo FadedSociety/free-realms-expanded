@@ -69,7 +69,8 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     ),
     (
         "kart_gates.json",
-        "2bb93ba4b847d11582830a13e566c12fcd9f729a1c18f2343248c760dbb9e384",
+        // P-kart-racing: `gate_rows`, each speedway gate bound to its own MiniGameData row.
+        "bfacf40b6265a6dbff0260bdb0a4ed7345f3b9fef879ed134caa0b70f38b5079",
     ),
     (
         "derby_entry.json",

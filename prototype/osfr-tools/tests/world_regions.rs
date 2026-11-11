@@ -284,7 +284,10 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     }
 
     // L932: the two Snowhill soccer gates (1,225). P-housing: Farmer Chug on the Wilds Farm lot (1,299).
-    assert_eq!(total, 1299, "shipped NPC rows");
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    // P-quest-npcs: seven people the world already drew get a record in npcs/quest_spawned.json (1,306).
+    assert_eq!(total, 1312, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
@@ -295,18 +298,25 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     // L1043: the wiki pick-up quests' givers add two rows in a place and a banner region (1,219);
     // the second pick-up batch two more (1,221); Vittorio (Chapter 1) one more (1,222).
     // The research-table quest batch: nine givers in a place (1,234).
-    assert_eq!(in_place, 1281, "rows in a first-party place group");
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    // P-quest-npcs: seven new quest_spawned.json rows and three moved ones (Drake Sullenfangs, Hector,
+    // Princess Reedshadow): 1,281 -> 1,288 in a place, 950 -> 956 and 1,020 -> 1,026 in the regions.
+    assert_eq!(in_place, 1294, "rows in a first-party place group");
     // T896 moved sixteen reconstructed rows onto their video-archive points; net, one row fewer stands in the
     // banner regions (892 -> 891) and two fewer in any region shape (953 -> 951).
     // L925's twelve givers: nine stand in a banner region (891 -> 900).
     assert_eq!(
-        in_recovered_region, 950,
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+        in_recovered_region, 957,
         "rows in the banner regions 2..=10"
     );
     // L096's two turnstile actors stand in the region 1 fallback sphere, not a banner region (953).
     // L925: the same nine givers (953 -> 962).
-    assert_eq!(in_any_region, 1020, "rows in a region (including region 1)");
-    assert_eq!(covered, 1281, "rows in a place or a region");
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    assert_eq!(in_any_region, 1028, "rows in a region (including region 1)");
+    assert_eq!(covered, 1294, "rows in a place or a region");
 }
 
 #[test]

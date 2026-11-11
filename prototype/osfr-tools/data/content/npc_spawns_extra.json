@@ -23980,7 +23980,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1553; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2810 (ModelId=43, ModelFileName=fairy_f_03.adr, NameId=38083)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500000192
     },
     {
       "spawn_guid": 100000002812,
@@ -24002,7 +24003,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1555; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2812 (ModelId=241, ModelFileName=fairychild_f_pigtailsdress.adr, NameId=38089)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005233
     },
     {
       "spawn_guid": 100000002813,
@@ -24628,7 +24630,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1592; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2849 (ModelId=64, ModelFileName=chugawug_f_greenwood_soldier.adr, NameId=45201)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005222
     },
     {
       "spawn_guid": 100000002850,
@@ -27063,7 +27066,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1765; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3022 (ModelId=534, ModelFileName=fairy_m_mechanic_crofti_01.agr, NameId=401323)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004389
     },
     {
       "spawn_guid": 100000003023,
@@ -27733,7 +27737,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3061 (ModelId=835, ModelFileName=human_m_rip_ringa.agr, NameId=401319)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004678
     },
     {
       "spawn_guid": 100000003062,
@@ -47831,7 +47836,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2935; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4269 (ModelId=361, ModelFileName=fairy_m_freestyle_jestin_01.agr, NameId=37017)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005281
     },
     {
       "spawn_guid": 100000004270,
@@ -61698,7 +61704,7 @@
       "name_string_id": 382902,
       "position": [
         -1272.5175,
-        -14.195691,
+        -15.0,
         212.49059
       ],
       "heading": 1.389184,
@@ -77719,7 +77725,8 @@
           "evidence": "(R) Body cat_longhair.adr for the fluffy coat (nearest other use 137 m), not checked by eye for colour. Stands beside the cave entrance prop sh_cave_entrance_bat_cave_01 at (-65.5, 19.5, 1147.4) on the river. No NPC stands within 15 m, so y comes from the zone-0 terrain grid here."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005023
     },
     {
       "spawn_guid": 100000090009,
@@ -77745,7 +77752,8 @@
           "evidence": "(R) Position, heading and body from the Sanctuary emulator: lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3934 and src/Resources/Npcs.json Id 33723 (model 1577). That is 3.5 m from the one sh_telephone_booth_01 prop at (283.4, 26, 385.2); terrain grid 26.24. No NPC stands within 15 m, so y is the emulator's. Body not checked by eye."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004864
     },
     {
       "spawn_guid": 100000090010,
@@ -79172,7 +79180,8 @@
           "evidence": "(R) Red flower body by the quest's text; model-view shows every sg_dpo_flower tint with one texture. Spot 6 m from Edvard Leafsnipper at the Gardener's Hutch. Should move to wherever the earlier quest's dirt mound lands. Probe: no water, flat, open 8/8."
         }
       ],
-      "spawn_guid": 100000090063
+      "spawn_guid": 100000090063,
+      "content_key": 9500005020
     },
     {
       "legacy_npc_id": null,
@@ -79202,7 +79211,8 @@
           "evidence": "(R) Generic male cat 50 cat_shorthair.adr, seen in model-view; no portrait compared. 2.4 m from Halle. Probe: no water, slope 6, open 8/8. Added because the quest cannot finish without him."
         }
       ],
-      "spawn_guid": 100000090064
+      "spawn_guid": 100000090064,
+      "content_key": 9500005137
     },
     {
       "legacy_npc_id": null,
@@ -79329,6 +79339,164 @@
       ],
       "spawn_guid": 100000090068,
       "content_key": 9500000751
+    },
+    {
+      "spawn_guid": 100000090101,
+      "legacy_npc_id": null,
+      "model_id": 141,
+      "model_file_name": "toad.adr",
+      "name": "Gribbit",
+      "name_string_id": 45277,
+      "position": [
+        -294.5,
+        -89.575,
+        2375.0
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "String 45277 reads exactly 'Gribbit'; his quests' own lines sit beside it (45659 You Can't Judge a Frog..., 45698 The Pixie Princess, 45762 'Gribbit would like to impress Princess Reedshadow')."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr.fanbyte.com FR_Mob:Gribbit: Frog, male, Briarwood, Nettleseed, 'On the northeastern bank of the river'."
+        },
+        {
+          "kind": "video",
+          "evidence": "lab/reports/placement/index.tsv: Gribbit solved at x=-294.5 z=2375.0, error 4.0 m, 9 sightings in 7 videos (dot+rings), confidence high, status unknown_name (no record carried the name)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 141 toad.adr, checked by eye in the NPC research (a large frog; the Toad-race quest NPCs use it), not proven to be Gribbit's own. y -89.575 is the terrain height at the solved point (Studio probe, 8 degree slope, 8 m from a road node); heading 0 is a guess."
+        }
+      ],
+      "position_w": null,
+      "content_key": 9500005116
+    },
+    {
+      "spawn_guid": 100000090069,
+      "legacy_npc_id": null,
+      "content_key": 9000000004,
+      "model_id": 1327,
+      "model_file_name": "human_m_racecardriver_01.agr",
+      "name": "Carter Coal",
+      "name_string_id": 394254,
+      "position": [
+        -244.15,
+        1.1,
+        -45.98
+      ],
+      "heading": 1.67,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 394254 'Carter Coal' in the demo-derby cast run (394253 Pit Boss Buck, 394255 Jace Wildwheel); 403469 title 'Demo Derby: An Eye for Talent'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_demo_derby_an_eye_for_talent_9d27f1: 'To Start: Speak to Carter Coal in Frost Ridge Speedway.' No FR_Mob page exists for him."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 1327 human_m_racecardriver_01.agr, a generic human male racer (model-view, quest-research/proposed-people-2.json); race and gender are a name-only guess. Spot as in position_reason. quest-research/givers-4.json row 9."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090070,
+      "legacy_npc_id": null,
+      "content_key": 9000000149,
+      "model_id": 3915,
+      "model_file_name": "sh_corkboard_01.adr",
+      "name": "Message Board",
+      "name_string_id": 442218,
+      "position": [
+        -1315.81,
+        -65.144,
+        893.22
+      ],
+      "heading": -0.61,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 442218 'Message Board'; title 442279 'Being a Better Fisherman'; its step 442264 'Speak to Reed Stillwater in Stillwater Crossing' (quest-research/client-steps/steps-second.json), so the giver is not Reed himself."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "The two Legacy Sanctuary boards (spawns 100000002348 and 100000002388, ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2348/2388) use model 3915 sh_corkboard_01.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) A board prop as a quest giver: the wiki starts the job guides from a Message Board; the Legacy board model is reused and the spot is by Reed Stillwater. No native run has offered a quest from a prop yet. quest-research/givers-4.json row 10."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000090071,
+      "legacy_npc_id": null,
+      "content_key": 9000000548,
+      "model_id": 3915,
+      "model_file_name": "sh_corkboard_01.adr",
+      "name": "Message Board",
+      "name_string_id": 442218,
+      "position": [
+        -162.51,
+        -5.467,
+        253.79
+      ],
+      "heading": 2.11,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "title 442276 'Being a Better Soccer Star' in the run 442268-442282 of job guides whose Fisherman entry starts from a Message Board (npc_name 442218); its step 442261 'Speak to Manager Landon in Snowhill' (quest-research/client-steps/steps-second.json)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "The two Legacy Sanctuary boards (spawns 100000002348 and 100000002388, ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2348/2388) use model 3915 sh_corkboard_01.adr."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ASSUMES a board by analogy with the Fisherman guide (npcs_unresolved.json ref 9000000548 names only the place 'Snowhill Soccer Field'); the spot is by the soccer gates. quest-research/givers-4.json row 11."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 333,
+      "model_file_name": "sg_collection_node_robgoblin_junkpile_01.adr",
+      "name": "Whizzlebang Whirlygig",
+      "name_string_id": null,
+      "position": [
+        -469.09,
+        9.6,
+        775.54
+      ],
+      "position_w": null,
+      "heading": 3.11,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "21788 'Find a whizzlebang whirlygig remote control from a junkpile in the robgoblin camp'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_missing_marty: 'in a big junkpile behind Fizzlesticks' wagon'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No client name for the thing; name is the step's words, null name id. Body 333, the robgoblin junkpile collection node, seen in model-view (red and blue scrap heap); the plain sg_robgoblin_junkpile_01 (276) renders nothing. The wagon itself was not located: 12 m from Fizzlesticks. Probe: no water, flat, open 7/8."
+        }
+      ],
+      "spawn_guid": 100000090057
     }
   ]
 }

@@ -1481,11 +1481,14 @@ fn node_content_is_bounded_and_unique() {
     // (`quest_wire.py`: up to count + 2 each, on a ring round the giver), and the 12 rich veins
     // P-quest-games places (3 rich copper and 3 rich tin at Dartmoor, 2 each of rich iron, silver
     // and gold at Snorg's camp: the pool maxima of 4, 4, 2, 2, 2 spots).
-    assert_eq!(actors.len(), 923);
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123); three crate spawns were the same in both (1,030); P-pickup-fix adds 12 split-step spots (1,042).
+    // P-quest-npcs: 60 spots for 17 more quest pick-ups (983).
+    assert_eq!(actors.len(), 1051);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 923);
+    assert_eq!(ids.len(), 1051);
     assert!(
         actors
             .iter()

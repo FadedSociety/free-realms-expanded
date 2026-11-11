@@ -7,13 +7,16 @@
 //! - `3080009` Kart Driver: Exploder's League Sponsorship (q3080009): giver and only
 //!   target Blammo 9500000872.
 //!
-//! The other three rows in `wiring/round3/wildwood.json` stay disabled. `3080004`,
-//! `3080011` and `3080012` wait on `finish_minigame` ids 628, 632 and 633, which are
-//! client MiniGameData race rows; the only kart producer credits the content
-//! speedway 31 (`KartGateway::claim_reward_with_event` -> `KartRewardClaim.minigame_id`
-//! -> `Gameplay::tick_world`), so no server event can match those ids. `3080004` also
-//! has no evidenced giver, and `3080011`'s Big Paulie has no content row (only a
-//! reference spawn). The reasons are in `notes/Autopilot/T732.md`.
+//! P-kart-racing (lead 2026-11-10) since enabled `3080011` and `3080012`: the kart rows now
+//! serve races 632 and 633, and the test below pins that each race objective names a served row.
+//! The history: two other rows in `wiring/round3/wildwood.json` stayed disabled. `3080011` and `3080012`
+//! wait on `finish_minigame` ids 632 and 633, which are client MiniGameData race rows; the
+//! only kart producer credits the content speedway 31
+//! (`KartGateway::claim_reward_with_event` -> `KartRewardClaim.minigame_id` ->
+//! `Gameplay::tick_world`), so no server event can match those ids, and `3080011`'s Big
+//! Paulie has no content row (only a reference spawn). The reasons are in
+//! `notes/Autopilot/T732.md`. `3080004` went live in the round-4 batch once race 628 joined
+//! the pinned producers and Verve McNichols became its giver.
 //!
 //! Every test drives the production paths in `tests/support/npc_quest_chain.rs`: the
 //! 26/8 -> 26/10 -> 26/6 offer (49/1, decoded with the production reader), 49/2
@@ -307,11 +310,28 @@ fn shipped_records_keep_the_checked_objectives_and_payouts() {
             "quest {quest} cites T732"
         );
     }
-    for disabled in [3_080_004, 3_080_011, 3_080_012] {
-        let record = shipped_quest(disabled);
+    // Lead 2026-11-10: P-kart-racing serves every speedway's MiniGameData rows (`kart_rows.json`,
+    // the row the race ran as is the credited `minigame_id`), so 3080011 and 3080012 went live;
+    // each race objective must name a row the kart producer serves.
+    let served: Vec<u64> = read_json(&content_dir().join("kart_rows.json"))["rows"]
+        .as_array()
+        .expect("kart rows")
+        .iter()
+        .filter_map(|row| row["game_id"].as_u64())
+        .collect();
+    for raced in [3_080_011, 3_080_012] {
+        let record = shipped_quest(raced);
+        assert!(record.enabled, "quest {raced} is enabled");
+        let races: Vec<u64> = record
+            .objectives
+            .iter()
+            .filter(|objective| objective["kind"] == json!("finish_minigame"))
+            .filter_map(|objective| objective["minigame_id"].as_u64())
+            .collect();
+        assert!(!races.is_empty(), "quest {raced} has a race objective");
         assert!(
-            !record.enabled && record.objectives.is_empty(),
-            "quest {disabled} waits on a race id no server path emits"
+            races.iter().all(|race| served.contains(race)),
+            "quest {raced} waits on a race id the kart rows do not serve: {races:?}"
         );
     }
 

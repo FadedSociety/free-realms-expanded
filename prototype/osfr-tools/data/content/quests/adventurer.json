@@ -2524,7 +2524,44 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 199,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rolled-Sleeve Hoodie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_missing_sisters_2b90b2)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) every 'Rolled-Sleeve Hoodie' row is girls-only (190 is the lowest); boys get its counterpart 'Hoodie' 199, the same freestyle chest slot, cost and tint set in the adjacent id block, so both wearers are paid (quest-research/reward-item-names.json, 2026-11-09)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 190,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rolled-Sleeve Hoodie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_missing_sisters_2b90b2)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) every 'Rolled-Sleeve Hoodie' row is girls-only (190 is the lowest); boys get its counterpart 'Hoodie' 199, the same freestyle chest slot, cost and tint set in the adjacent id block, so both wearers are paid (quest-research/reward-item-names.json, 2026-11-09)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },

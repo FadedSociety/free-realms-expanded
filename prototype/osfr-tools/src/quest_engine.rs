@@ -22,7 +22,9 @@ use std::{
 };
 
 const MAX_OBJECTIVES: usize = 64;
-const MAX_QUESTS: usize = 1024;
+// A sanity bound on catalogue and save size, not a game rule: the wiki lists about 1,420 quests (1,337 live),
+// so 1,024 refused the shipped catalogue once it passed that count (2026-11-10).
+const MAX_QUESTS: usize = 4096;
 pub(crate) const MAX_COUNT: u32 = 1_000_000;
 /// Local bound on one quest's `excludes_quest_ids` (R; no recovered retail table).
 const MAX_EXCLUSIONS: usize = 16;
@@ -1221,7 +1223,7 @@ impl QuestEngine {
                 quests.push(quest);
             }
             if quests.len() > MAX_QUESTS {
-                return Err(invalid("split quest catalogue exceeds 1,024 records"));
+                return Err(invalid("split quest catalogue exceeds 4,096 records"));
             }
         }
         if quests.is_empty() {

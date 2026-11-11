@@ -11143,8 +11143,27 @@
       "location_evidence": [
         "On top of a hill overlooking the path between Queensfields and Highroad Junction."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957174,
+          "title": "Scare Tactics",
+          "title_string_id": 37112,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scare Tactics (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scare_tactics_1859cd)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957174
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": null,
@@ -11430,8 +11449,15 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: most common model of drawn human male NPCs"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

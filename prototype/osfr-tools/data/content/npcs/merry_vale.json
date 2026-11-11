@@ -5486,12 +5486,63 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3957143,
+          "title": "Ooey, Gooey Love",
+          "title_string_id": 427117,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ooey, Gooey Love (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ooey_gooey_love_739c57)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957159,
+          "title": "Potion Testing: Version 7.0",
+          "title_string_id": 427141,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Potion Testing: Version 7.0 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_potion_testing_version_7_0_26f72b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957232,
+          "title": "Where is the Love",
+          "title_string_id": 427145,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Where is the Love (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_the_love_1f5562)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3955888,
         3955737,
-        3955895
+        3955895,
+        3957143,
+        3957159,
+        3957232
       ],
       "quests_given_text": [
         "Wiki list: Petal Picker (repeatable), A Bundle of Love, Potion Testing: Version 6.0, Ooey, Gooey Love, Potion Testing: Version 7.0, Where is the Love?, Softening the Stone, Sleeping Pixie, Stone Heart's Hideaway (repeatable). See the quest table for title ids and the strings that fit each."
@@ -12623,9 +12674,27 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part F. Festival of Hearts NPCs, row 120; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3957176,
+          "title": "Secret Admirer",
+          "title_string_id": 427010,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Secret Admirer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_secret_admirer_d3d888)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3957176
+      ],
       "quests_given_text": [
         "Mending Hearts (wiki: continuously repeatable; \"use the love potion's powers to drive off heartbreakers\", 3231254716); Secret Admirer (wiki: repeatable once a day; she sends the player to Postmaster Vixie, 1121958750)."
       ],
@@ -12989,8 +13058,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000394,
@@ -14686,10 +14776,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AKendra"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000398,
@@ -25196,8 +25293,27 @@
       "location_evidence": [
         "Green marker 36 to 70 m in 12 frames, one labelled Merry Vale at 52 m (CXeswcNcDTM/00036; Oa-JwM60kJQ/00014; p5sDafXSQtQ/00048)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956090,
+          "title": "One Man's Trash",
+          "title_string_id": 47534,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "One Man's Trash (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_2deafb)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956090
+      ],
       "quests_given_text": [
         "Gather fresh sunflower seed pies so he can swap in smelly sock pies (3257964355, 2818026809); collect purple bunnies from the wilderness and release them in the camps (2600032385, 3517687568, 3019004404; cut title \"NOT LIVE - Release the Bunnies!\" 183026870, by wording); sift the rubbish piles for salvage (2618255743, 3386388483, 294838154; title candidate \"Trash or Treasure\" 3137783266, by wording). Return lines 687608644, 1338678498."
       ],
@@ -26060,11 +26176,28 @@
               "evidence": "A Delivery to Aunt Daisy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_delivery_to_aunt_daisy_d0cdc6)."
             }
           ]
+        },
+        {
+          "quest_id": 3957131,
+          "title": "Missing Homework",
+          "title_string_id": 46489,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Missing Homework (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_homework_c6d397)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3954832,
-        3954779
+        3954779,
+        3957131
       ],
       "quests_given_text": [
         "Firewood chores (\"Gather firewood in Merry Vale and bring it to Ronnie\", 4158751946; \"Before I can have fun, I have to get all my chores done\", 3010630538; title candidate Chores, What a Bore! 1797539126, by wording); his homework, scattered by a robgoblin (801776192, 2820712755; title not found); a package to his Aunt Daisy at Farnum Farmstead \"so he can see the fairy show\" (1094445753, 3130839664; return trip 832424182)."

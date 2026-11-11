@@ -4,16 +4,28 @@
     {
       "game_id": 28,
       "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
           "evidence": "Resources/MiniGameData.txt row 28 '28^10^17958^37935^9870^1^...' is TYPE 10, NAME_ID 17958 (Wildwood Kart Racing), description id 37935. Games window row 62 has ContentId 28. The shipped race package (kart_entry.json) runs this row as is: scene sg_kt_track, its own lap count and race window."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 28: NAME_ID 17958, DESCRIPTION_ID 37935, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 37,
       "track": "sh_kt_track",
+      "name_id": 37933,
+      "description_id": 37936,
+      "icon_id": 9872,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -21,13 +33,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: the client asset manifest lists the scene sh_kt_track (Snowhill, home of Frost Ridge). No race content (gates, start, pickups) was recovered for it, so the row stays listed and closed."
+          "evidence": "(R) track: the client asset manifest lists the scene sh_kt_track (Snowhill, home of Frost Ridge). P-kart-racing: its race package is kart_tracks/<scene>.json, built from the client's gate curtains (lab/tools/kart_track_build.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 37: NAME_ID 37933, DESCRIPTION_ID 37936, ICON_ID 9872, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 38,
       "track": "bw_kt_track",
+      "name_id": 37934,
+      "description_id": 37937,
+      "icon_id": 9868,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -35,13 +55,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: the client asset manifest lists the scene bw_kt_track (Briarwood, home of Tangletrack). No race content was recovered for it, so the row stays listed and closed."
+          "evidence": "(R) track: the client asset manifest lists the scene bw_kt_track (Briarwood, home of Tangletrack). P-kart-racing: its race package is kart_tracks/<scene>.json, built from the client's gate curtains (lab/tools/kart_track_build.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 38: NAME_ID 37934, DESCRIPTION_ID 37937, ICON_ID 9868, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 567,
       "track": "sg_kt_track2",
+      "name_id": 3606,
+      "description_id": 3244,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -49,13 +77,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: the client asset manifest lists a second scene beside the Wildwood one, sg_kt_track2; assigning it to Thunder Falls is a guess. No race content was recovered for it, so the row stays listed and closed."
+          "evidence": "(R) track: the client asset manifest lists a second scene beside the Wildwood one, sg_kt_track2; assigning it to Thunder Falls is a guess. P-kart-racing: its race package is kart_tracks/<scene>.json, built from the client's gate curtains (lab/tools/kart_track_build.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 567: NAME_ID 3606, DESCRIPTION_ID 3244, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 578,
       "track": "ss_kt_track",
+      "name_id": 401623,
+      "description_id": 407515,
+      "icon_id": 20991,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -63,13 +99,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: the client asset manifest lists the scene ss_kt_track (Seaside, home of Sandstorm). No race content was recovered for it, so the row stays listed and closed."
+          "evidence": "(R) track: the client asset manifest lists the scene ss_kt_track (Seaside, home of Sandstorm). P-kart-racing: its race package is kart_tracks/<scene>.json, built from the client's gate curtains (lab/tools/kart_track_build.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 578: NAME_ID 401623, DESCRIPTION_ID 407515, ICON_ID 20991, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 277,
       "track": null,
+      "name_id": 117323,
+      "description_id": 139383,
+      "icon_id": 18420,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -78,13 +122,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: the tutorial's track is not recovered (the quest places the lesson at Frost Ridge), so the row stays listed and closed."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 277: NAME_ID 117323, DESCRIPTION_ID 139383, ICON_ID 18420, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 628,
       "track": "sg_kt_track",
-      "time_limit_s": 250,
+      "name_id": 3296,
+      "description_id": 3433,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -92,14 +143,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: the race has no rival racers, so the rival is a par time. Finish the package's 3 laps inside 250 s or the race ends unpaid at the limit. The three Wildwood rival rows step 250 / 215 / 190 s, tightening toward the 167 s Wildwood endurance time (row 632)."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (250 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 628: NAME_ID 3296, DESCRIPTION_ID 3433, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 629,
       "track": "sg_kt_track",
-      "time_limit_s": 215,
+      "name_id": 3297,
+      "description_id": 3434,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -107,14 +165,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: the race has no rival racers, so the rival is a par time. Finish the package's 3 laps inside 215 s or the race ends unpaid at the limit. The three Wildwood rival rows step 250 / 215 / 190 s, tightening toward the 167 s Wildwood endurance time (row 632)."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (215 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 629: NAME_ID 3297, DESCRIPTION_ID 3434, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 630,
       "track": "sg_kt_track",
-      "time_limit_s": 190,
+      "name_id": 3298,
+      "description_id": 3435,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -122,7 +187,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: the race has no rival racers, so the rival is a par time. Finish the package's 3 laps inside 190 s or the race ends unpaid at the limit. The three Wildwood rival rows step 250 / 215 / 190 s, tightening toward the 167 s Wildwood endurance time (row 632)."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (190 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 630: NAME_ID 3298, DESCRIPTION_ID 3435, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -130,7 +199,10 @@
       "game_id": 631,
       "track": "sg_kt_track",
       "laps": 1,
-      "time_limit_s": 60,
+      "name_id": 3319,
+      "description_id": 394507,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -138,7 +210,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: sprint = 1 lap with a 60 s time limit; the race ends unpaid at the limit. Mechanism (limit = race window) is a reconstruction; the numbers are the client's."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (60 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 631: NAME_ID 3319, DESCRIPTION_ID 394507, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -146,7 +222,10 @@
       "game_id": 632,
       "track": "sg_kt_track",
       "laps": 3,
-      "time_limit_s": 167,
+      "name_id": 3320,
+      "description_id": 400926,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -154,14 +233,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: endurance = 3 laps with a 167 s (2:47) time limit; the race ends unpaid at the limit. Mechanism (limit = race window) is a reconstruction; the numbers are the client's."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (167 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 632: NAME_ID 3320, DESCRIPTION_ID 400926, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 633,
       "track": "sg_kt_track",
-      "time_limit_s": 167,
+      "name_id": 3321,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -169,14 +255,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: the race has no rival racers, so winning is a par time: the package's 3 laps inside 167 s (the Wildwood endurance time of row 632), or the race ends unpaid at the limit."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (167 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 633: NAME_ID 3321, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 634,
       "track": "sg_kt_track",
-      "time_limit_s": 167,
+      "name_id": 3425,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -184,13 +277,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) rule: the race has no rival racers, so winning is a par time: the package's 3 laps inside 167 s (the Wildwood endurance time of row 632), or the race ends unpaid at the limit."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (167 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 634: NAME_ID 3425, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 635,
       "track": "sh_kt_track",
+      "name_id": 3322,
+      "description_id": 3439,
+      "icon_id": 9872,
+      "difficulty": 1,
       "source": [
         {
           "kind": "client",
@@ -199,12 +300,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 635: NAME_ID 3322, DESCRIPTION_ID 3439, ICON_ID 9872, DIFFICULTY 1: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 636,
       "track": "sh_kt_track",
+      "name_id": 3323,
+      "description_id": 3440,
+      "icon_id": 9872,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -213,12 +322,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 636: NAME_ID 3323, DESCRIPTION_ID 3440, ICON_ID 9872, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 637,
       "track": "sh_kt_track",
+      "name_id": 3324,
+      "description_id": 3443,
+      "icon_id": 9872,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -227,6 +344,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 637: NAME_ID 3324, DESCRIPTION_ID 3443, ICON_ID 9872, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -234,7 +355,10 @@
       "game_id": 638,
       "track": "sh_kt_track",
       "laps": 1,
-      "time_limit_s": 28,
+      "name_id": 3325,
+      "description_id": 394925,
+      "icon_id": 9872,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -242,7 +366,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (28 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 638: NAME_ID 3325, DESCRIPTION_ID 394925, ICON_ID 9872, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -250,7 +378,10 @@
       "game_id": 639,
       "track": "sh_kt_track",
       "laps": 5,
-      "time_limit_s": 135,
+      "name_id": 3327,
+      "description_id": 401086,
+      "icon_id": 9872,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -258,13 +389,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (135 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 639: NAME_ID 3327, DESCRIPTION_ID 401086, ICON_ID 9872, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 640,
       "track": "sh_kt_track",
+      "name_id": 3328,
+      "description_id": 3438,
+      "icon_id": 9872,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -273,12 +412,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 640: NAME_ID 3328, DESCRIPTION_ID 3438, ICON_ID 9872, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 641,
       "track": "sh_kt_track",
+      "name_id": 3426,
+      "description_id": 3438,
+      "icon_id": 9872,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -287,12 +434,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sh_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 641: NAME_ID 3426, DESCRIPTION_ID 3438, ICON_ID 9872, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 642,
       "track": "sg_kt_track2",
+      "name_id": 3329,
+      "description_id": 3447,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -301,12 +456,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 642: NAME_ID 3329, DESCRIPTION_ID 3447, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 643,
       "track": "sg_kt_track2",
+      "name_id": 3337,
+      "description_id": 3448,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -315,12 +478,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 643: NAME_ID 3337, DESCRIPTION_ID 3448, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 644,
       "track": "sg_kt_track2",
+      "name_id": 3338,
+      "description_id": 3449,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -329,6 +500,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 644: NAME_ID 3338, DESCRIPTION_ID 3449, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -336,7 +511,10 @@
       "game_id": 645,
       "track": "sg_kt_track2",
       "laps": 1,
-      "time_limit_s": 48,
+      "name_id": 3339,
+      "description_id": 403408,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -344,7 +522,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (48 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 645: NAME_ID 3339, DESCRIPTION_ID 403408, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -352,7 +534,10 @@
       "game_id": 646,
       "track": "sg_kt_track2",
       "laps": 4,
-      "time_limit_s": 165,
+      "name_id": 3340,
+      "description_id": 403410,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -360,13 +545,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (165 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 646: NAME_ID 3340, DESCRIPTION_ID 403410, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 647,
       "track": "sg_kt_track2",
+      "name_id": 3341,
+      "description_id": 3438,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -375,12 +568,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 647: NAME_ID 3341, DESCRIPTION_ID 3438, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 648,
       "track": "sg_kt_track2",
+      "name_id": 3428,
+      "description_id": 3438,
+      "icon_id": 20990,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -389,12 +590,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: sg_kt_track2 has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 648: NAME_ID 3428, DESCRIPTION_ID 3438, ICON_ID 20990, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 649,
       "track": "bw_kt_track",
+      "name_id": 3343,
+      "description_id": 3461,
+      "icon_id": 9870,
+      "difficulty": 2,
       "source": [
         {
           "kind": "client",
@@ -403,12 +612,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 649: NAME_ID 3343, DESCRIPTION_ID 3461, ICON_ID 9870, DIFFICULTY 2: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 650,
       "track": "bw_kt_track",
+      "name_id": 3344,
+      "description_id": 3462,
+      "icon_id": 9870,
+      "difficulty": 3,
       "source": [
         {
           "kind": "client",
@@ -417,12 +634,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 650: NAME_ID 3344, DESCRIPTION_ID 3462, ICON_ID 9870, DIFFICULTY 3: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 651,
       "track": "bw_kt_track",
+      "name_id": 3356,
+      "description_id": 3466,
+      "icon_id": 9870,
+      "difficulty": 3,
       "source": [
         {
           "kind": "client",
@@ -431,6 +656,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 651: NAME_ID 3356, DESCRIPTION_ID 3466, ICON_ID 9870, DIFFICULTY 3: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -438,7 +667,10 @@
       "game_id": 652,
       "track": "bw_kt_track",
       "laps": 1,
-      "time_limit_s": 70,
+      "name_id": 3422,
+      "description_id": 403412,
+      "icon_id": 9870,
+      "difficulty": 3,
       "source": [
         {
           "kind": "client",
@@ -446,7 +678,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (70 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 652: NAME_ID 3422, DESCRIPTION_ID 403412, ICON_ID 9870, DIFFICULTY 3: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
@@ -454,7 +690,10 @@
       "game_id": 653,
       "track": "bw_kt_track",
       "laps": 2,
-      "time_limit_s": 135,
+      "name_id": 3423,
+      "description_id": 403414,
+      "icon_id": 9870,
+      "difficulty": 3,
       "source": [
         {
           "kind": "client",
@@ -462,13 +701,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. The laps and time limit are the client's stated numbers, kept for when the track runs."
+          "evidence": "(R) P-kart-racing (sheet C13): the row's clock (135 s) is the quest goal's `require.max_elapsed_seconds`, not the race window, so a slow racer still finishes, sees the board and is paid; only the goal fails (video CRhgVPzBnCg_3796.00)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 653: NAME_ID 3423, DESCRIPTION_ID 403414, ICON_ID 9870, DIFFICULTY 3: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 654,
       "track": "bw_kt_track",
+      "name_id": 3424,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 3,
       "source": [
         {
           "kind": "client",
@@ -477,12 +724,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 654: NAME_ID 3424, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 3: the offer window's title, picture, text and dots when the race runs as this row."
         }
       ]
     },
     {
       "game_id": 655,
       "track": "bw_kt_track",
+      "name_id": 3432,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 3,
       "source": [
         {
           "kind": "client",
@@ -491,6 +746,82 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) track: bw_kt_track has no recovered race content, so the row stays listed and closed. No rule is set; rivals and par times come with the track."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 655: NAME_ID 3432, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 3: the offer window's title, picture, text and dots when the race runs as this row."
+        }
+      ]
+    },
+    {
+      "game_id": 1103,
+      "track": "sg_kt_track",
+      "name_id": 5100776,
+      "description_id": 5100834,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1103 '1103^10^5100776^5100834^9870^1^...' is TYPE 10, Margin of Victory ('Help Johnny Thunder take back the Wildwood kart track'), icon 9870 (Wildwood). NAME_ID 5100776, DESCRIPTION_ID 5100834, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the Wildwood icon and the quest text (video CRhgVPzBnCg 3842-4120 races it at Wildwood against the Gloam Racers) put it on sg_kt_track; it runs the package's three laps."
+        }
+      ]
+    },
+    {
+      "game_id": 278,
+      "track": null,
+      "name_id": 117324,
+      "description_id": 139419,
+      "icon_id": 18420,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 278 '278^10^117324^139419^18420^1^...' is TYPE 10, Advanced Racing Tutorial (icon 18420). NAME_ID 117324, DESCRIPTION_ID 139419, ICON_ID 18420, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: like the Racing Tutorial 277, its track is not recovered, so the row stays listed and closed."
+        }
+      ]
+    },
+    {
+      "game_id": 579,
+      "track": "ss_kt_track",
+      "name_id": 436388,
+      "description_id": 436390,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 579 '579^10^436388^436390^9870^1^...' is TYPE 10, Shipwreck Circuit ('Kart Racing on the Shipwreck Circuit!'). NAME_ID 436388, DESCRIPTION_ID 436390, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: the Sandstorm zone ss_kt_track holds three road meshes (kart-racing/maps.md 5.5) and the lobby lists this circuit beside Sandstorm Speedway; until a driven lap separates the circuits it runs the Sandstorm package."
+        }
+      ]
+    },
+    {
+      "game_id": 580,
+      "track": "ss_kt_track",
+      "name_id": 436389,
+      "description_id": 436391,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 580 '580^10^436389^436391^9870^1^...' is TYPE 10, Switchback Circuit ('Kart Racing on the Switchback Circuit!'). NAME_ID 436389, DESCRIPTION_ID 436391, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: as row 579, a Sandstorm circuit; it runs the Sandstorm package until a driven lap separates the circuits."
         }
       ]
     }

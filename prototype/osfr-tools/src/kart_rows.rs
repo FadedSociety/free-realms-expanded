@@ -1,11 +1,12 @@
 //! L930: the MiniGameData rows the kart race serves (`kart_rows.json`, beside `kart_gates.json`).
 //!
-//! The shipped race package (`kart_entry.json`) is one track scene. A row names the track its
-//! MiniGameData row races on; only a row whose track is that scene can run, the others stay listed
-//! and closed until their track content exists (the Games window greys them out through the
-//! portal's own `CanPlayerJoin`). A running row may override the package's lap count and race
-//! window: the window is the row's time limit, and a race that runs past it ends unpaid
-//! (`KartService::tick`). A finished race credits the row's own MiniGameData id, never a speedway.
+//! A row names the track scene its MiniGameData row races on. A row runs when a race package serves
+//! that scene: the shipped Wildwood package (`kart_entry.json`) or one of the per-track packages
+//! (`kart_tracks/<scene>.json`, P-kart-racing). Rows on a scene with no package stay listed and
+//! closed (the Games window greys them out through the portal's own `CanPlayerJoin`). A running row
+//! may override the package's lap count; its clock lives on the quest goal (`require.max_elapsed_seconds`),
+//! never on the race, so a slow racer still finishes and sees the board (sheet C13). A finished
+//! race credits the row's own MiniGameData id, never a speedway.
 //!
 //! The file is deliberately outside `kart_entry.json`'s content hash, so editing a rule never
 //! invalidates a saved race. Every rule is reconstructed policy (R); each row's `source` says which
@@ -25,6 +26,17 @@ use std::{
 const MAX_FILE: usize = 64 * 1024;
 const MAX_ROWS: usize = 64;
 
+/// The client's own text ids for a row (`Resources/MiniGameData.txt`): the offer window's title,
+/// picture, description and difficulty dots when the race runs as this row.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct RowTexts {
+    pub name_id: u32,
+    pub description_id: u32,
+    pub icon_id: u32,
+    pub difficulty: u32,
+}
+
 /// One MiniGameData row the kart race knows.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -36,10 +48,45 @@ pub struct KartRow {
     /// Laps to run; unset keeps the package's.
     #[serde(default)]
     pub laps: Option<u32>,
-    /// Seconds the race may last (the row's par or limit); unset keeps the package's window.
+    /// Seconds the race window may last; unset keeps the package's. A quest's clock is a goal, not
+    /// a window: leave this unset unless a row must really cut a race short.
     #[serde(default)]
     pub time_limit_s: Option<u32>,
+    /// The client's offer texts (`RowTexts`); all four or none. Unset keeps the package's (the
+    /// Wildwood free race).
+    #[serde(default)]
+    pub name_id: Option<u32>,
+    #[serde(default)]
+    pub description_id: Option<u32>,
+    #[serde(default)]
+    pub icon_id: Option<u32>,
+    #[serde(default)]
+    pub difficulty: Option<u32>,
     pub source: Vec<SourceTag>,
+}
+
+impl KartRow {
+    fn texts(&self) -> Result<Option<RowTexts>, ()> {
+        match (
+            self.name_id,
+            self.description_id,
+            self.icon_id,
+            self.difficulty,
+        ) {
+            (None, None, None, None) => Ok(None),
+            (Some(name_id), Some(description_id), Some(icon_id), Some(difficulty))
+                if name_id > 0 && description_id > 0 && icon_id > 0 =>
+            {
+                Ok(Some(RowTexts {
+                    name_id,
+                    description_id,
+                    icon_id,
+                    difficulty,
+                }))
+            }
+            _ => Err(()),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -49,10 +96,10 @@ struct KartRowsFile {
     rows: Vec<KartRow>,
 }
 
-/// The loaded table, bound to the scene the race package runs.
+/// The loaded table, bound to the scenes a race package serves.
 #[derive(Clone, Debug)]
 pub struct KartRows {
-    scene: String,
+    scenes: BTreeSet<String>,
     rows: Vec<KartRow>,
 }
 
@@ -61,9 +108,9 @@ fn invalid(message: impl ToString) -> io::Error {
 }
 
 impl KartRows {
-    /// Reads `kart_rows.json`; absent means the package serves only its default row. `scene` is the
-    /// race package's track scene.
-    pub fn load(directory: &Path, scene: &str) -> io::Result<Option<Self>> {
+    /// Reads `kart_rows.json`; absent means the package serves only its default row. `scenes` are
+    /// the track scenes a race package serves.
+    pub fn load(directory: &Path, scenes: BTreeSet<String>) -> io::Result<Option<Self>> {
         let path = directory.join("kart_rows.json");
         let metadata = match std::fs::symlink_metadata(&path) {
             Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(None),
@@ -90,22 +137,22 @@ impl KartRows {
                 || !seen.insert(row.game_id)
                 || row.laps == Some(0)
                 || row.time_limit_s == Some(0)
+                || row.texts().is_err()
             {
                 return Err(invalid(format!("invalid kart row {}", row.game_id)));
             }
             check_sources(&format!("kart row {}", row.game_id), &row.source).map_err(invalid)?;
         }
         Ok(Some(Self {
-            scene: scene.to_owned(),
+            scenes,
             rows: file.rows,
         }))
     }
 
     fn playable(&self) -> impl Iterator<Item = &KartRow> {
-        let scene = Some(self.scene.as_str());
         self.rows
             .iter()
-            .filter(move |row| row.track.as_deref() == scene)
+            .filter(|row| row.track.as_ref().is_some_and(|t| self.scenes.contains(t)))
     }
 
     /// Ids of the rows that can run, in file order.
@@ -117,7 +164,26 @@ impl KartRows {
         self.playable_ids().any(|playable| playable == id)
     }
 
-    /// The race package row `id` runs: `base` with the row's laps and race window.
+    /// The track scene row `id` races on, when the row can run.
+    pub fn track(&self, id: u32) -> Option<&str> {
+        self.playable()
+            .find(|row| row.game_id == id)?
+            .track
+            .as_deref()
+    }
+
+    /// The client's offer texts of row `id`, when the table carries them.
+    pub fn texts(&self, id: u32) -> Option<RowTexts> {
+        self.rows
+            .iter()
+            .find(|row| row.game_id == id)?
+            .texts()
+            .ok()
+            .flatten()
+    }
+
+    /// The race package row `id` runs: `base` (the package of the row's track) with the row's laps
+    /// and race window.
     pub fn race(&self, id: u32, base: &KartServiceContent) -> io::Result<KartServiceContent> {
         let row = (self.playable())
             .find(|row| row.game_id == id)

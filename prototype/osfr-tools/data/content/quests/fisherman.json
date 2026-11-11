@@ -93,8 +93,33 @@
       "prerequisite_quest_ids": [
         3070001
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 442264,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 442264 'Speak to Reed Stillwater in Stillwater Crossing', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000181
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Being a Better Fisherman pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -127,9 +152,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070003,

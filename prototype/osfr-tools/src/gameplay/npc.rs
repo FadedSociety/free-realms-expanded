@@ -598,7 +598,8 @@ impl Gameplay {
             let bag_capacity = self.inventory.state().items.len().max(100);
             let reward_state =
                 RewardState::new(self.inventory.clone(), profile_state.clone(), bag_capacity)
-                    .with_boost(self.consumable_effects.boost());
+                    .with_boost(self.consumable_effects.boost())
+                    .with_gender(self.gender);
             let mut staged_engine = engine.clone();
             let (quest, next_state) = staged_engine.finish_turnin(quest_id, &reward_state)?;
             let next_profiles = if self.profiles.is_some() {
@@ -947,8 +948,11 @@ impl Gameplay {
                     let busy = self.activity_busy();
                     match self.kart_entry.as_ref().map(|kart| kart.admit(key, busy)) {
                         Some(Ok(())) => {
+                            // P-kart-racing: the gate's own speedway row, so a Snowhill gate
+                            // never starts the Wildwood race.
+                            let row = self.kart_entry.as_ref().and_then(|k| k.gate_row(key));
                             out = self.commit_if_changed(|staged| {
-                                staged.begin_kart_row(character, None)
+                                staged.begin_kart_row(character, row)
                             })?;
                         }
                         Some(Err(denied)) => out.replies.push(chat::system(denied.message())),

@@ -266,6 +266,20 @@
           "coins": 0,
           "items": [
             {
+              "definition_id": 75967,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "item-table.json row 75967 'Flat Rate Postman Shorts' (GenderUsage 1, courier_<race>_m_legs_shorts.adr, texture courier-silver-L1, cost 378) is the boys' row beside the girls' 75968 'Flat Rate Postman Short Shorts' (GenderUsage 2, same texture and cost)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) the wiki names only the girls' piece; boys get its twin. One per wearer (rewards::apply_grant)."
+                }
+              ]
+            },
+            {
               "definition_id": 75968,
               "count": 1,
               "source": [
@@ -992,12 +1006,63 @@
       "id": 3130011,
       "title_string_id": 115427,
       "giver_npc_id": 9000000086,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130010
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 22763,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Honey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_bixie_buds_042cdc)."
+            }
+          ],
+          "npc_id": 9000000107
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 115438,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Bixie Bud Blitz minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_bixie_buds_042cdc)."
+            }
+          ],
+          "minigame_id": 243,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 71372,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Honey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_bixie_buds_042cdc)."
+            }
+          ],
+          "npc_id": 9000000107
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 12976,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Gloves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_bixie_buds_042cdc)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 300
           },
@@ -1057,12 +1122,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000086, 9000000107]; objectives and rewards preserved."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 115428,
       "intro_text_string_id": 115426,
       "end_text_string_id": 115429,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130012,
@@ -2309,12 +2379,69 @@
       "id": 3130026,
       "title_string_id": 130295,
       "giver_npc_id": 9000000132,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130025
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130300,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Biting Back minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_biting_back_4265d8)."
+            }
+          ],
+          "minigame_id": 301,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 3463,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Loryn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_biting_back_4265d8)."
+            }
+          ],
+          "npc_id": 9000000132
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 12889,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_biting_back_4265d8)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 13294,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_biting_back_4265d8)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours and genders); the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },
@@ -2362,19 +2489,39 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130296,
       "intro_text_string_id": 130294,
       "end_text_string_id": 130297,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130027,
       "title_string_id": 130305,
       "giver_npc_id": 9000000132,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130026
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130311,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Brin Galeglow in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_summit_in_shrouded_glade_3f6c26)."
+            }
+          ],
+          "npc_id": 9000000031
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2426,19 +2573,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130306,
       "intro_text_string_id": 130304,
       "end_text_string_id": 130307,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130028,
       "title_string_id": 130314,
       "giver_npc_id": 9000000031,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130027
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130319,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Beware of Dogs minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_dogs_20f5c0)."
+            }
+          ],
+          "minigame_id": 265,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130322,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Brin Galeglow in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beware_of_dogs_20f5c0)."
+            }
+          ],
+          "npc_id": 9000000031
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2490,23 +2670,67 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130315,
       "intro_text_string_id": 130313,
       "end_text_string_id": 130316,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130029,
       "title_string_id": 130370,
       "giver_npc_id": 9000000031,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130028
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130390,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Shrouded Glade Mail Sorting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mile_high_mail_324db1)."
+            }
+          ],
+          "minigame_id": 380,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130393,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Brin Galeglow in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mile_high_mail_324db1)."
+            }
+          ],
+          "npc_id": 9000000031
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10870,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mile_high_mail_324db1)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },
@@ -2554,20 +2778,76 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130371,
       "intro_text_string_id": 130369,
       "end_text_string_id": 130372,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130030,
       "title_string_id": 130397,
       "giver_npc_id": 9000000031,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3130029
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 130402,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Always On Time minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_always_on_time_0e7a49)."
+            }
+          ],
+          "minigame_id": 266,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 130404,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Postmaster Lane in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_always_on_time_0e7a49)."
+            }
+          ],
+          "npc_id": 9000000173
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 1727,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Jacket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_always_on_time_0e7a49)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Postman: Always on Time (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_always_on_time_0e7a49)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2604,12 +2884,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130398,
       "intro_text_string_id": 130396,
       "end_text_string_id": 130399,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130031,

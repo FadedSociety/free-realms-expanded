@@ -1752,7 +1752,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 6536,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Miner Pick Axe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_arrowheads_for_lugabow_85b71c)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) item-table row 6536 'Pro Miner Pickaxe' is the table's spelling of the wiki's 'Pro Miner Pick Axe' (Pro Miner set, weapon slot) (quest-research/reward-item-names.json, 2026-11-09)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "14": 750
           },
@@ -2406,8 +2421,69 @@
       "prerequisite_quest_ids": [
         3100024
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 23658,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chain 20+ tiles in the Gold Mining minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_biggest_is_best_7c82fe)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 23658 'Mine Gold Ore from Briarwood' is the goal under title 23656 'Miner: Biggest is Best' (23657 'Out mine Pinkelug's gold ore collection record.', 23659 '... Mine 40 gold ore at the Mother Lode quarry.'); the wiki's 'Chain 20+ tiles' wording has no client line; quest_wire --questline faile"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "mining.json game 99 'Gold Mining' (outputs 2743 Gold Ore) is pinned; Pinkelug 9000000169 is drawn at [-880.87, -82.09, 2473.28] in Briarwood (The Mother Lode), the step after this one talks to her (78206)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) neither the 20-tile chain nor the client's 40 ore is modelled: one finish of Gold Mining 99 counts (crafting.rs npc_minigame_win_id_only pattern)"
+            }
+          ],
+          "minigame_id": 99,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 78206,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Pinkelug at the Mother Lode (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_biggest_is_best_7c82fe)."
+            }
+          ],
+          "npc_id": 9000000169
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 244,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Miner Boots (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_biggest_is_best_7c82fe)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Miner: Biggest is Best (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_biggest_is_best_7c82fe)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2440,10 +2516,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 23657,
-      "enabled": false
+      "enabled": true,
+      "job": 14
     },
     {
       "id": 3100026,

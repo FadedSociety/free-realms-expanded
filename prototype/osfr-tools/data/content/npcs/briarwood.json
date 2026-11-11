@@ -23015,11 +23015,40 @@
               "evidence": "title_string_id corrected from raw locale hash 691480628 to Global.Text id 413807 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3040064,
+          "title": "Tracking down Tyrone",
+          "title_string_id": 2568,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "2568 title 'Tracking down Tyrone'; 2366 'Find Tyrone Shadowshard'; 2574 'Look for Tyrone Shadowshard in Blackspore.'; 2580 offer 'Tyrone Shadowshard must be stopped! But the only way is to confront him at his camp in Blackspore.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest_tracking_down_tyrone_83f955: starts after the Shattered Past quest packs, next Dark Deal; the marketplace text 2165 says the Baron von Darkcheat quest pack granted it at Card Duelist level 20."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No NPC gave this quest: it came with a bought quest pack. Edwin Goldstory 9500000125, who gives the Shattered Past line's last quest Card Duelist: Final Dig (3040041), offers it after that quest instead; a purchase-triggered start has no place in the everything-free economy. quest-research/givers-4.json row 4."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040064 is the next free id in this file; the client's own quest id is not known."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040038,
-        3040041
+        3040041,
+        3040064
       ],
       "quests_given_text": [
         "Dig up artifacts, including at Sir Wellington's site (client 2151669046, 2181304264); speak to Ramirez and Tyrone Shadowshard (1382500642). Titles not found."
@@ -40953,9 +40982,149 @@
       "location_evidence": [
         "Tangletrack."
       ],
-      "quests_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080016,
+          "title": "Kart Driver: Redline Returns",
+          "title_string_id": 3521,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 14; name 'Kart Driver: Redline Returns'; title id cell 126755862 ucdt; 2553983407 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080016 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080017,
+          "title": "Kart Driver: Self Promotion",
+          "title_string_id": 394655,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 15; name 'Kart Driver: Self Promotion'; title id cell 605457886 ucdt; 3143050549 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080017 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080006,
+          "title": "Kart Driver: Ready to Redline",
+          "title_string_id": 3494,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 4; name 'Kart Driver: Ready to Redline'; title id cell 838462410 ucdt; 2005756081 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080006 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
       "quest_ids_given": [
-        3080007
+        3080007,
+        3080016,
+        3080017,
+        3080006
       ],
       "quests_given_text": [
         "Kart Driver: The Showdown."
@@ -41268,11 +41437,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1758; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3015 (ModelId=1300, ModelFileName=fairy_m_linx_redline.agr, NameId=394366)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.544222,
       "model_id": 1300,
-      "model_file_name": "fairy_m_linx_redline.agr"
+      "model_file_name": "fairy_m_linx_redline.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000165,
@@ -48024,8 +48200,44 @@
       "location_evidence": [
         "Bristlewood."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956011,
+          "title": "D'oh, a Deer!",
+          "title_string_id": 71392,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "D'oh, a Deer! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_d_oh_a_deer_83475b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3956165,
+          "title": "What's the Point",
+          "title_string_id": 71396,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "What's the Point (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_s_the_point_13c3a4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956011,
+        3956165
+      ],
       "quests_given_text": [
         "Report on wild deer, does and bucks, and the \"thirty point buck\" in the Vale of the Ancients (client 744063359, 3797784632, 3739837653, 910503836). \"Miss Artie's Hunting Dog\" (client title 1804852243)."
       ],
@@ -48037,7 +48249,7 @@
       "services_reason": "The regional row lists no distinct service.",
       "position": [
         -537.742517,
-        -66.509,
+        -65.757,
         2217.783005
       ],
       "position_w": null,
@@ -48058,7 +48270,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 93 by longest normalized whole-name score 11; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 93 by longest normalized whole-name score 11; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. The height is the terrain there (-65.76): the POI height sank her 0.75 m.",
       "source": [
         {
           "kind": "client",
@@ -48266,6 +48478,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) y set to the terrain under her spot (-65.76), 0.75 m above the POI height."
           }
         ],
         "position_reason": [
@@ -48331,10 +48547,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 339,
-      "model_file_name": "human_f_freestyle_01.agr"
+      "model_file_name": "human_f_freestyle_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000182,
@@ -52539,12 +52762,29 @@
               "evidence": "title_string_id corrected from raw locale hash 2231955117 to Global.Text id 78196 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3956080,
+          "title": "Miner: Speed Smelting",
+          "title_string_id": 35775,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Miner: Speed Smelting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_miner_speed_smelting_c2c84c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3100025,
         3100026,
-        3100027
+        3100027,
+        3956080
       ],
       "quests_given_text": [
         "Miner: Biggest is Best, Miner: Speed Smelting (no live client title), Miner: Mother Lode Lift; asks 12 topaz (client 1777039956)."
@@ -53091,11 +53331,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1498; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2755 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=23210)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.521806,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000191,
@@ -53437,11 +53684,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1481; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2738 (ModelId=15, ModelFileName=chugawug_m_miner_01.adr, NameId=17792)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.055999,
       "model_id": 15,
-      "model_file_name": "chugawug_m_miner_01.adr"
+      "model_file_name": "chugawug_m_miner_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000192,
@@ -53449,7 +53703,7 @@
       "reference_ids": [],
       "name": "Princess Reedshadow",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 38083,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": null,
@@ -53477,9 +53731,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -646.68838,
-        -50.775303,
-        2509.469553
+        -544.0463,
+        -80.37102,
+        2406.506
       ],
       "position_w": null,
       "rotation": [
@@ -53701,12 +53955,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=74 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=74 NameId=4469 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "Spawn 100000002810 in npc_spawns_extra.json draws this NPC, so its record stands on it (quest-research/npcs.json, 2026-11-08: client: locale line 45762 'gribbit would like to impress princess reedshadow by giving her flower' and 45699 'gribbit wants you to speak to reedshadow to find out if she s a prince...' make Reedshadow)"
           }
         ],
         "position_reason": [
@@ -53760,8 +54010,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000193,
@@ -55005,11 +55262,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1566; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2823 (ModelId=64, ModelFileName=chugawug_f_greenwood_soldier.adr, NameId=45653)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.37846,
       "model_id": 64,
-      "model_file_name": "chugawug_f_greenwood_soldier.adr"
+      "model_file_name": "chugawug_f_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000196,

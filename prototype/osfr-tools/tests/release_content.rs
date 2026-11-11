@@ -830,7 +830,9 @@ fn opening_actors_never_draw_a_second_body_on_a_world_npc() {
     let original = opening.actors().iter().find(is_bartle).unwrap().guid;
     let shared = opening_world::share_world_npcs(&mut opening, &world);
     assert!(shared.contains(&BARTLE), "{shared:?}");
-    assert_eq!(shared.len(), 8, "{shared:?}");
+    // The 35-quest batch draws Queen Valerian's world body (9500000519), so the opening's Queen
+    // Valerian shares it too (lead 2026-11-10): nine, every pair the same character.
+    assert_eq!(shared.len(), 9, "{shared:?}");
     let bartle = opening.actors().iter().find(|a| a.name == "Bartle").unwrap();
     assert_eq!(bartle.guid, BARTLE);
     assert!(!opening.wants_actor(BARTLE), "the campaign has not reached him");

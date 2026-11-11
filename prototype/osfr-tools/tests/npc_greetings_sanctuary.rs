@@ -242,7 +242,7 @@ const LATER_GREETINGS: [(u64, u32); 4] = [
 /// A legacy-data Sanctuary trainer, merchant and non-quest greeter in the edited set.
 const TRAINER: u64 = 9000000097; // General Glowlight
 const MERCHANT: u64 = 9500000515; // Pucca De'Flor
-const GREETER: u64 = 9500000522; // Ridwan Lacsher, ambient (Anura now gives The Toadal Truth, a wiki pick-up quest)
+const GREETER: u64 = 9500000522; // Ridwan Lacsher, ambient (he now gives Studying Squirrels; Anura gives The Toadal Truth)
 /// An untouched legacy-data Sanctuary row with no recovered greeting.
 const BLANK: u64 = 9500000443; // Barin Battlerock
 
@@ -418,11 +418,15 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
             .all(|option| option.action != NpcAction::Shop),
         "a merchant without priced stock must not list Shop"
     );
+    // P-quest-npcs: Ridwan now gives Studying Squirrels (the wiki's quest for him), as Anura got
+    // The Toadal Truth before him, and no ambient row of this edited set is left without a quest.
+    // He is still the set's ambient townsperson, and his own greeting still goes out in 26/3
+    // (both loops above), so the role is what this pins.
     let greeter = npc_record("sanctuary.json", GREETER);
     let greeter_roles = roles(&greeter);
     assert!(
-        greeter_roles.contains("ambient") && !greeter_roles.contains("quest_giver"),
-        "the edited set must include a non-quest greeter"
+        greeter_roles.contains("ambient"),
+        "the edited set must include an ambient greeter"
     );
 }
 

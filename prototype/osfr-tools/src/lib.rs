@@ -74,6 +74,7 @@ pub mod kart_rewards;
 pub mod kart_rows;
 pub mod vehicle_parts;
 pub mod kart_service;
+pub mod kart_tracks;
 pub mod kart_weapons;
 pub mod le;
 pub mod lobby_wire;

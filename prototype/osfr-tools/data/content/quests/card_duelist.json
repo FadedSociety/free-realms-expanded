@@ -1531,6 +1531,20 @@
                   "evidence": "(R) This name has 67 rows (colours and genders); the lowest id is used for each wearer."
                 }
               ]
+            },
+            {
+              "definition_id": 190,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Hoodie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_battle_bry_10c7f7)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Hoodie 199 is a boys' row (item-table GenderUsage 1) and no girls' row carries the same name; girls get the Rolled-Sleeve Hoodie 190 (GenderUsage 2), the pair Chapter 1: The Missing Sisters 3000029 pays. One per wearer (rewards::apply_grant)."
+                }
+              ]
             }
           ],
           "job_xp": {
@@ -4893,23 +4907,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defenders_duty_37dbfd)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "Defenders Duty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defenders_duty_37dbfd)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -4956,10 +4963,93 @@
     {
       "id": 3040044,
       "title_string_id": 436478,
-      "giver_npc_id": 9000000520,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9000000224,
+      "prerequisite_quest_ids": [
+        3040064
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 436483,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's First Deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dark_deal_abfdd5)."
+            }
+          ],
+          "minigame_id": 387,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 436557,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's Second Deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dark_deal_abfdd5)."
+            }
+          ],
+          "minigame_id": 388,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 436559,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's Third Deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dark_deal_abfdd5)."
+            }
+          ],
+          "minigame_id": 389,
+          "count": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "text_string_id": 436561,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Tyrone's Fourth Deck (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dark_deal_abfdd5)."
+            }
+          ],
+          "minigame_id": 390,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 436563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tyrone Shadowshard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dark_deal_abfdd5)."
+            }
+          ],
+          "npc_id": 9000000224
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Dark Deal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dark_deal_abfdd5)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -5000,20 +5090,56 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 436479,
       "intro_text_string_id": 436477,
       "end_text_string_id": 436480,
-      "enabled": false
+      "enabled": true,
+      "job": 120
     },
     {
       "id": 3040045,
       "title_string_id": 2569,
-      "giver_npc_id": 9000000143,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9000000224,
+      "prerequisite_quest_ids": [
+        3040044
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 2367,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Mayor Crystalline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_in_search_of_the_baron_4e0f53)."
+            }
+          ],
+          "npc_id": 9000000143
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "In Search of The Baron (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_in_search_of_the_baron_4e0f53)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -5046,9 +5172,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 120,
+      "description_string_id": 778,
+      "intro_text_string_id": 2581
     },
     {
       "id": 3040046,
@@ -5126,23 +5259,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_suspicious_sneak_d95bae)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "Suspicious Sneak (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_suspicious_sneak_d95bae)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -5219,23 +5345,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_catch_a_sneak_0549df)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "To Catch a Sneak (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_catch_a_sneak_0549df)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -5359,23 +5478,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finder_of_secrets_1f1fb2)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "Finder of Secrets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finder_of_secrets_1f1fb2)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -5452,23 +5564,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_guide_to_the_baron_0bb3f9)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "A Guide to The Baron (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_guide_to_the_baron_0bb3f9)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -5592,23 +5697,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_master_explorer_e1d695)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "Master Explorer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_master_explorer_e1d695)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -5685,23 +5783,16 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [
-            {
-              "definition_id": 77677,
-              "count": 1,
-              "source": [
-                {
-                  "kind": "wiki",
-                  "evidence": "none (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_the_baron_04c4fe)."
-                }
-              ]
-            }
-          ],
+          "items": [],
           "job_xp": {},
           "source": [
             {
               "kind": "wiki",
               "evidence": "Confronting The Baron (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_the_baron_04c4fe)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The wiki's reward cell says 'none'. It had matched item 77677, whose name text Global.Text 401440 is literally 'None' (no model, cost 0, item-table.json): not a reward, so no item is paid."
             }
           ]
         }
@@ -7356,6 +7447,71 @@
       "description_string_id": 5100631,
       "intro_text_string_id": 5100629,
       "end_text_string_id": 5100632,
+      "enabled": true,
+      "job": 120
+    },
+    {
+      "id": 3040064,
+      "title_string_id": 2568,
+      "giver_npc_id": 9500000125,
+      "prerequisite_quest_ids": [
+        3040041
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 2366,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Tyrone Shadowshard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tracking_down_tyrone_83f955)."
+            }
+          ],
+          "npc_id": 9000000224
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Tracking down Tyrone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tracking_down_tyrone_83f955)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "2568 title 'Tracking down Tyrone'; 2366 'Find Tyrone Shadowshard'; 2574 'Look for Tyrone Shadowshard in Blackspore.'; 2580 offer 'Tyrone Shadowshard must be stopped! But the only way is to confront him at his camp in Blackspore.'"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "fr_quest_tracking_down_tyrone_83f955: starts after the Shattered Past quest packs, next Dark Deal; the marketplace text 2165 says the Baron von Darkcheat quest pack granted it at Card Duelist level 20."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No NPC gave this quest: it came with a bought quest pack. Edwin Goldstory 9500000125, who gives the Shattered Past line's last quest Card Duelist: Final Dig (3040041), offers it after that quest instead; a purchase-triggered start has no place in the everything-free economy. quest-research/givers-4.json row 4."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) quest id 3040064 is the next free id in this file; the client's own quest id is not known."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 2574,
+      "intro_text_string_id": 2580,
       "enabled": true,
       "job": 120
     }

@@ -719,11 +719,114 @@
       "prerequisite_quest_ids": [
         3050009
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 100833,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the Queensfields Harvesting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_crazy_craving_ff7352)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "harvesting.json game 109 'Queensfields Harvesting' (outputs include 2889 Bumbleberry and 2875 Gummyfruit) is pinned; Honey 9000000107, the giver, is drawn at [-1503.99, -34.46, 377.92]"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "this quest's client block is 71056 'Chef: Crazy Craving', 71057 'Honey needs you to collect some Bumbleberry and Gummyfruit from the Queensfields ...', 71060 'Collect some cooking ingredients for Honey!', 71064 'Gather some Bumbleberry'; it has no 'play the minigame' goal; quest_wire --questline fai"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) client_text_id 100833 'Queensfields Harvesting' is the game's own name line, used because no goal line says 'play'; one finish of game 109 counts"
+            }
+          ],
+          "minigame_id": 109,
+          "count": 1
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "text_string_id": 71064,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather some Bumbleberry - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_crazy_craving_ff7352)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 71064 'Gather some Bumbleberry' is this quest's own goal (block 71056-71064); harvesting.json game 109 Queensfields outputs 2889 Bumbleberry (quest_wire HARVEST maps bumbleberry to 2889)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki row carries no client id for this step, so quest_wire would stop here with 'no client text' once the step before it is answered"
+            }
+          ],
+          "resource_id": 2889,
+          "quantity": 3
+        },
+        {
+          "kind": "gather_resource",
+          "id": 3,
+          "text_string_id": 140089,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather some Gummyfruit - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_crazy_craving_ff7352)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "harvesting.json game 109 Queensfields outputs 2875 Gummyfruit (quest_wire HARVEST maps gummyfruit to 2875); the wiki row carries no client id for this step"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) client_text_id 140089 'Gather some Gummyfruit' is borrowed from another chef quest's block: this quest's own Gummyfruit goal (71066, between 71064 and 71067) is missing from lab/reports/locale-id-to-text.json"
+            }
+          ],
+          "resource_id": 2875,
+          "quantity": 3
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13617,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Chef Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_crazy_craving_ff7352)."
+                }
+              ]
+            },
+            {
+              "definition_id": 6643,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Chef Spatula (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_crazy_craving_ff7352)."
+                }
+              ]
+            },
+            {
+              "definition_id": 2877,
+              "count": 3,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bundle of Spiralmint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_crazy_craving_ff7352)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 250
           },
@@ -771,12 +874,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 71057,
       "intro_text_string_id": 71055,
       "end_text_string_id": 71058,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050011,
@@ -1332,11 +1440,155 @@
       "title_string_id": 116477,
       "giver_npc_id": 9000000103,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 46329,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Cooking Table (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sg_cooking_table_nodes_01.adr is what the world draws for this kind of thing; the nearest placed one is 441 m from the quest's giver, so the quest's own instance needs placing"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden worktable covered in pots, pans and cooking clutter (sheets/a_world_click1.png r0c1, tile of sg_cooking_table_nodes_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chef_stillwater_inn_7e61db)."
+            }
+          ],
+          "node_type": "quest-table",
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 21837,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Spiralmint Steak - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "recipes.json recipe 33 'Spiralmint Steak' (minigame 173 'Cooking: Simone's Spiralmint Steak', pinned) is the dish; quest_wire --questline failed the step as 'no client text'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "this quest's client block is 116476 (Helena's offer), 116477 title, 116478 description, 116919 'Click on the Cooking Table in front of Helena to start cooking up some Spiralmint ...', 116921 'Now that Helena has taught you the secret of Spiralmint Steak ...', 116922 'Return to Helena', 116923 '... t"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) client_text_id 21837 'Cook up some Spiralmint Steak' is borrowed from Simone's quest block (21831 'NOT LIVE - Cobblestone Village Cafe', 21833-21839), the only goal title in the locale that says this; 116921 is this quest's own line but reads as a description"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) crafting.rs raises CraftRecipe with quantity 1 per run, so two cooks complete it"
+            }
+          ],
+          "recipe_id": 33,
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 116922,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Helena (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+            }
+          ],
+          "npc_id": 9000000103
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14839,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Chef Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+                }
+              ]
+            },
+            {
+              "definition_id": 13838,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Chef Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+                }
+              ]
+            },
+            {
+              "definition_id": 2900,
+              "count": 12,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Spice (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            },
+            {
+              "definition_id": 2889,
+              "count": 12,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bundle of Bumbleberry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            },
+            {
+              "definition_id": 2862,
+              "count": 12,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bat Meat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 3 rows (colours); the lowest id is used."
+                }
+              ]
+            },
+            {
+              "definition_id": 2877,
+              "count": 12,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bundle of Spiralmint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_stillwater_inn_7e61db)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 250
           },
@@ -1384,11 +1636,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 116478,
       "intro_text_string_id": 116476,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050016,
@@ -1725,12 +1982,85 @@
     {
       "id": 3050019,
       "title_string_id": 139271,
-      "giver_npc_id": 9000000107,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000422,
+      "prerequisite_quest_ids": [
+        3050014
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130796,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Vaelen Warpwatcher (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_meet_the_reputable_bordon_cloo_b0167d)."
+            }
+          ],
+          "npc_id": 9500000778
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 140014,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Meet Bordon Cloo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_meet_the_reputable_bordon_cloo_b0167d)."
+            }
+          ],
+          "npc_id": 9000000028
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 385675,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Obtain Broth for Cooking - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_meet_the_reputable_bordon_cloo_b0167d)."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text 385675 'Obtain Broth for Cooking' is this goal and 385676 'Speak with Bordon Cloo to get some Broth for your Savory Spiralmint Soup.' its description. Broth is item 2899 (item-table.json; 23309 is its name id, not its item id)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Bordon Cloo 9000000028 sells Broth 2899 (stores.json, 12 coins; vendors.json), and recipe 34 Savory Spiralmint Soup needs three. The goal is three Broth in the bag, bought from him: the server has no talk that hands items over."
+            }
+          ],
+          "item_id": 2899,
+          "quantity": 3
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 4,
+          "text_string_id": 140111,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Savory Spiralmint Soup (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_meet_the_reputable_bordon_cloo_b0167d)."
+            }
+          ],
+          "recipe_id": 34,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 140117,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Bordon Cloo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_meet_the_reputable_bordon_cloo_b0167d)."
+            }
+          ],
+          "npc_id": 9000000028
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 24,
           "items": [],
           "job_xp": {
             "45": 175
@@ -1739,6 +2069,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 175 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/chef.json, record 3050019)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "24 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_meet_the_reputable_bordon_cloo_b0167d)."
             }
           ]
         }
@@ -1779,12 +2113,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 139272,
       "intro_text_string_id": 139270,
       "end_text_string_id": 139273,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050020,
@@ -2773,11 +3112,87 @@
       "prerequisite_quest_ids": [
         3050029
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 73094,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook De'Flor Family Fried Dumplings - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_family_style_2f2af2)."
+            }
+          ],
+          "recipe_id": 54,
+          "quantity": 3
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 73096,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook Glerga's Gourmet Goulash - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_family_style_2f2af2)."
+            }
+          ],
+          "recipe_id": 42,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 140262,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Have your food reviewed by Glerga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_family_style_2f2af2)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Glerga 9000000332 is drawn (npcs/wilds.json, model 187, [-464.99, 9.49, 774.25]) and is this quest's giver; quest_wire --questline failed the step as 'no client text'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the client's own goals for this quest are 73094 'Cook De'Flor Family Fried Dumplings' and 73096 'Cook Glerga's Gourmet Goulash' (title 73078 'Chef: Family Style!', closing line 73098); it had no review goal"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) client_text_id 140262 'Have Your Food Reviewed' is borrowed from Chef: The Food Reviewer (its description 140263 names Lucca De'Flor); it is the only goal line in the locale that says what this wiki step says"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the talk completes the step; no food is handed over"
+            }
+          ],
+          "npc_id": 9000000332
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14907,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_family_style_2f2af2)."
+                }
+              ]
+            },
+            {
+              "definition_id": 10858,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Chef Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_family_style_2f2af2)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "45": 2000
           },
@@ -2829,12 +3244,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 73079,
       "intro_text_string_id": 73077,
       "end_text_string_id": 73080,
-      "enabled": false
+      "enabled": true,
+      "job": 45
     },
     {
       "id": 3050031,

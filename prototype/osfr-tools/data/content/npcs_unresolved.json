@@ -124,35 +124,6 @@
       ]
     },
     {
-      "ref_id": 9000000004,
-      "name": null,
-      "name_reason": "The page row describes an unnamed speaker, handoff, or inferred role rather than identifying a quest-giver NPC.",
-      "candidate_names": [],
-      "kind": "unknown",
-      "resolution": {
-        "npc_id": null,
-        "basis": "guide giver column reads unknown and quest-lines q3060028 (final) records no giver name; no offer line is tagged to the quest; the slot only has the speaker describing a snowy stretch of land"
-      },
-      "zone": "Snowhill",
-      "zone_reason": null,
-      "place": "Snowhill area (the speaker says \"this secluded snowy stretch of land\")",
-      "name_string_id": null,
-      "name_string_id_reason": "(R) no actor-to-locale name mapping is present in this content batch",
-      "contexts": [
-        "demo_derby_driver:Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel):25:Demo Derby: An Eye for Talent"
-      ],
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 25; title 'Demo Derby: An Eye for Talent'; source tags [client]"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ref_id is a deterministic batch content key; no matching keyed NPC spawn record exists in this first batch"
-        }
-      ]
-    },
-    {
       "ref_id": 9000000006,
       "name": "Anata Caliburn",
       "name_reason": null,
@@ -1038,39 +1009,6 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial (titles without the \"Fisherman:\" prefix), row E1; title 'Become a Fisherman'; source tags [client] [wiki]"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ref_id is a deterministic batch content key; no matching keyed NPC spawn record exists in this first batch"
-        }
-      ]
-    },
-    {
-      "ref_id": 9000000149,
-      "name": "Message Board",
-      "name_reason": null,
-      "candidate_names": [],
-      "kind": "non_npc",
-      "resolution": {
-        "npc_id": null,
-        "basis": "non_npc: a message board prop (T731 found the same for the Sanctuary board); npc_spawns_extra holds board props with no NPC row, so the quest starts from a board, not an NPC"
-      },
-      "zone": "Stillwater Crossing",
-      "zone_reason": null,
-      "place": "Stillwater Crossing",
-      "name_string_id": null,
-      "name_string_id_reason": "(R) no actor-to-locale name mapping is present in this content batch",
-      "contexts": [
-        "fisherman:Entry and tutorial (titles without the \"Fisherman:\" prefix):E2:Being a Better Fisherman"
-      ],
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial (titles without the \"Fisherman:\" prefix), row E2; title 'Being a Better Fisherman'; source tags [client] [wiki]"
-        },
-        {
-          "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial (titles without the \"Fisherman:\" prefix), row E2; title 'Being a Better Fisherman'; source tags [client] [wiki]"
         },
         {
           "kind": "reconstructed",
@@ -5652,35 +5590,6 @@
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 0 - Joining the job (entry titles), row 0a; title 'Become a Soccer Star'; source tags [client]"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ref_id is a deterministic batch content key; no matching keyed NPC spawn record exists in this first batch"
-        }
-      ]
-    },
-    {
-      "ref_id": 9000000548,
-      "name": null,
-      "name_reason": "The guide does not identify one NPC name for this giver.",
-      "candidate_names": [],
-      "kind": "unknown",
-      "resolution": {
-        "npc_id": null,
-        "basis": "guide giver column reads unknown and quest-lines q3140002 (final) record no giver name; no offer line is tagged to the quest"
-      },
-      "zone": "Snowhill",
-      "zone_reason": null,
-      "place": "Snowhill Soccer Field",
-      "name_string_id": null,
-      "name_string_id_reason": "(R) no actor-to-locale name mapping is present in this content batch",
-      "contexts": [
-        "soccer_star:Arc 0 - Joining the job (entry titles):0b:Being a Better Soccer Star"
-      ],
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 0 - Joining the job (entry titles), row 0b; title 'Being a Better Soccer Star'; source tags [client]"
         },
         {
           "kind": "reconstructed",

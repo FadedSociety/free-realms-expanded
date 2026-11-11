@@ -785,7 +785,20 @@ fn the_spawn_is_unique_and_the_quest_target_resolves() {
     );
     assert_eq!(record["objectives"].as_array().unwrap().len(), 3);
     assert_eq!(record["rewards"][0]["coins"], json!(QUEST_COINS));
-    assert_eq!(record["rewards"][0]["items"], json!([]));
+    // The wiki's pair, one per wearer (`quest_reward_gender.rs`): the boys' Hoodie 199 and the
+    // girls' Rolled-Sleeve Hoodie 190.
+    let items: Vec<(i64, i64)> = record["rewards"][0]["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|item| {
+            (
+                item["definition_id"].as_i64().unwrap(),
+                item["count"].as_i64().unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(items, [(199, 1), (190, 1)]);
     assert_eq!(record["rewards"][0]["job_xp"], json!({"1": QUEST_XP}));
 }
 

@@ -312,7 +312,9 @@ pub struct Gameplay {
     portal_refreshed_ms: Option<u64>,
     /// `portal_basis` when the last 167/1/1 was built; `None` before the first.
     portal_listed: Option<(usize, usize)>,
-    kart_entry: Option<crate::kart_gateway::KartGateway>,
+    /// Boxed: `Gameplay` is moved by value on threads near their stack limit (the gateway unit
+    /// tests), and the race package, its service and its saved state are hundreds of bytes.
+    kart_entry: Option<Box<crate::kart_gateway::KartGateway>>,
     /// Opt-in demolition derby package. A match is connection-local; a reconnect drops it.
     derby: Option<crate::derby_gateway::DerbyGateway>,
     /// W160 (R): the guide NPCs that offer fishing (`fishing_spots.json`). Not persisted.
@@ -1133,7 +1135,7 @@ impl Gameplay {
             }
         };
         let mystery_chests = MysteryChests::load(directory, &inventory)?.map(Arc::new);
-        let kart_entry = crate::kart_gateway::KartGateway::load(directory, kart_entry)?;
+        let kart_entry = crate::kart_gateway::KartGateway::load(directory, kart_entry)?.map(Box::new);
         if let (Some(kart), Some(interaction)) = (&kart_entry, &mut npc_interaction) {
             let unknown = interaction.set_race_gates(kart.gate_npcs(), kart.menu_string_id());
             for npc in unknown {
@@ -1190,7 +1192,7 @@ impl Gameplay {
             }
         }
         let folders = [directory, bundled_npc_content.as_path()];
-        let (kart, derby_ref) = (kart_entry.as_ref(), derby.as_ref());
+        let (kart, derby_ref) = (kart_entry.as_deref(), derby.as_ref());
         let hunt = artifact_hunt.as_ref();
         let type8 = [mining.as_ref(), harvesting.as_ref(), mail_sorting.as_ref(), hunt];
         let fishing_spots = crate::fishing_service::FishingSpots::load(directory)?.map(Arc::new);
@@ -4758,7 +4760,10 @@ impl Gameplay {
             let mut inventory = self.inventory.clone();
             let mut quests = self.quests.clone();
             let coins = self.consumable_effects.boost().coins(reward.coins);
-            match inventory.grant_bundle(coins, &reward.items) {
+            // A boys' or girls' reward piece goes only to that wearer.
+            let mut items = reward.items.clone();
+            items.retain(|&(id, _)| inventory.reward_fits_gender(id, self.gender));
+            match inventory.grant_bundle(coins, &items) {
                 Ok(result) => {
                     if reward.quest_id != 0 {
                         quests.acknowledge_reward(reward.quest_id)?;
@@ -4767,8 +4772,7 @@ impl Gameplay {
                     self.quests = quests;
                     out.changed |= result.changed;
                     out.replies.extend(result.replies);
-                    for (item_id, quantity) in reward.items.iter().copied().filter(|(_, n)| *n > 0)
-                    {
+                    for (item_id, quantity) in items.iter().copied().filter(|(_, n)| *n > 0) {
                         self.npc_quest_event(
                             crate::quest_engine::QuestEvent::CollectItem {
                                 item_id,

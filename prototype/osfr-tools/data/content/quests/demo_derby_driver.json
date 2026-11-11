@@ -456,13 +456,80 @@
     {
       "id": 3060007,
       "title_string_id": 403452,
-      "giver_npc_id": 9000000313,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000289,
+      "prerequisite_quest_ids": [
+        3060005
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394066,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Duncan Slickshoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_routine_maintenance_197fbc)."
+            }
+          ],
+          "npc_id": 9500004678
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 394060,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Knockout 3 cars (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_routine_maintenance_197fbc)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394060 'Knock out cars' sits in this quest's goal block (394066 'Speak to Duncan Slickshoes', 394067 'Compete in a Thunder Falls derby', 394069 'Return to Duncan Slickshoes'); quest_wire --questline failed the step as 'no client text'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "derby_minigames.json row 606 'Routine Maintenance' (MiniGameData type 11) is the quest's own derby and is in the pinned producer set (tests/enabled_quest_reachability.rs shipped_minigame_producers_are_pinned)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the client's goal block has two derby goals, 394067 'Compete in a Thunder Falls derby' and this one, both a finish of derby 606. The engine credits one open step per finish, so two steps would need two runs; they are one step here and one run completes it."
+            },
+            {
+              "kind": "client",
+              "evidence": "The finish counts only when the run meets the row's own goal: derby_rows.json row 606 asks for ten knock-outs made and none taken (goal: min_knockouts 10, max_knockouts_taken 0), and gameplay/derby_session.rs credits a goal row's quest only when that goal is met (a run that misses it still pays). The row's goal is client data and outranks the wiki's 'Knockout 3 cars'."
+            }
+          ],
+          "minigame_id": 606,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394069,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Duncan Slickshoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_routine_maintenance_197fbc)."
+            }
+          ],
+          "npc_id": 9500004678
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13773,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Demo Derby Shirt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_routine_maintenance_197fbc)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 263
           },
@@ -502,9 +569,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393377,
+      "intro_text_string_id": 393377
     },
     {
       "id": 3060008,
@@ -1764,13 +1838,80 @@
     {
       "id": 3060021,
       "title_string_id": 403453,
-      "giver_npc_id": 9000000354,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500004678,
+      "prerequisite_quest_ids": [
+        3060007
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395061,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect 4 Health Power Ups & Finish in Top 4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_wear_and_tear_817a1f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 395061 'Pickup 4 health power-ups' is the derby goal line for this quest (394021 'Collect health power-ups while competing in a demolition derby at Thunder Falls.' describes it; 393378 is Duncan's offer text); quest_wire --questline failed the step as 'no client text'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "derby_minigames.json row 607 'Wear and Tear' is the quest's own derby and is pinned"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the client's goal block has two derby goals, 394068 'Compete in the derby' and this one, both a finish of derby 607. The engine credits one open step per finish, so two steps would need two runs; they are one step here and one run completes it."
+            },
+            {
+              "kind": "client",
+              "evidence": "The finish counts only when the run meets the row's own goal: derby_rows.json row 607 asks for four health pick-ups and a finish in the top three (goal: pickups health 4, max_placement 3), and gameplay/derby_session.rs credits a goal row's quest only when that goal is met (a run that misses it still pays). The row's goal is client data and outranks the wiki's 'Finish in Top 4'."
+            }
+          ],
+          "minigame_id": 607,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394069,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Duncan Slickshoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_wear_and_tear_817a1f)."
+            }
+          ],
+          "npc_id": 9500004678
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394063,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Crash Davis (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_wear_and_tear_817a1f)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59660,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Basic Bounce Boosters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_wear_and_tear_817a1f)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 263
           },
@@ -1810,9 +1951,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 393378 is Duncan Slickshoes' offer for this quest (the wiki row's dialog) and 394021 'Collect health power-ups while competing in a demolition derby at Thunder Falls.' its description."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "intro_text_string_id": 393378,
+      "description_string_id": 394021
     },
     {
       "id": 3060022,
@@ -2177,11 +2329,26 @@
       "id": 3060028,
       "title_string_id": 403469,
       "giver_npc_id": 9000000004,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3060025
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394101,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Jace Wildwheel at Wildwood Speedway (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_eye_for_talent_9d27f1)."
+            }
+          ],
+          "npc_id": 9000000357
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "49": 200
@@ -2190,6 +2357,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 200 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/demo-derby-driver.json, record 3060028)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_eye_for_talent_9d27f1)."
             }
           ]
         }
@@ -2222,9 +2393,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 393354 'A mysterious derby fan admires your talent...' is the text the wiki row carries for this quest; no separate first-person offer line was found, so it serves as both offer and description."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "intro_text_string_id": 393354,
+      "description_string_id": 393354
     },
     {
       "id": 3060029,
@@ -3069,13 +3251,56 @@
     {
       "id": 3060037,
       "title_string_id": 403470,
-      "giver_npc_id": 9000000532,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000357,
+      "prerequisite_quest_ids": [
+        3060028
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394102,
+          "minigame_id": 617,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 617 counts for this goal (Win the Odd Audition challenge); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394103,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jace Wildwheel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_the_odd_audition_5db49c)."
+            }
+          ],
+          "npc_id": 9000000357
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76055,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Frame-Notched Derby Trousers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_the_odd_audition_5db49c)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) no row is named 'Frame-Notched Derby Trousers'; item-table row 76055 'Frame-Notched Derby Pants' is the set's legs piece (the wiki's other derby sets are wired to their 'Pants' rows the same way) (quest-research/reward-item-names.json, 2026-11-09)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 213
           },
@@ -3119,9 +3344,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393355,
+      "intro_text_string_id": 393395
     },
     {
       "id": 3060038,

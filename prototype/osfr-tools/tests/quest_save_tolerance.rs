@@ -231,7 +231,9 @@ fn repair_does_not_accept_wrong_identity_version_or_unbounded_history() {
     invalid.version = 2;
     assert!(QuestEngine::new(1, vec![definition(1, 1)], eligibility(1), Some(invalid)).is_err());
     let mut invalid = state(1, vec![], QuestStatus::Active);
-    invalid.quests = (1..=1025)
+    // P-quest-npcs: one past `quest_engine::MAX_QUESTS`, raised from 1,024 to 4,096 when the
+    // shipped catalogue passed 1,024 records (a save may hold a state for every quest).
+    invalid.quests = (1..=4097)
         .map(|id| {
             (
                 id,

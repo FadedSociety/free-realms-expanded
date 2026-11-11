@@ -374,14 +374,62 @@
         "Ranked racer, \"almost mistake free\" (2898295324)."
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Frost Ridge Speedway (2726880386)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080018,
+          "title": "Kart Driver: Icy Perfection",
+          "title_string_id": 3522,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 16; name 'Kart Driver: Icy Perfection'; title id cell 4205031367 ucdt; 1551478619 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080018 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080018
+      ],
       "quests_given_text": [
         "Race target of Kart Driver: Self Promotion and Kart Driver: Icy Perfection."
       ],
@@ -689,11 +737,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1728; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2985 (ModelId=823, ModelFileName=human_f_amber_violet.agr, NameId=101910)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.383507,
       "model_id": 823,
-      "model_file_name": "human_f_amber_violet.agr"
+      "model_file_name": "human_f_amber_violet.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000869,
@@ -2592,9 +2647,190 @@
       "location_evidence": [
         "\"A robgoblin at the Wildwood Speedway\" (241877165)."
       ],
-      "quests_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080010,
+          "title": "Kart Driver: Wildwood Sprint Challenge",
+          "title_string_id": 394496,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 8; name 'Kart Driver: Wildwood Sprint Challenge'; title id cell 1669408147 ucdt; 2301397015 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080010 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080011,
+          "title": "Kart Driver: Wildwood Endurance Challenge",
+          "title_string_id": 394572,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 9; name 'Kart Driver: Wildwood Endurance Challenge'; title id cell 4045005532 ucdt; 3185435926 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080011 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080012,
+          "title": "Kart Driver: Dominating at Wildwood",
+          "title_string_id": 3509,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 10; name 'Kart Driver: Dominating at Wildwood'; title id cell 1991360986 ucdt; 542618925 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 10; name 'Kart Driver: Dominating at Wildwood'; title id cell 1991360986 ucdt; 542618925 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080012 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080013,
+          "title": "Kart Driver: Guest of Honor",
+          "title_string_id": 394603,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 11; name 'Kart Driver: Guest of Honor'; title id cell 2327413006 ucdt; 956848619 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080013 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
       "quest_ids_given": [
-        3080009
+        3080009,
+        3080010,
+        3080011,
+        3080012,
+        3080013
       ],
       "quests_given_text": [
         "Kart Driver: Exploder's League Sponsorship, Kart Driver: Wildwood Sprint Challenge, Kart Driver: Wildwood Endurance Challenge, Kart Driver: Dominating at Wildwood, Kart Driver: Guest of Honor (hands off to Squee at the Robgoblin Camp)."
@@ -2903,11 +3139,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1754; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3011 (ModelId=4, ModelFileName=robgoblin_m_basic.adr, NameId=394488)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.089922,
       "model_id": 4,
-      "model_file_name": "robgoblin_m_basic.adr"
+      "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000873,
@@ -11934,6 +12177,46 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             }
           ]
+        },
+        {
+          "quest_id": 3060007,
+          "title": "Demo Derby: Routine Maintenance",
+          "title_string_id": 403452,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 4; name 'Demo Derby: Routine Maintenance'; title id cell 483849326 ucdt; 2971883563 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060007 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -11946,7 +12229,8 @@
         3060010,
         3060009,
         3060014,
-        3060015
+        3060015,
+        3060007
       ],
       "quests_given_text": [
         "Demo Derby: License to Drive (inferred), Demo Derby: Taking the Wheel (inferred), Demo Derby: Dealing Damage, Demo Derby: Spare Parts, Demo Derby: So Long, Betty!, Demo Derby: Thunder Falls Crash for Coin (inferred), Demo Derby: Tucker's Troubles (inferred), Demo Derby: Wildwood Derby 1000."
@@ -19246,12 +19530,65 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3050030,
+          "title": "Chef: Family Style",
+          "title_string_id": 73078,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M12; name 'Chef: Family Style! (wiki: \"Family Style\")'; title id cell ucdt 3436730652 / ugdt 2563200224"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M12; name 'Chef: Family Style! (wiki: \"Family Style\")'; title id cell ucdt 3436730652 / ugdt 2563200224"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 4: level 15 to 20 (Glerga, then Bordon Cloo), row M12; name 'Chef: Family Style! (wiki: \"Family Style\")'; title id cell ucdt 3436730652 / ugdt 2563200224"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3050030 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row M11; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3050031,
         3954498,
-        3050032
+        3050032,
+        3050030
       ],
       "quests_given_text": [
         "Chef: Glerga (Lucca sends the player), Chef: Family Style!, Chef: Reach Level 20; Burnetta's leftover-meal errand (1376567889, 113617067); worm-soup and stirfry orders (1337449147, 1444357337); Slugmud Surprise (1744403283); also appears in the Birthday Bash event (Chef)."
@@ -20799,10 +21136,27 @@
               "evidence": "title_string_id corrected from raw locale hash 538405209 to Global.Text id 78925 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3956071,
+          "title": "Keep Your Friends Close...",
+          "title_string_id": 38582,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Keep Your Friends Close... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_your_friends_close_742156)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3110002
+        3110002,
+        3956071
       ],
       "quests_given_text": [
         "Ninja: Stolen Away (wiki giver); \"Grosh has informed you that the Troll Summoner has been kidnapping pixies. Defeat him\" (2620057027) and the Queen version (1933409240); the sunflower peace-offering to the robgoblins, delivered to Boss Biggins (764763969, 1524624793); \"Find Grosh's encampment and make sure he's working!\" (2268358718). Titles of the last two not found."
@@ -23928,46 +24282,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3060021,
-          "title": "Demo Derby: Wear and Tear",
-          "title_string_id": 403453,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 3: Paws 'n Claws and the Frost Ridge arena, row 18; name 'Demo Derby: Wear and Tear'; title id cell 4252142308 ucdt; 3576592894 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3060021 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 4252142308 to Global.Text id 403453 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3060022,
           "title": "Demo Derby: Getting Scrappy",
           "title_string_id": 403462,
@@ -24045,7 +24359,6 @@
         }
       ],
       "quest_ids_given": [
-        3060021,
         3060022,
         3060018
       ],
@@ -24509,10 +24822,55 @@
               "evidence": "title_string_id corrected from raw locale hash 3675828643 to Global.Text id 403471 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3060037,
+          "title": "Demo Derby: The Odd Audition",
+          "title_string_id": 403470,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 4: The film set at Wildwood (Sir Horace, Sydney Spellmerg, Jace Wildwheel), row 34; name 'Demo Derby: The Odd Audition'; title id cell 2275167615 ucdt; 2606167070 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3060037 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3060030
+        3060030,
+        3060037
       ],
       "quests_given_text": [
         "Demo Derby: Stunt Double, Demo Derby: An Incomplete Set (inferred); likely also Demo Derby: Not One, But a Few."
@@ -24887,11 +25245,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1764; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3021 (ModelId=1298, ModelFileName=fairy_m_jace_wildwheel.agr, NameId=394255)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.671337,
       "model_id": 1298,
-      "model_file_name": "fairy_m_jace_wildwheel.agr"
+      "model_file_name": "fairy_m_jace_wildwheel.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000911,
@@ -24927,8 +25292,63 @@
       "location_evidence": [
         "Wildwood Speedway (\"Speak to Johnny Thunder at the Wildwood Speedway for more information on how to become a Kart Racer\", 866459640). [video: nameplate title \"Kart Driver Trainer\", aveqYa4AVk8/00000]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080003,
+          "title": "Kart Driver: Challenge Verve McNichols",
+          "title_string_id": 394241,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 1; name 'Kart Driver: Challenge Verve McNichols'; title id cell 3078946987 ucdt; 257364816 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080003 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Johnny Thunder 9500000911 gives this quest: client 412379 'Learn how to be a kart driver by speaking to Johnny Thunder at Wildwood Speedway.' and the wiki page's 'Starting the Quest: Johnny Thunder at Wildwood Speedway' (fr_quest_kart_driver_challenge_verve_mcnichols_3b73ea). The earlier giver id 9000000538 named no NPC record. (R) The wiki also lets Mustang Alli offer it; ContentDb v1 has one giver, so the client's named trainer keeps it."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080003
+      ],
       "quests_given_text": [
         "Unlocks the job (2067788454); the licence line \"First get your Driver's License. Then help Johnny Thunder pull off an upset against the Gloam Racers at Wildwood Speedway\" (2486626195, title not found); town referrals from Shakey (4211297395) and Ricky Danger (2454371300)."
       ],
@@ -25396,11 +25816,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1753; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3010 (ModelId=360, ModelFileName=human_m_racer_johnny_thunder.agr, NameId=20061)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.302246,
       "model_id": 360,
-      "model_file_name": "human_m_racer_johnny_thunder.agr"
+      "model_file_name": "human_m_racer_johnny_thunder.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000912,
@@ -40757,14 +41184,103 @@
         "Mechanic and ranked racer (\"one of the best mechanics there is\", 2271508391)."
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Frost Ridge Speedway (654771731)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080014,
+          "title": "Kart Driver: A Treacherous Track",
+          "title_string_id": 3512,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 12; name 'Kart Driver: A Treacherous Track'; title id cell 247768989 ucdt; 3867343581 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080014 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080015,
+          "title": "Kart Driver: Stopping the Sabotage",
+          "title_string_id": 394647,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 13; name 'Kart Driver: Stopping the Sabotage'; title id cell 1065992700 ucdt; 2298886339 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080015 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080014,
+        3080015
+      ],
       "quests_given_text": [
         "Race target of Kart Driver: A Treacherous Track; supplies the potion in Kart Driver: Stopping the Sabotage (940241182)."
       ],
@@ -41072,11 +41588,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1734; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2991 (ModelId=822, ModelFileName=fairy_m_sparks_blitzwing.agr, NameId=101908)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.574204,
       "model_id": 822,
-      "model_file_name": "fairy_m_sparks_blitzwing.agr"
+      "model_file_name": "fairy_m_sparks_blitzwing.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000949,
@@ -41418,11 +41941,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2726; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4060 (ModelId=189, ModelFileName=robgoblin_m_bruiser.adr, NameId=394606)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.378827,
       "model_id": 189,
-      "model_file_name": "robgoblin_m_bruiser.adr"
+      "model_file_name": "robgoblin_m_bruiser.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000477,
@@ -46056,8 +46586,108 @@
       "location_evidence": [
         "Wildwood Speedway (\"[player] has found the ex-demo derby driver, Verve McNichols at the Wildwood Speedway\", 4113957297)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080004,
+          "title": "Kart Driver: Target Acquired",
+          "title_string_id": 3490,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 2; name 'Kart Driver: Target Acquired'; title id cell 3499492051 ucdt; 2996613623 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 2; name 'Kart Driver: Target Acquired'; title id cell 3499492051 ucdt; 2996613623 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080004 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Verve McNichols 9500000956 gives this quest: the wiki's 'Speak to Verve McNichols in Wildwood Speedway.' (fr_quest_kart_driver_target_acquired_6f9374). The earlier giver id 9000000539 named no NPC record."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080005,
+          "title": "Kart Driver: Even the Odds",
+          "title_string_id": 394347,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 3; name 'Kart Driver: Even the Odds'; title id cell 1232142723 ucdt; 1342697811 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080005 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080004,
+        3080005
+      ],
       "quests_given_text": [
         "Kart Driver: Challenge Verve McNichols, Kart Driver: Target Acquired (race targets); gives Kart Driver: Even the Odds (778817333)."
       ],
@@ -46365,11 +46995,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1755; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3012 (ModelId=839, ModelFileName=human_m_verve_mcnichols.agr, NameId=101902)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.360826,
       "model_id": 839,
-      "model_file_name": "human_m_verve_mcnichols.agr"
+      "model_file_name": "human_m_verve_mcnichols.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000957,
@@ -47336,9 +47973,78 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part H. Wilderness NPCs between the towns, row 200; source cell: [client]"
             }
           ]
+        },
+        {
+          "quest_id": 3957223,
+          "title": "Wanderwings' Riddle",
+          "title_string_id": 47396,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wanderwings' Riddle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wanderwings_riddle_73a7d6)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957224,
+          "title": "Wanderwings' Second Riddle",
+          "title_string_id": 387137,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wanderwings' Second Riddle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wanderwings_second_riddle_50c139)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957225,
+          "title": "Wanderwings' Third Riddle",
+          "title_string_id": 387147,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wanderwings' Third Riddle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wanderwings_third_riddle_89f030)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957222,
+          "title": "Wanderwings' Last Riddle",
+          "title_string_id": 387157,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wanderwings' Last Riddle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wanderwings_last_riddle_50423a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3957223,
+        3957224,
+        3957225,
+        3957222
+      ],
       "quests_given_text": [
         "A four-riddle chain with client titles Wanderwings' Riddle (211431827), Wanderwings' Second Riddle (202560240), Wanderwings' Third Riddle (1740494163), Wanderwings' Last Riddle (361777415); \"You solved all the riddles!\" (2189801682)."
       ],
@@ -47624,8 +48330,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 398,
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000960,

@@ -412,15 +412,24 @@ def _check_lobby(lobby) -> None:
 def _check_kart_gates(gates) -> list[int]:
     npcs = gates.get("npcs") if isinstance(gates, dict) else None
     cooldown = gates.get("reward_cooldown_s", 0) if isinstance(gates, dict) else None
+    # P-kart-racing: `gate_rows` binds a listed gate (its key as a string) to its speedway row.
+    gate_rows = gates.get("gate_rows", {}) if isinstance(gates, dict) else None
     if (
         not isinstance(gates, dict)
         or gates.get("schema_version") != 1
         or not set(gates)
-        <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s", "minigame_id"}
+        <= {"schema_version", "menu_string_id", "npcs", "reward_cooldown_s", "minigame_id", "gate_rows"}
         or not isinstance(npcs, list)
         or len(npcs) > 16
         or any(type(n) is not int or n <= 0 for n in npcs)
         or len(set(npcs)) != len(npcs)
+        or not isinstance(gate_rows, dict)
+        or any(
+            not (isinstance(key, str) and key.isdigit() and int(key) in npcs)
+            or type(row) is not int
+            or row <= 0
+            for key, row in gate_rows.items()
+        )
         or type(cooldown) is not int
         or not 0 <= cooldown <= 86_400
         or (gates.get("menu_string_id") is not None

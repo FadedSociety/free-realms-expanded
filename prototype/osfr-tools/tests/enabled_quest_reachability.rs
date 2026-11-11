@@ -775,7 +775,8 @@ fn shipped_minigame_producers_are_pinned() {
         // reporting the team's goals and the match time. L931: the derby also credits 40/41 (Games
         // window rows 67/68), the tutorials 289/290 and the quest rows 607, 615, 616, 624 and 627.
         // L930: a kart finish credits the MiniGameData row it ran as, no longer the speedway id 31:
-        // 28 (Wildwood Kart Racing) and the Wildwood challenge rows 628-634. L952: the Soccer Tutorial
+        // 28 (Wildwood Kart Racing) and the Wildwood challenge rows 628-634; P-kart-racing adds the
+        // other speedways 37, 38, 567, 578-580 with their rows 635-655 and 1103. L952: the Soccer Tutorial
         // row 1030 is a soccer row. L961: the Feeling the Beat! songs 201-204, and 205 (Very Hard,
         // offered at a music stand). L962: the Tower Defense
         // games 150-161, 250-261, 350-361 and the basic 450-457. Pirate's Plunder's arenas are
@@ -792,7 +793,7 @@ fn shipped_minigame_producers_are_pinned() {
         // their nodes), the Postman's Biting Back 301 (`world_challenges.json`) and the Tempest
         // Woven and Void Woven Wand forging rows 367/369 (`recipes.json`).
         vec![
-            14, 18, 20, 21, 28, 29, 36, 39, 40, 41, 42, 43, 44, 46,
+            14, 18, 20, 21, 28, 29, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46,
             57, 66, 67, 74, 77, 79, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 109, 111, 113,
             115, 117, 119, 125, 126, 134, 135, 136, 137, 138, 139, 141, 142, 144,
             146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
@@ -811,15 +812,17 @@ fn shipped_minigame_producers_are_pinned() {
             424, 425, 426, 450, 451, 452, 453, 454, 455, 456, 457, 499, 500, 501,
             502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515,
             516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529,
-            530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 551, 553, 555, 571, 572, 573,
-            574, 575, 577, 585, 586, 587, 588, 590, 591, 592, 593, 594, 596, 597, 598, 599, 600,
+            530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 551, 553, 555, 567, 571, 572, 573,
+            574, 575, 577, 578, 579, 580, 585, 586, 587, 588, 590, 591, 592, 593, 594, 596, 597, 598, 599, 600,
             601, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615,
             616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629,
-            630, 631, 632, 633, 634, 658, 659, 660, 661, 666, 667, 668, 669, 681, 682,
+            630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640, 641, 642, 643, 644,
+            645, 646, 647, 648, 649, 650, 651, 652, 653, 654, 655,
+            658, 659, 660, 661, 666, 667, 668, 669, 681, 682,
             683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694, 695, 696,
             697, 698, 699, 710, 711, 726, 1026, 1030, 1032, 1033, 1034, 1036, 1037, 1038,
             1040, 1042, 1044, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093,
-            1094, 1095, 1096, 1097, 1098,
+            1094, 1095, 1096, 1097, 1098, 1103,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
@@ -906,8 +909,12 @@ fn shipped_minigame_producers_are_pinned() {
             "{soccer}"
         );
     }
-    // L930: every kart row is a solo time trial: its elapsed time is the only fact.
-    for kart in [28, 628, 629, 630, 631, 632, 633, 634] {
+    // L930: every kart row is a solo time trial: its elapsed time is the only fact. P-kart-racing:
+    // the four other speedways' rows (37/38/567/578-580, 635-655) and 1103 race the same way.
+    for kart in [28, 37, 38, 567, 578, 579, 580, 1103]
+        .into_iter()
+        .chain(628..=655)
+    {
         assert!(catalogue.targets.reports(kart, MinigameFact::Elapsed));
         assert!(!catalogue.targets.reports(kart, MinigameFact::Score));
         assert!(!catalogue.targets.reports(kart, MinigameFact::Placement));

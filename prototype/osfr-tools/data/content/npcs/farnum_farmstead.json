@@ -2166,8 +2166,44 @@
       "location_evidence": [
         "\"On the other side of the barn. Just go past the Cooking Table to the Forge and Anvil area.\" (3747418871); the Easy Garden Defense table is \"near Hartley Harrison on the western side of the farmstead\" (2164323471); a crate stands \"beside Hartley Harrison\" or \"next to Hartley\" (2152938629, 2295230220). Not seen in video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957235,
+          "title": "Woolen Woes",
+          "title_string_id": 37922,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Woolen Woes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woolen_woes_8e037e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957041,
+          "title": "Chasing Down the Crate Thief",
+          "title_string_id": 38578,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chasing Down the Crate Thief (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chasing_down_the_crate_thief_81807d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957235,
+        3957041
+      ],
       "quests_given_text": [
         "Woolen Woes / Chasing Down the Crate Thief (chugawug steals crates of wool: \"Hartley has asked you to retrieve his stolen crates.\" 1709285740; the crate-thief chase starts at the crate beside him). Hartley's Deliveries by wording (\"Hartley has asked you to deliver some wool to Doctor Gordon in Sanctuary.\" 2479796374; \"Click on Herman to deliver Hartley's fine wool hearing protection.\" 2681791760; Herman the miner, 1766782538). The Hartley errand list also names him as a debtor: \"Collect dues from Hartley Harrison. Hartley can be found at Farnum Farmstead.\" (2957906527, 1384414456, 2450659577) in Brawler: I Want My Money! (Sampson Idlefist's three collections, 984637270); the same three debtors (Bluerose in Lakeshore, Hartley, Tori in Sanctuary) appear in 1273915006, 1468721766 and 3676305386."
       ],

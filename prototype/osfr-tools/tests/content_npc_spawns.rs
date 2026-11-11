@@ -324,7 +324,10 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // turnstile actors (1,211, live_capture); L925 twelve fanbyte-wiki quest givers (1,223, poi_anchor);
     // L932 the two Snowhill soccer gates (1,225, client_object); P-housing Farmer Chug on the
     // Wilds Farm lot (house_lot, 1,299).
-    assert_eq!(regional_legacy + regional_reconstructed, 1299);
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    // P-quest-npcs: seven quest people bound to spawns the world already drew (1,306).
+    assert_eq!(regional_legacy + regional_reconstructed, 1312);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"
@@ -350,7 +353,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // each a hostile body with the same GUID, which hides the passive copy. That leaves 3,199.
     // L096 appended the bodies of the two Wildwood turnstile actors (3,201); L932 the two Snowhill
     // soccer gates (3,203).
-    assert_eq!(extra_rows.len(), 3266);
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    // P-quest-npcs: Gribbit, placed from the video index (3,267).
+    assert_eq!(extra_rows.len(), 3271);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",
@@ -427,4 +432,49 @@ fn retired_legacy_spawns_stay_out_of_the_world() {
             );
         }
     }
+}
+
+/// P-quest-npcs: a click is in range of the record's position (`npc_interaction::check_range`),
+/// while the client draws the bound extras body. A record left at an old guess while its body
+/// stands elsewhere can be seen and never talked to, so every bound body stands within half the
+/// interaction radius of its record.
+#[test]
+fn a_bound_body_stands_where_its_record_does() {
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let mut records: HashMap<u64, [f64; 3]> = HashMap::new();
+    for entry in fs::read_dir(content.join("npcs")).unwrap() {
+        let path = entry.unwrap().path();
+        if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
+            continue;
+        }
+        for row in read_json(&path)["records"].as_array().unwrap() {
+            if let Some(position) = row["position"].as_array().filter(|p| p.len() == 3) {
+                let at = [0, 1, 2].map(|i| position[i].as_f64().unwrap());
+                records.insert(row["npc_id"].as_u64().unwrap(), at);
+            }
+        }
+    }
+    let reach = osfr_tools::npc_interaction::INTERACTION_RADIUS / 2.0;
+    let extra = read_json(&content.join("npc_spawns_extra.json"));
+    let mut bound = 0;
+    for body in extra["records"].as_array().unwrap() {
+        let (Some(key), true) = (body["content_key"].as_u64(), body["capture_match"].is_null())
+        else {
+            continue;
+        };
+        let Some(record) = records.get(&key) else {
+            continue;
+        };
+        bound += 1;
+        let off = (0..3)
+            .map(|i| (body["position"][i].as_f64().unwrap() - record[i]).powi(2))
+            .sum::<f64>()
+            .sqrt();
+        assert!(
+            off <= reach,
+            "record {key}: its body {} stands {off:.1} m away",
+            body["spawn_guid"]
+        );
+    }
+    assert!(bound > 200, "only {bound} bound bodies were checked");
 }

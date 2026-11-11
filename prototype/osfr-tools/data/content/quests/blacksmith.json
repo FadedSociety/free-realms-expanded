@@ -342,11 +342,70 @@
       "prerequisite_quest_ids": [
         3020003
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 90206,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Spunky Scrapper Hammers - 0/2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_training_197458)."
+            }
+          ],
+          "recipe_id": 11,
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90212,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give Smitty the Spunky Scrapper Hammers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_training_197458)."
+            }
+          ],
+          "npc_id": 9000000206
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 41667,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Smitty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_training_197458)."
+            }
+          ],
+          "npc_id": 9000000206
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10850,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Blacksmith Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_training_197458)."
+                }
+              ]
+            },
+            {
+              "definition_id": 21490,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Blacksmith Goggles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_hammer_training_197458)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 498
           },
@@ -394,12 +453,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 90406,
       "intro_text_string_id": 90404,
       "end_text_string_id": 90407,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020005,

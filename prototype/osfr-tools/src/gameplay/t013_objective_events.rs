@@ -524,12 +524,14 @@ fn kart_gateway(scratch: &Scratch) -> crate::kart_gateway::KartGateway {
             max_race_ms: 600_000,
             max_claims: 64,
             max_observations: 4_096,
+            claim_window_ms: 3_000,
         },
         gate_band: None,
         gate_curtains: Vec::new(),
         pickups: Vec::new(),
         pickup_respawn: None,
         weapon_effects: false,
+        gate_rule: None,
     };
     let content = KartGatewayContent {
         schema_version: 1,
@@ -1216,7 +1218,7 @@ fn kart_completion_reaches_quests_only_after_a_paid_claim() {
         // finish that leaked a second quest event would saturate it and be visible below.
         2,
     );
-    game.kart_entry = Some(kart);
+    game.kart_entry = Some(Box::new(kart));
 
     send(&mut game, &character, &kart_register(), 100_000);
     let active = game
@@ -1335,7 +1337,7 @@ fn kart_rows_game(scratch: &Scratch, objective: ObjectiveKind) -> Gameplay {
     let kart = kart_gateway(scratch);
     let mut game = game();
     install(&mut game, objective, 2);
-    game.kart_entry = Some(kart);
+    game.kart_entry = Some(Box::new(kart));
     game
 }
 

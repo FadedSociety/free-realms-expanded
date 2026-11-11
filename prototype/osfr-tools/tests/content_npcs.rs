@@ -527,7 +527,10 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // T739 appended four clickable quest props (1,209); L096 the two Wildwood turnstile actors.
     // L925: twelve wiki quest givers. L932: the two Snowhill soccer gates. P-housing: Farmer Chug on
     // the Wilds Farm lot (house_lot, 1,299).
-    assert_eq!(content_npcs.len(), 1299);
+    // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    // P-quest-npcs: seven quest people bound to spawns the world already drew (1,306).
+    assert_eq!(content_npcs.len(), 1312);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),
@@ -538,12 +541,13 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 1006); // 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
-    assert_eq!(resolved_reference_ids.len(), 295);
-    assert_eq!(unresolved_ids.len(), 170);
+    // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
+    assert_eq!(db.quests.len(), 1056); // P-quest-npcs: 31 more wiki quests (quest_wire.py); 45 more from the quest research tables; 40 wiki pick-up, talk and craft quests (quest_wire.py); T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones; T502: five Wugachug/Briarwood ones; T503: A Booming Problem; T539: three collect quests; T542: eight Become-a records
+    assert_eq!(resolved_reference_ids.len(), 298);
+    assert_eq!(unresolved_ids.len(), 167);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        1006
+        1056
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

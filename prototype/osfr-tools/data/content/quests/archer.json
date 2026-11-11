@@ -259,7 +259,7 @@
               "evidence": "the world's Practice Dummy 387 stands at Lugabow's camp but renders as fragments, so 226 is the one actually seen"
             }
           ],
-          "node_type": "quest-dummy",
+          "node_type": "quest-dummy-step-1",
           "quantity": 1
         },
         {

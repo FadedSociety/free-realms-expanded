@@ -87,8 +87,33 @@
       "title_string_id": 442276,
       "giver_npc_id": 9000000548,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 442261,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 442261 'Speak to Manager Landon in Snowhill', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000140
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Being a Better Soccer Star pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -121,9 +146,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3140003,

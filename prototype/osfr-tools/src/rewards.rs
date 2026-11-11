@@ -87,6 +87,9 @@ pub struct RewardState {
     pub boost: Boost,
     /// L926: the jobs' XP curves, so a payout's 38/14 and 38/18 show the job's real rank.
     pub curves: std::sync::Arc<std::collections::BTreeMap<i32, crate::profiles::RankCurve>>,
+    /// Character gender (1 boy, 2 girl): a boys' or girls' reward item is granted only to
+    /// that wearer. 0 (unknown, and every path that does not set it) is not checked.
+    pub gender: i32,
 }
 
 impl RewardState {
@@ -100,7 +103,13 @@ impl RewardState {
             wallet_ceiling: 0,
             boost: Boost::default(),
             curves: Default::default(),
+            gender: 0,
         }
+    }
+
+    pub fn with_gender(mut self, gender: i32) -> Self {
+        self.gender = gender;
+        self
     }
 
     /// Stage the character's Station Cash wallet and its data ceiling with this transaction.
@@ -271,6 +280,13 @@ pub fn apply_grant(
         }
         if !next.inventory.has_definition(item.definition_id) {
             return Err(GrantFailure::UnknownItem);
+        }
+        // The wiki's reward pairs list a boys' and a girls' piece; each wearer gets their own.
+        if !next
+            .inventory
+            .reward_fits_gender(item.definition_id, next.gender)
+        {
+            continue;
         }
         // Bag room is the `bag_capacity` check below. Past the row checks above, `grant` refuses
         // an over-stack row, its item-id counter or encoding (`BadItem`), or a new stack at its

@@ -9524,9 +9524,27 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 48; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3957251,
+          "title": "What's for Dinner",
+          "title_string_id": 429448,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "What's for Dinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_s_for_dinner_dc9be0)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3957251
+      ],
       "quests_given_text": [
         "What's for Dinner? (wiki, repeatable; client title 1573378092): \"Wes invites you to fish with him to catch enough for dinner.\" (37910159); \"Catch enough fish for the campers at Camp Robbie.\" (2934642322); video tracker with Tickled Trout 2/5 and Flutterfish (L27vxozHOls/00326). \"Return to Counselor Wes back at camp\" (3158569384). See Fisherman for the fish."
       ],

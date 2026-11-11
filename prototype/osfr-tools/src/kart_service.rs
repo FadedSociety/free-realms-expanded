@@ -126,7 +126,7 @@ use crate::kart_racing::{
 use crate::kart_weapons::{WeaponKind, WeaponObservation, WeaponPose, WeaponState};
 use crate::le;
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{collections::BTreeSet, fmt};
 
 pub use crate::kart_progress_native::PROGRESS_SUBTYPE;
 
@@ -320,11 +320,22 @@ pub struct RaceBounds {
     /// Older content that predates this field loads with the default: 600 s at 200 Hz.
     #[serde(default = "default_max_observations")]
     pub max_observations: u32,
+    /// (R) The longest run between two gates a claim may pay for at `max_speed_mps`
+    /// ([`CLAIM_CREDIT_WINDOW_MS`] for the captured Wildwood route, whose gates are 50 m apart).
+    /// A track whose grid or leaves lie further apart (Thunder Falls enters its loop 240 m from
+    /// the grid) sets a longer window instead of a looser speed; a first claim has no banked credit.
+    #[serde(default = "default_claim_window_ms")]
+    pub claim_window_ms: u64,
 }
 
 /// Default observation budget for content written before the field existed: 600 s at 200 Hz.
 pub fn default_max_observations() -> u32 {
     120_000
+}
+
+/// Default claim window for content written before the field existed.
+pub fn default_claim_window_ms() -> u64 {
+    CLAIM_CREDIT_WINDOW_MS
 }
 
 /// Lead/private content for one speedway race. The unmapped `33/14` fields come from
@@ -360,6 +371,21 @@ pub struct KartServiceContent {
     /// Opt-in reconstructed weapon simulation using recovered native packet layouts.
     #[serde(default)]
     pub weapon_effects: bool,
+    /// (R) How a lap is counted; absent keeps the ordered gate sequence. See [`GateRule`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub gate_rule: Option<GateRule>,
+}
+
+/// (R) The lap rule of a track whose gate order no driven lap has shown yet (`kart_tracks/*.json`,
+/// built from the client's own gate curtains by `lab/tools/kart_track_build.py`). Every leaf is a
+/// gate and may be crossed in any order; a lap closes when `finish_gate` (1-based) is crossed after at
+/// least `min_gates` distinct gates since the last close, so a wrong guess at the order or the
+/// direction can never make a race unfinishable, while a racer still has to drive the track. The
+/// ordered rule (`None`) stays for the captured Wildwood route.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, tag = "kind", rename_all = "snake_case")]
+pub enum GateRule {
+    Coverage { finish_gate: u32, min_gates: u32 },
 }
 
 /// The identity of one race. `session` binds the service to the entry the lead started; the wire
@@ -572,6 +598,8 @@ pub enum ServiceError {
         gate: usize,
         leaf: usize,
     },
+    /// A coverage rule names a finish gate or a gate count outside `1..=gates`.
+    GateRule,
     NonFiniteStart,
     ScheduleCount {
         steps: usize,
@@ -681,6 +709,10 @@ impl fmt::Display for ServiceError {
                 f,
                 "gate {gate} curtain leaf {leaf} is non-finite, degenerate, not vertical or \
                  unbounded"
+            ),
+            ServiceError::GateRule => write!(
+                f,
+                "the coverage gate rule needs finish_gate and min_gates in 1..=gates"
             ),
             ServiceError::NonFiniteStart => write!(f, "start position is not finite"),
             ServiceError::ScheduleCount { steps, max } => {
@@ -856,6 +888,9 @@ pub struct ServiceSnapshot {
     #[serde(default)]
     pub weapon_pose: Option<WeaponObservation>,
     pub reward_taken: bool,
+    /// Gates crossed since the last lap close under a coverage rule. Older saves load as empty.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub covered: Vec<u32>,
 }
 
 impl ServiceSnapshot {
@@ -896,6 +931,7 @@ impl ServiceSnapshot {
             weapons,
             weapon_pose: _session_pose,
             reward_taken,
+            covered,
         } = self;
         phase == &other.phase
             && context == &other.context
@@ -924,6 +960,7 @@ impl ServiceSnapshot {
             && weapon_effects == &other.weapon_effects
             && weapons.save_decision_eq(&other.weapons)
             && reward_taken == &other.reward_taken
+            && covered == &other.covered
     }
 }
 
@@ -965,6 +1002,8 @@ pub struct KartService {
     reward_taken: bool,
     /// When state 11 goes out. Not saved: a reconnect keeps the race, not this hold.
     close_at_ms: Option<u64>,
+    /// Gates crossed since the last lap close ([`GateRule::Coverage`]); unused by the ordered rule.
+    covered: BTreeSet<u32>,
 }
 
 fn finite(values: [f32; 3]) -> bool {
@@ -1298,6 +1337,13 @@ fn validate_content(
             field: "max_step_ms",
         });
     }
+    if content.bounds.claim_window_ms == 0
+        || content.bounds.claim_window_ms > content.bounds.max_step_ms
+    {
+        return Err(ServiceError::Bounds {
+            field: "claim_window_ms",
+        });
+    }
     if content.bounds.max_race_ms == 0 {
         return Err(ServiceError::Bounds {
             field: "max_race_ms",
@@ -1347,7 +1393,21 @@ fn validate_content(
         }
         None => None,
     };
-    let checkpoints: Vec<u32> = (1..=content.gates.len() as u32).collect();
+    // A coverage rule's session has one checkpoint, the finish gate: the other gates are counted by
+    // the service, and every crossing of the finish gate it lets through closes a lap.
+    let gates = content.gates.len() as u32;
+    let checkpoints: Vec<u32> = match content.gate_rule {
+        Some(GateRule::Coverage {
+            finish_gate,
+            min_gates,
+        }) => {
+            if !(1..=gates).contains(&finish_gate) || !(1..=gates).contains(&min_gates) {
+                return Err(ServiceError::GateRule);
+            }
+            vec![finish_gate]
+        }
+        None => (1..=gates).collect(),
+    };
     let curtains = curtain_volume(content)?;
     let layout = TrackLayout::new(content.speedway, content.laps, checkpoints, content.reward)
         .map_err(ServiceError::Track)?;
@@ -1437,6 +1497,7 @@ impl KartService {
             weapon_pose: None,
             reward_taken: false,
             close_at_ms: None,
+            covered: BTreeSet::new(),
         })
     }
 
@@ -1539,6 +1600,7 @@ impl KartService {
         self.countdown_sent = None;
         self.reward_taken = false;
         self.close_at_ms = None;
+        self.covered.clear();
         Ok(ServiceOutcome::Handled {
             replies: Vec::new(),
             reward_ready: false,
@@ -2090,6 +2152,7 @@ impl KartService {
             weapons: self.weapons.clone(),
             weapon_pose: self.weapon_pose,
             reward_taken: self.reward_taken,
+            covered: self.covered.iter().copied().collect(),
         })
     }
 
@@ -2341,6 +2404,16 @@ impl KartService {
         if !coherent {
             return Err(ServiceError::CorruptSnapshot { field: "phase" });
         }
+        let gates = content.gates.len() as u32;
+        if snapshot.covered.len() > content.gates.len()
+            || (content.gate_rule.is_none() && !snapshot.covered.is_empty())
+            || snapshot
+                .covered
+                .iter()
+                .any(|gate| !(1..=gates).contains(gate))
+        {
+            return Err(ServiceError::CorruptSnapshot { field: "covered" });
+        }
         Ok(Self {
             content,
             layout,
@@ -2369,6 +2442,7 @@ impl KartService {
             weapon_pose: snapshot.weapon_pose,
             reward_taken: snapshot.reward_taken,
             close_at_ms: None,
+            covered: snapshot.covered.iter().copied().collect(),
         })
     }
 
@@ -2418,7 +2492,7 @@ impl KartService {
             let dz = position[2] - self.last_position[2];
             (dx * dx + dy * dy + dz * dz).sqrt()
         };
-        let elapsed_ms = delta_ms.min(CLAIM_CREDIT_WINDOW_MS);
+        let elapsed_ms = delta_ms.min(self.content.bounds.claim_window_ms);
         let mut allowance =
             self.content.bounds.max_speed_mps * (elapsed_ms as f32 / 1_000.0) + self.claim_credit_m;
         if delta_ms < MIN_CLAIM_DELTA_MS {
@@ -2530,6 +2604,13 @@ impl KartService {
             Ok(charge) => charge,
             Err(refusal) => return Ok(ServiceOutcome::Refused(refusal)),
         };
+        if let Some(GateRule::Coverage {
+            finish_gate,
+            min_gates,
+        }) = self.content.gate_rule
+        {
+            return self.claim_covered_gate(position, now_ms, charge, finish_gate, min_gates);
+        }
         let expected = self
             .session
             .as_ref()
@@ -2560,6 +2641,66 @@ impl KartService {
                 return Ok(ServiceOutcome::Refused(ServiceRefusal::OutsideGates));
             }
         }
+        self.settle_checkpoint(position, now_ms, charge, expected)
+    }
+
+    /// (R) [`GateRule::Coverage`]: the claim is attributed to the first gate volume holding it. Any
+    /// gate but the finish counts once per lap and answers with the racer's progress; the finish
+    /// gate closes the lap through the session once `min_gates` were covered, else it is a stale
+    /// claim like a re-crossed leaf, so the racer's clock, laps and finish follow the ordered rule's.
+    fn claim_covered_gate(
+        &mut self,
+        position: [f32; 3],
+        now_ms: u64,
+        charge: MovementCharge,
+        finish_gate: u32,
+        min_gates: u32,
+    ) -> Result<ServiceOutcome, ServiceError> {
+        let got = (0..self.content.gates.len())
+            .find(|index| self.contains(*index, &self.content.gates[*index], position))
+            .map(|index| index as u32 + 1);
+        let Some(got) = got else {
+            return Ok(ServiceOutcome::Refused(ServiceRefusal::OutsideGates));
+        };
+        if got != finish_gate {
+            if !self.covered.insert(got) {
+                return Ok(ServiceOutcome::Refused(ServiceRefusal::StaleGate {
+                    expected: finish_gate,
+                    got,
+                }));
+            }
+            let (Some(context), Some(session)) = (self.context, self.session.as_ref()) else {
+                return Ok(ServiceOutcome::Refused(ServiceRefusal::NoOpenRace));
+            };
+            let (laps_completed, best_lap_ms) = (session.laps_completed(), session.best_lap_ms());
+            self.accept_movement(position, now_ms, &charge);
+            let reply =
+                self.progress_frame(context.player_guid, laps_completed, best_lap_ms, now_ms);
+            return Ok(ServiceOutcome::Handled {
+                replies: vec![reply],
+                reward_ready: false,
+                abort: false,
+            });
+        }
+        if (self.covered.len() as u32) < min_gates {
+            return Ok(ServiceOutcome::Refused(ServiceRefusal::StaleGate {
+                expected: finish_gate,
+                got,
+            }));
+        }
+        self.covered.clear();
+        self.settle_checkpoint(position, now_ms, charge, finish_gate)
+    }
+
+    /// Feeds the attributed gate to the session and builds the replies of an accepted claim: the
+    /// progress frame, and on the last lap the weapon clear, state 10 and the results hold.
+    fn settle_checkpoint(
+        &mut self,
+        position: [f32; 3],
+        now_ms: u64,
+        charge: MovementCharge,
+        expected: u32,
+    ) -> Result<ServiceOutcome, ServiceError> {
         let got = expected;
         let (Some(context), Some(session)) = (self.context, self.session.as_mut()) else {
             return Ok(ServiceOutcome::Refused(ServiceRefusal::NoOpenRace));

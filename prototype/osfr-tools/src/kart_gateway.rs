@@ -12,16 +12,28 @@ use crate::{
     kart_entry::{EntryGate, EntryOutcome, KartEntryHandler, RaceEntryContent, RaceEntryContext},
     kart_rows::KartRows,
     kart_service::KartServiceContent,
+    kart_tracks::{self, TrackPackage},
+    le,
     vehicle_parts::{self, GarageContent, Loadouts, Looks, Vehicles},
-    le, zone_transition,
+    zone_transition,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
+    collections::{BTreeMap, BTreeSet},
     io::{self, Read},
     path::Path,
     sync::Arc,
 };
+
+/// The per-track packages, keyed by scene (`kart_tracks/<scene>.json`).
+type Tracks = BTreeMap<String, Arc<TrackPackage>>;
+
+/// Bytes of a start pose in the captured bodies: a 3 x 3 row-major basis then the translation.
+const POSE_BYTES: usize = 48;
+/// Where the captured 41/114 details carry the MiniGameData row id, counted from the end (R: the
+/// word before the Games window row 62 and its `62/14` pair; `initialize` clears a later word).
+const DETAILS_ROW_FROM_END: usize = 43;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -61,6 +73,11 @@ pub struct KartGates {
     /// the `sg_kt_track` scene); the Games window row with that ContentId starts the race too.
     #[serde(default)]
     pub minigame_id: Option<u32>,
+    /// P-kart-racing: the speedway row each gate starts (NPC content key -> MiniGameData row); a
+    /// gate absent here starts `minigame_id`. A gate whose row has no track package refuses with
+    /// "Racing isn't open yet" instead of starting another speedway's race (sheet B5).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub gate_rows: BTreeMap<u64, u32>,
 }
 
 /// (R) Sanity bound on the gate cooldown: one day.
@@ -181,6 +198,12 @@ pub struct KartGateway {
     gates: Option<Arc<KartGates>>,
     /// L930: the rows the race serves; `None` means the one default row.
     rows: Option<Arc<crate::kart_rows::KartRows>>,
+    /// P-kart-racing: the race packages of the other track scenes.
+    tracks: Arc<Tracks>,
+    /// Where the captured 41/114 details carry the MiniGameInfo texts [name, icon, description,
+    /// difficulty], so a quest row's offer shows its own title (R: found by the Wildwood row's
+    /// texts; `None` leaves the frames as captured).
+    texts_offset: Option<usize>,
     /// The row the next [`Self::begin`] runs, set by [`Self::choose_row`]; never saved.
     next_row: Option<u32>,
     /// `None` when the content has no vehicle table: logins keep the template's list.
@@ -189,6 +212,28 @@ pub struct KartGateway {
     looks: Option<Arc<Looks>>,
     /// The garage's own values; `None` without `kart_garage.json` (no doors, no first cars).
     garage_content: Option<Arc<GarageContent>>,
+}
+
+/// The grid pose (3 x 3 basis then translation) opens the captured 33/5 body (`client_data`,
+/// `kart-motion-layout` report) and follows the owner guid in the kart's 33/11 block, so it moves
+/// with the definition when another look is applied.
+const CLIENT_DATA_POSE: usize = 0;
+const VEHICLE_POSE_AFTER_GUID: usize = 8;
+
+/// True when `bytes` carry a pose at `offset` whose translation is `start`.
+fn pose_at(bytes: &[u8], offset: usize, start: [f32; 3]) -> bool {
+    bytes.len() >= offset + POSE_BYTES
+        && (0..3).all(|axis| le::f32(bytes, offset + 36 + axis * 4) == Some(start[axis]))
+}
+
+/// Writes a grid pose (basis rows then translation) at `offset`.
+fn write_pose(bytes: &mut [u8], offset: usize, basis: [f32; 9], translation: [f32; 3]) {
+    for (index, value) in basis.iter().chain(translation.iter()).enumerate() {
+        let at = offset + index * 4;
+        if let Some(slot) = bytes.get_mut(at..at + 4) {
+            slot.copy_from_slice(&value.to_le_bytes());
+        }
+    }
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -204,17 +249,31 @@ pub(crate) fn player_status(guid: u64, flags: u32) -> Vec<u8> {
     bytes
 }
 
-/// The race package row `row` runs: the table's rules for a table row, the package itself for a
-/// save that predates rows or a package with no table.
+/// The race package row `row` runs: the table's rules over the package of the row's track (the
+/// Wildwood `base` or a `kart_tracks` package), the base itself for a save that predates rows or a
+/// package with no table.
 fn race_for(
     rows: Option<&KartRows>,
+    tracks: &Tracks,
     base: &KartServiceContent,
     row: Option<u32>,
 ) -> io::Result<KartServiceContent> {
     match (rows, row) {
-        (Some(rows), Some(id)) => rows.race(id, base),
+        (Some(rows), Some(id)) => {
+            let track = rows.track(id).and_then(|scene| tracks.get(scene));
+            rows.race(id, track.map_or(base, |track| &track.race))
+        }
         _ => Ok(base.clone()),
     }
+}
+
+/// The track package row `row` races on, when it is not the Wildwood package.
+fn track_for<'a>(
+    rows: Option<&KartRows>,
+    tracks: &'a Tracks,
+    row: Option<u32>,
+) -> Option<&'a Arc<TrackPackage>> {
+    tracks.get(rows?.track(row?)?)
 }
 
 fn now_unix() -> u64 {
@@ -242,12 +301,16 @@ fn load_gates(directory: &Path) -> io::Result<Option<KartGates>> {
         return Err(invalid("kart gates exceed 16 KiB"));
     }
     let gates: KartGates = serde_json::from_slice(&bytes).map_err(invalid)?;
-    let mut seen = std::collections::BTreeSet::new();
+    let mut seen = BTreeSet::new();
     if gates.schema_version != 1
         || gates.menu_string_id == 0
         || gates.npcs.len() > MAX_GATES
         || gates.reward_cooldown_s > MAX_REWARD_COOLDOWN_S
         || !gates.npcs.iter().all(|npc| *npc != 0 && seen.insert(*npc))
+        || !gates
+            .gate_rows
+            .iter()
+            .all(|(npc, row)| seen.contains(npc) && *row != 0)
     {
         return Err(invalid("invalid kart gates"));
     }
@@ -417,8 +480,41 @@ impl KartGateway {
         {
             return Err(invalid("kart entry snapshot content differs"));
         }
+        let gates = load_gates(directory)?.map(Arc::new);
+        // Every track pays the one registered price (the base package's, with the Kart Driver's
+        // `activity_xp` already applied above) and reports the base speedway to the registry.
+        let mut tracks = kart_tracks::load(directory)?;
+        if let Some(base) = &content.race {
+            for track in tracks.values_mut() {
+                track.race.reward = base.reward;
+                track.race.speedway = base.speedway;
+            }
+        }
+        let tracks: Arc<Tracks> = Arc::new(
+            tracks
+                .into_iter()
+                .map(|(scene, track)| (scene, Arc::new(track)))
+                .collect(),
+        );
+        let scenes: BTreeSet<String> = std::iter::once(content.context.scene.scene.clone())
+            .chain(tracks.keys().cloned())
+            .collect();
+        let rows = KartRows::load(directory, scenes)?.map(Arc::new);
+        // A saved race on a track whose package is gone (content moved on) keeps its entry so
+        // the login abandon returns the player (`Gameplay::abandon_kart_for_reconnect`), but its
+        // race is dropped: nothing can judge or pay it.
+        let orphaned = state.active.as_ref().is_some_and(|active| {
+            active.context.scene.scene != content.context.scene.scene
+                && track_for(rows.as_deref(), &tracks, active.row).is_none()
+        });
         if let Some(active) = &state.active {
             let mut expected = content.context.clone();
+            if let Some(track) = track_for(rows.as_deref(), &tracks, active.row) {
+                expected.scene = track.scene.clone();
+            } else if orphaned {
+                zone_transition::encode(&active.context.scene)?;
+                expected.scene = active.context.scene.clone();
+            }
             expected.session = active.return_location.guid;
             expected.instance_id = active.context.instance_id;
             expected.scene.id = active.context.instance_id as i32;
@@ -436,18 +532,50 @@ impl KartGateway {
                 return Err(invalid("invalid active kart entry snapshot"));
             }
         }
-        let gates = load_gates(directory)?.map(Arc::new);
-        let rows = KartRows::load(directory, &content.context.scene.scene)?.map(Arc::new);
         if let (Some(rows), Some(base)) = (&rows, &content.race) {
             // Every row that can run must build a valid race, and the gates' row must be one.
             for id in rows.playable_ids() {
-                crate::kart_service::KartService::new(rows.race(id, base)?).map_err(invalid)?;
+                let race = race_for(Some(rows), &tracks, base, Some(id))?;
+                crate::kart_service::KartService::new(race).map_err(invalid)?;
             }
             if let Some(id) = gates.as_ref().and_then(|g| g.minigame_id)
                 && !rows.is_playable(id)
             {
                 return Err(invalid("the kart gates' row cannot run"));
             }
+        }
+        // Races on another track move the kart to that track's grid, so the captured bodies must
+        // carry the Wildwood grid where `rebuild_entry` writes: the 33/5 body's head and the 33/11
+        // block right after the owner guid. The MiniGameInfo texts of the captured details are
+        // found by the default row's texts; without them the frames stay as captured.
+        if !tracks.is_empty()
+            && !content.race.as_ref().is_some_and(|race| {
+                pose_at(&content.entry.client_data, CLIENT_DATA_POSE, race.start_position)
+                    && pose_at(
+                        &content.entry.entry_vehicles[0].attribute_block,
+                        content.vehicle_guid_offset + VEHICLE_POSE_AFTER_GUID,
+                        race.start_position,
+                    )
+            })
+        {
+            return Err(invalid("kart track packages need the package's grid pose"));
+        }
+        let texts_offset = gates
+            .as_ref()
+            .and_then(|g| g.minigame_id)
+            .and_then(|id| rows.as_ref()?.texts(id))
+            .and_then(|texts| {
+                let frame = &content.details_loading;
+                (0..frame.len().saturating_sub(16)).find(|&at| {
+                    le::u32(frame, at) == Some(texts.name_id)
+                        && le::u32(frame, at + 4) == Some(texts.icon_id)
+                        && le::u32(frame, at + 8) == Some(texts.description_id)
+                        && le::u32(frame, at + 12) == Some(texts.difficulty)
+                })
+            });
+        let mut state = state;
+        if orphaned {
+            state.race = None;
         }
         let mut race = match (&content.race, &state.race) {
             (Some(config), Some(saved)) => {
@@ -468,7 +596,7 @@ impl KartGateway {
                 let row = state.active.as_ref().and_then(|a| a.row);
                 Some(
                     crate::kart_service::KartService::restore(
-                        race_for(rows.as_deref(), config, row)?,
+                        race_for(rows.as_deref(), &tracks, config, row)?,
                         saved.clone(),
                     )
                     .map_err(invalid)?,
@@ -511,6 +639,8 @@ impl KartGateway {
             rewards,
             gates,
             rows,
+            tracks,
+            texts_offset,
             next_row: None,
             vehicles: Vehicles::load(directory)?,
             looks: Looks::load(directory)?,
@@ -555,15 +685,36 @@ impl KartGateway {
     /// default row. Call it just before `begin`, on the same staged copy.
     pub fn choose_row(&mut self, wanted: &[u32], entered: Option<u32>) {
         let runs = |id: &u32| self.rows.as_ref().is_some_and(|rows| rows.is_playable(*id));
+        // P-kart-racing: a gate or Games row names a speedway; a quest row may stand in for it
+        // only on that speedway's track, so Mustang Alli never zones a Wildwood Sprint to Wildwood.
+        let track = |id: u32| self.rows.as_ref().and_then(|rows| rows.track(id));
+        let entered_track = entered.and_then(track);
         self.next_row = wanted
             .iter()
             .copied()
+            .filter(|id| entered_track.is_none_or(|scene| track(*id) == Some(scene)))
             .find(runs)
             .or_else(|| entered.filter(runs));
     }
     /// The row a race with no choice runs as: the gates' `minigame_id`.
     fn default_row(&self) -> Option<u32> {
         self.gates.as_ref()?.minigame_id
+    }
+    /// P-kart-racing: the speedway row gate `npc_id` starts when no quest row is wanted
+    /// (`kart_gates.json` `gate_rows`); `None` falls to the default row.
+    pub fn gate_row(&self, npc_id: u64) -> Option<u32> {
+        self.gates.as_ref()?.gate_rows.get(&npc_id).copied()
+    }
+    /// The track package the active race (or the row about to start) races on, when it is not
+    /// the Wildwood package.
+    fn track(&self, row: Option<u32>) -> Option<&Arc<TrackPackage>> {
+        track_for(self.rows.as_deref(), &self.tracks, row)
+    }
+    /// Every track scene a race can zone into, the package's first.
+    pub fn scenes(&self) -> Vec<&str> {
+        std::iter::once(self.content.context.scene.scene.as_str())
+            .chain(self.tracks.keys().map(String::as_str))
+            .collect()
     }
     /// The row the active race runs as; saves that predate rows run the default one.
     pub fn row(&self) -> Option<u32> {
@@ -592,6 +743,13 @@ impl KartGateway {
             .is_some_and(|g| g.npcs.contains(&npc_id))
         {
             return Err(EntryDenied::NotAGate);
+        }
+        // A gate bound to a speedway whose row the table lists but cannot run refuses rather than
+        // starting the Wildwood race in its place; a package with no row table has one race only.
+        if let (Some(row), Some(rows)) = (self.gate_row(npc_id), self.rows.as_ref())
+            && !rows.is_playable(row)
+        {
+            return Err(EntryDenied::NoRace);
         }
         self.admit_play_at(busy, now_unix)
     }
@@ -710,6 +868,24 @@ impl KartGateway {
                 progress.tail_0x29 = owned;
             }
         }
+        // P-kart-racing: a race on another track puts the kart on that track's grid, in the 33/5
+        // body and the 33/11 block alike (the captured bodies carry the Wildwood grid). The 33/11
+        // pose follows the owner guid, so it moves with `start` when a look replaces the definition.
+        if let Some(track) = self.track(self.row()).cloned() {
+            let basis = track.start_basis();
+            write_pose(
+                &mut content.client_data,
+                CLIENT_DATA_POSE,
+                basis,
+                track.race.start_position,
+            );
+            write_pose(
+                &mut content.entry_vehicles[0].attribute_block,
+                start + VEHICLE_POSE_AFTER_GUID,
+                basis,
+                track.race.start_position,
+            );
+        }
         let mut entry = KartEntryHandler::new(content).map_err(invalid)?;
         entry.set_gate(EntryGate::Enabled);
         entry.open(active.context.clone()).map_err(invalid)?;
@@ -729,6 +905,32 @@ impl KartGateway {
         };
         bytes[8..12].copy_from_slice(&active.context.instance_id.to_le_bytes());
         bytes[32..40].copy_from_slice(&active.context.session.to_le_bytes());
+        // P-kart-racing: the offer names the scene the race zones into and the row it runs as.
+        for axis in 0..3 {
+            bytes[51 + axis * 4..55 + axis * 4]
+                .copy_from_slice(&active.context.scene.position[axis].to_le_bytes());
+        }
+        if let (Some(row), Some(at)) = (self.row(), self.texts_offset)
+            && let Some(texts) = self.rows.as_ref().and_then(|rows| rows.texts(row))
+        {
+            for (index, value) in [
+                texts.name_id,
+                texts.icon_id,
+                texts.description_id,
+                texts.difficulty,
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                if let Some(slot) = bytes.get_mut(at + index * 4..at + index * 4 + 4) {
+                    slot.copy_from_slice(&value.to_le_bytes());
+                }
+            }
+            let id_at = bytes.len().saturating_sub(DETAILS_ROW_FROM_END);
+            if le::u32(&bytes, id_at) == self.default_row() {
+                bytes[id_at..id_at + 4].copy_from_slice(&row.to_le_bytes());
+            }
+        }
         Ok(bytes)
     }
     pub fn begin(
@@ -747,6 +949,9 @@ impl KartGateway {
         let row = self.next_row.take().or_else(|| self.default_row());
         let mut staged = self.clone();
         let mut context = self.content.context.clone();
+        if let Some(track) = self.track(row) {
+            context.scene = track.scene.clone();
+        }
         context.session = character.guid;
         context.instance_id = staged.state.next_instance;
         context.scene.id = context.instance_id as i32;
@@ -760,7 +965,7 @@ impl KartGateway {
         staged.state.next_instance = next;
         staged.rebuild_entry()?;
         if let Some(base) = &staged.content.race {
-            let config = race_for(staged.rows.as_deref(), base, row)?;
+            let config = race_for(staged.rows.as_deref(), &staged.tracks, base, row)?;
             let mut race = crate::kart_service::KartService::new(config).map_err(invalid)?;
             race.set_gate(EntryGate::Enabled);
             staged.race = Some(race);

@@ -1176,9 +1176,9 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
     assert_reward_shape(testing, 3, 10); // wiki coins; L926: wiki stars
 
     // T542 enables the Jobs-window record 3070001 (Reed, one Talk, five coins); the
-    // narrative alternative 3070002 stays unpublished.
+    // job guide 3070002 followed in the round-4 batch, offered by the Message Board beside Reed.
     assert_eq!(find_record(BECOME_A_FISHERMAN)["enabled"], json!(true));
-    assert_eq!(find_record(3_070_002)["enabled"], json!(false));
+    assert_eq!(find_record(3_070_002)["enabled"], json!(true));
 
     // Reed's fishing spot is the real game id 599, not the framework type 21.
     let spots = read_json(&content_dir().join("fishing_spots.json"));

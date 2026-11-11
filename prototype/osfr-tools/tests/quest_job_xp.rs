@@ -1236,13 +1236,15 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         ),
         // T279: the second story beat. It is an independent playtest entry (no
         // prerequisite and no job gate); its 225 XP (L926) pays the explicit Adventurer profile.
+        // The wiki's Rolled-Sleeve Hoodie is girls-only (190); boys get its counterpart Hoodie
+        // 199 (R, quest-research/reward-item-names.json, round 4).
         (
             "adventurer.json",
             3_000_029,
             GEOFFREY,
             &[],
             30,
-            &[],
+            &[199, 190],
             None,
             ADVENTURER,
             225, // L926: wiki stars

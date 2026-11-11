@@ -296,9 +296,50 @@
     {
       "id": 3080003,
       "title_string_id": 394241,
-      "giver_npc_id": 9000000538,
+      "giver_npc_id": 9500000911,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101159,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Verve McNichols (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_challenge_verve_mcnichols_3b73ea)."
+            }
+          ],
+          "npc_id": 9500000956
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 117336,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to your quest giver (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_challenge_verve_mcnichols_3b73ea)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki fr_quest_kart_driver_challenge_verve_mcnichols_3b73ea 'Starting the Quest: Johnny Thunder at Wildwood Speedway; Mustang Alli at Frost Ridge Speedway'; givers-4.json binds the giver to Johnny Thunder 9500000911 (record 3080003's giver 9000000538 is dangling), so the return goes to him"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 412379 'Learn how to be a kart driver by speaking to Johnny Thunder at Wildwood Speedway.' and 406825 (offer): Johnny Thunder is the client's named Kart Driver trainer; Johnny Thunder 9500000911 stands at (-2255.6, -16.6, 579.9) in npcs/wilds.json, model 360, 2 m from Verve McNichols' track"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the quest's own block (394236-394242) has no return line; 117336 'Return to Johnny Thunder' is the Racing Tutorial's return line reused, the only client line that names the return to him. Same npc, different quest: mark it if the journal must stay exact"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "this row only frees the quest together with givers-4.json's giver bind; behind it Target Acquired 3080004, Even the Odds 3080005 and Ready to Redline 3080006 are ready (their races 628/629 are served)"
+            }
+          ],
+          "npc_id": 9500000911
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -350,21 +391,77 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Johnny Thunder 9500000911 gives this quest: client 412379 'Learn how to be a kart driver by speaking to Johnny Thunder at Wildwood Speedway.' and the wiki page's 'Starting the Quest: Johnny Thunder at Wildwood Speedway' (fr_quest_kart_driver_challenge_verve_mcnichols_3b73ea). The earlier giver id 9000000538 named no NPC record. (R) The wiki also lets Mustang Alli offer it; ContentDb v1 has one giver, so the client's named trainer keeps it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394242,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080004,
       "title_string_id": 3490,
-      "giver_npc_id": 9000000539,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000956,
+      "prerequisite_quest_ids": [
+        3080003
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394326,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Target Acquired race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_target_acquired_6f9374)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394326 'Win the \"Target Acquired\" race' (block 394321-394330: 394327 'Beat Verve McNichols in the \"Target Acquired\" race at Wildwood Speedway.'); MiniGameData row 628 'Target Acquired' (name 3296, goal 3433) is a kart_rows.json row on sg_kt_track, time limit 250 s, in the pinned producer set"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the step's client id was empty in the wiki table; this row supplies it. The quest is not blocked by this step today, only by its giver chain (Challenge Verve McNichols)"
+            }
+          ],
+          "minigame_id": 628,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101159,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Verve McNichols (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_target_acquired_6f9374)."
+            }
+          ],
+          "npc_id": 9500000956
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14097,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Kart Driver Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_target_acquired_6f9374)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 300
           },
@@ -412,16 +509,76 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Verve McNichols 9500000956 gives this quest: the wiki's 'Speak to Verve McNichols in Wildwood Speedway.' (fr_quest_kart_driver_target_acquired_6f9374). The earlier giver id 9000000539 named no NPC record."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 101174,
+      "intro_text_string_id": 101174
     },
     {
       "id": 3080005,
       "title_string_id": 394347,
       "giver_npc_id": 9500000956,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080004
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 394372,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the toolbox (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_even_the_odds_52a803)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red wooden tool chest with handles and latches (sheets/b_world_click2.png r0c3, tile of sg_garage_toolbox_02.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_kart_driver_even_the_odds_52a803)."
+            }
+          ],
+          "node_type": "quest-toolbox",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 394374,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Even the Odds minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_even_the_odds_52a803)."
+            }
+          ],
+          "minigame_id": 585,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394393,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Linx Redline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_even_the_odds_52a803)."
+            }
+          ],
+          "npc_id": 9500000164
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -469,23 +626,75 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394348,
       "intro_text_string_id": 394346,
       "end_text_string_id": 394349,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080006,
       "title_string_id": 3494,
       "giver_npc_id": 9500000164,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080005
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394391,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Ready to Redline race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_ready_to_redline_2ccb99)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394391 'Win the \"Ready to Redline\" race' (block 394383-394395: 394392 'Beat Linx Redline in the \"Ready to Redline\" race at Wildwood Speedway.'); MiniGameData row 629 'Ready to Redline' (name 3297, goal 3434) is a kart_rows.json row on sg_kt_track, time limit 215 s, pinned"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the step's client id was empty in the wiki table; this row supplies it. The quest waits only on its chain (Challenge Verve McNichols)"
+            }
+          ],
+          "minigame_id": 629,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394393,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Linx Redline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_ready_to_redline_2ccb99)."
+            }
+          ],
+          "npc_id": 9500000164
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 15035,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Kart Driver Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_ready_to_redline_2ccb99)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 188
           },
@@ -529,10 +738,19 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 3495 is the title 'Kart Driver: You Want To Go Fast?', not this quest's description, so no description id is stored; the offer is 394380."
         }
       ],
-      "description_string_id": 3495,
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "intro_text_string_id": 394380
     },
     {
       "id": 3080007,
@@ -780,8 +998,51 @@
       "id": 3080010,
       "title_string_id": 394496,
       "giver_npc_id": 9500000872,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080009
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394506,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Wildwood Sprint Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_wildwood_sprint_challenge_f5033c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) P-kart-racing (sheet C13): the row's own description sets the clock, 60 s, as the goal's `require.max_elapsed_seconds`; the race itself runs its full window, so a slow lap finishes, shows the board and pays, and only this goal stays open."
+            }
+          ],
+          "minigame_id": 631,
+          "count": 1,
+          "require": {
+            "max_elapsed_seconds": 60
+          }
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394491,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Blammo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_wildwood_sprint_challenge_f5033c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target and quest giver is Blammo"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 394491 'talk to blammo' sits in the same id block as the title 394496"
+            }
+          ],
+          "npc_id": 9500000872
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -829,19 +1090,79 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394497,
       "intro_text_string_id": 394495,
       "end_text_string_id": 394498,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080011,
       "title_string_id": 394572,
       "giver_npc_id": 9500000872,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080010
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 407377,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Big Paulie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_wildwood_endurance_challenge_5d3395)."
+            }
+          ],
+          "npc_id": 9500004389
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 394582,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Wildwood Edurance Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_wildwood_endurance_challenge_5d3395)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 632 'Wildwood Endurance Challenge' (type 10) is in the server's pinned producer set; objective client text 'Win the Wildwood Endurance Challenge race'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki typo: 'Edurance'; client text 394582 says 'Wildwood Endurance Challenge'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) P-kart-racing (sheet C13): the row's own description sets the clock, 167 s, as the goal's `require.max_elapsed_seconds`; the race itself runs its full window, so a slow lap finishes, shows the board and pays, and only this goal stays open."
+            }
+          ],
+          "minigame_id": 632,
+          "count": 1,
+          "require": {
+            "max_elapsed_seconds": 167
+          }
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 394491,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Blammo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_wildwood_endurance_challenge_5d3395)."
+            }
+          ],
+          "npc_id": 9500000872
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -889,19 +1210,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394573,
       "intro_text_string_id": 394571,
       "end_text_string_id": 394574,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080012,
       "title_string_id": 3509,
       "giver_npc_id": 9500000872,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080011
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394597,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Dominating at Wildwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_wildwood_744691)."
+            }
+          ],
+          "minigame_id": 633,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394491,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Blammo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_wildwood_744691)."
+            }
+          ],
+          "npc_id": 9500000872
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -949,16 +1303,95 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 394503
     },
     {
       "id": 3080013,
       "title_string_id": 394603,
-      "giver_npc_id": 9000000026,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000872,
+      "prerequisite_quest_ids": [
+        3080012
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394623,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Squee (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+            }
+          ],
+          "npc_id": 9500000949
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 394625,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the fireworks cart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: wheeled cart loaded with rockets (sheets/c_click3.png r3c3, tile of evnt_anniversary_fireworks_cart_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+            }
+          ],
+          "node_type": "quest-cart-2-2",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 394627,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Guest of Honor minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+            }
+          ],
+          "minigame_id": 587,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 394629,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Squee (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+            }
+          ],
+          "npc_id": 9500000949
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 394631,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Sparks Blitzwing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+            }
+          ],
+          "npc_id": 9500000948
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1006,19 +1439,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394604,
       "intro_text_string_id": 394602,
       "end_text_string_id": 394605,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080014,
       "title_string_id": 3512,
-      "giver_npc_id": 9000000239,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000948,
+      "prerequisite_quest_ids": [
+        3080013
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394721,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Treacherous Track race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_a_treacherous_track_fd5be8)."
+            }
+          ],
+          "minigame_id": 635,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394631,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Sparks Blitzwing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_a_treacherous_track_fd5be8)."
+            }
+          ],
+          "npc_id": 9500000948
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1062,16 +1528,96 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 394718,
+      "intro_text_string_id": 394642
     },
     {
       "id": 3080015,
       "title_string_id": 394647,
-      "giver_npc_id": 9000000475,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000948,
+      "prerequisite_quest_ids": [
+        3080014
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394393,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Linx Redline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+            }
+          ],
+          "npc_id": 9500000164
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394756,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sparks Blitzwing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+            }
+          ],
+          "npc_id": 9500000948
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 394760,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on Sparks' Toolbox (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: red wooden tool chest with handles and latches (sheets/b_world_click2.png r0c3, tile of sg_garage_toolbox_02.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+            }
+          ],
+          "node_type": "quest-toolbox-3",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "text_string_id": 394781,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Stopping the Sabotage minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+            }
+          ],
+          "minigame_id": 588,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 395186,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Linx Redline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+            }
+          ],
+          "npc_id": 9500000164
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1119,19 +1665,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394648,
       "intro_text_string_id": 394646,
       "end_text_string_id": 394649,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080016,
       "title_string_id": 3521,
-      "giver_npc_id": 9000000541,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000164,
+      "prerequisite_quest_ids": [
+        3080015
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394810,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Redline Returns race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_redline_returns_c0de0b)."
+            }
+          ],
+          "minigame_id": 636,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 395186,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Linx Redline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_redline_returns_c0de0b)."
+            }
+          ],
+          "npc_id": 9500000164
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1179,16 +1758,88 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 394650,
+      "intro_text_string_id": 394650
     },
     {
       "id": 3080017,
       "title_string_id": 394655,
-      "giver_npc_id": 9000000542,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000164,
+      "prerequisite_quest_ids": [
+        3080016
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 394832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Amber Violet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_self_promotion_132feb)."
+            }
+          ],
+          "npc_id": 9500000868
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 130477,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the barrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_self_promotion_132feb)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sh_barrel_01.adr is what the world draws for this kind of thing; the nearest placed one is 338 m from the quest's giver, so the quest's own instance needs placing"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden barrel with dark bands (sheets/a_world_click1.png r0c0, tile of sh_barrel_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_kart_driver_self_promotion_132feb)."
+            }
+          ],
+          "node_type": "quest-barrel-2-3",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 394836,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Self Promotion minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_self_promotion_132feb)."
+            }
+          ],
+          "minigame_id": 660,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 394838,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Amber Violet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_self_promotion_132feb)."
+            }
+          ],
+          "npc_id": 9500000868
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1240,19 +1891,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394656,
       "intro_text_string_id": 394654,
       "end_text_string_id": 394657,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080018,
       "title_string_id": 3522,
-      "giver_npc_id": 9000000543,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000868,
+      "prerequisite_quest_ids": [
+        3080017
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394892,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Icy Perfection race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_icy_perfection_a75713)."
+            }
+          ],
+          "minigame_id": 637,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394832,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Amber Violet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_icy_perfection_a75713)."
+            }
+          ],
+          "npc_id": 9500000868
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1300,9 +1984,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 394831
     },
     {
       "id": 3080019,
@@ -1398,8 +2088,43 @@
       "id": 3080020,
       "title_string_id": 394667,
       "giver_npc_id": 9500000613,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080019
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394924,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Frost Ridge Sprint Challenge race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_frost_ridge_sprint_challenge_a2922d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) P-kart-racing (sheet C13): the row's own description sets the clock, 28 s, as the goal's `require.max_elapsed_seconds`; the race itself runs its full window, so a slow lap finishes, shows the board and pays, and only this goal stays open."
+            }
+          ],
+          "minigame_id": 638,
+          "count": 1,
+          "require": {
+            "max_elapsed_seconds": 28
+          }
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394911,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Petal Oceanmist (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_frost_ridge_sprint_challenge_a2922d)."
+            }
+          ],
+          "npc_id": 9500000613
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1447,19 +2172,59 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394668,
       "intro_text_string_id": 394666,
       "end_text_string_id": 394669,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080021,
       "title_string_id": 394671,
       "giver_npc_id": 9500000613,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080020
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394953,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Frost Ridge Endurance Challenge race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_frost_ridge_endurance_challenge_9a219a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) P-kart-racing (sheet C13): the row's own description sets the clock, 135 s, as the goal's `require.max_elapsed_seconds`; the race itself runs its full window, so a slow lap finishes, shows the board and pays, and only this goal stays open."
+            }
+          ],
+          "minigame_id": 639,
+          "count": 1,
+          "require": {
+            "max_elapsed_seconds": 135
+          }
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394911,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Petal Oceanmist (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_frost_ridge_endurance_challenge_9a219a)."
+            }
+          ],
+          "npc_id": 9500000613
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1507,19 +2272,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 394672,
       "intro_text_string_id": 394670,
       "end_text_string_id": 394673,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080022,
       "title_string_id": 3525,
       "giver_npc_id": 9500000613,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080021
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 398603,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Dominating at Frost Ridge race three times - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_frost_ridge_4de2c3)."
+            }
+          ],
+          "minigame_id": 640,
+          "count": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394911,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Petal Oceanmist (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_frost_ridge_4de2c3)."
+            }
+          ],
+          "npc_id": 9500000613
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1563,9 +2361,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 394674,
+      "intro_text_string_id": 394674
     },
     {
       "id": 3080023,

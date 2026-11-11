@@ -436,6 +436,25 @@ const MERK_LEGACY_FIELDS: [&str; 12] = [
     "source",
 ];
 
+/// Round 4: Queen Valerian's `unanchored` -> `legacy_data` move touches Merk's fields plus the
+/// row's location evidence and per-field provenance.
+const QUEEN_LEGACY_FIELDS: [&str; 14] = [
+    "field_sources",
+    "heading",
+    "location_evidence",
+    "model_file_name",
+    "model_id",
+    "name_string_id",
+    "placement",
+    "placement_candidates",
+    "placement_confidence",
+    "placement_source",
+    "position",
+    "position_reason",
+    "rotation",
+    "source",
+];
+
 /// T878: the fields a video-archive move rewrites on a reconstructed row (position and the
 /// placement class that labels it). `content_npc_placement.rs` and `video_placement_index.rs`
 /// pin the values.
@@ -559,7 +578,9 @@ fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> boo
         let fields: Vec<&str> = QUEST_BINDING_FIELDS
             .iter()
             .copied()
-            .chain(["greeting_string_id", "greeting_reason", "model_id", "model_file_name", "name_string_id", "field_sources", "position"])
+            // Lead 2026-11-10: `position_reason` is the position's own note (P-quest-npcs set Miss
+            // Artie down onto the terrain and said so there); the move rule below still applies.
+            .chain(["greeting_string_id", "greeting_reason", "model_id", "model_file_name", "name_string_id", "field_sources", "position", "position_reason"])
             .collect();
         // A record set down onto its floor changes height only. One moved anywhere else must
         // cite why it now stands there.
@@ -623,12 +644,25 @@ fn is_quest_binding_change_between(path: &str, old: &Value, new: &Value) -> bool
         {
             return true;
         }
-        path.ends_with("/shrouded_glade.json")
+        if path.ends_with("/shrouded_glade.json")
             && old["npc_id"].as_u64() == Some(9_500_000_690)
             && old["placement"].as_str() != Some("legacy_data")
             && new["placement"].as_str() == Some("legacy_data")
             && without_fields(&quest_old, &MERK_LEGACY_FIELDS)
                 == without_fields(&quest_new, &MERK_LEGACY_FIELDS)
+        {
+            return true;
+        }
+        // Round 4: Queen Valerian's `unanchored` row in sanctuary.json moved to her Legacy spawn
+        // (FabledRealms.lua:4184, model 400) the same way Merk did; the move also rewrites the
+        // row's location evidence and field provenance. `content_npc_placement.rs` and
+        // `content_npc_spawns.rs` pin the resulting placement.
+        path.ends_with("/sanctuary.json")
+            && old["npc_id"].as_u64() == Some(9_500_000_519)
+            && old["placement"].as_str() == Some("unanchored")
+            && new["placement"].as_str() == Some("legacy_data")
+            && without_fields(&quest_old, &QUEEN_LEGACY_FIELDS)
+                == without_fields(&quest_new, &QUEEN_LEGACY_FIELDS)
     })
 }
 

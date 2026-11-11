@@ -3628,14 +3628,34 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Sanctuary"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956082,
+          "title": "Movie Magic!",
+          "title_string_id": 15123,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Movie Magic! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_movie_magic_01af77)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956082
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -3919,9 +3939,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3580 spawnNpcWithGuid(33350); src/Resources/Npcs.json Id=33350"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -2.94020008
+      "heading": -2.94020008,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000445,
@@ -3955,8 +3982,27 @@
       "location_evidence": [
         "Sanctuary (328464456)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956132,
+          "title": "Somewhere in Storage",
+          "title_string_id": 390806,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Somewhere in Storage (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_somewhere_in_storage_4c4d9c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956132
+      ],
       "quests_given_text": [
         "Pendant replacement errand (1780843112; title unknown)"
       ],
@@ -3970,7 +4016,7 @@
       "services_reason": null,
       "position": [
         -1272.5175,
-        -14.195691,
+        -15.0,
         212.49059
       ],
       "position_w": null,
@@ -3985,7 +4031,7 @@
       "placement_confidence": "medium",
       "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3650; replaces reconstructed guess [-1408.763, -27.631, 354.654]",
+      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3650; replaces reconstructed guess [-1408.763, -27.631, 354.654] The height is the street there (-15.0): the reference height left her 0.8 m in the air.",
       "source": [
         {
           "kind": "client",
@@ -4189,6 +4235,10 @@
           {
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3650 spawnNpcWithGuid(33426); src/Resources/Npcs.json Id=33426"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) y set to the ground under her spot (-15.0), 0.8 m below the reference height."
           }
         ],
         "position_reason": [
@@ -4244,9 +4294,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3650 spawnNpcWithGuid(33426); src/Resources/Npcs.json Id=33426"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.389184
+      "heading": 1.389184,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000446,
@@ -11809,8 +11866,61 @@
       "location_evidence": [
         "Near the World Tree (2476668007)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957007,
+          "title": "A Piece of Cake",
+          "title_string_id": 428037,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Piece of Cake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_piece_of_cake_c0eb8e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957022,
+          "title": "Birthday Cake Bake-off",
+          "title_string_id": 428081,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Birthday Cake Bake-off (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_birthday_cake_bake_off_b32518)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957219,
+          "title": "Undelivered Confections",
+          "title_string_id": 428042,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Undelivered Confections (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_undelivered_confections_109c9a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957007,
+        3957022,
+        3957219
+      ],
       "quests_given_text": [
         "A Piece of Cake (daily); Undelivered Confections; Birthday Cake Bake-Off"
       ],
@@ -12264,8 +12374,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000462,
@@ -22233,9 +22364,16 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3600 spawnNpcWithGuid(33376); src/Resources/Npcs.json Id=33376"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": 1.67903996
+      "heading": 1.67903996,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000479,
@@ -28253,8 +28391,27 @@
       "location_evidence": [
         "Mansion by the western-most bixie field near Queensfields (2110504430); wiki: west along the moat past the animal center"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957009,
+          "title": "A Trip to the Swamp",
+          "title_string_id": 415319,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Trip to the Swamp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_trip_to_the_swamp_bd13dd)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957009
+      ],
       "quests_given_text": [
         "Medic: House Call (visit); Medic: Palatable Pills; Medic: Take Your Vitamins (Medic); A Trip to the Swamp and Spectral Spectacles (Super Spooktacular, wiki; client titles 464712624, 3010912441)"
       ],
@@ -30437,15 +30594,102 @@
         "Skeleton candy-stall keeper"
       ],
       "roles": [
-        "quest_giver",
-        "enemy"
+        "enemy",
+        "quest_giver"
       ],
       "enemy_kind": "Skeleton candy-stall keeper",
       "location_evidence": [
         "Pixiewood Hills (wiki Super Spooktacular)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957217,
+          "title": "Trick-or-Treat",
+          "title_string_id": 415050,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Trick-or-Treat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_trick_or_treat_bcf2b5)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957017,
+          "title": "Bag Snatchers",
+          "title_string_id": 415303,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bag Snatchers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bag_snatchers_05ab76)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957040,
+          "title": "Candy Gram",
+          "title_string_id": 415311,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Candy Gram (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_candy_gram_47d151)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957105,
+          "title": "Halloween Fanatic",
+          "title_string_id": 416807,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Halloween Fanatic (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_halloween_fanatic_39c95b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957003,
+          "title": "A Formal Report",
+          "title_string_id": 415315,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Formal Report (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_formal_report_7415ec)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957217,
+        3957017,
+        3957040,
+        3957105,
+        3957003
+      ],
       "quests_given_text": [
         "Trick-or-Treat (repeatable); Bag Snatchers; Candy Gram; A Formal Report; Halloween Fanatic; Delicious Goo'd Candy"
       ],
@@ -30969,8 +31213,27 @@
       "location_evidence": [
         "Pixiewood Hills"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957099,
+          "title": "Ghostly Games",
+          "title_string_id": 415347,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ghostly Games (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ghostly_games_d8df00)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957099
+      ],
       "quests_given_text": [
         "Ghostly Games"
       ],
@@ -30981,9 +31244,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1412.290897,
-        -27.631,
-        360.642962
+        -1280.0,
+        -14.395,
+        296.0
       ],
       "position_w": null,
       "rotation": [
@@ -31282,11 +31545,11 @@
         "position": [
           {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "evidence": "The anchor of this spot: quest-research/npcs.json (2026-11-08): POI 36 Bixie Tower Defense at (-1273, -14, 292) is the only defense table in Pixiewood Hills' area; 'northwest corner' read as a few metres off it. Low confidence."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) quest-research/npcs.json (2026-11-08): POI 36 Bixie Tower Defense at (-1273, -14, 292) is the only defense table in Pixiewood Hills' area; 'northwest corner' read as a few metres off it. Low confidence. Moved 4 m west on 2026-11-10 to stand 3 m clear of the chairs and tables there (the editor's terrain probe: floor -14.395, open on all sides)."
           }
         ],
         "position_reason": [
@@ -31340,8 +31603,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "client",
+            "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 945,
+      "model_file_name": "human_m_ninja_ghost.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000495,
@@ -31926,55 +32210,10 @@
               "evidence": "title_string_id corrected from raw locale hash 994831592 to Global.Text id 71056 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
-        },
-        {
-          "quest_id": 3050019,
-          "title": "Chef: Meet the Reputable Bordon Cloo",
-          "title_string_id": 139271,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M1; name 'Chef: Meet the Reputable Bordon Cloo'; title id cell ucdt 123386172 / ugdt 1415008934"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M1; name 'Chef: Meet the Reputable Bordon Cloo'; title id cell ucdt 123386172 / ugdt 1415008934"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3050019 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 123386172 to Global.Text id 139271 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
         }
       ],
       "quest_ids_given": [
-        3050010,
-        3050019
+        3050010
       ],
       "quests_given_text": [
         "Chef: Crazy Craving; Chef: Meet the Reputable Bordon Cloo; Postman: Bixie Buds (wiki appearance); interviewed in Looking for Lavender (2478429130) (Chef)"
@@ -46422,14 +46661,35 @@
         "Queen of Sanctuary, sister of Darkthorne"
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
-        "Royal Palace, top of the throne room (Adventurer line \"at the top of the throne\", 802448179)"
+        "Royal Palace, top of the throne room (Adventurer line \"at the top of the throne\", 802448179)",
+        "Royal Palace throne room: Legacy spawn 100000031331 at [-1054.1, 4.6, 305.7], flanked by the royal-guard spawns 100000002336 and 100000002337."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956023,
+          "title": "Defending the Glade",
+          "title_string_id": 438461,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defending the Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_glade_1b16af)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956023
+      ],
       "quests_given_text": [
         "Visiting the Job Center (wiki; client 3118256436 says she suggests the Job Center); receives the Adventurer entry quests Local Hero, Sal's Suggestion, Farnum's Free Advice, Sharing Your Talents and Off to the Queen (Adventurer); target of Chapter 1: The Queen's Last Hope (antidote)"
       ],
@@ -46442,29 +46702,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1422.697626,
-        -27.631,
-        344.63701
+        -1054.135,
+        4.629629,
+        305.7209
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        -0.680419187380278,
         0.0,
-        0.43252943260879895
+        0.7328231228917126
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 0
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547). Two Legacy royal guards (spawns 100000002336/100000002337) stand 3 m either side of this spot in the Royal Palace throne room.",
       "source": [
         {
           "kind": "client",
@@ -46481,6 +46735,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
         }
       ],
       "field_sources": {
@@ -46834,12 +47092,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
           }
         ],
         "position_reason": [
@@ -46856,30 +47110,26 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "Y-axis quaternion of the Legacy heading; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
           }
         ],
         "placement_candidates": [
@@ -46893,8 +47143,36 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4184; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31331 (ModelId=400, ModelFileName=fairy_queenvalerian.adr, NameId=130547)."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "heading": -1.496669,
+      "model_id": 400,
+      "model_file_name": "fairy_queenvalerian.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000520,
@@ -47696,14 +47974,34 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Outside Sanctuary"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957191,
+          "title": "Studying Squirrels",
+          "title_string_id": 37042,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Studying Squirrels (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_studying_squirrels_9331ef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957191
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",

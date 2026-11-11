@@ -348,11 +348,12 @@ fn the_loader_binds_each_giver_and_turn_in() {
 /// check: `Some(item)` is a gather target no server mining or harvesting game yields. The rest
 /// are in `notes/Autopilot/T669.md`: a giver nobody draws, a client-reported step, an item the
 /// catalogue lacks, a recipe without an id. The tenth, Chef 3050025, went live in d7b0b831
-/// ("55 more quests", 2026-11-09).
+/// ("55 more quests", 2026-11-09), and Miner: Biggest is Best 3100025 in the round-4 batch
+/// (one finish of Gold Mining 99 stands for the tile chain, (R)).
 #[test]
-// Named when ten rows were off; one has since gone live.
+// Named when ten rows were off; two have since gone live.
 fn the_other_ten_stay_off_until_their_blocker_lifts() {
-    const OFF: [(u32, Option<u32>); 9] = [
+    const OFF: [(u32, Option<u32>); 8] = [
         (3_000_043, None),
         (3_000_044, None),
         (3_070_019, None),
@@ -360,7 +361,6 @@ fn the_other_ten_stay_off_until_their_blocker_lifts() {
         (3_090_020, Some(77_549)),
         (3_090_023, None),
         (3_090_032, None),
-        (3_100_025, None),
         (3_100_027, None),
     ];
     let targets = Targets::load(&content_dir(), &reference_content()).unwrap();

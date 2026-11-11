@@ -5152,9 +5152,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        5.909299,
-        41.038,
-        1113.916419
+        3.81,
+        41.28,
+        1114.71
       ],
       "position_w": null,
       "rotation": [
@@ -5179,7 +5179,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 8 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) By the Shrouded Glade Warpstone (spawn 100000002163 at (4.1, 42.0, 1117.7)), where the wiki puts him ('in front of the Warpstone in Shrouded Glade', Quest:Trapped and Alone); 3 m from it on the terrain, clear of the people drawn around it. Not a captured NPC transform.",
       "source": [
         {
           "kind": "client",
@@ -5622,11 +5622,15 @@
         "position": [
           {
             "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=8 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=8 NameId=3502 matches native name_string_id."
+            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=8 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=8 NameId=3502 matches native name_string_id. The anchor only: POI 8 'Shrouded Glade' (name 3502) lies within 5 m of the warpstone he stands by."
+          },
+          {
+            "kind": "wiki",
+            "evidence": "'In front of the Warpstone in Shrouded Glade' (wiki Quest:Trapped and Alone; NPCs - Shrouded Glade)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) 3 m from the warpstone spawn 100000002163, on the terrain and clear of the drawn people there; the exact spot is not captured."
           }
         ],
         "position_reason": [
@@ -5680,8 +5684,33 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2378 (ModelId=345, ModelFileName=fairy_royalguard_m.adr, NameId=437145), the Captain Sunspark spawn the Sanctuary row 9500000565 stands on."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the same captain stands in Shrouded Glade during the invasion, so this row takes his body."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2378 (ModelId=345, ModelFileName=fairy_royalguard_m.adr, NameId=437145), the Captain Sunspark spawn the Sanctuary row 9500000565 stands on."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000658,
@@ -13855,12 +13884,29 @@
               "evidence": "Feel Better Flowers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feel_better_flowers_f19101)."
             }
           ]
+        },
+        {
+          "quest_id": 3956052,
+          "title": "Garnered Garden Tools",
+          "title_string_id": 91337,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Garnered Garden Tools (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garnered_garden_tools_f2dffa)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3954730,
         3954900,
-        3954876
+        3954876,
+        3956052
       ],
       "quests_given_text": [
         "Edvard's gardening: missing tools (484860584; shovels 853289627, watering buckets 1160798607, fertilizer bags 1246254551, gardening picks 3794212657, \"Return the missing garden tools to Edvard Leafsnipper at the Gardener's Hutch.\" 1480660843); fertilizer (\"Edvard makes his own special blend of fertilizer ... harvest sunleaf, punkin, and rainleaf.\" 1191354260; \"Edvard would like for you to add the fertilizer to potted ferns around Shrouded Glade.\" 3346727576; 275780311 \"yellow potted ferns\"); a well-water planting task (2268351299). The post-invasion helper line: \"Things have been difficult since the invasion. The lights are still acting up, and Edvard the gardener has been having trouble regrowing his plants.\" (3115356372). Items \"Edvard's Fertilizer\" (763047425), \"Edvard's Shovel\" (3688564881), \"Edvard's Gardening Pick\" (556949301). Rare flower to Ceard (3168642161)."
@@ -16389,10 +16435,44 @@
               "evidence": "Overboard! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
             }
           ]
+        },
+        {
+          "quest_id": 3956134,
+          "title": "Stranded!",
+          "title_string_id": 390326,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Stranded! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_stranded_220636)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3956120,
+          "title": "Saying Sorry",
+          "title_string_id": 390619,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Saying Sorry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_saying_sorry_a8d5de)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3952928
+        3952928,
+        3956134,
+        3956120
       ],
       "quests_given_text": [
         "Rescue Shelby: oars (\"Emil Jadefish accidentally left his friend Shelby stranded on a small island in Shrouded Glade. He can't rescue her without his oars\" 2310020106; \"Find Emil's oars floating in the water within Shrouded Glade.\" 4169512516); apology errand (\"Emil really wants to apologize to Shelby\" 420566424); fish release (\"Emil would like for you to catch some fish from Lakeshore and then release them in the water next to him in Shrouded Glade.\" 1558693511; \"Release the fish in Shrouded Glade\" 953406926)."
@@ -20479,8 +20559,44 @@
       "location_evidence": [
         "\"Outside of the Pet Park in Shrouded Glade\" (3120153641). Video: nameplate in KYKRXeDqYDc/00008, /00018, /00020, /00022, QBr1g_qkZMY/00070, /00094, /00148."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957169,
+          "title": "Run Away Strays",
+          "title_string_id": 92573,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Run Away Strays (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_run_away_strays_37e219)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3957229,
+          "title": "What the Cat Dragged In",
+          "title_string_id": 384994,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "What the Cat Dragged In (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_the_cat_dragged_in_2382ee)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957169,
+        3957229
+      ],
       "quests_given_text": [
         "Halle's lost cats (Jack and Alice; \"My two favorite cats, Jack and Alice, ran off again! If Vidor finds out, he won't let me volunteer anymore.\" 3923793028; \"Halle's favorite cats at the Shrouded Glade Pet Adoption Center, Jack and Alice, have run off again.\" 2021420297); the Jack-and-the-flower follow-up (3400054560). Noted on Pet Trainer (title not found there). Cats: Jack (ucdt 95924569), Alice (ucdt 2857099255)."
       ],
@@ -20858,11 +20974,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:131; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1354 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45413)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.735082,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000690,
@@ -29288,10 +29411,27 @@
               "evidence": "Power Source (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_source_313708)."
             }
           ]
+        },
+        {
+          "quest_id": 3957028,
+          "title": "Blue is Good, Red is Bad",
+          "title_string_id": 385059,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blue is Good, Red is Bad (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blue_is_good_red_is_bad_22d3d0)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3954688
+        3954688,
+        3957028
       ],
       "quests_given_text": [
         "Light sources (\"Phyll has asked you to check all of the light sources around Shrouded Glade to make sure they are still glowing brightly.\" 2425225872; 23 of them, 2244724547); receives Tran's rare flower (\"Deliver the flower to Phyll Chlorowing in Shrouded Glade.\" 34073552); Jack's flower (examines what Halle's cat Jack brought back, 319637804, 637881647, 3400054560; plants a seed and checks it, 1352505336, 2770299069)."
@@ -30137,11 +30277,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:222; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1455 (ModelId=442, ModelFileName=fairy_m_courier_01.agr, NameId=139312)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.6742,
       "model_id": 442,
-      "model_file_name": "fairy_m_courier_01.agr"
+      "model_file_name": "fairy_m_courier_01.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000710,
@@ -30953,8 +31100,31 @@
       "location_evidence": [
         "Shrouded Glade. Video: nameplate by Karmen (bgHR3By3b9g/00340)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956066,
+          "title": "In the Name of Science",
+          "title_string_id": 389643,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "In the Name of Science (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_in_the_name_of_science_805643)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Sera Bella is the Shrouded Glade student, record 9500000712 (legacy_data, 'Speak to Sera Bella in Shrouded Glade' on the wiki page; her jars and ducks stand in the Glade); the Briarwood row 9500000207 'Sera / Bella' is mentioned-only and 1.5 km away."
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956066
+      ],
       "quests_given_text": [
         "Rescue Shelby (needs fish oil from Robgoblin Creek, duck feathers and jars: \"Take the jars of fish oil to Sera Bella in Shrouded Glade.\" 3839857954; \"pluck some feathers from a few unsuspecting ducks. They waddle around Shrouded Glade, usually away from the academy.\" 2735039072; \"Take the duck feathers back to Sera Bella in Shrouded Glade.\" 1014469575); A Hound Ate My Homework! (title ucdt 2321938079 / ugdt 36332524; \"Sera was attacked by some hounds while collecting samples for a science project ... venture into the Vale of the Ancients and retrieve her homework.\" 2924794630; \"Take the homework back to Sera Bella in Shrouded Glade.\" 1436517312)."
       ],
@@ -31346,11 +31516,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:213; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1446 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45397)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.270749,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000713,
@@ -31702,10 +31879,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AShelby"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000714,

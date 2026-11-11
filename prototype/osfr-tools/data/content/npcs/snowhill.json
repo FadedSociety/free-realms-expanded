@@ -6629,11 +6629,79 @@
               "evidence": "Present Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
             }
           ]
+        },
+        {
+          "quest_id": 3956060,
+          "title": "Holiday Cheer",
+          "title_string_id": 420272,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Holiday Cheer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_holiday_cheer_aa9e9a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3956123,
+          "title": "Silversnow's Sapling",
+          "title_string_id": 422984,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Silversnow's Sapling (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_silversnow_s_sapling_d120b8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3956055,
+          "title": "Guarding the Gifting Tree",
+          "title_string_id": 420280,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Guarding the Gifting Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_guarding_the_gifting_tree_71c43f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3956145,
+          "title": "The Perfect Disguise",
+          "title_string_id": 420284,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Perfect Disguise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_perfect_disguise_4ee3f9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3951040,
-        3951995
+        3951995,
+        3956060,
+        3956123,
+        3956055,
+        3956145
       ],
       "quests_given_text": [
         "The Gifting Tree (repeatable once a day), Present Problems, Holiday Cheer, Silversnow's Sapling, Guarding the Gifting Tree, The Perfect Disguise, Robgoblin Robbery Ring, Snowmen Disassembly, An Unexpected Gift, Bye-Bye Supplies!."
@@ -25006,50 +25074,6 @@
           ]
         },
         {
-          "quest_id": 3040045,
-          "title": "Card Duelist: In Search of The Baron",
-          "title_string_id": 2569,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 44; name 'Card Duelist: In Search of The Baron'; title id cell 3066807454 ucdt; 457577169 ugdt"
-            },
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 3 - Snowhill and the Baron von Darkcheat quest packs (TCG Series 3), row 44; name 'Card Duelist: In Search of The Baron'; title id cell 3066807454 ucdt; 457577169 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040045 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3066807454 to Global.Text id 2569 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3090017,
           "title": "Medic: A Blustery Blunder",
           "title_string_id": 74026,
@@ -25157,7 +25181,6 @@
         3030039,
         3040042,
         3040043,
-        3040045,
         3090017,
         3090018,
         3954907
@@ -30776,11 +30799,60 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3050019,
+          "title": "Chef: Meet the Reputable Bordon Cloo",
+          "title_string_id": 139271,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M1; name 'Chef: Meet the Reputable Bordon Cloo'; title id cell ucdt 123386172 / ugdt 1415008934"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Main series, band 1: level 1 to 5 (Honey, Bordon Cloo), row M1; name 'Chef: Meet the Reputable Bordon Cloo'; title id cell ucdt 123386172 / ugdt 1415008934"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3050019 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3954675,
-        3050014
+        3050014,
+        3050019
       ],
       "quests_given_text": [
         "Harvest quests: \"Perry can't seem to harvest the Snowberry she needs\" (client 423513700); Snowberry Harvest (title 3810427204). The Chef text also says her farm is \"north of Highroad Junction\" (see Conflicts)."
@@ -35848,11 +35920,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2321; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3578 (ModelId=378, ModelFileName=fairy_m_old_silversnow_01.adr, NameId=6506)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.639638,
       "model_id": 378,
-      "model_file_name": "fairy_m_old_silversnow_01.adr"
+      "model_file_name": "fairy_m_old_silversnow_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000769,

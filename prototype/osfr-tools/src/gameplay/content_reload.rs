@@ -72,7 +72,7 @@ impl Gameplay {
                         self.activities.live(),
                         self.daily_wheel.activity_id(),
                         super::portal_games::games(
-                            self.kart_entry.as_ref(),
+                            self.kart_entry.as_deref(),
                             self.derby.as_ref(),
                             &self.recipe_catalog,
                             [

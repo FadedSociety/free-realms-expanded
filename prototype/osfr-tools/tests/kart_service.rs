@@ -162,12 +162,14 @@ fn synthetic_content() -> KartServiceContent {
             max_race_ms: 600_000,
             max_claims: 64,
             max_observations: 4_096,
+            claim_window_ms: 3_000,
         },
         gate_band: None,
         gate_curtains: Vec::new(),
         pickups: Vec::new(),
         pickup_respawn: None,
         weapon_effects: false,
+        gate_rule: None,
     }
 }
 
@@ -4040,12 +4042,14 @@ fn private_capture_route_is_accepted() {
             max_race_ms: 600_000,
             max_claims: 128,
             max_observations: 20_000,
+            claim_window_ms: 3_000,
         },
         gate_band: None,
         gate_curtains: Vec::new(),
         pickups: Vec::new(),
         pickup_respawn: None,
         weapon_effects: false,
+        gate_rule: None,
     };
     let derived_context = RaceContext {
         session: guid,

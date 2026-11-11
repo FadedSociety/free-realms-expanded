@@ -641,6 +641,15 @@ impl Inventory {
         )
     }
 
+    /// Whether a character of `gender` receives this reward item: a boys' (1) or girls' (2)
+    /// piece (item-table GenderUsage) goes only to that gender, anything else to everyone. As
+    /// in L953, an unknown gender (0, no identity yet) is not checked. An item the catalogue
+    /// does not define fits, so the grant itself still refuses it.
+    pub fn reward_fits_gender(&self, definition_id: i32, gender: i32) -> bool {
+        let need = self.definition_gender(definition_id).unwrap_or(0);
+        !matches!(need, 1 | 2) || gender == 0 || need == gender
+    }
+
     /// How the catalogue draws this item (the fields `write_attachment` sends); `None` when the
     /// loaded catalogue does not define it.
     pub fn look(&self, definition_id: i32) -> Option<ItemLook> {

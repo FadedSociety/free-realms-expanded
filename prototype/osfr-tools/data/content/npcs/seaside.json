@@ -9116,11 +9116,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1121; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2378 (ModelId=345, ModelFileName=fairy_royalguard_m.adr, NameId=437145)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -0.842952,
       "model_id": 345,
-      "model_file_name": "fairy_royalguard_m.adr"
+      "model_file_name": "fairy_royalguard_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000566,
@@ -20927,8 +20934,27 @@
       "location_evidence": [
         "Seaside; video nameplate in 16 frames next to Tozer (4Y2sOrvk1Lo/00026)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3956073,
+          "title": "Launching the Distance",
+          "title_string_id": 424931,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Launching the Distance (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_launching_the_distance_c18e27)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3956073
+      ],
       "quests_given_text": [
         "\"Try out a Tattered Parachute\" (563950854, 2424747643); \"use the launch pads to reach Morgan Webfoot on Shadeside Island\" (2742396435, 2706834038). Titles not found"
       ],
@@ -21388,11 +21414,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:497; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1735 (ModelId=311, ModelFileName=human_m_freestyle_02.agr, NameId=424934)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.613592,
       "model_id": 311,
-      "model_file_name": "human_m_freestyle_02.agr"
+      "model_file_name": "human_m_freestyle_02.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000588,
@@ -30712,11 +30745,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:800; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2044 (ModelId=545, ModelFileName=human_f_freestyle_03.agr, NameId=425245)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.099537,
       "model_id": 545,
-      "model_file_name": "human_f_freestyle_03.agr"
+      "model_file_name": "human_f_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000606,
@@ -33939,10 +33979,141 @@
               "evidence": "(R) T726: quest id 3080019 is a stable batch key; the guide does not provide a numeric server quest id, and data/content/quests/kart_driver.json binds title_string_id 394663 (Global.Text.394663 = the guide title)."
             }
           ]
+        },
+        {
+          "quest_id": 3080020,
+          "title": "Kart Driver: Frost Ridge Sprint Challenge",
+          "title_string_id": 394667,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 18; name 'Kart Driver: Frost Ridge Sprint Challenge'; title id cell 122825727 ucdt; 4238252862 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080020 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080021,
+          "title": "Kart Driver: Frost Ridge Endurance Challenge",
+          "title_string_id": 394671,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 19; name 'Kart Driver: Frost Ridge Endurance Challenge'; title id cell 1272864031 ucdt; 2713115317 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080021 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080022,
+          "title": "Kart Driver: Dominating at Frost Ridge",
+          "title_string_id": 3525,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 20; name 'Kart Driver: Dominating at Frost Ridge'; title id cell 1423615597 ucdt; 1437408792 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080022 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3080019
+        3080019,
+        3080020,
+        3080021,
+        3080022
       ],
       "quests_given_text": [
         "Kart Driver: Seaside Board of Tourism Sponsorship and the Frost Ridge challenges; she does not stand in Seaside. Kart Driver"

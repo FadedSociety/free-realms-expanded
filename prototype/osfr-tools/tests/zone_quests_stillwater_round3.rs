@@ -52,10 +52,11 @@ const CLIENT_INTRO: u32 = 116_460;
 const BRAWLER_QUEST: u32 = 3_030_016;
 const FISHER_ENTRY: u32 = 3_070_001;
 const FISHER_ADVANCE: u32 = 3_070_002;
-/// The fisherman follow-up's giver: not an `npcs/*.json` row (the guide calls it a
-/// Message Board object), so no menu can offer it. T542 moved the entry record to Reed
-/// Stillwater.
+/// The fisherman follow-up's giver: the Message Board the guide names, since the round-4 batch
+/// a `quest_spawned.json` row drawn by its corkboard body (extras spawn 100000090070) beside
+/// Reed Stillwater. T542 moved the entry record to Reed Stillwater.
 const FISHER_ADVANCE_GIVER: u64 = 9_000_000_149;
+const FISHER_ADVANCE_BOARD: u64 = 100_000_090_070;
 
 /// Every row these tests click is in `stillwater_crossing.json`, and no NPC has an
 /// extra runtime spawn.
@@ -249,12 +250,10 @@ fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
     assert!(entry.enabled, "T542 enables Become a Fisherman");
     assert_eq!(entry.giver_npc_id, 9_000_000_181);
 
-    // T670 enabled Chef: Gavin Gone Missing (3050016, `tests/zone_quests_round2_chef.rs`). The
-    // other two stay disabled, each with the blocker named by its record.
-    for (id, prerequisite) in [
-        (BRAWLER_QUEST, Some(3_030_015)),
-        (FISHER_ADVANCE, Some(FISHER_ENTRY)),
-    ] {
+    // T670 enabled Chef: Gavin Gone Missing (3050016, `tests/zone_quests_round2_chef.rs`) and the
+    // round-4 batch Being a Better Fisherman (3070002). The Brawler one stays disabled, with the
+    // blocker named by its record.
+    for (id, prerequisite) in [(BRAWLER_QUEST, Some(3_030_015))] {
         let shipped = record(id);
         assert!(
             !shipped.enabled,
@@ -265,23 +264,25 @@ fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
                 shipped.prerequisite_quest_ids.contains(&prerequisite),
                 "quest {id} keeps its authored prerequisite {prerequisite}"
             );
-            // The Brawler chain is also cut upstream; the fisherman follow-up's own
-            // `enabled: false` is its blocker, since T542 enabled 3070001.
-            if id == BRAWLER_QUEST {
-                assert!(
-                    !record(prerequisite).enabled,
-                    "quest {id} is unreachable while its prerequisite {prerequisite} is disabled"
-                );
-            }
+            // The Brawler chain is also cut upstream.
+            assert!(
+                !record(prerequisite).enabled,
+                "quest {id} is unreachable while its prerequisite {prerequisite} is disabled"
+            );
         }
     }
 
-    // The fisherman follow-up still names a giver that is not an authored NPC row, so no
-    // drawable actor can open its menu.
+    // The fisherman follow-up is live behind the entry quest, and its Message Board giver is a
+    // drawn row: the corkboard body in `npc_spawns_extra.json` is bound to it, so a click there
+    // opens its menu.
+    let advance = record(FISHER_ADVANCE);
+    assert!(advance.enabled, "round 4 enabled Being a Better Fisherman");
+    assert_eq!(advance.giver_npc_id, FISHER_ADVANCE_GIVER);
+    assert!(advance.prerequisite_quest_ids.contains(&FISHER_ENTRY));
     let visibility = NpcVisibility::load(&content_dir()).expect("NPC visibility loads");
     assert_eq!(
-        visibility.content_key(FISHER_ADVANCE_GIVER),
-        None,
-        "giver {FISHER_ADVANCE_GIVER} must not be a drawn NPC row"
+        visibility.content_key(FISHER_ADVANCE_BOARD),
+        Some(FISHER_ADVANCE_GIVER),
+        "the board body {FISHER_ADVANCE_BOARD} is bound to giver {FISHER_ADVANCE_GIVER}"
     );
 }
