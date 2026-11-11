@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "duration_ms": 3600000,
+  "max_guests": 24,
+  "leave_radius_m": 120.0,
+  "reach_m": 12.0,
+  "venues": [
+    {
+      "key": "pixiewood",
+      "name": "the Pixiewood Hills party",
+      "planner": 9500000514,
+      "planner_at": [-1391.5509, -27.172358, 334.9232],
+      "greeting_id": 422717,
+      "private_label_id": 422707,
+      "centre": [-1194.0, 23.0, 506.0],
+      "spots": [
+        [-1194.0, 23.0, 506.0, -2.81],
+        [-1196.5, 22.77, 505.0, -2.81],
+        [-1191.5, 23.47, 505.5, -2.81],
+        [-1194.0, 23.0, 503.5, -2.81],
+        [-1193.0, 23.55, 508.0, -2.81],
+        [-1197.0, 23.27, 507.0, -2.81],
+        [-1191.0, 23.57, 503.0, -2.81],
+        [-1195.0, 22.74, 501.5, -2.81]
+      ],
+      "cakes": [
+        {"id": 7970, "at": [-1189.0, 23.8, 502.0, -1.57]},
+        {"id": 7974, "at": [-1190.0, 23.7, 504.0, -1.57]}
+      ],
+      "boombox": {"id": 1913, "at": [-1198.0, 22.3, 503.0, 1.57]},
+      "decorations": [
+        {"id": 2141, "at": [-1188.5, 23.93, 506.0, 0.0]},
+        {"id": 1818, "at": [-1199.5, 22.77, 505.0, 0.0]},
+        {"id": 2137, "at": [-1193.5, 23.58, 509.5, 3.14]}
+      ],
+      "source": [
+        "freerealms.com article 763: Preston Daly near the Sanctuary warpstone teleports to the party area behind the Pixiewood sign; the planner is the drawn spawn 9500000514 (npc_spawns_extra.json, sanctuary.json content key)",
+        "client Global.Text 422709 Preston Daly, 422710 Pixiewood Hills Party Planner, 422717 his line (the dialog body), 422707 Pixiewood Private Party Ticket (the private row)",
+        "world geometry (lab/reports/world-objects-20261015.json, chunk 003423.gcnk): sg_bixiewood_sign_01 at (-1198.3, 20.5, 493.5) and four evnt_private_party_ropes_01 at (-1199.9, 23.2, 506.6) .. (-1188.9, 23.8, 505.7) around the clearing behind it",
+        "(R) spots, cakes, boombox and decorations: heights are the baked terrain (lab/terrain/zone_0.hgt, no placed-object surface above it); every spot faces the sign; cakes 7970 (Sanctuary) and 7974 (Boss Birthday Cake), boombox 1913 (the Rainbow Randomizer, the one row with songs), decorations hsg_freerealms_balloon_01, hsg_balloons_01, hsg_banners_01 (Models.txt 2141, 1818, 2137)"
+      ]
+    },
+    {
+      "key": "lakeshore_treehouse",
+      "name": "the Lakeshore tree house party",
+      "planner": 100000003084,
+      "planner_at": [-673.6552, -5.223303, 602.0707],
+      "greeting_id": 422818,
+      "private_label_id": 422705,
+      "centre": [-696.5, 6.0, 521.5],
+      "spots": [
+        [-695.5, 6.2, 522.0, 1.57],
+        [-697.0, 6.2, 520.0, 1.57],
+        [-694.5, 6.2, 523.0, 1.57],
+        [-697.5, 6.2, 522.5, 1.57]
+      ],
+      "cakes": [
+        {"id": 7970, "at": [-694.0, 6.0, 521.8, -1.57]},
+        {"id": 7974, "at": [-696.0, 6.0, 519.8, 0.0]}
+      ],
+      "boombox": {"id": 1913, "at": [-698.0, 6.0, 519.5, 1.57]},
+      "decorations": [
+        {"id": 1818, "at": [-693.5, 6.0, 524.0, 0.0]},
+        {"id": 2141, "at": [-698.5, 6.0, 524.5, 0.0]}
+      ],
+      "source": [
+        "freerealms.com article 763: Party Planner Courtney Lakebash on one of the Lakeshore walkways teleports into the nearby tree house party area; the planner is the drawn spawn 100000003084 (npc_spawns_extra.json, Legacy Npcs.json Id 3084, NameId 422817)",
+        "client Global.Text 425220 Lakeshore Party Planner, 422818 her line (the dialog body), 422705 Lakeshore Private Party Ticket (the private row), 430483 Treehouse Party",
+        "world geometry (lab/reports/world-objects-20261015.json, chunk 000041.gcnk): evnt_world_private_party_tree_01 at (-700.1, -10.7, 521.8) with its top deck's tables, chairs, phone and soda crates at y 5.8-6.0 (hum_coffee_table_02 at (-696.4, 5.8, 523.8)); a second tree house at (-673.8, -8.0, 558.6)",
+        "(R) the floor height is the top-deck furniture's own (y 5.9): the baked collision (lab/terrain/zone_0.obs) has no surface for the tree house, so spots stand 0.3 m above it and the client sets the player down; cakes 7970 and 7974, boombox 1913, decorations hsg_balloons_01 and hsg_freerealms_balloon_01 (Models.txt 1818, 2141)"
+      ]
+    },
+    {
+      "key": "tanglewood_towers",
+      "name": "the Tanglewood Tower party",
+      "planner": 9500000172,
+      "planner_at": [-507.1272, -73.36512, 2204.657],
+      "greeting_id": 422690,
+      "private_label_id": 422667,
+      "centre": [-334.4, -30.6, 2493.6],
+      "spots": [
+        [-334.4, -30.4, 2493.6, 0.0],
+        [-331.0, -30.4, 2491.0, 0.0],
+        [-336.5, -30.4, 2491.0, 0.0],
+        [-331.5, -30.4, 2496.5, 0.0],
+        [-334.0, -30.4, 2489.0, 0.0],
+        [-330.0, -30.4, 2494.0, 0.0]
+      ],
+      "cakes": [
+        {"id": 7973, "at": [-332.5, -30.6, 2497.5, 0.0]},
+        {"id": 7974, "at": [-329.5, -30.6, 2491.5, 0.0]}
+      ],
+      "boombox": {"id": 1913, "at": [-336.0, -30.6, 2494.5, 0.0]},
+      "decorations": [
+        {"id": 1818, "at": [-328.0, -30.6, 2488.5, 0.0]},
+        {"id": 405, "at": [-340.5, -30.6, 2491.0, 0.0]}
+      ],
+      "source": [
+        "freerealms.com article 763: the Briarwood Party Planner near the Bristlewood warpstone, whose party is in the towers high above the Tanglewood Fort; article 937 (Bristlewood Bash, 2010-02-05) names her Mandy Vice, as the client does (Global.Text 422676; 763 spells it Mandy Vide); she is the drawn regional row 9500000172 (briarwood.json)",
+        "client Global.Text 422677 Briarwood Party Planner, 422690 her line (the dialog body), 422667 Briarwood Private Party Ticket (the private row), 18232 Tanglewood Tower party, 18233 'a party in the towers high above Briarwood'",
+        "world geometry (lab/reports/world-objects-20261015.json, chunks 000930/001470.gcnk): two bw_wall_01 towers at (-334.1, -105.6, 2494.2) and (-262.7, -105.4, 2454.9) whose tops carry evnt_world_private_party_rug_01, evnt_private_party_ropes_01 rings, tables, benches and a Briarwood cake at y -30.6 and -30.3; the fort door is at y -83.1 (entrances.json)",
+        "(R) the floor height is the party props' own (y -30.6 on the first tower): the baked collision (lab/terrain/zone_0.obs) shows a flat surface at -44.0 there instead, so the spots stand 0.2 m above the props and the native check confirms the floor; cakes 7973 (Briarwood) and 7974, boombox 1913, decorations hsg_balloons_01 and evnt_anniversary_balloons_01 (Models.txt 1818, 405)"
+      ]
+    }
+  ]
+}

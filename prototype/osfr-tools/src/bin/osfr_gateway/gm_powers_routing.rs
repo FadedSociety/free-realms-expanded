@@ -650,8 +650,9 @@ fn way_back(staff: &Session, world: &SharedWorld, membership: &World) -> Result<
     })
 }
 
-/// A zone's scene with an arrival pose, for an instance transfer (opcode-31 begin zoning).
-fn scene_at(
+/// A zone's scene with an arrival pose, for an instance transfer (opcode-31 begin zoning). The
+/// party venues (`party_routing`) send their guests in and back with it too.
+pub(super) fn scene_at(
     zone: osfr_tools::content::Zone,
     position: [f32; 3],
     rotation: [f32; 3],
@@ -672,7 +673,7 @@ fn scene_at(
 
 /// Stage a change on a clone of `session`'s gateway and commit it through that session (pose
 /// fanout, membership, save), as `admin_move::relocate` does.
-fn commit(
+pub(super) fn commit(
     session: &mut Session,
     sessions: &mut SessionMap,
     world: &mut SharedWorld,

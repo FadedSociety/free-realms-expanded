@@ -367,6 +367,14 @@ impl PlacedCakes {
         self.live.is_empty()
     }
 
+    /// Drop every cake in `instance` now (a party venue that closes takes its cakes along). Its
+    /// viewers are leaving that instance, so no removal is sent. The number dropped.
+    pub fn remove_in(&mut self, instance: ZoneInstance) -> usize {
+        let before = self.live.len();
+        self.live.retain(|cake| cake.instance != instance);
+        before - self.live.len()
+    }
+
     /// The next counter value whose guid no live cake has, counting up through the low word and
     /// wrapping, and that guid. `place` stores the counter only once the cake is built.
     fn free_guid(&self) -> (u32, u64) {

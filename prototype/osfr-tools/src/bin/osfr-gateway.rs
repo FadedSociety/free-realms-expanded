@@ -95,6 +95,8 @@ mod room_routing;
 mod world_event_routing;
 #[path = "osfr_gateway/mail_routing.rs"]
 mod mail_routing;
+#[path = "osfr_gateway/party_routing.rs"]
+mod party_routing;
 use paths::{character_state_path, chat_settings_path, savestate_dir, social_path};
 
 /// Percent-decoding for Studio query strings and paths.
@@ -1687,7 +1689,9 @@ impl Session {
                 return Ok(());
             }
         }
-        if gm_powers_routing::chat(self, message, options, now_ms, world, membership, sessions)? {
+        if party_routing::route(self, message, now_ms, world, membership, sessions)
+            || gm_powers_routing::chat(self, message, options, now_ms, world, membership, sessions)?
+        {
             return Ok(());
         }
         let previous = self.gateway.state().clone();
@@ -3494,18 +3498,6 @@ impl Server {
     }
 
     #[cfg(test)]
-    pub fn test_field_child(&mut self) -> i32 {
-        self.membership
-            .create_child_instance(
-                0,
-                0,
-                osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
-                self.start.elapsed().as_millis() as u64,
-            )
-            .unwrap()
-    }
-
-    #[cfg(test)]
     pub fn test_location(&self, guid: u64) -> Option<(CharacterState, i32, bool, BTreeSet<u64>)> {
         let session_id = self.world.active_sessions.get(&guid)?;
         let key = self.world.session_keys.get(session_id)?;
@@ -3708,6 +3700,7 @@ impl Server {
             self.tick_shared_fields(now_ms);
             group_arena::tick(self, now_ms);
             room_routing::tick(self, now_ms);
+            party_routing::tick(self, now_ms);
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
             client_area_routing::banner_tick(&mut self.world, &mut self.sessions, now_ms);

@@ -14,8 +14,9 @@ use osfr_tools::placed_cakes::{Action, Catalogue, PlacedCakes};
 /// The world's live cakes and the table they are placed from. Session-only: never saved.
 #[derive(Clone, Debug, Default)]
 pub(super) struct Cakes {
-    table: Catalogue,
-    live: PlacedCakes,
+    pub(super) table: Catalogue,
+    /// PB3: a party venue places its cakes here too (`party_routing`), so clicks reach them.
+    pub(super) live: PlacedCakes,
 }
 
 /// `placed_cakes.json` from the NPC content set `Gameplay::load` binds (the item bar reads the

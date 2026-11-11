@@ -110,6 +110,7 @@ pub mod opening;
 pub mod opening_abilities;
 pub mod opening_journal;
 pub mod opening_world;
+pub mod party_planner;
 pub mod pathing;
 pub mod pet_follow;
 pub mod pets;

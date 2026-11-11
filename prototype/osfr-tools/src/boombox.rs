@@ -936,15 +936,7 @@ impl Boomboxes {
         let Ok(add) = world::unframe_tunnel(&startup_world::build_add_npc(&npc)) else {
             return sends;
         };
-        if let Some(old) = self
-            .live
-            .iter()
-            .position(|b| !b.permanent() && b.owner == owner)
-        {
-            let mut old = self.live.remove(old);
-            self.released.extend(old.release());
-            old.end(&mut sends);
-        }
+        sends.extend(self.end_owner(owner));
         let mut placed = Placed {
             guid,
             owner,
@@ -964,6 +956,21 @@ impl Boomboxes {
             placed.show(session, true, &mut sends);
         }
         self.live.push(placed);
+        sends
+    }
+
+    /// End `owner`'s pressed box now, as a replacement or a closing party venue does: its dancers
+    /// are released for the next tick and its viewers get the stop, poof and removal.
+    pub fn end_owner(&mut self, owner: u64) -> Sends {
+        let mut sends = Sends::new();
+        let at = self
+            .live
+            .iter()
+            .position(|b| !b.permanent() && b.owner == owner);
+        if let Some(mut old) = at.map(|at| self.live.remove(at)) {
+            self.released.extend(old.release());
+            old.end(&mut sends);
+        }
         sends
     }
 

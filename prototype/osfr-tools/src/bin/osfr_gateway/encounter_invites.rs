@@ -192,4 +192,16 @@ impl Server {
     pub fn test_advance_clock(&mut self, ms: u64) {
         self.start = self.start.checked_sub(Duration::from_millis(ms)).unwrap();
     }
+
+    /// A fresh child of the open world for the shared-world socket tests (moved out of the hub).
+    pub fn test_field_child(&mut self) -> i32 {
+        self.membership
+            .create_child_instance(
+                0,
+                0,
+                osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
+                self.start.elapsed().as_millis() as u64,
+            )
+            .unwrap()
+    }
 }

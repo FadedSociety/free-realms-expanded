@@ -1313,6 +1313,10 @@ pub enum InstanceKind {
     House {
         house_guid: u64,
     },
+    /// PB3: one booked party venue (`party_planner`); only its host and guests are let in.
+    Party {
+        party_guid: u64,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1408,6 +1412,8 @@ pub struct World {
     invites: crate::encounter_invite::Invites,
     // T441: shared battle runs by run instance (the same single-writer rule as `fields`).
     arenas: BTreeMap<InstanceId, crate::encounter::SharedArena>,
+    // PB3: booked parties, each in its own `InstanceKind::Party` child; session-only.
+    parties: crate::party_planner::Parties,
 }
 
 /// (R) Only touched membership data is staged. No packets or world-wide clone.
@@ -1715,11 +1721,20 @@ impl World {
             group_heals: std::collections::VecDeque::new(),
             invites: Default::default(),
             arenas: BTreeMap::new(),
+            parties: Default::default(),
         }
     }
 
     pub fn invites_mut(&mut self) -> &mut crate::encounter_invite::Invites {
         &mut self.invites
+    }
+
+    pub fn parties(&self) -> &crate::party_planner::Parties {
+        &self.parties
+    }
+
+    pub fn parties_mut(&mut self) -> &mut crate::party_planner::Parties {
+        &mut self.parties
     }
 
     /// T441: the shared battle run this player is a member of, by its run instance. The player
