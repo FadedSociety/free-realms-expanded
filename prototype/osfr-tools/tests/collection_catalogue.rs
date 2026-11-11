@@ -698,6 +698,10 @@ fn generate(packet: &[u8], references: &Path) -> String {
             null_item_links,
             collection_add_not_captured,
         },
+        // Hand-kept (R) rows: carried over from the committed file, not derived.
+        token_entries: serde_json::from_str::<CatalogueFile>(&committed_text())
+            .unwrap()
+            .token_entries,
     };
     serde_json::to_string_pretty(&file).unwrap() + "\n"
 }

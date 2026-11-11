@@ -5,7 +5,7 @@
     "license": "AGPL data rows only, no code copied (Sanctuary LICENSE is AGPL-3.0)",
     "node_tables": "src/Resources/CollectionNodeTypes.json and src/Resources/CollectionNodePools.json",
     "spawn_tables": "src/Resources/CollectionNodeSpawns/1/*.json; briarwood-mushrooms and briarwood-mushrooms-rare excluded (Legacy harvest_nodes.json holds those 76 hardpoints)",
-    "counts": "12 types, 34 pools, 847 spawns, 1888 drop rows, 1024 distinct drop items",
+    "counts": "14 types, 36 pools, 909 spawns, 2209 drop rows, 1210 distinct drop items, 89 entry-only rows",
     "client_models": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt; every ModelId found",
     "client_effects": "lab/working/OSFR.Client/OSFR Client/Resources/ActorCompositeEffectDefinitions.xml; every CompositeEffectId and ExtraCompositeEffectIds id found",
     "client_cursor": "lab/working/OSFR.Client/OSFR Client/Resources/Cursors.txt line 20: 18^cursor_interaction_harvesting.cur",
@@ -51,7 +51,9 @@
     "sha256_git_blob.src/Resources/CollectionNodeSpawns/1/nettleseed-sparkling-water.json": "517ba41454ee09715cfe4c4d78ffe4f36ab96a1fc8fd04c5f1f17e5b6778079a",
     "sha256_git_blob.src/Resources/CollectionNodeSpawns/1/nettleseed-sparkling-water-rare.json": "acf69ce6dde8bc9214b3cd2c86fda4fe7ee3a66e8a82648f44b40d35a8db50f0",
     "sha256_git_blob.src/Resources/CollectionNodeSpawns/1/merryvale-sparkling-water.json": "9a057f14a7f3045e311f02481b0347f7ab72ac248a067aca2ccfa9c95d3700d4",
-    "sha256_git_blob.src/Resources/CollectionNodeSpawns/1/merryvale-sparkling-water-rare.json": "cd4d42ff83e293ca7d5d6fb30cff94f0ede8594f187ebc05586e99c278912e04"
+    "sha256_git_blob.src/Resources/CollectionNodeSpawns/1/merryvale-sparkling-water-rare.json": "cd4d42ff83e293ca7d5d6fb30cff94f0ede8594f187ebc05586e99c278912e04",
+    "wiki_sets": "(R) 2026-11-09: 28 sets the wiki assigns to a Robgoblin Junkpile or Wild Flowers spawn were in no table; each joins the table of its wiki region (Wilds North: stillwater, Central: sanctuary-central, South: southern-wilds, no place: all three). A row with collection_entry_id and item 0 fills an entry that has no item definition.",
+    "mushroom_rings": "Mushroom Ring is a collection spawn (wiki: seven Briarwood mushroom sets; video piWfe7lXZ9I at 231 s). Types and tables are Sanctuary@10f129e; the hardpoints are Sanctuary's 76 rows (the same rows Legacy carries) less the ones harvest_nodes.json places as Chef nodes, which stay until the owner decides what those are."
   },
   "node_types": [
     {
@@ -70,8 +72,10 @@
         "cursor_id": "client_Cursors_txt_verified",
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
-        "placement_y_offset": "community_policy_R"
-      }
+        "placement_y_offset": "community_policy_R",
+        "name_id": "client_locale_verified: Global.Text.76562 'Pile of Fossils'"
+      },
+      "name_id": 76562
     },
     {
       "key": "rare-fossils",
@@ -91,8 +95,10 @@
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
-        "sub_text_name_id": "client_locale_verified"
-      }
+        "sub_text_name_id": "client_locale_verified",
+        "name_id": "client_locale_verified: Global.Text.76562 'Pile of Fossils'"
+      },
+      "name_id": 76562
     },
     {
       "key": "sparkling-water",
@@ -114,8 +120,10 @@
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
-        "extra_composite_effect_ids": "client_ActorCompositeEffectDefinitions_xml_verified"
-      }
+        "extra_composite_effect_ids": "client_ActorCompositeEffectDefinitions_xml_verified",
+        "name_id": "client_locale_verified: Global.Text.76565 'Sparkling Water'"
+      },
+      "name_id": 76565
     },
     {
       "key": "rare-sparkling-water",
@@ -139,8 +147,10 @@
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
         "extra_composite_effect_ids": "client_ActorCompositeEffectDefinitions_xml_verified",
-        "sub_text_name_id": "client_locale_verified"
-      }
+        "sub_text_name_id": "client_locale_verified",
+        "name_id": "client_locale_verified: Global.Text.76565 'Sparkling Water'"
+      },
+      "name_id": 76565
     },
     {
       "key": "flowers",
@@ -158,8 +168,10 @@
         "cursor_id": "client_Cursors_txt_verified",
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
-        "placement_y_offset": "community_policy_R"
-      }
+        "placement_y_offset": "community_policy_R",
+        "name_id": "client_locale_verified: Global.Text.16975 'Wild Flowers'"
+      },
+      "name_id": 16975
     },
     {
       "key": "rare-flowers",
@@ -179,8 +191,10 @@
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
-        "sub_text_name_id": "client_locale_verified"
-      }
+        "sub_text_name_id": "client_locale_verified",
+        "name_id": "client_locale_verified: Global.Text.16975 'Wild Flowers'"
+      },
+      "name_id": 16975
     },
     {
       "key": "robgoblin-junk",
@@ -198,8 +212,10 @@
         "cursor_id": "client_Cursors_txt_verified",
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
-        "placement_y_offset": "community_policy_R"
-      }
+        "placement_y_offset": "community_policy_R",
+        "name_id": "client_locale_verified: Global.Text.20748 'Robgoblin Junkpile'"
+      },
+      "name_id": 20748
     },
     {
       "key": "rare-robgoblin-junk",
@@ -219,8 +235,10 @@
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
-        "sub_text_name_id": "client_locale_verified"
-      }
+        "sub_text_name_id": "client_locale_verified",
+        "name_id": "client_locale_verified: Global.Text.20748 'Robgoblin Junkpile'"
+      },
+      "name_id": 20748
     },
     {
       "key": "shells",
@@ -238,8 +256,10 @@
         "cursor_id": "client_Cursors_txt_verified",
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
-        "placement_y_offset": "community_policy_R"
-      }
+        "placement_y_offset": "community_policy_R",
+        "name_id": "client_locale_verified: Global.Text.76560 'Shell Pile'"
+      },
+      "name_id": 76560
     },
     {
       "key": "rare-shells",
@@ -259,8 +279,10 @@
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
-        "sub_text_name_id": "client_locale_verified"
-      }
+        "sub_text_name_id": "client_locale_verified",
+        "name_id": "client_locale_verified: Global.Text.76560 'Shell Pile'"
+      },
+      "name_id": 76560
     },
     {
       "key": "leaves",
@@ -278,8 +300,10 @@
         "cursor_id": "client_Cursors_txt_verified",
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
-        "placement_y_offset": "community_policy_R"
-      }
+        "placement_y_offset": "community_policy_R",
+        "name_id": "client_locale_verified: Global.Text.38909 'Leaf Pile'"
+      },
+      "name_id": 38909
     },
     {
       "key": "rare-leaves",
@@ -299,8 +323,49 @@
         "scale": "community_policy_R",
         "interact_range": "community_policy_R",
         "placement_y_offset": "community_policy_R",
-        "sub_text_name_id": "client_locale_verified"
+        "sub_text_name_id": "client_locale_verified",
+        "name_id": "client_locale_verified: Global.Text.38909 'Leaf Pile'"
+      },
+      "name_id": 38909
+    },
+    {
+      "key": "mushrooms",
+      "name": "Mushroom Ring",
+      "name_id": 17080,
+      "model_id": 249,
+      "scale": 1,
+      "composite_effect_id": 5742,
+      "interact_range": 12,
+      "cursor_id": 18,
+      "placement_y_offset": -0.05,
+      "source_tag": "sanctuary@10f129e:CollectionNodeTypes.json#mushrooms",
+      "source_tags": {
+        "name_id": "client_locale_verified: Global.Text.17080 'Mushroom Ring'; wiki spawn name; video piWfe7lXZ9I 231 s",
+        "model_id": "client_Models_txt_verified",
+        "scale": "community_policy_R",
+        "interact_range": "community_policy_R",
+        "placement_y_offset": "community_policy_R"
       }
+    },
+    {
+      "key": "rare-mushrooms",
+      "name": "Rare Mushroom Ring",
+      "name_id": 17080,
+      "model_id": 674,
+      "scale": 1,
+      "composite_effect_id": 5740,
+      "interact_range": 12,
+      "cursor_id": 18,
+      "placement_y_offset": -0.05,
+      "source_tag": "sanctuary@10f129e:CollectionNodeTypes.json#rare-mushrooms",
+      "source_tags": {
+        "name_id": "client_locale_verified: Global.Text.17080 'Mushroom Ring'; wiki spawn name; video piWfe7lXZ9I 231 s",
+        "model_id": "client_Models_txt_verified",
+        "scale": "community_policy_R",
+        "interact_range": "community_policy_R",
+        "placement_y_offset": "community_policy_R"
+      },
+      "sub_text_name_id": -2118222202
     }
   ],
   "pools": [
@@ -1508,6 +1573,69 @@
           "weight": 100,
           "source_tags": {
             "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 67,
+          "collection_entry_id": 126,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 68,
+          "collection_entry_id": 127,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 72,
+          "collection_entry_id": 128,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 73,
+          "collection_entry_id": 129,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 69,
+          "collection_entry_id": 130,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 70,
+          "collection_entry_id": 131,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 71,
+          "collection_entry_id": 132,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
             "weight": "community_policy_R"
           }
         }
@@ -3524,6 +3652,798 @@
           "weight": 100,
           "source_tags": {
             "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3194,
+          "collection_entry_id": 222,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3195,
+          "collection_entry_id": 223,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3196,
+          "collection_entry_id": 224,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3197,
+          "collection_entry_id": 225,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3198,
+          "collection_entry_id": 226,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3199,
+          "collection_entry_id": 227,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3200,
+          "collection_entry_id": 228,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3201,
+          "collection_entry_id": 229,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Dolls, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 302,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 303,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 304,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 305,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 306,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 307,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 308,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 309,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Pixie Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 350,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 351,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 352,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 353,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 354,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 355,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 356,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3425,
+          "collection_entry_id": 357,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3434,
+          "collection_entry_id": 366,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3435,
+          "collection_entry_id": 367,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3436,
+          "collection_entry_id": 368,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3437,
+          "collection_entry_id": 369,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3438,
+          "collection_entry_id": 370,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3439,
+          "collection_entry_id": 371,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3440,
+          "collection_entry_id": 372,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3441,
+          "collection_entry_id": 373,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Brawler Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 382,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 383,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 384,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 385,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 386,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 387,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 388,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3457,
+          "collection_entry_id": 389,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Human Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3458,
+          "collection_entry_id": 390,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3459,
+          "collection_entry_id": 391,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3460,
+          "collection_entry_id": 392,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3461,
+          "collection_entry_id": 393,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3462,
+          "collection_entry_id": 394,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3463,
+          "collection_entry_id": 395,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3464,
+          "collection_entry_id": 396,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3465,
+          "collection_entry_id": 397,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Big Blue Sky Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3466,
+          "collection_entry_id": 398,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3467,
+          "collection_entry_id": 399,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3468,
+          "collection_entry_id": 400,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3469,
+          "collection_entry_id": 401,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3470,
+          "collection_entry_id": 402,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3471,
+          "collection_entry_id": 403,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3472,
+          "collection_entry_id": 404,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3473,
+          "collection_entry_id": 405,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3482,
+          "collection_entry_id": 414,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3483,
+          "collection_entry_id": 415,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3484,
+          "collection_entry_id": 416,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3485,
+          "collection_entry_id": 417,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3486,
+          "collection_entry_id": 418,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3487,
+          "collection_entry_id": 419,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3488,
+          "collection_entry_id": 420,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3489,
+          "collection_entry_id": 421,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bright Yellow Sun Ninja Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3490,
+          "collection_entry_id": 422,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3491,
+          "collection_entry_id": 423,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3492,
+          "collection_entry_id": 424,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3493,
+          "collection_entry_id": 425,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3494,
+          "collection_entry_id": 426,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3495,
+          "collection_entry_id": 427,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3496,
+          "collection_entry_id": 428,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3497,
+          "collection_entry_id": 429,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 438,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 439,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 440,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 441,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 442,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 443,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 444,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 445,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Snowhill Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3514,
+          "collection_entry_id": 446,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3515,
+          "collection_entry_id": 447,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3516,
+          "collection_entry_id": 448,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3517,
+          "collection_entry_id": 449,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3518,
+          "collection_entry_id": 450,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3519,
+          "collection_entry_id": 451,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3520,
+          "collection_entry_id": 452,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3521,
+          "collection_entry_id": 453,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Wilds Queen Doll, 'Robgoblin Junkpile', stillwater by its place category",
             "weight": "community_policy_R"
           }
         }
@@ -7798,6 +8718,69 @@
             "item_definition_id": "legacy+client_item_definitions_verified",
             "weight": "community_policy_R"
           }
+        },
+        {
+          "item_definition_id": 67,
+          "collection_entry_id": 126,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 68,
+          "collection_entry_id": 127,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 72,
+          "collection_entry_id": 128,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 73,
+          "collection_entry_id": 129,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 69,
+          "collection_entry_id": 130,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 70,
+          "collection_entry_id": 131,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 71,
+          "collection_entry_id": 132,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
         }
       ],
       "source_tag": "sanctuary@10f129e:CollectionNodePools.json#sanctuary-central-flowers",
@@ -9956,6 +10939,798 @@
           "weight": 100,
           "source_tags": {
             "item_definition_id": "legacy+client_item_definitions_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3178,
+          "collection_entry_id": 206,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3179,
+          "collection_entry_id": 207,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3180,
+          "collection_entry_id": 208,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3181,
+          "collection_entry_id": 209,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3182,
+          "collection_entry_id": 210,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3183,
+          "collection_entry_id": 211,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3184,
+          "collection_entry_id": 212,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3185,
+          "collection_entry_id": 213,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Yo-yos, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3186,
+          "collection_entry_id": 214,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3187,
+          "collection_entry_id": 215,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3188,
+          "collection_entry_id": 216,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3189,
+          "collection_entry_id": 217,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3190,
+          "collection_entry_id": 218,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3191,
+          "collection_entry_id": 219,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3192,
+          "collection_entry_id": 220,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3193,
+          "collection_entry_id": 221,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tops, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 294,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 295,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 296,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 297,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 298,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 299,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 300,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 301,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 334,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 335,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 336,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 337,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 338,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 339,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 340,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3409,
+          "collection_entry_id": 341,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Rockstar Pixie Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 342,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 343,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 344,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 345,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 346,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3415,
+          "collection_entry_id": 347,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 348,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 349,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3426,
+          "collection_entry_id": 358,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3427,
+          "collection_entry_id": 359,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3428,
+          "collection_entry_id": 360,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3429,
+          "collection_entry_id": 361,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3430,
+          "collection_entry_id": 362,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3431,
+          "collection_entry_id": 363,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3432,
+          "collection_entry_id": 364,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3433,
+          "collection_entry_id": 365,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Lakeshore Human Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3466,
+          "collection_entry_id": 398,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3467,
+          "collection_entry_id": 399,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3468,
+          "collection_entry_id": 400,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3469,
+          "collection_entry_id": 401,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3470,
+          "collection_entry_id": 402,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3471,
+          "collection_entry_id": 403,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3472,
+          "collection_entry_id": 404,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3473,
+          "collection_entry_id": 405,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3474,
+          "collection_entry_id": 406,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3475,
+          "collection_entry_id": 407,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3476,
+          "collection_entry_id": 408,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3477,
+          "collection_entry_id": 409,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3478,
+          "collection_entry_id": 410,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3479,
+          "collection_entry_id": 411,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3480,
+          "collection_entry_id": 412,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3481,
+          "collection_entry_id": 413,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Bamboo Ninja Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3490,
+          "collection_entry_id": 422,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3491,
+          "collection_entry_id": 423,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3492,
+          "collection_entry_id": 424,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3493,
+          "collection_entry_id": 425,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3494,
+          "collection_entry_id": 426,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3495,
+          "collection_entry_id": 427,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3496,
+          "collection_entry_id": 428,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3497,
+          "collection_entry_id": 429,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 430,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 431,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 432,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 433,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 434,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 435,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 436,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 437,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Seaside Queen Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3530,
+          "collection_entry_id": 462,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3531,
+          "collection_entry_id": 463,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3532,
+          "collection_entry_id": 464,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3533,
+          "collection_entry_id": 465,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3534,
+          "collection_entry_id": 466,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3535,
+          "collection_entry_id": 467,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3536,
+          "collection_entry_id": 468,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3537,
+          "collection_entry_id": 469,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Royal Doll, 'Robgoblin Junkpile', sanctuary-central by its place category",
             "weight": "community_policy_R"
           }
         }
@@ -12694,6 +14469,69 @@
             "item_definition_id": "legacy+client_item_definitions_verified",
             "weight": "community_policy_R"
           }
+        },
+        {
+          "item_definition_id": 67,
+          "collection_entry_id": 126,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 68,
+          "collection_entry_id": 127,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 72,
+          "collection_entry_id": 128,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 73,
+          "collection_entry_id": 129,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 69,
+          "collection_entry_id": 130,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 70,
+          "collection_entry_id": 131,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 71,
+          "collection_entry_id": 132,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Tulips, 'Wild Flowers'",
+            "weight": "community_policy_R"
+          }
         }
       ],
       "source_tag": "sanctuary@10f129e:CollectionNodePools.json#southern-wilds-flowers",
@@ -14806,6 +16644,582 @@
             "item_definition_id": "legacy+client_item_definitions_verified",
             "weight": "community_policy_R"
           }
+        },
+        {
+          "item_definition_id": 3202,
+          "collection_entry_id": 230,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3203,
+          "collection_entry_id": 231,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3204,
+          "collection_entry_id": 232,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3205,
+          "collection_entry_id": 233,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3206,
+          "collection_entry_id": 234,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3207,
+          "collection_entry_id": 235,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3208,
+          "collection_entry_id": 236,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3209,
+          "collection_entry_id": 237,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Army Men, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3378,
+          "collection_entry_id": 310,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3379,
+          "collection_entry_id": 311,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3380,
+          "collection_entry_id": 312,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3381,
+          "collection_entry_id": 313,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3382,
+          "collection_entry_id": 314,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3383,
+          "collection_entry_id": 315,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3384,
+          "collection_entry_id": 316,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3385,
+          "collection_entry_id": 317,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Pixiewood Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 318,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 319,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 320,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3389,
+          "collection_entry_id": 321,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 322,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 323,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 324,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 325,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 326,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 327,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 328,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 329,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 330,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 331,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 332,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3401,
+          "collection_entry_id": 333,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Pixie Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 374,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 375,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 376,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 377,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 378,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 379,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 380,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3449,
+          "collection_entry_id": 381,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Casual Human Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3466,
+          "collection_entry_id": 398,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3467,
+          "collection_entry_id": 399,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3468,
+          "collection_entry_id": 400,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3469,
+          "collection_entry_id": 401,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3470,
+          "collection_entry_id": 402,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3471,
+          "collection_entry_id": 403,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3472,
+          "collection_entry_id": 404,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3473,
+          "collection_entry_id": 405,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Deep Blue Sea Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3490,
+          "collection_entry_id": 422,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3491,
+          "collection_entry_id": 423,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3492,
+          "collection_entry_id": 424,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3493,
+          "collection_entry_id": 425,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3494,
+          "collection_entry_id": 426,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3495,
+          "collection_entry_id": 427,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3496,
+          "collection_entry_id": 428,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3497,
+          "collection_entry_id": 429,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Fire & Ice Ninja Doll, 'Robgoblin Junkpile'",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 454,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 455,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 456,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3525,
+          "collection_entry_id": 457,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 458,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 459,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 460,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 461,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Formal Queen Doll, 'Robgoblin Junkpile', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
         }
       ],
       "source_tag": "sanctuary@10f129e:CollectionNodePools.json#southern-wilds-robgoblin-junk",
@@ -15494,6 +17908,42 @@
             "item_definition_id": "legacy+client_item_definitions_verified",
             "weight": "community_policy_R"
           }
+        },
+        {
+          "item_definition_id": 23066,
+          "collection_entry_id": 941,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Doll's Pets, 'Robgoblin Junkpile <Rare Collection>', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23067,
+          "collection_entry_id": 942,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Doll's Pets, 'Robgoblin Junkpile <Rare Collection>', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 0,
+          "collection_entry_id": 943,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Doll's Pets, 'Robgoblin Junkpile <Rare Collection>', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23069,
+          "collection_entry_id": 944,
+          "weight": 100,
+          "source_tags": {
+            "set": "fanbyte-wiki-20261102 FR_Collection page: Doll's Pets, 'Robgoblin Junkpile <Rare Collection>', southern-wilds by its place category",
+            "weight": "community_policy_R"
+          }
         }
       ],
       "source_tag": "sanctuary@10f129e:CollectionNodePools.json#southern-wilds-robgoblin-junk-rare",
@@ -15948,6 +18398,482 @@
       "source_tags": {
         "zone_definition_id": "sanctuary_pool_table",
         "node_type": "sanctuary_pool_table",
+        "max_active_nodes": "community_policy_R",
+        "respawn_seconds": "community_policy_R"
+      }
+    },
+    {
+      "key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "node_type": "mushrooms",
+      "max_active_nodes": 12,
+      "respawn_seconds": 60,
+      "drop_table": [
+        {
+          "item_definition_id": 11082,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11083,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11084,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11086,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11087,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11088,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3274,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3275,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3276,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3277,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3278,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3279,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3282,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3283,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3284,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3285,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3286,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3287,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23507,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23508,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23509,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23510,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23511,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23512,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23515,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23516,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23517,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23518,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23519,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23520,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23523,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23524,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23525,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23526,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23527,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23528,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23531,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23532,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23533,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23534,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23535,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23536,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        }
+      ],
+      "source_tag": "sanctuary@10f129e:CollectionNodePools.json#briarwood-mushrooms",
+      "source_tags": {
+        "max_active_nodes": "community_policy_R",
+        "respawn_seconds": "community_policy_R"
+      }
+    },
+    {
+      "key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "node_type": "rare-mushrooms",
+      "max_active_nodes": 2,
+      "respawn_seconds": 300,
+      "drop_table": [
+        {
+          "item_definition_id": 11081,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 11085,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3280,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3281,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3288,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 3289,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23513,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23514,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23521,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23522,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23529,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23530,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23537,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        },
+        {
+          "item_definition_id": 23538,
+          "weight": 100,
+          "source_tags": {
+            "item_definition_id": "sanctuary+item_table_verified",
+            "weight": "community_policy_R"
+          }
+        }
+      ],
+      "source_tag": "sanctuary@10f129e:CollectionNodePools.json#briarwood-mushrooms-rare",
+      "source_tags": {
         "max_active_nodes": "community_policy_R",
         "respawn_seconds": "community_policy_R"
       }
@@ -29501,6 +32427,998 @@
       ],
       "heading": -1.7752966,
       "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/merryvale-sparkling-water-rare.json#905",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 2,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -777.5667,
+        -50.01,
+        1732.152
+      ],
+      "heading": 1.9003488,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#2 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 3,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -771.9481,
+        -50.01,
+        1759.2593
+      ],
+      "heading": -0.20764561,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#3 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 4,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -745.1193,
+        -50.01,
+        1749.243
+      ],
+      "heading": -1.277564,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#4 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 5,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -691.169,
+        -50.01,
+        1788.7634
+      ],
+      "heading": -2.5878139,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#5 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 7,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -874.4694,
+        -49.8508,
+        1699.0721
+      ],
+      "heading": 0.1630986,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#7 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 8,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -870.82263,
+        -50.01,
+        1746.2748
+      ],
+      "heading": -1.7938848,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#8 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 9,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -885.5964,
+        -50.009995,
+        1787.501
+      ],
+      "heading": 0.6147363,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#9 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 10,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -900.13684,
+        -50.01,
+        1866.7305
+      ],
+      "heading": -1.4087245,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#10 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 11,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -861.20026,
+        -50.01,
+        1840.9888
+      ],
+      "heading": 2.4495385,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#11 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 13,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -634.61035,
+        -48.422714,
+        1795.4663
+      ],
+      "heading": 2.247903,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#13 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 14,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -710.75903,
+        -49.96198,
+        1834.3875
+      ],
+      "heading": -1.0517426,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#14 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 17,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -694.16046,
+        -50.01,
+        1687.7819
+      ],
+      "heading": 2.1102843,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#17 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 18,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -737.7079,
+        -50.010067,
+        1664.1189
+      ],
+      "heading": 0.62728953,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#18 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 20,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -633.81506,
+        -68.270584,
+        1865.6357
+      ],
+      "heading": -0.37828174,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#20 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 21,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -683.2057,
+        -63.321262,
+        1897.0142
+      ],
+      "heading": -0.7824209,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#21 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 22,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -605.5209,
+        -69.418175,
+        1953.3473
+      ],
+      "heading": 0.5377409,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#22 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 23,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -792.25665,
+        -50.01,
+        1760.9254
+      ],
+      "heading": 0.0985059,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#23 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 24,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -707.0895,
+        -50.01,
+        1778.8201
+      ],
+      "heading": 2.2405055,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#24 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 26,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -591.3292,
+        -70.27984,
+        1985.4259
+      ],
+      "heading": -0.48694044,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#26 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 27,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -647.45776,
+        -68.85806,
+        2004.0754
+      ],
+      "heading": -2.2309275,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#27 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 28,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -506.81717,
+        -64.13412,
+        1904.7926
+      ],
+      "heading": 1.8666081,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#28 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 29,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -402.14172,
+        -67.150116,
+        1883.4929
+      ],
+      "heading": -0.4119073,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#29 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 31,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -330.10132,
+        -58.31651,
+        2022.7954
+      ],
+      "heading": 2.566614,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#31 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 32,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -389.08704,
+        -56.52382,
+        1995.9691
+      ],
+      "heading": -2.4227517,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#32 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 33,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -479.98526,
+        -67.32392,
+        1972.0228
+      ],
+      "heading": -2.232457,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#33 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 34,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -525.9714,
+        -69.19547,
+        2255.0442
+      ],
+      "heading": 0.42731214,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#34 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 35,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -548.6164,
+        -67.35766,
+        2279.7188
+      ],
+      "heading": 0.6146312,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#35 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 37,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -682.0958,
+        -65.1131,
+        2343.3176
+      ],
+      "heading": -1.2635078,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#37 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 38,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -714.92676,
+        -65.91882,
+        2287.7495
+      ],
+      "heading": -2.8364804,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#38 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 39,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -802.3364,
+        -62.33505,
+        2263.524
+      ],
+      "heading": 2.8834631,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#39 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 40,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -739.1476,
+        -67.1372,
+        2191.0913
+      ],
+      "heading": 1.7332697,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#40 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 42,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -703.1558,
+        -43.550823,
+        2097.3254
+      ],
+      "heading": 1.0312008,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#42 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 43,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -648.3753,
+        -46.407696,
+        2098.3667
+      ],
+      "heading": 2.6019995,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#43 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 44,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -436.62305,
+        -57.587856,
+        2077.9
+      ],
+      "heading": 1.4587224,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#44 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 45,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -465.4537,
+        -52.09379,
+        2038.1394
+      ],
+      "heading": -2.5061805,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#45 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 46,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -415.8508,
+        -54.3267,
+        2012.7069
+      ],
+      "heading": 1.4330372,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#46 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 48,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -461.86642,
+        -70.75791,
+        2200.0042
+      ],
+      "heading": 0.21403292,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#48 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 49,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -518.60614,
+        -69.17378,
+        2120.5327
+      ],
+      "heading": 3.1191359,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#49 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 50,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -522.22504,
+        -69.738914,
+        2061.766
+      ],
+      "heading": 1.5663147,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#50 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 51,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -580.2633,
+        -68.493324,
+        2144.2332
+      ],
+      "heading": -1.4587042,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#51 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 53,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -480.00656,
+        -86.02494,
+        2368.6853
+      ],
+      "heading": 0.5805629,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#53 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 54,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -309.77576,
+        -87.409195,
+        2381.4607
+      ],
+      "heading": -1.1186222,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#54 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 55,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -238.04156,
+        -87.98718,
+        2390.8877
+      ],
+      "heading": -0.5576502,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#55 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 56,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -122.267235,
+        -64.331276,
+        2188.415
+      ],
+      "heading": 1.6134723,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#56 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 57,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -100.95085,
+        -55.816563,
+        2248.7014
+      ],
+      "heading": -0.06412733,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#57 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 59,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -561.9884,
+        -81.130516,
+        2408.5576
+      ],
+      "heading": 2.896125,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#59 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 60,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -573.84796,
+        -59.91512,
+        2464.9766
+      ],
+      "heading": -2.3863616,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#60 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 61,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -535.21027,
+        -57.03634,
+        2539.072
+      ],
+      "heading": -2.91449,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#61 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 62,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -425.50714,
+        -75.67235,
+        2502.2708
+      ],
+      "heading": 2.4123127,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#62 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 64,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -345.85052,
+        -86.52874,
+        2355.4653
+      ],
+      "heading": -1.1766242,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#64 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 65,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -341.65167,
+        -89.86473,
+        2231.979
+      ],
+      "heading": -0.64272326,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#65 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 66,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -631.0856,
+        -62.595737,
+        2440.0237
+      ],
+      "heading": -0.19398248,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#66 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 67,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -803.2385,
+        -50.01226,
+        1672.3546
+      ],
+      "heading": -0.9076394,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#67 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 68,
+      "pool_key": "briarwood-mushrooms",
+      "zone_definition_id": 1,
+      "position": [
+        -540.30286,
+        -68.46892,
+        1983.3242
+      ],
+      "heading": -0.2174618,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms.json#68 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 70,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -899.4192,
+        -50.008297,
+        1929.6582
+      ],
+      "heading": 0.52385485,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#70 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 71,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -752.1683,
+        -50.298775,
+        1642.752
+      ],
+      "heading": 2.1564155,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#71 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 72,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -770.9457,
+        -65.60923,
+        2442.2864
+      ],
+      "heading": -0.5129169,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#72 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 73,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -87.60222,
+        -31.911438,
+        2275.838
+      ],
+      "heading": -0.50418246,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#73 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 75,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -675.4563,
+        -60.241264,
+        2450.3093
+      ],
+      "heading": 2.7146401,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#75 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 76,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -235.26727,
+        -66.90222,
+        2109.241
+      ],
+      "heading": -2.5212421,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#76 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 77,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -811.9612,
+        -63.83907,
+        2206.1758
+      ],
+      "heading": 2.45503,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#77 (a hardpoint harvest_nodes.json does not place)",
+      "source_tags": {
+        "position": "community_policy_R",
+        "heading": "community_policy_R"
+      }
+    },
+    {
+      "id": 78,
+      "pool_key": "briarwood-mushrooms-rare",
+      "zone_definition_id": 1,
+      "position": [
+        -756.3964,
+        -68.267296,
+        2383.2256
+      ],
+      "heading": -2.7948217,
+      "source_tag": "sanctuary@10f129e:CollectionNodeSpawns/1/briarwood-mushrooms-rare.json#78 (a hardpoint harvest_nodes.json does not place)",
       "source_tags": {
         "position": "community_policy_R",
         "heading": "community_policy_R"

@@ -80,7 +80,7 @@ fn collection_nodes_load_with_the_imported_counts_and_unique_ids() {
             content.pools.len(),
             content.spawns.len()
         ),
-        (12, 34, 847)
+        (14, 36, 909)
     );
     assert_eq!(type_keys(&content).len(), content.node_types.len());
     assert_eq!(pool_keys(&content).len(), content.pools.len());
@@ -142,7 +142,7 @@ fn pools_reference_types_and_spawns_fit_the_caps_and_respawn_policy() {
         .iter()
         .filter(|pool| pool.node_type.starts_with("rare-"))
         .count();
-    assert_eq!((common, rare), (17, 17));
+    assert_eq!((common, rare), (18, 18));
 
     let mut counts: HashMap<&str, usize> = HashMap::new();
     for spawn in &content.spawns {
@@ -211,8 +211,26 @@ fn every_drop_item_resolves_to_one_entry_or_is_a_listed_gap() {
         .iter()
         .flat_map(|pool| &pool.drop_table)
         .map(|drop| drop.item_definition_id)
+        .filter(|item| *item != 0)
         .collect();
     assert!(!drops.is_empty());
+    // A row that names its entry (item 0 where the entry has no item) names a real one, and an
+    // item it carries is that entry's own.
+    for drop in content.pools.iter().flat_map(|pool| &pool.drop_table) {
+        let Some(entry) = drop.collection_entry_id else {
+            assert_ne!(
+                drop.item_definition_id, 0,
+                "a row with neither item nor entry"
+            );
+            continue;
+        };
+        let (row, _) = catalogue
+            .entry(entry)
+            .expect("a drop names a catalogue entry");
+        if drop.item_definition_id != 0 {
+            assert_eq!(row.item_definition_id, Some(drop.item_definition_id as i32));
+        }
+    }
     let expected: Vec<u32> = drops
         .iter()
         .copied()

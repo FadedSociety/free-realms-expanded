@@ -169,7 +169,11 @@ pub struct HarvestNodeType {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct HarvestNodeDrop {
+    /// 0 on a collection row that fills an entry with no item definition.
     pub item_definition_id: u32,
+    /// The catalogue entry a collection row fills; absent, the item's one linked entry.
+    #[serde(default)]
+    pub collection_entry_id: Option<i32>,
     pub weight: u32,
     #[serde(default)]
     pub source_tags: BTreeMap<String, String>,
@@ -583,17 +587,35 @@ impl GatheringNodes {
     /// advances nothing; [`Self::consume`] makes the draw when the click commits. `None` for a
     /// non-collect site or a table that cannot yield (the loader refuses those).
     pub fn collect_item(&self, guid: u64) -> Option<u32> {
+        self.collect_drop(guid).map(|(item, _)| item)
+    }
+
+    /// The same pick as [`Self::collect_item`] with the row's entry: `(item, entry)`, item 0
+    /// for an entry-only row.
+    pub fn collect_drop(&self, guid: u64) -> Option<(u32, Option<i32>)> {
+        self.collect_drop_skipping(guid, |_| false)
+    }
+
+    /// [`Self::collect_drop`] over the rows that can still give this player something: an
+    /// entry-only row whose entry is `held` is left out of the draw, so a click never spends
+    /// the node on nothing. `None` when no row is left.
+    pub fn collect_drop_skipping(
+        &self,
+        guid: u64,
+        held: impl Fn(i32) -> bool,
+    ) -> Option<(u32, Option<i32>)> {
         let SiteKind::Collect { drops } = &self.sites.get(&guid)?.kind else {
             return None;
         };
+        let live = |drop: &&HarvestNodeDrop| {
+            drop.item_definition_id != 0 || !drop.collection_entry_id.is_some_and(&held)
+        };
         let mut rolls = self.rolls.clone();
         pick_weighted(
-            drops
-                .iter()
-                .map(|drop| (&drop.item_definition_id, drop.weight)),
+            drops.iter().filter(live).map(|drop| (drop, drop.weight)),
             &mut rolls,
         )
-        .copied()
+        .map(|drop| (drop.item_definition_id, drop.collection_entry_id))
     }
 
     /// The admission lines every node shares: placed, shown, not busy, in the open world and
@@ -808,6 +830,12 @@ fn add_sites(
                     == 0
                 {
                     return Err(bad("a collection pool has no drops"));
+                }
+                let empty = |drop: &HarvestNodeDrop| {
+                    drop.item_definition_id == 0 && drop.collection_entry_id.is_none()
+                };
+                if pool.drop_table.iter().any(empty) {
+                    return Err(bad("a collection drop names neither an item nor an entry"));
                 }
                 SiteKind::Collect {
                     drops: Arc::from(pool.drop_table.clone()),

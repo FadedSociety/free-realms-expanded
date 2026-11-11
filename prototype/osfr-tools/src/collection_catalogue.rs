@@ -38,6 +38,13 @@ pub struct CatalogueFile {
     /// One per captured record, in capture order.
     pub collections: Vec<Collection>,
     pub gaps: Gaps,
+    /// (R) Token id to the collection entry it stands for. The wiki names the entry as the
+    /// set's reward ("Stillwater Crossing Newbie update for Newbie Explorer") and every captured
+    /// token row sits on a set whose name one meta entry carries. A token not listed does
+    /// nothing here; the Elite Explorer and Fishing Expert tokens are left to the T522 meta
+    /// map, which pairs the same sets. Hand-kept: the generator carries it over.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub token_entries: BTreeMap<i32, i32>,
 }
 
 /// One collection record (`009099d0`: dwords to +0x9c, +0xa0, +0xa4, +0xa8, the icon pair, +0xb8).
@@ -120,7 +127,8 @@ pub struct RewardItem {
     /// Lxzxrus `RewardItemIdsGirls`, only where it lists one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub female_item_definition_id: Option<i32>,
-    /// The captured `+0x24` id, kept only when it has no definition and so is not granted.
+    /// The captured `+0x24` id, kept when the Legacy table has no row for it. Granted only when
+    /// `item_definition_id` is not and the running item table defines it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub captured_item_definition_id: Option<i32>,
 }
@@ -158,6 +166,9 @@ pub struct CollectionCatalogueContent {
     items: BTreeMap<i32, Option<i32>>,
     /// T522: source collection id to the meta collection entry its completion records.
     meta: BTreeMap<i32, i32>,
+    /// Every entry a completion records in another set: the T522 meta entry, each token's
+    /// entry, and each reward item that is an entry of a set `collection_add` names.
+    chain: BTreeMap<i32, Vec<i32>>,
 }
 
 fn invalid(message: String) -> io::Error {
@@ -308,12 +319,58 @@ impl CollectionCatalogueContent {
                 .map_err(|error| refuse(error.to_string()))?;
         }
         let meta = meta_map(&file.collections)?;
+        let mut chain: BTreeMap<i32, Vec<i32>> = BTreeMap::new();
+        for collection in &file.collections {
+            let reward = &collection.reward;
+            let own = |entry: &i32| collection.entries.iter().any(|e| e.id == *entry);
+            let mut next: Vec<i32> = meta.get(&collection.id).copied().into_iter().collect();
+            for token in &reward.tokens {
+                let Some(&entry) = file.token_entries.get(&token.token_id) else {
+                    continue;
+                };
+                if !entries.contains_key(&entry) || own(&entry) {
+                    return Err(invalid(format!(
+                        "collection {}: token {} names a bad entry",
+                        collection.id, token.token_id
+                    )));
+                }
+                next.push(entry);
+            }
+            // "The reward for this collection, Golden Tulip, is used in the Golden Flowers
+            // collection" (wiki): the paid item fills its entry in the set the row adds to.
+            for target in file
+                .collections
+                .iter()
+                .filter(|target| reward.collection_add.contains(&target.id))
+            {
+                next.extend(
+                    target
+                        .entries
+                        .iter()
+                        .filter(|entry| {
+                            entry.item_definition_id.is_some_and(|item| {
+                                reward
+                                    .items
+                                    .iter()
+                                    .any(|paid| paid.item_definition_id == Some(item))
+                            })
+                        })
+                        .map(|entry| entry.id),
+                );
+            }
+            next.sort_unstable();
+            next.dedup();
+            if !next.is_empty() {
+                chain.insert(collection.id, next);
+            }
+        }
         Ok(Some(Self {
             collections: file.collections,
             catalogue,
             entries,
             items,
             meta,
+            chain,
         }))
     }
 
@@ -362,7 +419,11 @@ impl CollectionCatalogueContent {
         grant.coins = reward.coins;
         let fitted = |item: &RewardItem| match item.female_item_definition_id {
             Some(girls) if gender == 2 && item_known(girls) => Some(girls),
-            _ => item.item_definition_id.filter(|&id| item_known(id)),
+            // The captured id pays where the item table has since gained its row.
+            _ => [item.item_definition_id, item.captured_item_definition_id]
+                .into_iter()
+                .flatten()
+                .find(|&id| item_known(id)),
         };
         grant.items = reward
             .items
@@ -398,6 +459,30 @@ impl CollectionCatalogueContent {
     /// T522: the meta collection entry that completing `collection_id` also records.
     pub fn meta_entry(&self, collection_id: i32) -> Option<i32> {
         self.meta.get(&collection_id).copied()
+    }
+
+    /// Reward items no running definition covers: `(collection, captured or listed id)`.
+    pub fn unpayable_reward_items(&self, item_known: impl Fn(i32) -> bool) -> Vec<(i32, i32)> {
+        let mut missing = Vec::new();
+        for collection in &self.collections {
+            for item in &collection.reward.items {
+                let ids = [item.item_definition_id, item.captured_item_definition_id];
+                if !ids.into_iter().flatten().any(&item_known) {
+                    missing.extend(
+                        ids.into_iter()
+                            .flatten()
+                            .last()
+                            .map(|id| (collection.id, id)),
+                    );
+                }
+            }
+        }
+        missing
+    }
+
+    /// Every entry of another set that completing `collection_id` records (see `chain`).
+    pub fn chain_entries(&self, collection_id: i32) -> &[i32] {
+        self.chain.get(&collection_id).map_or(&[], Vec::as_slice)
     }
 
     /// The accepted source-collection to meta-entry pairs (T522).

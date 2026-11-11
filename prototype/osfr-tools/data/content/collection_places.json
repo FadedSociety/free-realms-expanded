@@ -1,0 +1,836 @@
+{
+ "schema_version": 1,
+ "provenance": {
+  "rule": "(R) An exploration entry is recorded when the player walks within radius of its spot. The game filled these sets by discovery (tutorial text in video T-gxBo8ImE4 at 1968 s: 'You get some collections automatically by exploring a new part of the world'; wiki: 'Visit the following locations'); where the server drew each spot is not recorded anywhere.",
+  "license": "Sanctuary AGPL-3.0 data rows only, no code copied"
+ },
+ "places": [
+  {
+   "entry_id": 1836,
+   "name": "Treeleaf's Retreat",
+   "position": [
+    -712.791,
+    -49.829,
+    1752.531
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=78 'Treeleaf's Retreat' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 1838,
+   "name": "Briarheart Caverns",
+   "position": [
+    -39.802,
+    -0.004,
+    2904.154
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=66 'Briarheart Caverns' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 1839,
+   "name": "Sperry's Spore Farm",
+   "position": [
+    -567.624,
+    -53.093,
+    2555.197
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Sperry in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1840,
+   "name": "Chugilda's Kitchen",
+   "position": [
+    -447.646,
+    -88.192,
+    2300.182
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Chugilda in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1841,
+   "name": "Glimmer's Expedition",
+   "position": [
+    -550.847,
+    -79.236,
+    2407.052
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Glimmer in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1843,
+   "name": "Gorg's Camp",
+   "position": [
+    -644.276,
+    -70.575,
+    2283.518
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Gorg in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1845,
+   "name": "Darrel's Hut and Mini-Frog Storage",
+   "position": [
+    -561.716,
+    -68.632,
+    2042.571
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Darrel in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1846,
+   "name": "Lazi's Pig Farm",
+   "position": [
+    -471.11,
+    -55.529,
+    2073.85
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Lazi in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1847,
+   "name": "Snorg's Camp",
+   "position": [
+    -773.342,
+    -69.86,
+    2361.465
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Snorg in npcs/briarwood.json; radius (R)"
+  },
+  {
+   "entry_id": 1849,
+   "name": "Grosh's Hideaway",
+   "position": [
+    -496.791,
+    1.484,
+    1072.026
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Grosh in npcs/wilds.json; radius (R)"
+  },
+  {
+   "entry_id": 1852,
+   "name": "Burgl's Quarry",
+   "position": [
+    -991.93,
+    -6.471,
+    438.372
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Burgl in npcs/wilds.json; radius (R)"
+  },
+  {
+   "entry_id": 1853,
+   "name": "Wuga's Well",
+   "position": [
+    -590.684,
+    1.562,
+    1290.378
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Wuga in npcs/wilds.json; radius (R)"
+  },
+  {
+   "entry_id": 1854,
+   "name": "Jacque's Cafe",
+   "position": [
+    -1212.878,
+    -13.957,
+    463.841
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Jacque in npcs/sanctuary.json; radius (R)"
+  },
+  {
+   "entry_id": 1861,
+   "name": "Greyli's Mansion",
+   "position": [
+    -1312.363,
+    -32.884,
+    103.689
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Greyli Dustywings in npcs/sanctuary.json; radius (R)"
+  },
+  {
+   "entry_id": 1862,
+   "name": "Seafoam's Mansion",
+   "position": [
+    -1358.897,
+    -35.173,
+    552.432
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Seafoam in npcs/sanctuary.json; radius (R)"
+  },
+  {
+   "entry_id": 1863,
+   "name": "Splortata's Camp",
+   "position": [
+    -1726.361,
+    -30.608,
+    845.139
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Splortata in npcs/blackspore_swamp.json; radius (R)"
+  },
+  {
+   "entry_id": 1864,
+   "name": "Mucklewhump's Ferry",
+   "position": [
+    -2133.308,
+    -32.948,
+    1043.573
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Mucklewhump in npcs/blackspore_swamp.json; radius (R)"
+  },
+  {
+   "entry_id": 1869,
+   "name": "Oberyn's Retreat",
+   "position": [
+    -2190.729,
+    -28.384,
+    1075.754
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Oberyn Duskshine in npcs/blackspore_swamp.json; radius (R)"
+  },
+  {
+   "entry_id": 1873,
+   "name": "Headmaster's Hut",
+   "position": [
+    482.148,
+    65.424,
+    1747.054
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Headmaster Merk in npcs/shrouded_glade.json; radius (R)"
+  },
+  {
+   "entry_id": 1877,
+   "name": "Rainbow Lake",
+   "position": [
+    -718.069,
+    -6.887,
+    789.279
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=127 'Rainbow Lake' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 1885,
+   "name": "Cray Caves",
+   "position": [
+    -45.176,
+    -31.049,
+    -1172.106
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=84 'Cray Caves' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 1910,
+   "name": "Singing Crystal Mines",
+   "position": [
+    407.055,
+    47.112,
+    345.557
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=30 'Singing Crystal Mines' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 1926,
+   "name": "Hewey's Escape",
+   "position": [
+    -447.579,
+    -0.676,
+    326.01
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=89 'Hewey's Escape' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 1928,
+   "name": "Cursed Graveyard",
+   "position": [
+    -1160.368,
+    -40.694,
+    744.348
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=121 'Cursed Graveyard!' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 82,
+   "name": "Sanctuary Warpstone",
+   "position": [
+    -1414.636,
+    -27.631,
+    351.567
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=5 'Sanctuary' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 83,
+   "name": "Snowhill Warpstone",
+   "position": [
+    51.391,
+    30.987,
+    363.156
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=3 'Snowhill' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 87,
+   "name": "Briarwood Warpstone",
+   "position": [
+    -808.386,
+    -21.029,
+    1631.789
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=4 'Briarwood' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 899,
+   "name": "Shrouded Glade Warpstone",
+   "position": [
+    1.167,
+    41.038,
+    1114.959
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=8 'Shrouded Glade' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 903,
+   "name": "Wugachug Warpstone",
+   "position": [
+    -70.419,
+    38.789,
+    -445.165
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=12 'Wugachug' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 904,
+   "name": "Seaside Warpstone",
+   "position": [
+    -636.96,
+    9.31,
+    -1041.615
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=13 'Seaside' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 905,
+   "name": "Merry Vale Warpstone",
+   "position": [
+    -1179.131,
+    -34.879,
+    -434.421
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=14 'Merry Vale' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 1833,
+   "name": "Blackspore Warpstone",
+   "position": [
+    -2140.764,
+    -32.948,
+    1041.53
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=16 'Blackspore' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 84,
+   "name": "Cobblestone Village Warpstone",
+   "position": [
+    -1904.46,
+    -39.79,
+    413.316
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=7 'Cobblestone Village' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 900,
+   "name": "Lakeshore Warpstone",
+   "position": [
+    -733.952,
+    9.09,
+    945.973
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=9 'Lakeshore' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 901,
+   "name": "Briarheart Warpstone",
+   "position": [
+    44.487,
+    -30.922,
+    2804.612
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=10 'Briarheart' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 906,
+   "name": "Lavender Coast Warpstone",
+   "position": [
+    -2124.768,
+    -23.903,
+    -292.377
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=15 'Lavender Coast Pass' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 1922,
+   "name": "Highroad Junction Warpstone",
+   "position": [
+    -444.471,
+    -3.885,
+    186.237
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=17 'Highroad Junction' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 1923,
+   "name": "Stillwater Crossing Warpstone",
+   "position": [
+    -1264.574,
+    -49.042,
+    784.906
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=18 'Stillwater Crossing' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 2005,
+   "name": "Bristlewood Warpstone",
+   "position": [
+    -532.374,
+    -66.509,
+    2217.561
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=93 'Bristlewood' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 2179,
+   "name": "Greenwood Warpstone",
+   "position": [
+    -1583.139,
+    -45.376,
+    -547.831
+   ],
+   "radius": 20.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=6 'Greenwood Forest' SpawnPosition, where the warpstone lands a traveller; (R) radius"
+  },
+  {
+   "entry_id": 2182,
+   "name": "The Rumbledome",
+   "position": [
+    428.472,
+    71.526,
+    1840.53
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=146 'The Rumbledome' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 2183,
+   "name": "Precursor Ruins",
+   "position": [
+    419.868,
+    8.109,
+    2222.966
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=147 'Precursor Ruins' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 2184,
+   "name": "Red's Haven",
+   "position": [
+    578.991,
+    88.874,
+    1974.791
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Red Stonehammer in npcs/sunstone_valley.json; radius (R)"
+  },
+  {
+   "entry_id": 2185,
+   "name": "Sandscale Oasis",
+   "position": [
+    631.585,
+    81.367,
+    1760.907
+   ],
+   "radius": 30.0,
+   "source": "Sanctuary@10f129e PointOfInterests.json Id=148 'Sandscale Oasis' Position, the map point of the same name; (R) radius"
+  },
+  {
+   "entry_id": 2186,
+   "name": "Whirly's Scrap Camp",
+   "position": [
+    892.397,
+    -1.333,
+    1944.043
+   ],
+   "radius": 30.0,
+   "source": "(R) anchored on the person the spot is named for: Whirly Willis in npcs/wilds.json; radius (R)"
+  }
+ ],
+ "gaps": [
+  {
+   "collection_id": 244,
+   "entry_id": 1834,
+   "name": "The Hidden Gate",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 244,
+   "entry_id": 1835,
+   "name": "Thistlerow Maw",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 245,
+   "entry_id": 1837,
+   "name": "Briarheart Palace",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 246,
+   "entry_id": 1842,
+   "name": "Soldier's Outpost",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 247,
+   "entry_id": 1844,
+   "name": "Brambleback's Farm",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 247,
+   "entry_id": 1848,
+   "name": "The Quarry",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 248,
+   "entry_id": 1850,
+   "name": "Forest Troll Camp",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 248,
+   "entry_id": 1851,
+   "name": "The Mystic Circle",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 249,
+   "entry_id": 1855,
+   "name": "Ayani's Pride Hospital",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 249,
+   "entry_id": 1856,
+   "name": "Sanctuary Town Hall",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 249,
+   "entry_id": 1857,
+   "name": "Sanctuary Post Office",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 249,
+   "entry_id": 1858,
+   "name": "The Heartseed",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 249,
+   "entry_id": 1859,
+   "name": "Royal Guard Barracks",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 250,
+   "entry_id": 1860,
+   "name": "Sanctuary Pet Adoption Center",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 251,
+   "entry_id": 1865,
+   "name": "Relic Excavation Site",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 251,
+   "entry_id": 1866,
+   "name": "Blackspore Pet Adoption Center",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 251,
+   "entry_id": 1867,
+   "name": "The Quagmire Quarry",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 251,
+   "entry_id": 1868,
+   "name": "The Sinking Cemetery",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 252,
+   "entry_id": 1870,
+   "name": "Gardener's Hutch",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 252,
+   "entry_id": 1871,
+   "name": "Druid Academy",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 252,
+   "entry_id": 1872,
+   "name": "The Wishing Well",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 252,
+   "entry_id": 1874,
+   "name": "Daybreak Falls",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 253,
+   "entry_id": 1875,
+   "name": "Lakeshore Docks",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 253,
+   "entry_id": 1876,
+   "name": "The Little Kitchen",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1878,
+   "name": "Seaspray Inn",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1879,
+   "name": "Post Office",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1880,
+   "name": "Luxurious Oceanfront Homes",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1881,
+   "name": "Fisherman's Shanties",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1883,
+   "name": "Piers and Docks",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1884,
+   "name": "Ocean Treasures Cafe",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 254,
+   "entry_id": 1886,
+   "name": "Tide Pools",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 255,
+   "entry_id": 1888,
+   "name": "The Merry Vale Mainstage",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 255,
+   "entry_id": 1907,
+   "name": "The Midway",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 255,
+   "entry_id": 1908,
+   "name": "The Sunflower Patch",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 256,
+   "entry_id": 1889,
+   "name": "The Brawler's Pit",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 256,
+   "entry_id": 1890,
+   "name": "Cobblestone Village Cafe",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 256,
+   "entry_id": 1891,
+   "name": "Cobblestone Village Animal Park",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1909,
+   "name": "Snowhill Stage",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1911,
+   "name": "Snowhill Hot Springs",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1912,
+   "name": "Snowhill Post Office",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1913,
+   "name": "Valley View Point",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1914,
+   "name": "Widow's Peak",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1915,
+   "name": "Lookout Below",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 260,
+   "entry_id": 1916,
+   "name": "Penguin Training Institute",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 261,
+   "entry_id": 1917,
+   "name": "The Party Tent",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 261,
+   "entry_id": 1918,
+   "name": "The Sasparilla Brewery",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 261,
+   "entry_id": 1919,
+   "name": "The Chugaroot Patch",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 261,
+   "entry_id": 1921,
+   "name": "The Thoroughfare",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 262,
+   "entry_id": 1924,
+   "name": "Pet Center",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 262,
+   "entry_id": 1925,
+   "name": "Dance Party",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 263,
+   "entry_id": 1927,
+   "name": "Pet Center",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 263,
+   "entry_id": 1929,
+   "name": "Stillwater Party",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 310,
+   "entry_id": 2180,
+   "name": "Rough Rider Raceway",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 310,
+   "entry_id": 2181,
+   "name": "Sunstone Valley Approach",
+   "reason": "no sourced position yet"
+  },
+  {
+   "collection_id": 310,
+   "entry_id": 2187,
+   "name": "Glimmerdeep Hydropower Dam",
+   "reason": "no sourced position yet"
+  }
+ ]
+}

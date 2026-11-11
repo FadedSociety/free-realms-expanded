@@ -26,6 +26,14 @@
 //! roll is a per-player stream seeded from OS entropy, so the client cannot steer it; the item
 //! grant, its 38/10 and the node hide commit together, and a missing catalogue or entry
 //! refuses before anything is staged.
+//!
+//! Collections piece (2026-11-09): a completion chains on. Besides the T522 meta entry it records
+//! the entry its reward item is in a set the reward row adds to (wiki: "The reward for this
+//! collection, Golden Tulip, is used in the Golden Flowers collection") and the entry its Token
+//! row stands for (R, `token_entries`). A node row may name its entry and carry no item, for the
+//! entries no item table defines. Exploration spots (`collection_places.json`) record their
+//! entry when the player walks into them (R: the tutorial text says such sets fill "by exploring
+//! a new part of the world"; where the server drew each spot is not recorded).
 use super::*;
 use crate::{
     collection_catalogue::CollectionCatalogueContent,
@@ -45,6 +53,60 @@ pub(super) struct CollectionWorld {
     content: CollectionCoins,
     /// Content plus overlay, what pickup and the client view use.
     coins: CollectionCoins,
+    /// Exploration spots (`collection_places.json`); empty without the file.
+    places: Arc<[Place]>,
+    /// This session's refused entries. It lives here, behind the session's `Arc`, and not as a
+    /// `Gameplay` field: every staged copy of `Gameplay` sits on the stack, and the gateway's
+    /// deepest test path is within a few KB of its 2 MiB stack.
+    visit: std::sync::Mutex<CollectionVisit>,
+}
+
+/// One exploration spot: walking within `radius` of `position` records `entry_id` (R).
+#[derive(serde::Deserialize)]
+struct Place {
+    entry_id: i32,
+    position: [f32; 3],
+    radius: f32,
+}
+
+/// Entries whose reward was refused, so a full bag is told once instead of on every movement
+/// packet. Per session, never saved; a staged copy that is thrown away may leave a hold
+/// behind, which only delays a retry.
+#[derive(Default)]
+struct CollectionVisit {
+    /// Spots: forgotten when the player leaves the spot.
+    spots: BTreeSet<i32>,
+    /// Chained entries a finished set owes: kept until relog.
+    chains: BTreeSet<i32>,
+}
+
+/// (R) Sanity bound on a spot radius, not a recovered limit.
+const MAX_PLACE_RADIUS: f32 = 200.0;
+
+/// Reads `collection_places.json`; absent is no spots. A row that names an unknown entry or a
+/// radius out of bounds fails the load, since it could never fire or would fire everywhere.
+fn load_places(dir: &Path, catalogue: &CollectionCatalogueContent) -> io::Result<Arc<[Place]>> {
+    #[derive(serde::Deserialize)]
+    struct File {
+        schema_version: u32,
+        places: Vec<Place>,
+    }
+    let bytes = match std::fs::read(dir.join("collection_places.json")) {
+        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Arc::from([])),
+        bytes => bytes?,
+    };
+    let file: File = serde_json::from_slice(&bytes)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    let sound = |place: &Place| {
+        catalogue.entry(place.entry_id).is_some()
+            && place.position.iter().all(|v| v.is_finite())
+            && place.radius > 0.0
+            && place.radius <= MAX_PLACE_RADIUS
+    };
+    if file.schema_version != 1 || !file.places.iter().all(sound) {
+        return Err(invalid("collection places: bad schema, entry or radius"));
+    }
+    Ok(file.places.into())
 }
 
 impl CollectionWorld {
@@ -63,6 +125,8 @@ impl CollectionWorld {
             catalogue: self.catalogue.clone(),
             content: self.content.clone(),
             coins,
+            places: self.places.clone(),
+            visit: Default::default(),
         })
     }
 }
@@ -74,6 +138,7 @@ pub(super) fn load(
     content_dir: &Path,
     extras: &ProgressionExtras,
     visibility: &mut Option<NpcVisibility>,
+    item_known: impl Fn(i32) -> bool,
 ) -> io::Result<Option<Arc<CollectionWorld>>> {
     let Some(catalogue) = CollectionCatalogueContent::load(content_dir)? else {
         return Ok(None);
@@ -82,14 +147,14 @@ pub(super) fn load(
         return Ok(None);
     };
     // A reward item without a definition is never granted; say which, once per load.
-    let skipped: BTreeSet<i32> = catalogue
-        .collections()
-        .iter()
-        .flat_map(|collection| &collection.reward.items)
-        .filter_map(|item| item.captured_item_definition_id)
-        .collect();
+    // The cause is always the same: the reward row names an item no loaded item table defines.
+    let skipped = catalogue.unpayable_reward_items(item_known);
     if !skipped.is_empty() {
-        npc_event(serde_json::json!({"event": "collection_reward_items_skipped", "ids": skipped}));
+        npc_event(serde_json::json!({
+            "event": "collection_reward_items_skipped",
+            "reason": "no item definition",
+            "collection_item": skipped,
+        }));
     }
     // T522: the accepted meta collections, once per load.
     if !catalogue.meta_pairs().is_empty() {
@@ -108,6 +173,8 @@ pub(super) fn load(
         }));
     }
     let world = CollectionWorld {
+        places: load_places(content_dir, &catalogue)?,
+        visit: Default::default(),
         catalogue,
         coins: content.clone(),
         content,
@@ -258,6 +325,95 @@ impl Gameplay {
         Ok(Some(out))
     }
 
+    /// Called on every accepted movement, so it only scans; the staged copy is made on a hit.
+    /// Records, one entry per call: a chained entry a finished set still owes (a save that
+    /// finished the set before chains existed, or whose chained reward was refused), then the
+    /// exploration spot the player has walked into. A reward that cannot be stored is told once
+    /// and not tried again until the player leaves that spot (a chained entry: until relog).
+    pub(super) fn visit_collection_places(
+        &mut self,
+        character: &CharacterState,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(world) = self.collections.clone() else {
+            return Ok(());
+        };
+        if character.zone_id != OPEN_WORLD_ZONE {
+            return Ok(());
+        }
+        let inside = |place: &Place| {
+            let reach: f32 = (place.position.iter().zip(character.position))
+                .map(|(a, b)| (a - b).powi(2))
+                .sum();
+            reach <= place.radius.powi(2)
+        };
+        let mut held = (world.visit.lock()).unwrap_or_else(std::sync::PoisonError::into_inner);
+        held.spots.retain(|entry| {
+            (world.places.iter()).any(|place| place.entry_id == *entry && inside(place))
+        });
+        let ledger = self.progression_extras.collections();
+        let owed = (world.catalogue.collections().iter())
+            .filter(|collection| ledger.is_completed(collection.id))
+            .flat_map(|collection| world.catalogue.chain_entries(collection.id))
+            .find(|entry| !ledger.is_collected(**entry) && !held.chains.contains(*entry))
+            .map(|entry| (*entry, false));
+        let spot = || {
+            (world.places.iter())
+                .find(|place| {
+                    inside(place)
+                        && !ledger.is_collected(place.entry_id)
+                        && !held.spots.contains(&place.entry_id)
+                })
+                .map(|place| (place.entry_id, true))
+        };
+        let Some((entry_id, is_spot)) = owed.or_else(spot) else {
+            return Ok(());
+        };
+        drop(held);
+        if self.activity_busy() {
+            return Ok(());
+        }
+        self.record_visit(&world, entry_id, is_spot, character.guid, out)
+    }
+
+    /// The hit of [`Self::visit_collection_places`]. Kept out of line: the staged copy of the
+    /// whole session would otherwise sit in the frame of every movement packet, and the
+    /// gateway's deep test paths run on 2 MB stacks.
+    #[inline(never)]
+    fn record_visit(
+        &mut self,
+        world: &CollectionWorld,
+        entry_id: i32,
+        is_spot: bool,
+        player_guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let mut staged = Box::new(self.clone());
+        let mut staged_out = Outcome::default();
+        match staged.record_collection_entry(world, entry_id, player_guid, &mut staged_out) {
+            Ok(()) => {
+                *self = *staged;
+                out.replies.extend(staged_out.replies);
+                out.changed = true;
+                Ok(())
+            }
+            Err(error) if error.get_ref().is_some_and(|e| e.is::<GrantFailure>()) => {
+                let mut held =
+                    (world.visit.lock()).unwrap_or_else(std::sync::PoisonError::into_inner);
+                if is_spot {
+                    held.spots.insert(entry_id);
+                } else {
+                    held.chains.insert(entry_id);
+                }
+                out.replies.push(chat::system(
+                    "Your bag is full. Make room, then come back to add this to your collection.",
+                ));
+                Ok(())
+            }
+            Err(error) => Err(error),
+        }
+    }
+
     /// T524: a 26/8 click on a sparkling collection node (the caller matched the guid with
     /// `GatheringNodes::is_collect` and validated the request). The node's pool yields one
     /// item; the item's catalogue entry is recorded through the same shared ledger path as a
@@ -284,23 +440,26 @@ impl Gameplay {
             out.replies.push(chat::system(&denied.message()));
             return Ok(out);
         }
-        let Some(item) = self
-            .gathering_nodes
-            .as_ref()
-            .and_then(|nodes| nodes.collect_item(target))
-        else {
-            out.replies.push(chat::system(&Denied::Gone.message()));
+        // A row that could only repeat an entry this player holds is left out of the draw.
+        let ledger = self.progression_extras.collections();
+        let Some((item, row_entry)) = self.gathering_nodes.as_ref().and_then(|nodes| {
+            nodes.collect_drop_skipping(target, |entry| ledger.is_collected(entry))
+        }) else {
+            out.replies
+                .push(chat::system("There is nothing new for you here."));
             return Ok(out);
         };
+        let refuse = |event: &str, out: &mut Outcome| {
+            npc_event(serde_json::json!({"event": event, "item": item}));
+            out.replies
+                .push(chat::system("You cannot gather that right now."));
+        };
+        // An entry-only row (item 0) fills an entry that has no item definition.
         let item = match i32::try_from(item) {
-            Ok(item) if self.inventory.has_definition(item) => item,
+            Ok(0) if row_entry.is_some() => None,
+            Ok(item) if self.inventory.has_definition(item) => Some(item),
             _ => {
-                npc_event(serde_json::json!({
-                    "event": "collection_node_bad_item",
-                    "item": item,
-                }));
-                out.replies
-                    .push(chat::system("You cannot gather that right now."));
+                refuse("collection_node_bad_item", &mut out);
                 return Ok(out);
             }
         };
@@ -309,27 +468,21 @@ impl Gameplay {
         // must refuse before staging; otherwise the bag gains a free item and the node hides
         // while the collection can never fill.
         let Some(world) = self.collections.clone() else {
-            npc_event(serde_json::json!({
-                "event": "collection_node_no_content",
-                "item": item,
-            }));
-            out.replies
-                .push(chat::system("You cannot gather that right now."));
+            refuse("collection_node_no_content", &mut out);
             return Ok(out);
         };
-        let Some(entry) = world.catalogue.entry_for_item(item) else {
-            npc_event(serde_json::json!({
-                "event": "collection_node_no_entry",
-                "item": item,
-            }));
-            out.replies
-                .push(chat::system("You cannot gather that right now."));
+        let entry = row_entry
+            .filter(|entry| world.catalogue.entry(*entry).is_some())
+            .or_else(|| item.and_then(|item| world.catalogue.entry_for_item(item)));
+        let Some(entry) = entry else {
+            refuse("collection_node_no_entry", &mut out);
             return Ok(out);
         };
+        let grant: Vec<(i32, u32)> = item.map(|item| (item, 1)).into_iter().collect();
         // Same start gate as the Type8 path: a grant that cannot be stored changes nothing.
         // (Not redundant: `grant_reward` reports a full bag as a plain "inventory is full"
         // error, which would answer the generic line instead of this one.)
-        if !self.inventory.accepts_reward_bundle(&[(item, 1)]) {
+        if !self.inventory.accepts_reward_bundle(&grant) {
             out.replies.push(chat::system(
                 "Your bag is full. Make room before gathering.",
             ));
@@ -338,14 +491,17 @@ impl Gameplay {
         // Stage the item grant, then its 38/10, then the hide: one commit or none.
         let mut staged = self.clone();
         let mut staged_out = Outcome::default();
-        let staged_result = staged
-            .grant_reward(0, &[(item, 1)], &mut staged_out)
-            .and_then(|()| {
-                if staged.progression_extras.collections().is_collected(entry) {
-                    return Ok(());
-                }
-                staged.record_collection_entry(&world, entry, character.guid, &mut staged_out)
-            });
+        let granted = if grant.is_empty() {
+            Ok(())
+        } else {
+            staged.grant_reward(0, &grant, &mut staged_out)
+        };
+        let staged_result = granted.and_then(|()| {
+            if staged.progression_extras.collections().is_collected(entry) {
+                return Ok(());
+            }
+            staged.record_collection_entry(&world, entry, character.guid, &mut staged_out)
+        });
         if let Err(error) = staged_result {
             let failure = error
                 .get_ref()
@@ -391,24 +547,24 @@ impl Gameplay {
         player_guid: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        let collection_id = match self.collect_entry(world, entry_id, player_guid, out) {
-            Ok(collection_id) => collection_id,
-            Err(error) => {
-                log_refused_entry(entry_id, &error);
-                return Err(error);
+        // A completion records its chained entries (meta, token and reward-item links), and a
+        // set those complete chains on. `seen` ends any loop the content could describe.
+        let mut pending = vec![entry_id];
+        let mut seen = BTreeSet::new();
+        while let Some(entry) = pending.pop() {
+            let again =
+                entry != entry_id && self.progression_extras.collections().is_collected(entry);
+            if !seen.insert(entry) || again {
+                continue;
             }
-        };
-        let Some(collection_id) = collection_id else {
-            return Ok(());
-        };
-        // One level only: the load drops a pair whose source is another pair's target, and a
-        // meta completion is never cascaded again.
-        let Some(meta_entry) = world.catalogue.meta_entry(collection_id) else {
-            return Ok(());
-        };
-        if let Err(error) = self.collect_entry(world, meta_entry, player_guid, out) {
-            log_refused_entry(meta_entry, &error);
-            return Err(error);
+            match self.collect_entry(world, entry, player_guid, out) {
+                Ok(Some(done)) => pending.extend(world.catalogue.chain_entries(done)),
+                Ok(None) => {}
+                Err(error) => {
+                    log_refused_entry(entry, &error);
+                    return Err(error);
+                }
+            }
         }
         Ok(())
     }

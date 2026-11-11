@@ -967,7 +967,9 @@ impl Gameplay {
         let opening_twins = (opening.as_mut().zip(npc_visibility.as_ref()))
             .map_or_else(BTreeSet::new, |(o, v)| crate::opening_world::share_world_npcs(o, v));
         let collections =
-            collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
+            collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility, |id| {
+                inventory.has_definition(id)
+            })?;
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
         let mut encounter = encounter;
         if let Some(engine) = encounter.as_mut() {
@@ -1941,6 +1943,7 @@ impl Gameplay {
         out.replies.extend(visited.replies);
         out.replies
             .extend(visited.notices.iter().map(|text| chat::system(text)));
+        self.visit_collection_places(character, &mut out)?;
         // gateway.rs calls this only after movement validation accepted/clamped
         // the pose. Engine checks active objectives indexed by current zone.
         self.npc_quest_event(

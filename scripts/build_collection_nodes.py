@@ -4,7 +4,8 @@ Run with `python -I`. Reads Sanctuary-main-20261019 at 10f129e (AGPL data rows o
 copied) through `git show`, so the worktree state cannot drift. The two briarwood mushroom pools
 are skipped on purpose: Legacy's 76 mushroom hardpoints already live in harvest_nodes.json.
 
-The file is dormant: nothing loads it at runtime yet; collection-node-pickups owns that import.
+`GatheringNodes::load` reads the file (T524). The committed file is this output run through
+`extend_collection_nodes.py` (collections piece), which adds the mushroom rings and the wiki sets.
 """
 
 import hashlib
@@ -247,8 +248,9 @@ def main():
             "sha256_git_blob.* are the input blobs at the pinned revision (git show), "
             "not the CRLF worktree checkout"
         ),
-        "dormant": (
-            "not read by GatheringNodes::load; collection-node-pickups owns the runtime import"
+        "loaded": (
+            "T524: GatheringNodes::load reads this file (guid tag 5) as sparkling collect nodes; "
+            "the gameplay handler is gameplay/collection_pickup.rs"
         ),
     }
     for path in [TYPES, POOLS, *used_spawn_paths]:

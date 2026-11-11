@@ -10,7 +10,8 @@
       "910103": "Snow Days (seasonal; no description of its own, the series' shared line)",
       "910104": "Chest of Wonders (mysterychest_genie)"
     },
-    "recipe_outputs": "Ids 910200-910226 are reconstructed (2026-11-07): crafting outputs the server never sent (recipes_unresolved.json names them). Name and description are the client's own text ids for that name; icon, model, slot, type, category, rank and rarity follow the closest existing item of the same kind (lab/tools/item_reconstruct.py) (R)."
+    "recipe_outputs": "Ids 910200-910226 are reconstructed (2026-11-07): crafting outputs the server never sent (recipes_unresolved.json names them). Name and description are the client's own text ids for that name; icon, model, slot, type, category, rank and rarity follow the closest existing item of the same kind (lab/tools/item_reconstruct.py) (R).",
+    "collection_rewards": "(R) 2026-11-09: two collection reward items no item table defines, so the captured reward rows could not be granted. 38816 Skullz Tent and 38817 Sunstone Street Lamp are the ids the 2014 login capture carries on the Sunstone Valley Elite and Rare Exploration reward rows; the wiki names both rewards; name ids are the client's own text (33940, 33942), model and icon are the client's own files (hsg_tents_skullz_01.adr with image set 74, hsg_sunstone_street_lamp_01.adr with image set 8000), and the other columns follow the nearest housing rows (16875 Medium Tent, 18152 Tall Street Lamp). The third skipped reward, 79446 Skeletal T-Rex (Sunstone Valley Explorer), is defined by the mounts piece's row."
   },
   "columns": [
     "NameId",
@@ -2206,6 +2207,68 @@
       ],
       "wand_ar_ag_weapon_gem.adr",
       "wizard-maze-L4",
+      "dyetint"
+    ],
+    [
+      38816,
+      [
+        33940,
+        1114,
+        74,
+        0,
+        50,
+        0,
+        0,
+        0,
+        0,
+        1,
+        57,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        10,
+        0,
+        0,
+        64
+      ],
+      "hsg_tents_skullz_01.adr",
+      "tent-skullz-L1",
+      "dyetint"
+    ],
+    [
+      38817,
+      [
+        33942,
+        1114,
+        8000,
+        0,
+        50,
+        0,
+        0,
+        0,
+        0,
+        1,
+        56,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        10,
+        0,
+        0,
+        96
+      ],
+      "hsg_sunstone_street_lamp_01.adr",
+      "lamp-bikerstreet-L1",
       "dyetint"
     ]
   ]

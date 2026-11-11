@@ -1480,17 +1480,19 @@ fn node_content_is_bounded_and_unique() {
     // plots (every recovered plot is active), and 496 spots for the quest pick-ups (with the Chapter 1 caravan)
     // (`quest_wire.py`: up to count + 2 each, on a ring round the giver), and the 12 rich veins
     // P-quest-games places (3 rich copper and 3 rich tin at Dartmoor, 2 each of rich iron, silver
-    // and gold at Snorg's camp: the pool maxima of 4, 4, 2, 2, 2 spots).
+    // and gold at Snorg's camp: the pool maxima of 4, 4, 2, 2, 2 spots). Collections piece: 12 + 2
+    // Mushroom Ring collection nodes on the hardpoints the Chef file does not place.
+    // Lead 2026-11-10: collections on the quest stack (L1129): its 1,051 plus collections' 14.
     // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123); three crate spawns were the same in both (1,030); P-pickup-fix adds 12 split-step spots (1,042).
     // P-quest-npcs: 60 spots for 17 more quest pick-ups (983).
     // P-quest-crate: Somewhere in Storage's three crates leave the quest-crate pool (nine spots, max 6)
-    // for their own pool of three, so all nine crates are live (1,051 -> 1,054).
-    assert_eq!(actors.len(), 1054);
+    // for their own pool of three, so all nine crates are live (1,051 -> 1,054); collections' 14 on top.
+    assert_eq!(actors.len(), 1068);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 1054);
+    assert_eq!(ids.len(), 1068);
     assert!(
         actors
             .iter()
