@@ -21,6 +21,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// G3: the staff quest setter (`character_admin`), kept beside its module.
+#[path = "character_admin/quest_set.rs"]
+mod admin_set;
+
 const MAX_OBJECTIVES: usize = 64;
 // A sanity bound on catalogue and save size, not a game rule: the wiki lists about 1,420 quests (1,337 live),
 // so 1,024 refused the shipped catalogue once it passed that count (2026-11-10).

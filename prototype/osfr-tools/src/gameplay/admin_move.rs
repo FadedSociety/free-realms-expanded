@@ -6,6 +6,11 @@
 //! (`bin/osfr_gateway/admin_move.rs`). The moved character's side is `admin_relocation`.
 use super::*;
 
+/// G3: staff character and inventory edits (`crate::character_admin`): the edited character's
+/// side of every other admin write, kept beside that module.
+#[path = "../character_admin/live.rs"]
+mod character_admin;
+
 const USAGE: &str =
     "Usage: realm move <character name or GUID> <warpstone name | x z | x y z>. Nothing changed.";
 

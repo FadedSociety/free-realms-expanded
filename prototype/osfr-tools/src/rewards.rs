@@ -359,7 +359,7 @@ fn boosted(grant: &RewardGrant, boost: Boost) -> RewardGrant {
     grant
 }
 
-fn experience_packets(
+pub(crate) fn experience_packets(
     profile_id: i32,
     previous: u32,
     updated: u32,

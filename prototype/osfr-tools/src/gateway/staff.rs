@@ -21,6 +21,25 @@ impl Gateway {
         let lower = text.trim().to_ascii_lowercase();
         let command = lower.strip_prefix("realm ").unwrap_or_default();
         let first = command.split_whitespace().next().unwrap_or_default();
+        // G3: `realm give|take|coins <First Last> ...` edits another character. Refused here
+        // (admins only, through the same role gate); an accepted one is run by the host after
+        // this transaction commits (`osfr_gateway/character_admin.rs`), which answers it.
+        if let Some(parsed) = crate::character_admin::parse_chat(command) {
+            let reply = if !game.may_run(first) {
+                outcome.dev_command_denials += 1;
+                "Cannot do that: developer command requires --dev-tools and an authorized account role."
+            } else if self.role != crate::account_store::AccountRole::Admin {
+                outcome.dev_command_denials += 1;
+                "Cannot do that: admins only."
+            } else {
+                match parsed {
+                    Ok(_) => return true,
+                    Err(usage) => usage,
+                }
+            };
+            outcome.replies.push(wrapped(&crate::chat::system(reply)));
+            return true;
+        }
         if first != "role" && Action::parse(first).is_none() {
             return false;
         }

@@ -11,6 +11,11 @@ use osfr_tools::gameplay::{AdminMove, MoveTarget};
 use osfr_tools::moderation::Command;
 use osfr_tools::player_gm_menu::GmAction;
 
+/// G3: the character and inventory editing host (`osfr_tools::character_admin`): the facade G1's
+/// admin routes call, and the staff chat words `run` carries out after a commit.
+#[path = "character_admin.rs"]
+pub(crate) mod character_admin;
+
 const OPEN_WORLD_ZONE: u32 = 0;
 
 pub(super) fn run(
@@ -20,7 +25,11 @@ pub(super) fn run(
     world: &mut SharedWorld,
     membership: &mut World,
     now_ms: u64,
+    message: &[u8],
 ) -> Result<(), Box<dyn std::error::Error>> {
+    character_admin::run_chat(
+        session, options, sessions, world, membership, now_ms, message,
+    )?;
     for (target, action, at) in session.radial.take_gm() {
         // Only this message's choices, and only while the chooser is still an admin.
         if at != now_ms || session.gateway.role() != AccountRole::Admin {

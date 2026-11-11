@@ -1770,7 +1770,7 @@ impl Session {
                 room_routing::open(self, world, lobby_type);
             }
             moderation::run_staged(self, sessions, world, options, staged)?;
-            gm_menu_routing::run(self, options, sessions, world, membership, now_ms)?;
+            gm_menu_routing::run(self, options, sessions, world, membership, now_ms, message)?;
             encounter_invites::run(self, sessions, world, membership, now_ms, invites)?;
         }
         Ok(())

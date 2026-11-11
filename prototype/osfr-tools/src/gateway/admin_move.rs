@@ -69,13 +69,25 @@ impl Gateway {
         if !self.loaded {
             return Err(invalid("it is still loading"));
         }
-        let result = self
+        self.stage_admin_edit(|game| game.admin_grant(coins, sc))
+    }
+
+    /// An admin write to this character's gameplay (the L081 gift, G3's character edits),
+    /// staged like a move: `edit`'s replies to this client, its 35/6 equip changes to the
+    /// players near it, and a save at the commit. An error stages nothing. A session that is
+    /// still loading is the caller's to refuse; an offline save has no client to load.
+    pub fn stage_admin_edit<E: From<io::Error>>(
+        &mut self,
+        edit: impl FnOnce(&mut crate::gameplay::Gameplay) -> Result<crate::gameplay::Outcome, E>,
+    ) -> Result<GatewayOutcome, E> {
+        let game = self
             .gameplay
             .as_deref_mut()
-            .ok_or_else(|| invalid("it has no gameplay session"))?
-            .admin_grant(coins, sc)?;
+            .ok_or_else(|| invalid("it has no gameplay session"))?;
+        let result = edit(game)?;
         Ok(GatewayOutcome {
             replies: result.replies.iter().map(|reply| wrapped(reply)).collect(),
+            nearby: result.nearby,
             state_changed: true,
             gameplay_changed: true,
             ..GatewayOutcome::default()
