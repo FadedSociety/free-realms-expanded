@@ -20,7 +20,7 @@ use osfr_tools::{
     account_store::AccountRole,
     chat,
     client_areas::ClientAreas,
-    event_calendar::{EventCalendar, Mode, read_overrides, write_override},
+    event_calendar::{EventCalendar, Mode, read_hands, read_overrides, write_override, write_toggle},
     gameplay::Gameplay,
     quest_engine::QuestStatus,
     character_store::CharacterState,
@@ -334,15 +334,19 @@ fn an_admin_runs_an_event_by_hand_and_ends_it_again() {
     // Every form an admin may type: the realm line, `/event <key>` and `/<key>`.
     settle();
     let set = realm(&mut game, "/event spring_eggstravaganza on", &mut now);
-    let told = "spring_eggstravaganza (The Spring Eggstravaganza): on, running until an admin \
-                turns it off. Active now: spring_eggstravaganza, summer_camp.";
+    // A toggle holds until the event's next calendar edge: here each event's next start.
+    let told = "spring_eggstravaganza (The Spring Eggstravaganza): on, running by hand until \
+                2027-03-28 00:00, then by its dates. Active now: spring_eggstravaganza, summer_camp.";
     assert_eq!(set, told);
     settle();
     let set = realm(&mut game, "/halloween on", &mut now);
-    assert!(set.starts_with("halloween (Super Spooktacular): on, running until an admin"), "{set}");
+    let by_hand = "halloween (Super Spooktacular): on, running by hand until 2026-10-01 00:00, \
+                   then by its dates.";
+    assert!(set.starts_with(by_hand), "{set}");
     assert!(set.contains("Active now:") && set.contains("halloween"), "{set}");
     let one = realm(&mut game, "/halloween", &mut now);
-    assert_eq!(one, "halloween (Super Spooktacular): on, running until an admin turns it off.");
+    assert_eq!(one, by_hand);
+    assert_eq!(realm(&mut game, "realm halloween", &mut now), by_hand, "the form the client sends");
     clock(&mut game, JULY, &mut now);
     assert!(drawn(&mut game), "Halloween by hand brings its people");
     offer(&mut game, &alyssa, ALYSSA, EGG_HUNT, now);
@@ -399,28 +403,35 @@ fn with_role(fixture: &Fixture, role: AccountRole) -> (Gameplay, PathBuf) {
 
 #[test]
 fn only_an_admin_may_toggle_an_event() {
-    const REFUSAL: &str = "Cannot do that: only an admin can start or stop an event.";
+    // The realm router's own refusal: every form of the toggle is its `season` command.
     const ROLE: &str = "Cannot do that: your account role does not allow this command.";
     let fixture = Fixture::new().with_bulk_quests();
     // A tester may run almost every realm command; this one is not theirs.
-    for (role, realm_reply) in [
-        (AccountRole::Player, ROLE),
-        (AccountRole::Tester, REFUSAL),
-        (AccountRole::Builder, ROLE),
-        (AccountRole::Moderator, ROLE),
+    for role in [
+        AccountRole::Player,
+        AccountRole::Tester,
+        AccountRole::Builder,
+        AccountRole::Moderator,
     ] {
         let (mut game, live) = with_role(&fixture, role);
         let mut now = 1_000;
         clock(&mut game, JULY, &mut now);
-        for (command, reply) in [
-            ("/halloween on", REFUSAL),
-            ("/event halloween on", REFUSAL),
-            ("/event", REFUSAL),
-            ("/halloween off", REFUSAL),
-            ("realm event season halloween on", realm_reply),
-            ("realm event season", realm_reply),
+        for command in [
+            "realm halloween on",
+            "realm halloween off",
+            "realm halloween",
+            "realm event season halloween on",
+            "realm event season",
+            "/halloween on",
+            "/event halloween on",
+            "/event",
+            "/halloween off",
         ] {
-            assert_eq!(realm(&mut game, command, &mut now), reply, "{role:?}: {command}");
+            assert_eq!(realm(&mut game, command, &mut now), ROLE, "{role:?}: {command}");
+            // Refused where every realm command is, so the gateway's security log counts it.
+            let typed = chat::local_request(command);
+            let out = game.handle_in_world(&typed, &at_alyssa(), now).unwrap();
+            assert!(out.dev_command_denied && !out.changed, "{role:?}: {command}");
         }
         assert!(!live.join("event_overrides.json").exists(), "{role:?} wrote the toggle file");
         clock(&mut game, JULY, &mut now);
@@ -433,6 +444,20 @@ fn only_an_admin_may_toggle_an_event() {
         .handle_in_world(&chat::local_request("/wave"), &at_alyssa(), 2_000)
         .unwrap();
     assert!(!out.replies.iter().any(|packet| packet.starts_with(&[15, 0, 3, 0])));
+    // Nor is talk about an event: only `realm` or a slash makes a line a command.
+    for said in ["halloween on", "event halloween off"] {
+        let out = game.handle_in_world(&chat::local_request(said), &at_alyssa(), 3_000).unwrap();
+        assert!(!out.dev_command_denied, "{said}");
+        assert!(!out.replies.iter().any(|packet| packet.starts_with(&[15, 0, 3, 0])), "{said}");
+    }
+    // Without role commands or dev tools nobody toggles anything, an admin role included.
+    let (mut game, live) = with_role(&fixture, AccountRole::Admin);
+    game.set_role_commands(false);
+    let mut now = 1_000;
+    clock(&mut game, JULY, &mut now);
+    let refused = realm(&mut game, "realm halloween on", &mut now);
+    assert!(refused.starts_with("Cannot do that:"), "{refused}");
+    assert!(!live.join("event_overrides.json").exists());
 }
 
 #[test]
@@ -657,4 +682,236 @@ fn the_loader_refuses_a_rotation_it_cannot_run() {
     });
     fs::write(fine.0.join("event_calendar.json"), calendar.to_string()).unwrap();
     assert!(EventCalendar::load(&fine.0).is_ok(), "the untouched row loads");
+}
+
+/// Unix ms of 00:00 UTC on a civil date (`days_from_civil`, as the calendar counts).
+fn unix(year: i64, month: i64, day: i64) -> u64 {
+    let year = if month <= 2 { year - 1 } else { year };
+    let (era, shifted) = (year.div_euclid(400), if month > 2 { month - 3 } else { month + 9 });
+    let year_of_era = year - era * 400;
+    let day_of_year = (153 * shifted + 2) / 5 + day - 1;
+    let days = era * 146_097 + year_of_era * 365 + year_of_era / 4 - year_of_era / 100
+        + day_of_year
+        - 719_468;
+    u64::try_from(days).unwrap() * DAY
+}
+
+/// Every shipped event, with a fixed clock on each side of both edges of its yearly window. The
+/// windows are read from the data, so a retuned date moves this test with it; no date is code.
+#[test]
+fn every_shipped_event_starts_and_stops_on_its_window_edges() {
+    let read = |file: &str| -> Value {
+        serde_json::from_slice(&fs::read(content_dir().join(file)).unwrap()).unwrap()
+    };
+    let (seasons, events) = (read("client_areas.json"), read("event_calendar.json"));
+    let areas = ClientAreas::load(&content_dir()).unwrap();
+    assert_eq!(areas.utc_offset_minutes(), 0, "the edges below are UTC midnights");
+    let calendar = areas.calendar();
+    let events = events["events"].as_array().unwrap();
+    assert_eq!(events.len(), calendar.keys().count());
+    for event in events {
+        let key = event["key"].as_str().unwrap();
+        let season = (seasons["seasons"].as_array().unwrap().iter())
+            .find(|season| season["name"] == event["season"])
+            .unwrap();
+        let day = |field: &str| season[field].as_i64().unwrap();
+        let (first, last) = (
+            (day("start_month"), day("start_day")),
+            (day("end_month"), day("end_day")),
+        );
+        // A window whose last day is before its first one ends in the next year.
+        let start = unix(2026, first.0, first.1);
+        let after = unix(2026 + i64::from(last < first), last.0, last.1) + DAY;
+        let running = |ms: u64| calendar.active_at(&areas, ms).contains(&key);
+        assert!(!running(start - 60_000), "{key} runs before its first day");
+        assert!(running(start), "{key} is not running on its first minute");
+        assert!(running(after - 60_000), "{key} stops before its last day is over");
+        assert!(!running(after), "{key} runs past its last day");
+        // The calendar names the same two instants, a year apart each time.
+        assert_eq!(calendar.next_occurrence(key, &areas, start - DAY), Some(start), "{key}");
+        assert_eq!(calendar.running_until(key, &areas, start), Some(after), "{key}");
+        assert_eq!(calendar.next_edge(key, &areas, start - DAY), Some(start), "{key}");
+        assert_eq!(calendar.next_edge(key, &areas, start), Some(after), "{key}");
+        let next_year = unix(2027, first.0, first.1);
+        assert_eq!(calendar.next_occurrence(key, &areas, after), Some(next_year), "{key}");
+        // The event's quests open and close on those edges too.
+        for quest in event["quest_ids"].as_array().unwrap() {
+            let quest = u32::try_from(quest.as_u64().unwrap()).unwrap();
+            assert!(calendar.open_quests(&areas, start).contains(&quest), "{key} {quest}");
+            assert!(!calendar.open_quests(&areas, after).contains(&quest), "{key} {quest}");
+        }
+    }
+    // The one window a dated run fixes to the day: October 1 through November 12 (2013).
+    assert!(calendar.active_at(&areas, unix(2026, 10, 1)).contains(&"halloween"));
+    assert!(!calendar.active_at(&areas, unix(2026, 11, 13)).contains(&"halloween"));
+}
+
+/// The 13 Halloween client areas among opcode-89 packets, as (id, enabled).
+fn halloween_areas(packets: &[Vec<u8>]) -> Vec<(i32, bool)> {
+    let mut areas = switches(packets);
+    areas.retain(|(id, _)| (3992..=4004).contains(id));
+    areas
+}
+
+/// Nothing about a running event is saved: a server that starts inside a window is in the event
+/// at once, switches it off at the window's edge, and one that starts after it is out of it.
+#[test]
+fn a_server_restarted_inside_a_window_is_in_the_event_and_ends_it_on_time() {
+    let live = Scratch::new("restart-live");
+    let load = || ClientAreas::load(&content_dir()).unwrap().watching(&live.0);
+    let all = |on: bool| (3992..=4004).map(|id| (id, on)).collect::<Vec<_>>();
+    let (inside, after) = (unix(2026, 10, 20) + DAY / 2, unix(2026, 11, 13));
+
+    let mut areas = load();
+    assert_eq!(halloween_areas(&areas.world_ready_packets(inside)), all(true));
+    assert!(areas.season_changes(inside).is_empty(), "the first tick only records the state");
+    assert!(areas.calendar().active_at(&areas, inside).contains(&"halloween"));
+    assert!(areas.calendar().open_quests(&areas, inside).contains(&3_950_200));
+
+    // A second restart, later in the window, then the real clock runs over the edge.
+    let mut areas = load();
+    assert!(areas.season_changes(after - DAY).is_empty());
+    assert!(areas.season_changes(after - 60_000).is_empty(), "the last minute is inside");
+    assert_eq!(halloween_areas(&areas.season_changes(after)), all(false));
+    assert!(areas.season_changed());
+    assert!(areas.season_changes(after + 60_000).is_empty(), "an edge is reported once");
+
+    // Down over the edge: the next start finds the event over, with nothing to switch off.
+    let mut areas = load();
+    assert!(halloween_areas(&areas.world_ready_packets(after)).is_empty());
+    assert!(areas.season_changes(after).is_empty());
+    assert!(!areas.calendar().active_at(&areas, after).contains(&"halloween"));
+    // And next October it starts by itself again.
+    assert!(areas.season_changes(unix(2027, 10, 1) - 60_000).is_empty());
+    assert_eq!(halloween_areas(&areas.season_changes(unix(2027, 10, 1))), all(true));
+}
+
+/// A hand toggle overrides the calendar until the event's next edge, or until it is cleared,
+/// and it is kept in the live world's file, so it outlives a restart.
+#[test]
+fn a_hand_toggle_lapses_at_the_next_calendar_edge_and_outlives_a_restart() {
+    let dir = fest("lapse", fest_calendar(true, "calendar"));
+    let live = Scratch::new("lapse-live");
+    let load = || ClientAreas::load(&dir.0).unwrap().watching(&live.0);
+    let fest_on = |areas: &ClientAreas, ms: u64| areas.is_season_active("Fest", ms);
+    let (start, end) = (unix(2027, 2, 1), unix(2027, 2, 3));
+
+    // On in July: the next edge is the event's own start, next February 1.
+    let mut areas = load();
+    areas.poll(JULY);
+    assert!(!fest_on(&areas, JULY));
+    assert_eq!(areas.calendar().next_edge("fest", &areas, JULY), Some(start));
+    assert!(write_toggle(&live.0, "fest", Some((Mode::On, Some(start))), JULY).unwrap());
+    assert!(!write_toggle(&live.0, "fest", Some((Mode::On, Some(start))), JULY).unwrap());
+    assert!(areas.poll(JULY + 2_000) && fest_on(&areas, JULY));
+
+    // The server restarts in August: the toggle is still in force.
+    let mut areas = load();
+    areas.poll(JULY + 30 * DAY);
+    assert!(fest_on(&areas, JULY + 30 * DAY), "a restart dropped the toggle");
+    assert_eq!(switches(&areas.world_ready_packets(JULY + 30 * DAY)), [(10, true)]);
+    // Up to the edge it is the hand's; from the edge on the dates carry the event, with no
+    // gap, and end it on its last day although nobody turned it off.
+    areas.poll(start - 60_000);
+    assert_eq!(areas.hand_modes().get("fest"), Some(&Mode::On));
+    assert!(areas.season_changes(start).is_empty(), "the lapse must not blink the event");
+    assert!(areas.hand_modes().is_empty() && fest_on(&areas, start));
+    assert_eq!(switches(&areas.season_changes(end)), [(10, false)]);
+    // The file still stores the lapsed toggle; nothing reads it as one.
+    assert_eq!(read_overrides(&live.0).unwrap().len(), 1);
+    assert_eq!(read_hands(&live.0, start).unwrap(), Default::default());
+    assert_eq!(read_hands(&live.0, start - 1).unwrap().until.get("fest"), Some(&start));
+
+    // Off inside the next window: it lapses when that window ends, so the year after runs.
+    let (inside, ends, next) = (unix(2028, 2, 1) + DAY / 2, unix(2028, 2, 3), unix(2029, 2, 1));
+    let mut areas = load();
+    areas.poll(inside);
+    assert!(fest_on(&areas, inside));
+    let edge = areas.calendar().next_edge("fest", &areas, inside);
+    assert_eq!(edge, Some(ends));
+    settle();
+    assert!(write_toggle(&live.0, "fest", Some((Mode::Off, edge)), inside).unwrap());
+    assert_eq!(read_overrides(&live.0).unwrap().len(), 1, "the lapsed toggle left the file");
+    assert_eq!(switches(&areas.season_changes(inside + 2_000)), [(10, false)]);
+    // Asked again while it is held off, the edge is still the window's own end.
+    assert_eq!(areas.calendar().next_edge("fest", &areas, inside + 2_000), Some(ends));
+    let mut areas = load();
+    areas.poll(ends - 60_000);
+    assert!(!fest_on(&areas, ends - 60_000), "a restart dropped the off toggle");
+    areas.poll(ends);
+    assert!(areas.hand_modes().is_empty() && !fest_on(&areas, ends));
+    areas.poll(next);
+    assert!(fest_on(&areas, next), "an off toggle outlived its window");
+
+    // Cleared by hand before its edge: the calendar has the event back at once.
+    settle();
+    let later = next + DAY / 2;
+    assert!(write_toggle(&live.0, "fest", Some((Mode::Off, Some(next + 2 * DAY))), later).unwrap());
+    assert_eq!(switches(&areas.season_changes(later + 2_000)), [(10, false)]);
+    settle();
+    assert!(write_toggle(&live.0, "fest", None, later + 3_000).unwrap());
+    assert_eq!(switches(&areas.season_changes(later + 5_000)), [(10, true)]);
+
+    // An event the calendar never moves (mode on, or no real dates) has no edge: its toggle
+    // holds until an admin clears it.
+    let fixed = fest("lapse-fixed", fest_calendar(false, "calendar"));
+    let fixed = ClientAreas::load(&fixed.0).unwrap();
+    assert_eq!(fixed.calendar().next_edge("fest", &fixed, JULY), None);
+    assert_eq!(fixed.calendar().next_edge("nope", &fixed, JULY), None);
+}
+
+/// The whole path by chat: an admin's `realm <key> on` holds until the event's next start, the
+/// toggle outlives the server (a new session on the same live world), and from that start on
+/// the dates run the event and end it.
+#[test]
+fn a_toggle_typed_in_chat_outlives_a_restart_and_gives_way_to_the_dates() {
+    let fixture = Fixture::new().with_bulk_quests();
+    let alyssa = at_alyssa();
+    let mut game = admin(&fixture);
+    let mut now = 1_000;
+    clock(&mut game, JULY, &mut now);
+    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt in July");
+    settle();
+    let set = realm(&mut game, "realm spring_eggstravaganza on", &mut now);
+    let told = "spring_eggstravaganza (The Spring Eggstravaganza): on, running by hand until \
+                2027-03-28 00:00, then by its dates. Active now: spring_eggstravaganza, summer_camp.";
+    assert_eq!(set, told);
+    clock(&mut game, JULY, &mut now);
+    offer(&mut game, &alyssa, ALYSSA, EGG_HUNT, now);
+    drop(game);
+
+    // The restart: a new session, the same live world, a month on.
+    let mut game = admin(&fixture);
+    let mut now = 1_000;
+    clock(&mut game, JULY + 30 * DAY, &mut now);
+    offer(&mut game, &alyssa, ALYSSA, EGG_HUNT, now);
+    accept(&mut game, &alyssa, EGG_HUNT, now + 2);
+    now += 10;
+
+    // Inside next spring's window the toggle has lapsed and the event runs by its dates.
+    clock(&mut game, EGG_DAY + 365 * DAY, &mut now);
+    let line = realm(&mut game, "realm spring_eggstravaganza", &mut now);
+    let by_date = "spring_eggstravaganza (The Spring Eggstravaganza): calendar, running until \
+                   2027-04-08 00:00.";
+    assert_eq!(line, by_date);
+    assert_eq!(status(&game, EGG_HUNT), Some(QuestStatus::Active), "the lapse dropped the quest");
+    // And the dates end it: nobody typed `off`.
+    clock(&mut game, AFTER_EGGS + 365 * DAY, &mut now);
+    assert_eq!(status(&game, EGG_HUNT), Some(QuestStatus::Abandoned));
+    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt after its window");
+
+    // Off inside a window, cleared with `default` before its edge.
+    clock(&mut game, JULY + 365 * DAY, &mut now);
+    settle();
+    let off = realm(&mut game, "realm summer_camp off", &mut now);
+    let held = "summer_camp (Summer Camp): off, not running by hand until 2027-09-07 00:00, then \
+                by its dates. Active now: nothing.";
+    assert_eq!(off, held);
+    settle();
+    let cleared = realm(&mut game, "realm summer_camp default", &mut now);
+    let back = "summer_camp (Summer Camp): calendar, running until 2027-09-07 00:00. Active now: \
+                summer_camp.";
+    assert_eq!(cleared, back);
+    let usage = realm(&mut game, "realm summer_camp sometimes", &mut now);
+    assert!(usage.starts_with("Usage: realm halloween on|off|calendar"), "{usage}");
 }

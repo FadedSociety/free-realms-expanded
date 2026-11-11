@@ -23,8 +23,8 @@ use std::collections::BTreeSet;
 
 /// 2026-10-31 12:00 UTC: inside Halloween (9/20 to 11/11) and no other shipped season.
 const HALLOWEEN_MS: u64 = 1_793_448_000_000;
-/// 2026-11-12 00:00 UTC: the first minute after Halloween's last day.
-const HALLOWEEN_OVER_MS: u64 = 1_794_441_600_000;
+/// 2026-11-13 00:00 UTC: the first minute after Halloween's last day.
+const HALLOWEEN_OVER_MS: u64 = 1_794_528_000_000;
 /// 2026-12-20 12:00 UTC: inside Snow Days (12/1 to 1/14).
 const SNOW_DAYS_MS: u64 = 1_797_768_000_000;
 /// 2026-02-14 12:00 UTC: inside the Festival of Hearts (2/1 to 3/31).

@@ -108,13 +108,13 @@ fn season_windows_are_inclusive_wrap_the_year_and_follow_the_offset() {
     let areas = shipped();
     let halloween = |time| areas.is_season_active("Halloween", time);
     assert!(halloween(at(2026, 10, 21, 12, 0)));
-    assert!(!halloween(at(2026, 9, 19, 23, 59)));
-    assert!(halloween(at(2026, 9, 20, 0, 0)), "the first day is inside");
+    assert!(!halloween(at(2026, 9, 30, 23, 59)));
+    assert!(halloween(at(2026, 10, 1, 0, 0)), "the first day is inside");
     assert!(
-        halloween(at(2026, 11, 11, 23, 59)),
+        halloween(at(2026, 11, 12, 23, 59)),
         "the last day is inside"
     );
-    assert!(!halloween(at(2026, 11, 12, 0, 0)));
+    assert!(!halloween(at(2026, 11, 13, 0, 0)));
     assert!(!halloween(at(2026, 6, 1, 0, 0)));
     assert!(!areas.is_season_active("Winterfest", at(2026, 10, 21, 0, 0)));
 
@@ -169,7 +169,7 @@ fn world_ready_sends_the_pad_and_the_season_areas_only_in_season() {
     assert_eq!(october.len(), 14);
     assert_eq!(october, enables(HALLOWEEN.chain([4173])));
     assert_eq!(
-        read_all(&areas.world_ready_packets(at(2026, 11, 12, 0, 0))),
+        read_all(&areas.world_ready_packets(at(2026, 11, 13, 0, 0))),
         enables([4173])
     );
     // Nothing is saved: a fresh load (a restart or reconnect) recomputes the same answer.
@@ -344,7 +344,7 @@ fn an_event_toggle_reports_elapsed_time_and_unknown_ids_are_refused() {
 #[test]
 fn season_changes_report_each_boundary_once_even_with_a_clock_going_back() {
     let mut areas = shipped();
-    let end = at(2026, 11, 12, 0, 0);
+    let end = at(2026, 11, 13, 0, 0);
     assert!(
         areas.season_changes(end - 60_000).is_empty(),
         "the first call is the baseline"
@@ -360,10 +360,10 @@ fn season_changes_report_each_boundary_once_even_with_a_clock_going_back() {
         enables(HALLOWEEN)
     );
     assert!(areas.season_changes(end - 180_000).is_empty());
-    assert!(areas.season_changes(at(2026, 10, 1, 0, 0)).is_empty());
+    assert!(areas.season_changes(at(2026, 10, 2, 0, 0)).is_empty());
 
     let mut start = shipped();
-    let first = at(2026, 9, 20, 0, 0);
+    let first = at(2026, 10, 1, 0, 0);
     assert!(start.season_changes(first - 60_000).is_empty());
     assert_eq!(read_all(&start.season_changes(first)), enables(HALLOWEEN));
     assert!(start.season_changes(first + 60_000).is_empty());
@@ -382,7 +382,7 @@ fn an_event_and_a_season_sharing_an_area_keep_it_on_while_either_holds_it() {
     );
     // Held by the toggle when the season ends: only the other twelve go off.
     assert!(areas.set_area(3992, true, october).is_none());
-    let end = at(2026, 11, 12, 0, 0);
+    let end = at(2026, 11, 13, 0, 0);
     assert!(areas.season_changes(end - 60_000).is_empty());
     assert_eq!(
         read_all(&areas.season_changes(end)),

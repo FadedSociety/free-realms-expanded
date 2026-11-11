@@ -3332,9 +3332,9 @@ impl Gameplay {
             return Ok(false);
         };
         let lower = text.trim().to_ascii_lowercase();
-        let Some(command) = lower.strip_prefix("realm ") else {
-            return Ok(false);
-        };
+        // An event toggle, however it is typed, is the realm command `season` (live_events.rs).
+        let season = self.season_args(&lower).map(|_| "season");
+        let Some(command) = season.or(lower.strip_prefix("realm ")) else { return Ok(false) };
         let first = command.split_whitespace().next().unwrap_or_default();
         let ordinary = matches!(
             first,

@@ -241,8 +241,8 @@ mod tests {
         .unwrap()
     }
 
-    /// Unix ms of 2026-11-12 00:00 UTC, the day after Halloween ends.
-    const HALLOWEEN_OVER: u64 = 1_794_441_600_000;
+    /// Unix ms of 2026-11-13 00:00 UTC, the day after Halloween ends.
+    const HALLOWEEN_OVER: u64 = 1_794_528_000_000;
 
     #[test]
     fn a_season_change_reaches_loaded_sessions_and_a_full_queue_skips_only_its_own() {
@@ -305,6 +305,84 @@ mod tests {
             .map(|key| area_messages(&drain_replies(sessions.get_mut(key).unwrap(), 2_000)))
             .collect();
         assert!(received.iter().all(Vec::is_empty));
+    }
+
+    /// Unix ms of 2026-07-15 12:00 UTC: no shipped Halloween date, whatever day the test runs.
+    const JULY: u64 = 1_784_116_800_000;
+
+    /// The event toggle through the packet path a socket datagram takes: a player's and a
+    /// tester's `realm halloween on` are refused by the realm role gate and write nothing; an
+    /// admin's writes the live world's toggle file, and the shared world's next tick switches
+    /// the 13 Halloween areas for a loaded session that typed nothing.
+    #[test]
+    fn an_admin_toggles_an_event_by_chat_and_other_roles_are_refused() {
+        use osfr_tools::account_store::AccountRole;
+        if !super::super::tests::test_support::bin_test_target("client-area") {
+            return;
+        }
+        let scratch = Scratch::new("event-toggle");
+        let mut options = test_support::options(scratch.state());
+        if !test_support::fixtures_present(&options) {
+            eprintln!("skip event-toggle: the private lab fixtures are absent");
+            return;
+        }
+        let live = scratch.path().join("live");
+        std::fs::create_dir_all(&live).unwrap();
+        options.world = Some(live.clone());
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut scene = Scene::new(&options, 41);
+        scene.world.client_areas = ClientAreas::load(&shipped).unwrap().watching(&live);
+        let _ = enter_world(&mut scene, &options);
+        let mut watcher = test_support::enter(&options, 42);
+        watcher.gateway.handle(&wrap_application(&[13, 0])).unwrap();
+        watcher.gateway.handle(&wrap_application(&[10, 0])).unwrap();
+        let key = SessionKey {
+            peer: watcher.peer,
+            connection_id: watcher.request.id,
+        };
+        scene.sessions.insert(key, watcher);
+        let _ = drain_replies(scene.sessions.get_mut(&key).unwrap(), 250);
+        season_tick(&mut scene.world, &mut scene.sessions, JULY);
+
+        let typed = |text: &str| osfr_tools::chat::local_request(text);
+        let said = |replies: &[Vec<u8>], text: &str| {
+            (replies.iter()).any(|reply| reply.windows(text.len()).any(|w| w == text.as_bytes()))
+        };
+        let file = live.join(osfr_tools::event_calendar::OVERRIDES_FILE);
+        let mut now = 300;
+        let mut switched = |scene: &mut Scene, unix_ms: u64| {
+            season_tick(&mut scene.world, &mut scene.sessions, unix_ms);
+            now += 100;
+            (area_messages(&drain_replies(scene.sessions.get_mut(&key).unwrap(), now)).iter())
+                .map(|message| fields(message))
+                .collect::<Vec<_>>()
+        };
+
+        scene.session.gateway.set_role_commands(true);
+        for role in [AccountRole::Player, AccountRole::Tester, AccountRole::Moderator] {
+            scene.session.gateway.set_role(role);
+            for text in ["realm halloween on", "realm event season halloween on", "/halloween on"] {
+                let replies = scene.exchange(&options, &typed(text), 300);
+                let refusal = "your account role does not allow this command";
+                assert!(said(&replies, refusal), "{role:?}: {text}");
+            }
+        }
+        assert!(!file.exists(), "a refused toggle wrote the file");
+        assert!(switched(&mut scene, JULY + 2_000).is_empty());
+
+        scene.session.gateway.set_role(AccountRole::Admin);
+        let on = scene.exchange(&options, &typed("realm halloween on"), 400);
+        assert!(said(&on, "halloween (Super Spooktacular): on, running"), "the admin's answer");
+        assert!(file.exists());
+        let all = |on: bool| (3992..=4004).map(|id| (id, on, 0)).collect::<Vec<_>>();
+        assert_eq!(switched(&mut scene, JULY + 4_000), all(true));
+        assert!(switched(&mut scene, JULY + 6_000).is_empty(), "a toggle is sent once");
+
+        // Two writes inside one file-time tick would share a stamp (as tests/live_events.rs).
+        std::thread::sleep(std::time::Duration::from_millis(100));
+        let off = scene.exchange(&options, &typed("realm halloween off"), 500);
+        assert!(said(&off, "halloween (Super Spooktacular): off, not running"));
+        assert_eq!(switched(&mut scene, JULY + 8_000), all(false));
     }
 
     /// Unix ms of 2026-02-28 23:59 and 2026-03-01 00:00 UTC: the area-less Quiet season opens.

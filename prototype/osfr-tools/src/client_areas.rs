@@ -165,7 +165,8 @@ pub struct ClientAreas {
     modes: BTreeMap<String, crate::event_calendar::Mode>,
     /// The calendar read beside this file, and the live hand toggles it follows (if watched).
     calendar: crate::event_calendar::EventCalendar,
-    hand: Option<crate::event_calendar::HandWatch>,
+    /// Boxed: every session's `Gameplay` holds one of these tables by value.
+    hand: Option<Box<crate::event_calendar::HandWatch>>,
     /// T900: each session's area-banner state (104 and 15/2); see [`crate::area_banner`].
     pub banners: crate::area_banner::AreaBanners,
 }
@@ -208,9 +209,10 @@ impl ClientAreas {
     }
 
     /// Follow the hand toggles in `live_dir` (`event_overrides.json`): [`Self::poll`] and
-    /// [`Self::season_changes`] re-read the file when it changes, at most once a second.
+    /// [`Self::season_changes`] re-read the file when it changes or one of its toggles
+    /// lapses (at its event's next calendar edge), at most once a second.
     pub fn watching(mut self, live_dir: &Path) -> Self {
-        self.hand = Some(crate::event_calendar::HandWatch::new(live_dir));
+        self.hand = Some(Box::new(crate::event_calendar::HandWatch::new(live_dir)));
         self
     }
 

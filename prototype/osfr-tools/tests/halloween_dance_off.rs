@@ -23,7 +23,7 @@ const WORLD: ZoneInstance = ZoneInstance {
 /// The song-area centre in the client (FabledRealmsAreas.xml:3488); the viewer stands on it.
 const DANCE_SPOT: [f32; 3] = [-2384.4, -26.77, 1214.94];
 const OCT_21_2026_MS: u64 = 1_792_540_800_000; // 00:00 UTC, in the season
-const NOV_12_2026_MS: u64 = 1_794_441_600_000; // the day after the season's last day
+const NOV_13_2026_MS: u64 = 1_794_528_000_000; // the day after the season's last day
 const DAY_MS: u64 = 86_400_000;
 const POOF: i32 = 21; // PFX_smoke_black_explosion
 const BOOMBOX_SPARKS: i32 = 5120;
@@ -380,5 +380,5 @@ fn the_dance_off_runs_every_half_hour_in_season_and_not_after_it() {
         "{minutes:?}"
     );
     // The season ends on 11/11: a day later nothing is announced or started.
-    assert_eq!(sweep(NOV_12_2026_MS), (0, 0, Vec::new()));
+    assert_eq!(sweep(NOV_13_2026_MS), (0, 0, Vec::new()));
 }

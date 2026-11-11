@@ -95,9 +95,12 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
         AccountRole::Moderator => {
             matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "gm")
         }
-        AccountRole::Tester => {
-            !matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "role" | "code")
-        }
+        // `season` is an event toggle (`gameplay/live_events.rs`): it changes the world for every
+        // player, so it stays with the admins (owner 2026-11-09).
+        AccountRole::Tester => !matches!(
+            command,
+            "mute" | "unmute" | "kick" | "ban" | "unban" | "role" | "code" | "season"
+        ),
         AccountRole::Player => false,
     }
 }
@@ -863,7 +866,7 @@ mod tester_role_tests {
         for command in ["give", "coins", "sc", "level", "god", "goto", "here", "place", "reload all"] {
             assert!(can_run_realm_command(tester, command), "{command}");
         }
-        for command in ["mute", "unmute", "kick", "ban", "unban", "role", "code"] {
+        for command in ["mute", "unmute", "kick", "ban", "unban", "role", "code", "season"] {
             assert!(!can_run_realm_command(tester, command), "{command}");
         }
         assert!(!tester.outranks(AccountRole::Player), "testers cannot moderate anyone");

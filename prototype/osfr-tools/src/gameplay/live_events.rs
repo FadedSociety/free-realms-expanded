@@ -19,7 +19,8 @@
 //! has opened. Once a second the session re-reads the hand toggles, and when the running
 //! events moved it holds the seasons in its NPC view and closes the ended events' quests:
 //! a started one is abandoned (26/23's own `QuestAbandoned` answer) and a finished one is
-//! forgotten, as the calendar's `on_end` says. `realm event season` shows and sets the toggles.
+//! forgotten, as the calendar's `on_end` says. `realm event season` shows and sets the toggles;
+//! a toggle holds until the event's next calendar edge or until it is cleared.
 use super::*;
 use crate::client_areas::{ClientAreas, unix_now_ms};
 use crate::event_calendar::{self, Mode};
@@ -316,24 +317,43 @@ impl Gameplay {
         Ok(format!("Event {id} is {state}."))
     }
 
-    /// The short forms an admin types in chat: `/event` (list), `/event <key> on|off|calendar`
-    /// and `/<key> on|off|calendar` for every key of `event_calendar.json` (`/halloween on`).
-    /// Anything else is left to the realm router, starting with its role refusal.
-    pub(super) fn event_command(&mut self, inner: &[u8], guid: u64) -> io::Result<Option<Outcome>> {
-        let short = chat::request(inner, guid)?.and_then(|text| {
-            let lower = text.trim().to_ascii_lowercase();
-            let mut words = lower.strip_prefix('/')?.split_whitespace().map(str::to_owned);
-            let first = words.next()?;
-            let calendar = self.event_watch.seasons.as_ref()?.calendar();
-            if first == "event" {
-                return Some(words.collect::<Vec<String>>());
-            }
-            (calendar.has_event(&first)).then(|| std::iter::once(first).chain(words).collect())
-        });
-        let Some(args) = short else {
-            return self.command_refusal(inner, guid);
+    /// The words of an event toggle, whichever way it was typed (`lower`: the trimmed,
+    /// lower-cased chat line): `realm event season <words>`, the short `realm <key> <words>`
+    /// for every key of `event_calendar.json` (`realm halloween on`), and the slash forms
+    /// `/event <words>` and `/<key> <words>` (`/halloween on`). The stock client runs a line
+    /// that starts with `/` in its own console and answers an unknown one itself ("Command not
+    /// supported", client 0x00a9e480 and 0x00a9e2d0), so only the `realm` forms leave it; the
+    /// slash forms are for a client that sends them. `None`: not an event toggle.
+    pub(super) fn season_args<'a>(&self, lower: &'a str) -> Option<Vec<&'a str>> {
+        let calendar = self.event_watch.seasons.as_ref()?.calendar();
+        let (slash, rest) = match lower.strip_prefix('/') {
+            Some(rest) => (true, rest),
+            None => (false, lower.strip_prefix("realm ")?),
         };
-        let args: Vec<&str> = args.iter().map(String::as_str).collect();
+        let mut words = rest.split_whitespace();
+        match words.next()? {
+            "event" if slash => Some(words.collect()),
+            "event" => (words.next() == Some("season")).then(|| words.collect()),
+            key if calendar.has_event(key) => Some(std::iter::once(key).chain(words).collect()),
+            _ => None,
+        }
+    }
+
+    /// Chat's first stop: the realm router's role refusal for any command this account may not
+    /// run, then the event toggles. Every form of a toggle is the realm command `season` to the
+    /// role table (`account_store::can_run_realm_command` through `developer_command_denied`),
+    /// so a refused toggle gets the same line, flag and security-log entry as any other.
+    pub(super) fn event_command(&mut self, inner: &[u8], guid: u64) -> io::Result<Option<Outcome>> {
+        if let Some(refused) = self.command_refusal(inner, guid)? {
+            return Ok(Some(refused));
+        }
+        let Some(text) = chat::request(inner, guid)? else {
+            return Ok(None);
+        };
+        let lower = text.trim().to_ascii_lowercase();
+        let Some(args) = self.season_args(&lower) else {
+            return Ok(None);
+        };
         let reply = chat::system(&self.event_season_command(&args));
         Ok(Some(Outcome {
             replies: vec![reply],
@@ -342,21 +362,28 @@ impl Gameplay {
     }
 
     /// One event as an admin reads it: its mode, whether it runs, and until or from when.
-    fn event_line(areas: &ClientAreas, key: &str, unix_ms: u64) -> String {
+    /// `until` is when its hand toggle lapses (the event's next calendar edge), if it does.
+    fn event_line(areas: &ClientAreas, key: &str, until: Option<u64>, unix_ms: u64) -> String {
         let calendar = areas.calendar();
         let Some((name, mode)) = calendar.describe(key, areas.hand_modes()) else {
             return format!("{key} is not a calendar event");
         };
         let date = |ms: u64| event_calendar::local_date(areas.local_minute(ms));
         let running = calendar.active_at(areas, unix_ms).contains(&key);
-        let state = match (mode, running) {
-            (Mode::On, _) => "on, running until an admin turns it off".to_owned(),
-            (Mode::Off, _) => "off, not running until an admin turns it on".to_owned(),
-            (Mode::Calendar, true) => match calendar.running_until(key, areas, unix_ms) {
+        let state = match (mode, running, until) {
+            (Mode::On, _, Some(until)) => {
+                format!("on, running by hand until {}, then by its dates", date(until))
+            }
+            (Mode::Off, _, Some(until)) => {
+                format!("off, not running by hand until {}, then by its dates", date(until))
+            }
+            (Mode::On, ..) => "on, running until an admin turns it off".to_owned(),
+            (Mode::Off, ..) => "off, not running until an admin turns it on".to_owned(),
+            (Mode::Calendar, true, _) => match calendar.running_until(key, areas, unix_ms) {
                 Some(end) => format!("calendar, running until {}", date(end)),
                 None => "calendar, running".to_owned(),
             },
-            (Mode::Calendar, false) => match calendar.next_occurrence(key, areas, unix_ms) {
+            (Mode::Calendar, false, _) => match calendar.next_occurrence(key, areas, unix_ms) {
                 Some(start) => format!("calendar, not running, next starts {}", date(start)),
                 None => "calendar, not running".to_owned(),
             },
@@ -366,14 +393,17 @@ impl Gameplay {
 
     /// The event toggles, for admins only (owner 2026-11-09): list the calendar's events, show
     /// one, or set its hand toggle. `on` starts the event and its quests now, `off` ends it now
-    /// by the calendar's end rules, `calendar` (or `default`) returns it to its real dates. The
-    /// write goes to the live world's `event_overrides.json`; every session and the gateway's
-    /// shared world pick it up at their next one-second poll, this one included. Anyone who is
-    /// not an admin is refused before the file is looked at: a tester's wide realm rights do not
-    /// reach a switch that changes the world for every player.
+    /// by the calendar's end rules; either holds until the event's next calendar edge (the
+    /// start or end its dates give it next), where the calendar takes over again, or until
+    /// `default` clears it (`calendar` also returns it to its dates, over a content mode of on
+    /// or off too). The write goes to the live world's `event_overrides.json`; every session
+    /// and the gateway's shared world pick it up at their next one-second poll, this one
+    /// included. Only the role table's `season` command may use it (admins: a tester's wide
+    /// realm rights stop short of a switch that changes the world for every player), and a
+    /// refused caller never reaches the file.
     fn event_season_command(&mut self, args: &[&str]) -> String {
-        if self.role != crate::account_store::AccountRole::Admin {
-            return "Cannot do that: only an admin can start or stop an event.".into();
+        if !self.may_run("season") {
+            return "Cannot do that: your account role does not allow this command.".into();
         }
         let Some(areas) = self.event_watch.seasons.as_ref() else {
             return "The event calendar is not loaded.".into();
@@ -382,41 +412,53 @@ impl Gameplay {
         // The answer describes the toggles as the file now holds them, not the last poll.
         let view = |areas: &ClientAreas| {
             let mut view = areas.clone();
-            if let Ok(hand) = event_calendar::read_overrides(&live) {
-                view.set_hand_modes(hand);
-            }
-            view
+            let hands = event_calendar::read_hands(&live, unix_ms).unwrap_or_else(|_| {
+                event_calendar::Hands {
+                    modes: view.hand_modes().clone(),
+                    ..Default::default()
+                }
+            });
+            view.set_hand_modes(hands.modes);
+            (view, hands.until)
+        };
+        let line = |(view, until): &(ClientAreas, BTreeMap<String, u64>), key: &str| {
+            Self::event_line(view, key, until.get(key).copied(), unix_ms)
         };
         let (key, mode) = match args {
             [] => {
                 let view = view(areas);
-                let lines: Vec<String> = (view.calendar().keys())
-                    .map(|key| Self::event_line(&view, key, unix_ms))
-                    .collect();
+                let lines: Vec<String> =
+                    (view.0.calendar().keys()).map(|key| line(&view, key)).collect();
                 if lines.is_empty() {
                     return "The event calendar is empty.".into();
                 }
                 return lines.join("; ") + ".";
             }
-            [key] if areas.calendar().has_event(key) => {
-                return Self::event_line(&view(areas), key, unix_ms) + ".";
-            }
+            [key] if areas.calendar().has_event(key) => return line(&view(areas), key) + ".",
             [key, "on"] => (*key, Some(Mode::On)),
             [key, "off"] => (*key, Some(Mode::Off)),
             [key, "calendar"] => (*key, Some(Mode::Calendar)),
             [key, "default"] => (*key, None),
-            _ => return "Usage: /event [<key> on|off|calendar], or /<key> on|off|calendar.".into(),
+            _ => {
+                return "Usage: realm halloween on|off|calendar (any event key), or realm event season."
+                    .into();
+            }
         };
         if !areas.calendar().has_event(key) {
-            return format!("{key} is not a calendar event; /event lists them.");
+            return format!("{key} is not a calendar event; realm event season lists them.");
         }
-        if let Err(error) = event_calendar::write_override(&live, key, mode) {
+        // On and off lapse at the event's next calendar edge; `calendar` has no edge to wait for.
+        let toggle = mode.map(|mode| {
+            let edge = || areas.calendar().next_edge(key, areas, unix_ms);
+            (mode, (mode != Mode::Calendar).then(edge).flatten())
+        });
+        if let Err(error) = event_calendar::write_toggle(&live, key, toggle, unix_ms) {
             return format!("Could not save the event toggle: {error}. Nothing changed.");
         }
         let view = view(areas);
-        let active = view.calendar().active_at(&view, unix_ms).join(", ");
+        let active = view.0.calendar().active_at(&view.0, unix_ms).join(", ");
         let active = if active.is_empty() { "nothing".to_owned() } else { active };
-        format!("{}. Active now: {active}.", Self::event_line(&view, key, unix_ms))
+        format!("{}. Active now: {active}.", line(&view, key))
     }
 }
 

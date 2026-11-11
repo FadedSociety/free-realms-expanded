@@ -354,7 +354,7 @@ mod tests {
         dir
     }
 
-    /// The shipped Halloween season (September 20 to November 11) at a fixed UTC offset.
+    /// A Halloween season (September 20 to November 11) at a fixed UTC offset.
     fn areas(utc_offset_minutes: i32) -> ClientAreas {
         let dir = scratch("areas");
         let file = json!({"schema_version": 1, "utc_offset_minutes": utc_offset_minutes,

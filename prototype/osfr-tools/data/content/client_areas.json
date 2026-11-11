@@ -14,12 +14,12 @@
   "seasons": [
     {
       "name": "Halloween",
-      "start_month": 9,
-      "start_day": 20,
+      "start_month": 10,
+      "start_day": 1,
       "end_month": 11,
-      "end_day": 11,
+      "end_day": 12,
       "area_ids": [3992, 3993, 3994, 3995, 3996, 3997, 3998, 3999, 4000, 4001, 4002, 4003, 4004],
-      "source": "reference Sanctuary 10f129e src/Resources/Zones/FabledRealms.json:28-51 SeasonalClientAreas Halloween; (R) dates, the wiki only says the event ran in October; client FabledRealmsAreas.xml:3156-3195 Halloween_Pixiewood_1-10, Briarwood, Snowhill, StillWater"
+      "source": "Areas: reference Sanctuary 10f129e src/Resources/Zones/FabledRealms.json:28-51 SeasonalClientAreas Halloween; client FabledRealmsAreas.xml:3156-3195 Halloween_Pixiewood_1-10, Briarwood, Snowhill, StillWater. Dates: quest-lines/schedules.json svhalloween-super-spooktacular, the one fully dated run: 'starting October 1 and running through November 12, 2013' (freerealms.com article 2949; fanbyte Goo'd Candy: 'For 2013, Spooktacular begins on October 1st'). October 2010 and October 2012 were 'Super Spooktacular month' with no days given; the first run was announced for Oct 14 to Nov 11 2009 (article 476). (R) The 2013 window is used for every year; one record has a 2011 run to Nov 23, not confirmed, left out. The reference server's Sep 20 to Nov 11 had no dated source."
     },
     {
       "name": "Snow Days",
