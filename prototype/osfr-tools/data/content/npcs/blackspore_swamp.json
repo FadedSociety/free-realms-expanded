@@ -5285,6 +5285,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L1125 warpstone rock: this NPC stood on the warpstone dais (or inside its floating rock, model 280 sg_warpstone_01.adr, now drawn at every stone); moved 3.6 m out to open ground at the height grid's level."
           }
         ],
         "position_reason": [
