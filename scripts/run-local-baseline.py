@@ -50,6 +50,7 @@ parser.add_argument("--native-hook", metavar="SET", help="Attach the Frida nativ
 parser.add_argument("--live-log", action=argparse.BooleanOptionalAction, default=True, help="Write server/login packet traces and open the merged live log in a console beside the client (default on; --no-live-log to disable)")
 parser.add_argument("--bin-dir", type=Path, help="Directory holding osfr-gateway.exe and osfr-login.exe (default: the source checkout's target/release)")
 parser.add_argument("--dev-tools", action="store_true", help="Opt in to local developer entity teleport commands for this test run")
+parser.add_argument("--admin-port", type=int, default=0, help="Serve the web admin panel on 127.0.0.1:<port> (0: off)")
 parser.add_argument("--drop-server-sequence", type=int, help="Drop the first transmission of this reliable sequence to test recovery")
 parser.add_argument("--client-dir", type=Path, help="Client folder to copy for this run, under lab/ (default: lab/working/OSFR.Client/OSFR Client, the full 2014 packs); "
                     "lab/clients/community-clean is the launcher's community install, which streams AssetsW_002+ on first use")
@@ -76,6 +77,8 @@ if run_options.journal_text and not run_options.native_login:
     parser.error("--journal-text requires --native-login (explicit Locale8)")
 if run_options.character_select_title and not run_options.native_login:
     parser.error("--character-select-title requires --native-login")
+if run_options.admin_port and not run_options.native_login:
+    parser.error("--admin-port requires --native-login (the panel signs in against its account store)")
 journal_text = validate_journal_text(run_options.journal_text, run_options.content,
                                     client_source, lab)
 character_select_title = validate_character_select_title(run_options.character_select_title, lab)
@@ -136,6 +139,9 @@ if use_rust:
         server_command += ["--content", str(run_options.content.resolve())]
     if run_options.dev_tools:
         server_command += ["--dev-tools", "--client-logs", str(client / "Logs")]
+    if run_options.admin_port:
+        # The web admin panel on 127.0.0.1 (admin_http.rs); item icons are read from this client.
+        server_command += ["--admin-port", str(run_options.admin_port), "--admin-client", str(client)]
     # World Builder live layer: in-game builds (placed NPCs, marks, authored content) persist here.
     if run_options.dev_tools:
         server_command += ["--world", str(lab / "world"),
