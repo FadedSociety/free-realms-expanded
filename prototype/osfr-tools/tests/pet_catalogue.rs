@@ -146,10 +146,14 @@ fn every_trick_and_item_name_id_is_client_text() {
 #[test]
 fn every_item_row_matches_the_shipped_item_catalogue() {
     let inventory = Inventory::load(&round70_content::source(), None).expect("catalogue loads");
+    // B3 (event items): the pets the lab catalogue lacks are release supplement rows.
+    let release_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    let release = Inventory::load(&release_dir, None).expect("release content loads");
     for item in rows(&shipped(), "items") {
         let id = int(item, "item_id") as i32;
         let shown = inventory
             .presentation(id)
+            .or_else(|_| release.presentation(id))
             .unwrap_or_else(|e| panic!("item {id}: {e}"));
         assert_eq!(shown.item_type, 2, "item {id} type");
         assert_eq!(
@@ -226,17 +230,31 @@ fn every_client_type_2_item_is_a_pet_adoption_item() {
         .iter()
         .map(|row| int(row, "item_id"))
         .collect();
-    let mut count = 0;
+    let mut client_pets = BTreeSet::new();
     for item in client.as_array().unwrap() {
         if item.get("Type").and_then(Value::as_i64) != Some(2) {
             continue;
         }
-        count += 1;
         let id = int(item, "Id");
+        client_pets.insert(id);
         assert!(bound.contains(&id), "type-2 item {id} is not in pets.json");
     }
+    let count = client_pets.len();
     assert_eq!(count, 528, "the pinned client file's Type-2 count changed");
-    assert_eq!(bound.len(), count);
+    // B3 (event items, scripts/event_items.py): the 18 pet rows the release supplement adds are bound too;
+    // they are the only bindings the Legacy file does not hold.
+    let supplement = json::read(
+        &Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table-supplement.json"),
+    );
+    let supplement_pets: BTreeSet<i64> = rows(&supplement, "rows")
+        .iter()
+        .filter(|row| row[1][9].as_i64() == Some(2))
+        .map(|row| row[0].as_i64().unwrap())
+        .collect();
+    let added: BTreeSet<i64> = bound.difference(&client_pets).copied().collect();
+    assert_eq!(added.len(), 18);
+    assert!(added.is_subset(&supplement_pets), "a pets.json binding names no item row");
+    assert_eq!(bound.len(), count + added.len());
     let bundled = bundled();
     for (item_id, model_id) in [(FIREFLY_ITEM, 483), (CANDY_CORN_ITEM, 1530)] {
         let item = bundled

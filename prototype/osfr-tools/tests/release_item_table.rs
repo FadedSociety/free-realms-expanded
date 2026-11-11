@@ -78,7 +78,9 @@ const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     // P-vendor-stock: 116 RVS coin-price rows for the reconstructed vendor stock (25 of them in
     // the captured inventory), every one a client item table row. Recipe 861 is not among them:
     // it is a Learning to Crave the Flave pattern (`tests/zone_quests_sanctuary_r2.rs`).
-    ("stores.json", &["item_id"], 18_016, 850, 17_374),
+    // B3 (event items): 19 Legacy-only event and gift rows the store already priced (Robbie Outfit, Coffin,
+    // the Halloween decorations, Cat and Dog Ears, Hot Cocoa Mug, ...) now resolve (17,374 before).
+    ("stores.json", &["item_id"], 18_016, 850, 17_393),
     // P-kart-garage: the two mechanics' 280 kart ids (the same 13 captured), none shared with
     // the other vendors' stock. P-vendor-stock: 435 more ids across 67 reconstructed shops (41
     // captured), all table rows.

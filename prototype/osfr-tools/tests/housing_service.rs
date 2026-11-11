@@ -1488,8 +1488,10 @@ fn the_bundled_fixture_table_covers_the_placeable_items() {
     config.validate().expect("the generated table validates");
     assert_eq!(
         config.rows.len(),
-        // P-banking: the Storage Vault (910900) adds one row.
-        1_199,
+        // P-banking: the Storage Vault (910900) adds one row. B3 (event items, scripts/event_items.py): 189
+        // placeable event and gift items the item tables lacked (furniture sets, decorations, 2013 toys, building
+        // pieces, posters).
+        1_388,
         "one row per placeable item: T518's item rows plus T869's model-joined placement rows"
     );
     // The generator sorts by item id, so a regenerated table reviews as a small diff.

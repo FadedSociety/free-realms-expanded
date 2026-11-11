@@ -89,6 +89,10 @@ NO_ITEM_TABLE = (11614, 14184, 38788, 10481, 76906, 78070, 10469, 11939, 30589)
 for _item_id in NO_ITEM_TABLE:
     SKIP[_item_id] = ("In no item table the server ships (review 2026-11-09): held back until a native run "
                       "shows the client draws this pet's card and actor.")
+# B3 (event items, scripts/event_items.py): event and retired pets come from their event's shop or the gift
+# catalog (B2, GC), not from an earn ladder.
+EVENT_PET = ("An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift "
+             "catalog (B2, GC), not an earn ladder (R).")
 
 DOGS = ("dog_small_", "dog_large_")
 UNDEAD = ("skeleton", "wraith", "necrowart", "graveelemental", "ghost", "undead", "mauthedog")
@@ -154,6 +158,7 @@ def main():
     items = sorted(pets["items"], key=lambda item: item["item_id"])
     by_name = {}
     skip = dict(SKIP)
+    skip.update({item["item_id"]: EVENT_PET for item in pets["items"] if item["src"].startswith("B3 ")})
     for item in items:
         coats = by_name.setdefault(item["name"], {})
         twin = coats.get(item.get("tint_alias")) if item.get("tint_alias") else None

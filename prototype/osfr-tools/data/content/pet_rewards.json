@@ -2861,6 +2861,78 @@
    "reason": "In no item table the server ships (review 2026-11-09): held back until a native run shows the client draws this pet's card and actor."
   },
   {
+   "item_id": 911019,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911020,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911028,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911061,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911065,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911067,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911068,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911130,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911140,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911157,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911276,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911281,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911282,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911288,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911289,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911290,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911291,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
+   "item_id": 911292,
+   "reason": "An event or retired pet (B3, scripts/event_items.py): its source is its event's shop or the gift catalog (B2, GC), not an earn ladder (R)."
+  },
+  {
    "item_ids": [
     2171,
     2172,
@@ -3131,34 +3203,6 @@
    "wiki_pet": "Petunia",
    "original_source": [
     "tcg_reward"
-   ],
-   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
-  },
-  {
-   "wiki_pet": "Pinkeye",
-   "original_source": [
-    "membership_promo"
-   ],
-   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
-  },
-  {
-   "wiki_pet": "Piñata Pony",
-   "original_source": [
-    "sc_marketplace"
-   ],
-   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
-  },
-  {
-   "wiki_pet": "Snowflake",
-   "original_source": [
-    "sc_marketplace"
-   ],
-   "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
-  },
-  {
-   "wiki_pet": "St. Bernard",
-   "original_source": [
-    "quest_event"
    ],
    "reason": "The wiki lists this pet but no client pet item carries its name (pets.json items), so there is nothing to grant yet."
   },
