@@ -327,7 +327,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs: seven quest people bound to spawns the world already drew (1,306).
-    assert_eq!(regional_legacy + regional_reconstructed, 1312);
+    // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
+    assert_eq!(regional_legacy + regional_reconstructed, 1313);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"

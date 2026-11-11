@@ -162,7 +162,7 @@ fn the_pattern_scan_sees_every_item_shape() {
 #[test]
 fn the_other_rows_stay_off_behind_their_blocker() {
     // (quest, prerequisite that is itself disabled, why the row is not wired)
-    let gated: [(u32, u32, &str); 4] = [
+    let gated: [(u32, u32, &str); 3] = [
         (
             3_000_031,
             3_000_030,
@@ -178,11 +178,6 @@ fn the_other_rows_stay_off_behind_their_blocker() {
             3_090_024,
             "Darvon's Descent is an unplaced anchor and the shock-paddle box has no item",
         ),
-        (
-            3_150_013,
-            3_150_012,
-            "its prerequisite Warrior: Knocking Some Sense In waits on the class condition",
-        ),
     ];
     for (id, prerequisite, why) in gated {
         assert!(
@@ -193,6 +188,12 @@ fn the_other_rows_stay_off_behind_their_blocker() {
             !shipped_quest(prerequisite).enabled,
             "{id}: prerequisite {prerequisite} is now enabled, so the row can be reached; {why}"
         );
+    }
+    // Combat quests wave 2: Warrior: Knocking Some Sense In (3150012) went live over the combat
+    // engine (open-world Thugawugs and the Thugamug battle 12340), and Take Care of That Ankle
+    // (3150013, one talk) with it.
+    for id in [3_150_012, 3_150_013] {
+        assert!(shipped_quest(id).enabled, "{id} went live in combat quests wave 2");
     }
     // Medic: Operation: Revival is reachable (prerequisite 3090001 is on) but has no mechanic:
     // reviving twelve wounded bixies is a counted ability use the server cannot count yet.

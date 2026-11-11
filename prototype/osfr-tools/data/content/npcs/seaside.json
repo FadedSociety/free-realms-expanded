@@ -34107,13 +34107,58 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3080023,
+          "title": "Kart Driver: The Price of Fame",
+          "title_string_id": 394679,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 21; name 'Kart Driver: The Price of Fame'; title id cell 3820831760 ucdt; 2023117556 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080023 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3080019,
         3080020,
         3080021,
-        3080022
+        3080022,
+        3080023
       ],
       "quests_given_text": [
         "Kart Driver: Seaside Board of Tourism Sponsorship and the Frost Ridge challenges; she does not stand in Seaside. Kart Driver"
@@ -37622,11 +37667,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:503; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1741 (ModelId=546, ModelFileName=human_f_freestyle_04.agr, NameId=395119)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.148421,
       "model_id": 546,
-      "model_file_name": "human_f_freestyle_04.agr"
+      "model_file_name": "human_f_freestyle_04.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000621,

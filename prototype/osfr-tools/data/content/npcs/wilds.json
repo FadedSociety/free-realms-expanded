@@ -28,14 +28,103 @@
         "Former champion racer."
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Thunder Falls Speedway (909372951)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080024,
+          "title": "Kart Driver: Age Before Beauty",
+          "title_string_id": 3527,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 22; name 'Kart Driver: Age Before Beauty'; title id cell 4036336756 ucdt; 2103619070 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080024 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080025,
+          "title": "Kart Driver: A Helping Hand",
+          "title_string_id": 394692,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 23; name 'Kart Driver: A Helping Hand'; title id cell 1447593412 ucdt; 3202232969 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080025 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080024,
+        3080025
+      ],
       "quests_given_text": [
         "Race target of Kart Driver: Age Before Beauty."
       ],
@@ -343,11 +432,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1784; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3041 (ModelId=827, ModelFileName=human_m_ace_omally.agr, NameId=101907)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.850368,
       "model_id": 827,
-      "model_file_name": "human_m_ace_omally.agr"
+      "model_file_name": "human_m_ace_omally.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000868,
@@ -1369,10 +1465,112 @@
               "evidence": "title_string_id corrected from raw locale hash 2322652085 to Global.Text id 387489 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3150012,
+          "title": "Warrior: Knocking Some Sense In",
+          "title_string_id": 71265,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W12; name 'Warrior: Knocking Some Sense In (wiki job page: \"Knocking Some Sense\")'; title id cell ucdt 2111744232 / ugdt 3588410217"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W12; name 'Warrior: Knocking Some Sense In (wiki job page: \"Knocking Some Sense\")'; title id cell ucdt 2111744232 / ugdt 3588410217"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W12; name 'Warrior: Knocking Some Sense In (wiki job page: \"Knocking Some Sense\")'; title id cell ucdt 2111744232 / ugdt 3588410217"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3150012 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row W10; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3150013,
+          "title": "Warrior: Take Care of That Ankle",
+          "title_string_id": 72611,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W13; name 'Warrior: Take Care of That Ankle'; title id cell ucdt 3241119781 / ugdt 3401208551"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 3: level 10 to 15 (Aster, Doctor Gordon, General Glowlight), row W13; name 'Warrior: Take Care of That Ankle'; title id cell ucdt 3241119781 / ugdt 3401208551"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3150013 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row W12; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3150010
+        3150010,
+        3150012,
+        3150013
       ],
       "quests_given_text": [
         "Warrior: Achieve Level 10 (gate: \"Reach level 10 as a warrior, then return to Aster\", 313739159), Warrior: Knocking Some Sense In (defeat Thugawug Sneaks and a Bumbler so she can pass, 3906118291, 3815545278), Warrior: Take Care of That Ankle (she sprains an ankle in heels, 1811945937; Doctor Gordon in Sanctuary treats it)."
@@ -3543,11 +3741,28 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3957854,
+          "title": "Purr...fect Secret",
+          "title_string_id": 389700,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Purr...fect Secret (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3000332,
-        3957391
+        3957391,
+        3957854
       ],
       "quests_given_text": [
         "See Flax."
@@ -9451,10 +9666,112 @@
               "evidence": "title_string_id corrected from raw locale hash 2562047238 to Global.Text id 394710 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3080027,
+          "title": "Kart Driver: Making Amends",
+          "title_string_id": 394702,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 25; name 'Kart Driver: Making Amends'; title id cell 3539460646 ucdt; 2619443500 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 25; name 'Kart Driver: Making Amends'; title id cell 3539460646 ucdt; 2619443500 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 25; name 'Kart Driver: Making Amends'; title id cell 3539460646 ucdt; 2619443500 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080027 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080028,
+          "title": "Kart Driver: High Speed Chase",
+          "title_string_id": 3532,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 26; name 'Kart Driver: High Speed Chase'; title id cell 510928773 ucdt; 2401757030 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 26; name 'Kart Driver: High Speed Chase'; title id cell 510928773 ucdt; 2401757030 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080028 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3080029
+        3080029,
+        3080027,
+        3080028
       ],
       "quests_given_text": [
         "Kart Driver: Making Amends, Kart Driver: High Speed Chase, Kart Driver: Sweetwater Sasparilla Sponsorship; gives no quests until the earlier series quests are done (wiki)."
@@ -10618,6 +10935,50 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3140017,
+          "title": "Soccer Star: Missing Soccer Balls",
+          "title_string_id": 414959,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 2 - The season: Briarwood, mascot, Cheetahs, Mud Hoppers, row 14; name 'Soccer Star: Missing Soccer Balls'; title id cell 3937630260 ucdt; 1538493451 ugdt (bare 609406897)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140017 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -10627,7 +10988,8 @@
         3140008,
         3140009,
         3140011,
-        3140010
+        3140010,
+        3140017
       ],
       "quests_given_text": [
         "The Soccer Star line from Meeting The Team on: Soccer Star: The Perfect Mascot, Soccer Star: Achieve Level 2, Soccer Star: Slowing The Snowspurs, Soccer Star: Goal Stopper, Soccer Star: Power Game, Soccer Star: Achieve Level 5, Soccer Star: Briarwood's Fancy Feet, Soccer Star: Mascot Madness, Soccer Star: Achieve Level 8, Soccer Star: Cheetahs Double Challenge, Soccer Star: Missing Soccer Balls, Soccer Star: Mud Hopping, Soccer Star: Achieve Level 10, Soccer Star: Black Widows' Rematch, Soccer Star: Trophy Detective, Soccer Star: Returning The Trophy, Soccer Star: Achieve Level 13, Soccer Star: Making The Finals, Soccer Star: Twinkle Toes, Soccer Star: Achieve Level 15, Soccer Star: Ants In The Pants, Soccer Star: Robgoblin Troublemakers, Soccer Star: Achieve Level 19, Soccer Star: Tournament Champion."
@@ -17024,6 +17386,198 @@
         },
         {
           "quest_id": 3160005
+        },
+        {
+          "quest_id": 3160006,
+          "title": "Wizard: Lightning Bolt!",
+          "title_string_id": 74827,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 4; name 'Wizard: Lightning Bolt! (wiki: \"Lightning Bolt\")'; title id cell ucdt 2346978073 / ugdt 732171236"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 4; name 'Wizard: Lightning Bolt! (wiki: \"Lightning Bolt\")'; title id cell ucdt 2346978073 / ugdt 732171236"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3160006 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 3; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3160007,
+          "title": "Wizard: The First Rule of Being a Wizard...",
+          "title_string_id": 74820,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 5; name 'Wizard: The First Rule of Being a Wizard'; title id cell ucdt 2712229186 / ugdt 233531357"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 5; name 'Wizard: The First Rule of Being a Wizard'; title id cell ucdt 2712229186 / ugdt 233531357"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3160007 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 4; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3160008,
+          "title": "Wizard: Market Wizards",
+          "title_string_id": 74839,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 6; name 'Wizard: Market Wizards'; title id cell ucdt 1297997265 / ugdt 1498950365"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 6; name 'Wizard: Market Wizards'; title id cell ucdt 1297997265 / ugdt 1498950365"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3160008 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 5; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3160009,
+          "title": "Wizard: Student Profits",
+          "title_string_id": 74853,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 7; name 'Wizard: Student Profits'; title id cell ucdt 2655860047 / ugdt 499410726"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 7; name 'Wizard: Student Profits'; title id cell ucdt 2655860047 / ugdt 499410726"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3160009 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 6; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -17032,7 +17586,11 @@
         3160005,
         3160035,
         3160010,
-        3160001
+        3160001,
+        3160006,
+        3160007,
+        3160008,
+        3160009
       ],
       "quests_given_text": [
         "Wizard: How to be a Wizard, Wizard: I Can't Read This!, Sticky Spell Book, Wizard: Lightning Bolt!, Wizard: The First Rule of Being a Wizard..., Wizard: Market Wizards, Wizard: Student Profits, Wizard: Reach Level 5, Wizard: An Icy Mistake, Being a Better Wizard. The grenade-recovery and glasses errands (1226440549, 370084981) have no title match."
@@ -39415,8 +39973,186 @@
       "location_evidence": [
         "\"At Thunder Falls\" (2487305644). One older line says \"Talk to Shooblemoot at the Wildwood Speedway\" (1746871138)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080030,
+          "title": "Kart Driver: Thunder Falls Sprint Challenge",
+          "title_string_id": 394740,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 28; name 'Kart Driver: Thunder Falls Sprint Challenge'; title id cell 711448517 ucdt; 2557422335 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080030 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080031,
+          "title": "Kart Driver: Thunder Falls Endurance Challenge",
+          "title_string_id": 395146,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 29; name 'Kart Driver: Thunder Falls Endurance Challenge'; title id cell 367062867 ucdt; 3064016631 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080031 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080032,
+          "title": "Kart Driver: Dominating at Thunder Falls",
+          "title_string_id": 3579,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 30; name 'Kart Driver: Dominating at Thunder Falls'; title id cell 1339119059 ucdt; 1982716411 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080032 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080034,
+          "title": "Kart Driver: Endorsement Deal",
+          "title_string_id": 395282,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 3 - Thunder Falls Speedway (rivals: Ace O'Mally, Linx Redline, Chase Wheeler; sponsor: Shooblemoot), row 32; name 'Kart Driver: Endorsement Deal'; title id cell 4169142617 ucdt; 2418619074 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080034 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080030,
+        3080031,
+        3080032,
+        3080034
+      ],
       "quests_given_text": [
         "Kart Driver: Thunder Falls Sprint Challenge, Kart Driver: Thunder Falls Endurance Challenge, Kart Driver: Dominating at Thunder Falls, Kart Driver: Endorsement Deal (sends the player to Wugachug), Kart Driver: Burning Up the Track (sets up the Tangletrack race)."
       ],
@@ -39724,11 +40460,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1788; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3045 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=394913)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.766192,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000944,

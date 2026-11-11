@@ -1150,8 +1150,56 @@
       "id": 3030015,
       "title_string_id": 116485,
       "giver_npc_id": 9000000038,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3951547
+      ],
+      "objectives": [
+        {
+          "kind": "enter_fight",
+          "id": 1,
+          "text_string_id": 116930,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the gate to the Cursed Graveyard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_graveyard_grumble_c9080b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'cursed graveyard' is fight 14018"
+            }
+          ],
+          "fight_id": 14018
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 116932,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat the wraith (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_graveyard_grumble_c9080b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'wraith' is definition [930072]"
+            }
+          ],
+          "model_id": 930072,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 116934,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Caitlyn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_graveyard_grumble_c9080b)."
+            }
+          ],
+          "npc_id": 9000000038
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1203,12 +1251,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 116486,
       "intro_text_string_id": 116484,
       "end_text_string_id": 116487,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030016,
@@ -1217,7 +1270,20 @@
       "prerequisite_quest_ids": [
         3030015
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 116955,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Seth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_get_mcgrobie_5ecdbd)."
+            }
+          ],
+          "npc_id": 9000000196
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1269,12 +1335,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 116506,
       "intro_text_string_id": 116504,
       "end_text_string_id": 116507,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030017,
@@ -1283,7 +1354,37 @@
       "prerequisite_quest_ids": [
         3030016
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 103235,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Robgoblin Pondblasters - 0/30 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_stolen_merchandise_f8ae90)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin pondblaster' is definition [1294]"
+            }
+          ],
+          "model_id": 1294,
+          "count": 30
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 116961,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Seth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_stolen_merchandise_f8ae90)."
+            }
+          ],
+          "npc_id": 9000000196
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1339,12 +1440,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 116510,
       "intro_text_string_id": 116508,
       "end_text_string_id": 116511,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030018,
@@ -1353,7 +1459,20 @@
       "prerequisite_quest_ids": [
         3030017
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 116963,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Virgil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_rightful_owner_cdee3b)."
+            }
+          ],
+          "npc_id": 9000000505
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1405,12 +1524,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 116514,
       "intro_text_string_id": 116512,
       "end_text_string_id": 116515,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030019,
@@ -1419,7 +1543,20 @@
       "prerequisite_quest_ids": [
         3030018
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 130798,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Petra (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_cemetery_security_70e96c)."
+            }
+          ],
+          "npc_id": 9000000428
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1471,12 +1608,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 130862,
       "intro_text_string_id": 130860,
       "end_text_string_id": 130863,
-      "enabled": false
+      "enabled": true,
+      "job": 43
     },
     {
       "id": 3030020,
@@ -2427,7 +2569,54 @@
       "prerequisite_quest_ids": [
         3030030
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 388536,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat some Frosty Yetis - (0/10) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_colder_weather_f91291)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'yeti' is definition [930073]"
+            }
+          ],
+          "model_id": 930073,
+          "count": 10
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 388538,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chase off some Ice Troll Scouts - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_colder_weather_f91291)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'ice troll scout' is definition [3593]"
+            }
+          ],
+          "model_id": 3593,
+          "count": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 388651,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Fernando Flexsteel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_colder_weather_f91291)."
+            }
+          ],
+          "npc_id": 9500000785
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2475,9 +2664,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "description_string_id": 388504,
+      "intro_text_string_id": 388506
     },
     {
       "id": 3030032,

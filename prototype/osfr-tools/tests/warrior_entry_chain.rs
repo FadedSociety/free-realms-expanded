@@ -899,6 +899,9 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         .filter(|row| row["id"].as_u64() != Some(u64::from(ASKING_OLD_FOLKS)))
         // L1057: the two quests after Distracted, wired from the wiki.
         .filter(|row| ![3_150_009, 3_150_010].contains(&row["id"].as_u64().unwrap()))
+        // Combat quests wave 2: Knocking Some Sense In and Take Care of That Ankle
+        // (tests/zone_quests_sanctuary_r2.rs, tests/combat_quests_on.rs).
+        .filter(|row| ![3_150_012, 3_150_013].contains(&row["id"].as_u64().unwrap()))
         .collect();
     assert_eq!(
         enabled
@@ -1047,6 +1050,10 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             ASKING_OLD_FOLKS,
             3_150_009,
             3_150_010,
+            // Combat quests wave 2: Knocking Some Sense In (Thugawugs and the Thugamug
+            // battle) and Take Care of That Ankle (one talk) are live.
+            3_150_012,
+            3_150_013,
         ]
         .contains(&(id as u32))
         {

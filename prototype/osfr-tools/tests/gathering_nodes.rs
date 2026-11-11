@@ -1489,11 +1489,13 @@ fn node_content_is_bounded_and_unique() {
     // P-quest-crate: Somewhere in Storage's three crates leave the quest-crate pool (nine spots, max 6)
     // for their own pool of three, so all nine crates are live (1,051 -> 1,054); collections' 14 on top.
     // Combat quests on: 6 spots for 2 pick-ups behind combat quests (sap samples, junk) (1,074).
-    assert_eq!(actors.len(), 1074);
+    // Combat quests wave 2 (quest_wire.py): 9 spots for the Kart Driver karts, mugs and keys and 4
+    // for the Purr...fect Secret cat bowls (1,087).
+    assert_eq!(actors.len(), 1087);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 1074);
+    assert_eq!(ids.len(), 1087);
     assert!(
         actors
             .iter()

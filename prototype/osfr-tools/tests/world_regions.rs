@@ -287,7 +287,8 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs: seven people the world already drew get a record in npcs/quest_spawned.json (1,306).
-    assert_eq!(total, 1312, "shipped NPC rows");
+    // Combat quests wave 2: Roxy's Barrel, bound to the barrel the world already drew (1,313).
+    assert_eq!(total, 1313, "shipped NPC rows");
     // T876 (was 981 / 844 / 905 / 1091 with the T753 grouping and the community region shapes): the places'
     // music/ambience area families and the client-row regions cover 1,193 rows, of which every one is in a place.
     // T665 moved Sorin and Coach Eddie onto drawn Legacy spawns; one of the two landed outside every
@@ -302,21 +303,22 @@ fn shipped_npc_rows_cover_1192_of_1209() {
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs: seven new quest_spawned.json rows and three moved ones (Drake Sullenfangs, Hector,
     // Princess Reedshadow): 1,281 -> 1,288 in a place, 950 -> 956 and 1,020 -> 1,026 in the regions.
-    assert_eq!(in_place, 1294, "rows in a first-party place group");
+    // Combat quests wave 2: Roxy's Barrel stands in Seaside, place and banner region 6 (each count + 1).
+    assert_eq!(in_place, 1295, "rows in a first-party place group");
     // T896 moved sixteen reconstructed rows onto their video-archive points; net, one row fewer stands in the
     // banner regions (892 -> 891) and two fewer in any region shape (953 -> 951).
     // L925's twelve givers: nine stand in a banner region (891 -> 900).
     assert_eq!(
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
-        in_recovered_region, 957,
+        in_recovered_region, 958,
         "rows in the banner regions 2..=10"
     );
     // L096's two turnstile actors stand in the region 1 fallback sphere, not a banner region (953).
     // L925: the same nine givers (953 -> 962).
     // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
-    assert_eq!(in_any_region, 1028, "rows in a region (including region 1)");
-    assert_eq!(covered, 1294, "rows in a place or a region");
+    assert_eq!(in_any_region, 1029, "rows in a region (including region 1)");
+    assert_eq!(covered, 1295, "rows in a place or a region");
 }
 
 #[test]

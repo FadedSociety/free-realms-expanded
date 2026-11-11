@@ -369,6 +369,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs appended seven quest people bound to spawns the world already drew (unanchored, 1,306).
-    assert_eq!(npc_count, 1312);
+    // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
+    assert_eq!(npc_count, 1313);
     println!("NPC placement sources: {counts:?}");
 }

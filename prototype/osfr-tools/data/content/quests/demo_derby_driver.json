@@ -405,7 +405,33 @@
       "title_string_id": 403447,
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 394056,
+          "minigame_id": 603,
+          "count": 1,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 2026-11-08: finishing this quest's own derby row 603 counts for this goal (Place in the top 4 - (0/3)); the goal's own condition is not modelled."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 394057,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Crash Davis at Thunder Falls Speedway (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_taking_the_wheel_ca3b5b)."
+            }
+          ],
+          "npc_id": 9000000289
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -449,9 +475,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 49,
+      "description_string_id": 393372
     },
     {
       "id": 3060007,

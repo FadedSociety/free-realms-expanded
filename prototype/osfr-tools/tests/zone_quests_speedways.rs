@@ -163,9 +163,10 @@ fn petal_row_binds_the_sponsorship_as_given_and_accepted() {
         .expect("Petal's row ships");
     // Lead 2026-11-10: P-kart-racing gives the three Frost Ridge challenges from Petal too
     // (3080020 Sprint, 3080021 Endurance, 3080022 Dominating); the sponsorship stays first.
+    // Combat quests wave 2 (quest_wire.py): The Price of Fame (3080023) after Dominating.
     assert_eq!(
         row["quest_ids_given"],
-        serde_json::json!([QUEST, 3_080_020, 3_080_021, 3_080_022])
+        serde_json::json!([QUEST, 3_080_020, 3_080_021, 3_080_022, 3_080_023])
     );
     for list in ["quests_given", "quests_accepted"] {
         let entries = row[list].as_array().expect(list);

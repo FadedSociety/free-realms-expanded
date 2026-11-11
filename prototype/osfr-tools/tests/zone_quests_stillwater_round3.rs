@@ -251,23 +251,23 @@ fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
     assert_eq!(entry.giver_npc_id, 9_000_000_181);
 
     // T670 enabled Chef: Gavin Gone Missing (3050016, `tests/zone_quests_round2_chef.rs`) and the
-    // round-4 batch Being a Better Fisherman (3070002). The Brawler one stays disabled, with the
-    // blocker named by its record.
+    // round-4 batch Being a Better Fisherman (3070002). Combat quests wave 2 runs the Brawler
+    // chain: Graveyard Grumble (3030015) enters the Cursed Graveyard door (fight 14018) and
+    // defeats the wraith, so Get McGrobie! behind it is live too, still after its prerequisite.
     for (id, prerequisite) in [(BRAWLER_QUEST, Some(3_030_015))] {
         let shipped = record(id);
         assert!(
-            !shipped.enabled,
-            "quest {id} must stay disabled until its chain can run"
+            shipped.enabled,
+            "quest {id} went live in combat quests wave 2"
         );
         if let Some(prerequisite) = prerequisite {
             assert!(
                 shipped.prerequisite_quest_ids.contains(&prerequisite),
                 "quest {id} keeps its authored prerequisite {prerequisite}"
             );
-            // The Brawler chain is also cut upstream.
             assert!(
-                !record(prerequisite).enabled,
-                "quest {id} is unreachable while its prerequisite {prerequisite} is disabled"
+                record(prerequisite).enabled,
+                "quest {id} is reachable: its prerequisite {prerequisite} is live"
             );
         }
     }

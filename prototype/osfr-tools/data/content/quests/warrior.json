@@ -1013,7 +1013,83 @@
       "prerequisite_quest_ids": [
         3150010
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 141584,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat a Thugawug Bumbler (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'thugawug bumbler' is definition [3491]"
+            }
+          ],
+          "model_id": 3491,
+          "count": 1
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 141586,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Thugawug Sneaks - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'thugawug sneak' is definition [1639]"
+            }
+          ],
+          "model_id": 1639,
+          "count": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 71239,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Aster (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+            }
+          ],
+          "npc_id": 9000000243
+        },
+        {
+          "kind": "defeat",
+          "id": 4,
+          "text_string_id": 91810,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Thugamug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'thugamug' is definition [1234001]"
+            }
+          ],
+          "model_id": 1234001,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 91812,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Aster (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+            }
+          ],
+          "npc_id": 9000000243
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1069,12 +1145,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 71266,
       "intro_text_string_id": 71264,
       "end_text_string_id": 71267,
-      "enabled": false
+      "enabled": true,
+      "job": 32
     },
     {
       "id": 3150013,
@@ -1083,7 +1164,20 @@
       "prerequisite_quest_ids": [
         3150012
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 72620,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Doctor Gordon in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_take_care_of_that_ankle_0a4a63)."
+            }
+          ],
+          "npc_id": 9000000073
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1135,12 +1229,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 72612,
       "intro_text_string_id": 72610,
       "end_text_string_id": 72613,
-      "enabled": false
+      "enabled": true,
+      "job": 32
     },
     {
       "id": 3150014,

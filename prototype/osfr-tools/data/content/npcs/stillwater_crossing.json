@@ -2291,8 +2291,55 @@
       "location_evidence": [
         "Wiki Brawler page: Stillwater Crossing (the client gives no place; the only place source is the wiki). Video shows his name only as a tracker line in \"Brawler: Achieve Level 15\" (\"Talk to Fernando Flexsteel\"), recorded away from Stillwater (fMOGHMuA2Hc/00000, pLF-dUhMFWs/00266)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3030031,
+          "title": "Contract: Colder Weather",
+          "title_string_id": 388507,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M12; name 'Contract: Colder Weather'; title id cell ucdt 3946995887 / ugdt 3549991489"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Main series, band 3: level 10 to 15 (Snowhill and Sampson), row M12; name 'Contract: Colder Weather'; title id cell ucdt 3946995887 / ugdt 3549991489"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3030031 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row M11; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3030031
+      ],
       "quests_given_text": [
         "Contract: Hello Fernando, Contract: Colder Weather, Contract: Local Bounty, Contract: Troll Brawling (wiki: members only). Level gates elsewhere send the player to him (1845519041, 2232233194, 3769051197, 2731763316). Receives a flier (3482278812)."
       ],
@@ -10444,13 +10491,58 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3070017,
+          "title": "Fisherman: Good Enough to Eat!",
+          "title_string_id": 418999,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster C - Vick Sapshot and Callie Kelpcake (Sacred Grove Shallows), row 13; name 'Fisherman: Good Enough to Eat!'; title id cell 1446607819 / 319747346"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070017 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070003,
         3070004,
         3070001,
-        3070021
+        3070021,
+        3070017
       ],
       "quests_given_text": [
         "Become a Fisherman and Being a Better Fisherman (the job pages name him as the contact; the wiki starts them from the Message Board in Sanctuary), Learn to Fish!, Testing the Waters. Identifies odd catches: Fisherman: What Is It?! and Fisherman: Good Enough to Eat! mention him; he turns in the fungus and the ink cod in Fisherman: Fishy Fungus and Fisherman: Ink Cod Ink. Shows the way to Brambleback's Bayou (2651529106)."
@@ -14114,10 +14206,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Zachery"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9600000008,

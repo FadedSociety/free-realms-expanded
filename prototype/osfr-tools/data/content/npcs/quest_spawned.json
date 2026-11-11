@@ -24312,6 +24312,290 @@
         ]
       },
       "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
+    },
+    {
+      "npc_id": 9500005519,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Roxy's Barrel",
+      "name_reason": null,
+      "name_string_id": 394787,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 394787
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Seaside",
+      "zone_id": 11,
+      "zone_reason": null,
+      "region_pages": [
+        "Seaside"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Quest NPC bound to its spawn"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "No vendor stock is recorded for this NPC.",
+      "services": [],
+      "services_reason": "No distinct service is recorded for this NPC.",
+      "position": [
+        -614.1764,
+        16.33871,
+        -1028.986
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.320234014405485,
+        0.0,
+        0.9473384696177748
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record.",
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "name": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Spawn 100000001742 in npc_spawns_extra.json draws this NPC; a quest names it, so it has this record."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ]
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     }
   ]
 }

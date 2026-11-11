@@ -4973,6 +4973,222 @@
         "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       },
       "name_id": 77081
+    },
+    {
+      "key": "quest-antonio-taurino-s-kart-q3080036",
+      "name": "Antonio Taurino's Kart",
+      "model_id": 1078,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 398672
+    },
+    {
+      "key": "quest-chase-wheeler-s-kart-q3080025",
+      "name": "Chase Wheeler's Kart",
+      "model_id": 1082,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 395359
+    },
+    {
+      "key": "quest-key-2-q3080038",
+      "name": "Key",
+      "model_id": 1077,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 395301
+    },
+    {
+      "key": "quest-linx-redline-s-kart-q3080027",
+      "name": "Linx Redline's Kart",
+      "model_id": 1079,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 393288
+    },
+    {
+      "key": "quest-mug-2-q3080034",
+      "name": "Mug",
+      "model_id": 533,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 70454
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-1",
+      "name": "Bowl",
+      "model_id": 349,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 117096
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-2",
+      "name": "Bowl",
+      "model_id": 349,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 117096
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-3",
+      "name": "Bowl",
+      "model_id": 349,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 117096
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-4",
+      "name": "Bowl",
+      "model_id": 349,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 117096
     }
   ],
   "pools": [
@@ -8071,6 +8287,141 @@
       "zone_definition_id": 1,
       "node_type": "quest-sap-samples-q3010008",
       "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-antonio-taurino-s-kart-q3080036",
+      "zone_definition_id": 1,
+      "node_type": "quest-antonio-taurino-s-kart-q3080036",
+      "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-chase-wheeler-s-kart-q3080025",
+      "zone_definition_id": 1,
+      "node_type": "quest-chase-wheeler-s-kart-q3080025",
+      "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-key-2-q3080038",
+      "zone_definition_id": 1,
+      "node_type": "quest-key-2-q3080038",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-linx-redline-s-kart-q3080027",
+      "zone_definition_id": 1,
+      "node_type": "quest-linx-redline-s-kart-q3080027",
+      "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-mug-2-q3080034",
+      "zone_definition_id": 1,
+      "node_type": "quest-mug-2-q3080034",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-1",
+      "zone_definition_id": 1,
+      "node_type": "quest-purr-fect-secret-cat-bowl-1",
+      "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-2",
+      "zone_definition_id": 1,
+      "node_type": "quest-purr-fect-secret-cat-bowl-2",
+      "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-3",
+      "zone_definition_id": 1,
+      "node_type": "quest-purr-fect-secret-cat-bowl-3",
+      "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-purr-fect-secret-cat-bowl-4",
+      "zone_definition_id": 1,
+      "node_type": "quest-purr-fect-secret-cat-bowl-4",
+      "max_active_nodes": 1,
       "respawn_seconds": 30,
       "source_tag": "reconstructed",
       "source_tags": {
@@ -21568,6 +21919,214 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it; height set on the measured ground under it (world editor probe, 2026-11-10)",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100028,
+      "pool_key": "quest-antonio-taurino-s-kart-q3080036",
+      "zone_definition_id": 1,
+      "position": [
+        -268.37,
+        -59.443,
+        1971.75
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100029,
+      "pool_key": "quest-chase-wheeler-s-kart-q3080025",
+      "zone_definition_id": 1,
+      "position": [
+        -914.96,
+        -38.23,
+        1188.59
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100030,
+      "pool_key": "quest-key-2-q3080038",
+      "zone_definition_id": 1,
+      "position": [
+        -2246.33,
+        -15.84,
+        564.43
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100031,
+      "pool_key": "quest-key-2-q3080038",
+      "zone_definition_id": 1,
+      "position": [
+        -2250.33,
+        -17.67,
+        584.43
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100032,
+      "pool_key": "quest-key-2-q3080038",
+      "zone_definition_id": 1,
+      "position": [
+        -2262.33,
+        -16.5,
+        576.43
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100033,
+      "pool_key": "quest-linx-redline-s-kart-q3080027",
+      "zone_definition_id": 1,
+      "position": [
+        -905.85,
+        -38.785,
+        1180.01
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100034,
+      "pool_key": "quest-mug-2-q3080034",
+      "zone_definition_id": 1,
+      "position": [
+        -912.18,
+        -39.32,
+        1175.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100035,
+      "pool_key": "quest-mug-2-q3080034",
+      "zone_definition_id": 1,
+      "position": [
+        -906.18,
+        -39.11,
+        1175.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100036,
+      "pool_key": "quest-mug-2-q3080034",
+      "zone_definition_id": 1,
+      "position": [
+        -904.18,
+        -38.62,
+        1183.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100037,
+      "pool_key": "quest-purr-fect-secret-cat-bowl-1",
+      "zone_definition_id": 1,
+      "position": [
+        -367.49,
+        -5.335,
+        -751.68
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100038,
+      "pool_key": "quest-purr-fect-secret-cat-bowl-2",
+      "zone_definition_id": 1,
+      "position": [
+        -366.62,
+        -5.472,
+        -740.96
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100039,
+      "pool_key": "quest-purr-fect-secret-cat-bowl-3",
+      "zone_definition_id": 1,
+      "position": [
+        -366.62,
+        -5.955,
+        -762.4
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100040,
+      "pool_key": "quest-purr-fect-secret-cat-bowl-4",
+      "zone_definition_id": 1,
+      "position": [
+        -361.49,
+        -4.423,
+        -751.68
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
         "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       }
     }

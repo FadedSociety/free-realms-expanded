@@ -303,8 +303,9 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
     /// 3140010 and 3140011 got objectives and went live in d7b0b831 ("55 more quests",
     /// 2026-11-09).
     const NO_OBJECTIVES: [u32; 2] = [3_140_023, 3_140_026];
-    /// Quests behind a prerequisite that is itself disabled.
-    const NO_PREREQUISITE: [u32; 2] = [3_160_008, 3_160_009];
+    /// Combat quests wave 2 wired the Wizard line from Lightning Bolt! (3160006, behind the live
+    /// Sticky Spell Book 3160005) through Student Profits (3160009); each waited on the one before.
+    const WIRED: [u32; 4] = [3_160_006, 3_160_007, 3_160_008, 3_160_009];
     let root = content_dir();
     let visibility = NpcVisibility::load(&root).unwrap();
     let drawn: BTreeSet<u64> = placement::drawn_npcs(&visibility)
@@ -325,15 +326,20 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
             "{id} grew objectives; re-check it"
         );
     }
-    for id in NO_PREREQUISITE {
-        let disabled = off(id)
+    for id in WIRED {
+        let quest = shipped_quest(id);
+        assert!(
+            quest.enabled && !quest.objectives.is_empty(),
+            "{id} went live in combat quests wave 2"
+        );
+        let live = quest
             .prerequisite_quest_ids
             .iter()
-            .any(|p| !shipped_quest(*p).enabled);
-        assert!(disabled, "{id}: its prerequisites are enabled now");
+            .all(|p| shipped_quest(*p).enabled);
+        assert!(live, "{id}: the quest before it is live");
     }
     // The rest of the list: still stubs nobody has wired.
-    for id in [3_060_022, 3_090_010, 3_160_006, 3_160_007, 3_160_012] {
+    for id in [3_060_022, 3_090_010, 3_160_012] {
         assert!(
             off(id).objectives.is_empty(),
             "{id} grew objectives; re-check it"

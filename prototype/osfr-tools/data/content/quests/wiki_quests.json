@@ -30044,6 +30044,331 @@
       "intro_text_string_id": 76114,
       "enabled": true,
       "end_text_string_id": 76117
+    },
+    {
+      "id": 3957715,
+      "title_string_id": 441102,
+      "giver_npc_id": 9000000492,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 441170,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete a solo race at the Frost Ridge Speedway. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_7_snowhill_racing_17d57d)."
+            }
+          ],
+          "minigame_id": 641,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Day 7: Snowhill Racing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_7_snowhill_racing_17d57d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 5 coins: the wiki's 12 Days Bow - Day 7 and 12 Days Present - Day 7 have no item row; Trina Turtledove's live Day 9: Snowhill Soccer (3950114) and Day 11: Snowhill Derby (3953095) pay 5 coins."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Day 7: Snowhill Racing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_7_snowhill_racing_17d57d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 441103,
+      "intro_text_string_id": 441101,
+      "enabled": true
+    },
+    {
+      "id": 3957750,
+      "title_string_id": 72062,
+      "giver_npc_id": 9500000213,
+      "prerequisite_quest_ids": [
+        3955914
+      ],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 73634,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Knock out Bristlewood Vultures - (0/10) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fighting_is_for_the_birds_87cec8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'bristlewood vulture' is definition [930055]"
+            }
+          ],
+          "model_id": 930055,
+          "count": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72692,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Smoggo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fighting_is_for_the_birds_87cec8)."
+            }
+          ],
+          "npc_id": 9500000213
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fighting is for the Birds! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fighting_is_for_the_birds_87cec8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fighting is for the Birds! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fighting_is_for_the_birds_87cec8)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 72063,
+      "intro_text_string_id": 72061,
+      "enabled": true
+    },
+    {
+      "id": 3957765,
+      "title_string_id": 4685,
+      "giver_npc_id": 9500000756,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 18625,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Unga Frostclaw (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_get_some_sleep_434506)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'Unga Frostclaw' is definition [950088]"
+            }
+          ],
+          "model_id": 950088,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 18623,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Milo in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_get_some_sleep_434506)."
+            }
+          ],
+          "npc_id": 9500000756
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 38,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get Some Sleep (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_get_some_sleep_434506)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Get Some Sleep (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_get_some_sleep_434506)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 24787,
+      "intro_text_string_id": 24787,
+      "enabled": true
+    },
+    {
+      "id": 3957854,
+      "title_string_id": 389700,
+      "giver_npc_id": 9500000874,
+      "prerequisite_quest_ids": [
+        3957391
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 389708,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check the first cat bowl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: grey pet bowl with bone shapes on it (sheets/e_items.png r2c0, tile of bowl_basic.adr); objects.json row for this step."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) on the east shore of the Pixie Nursery lake, 25 to 31 m from Blazing Star: the automatic ring around her put every spot in the lake (Studio probe 2026-11-10: water 4.1 m deep)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) spots checked 2026-11-10 with Studio's terrain probe: dry, standable, open on all eight sides, slope at most 14 degrees, 5 m clear of every placed actor; one pool per bowl, so one click cannot do two."
+            }
+          ],
+          "node_type": "quest-purr-fect-secret-cat-bowl-1",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 389709,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check the second cat bowl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: grey pet bowl with bone shapes on it (sheets/e_items.png r2c0, tile of bowl_basic.adr); objects.json row for this step."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) on the east shore of the Pixie Nursery lake, 25 to 31 m from Blazing Star: the automatic ring around her put every spot in the lake (Studio probe 2026-11-10: water 4.1 m deep)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) spots checked 2026-11-10 with Studio's terrain probe: dry, standable, open on all eight sides, slope at most 14 degrees, 5 m clear of every placed actor; one pool per bowl, so one click cannot do two."
+            }
+          ],
+          "node_type": "quest-purr-fect-secret-cat-bowl-2",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 389710,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check the third cat bowl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: grey pet bowl with bone shapes on it (sheets/e_items.png r2c0, tile of bowl_basic.adr); objects.json row for this step."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) on the east shore of the Pixie Nursery lake, 25 to 31 m from Blazing Star: the automatic ring around her put every spot in the lake (Studio probe 2026-11-10: water 4.1 m deep)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) spots checked 2026-11-10 with Studio's terrain probe: dry, standable, open on all eight sides, slope at most 14 degrees, 5 m clear of every placed actor; one pool per bowl, so one click cannot do two."
+            }
+          ],
+          "node_type": "quest-purr-fect-secret-cat-bowl-3",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 389712,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check the fourth cat bowl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: grey pet bowl with bone shapes on it (sheets/e_items.png r2c0, tile of bowl_basic.adr); objects.json row for this step."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) on the east shore of the Pixie Nursery lake, 25 to 31 m from Blazing Star: the automatic ring around her put every spot in the lake (Studio probe 2026-11-10: water 4.1 m deep)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) spots checked 2026-11-10 with Studio's terrain probe: dry, standable, open on all eight sides, slope at most 14 degrees, 5 m clear of every placed actor; one pool per bowl, so one click cannot do two."
+            }
+          ],
+          "node_type": "quest-purr-fect-secret-cat-bowl-4",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 38127,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Blazing Star (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            }
+          ],
+          "npc_id": 9500000874
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Purr...fect Secret (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Purr...fect Secret (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
     }
   ]
 }

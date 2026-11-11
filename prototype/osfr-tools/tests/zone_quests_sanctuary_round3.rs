@@ -445,9 +445,12 @@ enum Blocker {
     /// The record carries no gate for its intended job, so enabling it would offer the
     /// quest to every player while that job is also not selectable.
     NoJobGate(i32),
+    /// The record has no objectives: a goal the server cannot count yet (General Concerns'
+    /// "Use your Quake ability on Changeling Marauders - 0/10" waits on the job kits).
+    NoObjectives,
 }
 
-use Blocker::{Giver, NoJobGate, NoProfile, Prerequisite};
+use Blocker::{Giver, NoJobGate, NoObjectives, NoProfile, Prerequisite};
 
 /// The round-3 quests that stay disabled. Each row lists every blocker that still holds;
 /// the test fails when one lifts, so the next builder re-checks the others before wiring it
@@ -463,7 +466,8 @@ fn the_other_fifteen_still_have_a_blocker() {
         (3_020_031, &[Giver, Prerequisite]),
         (3_070_026, &[Giver]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
-        (3_150_014, &[Prerequisite]),
+        // Combat quests wave 2 put Take Care of That Ankle (3150013) live: its prerequisite lifted.
+        (3_150_014, &[NoObjectives]),
         (3_150_015, &[Prerequisite]),
         (3_160_016, &[Prerequisite]),
         (3_160_033, &[Prerequisite]),
@@ -492,6 +496,7 @@ fn the_other_fifteen_still_have_a_blocker() {
                     .any(|p| quests.iter().any(|q| q.id == *p && !q.enabled)),
                 NoProfile(profile) => !targets.profiles.contains(&profile),
                 NoJobGate(profile) => quest.job != Some(profile),
+                NoObjectives => quest.objectives.is_empty(),
             };
             assert!(
                 held,

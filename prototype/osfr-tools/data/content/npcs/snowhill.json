@@ -26818,14 +26818,34 @@
         "One of the Snowhill \"old folks\". Not Milo E. Lizardo, who is a Card Duelist in another zone."
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "\"Up on a hilltop in Snowhill\" (client 3459824348)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957765,
+          "title": "Get Some Sleep",
+          "title_string_id": 4685,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get Some Sleep (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_get_some_sleep_434506)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957765
+      ],
       "quests_given_text": [
         "Target of Warrior: Asking Old Folks. Wakes in the Snowy Canyon quest to defeat Unga (Snowy Canyon, client 2755895875)."
       ],
@@ -27969,11 +27989,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2319; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3576 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=37306)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.052103,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000155,
@@ -44135,11 +44162,28 @@
               "evidence": "Day 11: Snowhill Derby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_11_snowhill_derby_97de36)."
             }
           ]
+        },
+        {
+          "quest_id": 3957715,
+          "title": "Day 7: Snowhill Racing",
+          "title_string_id": 441102,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Day 7: Snowhill Racing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_7_snowhill_racing_17d57d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3950114,
-        3953095
+        3953095,
+        3957715
       ],
       "quests_given_text": [
         "The 12 daily quests (12 Days quests)."

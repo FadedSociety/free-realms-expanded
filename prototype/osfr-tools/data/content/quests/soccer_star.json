@@ -1300,8 +1300,33 @@
       "title_string_id": 414959,
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 415019,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 415019 'Click the barrel', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500003335
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Soccer Star: Missing Soccer Balls pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1334,12 +1359,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 414960,
       "intro_text_string_id": 414958,
       "end_text_string_id": 414961,
-      "enabled": false
+      "enabled": true,
+      "job": 52
     },
     {
       "id": 3140018,

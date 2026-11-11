@@ -391,7 +391,37 @@
       "prerequisite_quest_ids": [
         3160005
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 103076,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat the Robgoblin Initiate Band - 0/5 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_lightning_bolt_00680e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin initiate' is definition [1474]"
+            }
+          ],
+          "model_id": 1474,
+          "count": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38877,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Fizzlesticks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_lightning_bolt_00680e)."
+            }
+          ],
+          "npc_id": 9000000324
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -443,12 +473,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 74828,
       "intro_text_string_id": 74826,
       "end_text_string_id": 74829,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160007,
@@ -457,7 +492,37 @@
       "prerequisite_quest_ids": [
         3160006
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 103235,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Robgoblin Pondblasters - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_the_first_rule_of_being_a_wizard_4d8fa7)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin pondblaster' is definition [1294]"
+            }
+          ],
+          "model_id": 1294,
+          "count": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 38877,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Fizzlesticks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_the_first_rule_of_being_a_wizard_4d8fa7)."
+            }
+          ],
+          "npc_id": 9000000324
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -509,12 +574,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 74821,
       "intro_text_string_id": 74819,
       "end_text_string_id": 74822,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160008,
@@ -523,7 +593,113 @@
       "prerequisite_quest_ids": [
         3160007
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 103369,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the Lakeshore farm (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) proximity counts: radius 15 m visit_position on the client POI 22 'Lakeshore Fields' (snapshot.json points_of_interest), the same pattern as shipped record 3010012; the step's real trigger is unknown."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: POI 22 'Lakeshore Fields' is the Punkin/Sunleaf farm the quest then harvests."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client text 103369: 'Find the Lakeshore farm'."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -797.4,
+            5.2,
+            938.3
+          ],
+          "radius": 15.0
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "text_string_id": 103371,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Punkin - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Punkin' is item 2882 (item-table.json); harvesting.json outputs it in Lakesfield Harvesting (117)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2882,
+          "quantity": 3
+        },
+        {
+          "kind": "gather_resource",
+          "id": 3,
+          "text_string_id": 91818,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Sunleaf - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Sunleaf' is item 2880 (item-table.json); harvesting.json outputs it in Lakesfield Harvesting (117)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2880,
+          "quantity": 3
+        },
+        {
+          "kind": "gather_resource",
+          "id": 4,
+          "text_string_id": 103377,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Rainleaf - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Rainleaf' is item 2884 (item-table.json); harvesting.json outputs it in Queensfields Harvesting (109), Chugaroot Farm Harvesting (113), Lakesfield Harvesting (117)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2884,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 103380,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Fizzlesticks in the Robgoblin Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+            }
+          ],
+          "npc_id": 9000000324
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -575,12 +751,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 74840,
       "intro_text_string_id": 74838,
       "end_text_string_id": 74841,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160009,
@@ -589,7 +770,44 @@
       "prerequisite_quest_ids": [
         3160008
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 103453,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ask the mayor of Snowhill about Yaren's student (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_student_profits_aa8359)."
+            }
+          ],
+          "npc_id": 9000000143
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 103476,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Morgulg in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_student_profits_aa8359)."
+            }
+          ],
+          "npc_id": 9000000154
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 103380,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Fizzlesticks in the Robgoblin Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_student_profits_aa8359)."
+            }
+          ],
+          "npc_id": 9000000324
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -641,12 +859,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 74854,
       "intro_text_string_id": 74852,
       "end_text_string_id": 74855,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160010,

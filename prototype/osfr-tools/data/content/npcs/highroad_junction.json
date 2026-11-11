@@ -6537,10 +6537,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AMercy_Merrywings"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000402,

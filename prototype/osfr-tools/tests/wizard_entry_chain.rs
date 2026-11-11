@@ -841,9 +841,14 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
         // T667 enables Reach Level 5 (tests/zone_quests_wilds_part2.rs); this test covers
         // Fizzlesticks' Robgoblin Camp chapter. T542's Become a Wizard (3160035) is the
         // Jobs-window record, not part of that chapter shape. 3160026 went live with the bulk
-        // quest wiring and is not part of it either.
+        // quest wiring and is not part of it either. Combat quests wave 2 wires Lightning Bolt!
+        // through Student Profits (3160006-3160009, tests/zone_quests_wilds_part2.rs).
         .filter(|record| {
             ![
+                3_160_006,
+                3_160_007,
+                3_160_008,
+                3_160_009,
                 3_160_026,
                 3_160_010,
                 3_160_017,

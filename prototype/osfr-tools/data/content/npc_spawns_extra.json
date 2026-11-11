@@ -7370,7 +7370,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:504; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1742 (ModelId=83, ModelFileName=sh_barrel_01.adr, NameId=394787)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005519
     },
     {
       "spawn_guid": 100000001750,
