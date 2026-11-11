@@ -286,6 +286,11 @@ impl Shipped {
                 let giver = self.records[&quest].giver_npc_id;
                 givers.entry(giver).or_default().push(quest);
             }
+            // The layer's save is loaded once: `Gameplay::load` costs seconds (`NpcVisibility::load`),
+            // and it ran once per giver, which made this the gate's slowest test (890 s at 759 live
+            // quests). Each giver gets a clone, the same fresh client a reload gave.
+            let mut layer_game = fixture.game(Some(state));
+            layer_game.set_world_dir(Some(live.clone())).unwrap();
             for (giver, targets) in givers {
                 let Some((at, actor)) = self.giver(CHARACTER, giver) else {
                     pass.unplaced.extend(targets);
@@ -294,9 +299,7 @@ impl Shipped {
                 // A fresh client per giver: one walking every giver accepts every offer and,
                 // with enough root quests, reaches the active-quest limit (`quest_engine.rs`
                 // `active_limit`), so the last givers offered nothing (the giver-pinned quest batch).
-                let mut game = fixture.game(Some(state.clone()));
-                game.set_world_dir(Some(live.clone())).unwrap();
-                let mut client = Client::new(game, at);
+                let mut client = Client::new(layer_game.clone(), at);
                 let offers = client.walk(actor, None);
                 pass.walks.push(Walk {
                     giver,
