@@ -200,6 +200,18 @@ The name is matched by its words, ignoring case and where the space falls betwee
 
 Login takes the account-store writer lock only for a write: a character create or delete, or a first login that creates or migrates an account. Login, the character list, the name check and character select read the store without it. A moderation or `realm role` command that still finds the store busy after a 50 ms wait answers "account store is busy or unavailable" and changes nothing; send it again. If that keeps happening, or a server prints "account store lock ... is held; request refused" or "account store lock ... could not be removed", look for a stale `accounts.json.lock` left by a crashed process and delete it once no writer is running.
 
+### Mail (gm-panel G2)
+
+An admin or moderator sends a letter from game chat; the 4th part (coins `<n>c`, items `<id>x<count>`) is optional:
+
+```text
+realm mail <First Last>[, <First Last>...] | <subject> | <body>
+realm mail everyone | <subject> | <body> | 100c 62529x2
+realm mail online | ... ;  realm mail role moderator | ... ;  realm mail zone 0 | ...
+```
+
+"Everyone" and a role include offline characters. The sender is told "Mail queued for N characters (job J)"; the letters go out at 50 a second in the background. Players see "You have N new messages" when a letter lands and once per login, and read with `realm mail [n]`, `realm mail claim <n>` and `realm mail delete <n>` (newest first), or by clicking a town postbox and choosing Read mail. Mailboxes and the audit log (`audit.jsonl`, one row per send) live in `mail/` beside the account store; caps are in `data/content/mail.json`.
+
 ## 2. Each friend
 
 **Open hosting (L070).** The launcher's "Play locally" with "Host for friends" starts login with `--open-enrollment` on this PC's LAN or VPN address: a friend makes a profile in Join a realm (address, "Ask the realm for its identity", a handle of their choice) and their first PLAY creates their player account. No key exchange and no restart. A `whitelist.txt` beside the account store (one handle per line) switches to `--enroll-handles`, so only listed handles can claim. Accounts made this way are players; the host's own account is admin. The operator-assisted steps below still work for a realm started without enrollment.

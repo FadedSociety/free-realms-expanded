@@ -2,6 +2,8 @@
 use super::npc_quests::added_npcs;
 use super::*;
 
+mod mailbox;
+
 impl Gameplay {
     pub fn exclude_startup_npcs(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
         if let Some(visibility) = &mut self.npc_visibility {
@@ -185,6 +187,10 @@ impl Gameplay {
             // T543: another actor's menu ends the open NPC conversation.
             self.quest_conversation = None;
             return Ok(None);
+        }
+        // gm-panel G2: a postbox's Mail Sorting row; the gateway answers every other mail row.
+        if let Some(out) = self.mailbox_sorting_26_6(inner, character, now_ms)? {
+            return Ok(Some(out));
         }
         if let Some(out) = self.npc_dialogue_26_6(inner, character)? {
             return Ok(Some(out));

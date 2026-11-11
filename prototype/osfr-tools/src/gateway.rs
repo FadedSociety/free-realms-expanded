@@ -130,6 +130,7 @@ pub struct Gateway {
     trace_enabled: bool,
     // (R) Server-only authorization seam; no client parser sets an instance id.
     pending_transfer: Option<crate::players::ZoneInstance>,
+    mail: crate::mail::chat::Slot, // staged staff sends and this login's notice (gateway/staff.rs)
 }
 
 #[derive(Debug, Default)]
@@ -937,6 +938,7 @@ impl Gateway {
             jump_relay: None,
             trace_enabled: false,
             pending_transfer: None,
+            mail: Default::default(),
         })
     }
 
@@ -1669,12 +1671,8 @@ impl Gateway {
                             continue;
                         }
                         let mut staged_game = game.clone(); // clones the box: heap, not this frame
-                        // `realm role` and the L042 moderation words (gateway/staff.rs).
-                        if crate::chat::request(&inner, state.guid)
-                            .ok()
-                            .flatten()
-                            .is_some_and(|text| self.staff_command(game, &text, &mut outcome))
-                        {
+                        // `realm role`, the L042 moderation words and mail (gateway/staff.rs).
+                        if self.staff_packet(game, &inner, &state, now_ms, &mut outcome) {
                             continue;
                         }
                         let result = match staged_game.handle_in_world(&inner, &state, now_ms) {

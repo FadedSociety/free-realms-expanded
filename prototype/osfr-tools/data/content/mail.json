@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "notes": "Staff and system mail (gm-panel G2, src/mail/). The original client has no mail system, so every value here is (R) and tunable. Mailboxes are the five town postbox groups the mail-sorting sheet names (npc_spawns_extra.json spawn guids and positions; Wugachug has none); `game` is the town's Mail Sorting game (client MiniGameData 376-381).",
+  "max_messages": 100,
+  "max_subject_chars": 60,
+  "max_body_chars": 1000,
+  "max_attachment_items": 6,
+  "max_attachment_coins": 1000000,
+  "send_rate_per_second": 50,
+  "click_range": 12.0,
+  "mailboxes": [
+    { "guid": 100000002375, "town": "Sanctuary", "game": 376, "position": [-1100.981, 5.187627, 223.4131] },
+    { "guid": 100000001881, "town": "Seaside", "game": 377, "position": [-376.7556, 10.82801, -1123.785] },
+    { "guid": 100000033695, "town": "Snowhill", "game": 379, "position": [219.05415, 27.934496, 438.7915] },
+    { "guid": 100000001426, "town": "Shrouded Glade", "game": 380, "position": [68.5, 60.87, 1181.4] },
+    { "guid": 100000002297, "town": "Merry Vale", "game": 381, "position": [-1109.795, -40.10367, -397.9945] }
+  ]
+}

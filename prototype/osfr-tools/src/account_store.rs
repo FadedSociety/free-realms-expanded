@@ -91,15 +91,17 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
                 | "reload power_ups"
                 | "reload placements"
         ),
-        // (R) L042: moderators get the moderation commands and nothing else.
+        // (R) L042: moderators get the moderation commands and nothing else; gm-panel G2 adds
+        // staff mail (`realm mail <to> | ...`, PLAN 4.8: "moderators get moderation, mail").
         AccountRole::Moderator => {
-            matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "gm")
+            matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban" | "gm" | "mail")
         }
         // `season` is an event toggle (`gameplay/live_events.rs`): it changes the world for every
-        // player, so it stays with the admins (owner 2026-11-09).
+        // player, so it stays with the admins (owner 2026-11-09). Staff mail reaches every
+        // player too, so it stays with the staff roles.
         AccountRole::Tester => !matches!(
             command,
-            "mute" | "unmute" | "kick" | "ban" | "unban" | "role" | "code" | "season"
+            "mute" | "unmute" | "kick" | "ban" | "unban" | "role" | "code" | "season" | "mail"
         ),
         AccountRole::Player => false,
     }
@@ -869,7 +871,7 @@ mod tester_role_tests {
         for command in ["give", "coins", "sc", "level", "god", "goto", "here", "place", "reload all"] {
             assert!(can_run_realm_command(tester, command), "{command}");
         }
-        for command in ["mute", "unmute", "kick", "ban", "unban", "role", "code", "season"] {
+        for command in ["mute", "unmute", "kick", "ban", "unban", "role", "code", "season", "mail"] {
             assert!(!can_run_realm_command(tester, command), "{command}");
         }
         assert!(!tester.outranks(AccountRole::Player), "testers cannot moderate anyone");

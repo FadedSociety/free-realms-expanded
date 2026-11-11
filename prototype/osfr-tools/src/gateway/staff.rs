@@ -1,14 +1,53 @@
-//! Staff `realm` words on a session gateway: `realm role` and the L042 moderation commands.
+//! Staff `realm` words on a session gateway: `realm role` and the L042 moderation commands,
+//! and (gm-panel G2) every mail packet, `crate::mail::chat`.
 //!
 //! The hub keeps only dispatch. A moderation command is staged in `GatewayOutcome::moderation`
 //! and run by the host after this transaction commits (`osfr_gateway/moderation.rs`), so a
-//! refused or failed transaction changes nothing.
+//! refused or failed transaction changes nothing. A staff mail send is staged on this gateway
+//! (`take_mail_sends`) and started by the host's world tick (`osfr_gateway/mail_routing.rs`),
+//! so it too exists only once the sender's transaction committed.
 
 use super::{Gateway, GatewayOutcome, wrapped};
+use crate::character_store::CharacterState;
 use crate::gameplay::Gameplay;
 use crate::moderation::{Action, Command, unix_now};
 
 impl Gateway {
+    /// The staff and mail stop before gameplay: true when this packet was answered here.
+    pub(super) fn staff_packet(
+        &mut self,
+        game: &mut Gameplay,
+        inner: &[u8],
+        state: &CharacterState,
+        now_ms: u64,
+        outcome: &mut GatewayOutcome,
+    ) -> bool {
+        let store = self.role_account.as_ref().map(|(path, _)| path.as_path());
+        if let Some(reply) =
+            crate::mail::chat::intercept(&mut self.mail, store, game, inner, state, now_ms)
+        {
+            outcome.dev_command_denials += usize::from(reply.denied);
+            outcome.state_changed |= reply.changed;
+            outcome.gameplay_changed |= reply.changed;
+            outcome.replies.extend(reply.packets.iter().map(|p| wrapped(p)));
+            return true;
+        }
+        crate::chat::request(inner, state.guid)
+            .ok()
+            .flatten()
+            .is_some_and(|text| self.staff_command(game, &text, outcome))
+    }
+
+    /// Staff mail sends this session staged; the host starts each once.
+    pub fn take_mail_sends(&mut self) -> Vec<crate::mail::chat::StagedSend> {
+        std::mem::take(&mut self.mail.sends)
+    }
+
+    /// Whether this login's "You have N new messages" check ran; the first call says no.
+    pub fn take_mail_notice_due(&mut self) -> bool {
+        !std::mem::replace(&mut self.mail.notified, true)
+    }
+
     /// Answer or stage `realm role` and the moderation words; false for any other text, which
     /// goes on to gameplay. The role gate (`Gameplay::may_run`, the account-store role) runs
     /// before the name is parsed, so an unauthorized sender learns nothing about other players.

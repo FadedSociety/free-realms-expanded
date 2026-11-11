@@ -83,6 +83,7 @@ pub mod lobby_wire;
 pub mod login;
 pub mod login_auth;
 pub mod artifact_hunt;
+pub mod mail;
 pub mod mail_sorting;
 pub mod matchmaking;
 pub mod minigame;

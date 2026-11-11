@@ -1015,9 +1015,9 @@ fn no_shipped_event_key_is_a_realm_command_word() {
     use osfr_tools::account_store::can_run_realm_command;
     // The words every role may type (`Gameplay::developer_command_denied`), then the lists of
     // the two roles the role table names commands for.
-    const ORDINARY: [&str; 13] = [
+    const ORDINARY: [&str; 14] = [
         "help", "status", "quest", "quests", "attack", "respawn", "inventory", "exit", "retry",
-        "accept", "turnin", "redeem", "race",
+        "accept", "turnin", "redeem", "race", "mail",
     ];
     let areas = ClientAreas::load(&content_dir()).unwrap();
     for key in areas.calendar().keys() {

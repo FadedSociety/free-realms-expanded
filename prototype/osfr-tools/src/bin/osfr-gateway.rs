@@ -91,6 +91,8 @@ mod tick_stats;
 mod room_routing;
 #[path = "osfr_gateway/world_event_routing.rs"]
 mod world_event_routing;
+#[path = "osfr_gateway/mail_routing.rs"]
+mod mail_routing;
 use paths::{character_state_path, chat_settings_path, savestate_dir, social_path};
 
 /// Percent-decoding for Studio query strings and paths.
@@ -2005,10 +2007,9 @@ impl Session {
                 now_ms,
             )));
 
-            // (R) A pose-only change (no gameplay change, zone transfer or run
-            // binding) is written at most every POSITION_SAVE_MS; `tick` and
-            // logout flush it. One save per accepted pose would be thousands of
-            // file writes a second at 1,000 players.
+            // (R) A pose-only change (no gameplay change, zone transfer or run binding) is
+            // written at most every POSITION_SAVE_MS; `tick` and logout flush it. One save per
+            // accepted pose would be thousands of file writes a second at 1,000 players.
             let deferred = outcome.state_changed
                 && !outcome.gameplay_changed
                 && !transfer
@@ -3340,8 +3341,7 @@ impl Server {
         self.socket.local_addr()
     }
 
-    /// Count refused traffic and log a summary at most every 10 s, so a flood
-    /// cannot grow the log.
+    /// Count refused traffic and log a summary at most every 10 s, so a flood cannot grow the log.
     fn refuse(&mut self, reason: &'static str) {
         self.refused += 1;
         self.world
@@ -3722,6 +3722,7 @@ impl Server {
             world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms, unix_ms);
             boombox_routing::tick(&mut self.world, &mut self.sessions, now_ms);
             cake_routing::tick(&mut self.world, &mut self.sessions, now_ms);
+            mail_routing::tick(&mut self.sessions, &self.options);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
@@ -3790,8 +3791,7 @@ impl Server {
         }
     }
 
-    /// Where authored content lives: the live gameplay's directory, else the
-    /// bundled data/content.
+    /// Where authored content lives: the live gameplay's directory, else the bundled data/content.
     fn studio_content_dir(&self) -> PathBuf {
         self.studio_session()
             .and_then(|key| {

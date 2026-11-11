@@ -962,12 +962,17 @@ fn the_opening_labels_bind_and_carry_their_locale_rows() {
     OpeningJournal::load(&release).unwrap();
     let journal = read_json(&release.join("journal-text.json"));
     let additions = read_json(&release.join("locale-additions.json"));
-    let rows: std::collections::BTreeMap<u64, &str> = additions["rows"]
+    let mut rows: std::collections::BTreeMap<u64, &str> = additions["rows"]
         .as_array()
         .unwrap()
         .iter()
         .map(|row| (row["hash"].as_u64().unwrap(), row["text"].as_str().unwrap()))
         .collect();
+    // gm-panel G2: the mail rows are the mail module's own, each under its text id's hash.
+    for (id, text) in osfr_tools::mail::chat::LOCALE_ROWS {
+        let hash = u64::from(osfr_tools::world_text::locale_hash(id as i32));
+        assert_eq!(rows.remove(&hash), Some(text), "mail text id {id}");
+    }
     let mut used = std::collections::BTreeSet::new();
     for entry in journal["entries"].as_array().unwrap() {
         for (id, text) in [("name_id", "name"), ("description_id", "description")] {

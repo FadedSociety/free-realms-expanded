@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "locale": "en_US",
- "notice": "Text our server shows that the stock client locale lacks (opening objective labels). The launcher adds these rows to the player's own locale; row hash = Jenkins lookup2 of \"Global.Text.<id>\".",
+ "notice": "Text our server shows that the stock client locale lacks (opening objective labels; the town mailbox's Read mail, text id 6100101). The launcher adds these rows to the player's own locale; row hash = Jenkins lookup2 of \"Global.Text.<id>\".",
  "rows": [
   {
    "hash": 225453572,
@@ -37,6 +37,11 @@
    "hash": 669093933,
    "tag": "ucdt",
    "text": "Put out the second farm fire"
+  },
+  {
+   "hash": 978826593,
+   "tag": "ucdt",
+   "text": "Read mail"
   },
   {
    "hash": 1168850750,

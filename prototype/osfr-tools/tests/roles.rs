@@ -250,3 +250,19 @@ fn moderation_hierarchy_is_strict() {
         }
     }
 }
+
+/// gm-panel G2: staff mail (`realm mail <to> | ...`) is the admins' and moderators' only; a
+/// tester, builder or player cannot mail the realm. Reading mail is every player's word and
+/// never reaches this table (`mail::chat::is_reader`).
+#[test]
+fn staff_mail_is_for_admins_and_moderators() {
+    assert!(can_run_realm_command(AccountRole::Admin, "mail"));
+    assert!(can_run_realm_command(AccountRole::Moderator, "mail"));
+    for role in [AccountRole::Tester, AccountRole::Builder, AccountRole::Player] {
+        assert!(!can_run_realm_command(role, "mail"), "{role:?}");
+    }
+    assert!(osfr_tools::mail::chat::is_reader("mail"));
+    assert!(osfr_tools::mail::chat::is_reader("mail claim 2"));
+    assert!(!osfr_tools::mail::chat::is_reader("mail everyone | a | b"));
+    assert!(!osfr_tools::mail::chat::is_reader("mailbox"));
+}

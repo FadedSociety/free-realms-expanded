@@ -3350,7 +3350,7 @@ impl Gameplay {
                 | "accept"
                 | "turnin"
                 | "redeem"
-        ) || (first == "race" && self.kart_entry.is_none());
+        ) || (first == "race" && self.kart_entry.is_none()) || crate::mail::chat::is_reader(command);
         Ok(!ordinary && !self.may_run(command))
     }
 
