@@ -27694,9 +27694,13 @@
             {
               "kind": "wiki",
               "evidence": "quest_wire's pickup_name has no 'search' verb"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool"
             }
           ],
-          "node_type": "quest-crate",
+          "node_type": "quest-storage-crate-1",
           "quantity": 1
         },
         {

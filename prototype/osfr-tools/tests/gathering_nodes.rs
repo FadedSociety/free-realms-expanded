@@ -1484,11 +1484,13 @@ fn node_content_is_bounded_and_unique() {
     // Lead 2026-11-10: kart racing on the quest stack (L1123, L1126, L1127): its counts plus kart's.
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123); three crate spawns were the same in both (1,030); P-pickup-fix adds 12 split-step spots (1,042).
     // P-quest-npcs: 60 spots for 17 more quest pick-ups (983).
-    assert_eq!(actors.len(), 1051);
+    // P-quest-crate: Somewhere in Storage's three crates leave the quest-crate pool (nine spots, max 6)
+    // for their own pool of three, so all nine crates are live (1,051 -> 1,054).
+    assert_eq!(actors.len(), 1054);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 1051);
+    assert_eq!(ids.len(), 1054);
     assert!(
         actors
             .iter()

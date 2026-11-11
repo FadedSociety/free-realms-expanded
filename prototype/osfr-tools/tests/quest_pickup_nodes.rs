@@ -536,3 +536,29 @@ fn quest_nodes_load_rejects_bad_rows() {
         .to_string();
     assert!(error.contains("1 MiB"), "{error}");
 }
+
+/// Two wiring batches each made a `quest-crate` pool; the merge kept one pool of six for both
+/// quests, so one quest's crates counted for the other and nine spots shared six live nodes.
+/// A pick-up node type (and so its pools and spots) belongs to exactly one quest.
+#[test]
+fn no_two_quests_share_a_pickup_node_type() {
+    let mut owners = std::collections::BTreeMap::<String, BTreeSet<u64>>::new();
+    for entry in fs::read_dir(content_dir().join("quests")).expect("the shipped quest files") {
+        let path = entry.expect("a quest file entry").path();
+        let file: Value =
+            serde_json::from_slice(&fs::read(&path).expect("a quest file")).expect("quest JSON");
+        for quest in file["records"].as_array().expect("quest records") {
+            for goal in quest["objectives"].as_array().expect("quest objectives") {
+                if goal["kind"] == "collect_node" {
+                    let node_type = goal["node_type"].as_str().expect("a node type");
+                    let quest = quest["id"].as_u64().expect("a quest id");
+                    owners.entry(node_type.to_owned()).or_default().insert(quest);
+                }
+            }
+        }
+    }
+    // Not a pin: only proof that the walk above read the shipped pick-up steps.
+    assert!(owners.len() >= 200, "only {} pick-up node types read", owners.len());
+    owners.retain(|_, quests| quests.len() > 1);
+    assert!(owners.is_empty(), "pick-up node types shared between quests: {owners:?}");
+}

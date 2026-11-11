@@ -4901,6 +4901,30 @@
         "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       },
       "name_id": 393463
+    },
+    {
+      "key": "quest-storage-crate-1",
+      "name": "Storage Crate",
+      "model_id": 84,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "name": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "model_id": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "scale": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "composite_effect_id": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "interact_range": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "cursor_id": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "placement_y_offset": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "drop_table": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool"
+      },
+      "name_id": 390816
     }
   ],
   "pools": [
@@ -7962,6 +7986,21 @@
         "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
         "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
         "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-storage-crate-1",
+      "zone_definition_id": 1,
+      "node_type": "quest-storage-crate-1",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "zone_definition_id": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "node_type": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "max_active_nodes": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool",
+        "respawn_seconds": "(R) Somewhere in Storage 3956132 step 1: its own node type, pool and three spots round Baxi Sparkletoes (spawns 801-803), split from quest-crate, which Woolen Woes 3957235 keeps; two quests no longer share one pool"
       }
     }
   ],
@@ -19636,13 +19675,13 @@
       "zone_definition_id": 1,
       "position": [
         -2063.56,
-        -54.65,
-        188.8
+        -55.49,
+        190.8
       ],
       "heading": 0.0,
       "source_tag": "reconstructed",
       "source_tags": {
-        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "position": "(R) Woolen Woes crate, moved 2 m off the top of a 0.8 m obstacle onto flat terrain (ground probe: terrain -55.49, slope 0), 6.3 m from Hartley Harrison",
         "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       }
     },
@@ -20640,7 +20679,7 @@
     },
     {
       "id": 801,
-      "pool_key": "quest-crate",
+      "pool_key": "quest-storage-crate-1",
       "zone_definition_id": 1,
       "position": [
         -1275.2,
@@ -20656,7 +20695,7 @@
     },
     {
       "id": 802,
-      "pool_key": "quest-crate",
+      "pool_key": "quest-storage-crate-1",
       "zone_definition_id": 1,
       "position": [
         -1270.52,
@@ -20672,7 +20711,7 @@
     },
     {
       "id": 803,
-      "pool_key": "quest-crate",
+      "pool_key": "quest-storage-crate-1",
       "zone_definition_id": 1,
       "position": [
         -1264.52,
