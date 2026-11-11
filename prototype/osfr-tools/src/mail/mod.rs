@@ -399,8 +399,13 @@ pub fn delete(path: &Path, id: u32) -> Result<(), MailError> {
     })
 }
 
-/// The 15/3 "You have N new messages" line: the client's own row when the gateway has its
-/// locale, else the same words. `chat::system` escapes markup, so the row's font tag is
+/// (R) The line after the notice: the stock client has no mail window, so it says how to read.
+pub const READ_HINT: &str =
+    "Type realm mail to read your mail, or click a town postbox. realm mail claim 1 takes its gifts.";
+
+/// The "You have N new messages" notice: the client's own row when the gateway has its locale,
+/// else the same words. rc-0136 F4: it is the 77/2 broadcast (`chat::broadcast`, on screen and
+/// in chat); a chat line alone was missed. The encoder escapes markup, so the row's font tag is
 /// stripped rather than shown as text.
 pub fn notice(unread: usize) -> Vec<u8> {
     let template = crate::world_text::locale_text(NEW_MESSAGES_TEXT_ID)
@@ -415,7 +420,7 @@ pub fn notice(unread: usize) -> Vec<u8> {
             _ => {}
         }
     }
-    crate::chat::system(&plain.replace("%1", &unread.to_string()))
+    crate::chat::broadcast(&plain.replace("%1", &unread.to_string()))
 }
 
 #[cfg(test)]
@@ -578,7 +583,7 @@ mod tests {
     #[test]
     fn the_notice_is_the_client_row_without_markup() {
         let packet = notice(3);
-        let text = String::from_utf8_lossy(&packet[8..packet.len() - 1]).into_owned();
+        let text = crate::chat::broadcast_text(&packet).unwrap_or_default();
         assert_eq!(text, "You have 3 new messages");
     }
 }

@@ -90,16 +90,47 @@ pub fn enter_area(name_string_id: u32) -> Vec<u8> {
     packet
 }
 
-pub fn system(message: &str) -> Vec<u8> {
-    let escaped = message
+fn escaped(message: &str) -> String {
+    message
         .replace('&', "&amp;")
         .replace('<', "&lt;")
-        .replace('>', "&gt;");
+        .replace('>', "&gt;")
+}
+
+pub fn system(message: &str) -> Vec<u8> {
+    let escaped = escaped(message);
     let mut packet = vec![15, 0, 3, 0];
     packet.extend_from_slice(&(escaped.len() as u32).to_le_bytes());
     packet.extend_from_slice(escaped.as_bytes());
     packet.push(1);
     packet
+}
+
+/// rc-0136 F4: 77/2 `BroadcastPacketZone`, a line on the player's screen that the client also
+/// prints in chat. Reader `maybe_ReadRecordI16I16StrU32` (`0x008fb0a0`): two u16, a NameData
+/// (`0x008e7290`: three i32, then first and last name strings), the message string, then an i32
+/// text id used only when the message is empty. `HandleBroadcastPacket` (`0x009174c0`) formats a
+/// nameless one with `SystemZoneBroadcastFormat` (locale 6953, `[*message*]`) and calls
+/// `NotificationErrorOrAlert` (`0x009023f0`) with both flags set: Lua
+/// `NotificationHandler:AlertMessage` shows it on screen, and `maybe_BaseClient__PrintLineColored`
+/// (`0x009020c0`, Lua `OnPrint` -> ChatLog) prints it in chat. Sanctuary sends the same packet for
+/// zone announcements.
+pub fn broadcast(message: &str) -> Vec<u8> {
+    let escaped = escaped(message);
+    let mut packet = vec![77, 0, 2, 0];
+    packet.extend([0; 12 + 4 + 4]);
+    packet.extend_from_slice(&(escaped.len() as u32).to_le_bytes());
+    packet.extend_from_slice(escaped.as_bytes());
+    packet.extend(0_i32.to_le_bytes());
+    packet
+}
+
+/// The text of a [`broadcast`] packet, for readers and tests; `None` for any other packet.
+pub fn broadcast_text(packet: &[u8]) -> Option<String> {
+    let body = packet.strip_prefix(&[77, 0, 2, 0][..])?.get(20..)?;
+    let length = usize::try_from(crate::le::u32(body, 0)?).ok()?;
+    let text = body.get(4..4_usize.checked_add(length)?)?;
+    Some(String::from_utf8_lossy(text).into_owned())
 }
 
 /// 15/4 ChatPacketFromStringId, 43 bytes, client reader 0x00b0f680 (header 0x00b0f550 reads the
@@ -120,6 +151,22 @@ pub fn string_say(speaker: u64, string_id: i32) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// rc-0136 F4: golden bytes against `0x008fb0a0`: header, an empty NameData, the escaped
+    /// message, text id 0; the reader helper gives the text back.
+    #[test]
+    fn broadcast_follows_the_zone_broadcast_reader() {
+        let packet = broadcast("Hi <all>");
+        let mut expected = vec![77, 0, 2, 0];
+        expected.extend([0; 20]);
+        expected.extend(14_u32.to_le_bytes());
+        expected.extend(b"Hi &lt;all&gt;");
+        expected.extend([0; 4]);
+        assert_eq!(packet, expected);
+        assert_eq!(broadcast_text(&packet).as_deref(), Some("Hi &lt;all&gt;"));
+        assert_eq!(broadcast_text(&system("Hi")), None);
+        assert_eq!(broadcast_text(&packet[..30]), None, "a short packet has no text");
+    }
+
     /// Golden bytes against the reader's layout; the first flag decides say versus emote.
     #[test]
     fn string_say_follows_the_reader_layout() {

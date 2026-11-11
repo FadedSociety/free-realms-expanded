@@ -87,6 +87,12 @@ impl Notification {
         Self { image_id, ..*self }.validate()
     }
 
+    /// Whether the client hangs an icon over the actor for this row (the handler draws for an
+    /// image key above 0 unless `hide_overhead`): a vein's pick, a vendor's or SC display's tag.
+    pub fn draws_overhead(&self) -> bool {
+        self.image_id > 0 && !self.hide_overhead
+    }
+
     fn write(&self, guid: u64, bytes: &mut Vec<u8>) {
         let word = |bytes: &mut Vec<u8>, value: i32| bytes.extend(value.to_le_bytes());
         bytes.extend(guid.to_le_bytes());

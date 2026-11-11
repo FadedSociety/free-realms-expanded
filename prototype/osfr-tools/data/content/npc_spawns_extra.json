@@ -53699,7 +53699,7 @@
       "model_id": 2040,
       "model_file_name": "trex_mount.adr",
       "name": "Striped T-Rex",
-      "name_string_id": 5102888,
+      "name_string_id": 5570,
       "position": [
         -908.5041,
         -34.22184,
@@ -53708,6 +53708,10 @@
       "heading": -1.545341,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4: the display carries its Marketplace ride's own name id (5570, the same words as Legacy's 5102888: ride items 7942-7947 and 76853 name it 5570), so a click opens that ride's Station Cash window (F3 `sc_display_26_8` finds a display by name id) and it shows the SC tag Sanctuary's row 33565 gives it."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3295; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4661 (ModelId=2040, ModelFileName=trex_mount.adr, NameId=5102888)."
@@ -53721,7 +53725,7 @@
       "model_id": 3209,
       "model_file_name": "trex_armor_mount.adr",
       "name": "Armored T-Rex",
-      "name_string_id": 5102892,
+      "name_string_id": 6403,
       "position": [
         -894.3927,
         -33.65656,
@@ -53730,6 +53734,10 @@
       "heading": -2.153399,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4: the display carries its Marketplace ride's own name id (6403, the same words as Legacy's 5102892: ride items 13683-13689 and 76859 name it 6403), so a click opens that ride's Station Cash window (F3 `sc_display_26_8` finds a display by name id) and it shows the SC tag Sanctuary's row 33322 gives it."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3296; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4662 (ModelId=3209, ModelFileName=trex_armor_mount.adr, NameId=5102892)."

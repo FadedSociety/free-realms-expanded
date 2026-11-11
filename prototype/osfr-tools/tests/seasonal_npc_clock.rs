@@ -308,3 +308,39 @@ fn quiet_package(tag: &str) -> std::path::PathBuf {
     );
     dir
 }
+
+/// rc-0136 F4: the event NPCs drawn from the regional tables follow their season too: the Snow
+/// Days snowman by the Snowhill gifting tree (the owner's "random snowman mob npcs in the snow
+/// hill city") and the Birthday Bash Cakenstein in Merry Vale. The event switch (`realm event`
+/// and the panel's, `NpcVisibility::set_event_modes`) forces them either way.
+const SNOWMAN: (u64, [f32; 3]) = (9_500_000_724, [234.6321, 24.93343, 399.1478]);
+const CAKENSTEIN: (u64, [f32; 3]) = (9_500_000_373, [-1177.2609, -34.879, -438.4174]);
+
+#[test]
+fn regional_event_npcs_follow_their_season_and_the_event_switch() {
+    for (clock, snowman, cake) in [
+        (HALLOWEEN_MS, false, false),
+        (SNOW_DAYS_MS, true, false),
+        (BIRTHDAY_MS, false, true),
+        (NO_SEASON_MS, false, false),
+    ] {
+        let visibility = load(clock);
+        let near_snowman = seen(&visibility, SNOWMAN.1);
+        assert_eq!(near_snowman.contains(&SNOWMAN.0), snowman, "the snowman at {clock}");
+        let near_cake = seen(&visibility, CAKENSTEIN.1);
+        assert_eq!(near_cake.contains(&CAKENSTEIN.0), cake, "Cakenstein at {clock}");
+    }
+    use osfr_tools::event_calendar::Mode;
+    let mut forced = load(HALLOWEEN_MS);
+    forced.set_event_modes([("snow_days".to_owned(), Mode::On)].into());
+    assert!(
+        seen(&forced, SNOWMAN.1).contains(&SNOWMAN.0),
+        "the event switch brings the snowman out of season"
+    );
+    let mut stopped = load(SNOW_DAYS_MS);
+    stopped.set_event_modes([("snow_days".to_owned(), Mode::Off)].into());
+    assert!(
+        !seen(&stopped, SNOWMAN.1).contains(&SNOWMAN.0),
+        "and takes it away in season"
+    );
+}

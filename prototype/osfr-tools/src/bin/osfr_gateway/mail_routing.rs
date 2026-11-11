@@ -139,6 +139,8 @@ fn notify(sessions: &mut SessionMap, store: &Path) {
         };
         if let Some(unread) = unread.filter(|unread| *unread > 0) {
             tell(session, &mail::notice(unread));
+            tell(session, &chat::system(mail::READ_HINT));
+            println!("{}", serde_json::json!({"event": "mail_notice", "guid": guid, "unread": unread}));
         }
     }
 }

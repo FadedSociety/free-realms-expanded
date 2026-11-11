@@ -1,6 +1,6 @@
-//! `realm broadcast <text>`: one server-owned system line for every online session.
-//! The text is validated here and encoded by the existing 15/3 `ChatPacketDebugChat`
-//! writer (`chat::system`), so no second packet shape or per-recipient encoder exists.
+//! `realm broadcast <text>`: one server-owned announcement for every online session.
+//! The text is validated here and encoded once by [`encode`] (77/2, on screen and in chat; it
+//! was the 15/3 `ChatPacketDebugChat` line below until rc-0136).
 //! Evidence (IDA, client 1.910.1.530630): receive dispatcher `0x00b14350` reads the shared
 //! two-u16 header (`0x00b0f550`) and, for subtype 3, constructs `0x00b0f9d0` and reads the
 //! body with `0x00b0f5f0` (called from `0x00b10a20`): two u16 header words, a u32 byte
@@ -74,9 +74,10 @@ pub fn parse(command: &str) -> Result<&str, NoticeError> {
     Ok(text)
 }
 
-/// The one 15/3 system-line encoder; markup escaping stays in `chat::system`.
+/// The one announcement encoder: rc-0136 F4 moved it from the 15/3 chat line to the 77/2
+/// broadcast (`chat::broadcast`), which the client shows on screen and prints in chat itself.
 pub fn encode(text: &str) -> Vec<u8> {
-    crate::chat::system(text)
+    crate::chat::broadcast(text)
 }
 
 /// Stage a `realm` line that starts with `broadcast`: the notice on success, one system
@@ -149,12 +150,16 @@ mod tests {
         assert_eq!(parse("BROADCAST Hello"), Ok("Hello"));
     }
 
+    /// rc-0136 F4: the existing escaped line is now the 77/2 broadcast (`chat::broadcast`), the
+    /// one encoder, on screen and in chat.
     #[test]
     fn encode_is_the_existing_escaped_system_line() {
         let packet = encode("<hunt>&");
-        assert_eq!(packet, crate::chat::system("<hunt>&"));
-        assert_eq!(&packet[..4], &[15, 0, 3, 0]);
-        assert_eq!(&packet[8..packet.len() - 1], b"&lt;hunt&gt;&amp;");
-        assert_eq!(packet[packet.len() - 1], 1);
+        assert_eq!(packet, crate::chat::broadcast("<hunt>&"));
+        assert_eq!(&packet[..4], &[77, 0, 2, 0]);
+        assert_eq!(
+            crate::chat::broadcast_text(&packet).as_deref(),
+            Some("&lt;hunt&gt;&amp;")
+        );
     }
 }

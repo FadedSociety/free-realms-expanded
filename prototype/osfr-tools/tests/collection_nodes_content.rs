@@ -400,10 +400,18 @@ fn the_gathering_loader_reads_collection_nodes() {
                 "a rich vein type's own scale and texture"
             );
         } else {
+            // rc-0136 F4: the old copper type also carries the other veins' pick (35/10,
+            // `NotificationImages.txt` 340); every other field stays the captured template's.
+            let mut fields = presentation.clone();
+            let pick = std::mem::take(&mut fields.notifications);
             assert_eq!(
-                presentation,
-                &template_presentation(),
+                fields,
+                template_presentation(),
                 "the old copper type keeps the captured template fields"
+            );
+            assert!(
+                pick.iter().any(|row| row.image_id == 340),
+                "the old copper type shows the veins' pick"
             );
         }
     }

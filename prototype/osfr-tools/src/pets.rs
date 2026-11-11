@@ -1559,7 +1559,7 @@ impl PetService {
             return species.name.clone();
         }
         self.adoption_item(pet)
-            .map(|item| item.name.clone())
+            .map(|item| shown_item_name(&item.name))
             .unwrap_or_default()
     }
 
@@ -3404,6 +3404,18 @@ fn owned_item_for_record(
         .ok_or_else(|| invalid("pet adoption item is not owned"))
 }
 
+/// rc-0136 F4: the shown name of an item-only pet. The Adoption Center items' client names are
+/// keys, "Pet: Dog: Small Floppy: solid-tan" (locale 75051 holds the same words), which the
+/// owner saw over the dog; such a pet shows "<breed> <kind>", "Small Floppy Dog" (R), the breed
+/// and kind `scripts/build_pet_rewards.py` gives the reward rows. Every other name is kept.
+fn shown_item_name(name: &str) -> String {
+    let parts: Option<Vec<&str>> = name.strip_prefix("Pet: ").map(|rest| rest.split(": ").collect());
+    match parts.as_deref() {
+        Some([kind, breed, _coat]) => format!("{breed} {kind}"),
+        _ => name.to_owned(),
+    }
+}
+
 fn validate_name(name: &str) -> io::Result<()> {
     if name.is_empty() || name.chars().count() > 64 || name.chars().any(char::is_control) {
         return Err(invalid("invalid pet name"));
@@ -3815,4 +3827,21 @@ fn invalid(message: &'static str) -> io::Error {
 
 fn parse_error(error: serde_json::Error) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, error)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::shown_item_name;
+
+    /// rc-0136 F4 (q-pet): the first-quest dog is item 23901, whose client name is a key.
+    #[test]
+    fn an_adoption_item_key_shows_breed_and_kind() {
+        assert_eq!(
+            shown_item_name("Pet: Dog: Small Floppy: solid-tan"),
+            "Small Floppy Dog"
+        );
+        assert_eq!(shown_item_name("Pet: Cat: Shorthair: darkmark-gray"), "Shorthair Cat");
+        assert_eq!(shown_item_name("Summer"), "Summer", "a named pet keeps its name");
+        assert_eq!(shown_item_name("Pet: Odd"), "Pet: Odd", "an unknown shape is kept");
+    }
 }

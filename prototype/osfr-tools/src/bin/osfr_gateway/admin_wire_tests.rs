@@ -378,6 +378,48 @@ fn admin_mail_goes_through_g2_and_tells_online_players() {
     assert_eq!(mails[0].after["attachments"]["coins"], 25);
 }
 
+/// rc-0136 F4 (g-mail): the owner's path. Mail to everyone with 25 coins from the panel; the
+/// online player sees the notice on screen (77/2) with the line that says how to read it,
+/// reads the letter with `realm mail`, claims it with `realm mail claim 1`, and the wallet
+/// holds the 25 coins. A second claim pays nothing.
+#[test]
+fn admin_mail_to_everyone_with_coins_is_told_read_and_claimed() {
+    let Some((_files, mut rig)) = panel("mail-coins", SESSION_TTL, None) else {
+        return;
+    };
+    let pip_key = rig.join(PIP).unwrap();
+    told(&mut rig);
+    let ada = sign_in(&mut rig, ADA_HANDLE);
+    let pip = guid(PIP);
+    let wallet = format!("/admin/api/players/{pip}/coins");
+    let set = ok(post(&mut rig, &wallet, json!({"op": "set", "amount": 10}), &ada));
+    assert_eq!(set["coins"], 10);
+    let gift = json!({"to": {"everyone": true}, "subject": "Server gift", "body": "Thanks for playing.",
+        "attachments": {"coins": 25}});
+    let sent = ok(post(&mut rig, "/admin/api/mail", gift, &ada));
+    let job = sent["job_id"].as_u64().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while mail::admin::job(job).is_none_or(|view| view.state != mail::admin::JobState::Done) {
+        assert!(Instant::now() < deadline, "the mail job finishes");
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    let heard = told(&mut rig);
+    let shown: Vec<_> = heard[&pip_key]
+        .iter()
+        .filter_map(|message| osfr_tools::chat::broadcast_text(message.get(7..)?))
+        .collect();
+    assert_eq!(shown, ["You have 1 new messages"], "the notice is on screen");
+    assert!(said(&heard[&pip_key], "Type realm mail"), "and says how to read it");
+    let read = rig.command(pip_key, "realm mail");
+    assert!(said(&read, "Server gift"), "realm mail shows the letter");
+    let claimed = rig.command(pip_key, "realm mail claim 1");
+    assert!(said(&claimed, "You claimed 25 coins."), "the claim pays");
+    let after = ok(post(&mut rig, &wallet, json!({"op": "give", "amount": 1}), &ada));
+    assert_eq!(after["coins"], 10 + 25 + 1, "the 25 coins are in the wallet");
+    let again = rig.command(pip_key, "realm mail claim 1");
+    assert!(said(&again, "nothing to claim"), "a letter pays once");
+}
+
 #[test]
 fn admin_powers_use_the_staff_character_or_act_on_others_alone() {
     let Some((files, mut rig)) = panel("powers", SESSION_TTL, None) else {

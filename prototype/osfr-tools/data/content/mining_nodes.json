@@ -16,7 +16,19 @@
       "interact_range": 12,
       "cursor_id": 0,
       "placement_y_offset": 0.0,
-      "source_tag": "reconstructed_R"
+      "source_tag": "reconstructed_R",
+      "notifications": [
+        {
+          "kind": 6,
+          "image_id": 340,
+          "state": 340,
+          "name_id": 7228,
+          "subtext_id": -1
+        }
+      ],
+      "source_tags": {
+        "notifications": "(R) rc-0136 F4: the pick (NotificationImages 340, icon_farming_dynamite_empty) the Snowhill and rich veins carry; this W171 type had none, so the veins beside Therin showed no icon."
+      }
     },
     {
       "key": "snowhill-copper-vein",

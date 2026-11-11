@@ -1208,7 +1208,7 @@ fn audience(to: &Value) -> Option<Audience> {
 }
 
 /// `realm broadcast`'s own line and recipient list (`delivery::broadcast_deliveries`), narrowed
-/// to the audience. The original client has no free-text banner, so `banner` is the chat line too.
+/// to the audience. Both styles are the 77/2 broadcast: on screen and in chat (rc-0136 F4).
 fn announce_now(server: &mut Server, audience: &Audience, text: &str) -> usize {
     let mut delivered = 0;
     for delivery in delivery::broadcast_deliveries(text, &server.world) {

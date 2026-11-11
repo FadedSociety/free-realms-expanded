@@ -202,6 +202,12 @@ pub fn send(
         reason: None,
         via: via.to_owned(),
     });
+    // rc-0136 F4: ids and numbers on stdout like every gateway event, so a run log shows sends.
+    println!(
+        "{}",
+        serde_json::json!({"event": "mail_sent", "job": job.id, "to": job.to_summary,
+            "recipients": total, "coins": letter.attachments.coins, "via": via})
+    );
     Ok(Receipt {
         job_id: job.id,
         recipients: total,

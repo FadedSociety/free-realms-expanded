@@ -80,14 +80,33 @@ struct VisibleNpc {
     notifications: Vec<Notification>,
     /// T899: the hover cursor sent after the notifications (`npc_presentation.json`).
     cursor: Option<Cursor>,
+    /// rc-0136 F4: how this actor answers a click when no content NPC row does, and until when
+    /// (session ms) this player's harvest of it is spent.
+    click: Option<npc_presentation::Click>,
+    picked_until_ms: u64,
 }
 
 impl VisibleNpc {
     /// What a viewer is sent to learn about this actor: its unframed 35/2, then its 35/10 when
     /// it has notifications (the client skips a 35/10 guid it has not spawned, `00984960`), then
     /// its 35/12 hover cursor.
+    ///
+    /// rc-0136 F4: an actor that carries an overhead icon is sent with its nameplate shown, or
+    /// the client drops the icon with the name (L1156 hid the veins' picks this way). The
+    /// actor's overhead set holds the name text (group 2), the name icon (group 1, built by
+    /// `sub_9622F0` 009622f0) and the 35/10 bitmaps (`sub_BF5680` 00bf5680, group 0);
+    /// `ProxiedCharacter__Process` (00973200) shows group 1 only while the hide bit is clear.
     fn draw_packets(&self) -> io::Result<Vec<Vec<u8>>> {
-        let mut packets = vec![unframe_tunnel(&startup_world::build_add_npc(&self.spawn))?];
+        let named;
+        let mut spawn = &self.spawn;
+        if spawn.hide_nameplate != 0 && self.notifications.iter().any(Notification::draws_overhead) {
+            named = NpcSpawn {
+                hide_nameplate: 0,
+                ..spawn.clone()
+            };
+            spawn = &named;
+        }
+        let mut packets = vec![unframe_tunnel(&startup_world::build_add_npc(spawn))?];
         let rows: Vec<_> = self
             .notifications
             .iter()
@@ -214,6 +233,10 @@ struct RegionalNpc {
     /// label the content tables group the row by.
     #[serde(default)]
     house_zone_id: Option<u32>,
+    /// rc-0136 F4: a `client_areas.json` season, as an extra spawn's `season`: an event NPC
+    /// (the Snow Days snowman in Snowhill) is drawn only while its event runs.
+    #[serde(default)]
+    season: Option<String>,
     /// `vendor` keeps the name shown (`nameplate::Named`).
     #[serde(default)]
     roles: Vec<String>,
@@ -569,13 +592,15 @@ impl NpcVisibility {
             result.push(
                 draw_zone,
                 VisibleNpc {
+                    click: presentation.click(spawn.name_string_id),
                     spawn,
                     name: npc.name,
                     position,
                     heading: heading.filter(|value| value.is_finite()),
-                    season: None,
+                    season: npc.season,
                     notifications,
                     cursor,
+                    picked_until_ms: 0,
                 },
             );
         }
@@ -630,6 +655,7 @@ impl NpcVisibility {
             result.push(
                 OPEN_WORLD_ZONE,
                 VisibleNpc {
+                    click: presentation.click(spawn.name_string_id),
                     spawn,
                     name: npc.name,
                     position: npc.position,
@@ -637,6 +663,7 @@ impl NpcVisibility {
                     season: npc.season,
                     notifications,
                     cursor,
+                    picked_until_ms: 0,
                 },
             );
         }
@@ -807,6 +834,8 @@ impl NpcVisibility {
             season: None,
             notifications: Vec::new(),
             cursor: None,
+            click: None,
+            picked_until_ms: 0,
         });
         self.placed.insert(placement.guid);
     }
@@ -892,6 +921,8 @@ impl NpcVisibility {
             season: None,
             notifications: Vec::new(),
             cursor: None,
+            click: None,
+            picked_until_ms: 0,
         });
     }
 
@@ -1056,6 +1087,24 @@ impl NpcVisibility {
     /// no position.
     pub fn actor_position(&self, actor_id: u64) -> Option<[f32; 3]> {
         self.shown(actor_id).map(|npc| npc.position)
+    }
+
+    /// rc-0136 F4: a drawn actor's dressing click (`npc_presentation.json` `click`), where it
+    /// stands, its name, and until when (session ms) this player's harvest of it is spent.
+    pub fn dressing(
+        &self,
+        actor_id: u64,
+    ) -> Option<(npc_presentation::Click, [f32; 3], Option<String>, u64)> {
+        let npc = self.shown(actor_id)?;
+        Some((npc.click?, npc.position, npc.name.clone(), npc.picked_until_ms))
+    }
+
+    /// Mark this player's harvest of a dressing actor spent until `until_ms` (session ms).
+    pub fn pick(&mut self, actor_id: u64, until_ms: u64) {
+        let npcs = Arc::make_mut(&mut self.by_zone).values_mut().flatten();
+        for npc in npcs.filter(|npc| npc.spawn.actor_id == actor_id) {
+            npc.picked_until_ms = until_ms;
+        }
     }
 
     /// F3: the nameplate text id and position of a shown actor (a Station Cash display is known

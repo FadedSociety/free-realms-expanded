@@ -303,10 +303,14 @@ impl Rig {
     }
 }
 
-/// One 15/3 `ChatPacketDebugChat` message inside the 5/1 application tunnel.
+/// One 15/3 `ChatPacketDebugChat` message, or since rc-0136 one 77/2 announcement (on screen and
+/// in chat), inside the 5/1 application tunnel.
 fn system_text(message: &[u8]) -> String {
     assert_eq!(&message[..3], &[5, 0, 1], "not an application message");
     let inner = &message[7..];
+    if let Some(text) = osfr_tools::chat::broadcast_text(inner) {
+        return text;
+    }
     assert_eq!(&inner[..4], &[15, 0, 3, 0], "not a 15/3 system line");
     let length = u32::from_le_bytes(inner[4..8].try_into().unwrap()) as usize;
     assert_eq!(inner.len(), 8 + length + 1);
@@ -316,9 +320,36 @@ fn system_text(message: &[u8]) -> String {
 fn system_texts(messages: &[Vec<u8>]) -> Vec<String> {
     messages
         .iter()
-        .filter(|message| message.len() > 10 && &message[7..11] == [15, 0, 3, 0])
+        .filter(|message| {
+            message.len() > 10 && matches!(&message[7..11], [15, 0, 3, 0] | [77, 0, 2, 0])
+        })
         .map(|message| system_text(message))
         .collect()
+}
+
+/// rc-0136 F4: an announcement is the 77/2 broadcast (the client shows it on screen and prints
+/// it in chat), one per recipient, and never also a 15/3 line (that would print it twice).
+#[test]
+fn an_announcement_is_one_on_screen_broadcast_per_recipient() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
+    let mut rig = Rig::new("screen", &[(1, true), (2, false)]);
+    let text = "Fireworks at the fountain";
+    rig.send(0, &broadcast(text), NOW);
+    for (index, delivery) in rig.drain_all(NOW).into_iter().enumerate() {
+        let shown: Vec<_> = delivery
+            .iter()
+            .filter_map(|message| osfr_tools::chat::broadcast_text(message.get(7..)?))
+            .collect();
+        assert_eq!(shown, vec![text.to_owned()], "session {index}");
+        let chat_lines = delivery
+            .iter()
+            .filter(|message| message.get(7..11) == Some(&[15, 0, 3, 0][..]))
+            .filter(|message| message.windows(text.len()).any(|w| w == text.as_bytes()))
+            .count();
+        assert_eq!(chat_lines, 0, "session {index}: no second copy as a 15/3 line");
+    }
 }
 
 fn echoes_command(messages: &[Vec<u8>], text: &str) -> bool {
@@ -598,23 +629,26 @@ fn maximum_length_escaped_text_reaches_each_recipient_byte_exactly() {
             vec![escaped.clone()],
             "session {index}"
         );
+        // rc-0136 F4: the 77/2 broadcast (reader 0x008fb0a0): header, an empty NameData (three
+        // i32 and two empty strings), the escaped text, then text id 0.
         let packet = delivery
             .iter()
-            .find(|message| message.len() > 10 && &message[7..11] == [15, 0, 3, 0])
-            .unwrap_or_else(|| panic!("session {index}: no 15/3 packet: {delivery:?}"));
+            .find(|message| message.len() > 10 && &message[7..11] == [77, 0, 2, 0])
+            .unwrap_or_else(|| panic!("session {index}: no 77/2 packet: {delivery:?}"));
         let inner = &packet[7..];
-        assert_eq!(&inner[..4], &[15, 0, 3, 0], "session {index}");
+        assert_eq!(&inner[..4], &[77, 0, 2, 0], "session {index}");
+        assert_eq!(&inner[4..24], &[0; 20], "session {index}: an empty NameData");
         assert_eq!(
-            u32::from_le_bytes(inner[4..8].try_into().unwrap()) as usize,
+            u32::from_le_bytes(inner[24..28].try_into().unwrap()) as usize,
             escaped.len(),
             "session {index}"
         );
         assert_eq!(
-            &inner[8..8 + escaped.len()],
+            &inner[28..28 + escaped.len()],
             escaped.as_bytes(),
             "session {index}"
         );
-        assert_eq!(inner.len(), 8 + escaped.len() + 1, "session {index}");
-        assert_eq!(inner[8 + escaped.len()], 1, "session {index}");
+        assert_eq!(inner.len(), 28 + escaped.len() + 4, "session {index}");
+        assert_eq!(&inner[28 + escaped.len()..], &[0; 4], "session {index}: text id 0");
     }
 }

@@ -227,8 +227,19 @@ fn an_unknown_season_fails_naming_the_row_and_drops_nothing() {
     let live = live_rows();
     let archived = archived_halloween_rows();
     // Rows are sorted by actor id, so this is the first seasonal row the check sees (a live row
-    // now precedes the archive; T775 tags both).
-    let first = *seasonal_rows(&live, &archived).keys().next().unwrap();
+    // now precedes the archive; T775 tags both). rc-0136 F4 tags regional `npcs/` rows too (the
+    // Snow Days snowman, the Birthday Bash Cakenstein), whose content keys sort first.
+    let regional = fs::read_dir(bundled().join("npcs"))
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.extension().is_some_and(|ext| ext == "json"))
+        .flat_map(|path| rows_of(&path))
+        .filter(|row| row["season"].is_string() && row["position"].is_array())
+        .filter_map(|row| row["npc_id"].as_u64());
+    let first = (seasonal_rows(&live, &archived).into_keys())
+        .chain(regional)
+        .min()
+        .unwrap();
     let guids: BTreeSet<u64> = live.iter().chain(&archived).map(guid).collect();
     let fixture = Fixture::new("unknown", &live, &archived);
     let mut visibility = NpcVisibility::load(fixture.path()).unwrap();

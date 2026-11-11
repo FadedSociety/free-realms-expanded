@@ -1414,16 +1414,30 @@ fn an_unclosed_mining_run_refuses_recipe_start_without_a_save() {
     assert!(active(&gateway, MINING).is_some());
 }
 
-/// The first T550 harvest plant: its actor guid and position. The row is content data, so the
-/// test follows a shipped row rather than hard-coding one region's coordinates.
+/// The first T550 harvest plant that is still pure decoration: its actor guid and position. The
+/// row is content data, so the test follows a shipped row rather than hard-coding one region's
+/// coordinates. rc-0136 F4 gave most wild plants a harvest (`npc_presentation.json` `click`,
+/// `f4_world_dressing` in the gateway's tests); a plant whose row has no `click` (Wildroot)
+/// still answers nothing.
 fn t550_plant() -> (u64, [f32; 3]) {
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let extras: Value =
         serde_json::from_slice(&fs::read(content.join("npc_spawns_extra.json")).unwrap()).unwrap();
+    let presentation: Value =
+        serde_json::from_slice(&fs::read(content.join("npc_presentation.json")).unwrap()).unwrap();
+    let answered: Vec<u64> = (presentation["records"].as_array().unwrap().iter())
+        .filter(|row| row.get("click").is_some())
+        .filter_map(|row| row["name_string_id"].as_u64())
+        .collect();
     let row = extras["records"]
         .as_array()
         .unwrap()
         .iter()
+        .filter(|row| {
+            row["name_string_id"]
+                .as_u64()
+                .is_none_or(|id| !answered.contains(&id))
+        })
         .find(|row| {
             row["model_file_name"]
                 .as_str()

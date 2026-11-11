@@ -2696,6 +2696,7 @@
     },
     {
       "npc_id": 9500000373,
+      "season": "Birthday Bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakenstein",
@@ -2775,6 +2776,7 @@
         }
       ],
       "field_sources": {
+        "season": [{"kind": "wiki", "evidence": "rc-0136 F4: title 'Birthday Bash event boss' (this row's title_or_role, wiki); 'has risen in Merry Vale!' (38764221) during the event."}],
         "npc_id": [
           {
             "kind": "client",

@@ -3,6 +3,7 @@ use super::npc_quests::added_npcs;
 use super::*;
 
 mod bank;
+mod dressing;
 mod mailbox;
 mod sc_display;
 
@@ -247,7 +248,12 @@ impl Gameplay {
         if let Some(out) = self.bank_packet(inner, character)? {
             return Ok(Some(out));
         }
+        // An extra spawn with no content record: a Station Cash display opens its shop (F3), a
+        // `npc_presentation.json` row with a `click` answers it (F4); anything else falls through.
         if let Some(out) = self.sc_display_26_8(inner, character, now_ms)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.dressing_click_26_8(inner, character, now_ms)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_interact_26_8(inner, character)? {

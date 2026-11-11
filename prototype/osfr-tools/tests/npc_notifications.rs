@@ -237,11 +237,21 @@ fn the_copper_veins_show_on_the_minimap_and_the_old_pool_does_not() {
         let back = visibility.update(0, vein.position).unwrap();
         assert_eq!(markers(&back).0.len(), 1);
     }
+    // rc-0136 F4: the old W171 veins beside Therin carry the same overhead pick (the owner
+    // missed it on "the copper mining nodes"). Its image row (`NotificationImages.txt` 340,
+    // USE_ON_MINI_MAP 0) puts nothing on the minimap, so the old pool still does not show there.
     for old in nodes_of_model(LEGACY_COPPER_MODEL) {
         let mut visibility = NpcVisibility::default();
         apply_node_changes(&mut visibility, vec![NodeChange::Show(old.clone())]);
         let packets = visibility.update(0, old.position).unwrap();
-        assert!(spawn_index(&packets, old.guid).is_some());
-        assert!(markers(&packets).0.is_empty());
+        let spawn = spawn_index(&packets, old.guid).expect("the old vein is drawn");
+        assert_eq!(
+            markers(&packets).0,
+            [Marker {
+                index: spawn + 1,
+                guid: old.guid,
+                ..expected
+            }]
+        );
     }
 }

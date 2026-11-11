@@ -1793,6 +1793,11 @@ mod f276_field_session_save;
 #[path = "t889_shared_gateway.rs"]
 mod t889_shared_gateway;
 
+/// rc-0136 F4: a wild plant's harvest and a holiday figure's line through the socket path.
+#[cfg(test)]
+#[path = "f4_world_dressing.rs"]
+mod f4_world_dressing;
+
 /// L039: a save off the map or deep under the terrain enters at the nearest warpstone.
 #[cfg(test)]
 #[path = "l039_login_pose.rs"]

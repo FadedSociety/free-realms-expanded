@@ -27,6 +27,8 @@ pub const CONTENT_FILE: &str = "npc_presentation.json";
 const MAX_CURSOR_ID: u8 = 127;
 /// (R) AddNpc dispositions in use are 0 (hostile), 1 (friendly) and 2 (companion); a typo guard.
 const MAX_DISPOSITION: i32 = 2;
+/// (R) A typo guard on a dressing harvest's regrow time.
+const MAX_REGROW_SECONDS: u32 = 86_400;
 
 /// One content row. Every field but the key is optional: an absent field leaves the NPC alone.
 #[derive(Clone, Debug, Deserialize)]
@@ -52,6 +54,24 @@ pub struct Record {
     /// The 35/10 rows this NPC shows (shop, combat, minigame markers).
     #[serde(default)]
     pub notifications: Vec<Notification>,
+    /// rc-0136 F4: how world dressing with this name (an actor with no content NPC row) answers
+    /// a click; absent, the click is not answered.
+    #[serde(default)]
+    pub click: Option<Click>,
+}
+
+/// A click answer for world dressing: a wild plant's harvest, a figure's line, or both.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Click {
+    /// One of this item per click, once per `regrow_seconds` for each player (R).
+    #[serde(default)]
+    pub item_id: Option<i32>,
+    #[serde(default)]
+    pub regrow_seconds: u32,
+    /// A locale line the actor says (15/4 `chat::string_say`).
+    #[serde(default)]
+    pub say_string_id: Option<i32>,
 }
 
 /// A 35/12 entry's cursor: the `Cursors.txt` id and the trailing flag byte.
@@ -82,6 +102,11 @@ impl Record {
             Some("disposition out of bounds")
         } else if self.notifications.len() > npc_notifications::MAX_ENTRIES {
             Some("too many notifications")
+        } else if self.click.is_some_and(|click| {
+            click.item_id.is_none_or(|id| id < 1) && click.say_string_id.is_none_or(|id| id < 1)
+                || click.regrow_seconds > MAX_REGROW_SECONDS
+        }) {
+            Some("a click gives no positive item or line, or regrows after more than a day")
         } else {
             self.notifications
                 .iter()
@@ -104,6 +129,11 @@ impl Presentation {
             }
         }
         Ok(Self { by_name })
+    }
+
+    /// The click answer of the row for this name id, if it has one (rc-0136 F4).
+    pub fn click(&self, name_string_id: i32) -> Option<Click> {
+        self.by_name.get(&(name_string_id as u32))?.click
     }
 
     /// Fills `spawn` and `notifications` from the row for the spawn's name id and returns the

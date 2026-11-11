@@ -79,9 +79,13 @@ fn admin_broadcast_sets_one_system_line_without_character_change() {
         assert!(out.replies.is_empty(), "{pack}: {:?}", reply_texts(&out));
         assert!(!out.changed, "{pack}: a notice must not mark state changed");
         assert_eq!(game.state(), before, "{pack}: character state changed");
+        // rc-0136 F4: the notice is the 77/2 broadcast, on screen and in chat.
         let packet = world_notice::encode(out.broadcast.as_deref().unwrap());
-        assert_eq!(&packet[..4], &[15, 0, 3, 0]);
-        assert_eq!(system_text(&packet), "Scavenger hunt at noon");
+        assert_eq!(&packet[..4], &[77, 0, 2, 0]);
+        assert_eq!(
+            chat::broadcast_text(&packet).as_deref(),
+            Some("Scavenger hunt at noon")
+        );
     }
 }
 
@@ -177,7 +181,7 @@ fn empty_overlong_multibyte_or_control_text_is_refused() {
     );
     assert_eq!(out.broadcast.as_deref(), Some(multibyte.as_str()));
     let packet = world_notice::encode(out.broadcast.as_deref().unwrap());
-    assert!(packet.len() <= 8 + 2048 + 1);
+    assert!(packet.len() <= 4 + 20 + 4 + 2048 + 4);
     assert_eq!(game.state(), before);
 }
 
@@ -188,7 +192,10 @@ fn announcement_text_is_trimmed_escaped_and_never_echoes_the_command() {
     assert_eq!(out.broadcast.as_deref(), Some("<hunt> & tips"));
     assert!(out.replies.is_empty());
     let packet = world_notice::encode(out.broadcast.as_deref().unwrap());
-    assert_eq!(&packet[8..packet.len() - 1], b"&lt;hunt&gt; &amp; tips");
+    assert_eq!(
+        chat::broadcast_text(&packet).as_deref(),
+        Some("&lt;hunt&gt; &amp; tips")
+    );
     assert!(!String::from_utf8_lossy(&packet).contains("realm"));
 }
 

@@ -5,6 +5,7 @@
   "records": [
     {
       "npc_id": 9500000724,
+      "season": "Snow Days",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Abominable Snowman",
@@ -82,6 +83,7 @@
         }
       ],
       "field_sources": {
+        "season": [{"kind": "wiki", "evidence": "rc-0136 F4: title 'Snow Days open-world boss' (this row's title_or_role, wiki); Legacy Npcs.json Id 31336 sits with the Snow Days extras 31425-31445, which carry season Snow Days."}],
         "npc_id": [
           {
             "kind": "client",
