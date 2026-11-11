@@ -35,6 +35,8 @@ use osfr_tools::studio;
 use osfr_tools::trade::{TradeMessage, TradeService, TradeSettlement};
 use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
+#[path = "osfr_gateway/admin_http.rs"]
+mod admin_http;
 #[path = "osfr_gateway/admin_move.rs"]
 mod admin_move;
 #[path = "osfr_gateway/ambient.rs"]
@@ -359,7 +361,7 @@ impl Options {
         let mut args = env::args().skip(1);
         let bind: SocketAddr = args
             .next()
-            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --state FILE [--reference DIR] [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--tick-stats-seconds N] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools]")?
+            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --state FILE [--reference DIR] [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--tick-stats-seconds N] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools] [--admin-port N | --admin-bind IP:PORT] [--admin-web DIR] [--admin-client DIR]")?
             .parse()?;
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
@@ -417,7 +419,8 @@ impl Options {
                         Path::new(&value),
                     )?))
                 }
-                "--trace" | "--tick-stats-seconds" => {} // read in `run`
+                "--trace" | "--tick-stats-seconds" | "--admin-port" | "--admin-bind"
+                | "--admin-web" | "--admin-client" => {} // read in `run` (`admin_http`)
                 _ => return Err(format!("unknown option {key}").into()),
             }
         }
@@ -2902,6 +2905,7 @@ pub struct Server {
     studio: Option<TcpListener>,
     card: Option<card_listener::CardListener>,
     portraits: Option<portrait_http::PortraitHttp>,
+    admin: Option<Box<admin_http::AdminHttp>>,
     // Studio asset browser: index files loaded on first search.
     studio_assets: BTreeMap<String, Vec<serde_json::Value>>,
 }
@@ -3270,27 +3274,10 @@ impl Server {
         let socket = UdpSocket::bind(options.bind)?;
         socket.set_read_timeout(Some(Duration::from_millis(10)))?;
         // Studio developer tooling: loopback only, and only with --dev-tools.
-        let studio = if options.dev_tools && options.studio_port != 0 {
-            match TcpListener::bind(("127.0.0.1", options.studio_port)) {
-                Ok(listener) => {
-                    listener.set_nonblocking(true)?;
-                    println!(
-                        "{}",
-                        json!({"event":"studio_listening","address":listener.local_addr()?.to_string()})
-                    );
-                    Some(listener)
-                }
-                Err(error) => {
-                    println!(
-                        "{}",
-                        json!({"event":"studio_unavailable","reason":error.to_string()})
-                    );
-                    None
-                }
-            }
-        } else {
-            None
-        };
+        let studio_at = SocketAddr::from(([127, 0, 0, 1], options.studio_port));
+        let studio = (options.dev_tools && options.studio_port != 0)
+            .then(|| admin_http::bind_logged(studio_at, "studio", true))
+            .flatten();
         let card = card_listener::open(&options)?;
         let mut world = SharedWorld::new();
         world
@@ -3337,6 +3324,7 @@ impl Server {
             studio,
             card,
             portraits,
+            admin: None,
             studio_assets: BTreeMap::new(),
             faulted_fields: BTreeSet::new(),
             dormant_fields: BTreeSet::new(),
@@ -3615,6 +3603,7 @@ impl Server {
         self.poll_studio(now_ms);
         self.poll_card(now_ms);
         self.poll_portraits(now_ms);
+        self.poll_admin();
         if self.security_flushed.elapsed() >= Duration::from_secs(5) {
             self.flush_security();
             self.security_flushed = Instant::now();
@@ -4451,6 +4440,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut server = Server::new(options)?;
     server.trace = trace_path.as_deref().map(trace::Trace::open).transpose()?;
     server.tick_stats = tick_stats::TickStats::new(tick_window);
+    server.admin = admin_http::open_from_args(&server.options)?;
     event(
         json!({"event":"listening","address":server.local_addr()?.to_string(),"reference":server.options.reference_dir(),"dev_tools":server.options.dev_tools}),
     );

@@ -3,7 +3,12 @@
 //! store, answers the moderator, writes one audit row (ids only) and, for a kick or ban, ends
 //! the target's bound session. A mute is read back by the target's own session
 //! (`Gateway::chat_muted`), so nothing here touches another player's gateway.
+//!
+//! GM panel (G1): chat and the panel share one path. Both run the store change through
+//! `rules::run_with_change`, the session half through [`finish`], and write the same
+//! `admin::audit` row (`via` chat or panel) beside the account store.
 use super::*;
+use osfr_tools::admin::{self, Staff, audit};
 use osfr_tools::chat;
 use osfr_tools::moderation::{self as rules, Action, Command};
 
@@ -17,29 +22,68 @@ pub(super) fn run_staged(
     staged: Vec<Command>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     for command in staged {
-        let result = match &options.account_store {
+        let reply = match &options.account_store {
             Some(path) if session.selected_character => {
-                rules::run(path, session.account_guid, &command, rules::unix_now())
+                run_chat(session, sessions, world, path, &command)
             }
-            _ => Err("Cannot do that: a verified account binding is required."),
-        };
-        let reply = match result {
-            Ok(applied) => {
-                let ended = matches!(applied.action, Action::Kick | Action::Ban)
-                    && end_bound_sessions(sessions, applied.target_account_id);
-                if applied.action == Action::Kick && !ended {
-                    "Cannot do that: that player is not online."
-                } else {
-                    audit(world, session.account_guid, applied);
-                    applied.action.done()
-                }
-            }
-            Err(refusal) => refusal,
+            _ => "Cannot do that: a verified account binding is required.",
         };
         session
             .sender
             .queue_message(&wrap_application(&chat::system(reply)))?;
     }
+    Ok(())
+}
+
+/// One chat command: the store change, its session half, then the audit row. Returns the
+/// moderator's reply line.
+fn run_chat(
+    session: &Session,
+    sessions: &mut SessionMap,
+    world: &SharedWorld,
+    path: &Path,
+    command: &Command,
+) -> &'static str {
+    let now = rules::unix_now();
+    let actor = session.account_guid;
+    let result = rules::run_with_change(path, actor, command, now).and_then(|change| {
+        finish(sessions, world, actor, change.0)?;
+        Ok(change)
+    });
+    let change = match result {
+        Ok(change) => change,
+        Err(refusal) => return refusal,
+    };
+    let name = session.social_identity.as_ref().map_or_else(
+        || format!("account {actor}"),
+        |identity| format!("{} {}", identity.name.first, identity.name.last).trim().to_owned(),
+    );
+    let staff = Staff {
+        account_id: actor,
+        name,
+    };
+    let row = admin::moderation::sanction_row(&staff, command, change, None, None, "chat", now);
+    if let Err(error) = audit::record(&audit::dir_for(path), &row) {
+        eprintln!("admin audit: {error}");
+    }
+    change.0.action.done()
+}
+
+/// The session half of an applied sanction, for chat and the GM panel alike: a kick or ban
+/// ends the target's bound sessions (a kick of nobody online is refused, unrecorded) and the
+/// security log gets its row.
+pub(super) fn finish(
+    sessions: &mut SessionMap,
+    world: &SharedWorld,
+    actor: u64,
+    applied: rules::Applied,
+) -> Result<(), &'static str> {
+    let ended = matches!(applied.action, Action::Kick | Action::Ban)
+        && end_bound_sessions(sessions, applied.target_account_id);
+    if applied.action == Action::Kick && !ended {
+        return Err("Cannot do that: that player is not online.");
+    }
+    audit(world, actor, applied);
     Ok(())
 }
 
@@ -98,4 +142,4 @@ pub(super) fn muted_chat(session: &Session, inner: &[u8]) -> Option<Vec<Delivery
 
 #[cfg(test)]
 #[path = "l042_moderation.rs"]
-mod tests;
+pub(super) mod tests;

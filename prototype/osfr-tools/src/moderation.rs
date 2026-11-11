@@ -77,7 +77,7 @@ impl Action {
         })
     }
 
-    fn word(self) -> &'static str {
+    pub fn word(self) -> &'static str {
         match self {
             Self::Mute => "mute",
             Self::Unmute => "unmute",
@@ -103,13 +103,42 @@ impl Action {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Command {
     pub action: Action,
-    /// Words of the target's display name as typed; the store folds them with `name_key`, as it
-    /// folds names for uniqueness (lowercasing first would turn 'İ' into 'i' and a combining dot).
-    name: Vec<String>,
+    target: Target,
     pub minutes: Option<u32>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Target {
+    /// Words of the target's display name as typed; the store folds them with `name_key`, as it
+    /// folds names for uniqueness (lowercasing first would turn 'İ' into 'i' and a combining dot).
+    Name(Vec<String>),
+    /// GM panel (`admin::moderation`): a character id from the player list.
+    Character(u64),
+}
+
+const MINUTES_REFUSED: &str =
+    "Cannot do that: minutes must be at least 1 and within the server limit.";
+
 impl Command {
+    /// The GM panel's form of a command: the target by character id, with the chat bounds.
+    pub fn for_character(
+        action: Action,
+        character: u64,
+        minutes: Option<u32>,
+    ) -> Result<Self, &'static str> {
+        if minutes.is_some_and(|minutes| !(1..=*MAX_MINUTES).contains(&minutes)) {
+            return Err(MINUTES_REFUSED);
+        }
+        if minutes.is_some() && !matches!(action, Action::Mute | Action::Ban) {
+            return Err("Cannot do that: only a mute or a ban takes minutes.");
+        }
+        Ok(Self {
+            action,
+            target: Target::Character(character),
+            minutes,
+        })
+    }
+
     /// Names hold no digits (`identity::valid_name`), so a trailing number is the minutes.
     pub fn parse(command: &str) -> Result<Self, &'static str> {
         let mut words: Vec<String> = command.split_whitespace().map(str::to_owned).collect();
@@ -124,9 +153,7 @@ impl Command {
                     .parse()
                     .ok()
                     .filter(|minutes| (1..=*MAX_MINUTES).contains(minutes))
-                    .ok_or(
-                        "Cannot do that: minutes must be at least 1 and within the server limit.",
-                    )?;
+                    .ok_or(MINUTES_REFUSED)?;
                 words.pop();
                 Some(minutes)
             }
@@ -138,9 +165,25 @@ impl Command {
         }
         Ok(Self {
             action,
-            name: words,
+            target: Target::Name(words),
             minutes,
         })
+    }
+
+    /// For the audit row: the character id the panel named, or the name typed in chat.
+    pub fn target_label(&self) -> (Option<u64>, Option<String>) {
+        match &self.target {
+            Target::Name(words) => (None, Some(words.join(" "))),
+            Target::Character(guid) => (Some(*guid), None),
+        }
+    }
+
+    /// The account the command names; none when no character (or several owners) match.
+    fn target_account(&self, store: &AccountStore) -> Option<u64> {
+        match &self.target {
+            Target::Name(words) => store.account_by_display_name(words),
+            Target::Character(guid) => store.character(*guid).map(|c| c.owner_account_id),
+        }
     }
 }
 
@@ -165,18 +208,10 @@ fn apply(
         .account_role(actor)
         .filter(|role| can_run_realm_command(*role, command.action.word()))
         .ok_or(NOT_ALLOWED)?;
-    let target = store
-        .account_by_display_name(&command.name)
+    let target = command
+        .target_account(store)
         .ok_or("Cannot do that: no single character has that name.")?;
-    if target == actor {
-        return Err("Cannot do that: you cannot moderate your own account.");
-    }
-    if !store
-        .account_role(target)
-        .is_some_and(|role| actor_role.outranks(role))
-    {
-        return Err("Cannot do that: that player's role is equal to or above yours.");
-    }
+    check_target(store, actor_role, actor, target)?;
     let mut sanctions = store.sanctions(target);
     // Saturating: a u32 of minutes in seconds fits a u64, and the sum clamps instead of panicking.
     let until = command.minutes.map_or(UNTIL_LIFTED, |minutes| {
@@ -201,22 +236,56 @@ fn apply(
     })
 }
 
+/// The staff hierarchy (R), shared by every moderation action and the GM panel's warn: the
+/// actor must strictly outrank the target's account role, and never targets its own account.
+pub fn check_target(
+    store: &AccountStore,
+    actor_role: crate::account_store::AccountRole,
+    actor: u64,
+    target: u64,
+) -> Result<(), &'static str> {
+    if target == actor {
+        return Err("Cannot do that: you cannot moderate your own account.");
+    }
+    if !store
+        .account_role(target)
+        .is_some_and(|role| actor_role.outranks(role))
+    {
+        return Err("Cannot do that: that player's role is equal to or above yours.");
+    }
+    Ok(())
+}
+
 /// Run `command` against the store file. A kick only reads it; every other action holds the
 /// writer lock across load, check and atomic save. A refusal leaves the file untouched.
 pub fn run(path: &Path, actor: u64, command: &Command, now: u64) -> Result<Applied, &'static str> {
+    run_with_change(path, actor, command, now).map(|(applied, ..)| applied)
+}
+
+/// `run`, also returning the target's sanctions before and after, for the GM panel's audit row.
+pub fn run_with_change(
+    path: &Path,
+    actor: u64,
+    command: &Command,
+    now: u64,
+) -> Result<(Applied, Sanctions, Sanctions), &'static str> {
     let writes = command.action != Action::Kick;
     let _lock = writes
         .then(|| AccountStoreLock::acquire_within(path, STAFF_LOCK_WAIT))
         .transpose()
         .map_err(|_| BUSY)?;
     let mut store = AccountStore::load(path).map_err(|_| BUSY)?;
+    let before = command
+        .target_account(&store)
+        .map(|id| store.sanctions(id))
+        .unwrap_or_default();
     let applied = apply(&mut store, actor, command, now)?;
     if writes {
         store
             .save(path)
             .map_err(|_| "Cannot do that: the moderation action was not saved.")?;
     }
-    Ok(applied)
+    Ok((applied, before, store.sanctions(applied.target_account_id)))
 }
 
 /// Wall-clock unix seconds: sanctions outlive restarts and expire by this clock.

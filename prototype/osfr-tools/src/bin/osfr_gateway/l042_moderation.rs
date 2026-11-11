@@ -8,15 +8,15 @@ use osfr_tools::account::{AccountFlags, SlotPolicy};
 use osfr_tools::account_store::{AccountRole, AccountStoreLock};
 use osfr_tools::moderation::{Command, MAX_MINUTES, Sanctions, UNTIL_LIFTED, run, unix_now};
 
-const HANDOFF: &[u8] = b"l042-synthetic-handoff-key";
-const MUTED: &str = "cannot chat right now";
+pub(crate) const HANDOFF: &[u8] = b"l042-synthetic-handoff-key";
+pub(crate) const MUTED: &str = "cannot chat right now";
 const DENIED: &str = "authorized account role";
 
 /// One account and one character each: account id = index + 1, character guid = index + 101.
 /// "Ann Lee" "Moss" and "Ann" "Lee Moss" are distinct name pairs on two accounts that display
 /// alike (an older store; creation now refuses the second). Quill's account also holds
 /// `SPARE`, a look-alike of its own name.
-const CAST: [(AccountRole, &str, &str); 8] = [
+pub(crate) const CAST: [(AccountRole, &str, &str); 8] = [
     (AccountRole::Admin, "Ada", "Admin"),
     (AccountRole::Moderator, "Mo", "Moderator"),
     (AccountRole::Moderator, "Mia", "Moderator"),
@@ -26,49 +26,49 @@ const CAST: [(AccountRole, &str, &str); 8] = [
     (AccountRole::Player, "Ann", "Lee Moss"),
     (AccountRole::Player, "Quill Zed", "Vox"),
 ];
-const ADA: usize = 0;
-const MO: usize = 1;
-const MIA: usize = 2;
-const PIP: usize = 3;
-const BEA: usize = 4;
-const QUILL: usize = 7;
+pub(crate) const ADA: usize = 0;
+pub(crate) const MO: usize = 1;
+pub(crate) const MIA: usize = 2;
+pub(crate) const PIP: usize = 3;
+pub(crate) const BEA: usize = 4;
+pub(crate) const QUILL: usize = 7;
 /// Guid, first and last name of the second character on Quill's account.
 const SPARE: (u64, &str, &str) = (201, "Quill", "Zed Vox");
 
-fn account(index: usize) -> u64 {
+pub(crate) fn account(index: usize) -> u64 {
     index as u64 + 1
 }
 
-fn guid(index: usize) -> u64 {
+pub(crate) fn guid(index: usize) -> u64 {
     index as u64 + 101
 }
 
 /// The account store, saves and security log of one test, kept across server restarts.
-struct Files(Scratch);
+pub(crate) struct Files(Scratch);
 
 impl Files {
-    fn new(tag: &str) -> Self {
+    pub(crate) fn new(tag: &str) -> Self {
         let files = Self(Scratch::new(&format!("l042-{tag}")));
         write_store(&files.store());
         files
     }
 
-    fn dir(&self) -> &Path {
+    pub(crate) fn dir(&self) -> &Path {
         self.0.path()
     }
 
-    fn store(&self) -> PathBuf {
+    pub(crate) fn store(&self) -> PathBuf {
         self.dir().join("accounts.json")
     }
 
-    fn sanctions(&self, index: usize) -> Sanctions {
+    pub(crate) fn sanctions(&self, index: usize) -> Sanctions {
         AccountStore::load(&self.store())
             .unwrap()
             .sanctions(account(index))
     }
 
     /// Moderation rows in the security log.
-    fn audit(&self) -> Vec<serde_json::Value> {
+    pub(crate) fn audit(&self) -> Vec<serde_json::Value> {
         fs::read_to_string(self.dir().join("security.jsonl"))
             .unwrap_or_default()
             .lines()
@@ -142,7 +142,7 @@ fn bind(guid: u64, ticket: &str) -> Vec<u8> {
     bytes
 }
 
-fn said(messages: &[Vec<u8>], text: &str) -> bool {
+pub(crate) fn said(messages: &[Vec<u8>], text: &str) -> bool {
     messages.iter().any(|message| {
         message
             .windows(text.len())
@@ -151,20 +151,20 @@ fn said(messages: &[Vec<u8>], text: &str) -> bool {
 }
 
 /// A typed chat request on `channel` (15/1); the mute guard runs before any body field.
-fn chat_on(channel: u16, text: &str) -> Vec<u8> {
+pub(crate) fn chat_on(channel: u16, text: &str) -> Vec<u8> {
     let mut inner = osfr_tools::chat::local_request(text);
     inner[4..6].copy_from_slice(&channel.to_le_bytes());
     inner
 }
 
 /// A real server (socket, template, security log) whose sessions are driven directly.
-struct Rig {
-    server: Server,
+pub(crate) struct Rig {
+    pub(crate) server: Server,
     next: u32,
 }
 
 impl Rig {
-    fn new(files: &Files) -> Self {
+    pub(crate) fn new(files: &Files) -> Self {
         let mut options = test_support::options(files.dir().join("state.json"));
         options.account_store = Some(files.store());
         options.handoff_key = HANDOFF.to_vec();
@@ -180,7 +180,7 @@ impl Rig {
     /// refreshes it). It ticks and flushes every session, and nothing here acknowledges those
     /// sends: wait out the sender's 250 ms retry interval (`Session::new`) so `drain` takes
     /// them back as resends and acknowledges them.
-    fn step(&mut self) {
+    pub(crate) fn step(&mut self) {
         test_support::step(&mut self.server).unwrap();
         std::thread::sleep(Duration::from_millis(300));
         for key in self.server.sessions.keys().copied().collect::<Vec<_>>() {
@@ -190,7 +190,7 @@ impl Rig {
 
     /// A new connection binds `index`'s character with a valid ticket and enters the world.
     /// A refused binding ends the session through the production close path.
-    fn join(&mut self, index: usize) -> Result<SessionKey, String> {
+    pub(crate) fn join(&mut self, index: usize) -> Result<SessionKey, String> {
         self.next += 1;
         let id = 7_000 + self.next;
         let peer: SocketAddr = format!("127.0.0.1:{}", 30_000 + id).parse().unwrap();
@@ -236,11 +236,11 @@ impl Rig {
     }
 
     /// The server's own dispatch clock, so `step` and these calls never run backwards.
-    fn now(&self) -> u64 {
+    pub(crate) fn now(&self) -> u64 {
         self.server.start.elapsed().as_millis() as u64
     }
 
-    fn send(&mut self, key: SessionKey, message: &[u8]) -> Result<(), String> {
+    pub(crate) fn send(&mut self, key: SessionKey, message: &[u8]) -> Result<(), String> {
         let now = self.now();
         let mut session = self.server.sessions.remove(&key).expect("live session");
         let result = session
@@ -259,22 +259,22 @@ impl Rig {
     }
 
     /// Send one typed chat line and return what the sender saw.
-    fn say(&mut self, key: SessionKey, inner: &[u8]) -> Vec<Vec<u8>> {
+    pub(crate) fn say(&mut self, key: SessionKey, inner: &[u8]) -> Vec<Vec<u8>> {
         self.send(key, &wrap_application(inner)).unwrap();
         self.drain(key)
     }
 
-    fn command(&mut self, key: SessionKey, text: &str) -> Vec<Vec<u8>> {
+    pub(crate) fn command(&mut self, key: SessionKey, text: &str) -> Vec<Vec<u8>> {
         self.say(key, &osfr_tools::chat::local_request(text))
     }
 
-    fn drain(&mut self, key: SessionKey) -> Vec<Vec<u8>> {
+    pub(crate) fn drain(&mut self, key: SessionKey) -> Vec<Vec<u8>> {
         let now = self.now();
         let session = self.server.sessions.get_mut(&key).unwrap();
         super::super::f120_fishing_hour_reconnect::drain_replies(session, now)
     }
 
-    fn live(&self, key: SessionKey) -> bool {
+    pub(crate) fn live(&self, key: SessionKey) -> bool {
         self.server
             .sessions
             .get(&key)

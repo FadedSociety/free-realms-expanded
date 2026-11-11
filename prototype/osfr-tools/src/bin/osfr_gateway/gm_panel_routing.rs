@@ -117,23 +117,14 @@ fn queue_move(
     }
 }
 
-/// Every player in the world: guid, name, and where they are.
+/// Every player in the world: guid, name, and where they are. The same rows as the web
+/// panel's online list (`admin_http::online_rows`).
 fn players(world: &SharedWorld) -> Vec<Vec<String>> {
-    world
-        .active_sessions
-        .iter()
-        .filter_map(|(guid, id)| {
-            let name = &world.identities.get(guid)?.name;
-            let zone = world
-                .players
-                .get(*id)
-                .map(|player| format!("zone {}", player.zone.zone_id))
-                .unwrap_or_default();
-            Some(vec![
-                guid.to_string(),
-                format!("{} {}", name.first, name.last).trim().to_owned(),
-                zone,
-            ])
+    admin_http::online_rows(world)
+        .into_iter()
+        .map(|row| {
+            let zone = row.zone.map(|zone| format!("zone {zone}"));
+            vec![row.character_id.to_string(), row.name, zone.unwrap_or_default()]
         })
         .collect()
 }
