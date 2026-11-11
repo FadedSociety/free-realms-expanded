@@ -536,3 +536,19 @@ fn traits_come_with_the_job_level() {
     let mut e = f.load(35, 5);
     assert!(dealt(&e.attack(101, [0.0; 3], 35, 0, 1000).unwrap()).iter().all(|d| matches!(*d, 512 | 768)), "488 x 1.05");
 }
+
+#[test]
+fn pb2_a_medic_group_heal_aimed_at_a_member_goes_out_and_a_hit_aimed_at_one_does_not() {
+    // The client sends the selected member's guid with the cast. A group heal treats it as the
+    // ally the Medic aims at: the cast lands and the group heal goes out for the host to route.
+    let f = Fixture::new(100_000, 0, false);
+    let member = 0x0000_0000_0000_0303;
+    let mut medic = f.load(11, 1);
+    let out = medic.cast_slot(1, member, [0.0; 3], 11, 1000).unwrap();
+    assert!(refusal(&out).is_none(), "the cast is not refused");
+    assert!(out.group_heal.is_some(), "Triage's group heal goes out");
+    // A damage ability aimed at a member is still the forged target it was: nothing happens.
+    let mut ninja = f.load(2, 1);
+    let out = ninja.cast_slot(1, member, [0.0; 3], 2, 1000).unwrap();
+    assert!(out.replies.is_empty() && out.group_heal.is_none() && dealt(&out).is_empty());
+}

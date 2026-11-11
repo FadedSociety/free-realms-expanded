@@ -52,6 +52,7 @@ pub mod player_gm_menu;
 pub mod redeem_codes;
 pub mod loot_tables;
 pub mod guilds;
+pub mod group_play;
 pub mod harvesting;
 mod hash;
 pub mod housing;

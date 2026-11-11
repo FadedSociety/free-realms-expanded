@@ -188,7 +188,7 @@ impl Gameplay {
     /// T440: the Go gates a group invite shares, minus the start screen and the prize preview: no
     /// busy activity, a combat job, the level floor. A knocked-out player passes; `begin` refuses it.
     fn group_battle_open(&self, battle: u32) -> bool {
-        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
+        let profile = self.group_entry_job(battle);
         !self.activity_busy()
             && self
                 .abilities
@@ -199,6 +199,18 @@ impl Gameplay {
                     .battle_level_refusal(battle, self.job_level(profile))
                     .is_none()
             })
+    }
+
+    /// PB2: the job a group member enters `battle` in. An entrance switches a member who is not
+    /// in a combat job into their best one, exactly as its Go does; a battle marker keeps the job.
+    fn group_entry_job(&self, battle: u32) -> i32 {
+        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
+        let combat = (self.abilities.as_ref()).is_some_and(|a| a.supports_basic(profile));
+        let entrance = (self.encounter.as_ref()).is_some_and(|e| e.is_entrance_battle(battle));
+        match (combat, entrance) {
+            (false, true) => self.entry_combat_job().unwrap_or(profile),
+            _ => profile,
+        }
     }
 
     /// T440: whether this player could press Go on `battle` now (the open gates and the prizes).
@@ -217,6 +229,12 @@ impl Gameplay {
             return Err(invalid("cannot join this battle now"));
         }
         let mut out = Outcome::default();
+        let job = self.group_entry_job(battle);
+        if self.profiles.as_ref().map(Profiles::active) != Some(job)
+            && !self.switch_job_for_entry(job, character, &mut out)?
+        {
+            return Err(invalid("cannot switch to a combat job for this battle"));
+        }
         match self.begin_field_battle(battle, character, &mut out)? {
             BattleStart::Started => Ok(out),
             BattleStart::Unavailable => Err(invalid(UNAVAILABLE_BATTLE_PRIZE)),

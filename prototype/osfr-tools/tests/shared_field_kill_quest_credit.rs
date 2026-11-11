@@ -1406,3 +1406,84 @@ fn a_reward_bearing_credit_advances_a_reconnected_contributor_once() {
     );
     assert_eq!(field.pending_kill_credits(B), 0);
 }
+
+/// PB2: a group member in reach shares a field kill like a hitter, once each; a member out of
+/// reach, or a player of another party standing beside the kill, gets nothing. The host sets the
+/// parties each tick (`SharedFieldState::set_parties`); here the test sets them directly.
+#[test]
+fn pb2_a_group_member_in_reach_shares_the_kill_once_and_others_do_not() {
+    const E: u64 = 505;
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
+    let (a_at, b_at, c_at, d_at, e_at) = (
+        [1.0, 0.0, 0.0],
+        [-1.0, 0.0, 0.0],
+        [0.0, 0.0, 20.0],
+        [70.0, 0.0, 0.0],
+        [0.0, 0.0, -2.0],
+    );
+    let (a_character, b_character) = (character_at_for(A, 0, a_at), character_at_for(B, 0, b_at));
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut c = player(&fixture, C, c_at);
+    let mut d = player(&fixture, D, d_at);
+    let mut e = player(&fixture, E, e_at);
+    let mut field = a.take_shared_fields().unwrap();
+    for game in [&mut b, &mut c, &mut d, &mut e] {
+        game.take_shared_fields();
+    }
+    // A, B, C and D are one party; E is in another.
+    let parties = [
+        (A, 1, a_at),
+        (B, 1, b_at),
+        (C, 1, c_at),
+        (D, 1, d_at),
+        (E, 2, e_at),
+    ];
+    field.set_parties(
+        parties
+            .iter()
+            .map(|&(guid, group, at)| (guid, (group, at)))
+            .collect(),
+        60.0,
+    );
+    let known = BTreeSet::from([WOLF_GUID]);
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(counts(&a, QUEST), [1, 0], "the killer");
+    assert_eq!(
+        field.pending_kill_credits(B),
+        1,
+        "a member who hit: one credit, not two"
+    );
+    assert_eq!(
+        field.pending_kill_credits(C),
+        1,
+        "a member 20 m away who never hit"
+    );
+    assert_eq!(field.pending_kill_credits(D), 0, "a member 70 m away");
+    assert_eq!(
+        field.pending_kill_credits(E),
+        0,
+        "another party beside the wolf"
+    );
+    for (game, guid, at) in [
+        (&mut b, B, b_at),
+        (&mut c, C, c_at),
+        (&mut d, D, d_at),
+        (&mut e, E, e_at),
+    ] {
+        let character = character_at_for(guid, 0, at);
+        game.tick_shared_effects(&mut field, &character, 150)
+            .unwrap();
+        game.tick_shared_effects(&mut field, &character, 200)
+            .unwrap();
+    }
+    assert_eq!(counts(&b, QUEST), [1, 0]);
+    assert_eq!(
+        counts(&c, QUEST),
+        [1, 0],
+        "the group credit counts on C's own step, once"
+    );
+    assert_eq!(counts(&d, QUEST), [0, 0]);
+    assert_eq!(counts(&e, QUEST), [0, 0]);
+}

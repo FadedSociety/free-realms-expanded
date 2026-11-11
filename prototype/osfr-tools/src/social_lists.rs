@@ -341,6 +341,21 @@ pub struct SocialService {
     group_invites: BTreeMap<u64, PendingGroupInvite>,
     /// Volatile 40/14 state: members whose job picker is open (HUD flag at member +0xc4).
     changing_job: BTreeSet<u64>,
+    /// PB2: each online character's active job as its group row shows it (volatile).
+    member_jobs: BTreeMap<u64, MemberJob>,
+}
+
+/// PB2: the job a group row shows. The group window's getter `00a7cd60`
+/// (`GroupMemberDataSource__GetColumnValue`) reads column 2 PlayerJobId from record +0x94,
+/// column 3 PlayerJobBackgroundIconId from +0xa0, column 4 PlayerJobIconId from +0x9c and
+/// column 5 PlayerJobRank from +0xa4. Its own row fills them from the active `ClientPcProfile`
+/// (reader `00911d60`): the profile id, the badge image set, the icon and the rank.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct MemberJob {
+    pub profile_id: i32,
+    pub icon: i32,
+    pub badge: i32,
+    pub rank: i32,
 }
 
 impl SocialService {
@@ -360,6 +375,7 @@ impl SocialService {
             member_group: BTreeMap::new(),
             group_invites: BTreeMap::new(),
             changing_job: BTreeSet::new(),
+            member_jobs: BTreeMap::new(),
         })
     }
 
@@ -935,6 +951,7 @@ impl SocialService {
             out.extend(self.remove_group_member(guid, false)?);
         }
         self.changing_job.remove(&guid);
+        self.member_jobs.remove(&guid);
         // Friend requests stay in the target's list and are shown again at their next login (R).
         Ok(out)
     }
@@ -951,6 +968,41 @@ impl SocialService {
         self.groups
             .get(&group_id)
             .map(|group| group.members.as_slice())
+    }
+
+    /// PB2: whether the player menu should offer Invite to Group for `target`. Only what the
+    /// wheel can know cheaply; `invite_to_group` re-checks everything and answers with 40/2.
+    pub fn can_group_invite(&self, inviter: u64, target: u64) -> bool {
+        let leads = self
+            .group_of(inviter)
+            .is_none_or(|group| self.group_leader(group) == Some(inviter));
+        leads
+            && inviter != target
+            && self.online.contains(&target)
+            && !self.member_group.contains_key(&target)
+            && !self.group_invites.contains_key(&target)
+            && !self.ignores_either(inviter, target)
+    }
+
+    /// PB2: record `guid`'s active job; when it changed and `guid` is grouped, every member gets
+    /// the 40/9 row with the new job (reader `0093daf0` case 9).
+    pub fn set_member_job(
+        &mut self,
+        guid: u64,
+        job: MemberJob,
+    ) -> Result<Vec<SocialMessage>, SocialError> {
+        if self.member_jobs.insert(guid, job) == Some(job) {
+            return Ok(Vec::new());
+        }
+        let Some(group) = self.group_of(guid) else {
+            return Ok(Vec::new());
+        };
+        let packet = encode_group_member_update(&self.group_member_record(guid)?)?;
+        let members = self.group_members(group).unwrap_or_default();
+        Ok(members
+            .iter()
+            .map(|member| message(*member, packet.clone()))
+            .collect())
     }
 
     pub fn group_invitee(&self, guid: u64) -> Option<(u32, u64)> {
@@ -1120,8 +1172,16 @@ impl SocialService {
                 first: profile.name.first.clone(),
                 last: profile.name.last.clone(),
             },
-            // Client member-record constructor `008dcd60` initializes +0x90..+0xa8 this way.
-            opaque_fields: [0, 0, 0, u32::MAX, u32::MAX, 1, 0],
+            // Client member-record constructor `008dcd60` initializes +0x90..+0xa8 this way;
+            // PB2: a known job fills +0x94, +0x9c, +0xa0 and +0xa4 as the client's own row does.
+            opaque_fields: self.member_jobs.get(&guid).map_or(
+                [0, 0, 0, u32::MAX, u32::MAX, 1, 0],
+                |job| {
+                    let [id, icon, badge, rank] =
+                        [job.profile_id, job.icon, job.badge, job.rank].map(|v| v as u32);
+                    [0, id, 0, icon, badge, rank, 0]
+                },
+            ),
             // `008dcd60` clears both flags; +0xc8 starts at zero. +0xc4 follows 40/14.
             flags: [self.changing_job.contains(&guid), false],
             minigame_type: 0,

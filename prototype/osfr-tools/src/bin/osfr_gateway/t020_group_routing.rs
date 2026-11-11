@@ -2,7 +2,7 @@ use super::*;
 use osfr_tools::players::PlayerPresentation;
 use osfr_tools::social_chat::{ChatChannel, PacketChat};
 
-const GUIDS: [u64; 3] = [301, 302, 303];
+pub(super) const GUIDS: [u64; 3] = [301, 302, 303];
 const NAMES: [&str; 3] = ["P301", "P302", "P303"];
 
 struct Rig {
@@ -202,7 +202,7 @@ fn send(rig: &mut Rig, index: usize, packet: &[u8]) -> Vec<Delivery> {
     send_at(rig, index, packet, 1_000)
 }
 
-fn route_server(server: &mut Server, key: SessionKey, packet: &[u8]) -> Vec<Delivery> {
+pub(super) fn route_server(server: &mut Server, key: SessionKey, packet: &[u8]) -> Vec<Delivery> {
     let mut session = server.sessions.remove(&key).unwrap();
     let deliveries = session.route_application(packet, &mut server.world, 1_000);
     server.sessions.insert(key, session);
@@ -215,7 +215,7 @@ fn chat_group(world: &SharedWorld, session: &Session) -> Option<u64> {
     world.social.group_of(session.character_guid).map(u64::from)
 }
 
-fn inner(delivery: &Delivery) -> &[u8] {
+pub(super) fn inner(delivery: &Delivery) -> &[u8] {
     assert_eq!(&delivery.bytes[..3], &[5, 0, 1]);
     &delivery.bytes[7..]
 }
@@ -239,7 +239,7 @@ fn group_header(sub: u16) -> Vec<u8> {
     out
 }
 
-fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
+pub(super) fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
     let mut out = group_header(1);
     // Client writer `00c235c0`: the family/sub header is followed by `00a95c50`.
     out.extend_from_slice(&GUIDS[from].to_le_bytes());
@@ -256,7 +256,7 @@ fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
     out
 }
 
-fn response(from: usize, to: usize, invite_id: u32, accepted: bool) -> Vec<u8> {
+pub(super) fn response(from: usize, to: usize, invite_id: u32, accepted: bool) -> Vec<u8> {
     let mut out = group_header(4);
     // Client writer `00a97250`: the family/sub header is followed by `00a95c50`.
     out.extend_from_slice(&GUIDS[from].to_le_bytes());
@@ -338,7 +338,7 @@ fn send_at(rig: &mut Rig, index: usize, packet: &[u8], now_ms: u64) -> Vec<Deliv
 }
 
 /// The per-invitation id the client copies from the 40/1 pop-up record and echoes in 40/4.
-fn invited_id(deliveries: &[Delivery], index: usize) -> u32 {
+pub(super) fn invited_id(deliveries: &[Delivery], index: usize) -> u32 {
     let delivery = deliveries
         .iter()
         .find(|delivery| {
@@ -1186,7 +1186,7 @@ fn f234_a_cross_instance_group_member_is_not_healed_or_saved() {
     fs::remove_dir_all(scratch).unwrap();
 }
 
-fn enter_member(membership: &mut World, guid: u64, target: Option<i32>) {
+pub(super) fn enter_member(membership: &mut World, guid: u64, target: Option<i32>) {
     let change = membership
         .prepare_membership(guid, 0, target, WorldPose::ORIGIN, true, 0)
         .unwrap();

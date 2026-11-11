@@ -30,6 +30,25 @@ pub(super) struct FieldSim {
     pub(super) seen: BTreeMap<u64, [f32; 3]>,
     /// Enemies the client was told are running home, until it is told they arrived.
     pub(super) homing: BTreeSet<u64>,
+    /// PB2: every grouped player in this field as (group, position), and the open-world reach
+    /// of shared credit; the host sets both each tick (`SharedFieldState::set_parties`).
+    pub(super) parties: BTreeMap<u64, (u32, [f32; 3])>,
+    pub(super) party_reach_m: f32,
+}
+
+impl FieldSim {
+    /// PB2: the group members of anyone in `credited` who stand within reach of the kill at
+    /// `at`. They share the kill like a hitter (`credit_field_kill`), once each: `who` is a set.
+    pub(super) fn party_near(&self, credited: &BTreeSet<u64>, at: [f32; 3]) -> Vec<u64> {
+        let groups: BTreeSet<u32> = (credited.iter())
+            .filter_map(|player| self.parties.get(player).map(|(group, _)| *group))
+            .collect();
+        let near = |p: &[f32; 3]| (p[0] - at[0]).hypot(p[2] - at[2]) <= self.party_reach_m;
+        (self.parties.iter())
+            .filter(|(_, (group, position))| groups.contains(group) && near(position))
+            .map(|(player, _)| *player)
+            .collect()
+    }
 }
 
 /// (R) Shared-field kill bookkeeping for power-up drops (W158 slice 2b).
@@ -241,6 +260,12 @@ impl SharedFieldState {
         }
         self.last_tick = Some(now_ms);
         Some(elapsed)
+    }
+    /// PB2: who is grouped in this field and where (player -> (group, position)), and the
+    /// open-world reach of shared credit. The host refreshes it every tick.
+    pub fn set_parties(&mut self, parties: BTreeMap<u64, (u32, [f32; 3])>, reach_m: f32) {
+        self.field_sim.parties = parties;
+        self.field_sim.party_reach_m = reach_m;
     }
     /// (R) Eligibility changes never reset health or corpse deadlines.
     pub fn set_active_quests(&mut self, active: &BTreeSet<u32>) {
@@ -545,8 +570,11 @@ impl EncounterEngine {
         now_ms: u64,
     ) -> io::Result<EncounterOutcome> {
         self.with_shared_fields(runtime, sender, |engine| {
+            // PB2: a kit cast judges its own target (a group heal may aim at a member).
+            let kit = ability.kit_slot.is_some() && engine.kit_applies(profile);
             if target != sender
                 && target != 0
+                && !kit
                 && !engine.enemy(target).is_some_and(|(_, s)| s.health > 0)
             {
                 return Ok(EncounterOutcome::default());

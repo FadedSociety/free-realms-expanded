@@ -287,7 +287,9 @@ impl Gameplay {
     ) -> io::Result<()> {
         self.pet_earn_quest_event(&event);
         if let Some(engine) = &mut self.npc_quests {
-            let result = engine.on_event(event)?;
+            // PB2: the one place credit is granted; a shared event also waits for the group.
+            let result =
+                super::quest_combat::group_credit::credit(engine, event, &mut self.group_credit)?;
             self.append_npc_quest_outcome_synced(result, out)?;
         }
         // Quest events also arrive from movement, ticks and automatic outcomes, not only

@@ -294,6 +294,7 @@ fn open_menu(
                 .trades
                 .can_invite(&world.players, &world.social, viewer, t),
             gm: false,
+            group: false,
         }
     })
 }

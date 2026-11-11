@@ -676,3 +676,34 @@ fn a_battle_starter_enters_its_scene_and_a_closed_one_refuses() {
         "a closed entrance changes nothing"
     );
 }
+
+/// PB2: a party enters an entrance's run together (T440/T441). The leader's Go opens the hive;
+/// a member who is not in a combat job is still invited and joins the leader's run in their best
+/// combat job, as their own Go would switch them. A battle marker keeps its old gate.
+#[test]
+fn pb2_a_member_in_any_job_joins_the_leaders_entrance_run() {
+    if !available() {
+        eprintln!("skipped: the private fixture is missing");
+        return;
+    }
+    let table = table();
+    let hive = row(&table, "bixie_hive");
+    let scene = table.scene("sg_bixie_hive").unwrap();
+    let fixture = Fixture::new();
+    let (mut leader, _) = fixture.session(hive.at, 2901);
+    let (mut member, _) = fixture.session(hive.at, 2902);
+    let card = details(&send(&mut leader, &interact(hive.guid), 400))
+        .expect("the click opens 41/114")
+        .to_vec();
+    assert!(send(&mut leader, &go(&card), 500).began_zoning);
+    let (battle, run, _) = leader.joinable_run().expect("an entrance run is joinable");
+
+    let job_before = active_profile(&member);
+    assert_ne!(job_before, BRAWLER, "the member is not in a combat job");
+    assert!(member.can_join_group_battle(battle), "and is still invited");
+    let joined = member.stage_encounter_join(battle, run, 600).unwrap();
+    assert!(joined.began_zoning, "Accept zones the member");
+    assert_eq!(member.state().zone_id, scene.zone_id, "into the hive");
+    assert_ne!(active_profile(&member), job_before, "in a combat job");
+    assert_eq!(member.joinable_run().map(|(b, ..)| b), Some(battle), "the leader's battle");
+}

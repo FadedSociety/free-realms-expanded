@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "credit_range_m": 60.0,
+  "job_icons": [
+    {"profile_id": 1, "icon": 1334, "badge": 19},
+    {"profile_id": 2, "icon": 1342, "badge": 10},
+    {"profile_id": 4, "icon": 1339, "badge": 11},
+    {"profile_id": 11, "icon": 1340, "badge": 13},
+    {"profile_id": 12, "icon": 1343, "badge": 12},
+    {"profile_id": 14, "icon": 1341, "badge": 11},
+    {"profile_id": 16, "icon": 1336, "badge": 11},
+    {"profile_id": 32, "icon": 21594, "badge": 10},
+    {"profile_id": 35, "icon": 1335, "badge": 32},
+    {"profile_id": 43, "icon": 1337, "badge": 10},
+    {"profile_id": 45, "icon": 156, "badge": 11},
+    {"profile_id": 48, "icon": 20725, "badge": 46},
+    {"profile_id": 49, "icon": 8059, "badge": 46},
+    {"profile_id": 52, "icon": 20743, "badge": 4842},
+    {"profile_id": 120, "icon": 396, "badge": 1783},
+    {"profile_id": 137, "icon": 20740, "badge": 4843}
+  ],
+  "source": [
+    {
+      "field": "credit_range_m",
+      "kind": "reconstructed",
+      "evidence": "(R) PB2 group play: the reach of shared kill, collect and objective credit in the open world, about the distance two players fighting one camp stand apart. Inside a battle or dungeon instance the whole instance counts."
+    },
+    {
+      "field": "job_icons",
+      "kind": "capture",
+      "evidence": "The captured ClientPcProfile records in startup/self_data.json (reader 00911d60): the icon is the record's fifth dword and the badge image set its seventh. The group window reads them from member record +0x9c and +0xa0 (00a7cd60 columns 4 and 3)."
+    }
+  ]
+}

@@ -359,6 +359,7 @@ impl EncounterEngine {
             .collect();
         who.extend(engaged.filter(|&g| g != 0));
         who.insert(killer);
+        who.extend(self.field_sim.party_near(&who, at)); // PB2: group members in reach
         let participants = who.len();
         if let Some(table) = table {
             self.drop_power_ups(table, kill, at, now_ms, participants, out);

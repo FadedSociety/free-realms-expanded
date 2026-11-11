@@ -242,7 +242,10 @@ impl EncounterEngine {
         // A named target that is not a live enemy here is a forged or stale GUID: nothing
         // happens, as in `shared_job_ability`. Only the client's own "no target" (0) lets the
         // kit pick one (lead 2026-11-10, playtest_first_hour).
-        if target != 0 && target != me && selected.is_none() {
+        // PB2: a group heal aimed at another player is the Medic's ally targeting: it casts as
+        // if untargeted, and the group heal reaches the members (the host's `heal_group`).
+        let ally_heal = ability.heal.is_some_and(|(whole, _)| whole);
+        if target != 0 && target != me && selected.is_none() && !ally_heal {
             return Ok(EncounterOutcome::default());
         }
         let allies = [Body {

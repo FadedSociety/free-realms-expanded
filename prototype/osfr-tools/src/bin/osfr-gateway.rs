@@ -963,10 +963,8 @@ impl CharacterLookup for IdentityLookup<'_> {
     fn find_by_name(&self, name: &SocialName) -> Option<SocialIdentity> {
         self.0
             .values()
-            .find(|identity| {
-                identity.name.first.eq_ignore_ascii_case(&name.first)
-                    && identity.name.last.eq_ignore_ascii_case(&name.last)
-            })
+            // PB2: the social window sends one display string ("First Last"), as friends do.
+            .find(|identity| identity.name.display().eq_ignore_ascii_case(&name.display()))
             .cloned()
     }
 }
@@ -2816,8 +2814,8 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
     let request = match (family, sub) {
         // 40/1 client reader `00912090`: the family/sub header, then `008fca60`.
         (40, 1) => {
-            r.u64()?;
-            r.social_name()?;
+            // PB2: the inviter pair is unread; `SendGroupInvite` 00c24d20 leaves it empty.
+            let _inviter = (r.u64()?, r.i32()?, r.i32()?, r.i32()?, r.string(128)?, r.string(128)?);
             r.u64()?;
             let target = r.social_name()?;
             r.u32()?;

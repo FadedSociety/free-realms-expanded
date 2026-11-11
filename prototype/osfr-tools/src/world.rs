@@ -1469,6 +1469,13 @@ impl World {
     pub fn field(&self, instance: InstanceId) -> Option<&crate::encounter::SharedFieldState> {
         self.fields.get(&instance)
     }
+    /// PB2: the live field, for a host refresh that must not clone the whole population.
+    pub fn field_mut(
+        &mut self,
+        instance: InstanceId,
+    ) -> Option<&mut crate::encounter::SharedFieldState> {
+        self.fields.get_mut(&instance)
+    }
     pub fn install_field(
         &mut self,
         instance: InstanceId,

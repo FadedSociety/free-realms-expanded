@@ -6,6 +6,10 @@
 use super::*;
 use osfr_tools::encounter::{EncounterPhase, FieldParticipant, SharedArena, is_pickup_guid};
 
+/// PB2 group play (shared credit, field parties, member jobs), ticked with the arenas.
+#[path = "group_play.rs"]
+pub(crate) mod group_play;
+
 /// One staged action's loan of the World's arena. `enter` before the gateway runs, `leave` after
 /// it, `publish` once the commit succeeded; a refused or failed action drops the copy, so the
 /// World's arena never changes for it.
@@ -160,6 +164,7 @@ pub(super) fn tick(server: &mut Server, now_ms: u64) {
             event(json!({"event":"arena_faulted","instance":instance,"reason":error.to_string()}));
         }
     }
+    group_play::tick(server, now_ms);
 }
 
 pub(super) fn key_of(server: &Server, guid: u64) -> Option<SessionKey> {

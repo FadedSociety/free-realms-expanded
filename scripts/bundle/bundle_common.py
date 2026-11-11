@@ -60,6 +60,7 @@ OPTIONAL_REPOSITORY_CONTENT = (
     "power_ups.json",  # power_ups.rs: combat power-up drop tables (W153)
     "crafting_stations.json",  # recipe_book.rs: world cooking, smelting and anvil models
     "job_trainers.json",  # profiles.rs: trainer NPCs and "Become a <job>" menu labels (W176)
+    "group_play.json",  # group_play.rs: shared credit reach, group row job icons (compiled-in copy if absent)
     # Combat: each is optional, and absent leaves its part of combat as it was.
     "combat_rules.json",  # encounter/combat_rules.rs: gate, energy, crit, revive (compiled-in copy if absent)
     "combat_wire.json",  # encounter/wire.rs: packet templates and switches

@@ -19,6 +19,8 @@ use super::*;
 use crate::encounter::{FightFact, KillFact};
 use crate::quest_engine::QuestEvent;
 
+pub(super) mod group_credit;
+
 /// (R) Local copy: no recovered client locale row names a quest drop the bag could not take.
 const QUEST_DROP_BAG_FULL: &str =
     "Your bag is full. Make room, then defeat another to collect that quest item.";

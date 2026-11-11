@@ -544,6 +544,11 @@ impl EncounterEngine {
 
     /// Whether `inner` is the client's own pick of the "Fight" entry (26/10) on the entrance
     /// whose menu is open: the straight launch's Go.
+    /// PB2: `battle` is an entrance's (its Go switches a non-combat job), not a battle marker's.
+    pub fn is_entrance_battle(&self, battle: u32) -> bool {
+        (self.fight_state.doors.rows.values()).any(|door| door.encounter == battle)
+    }
+
     pub fn entrance_picked(&self, inner: &[u8]) -> bool {
         let doors = &self.fight_state.doors;
         let Some(table) = doors.table.as_ref().filter(|t| t.launch == Launch::Direct) else {

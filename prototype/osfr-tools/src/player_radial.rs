@@ -50,6 +50,13 @@ const INSPECT_LABEL: i32 = 3902; // en_us locale "Inspect".
 pub const TRADE_ENTRY_ID: i32 = 1002;
 const TRADE_ICON: i32 = 43188; // peer schema; not checked against client assets.
 const TRADE_LABEL: i32 = 3299; // en_us locale "Trade".
+/// (R) Server-chosen radial entry id for Invite to Group. The original wheel carried it beside
+/// Trade and Inspect (video review batches B0004, B0015, B0017). Icon 136 is the client's
+/// `icon_UI_context_group_add01_64.dds` (`Images.txt`, beside 133 examine and 134/135 friend);
+/// label 3372 is "Invite to Group", the social window's own `INVITE_TO_GROUP_STR` (`S##3372`).
+pub const GROUP_ENTRY_ID: i32 = 1003;
+const GROUP_ICON: i32 = 136;
+const GROUP_LABEL: i32 = 3372;
 /// (R) Default selection reach in metres, tunable per instance.
 pub const DEFAULT_REACH_M: f32 = 40.0;
 const MAX_NAME_BYTES: usize = 64; // (R)
@@ -117,6 +124,8 @@ pub struct MenuOffer {
     pub trade: bool,
     /// L081: the clicker is an admin; the wheel carries the GM entry.
     pub gm: bool,
+    /// PB2: an Invite to Group could be sent now (the social service re-checks on the click).
+    pub group: bool,
 }
 
 /// What a valid 26/10 choice asks the server to do.
@@ -128,6 +137,8 @@ pub enum Chosen {
     Trade(u64),
     /// L081: a GM wheel entry on this character (open a page, or an action to queue).
     Gm(u64, crate::player_gm_menu::Step),
+    /// PB2: invite this character to the clicker's group (the 40/1 path re-checks everything).
+    GroupInvite(u64),
 }
 
 /// Per-session radial state: at most one open menu and one open inspect.
@@ -192,8 +203,7 @@ impl PlayerRadial {
     ) -> Result<Vec<Vec<u8>>, RadialError> {
         self.select_menu(registry, viewer, inner, |guid| MenuOffer {
             inspect: has_look(guid),
-            trade: false,
-            gm: false,
+            ..MenuOffer::default()
         })
     }
 
@@ -218,7 +228,7 @@ impl PlayerRadial {
         let name = self.visible_name(registry, viewer, target)?;
         // Only offer an action that can work: no public look, no Inspect entry.
         let offer = offer(target);
-        if !offer.inspect && !offer.trade && !offer.gm {
+        if offer == MenuOffer::default() {
             return Err(RadialError::NoLook);
         }
         self.menu_target = Some(target);
@@ -238,7 +248,9 @@ impl PlayerRadial {
         match self.choose_entry(registry, viewer, inner, look_of)? {
             None => Ok(None),
             Some(Chosen::Inspect(packet)) => Ok(Some(vec![packet])),
-            Some(Chosen::Trade(_) | Chosen::Gm(..)) => Err(RadialError::InvalidChoice),
+            Some(Chosen::Trade(_) | Chosen::Gm(..) | Chosen::GroupInvite(_)) => {
+                Err(RadialError::InvalidChoice)
+            }
         }
     }
 
@@ -266,6 +278,7 @@ impl PlayerRadial {
         let allowed = match (page, id) {
             (None, INSPECT_ENTRY_ID) => offered.inspect,
             (None, TRADE_ENTRY_ID) => offered.trade,
+            (None, GROUP_ENTRY_ID) => offered.group,
             (None, crate::player_gm_menu::ENTRY_GM) => offered.gm,
             // L081: a GM page accepts only the entries it showed.
             (Some(page), id) => crate::player_gm_menu::rows(page).iter().any(|r| r.0 == id),
@@ -280,6 +293,9 @@ impl PlayerRadial {
         }
         if id == TRADE_ENTRY_ID {
             return Ok(Some(Chosen::Trade(guid)));
+        }
+        if id == GROUP_ENTRY_ID {
+            return Ok(Some(Chosen::GroupInvite(guid)));
         }
         let look = look_of(guid).ok_or(RadialError::NoLook)?;
         let packet = start_inspect_packet(guid, &look)?;
@@ -388,8 +404,10 @@ fn put_i32(out: &mut Vec<u8>, value: i32) {
 /// two trailing bools (`00aa2220`; same shape as the proven NPC menus).
 fn menu_packet(guid: u64, name: &str, offer: MenuOffer) -> Vec<u8> {
     // Trade before Inspect, as in the original menu (video `fjZluIfbUIo/00024`); GM last (L081).
+    // PB2: Invite to Group first, as two of the three reviewed wheels list it (B0004, B0017).
     let (id, icon, label) = crate::player_gm_menu::gm_row();
     let entries: Vec<(i32, i32, i32)> = [
+        (offer.group, (GROUP_ENTRY_ID, GROUP_ICON, GROUP_LABEL)),
         (offer.trade, (TRADE_ENTRY_ID, TRADE_ICON, TRADE_LABEL)),
         (
             offer.inspect,

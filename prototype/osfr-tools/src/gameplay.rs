@@ -276,8 +276,7 @@ pub struct Gameplay {
     kart_lobby_reply: Option<Arc<[u8]>>,
     /// W150 (R): battles published in the activity portal (167/1/1). Not persisted.
     activities: crate::activity_portal::Catalogue,
-    /// Soccer content and one live session-only match. Neither is persisted;
-    /// a reconnect drops the match without a grant.
+    /// Soccer content and one live session-only match; neither is saved (a reconnect drops it).
     soccer_content: Option<Arc<crate::soccer_entry::Content>>,
     /// Boxed, as the Tower Defense run is: `Gameplay` is cloned on the stack per packet.
     soccer: Option<Box<crate::soccer_entry::Session>>,
@@ -321,8 +320,7 @@ pub struct Gameplay {
     fishing_spots: Option<Arc<crate::fishing_service::FishingSpots>>,
     /// The player's fishing round, if any. Ephemeral by design: a reconnect releases it.
     fishing: crate::fishing_service::FishingService,
-    /// W171/T524 (R): this player's ore, mushroom, quest and collection nodes. Not persisted:
-    /// a login sees every node.
+    /// W171/T524 (R): this player's ore, mushroom, quest and collection nodes; never saved.
     gathering_nodes: Option<crate::harvest_nodes::GatheringNodes>,
     /// (R) World-model station rules. Opening actors and current placements are
     /// resolved at use so a placement reload cannot leave stale coordinates.
@@ -407,6 +405,7 @@ pub struct Gameplay {
     /// Style-card look and tables (`gameplay/style_card_use.rs`).
     style_cards: style_card_use::StyleCards,
     game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
+    group_credit: Option<Box<quest_combat::group_credit::Ledger>>, // PB2; never saved
     /// T474 live treat, cake and transformation effects (`gameplay/item_use.rs`); session-only, never saved.
     consumable_effects: crate::consumable_effects::EffectStack,
     world_challenge: Box<world_challenge::State>,
@@ -1367,6 +1366,7 @@ impl Gameplay {
             gathering_nodes,
             world_station_rules,
             game_clock: crate::game_clock::GameClock::load(npc_content)?,
+            group_credit: None,
             consumable_effects: Default::default(),
             content_dir: npc_content.to_path_buf(),
         })

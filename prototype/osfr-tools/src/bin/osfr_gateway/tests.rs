@@ -1885,3 +1885,9 @@ fn l965_ship_reports_wait_for_the_tick_newest_kept() {
     assert!(session.ship_report.is_none());
     assert_eq!(dispatched(&session), 1, "handed on once");
 }
+
+/// PB2 group play: the wheel's Invite to Group, member jobs on the group rows, and who a shared
+/// credit reaches. Declared here because the hub file is at its line ceiling.
+#[cfg(test)]
+#[path = "pb2_group_play_tests.rs"]
+mod pb2_group_play_tests;

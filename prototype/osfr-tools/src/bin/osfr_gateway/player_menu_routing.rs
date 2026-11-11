@@ -26,6 +26,9 @@ impl Session {
                     inspect: looks.contains_key(&guid),
                     trade: trades.can_invite(&world.players, &world.social, me, guid),
                     gm: admin,
+                    // PB2: only a player the 40/1 path can name (an identity row).
+                    group: world.identities.contains_key(&guid)
+                        && world.social.can_group_invite(me, guid),
                 })
         } else {
             match self
@@ -40,6 +43,17 @@ impl Session {
                             .trades
                             .invite(&world.players, &world.social, me, target, now_ms);
                     return trade_deliveries(invited.unwrap_or_default());
+                }
+                Ok(Some(Chosen::GroupInvite(target))) => {
+                    // PB2: the wheel's Invite to Group is the social window's 40/1 by name.
+                    let Some(name) = world.identities.get(&target).map(|id| id.name.clone()) else {
+                        return Vec::new();
+                    };
+                    let lookup = IdentityLookup(&world.identities);
+                    let messages = world.social.invite_to_group(me, &name, &lookup, now_ms);
+                    return (messages.unwrap_or_default().into_iter())
+                        .filter_map(|message| world.social_delivery(message))
+                        .collect();
                 }
                 Ok(Some(Chosen::Inspect(packet))) => Ok(vec![packet]),
                 Ok(Some(Chosen::Gm(target, Step::Open(page)))) if admin => self
