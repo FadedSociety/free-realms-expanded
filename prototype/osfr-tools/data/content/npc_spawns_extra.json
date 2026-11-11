@@ -63746,14 +63746,6 @@
       "model_file_name": "sg_warpstone_01.adr",
       "name": "Sanctuary Warpstone",
       "name_string_id": 20831,
-      "notifications": [
-        {
-          "kind": 6,
-          "image_id": 3,
-          "state": 3,
-          "name_id": 20831
-        }
-      ],
       "position": [
         -1418.3218,
         -27.002932,
@@ -63773,10 +63765,6 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) spawn_guid 100000033167 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) notifications: Sanctuary-main row NotificationType 6, IconId 3, NameId = the stone's own name id. Client handler 00932100 keys the icon on the second value after the type (gate 00932157) and Sanctuary's IconState is 0, so the icon id is sent in both slots; client NotificationImages.txt #ID 3 has a minimap layer"
         }
       ],
       "position_w": null
@@ -63788,14 +63776,6 @@
       "model_file_name": "sg_warpstone_01.adr",
       "name": "Lakeshore Warpstone",
       "name_string_id": 41298,
-      "notifications": [
-        {
-          "kind": 6,
-          "image_id": 3,
-          "state": 3,
-          "name_id": 41298
-        }
-      ],
       "position": [
         -721.7169,
         9.560479,
@@ -63815,10 +63795,6 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) spawn_guid 100000033558 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) notifications: Sanctuary-main row NotificationType 6, IconId 3, NameId = the stone's own name id. Client handler 00932100 keys the icon on the second value after the type (gate 00932157) and Sanctuary's IconState is 0, so the icon id is sent in both slots; client NotificationImages.txt #ID 3 has a minimap layer"
         }
       ],
       "position_w": null
@@ -63830,14 +63806,6 @@
       "model_file_name": "sg_warpstone_01.adr",
       "name": "Snowhill Warpstone",
       "name_string_id": 20830,
-      "notifications": [
-        {
-          "kind": 6,
-          "image_id": 3,
-          "state": 3,
-          "name_id": 20830
-        }
-      ],
       "position": [
         50.92852,
         32.425617,
@@ -63857,10 +63825,130 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) spawn_guid 100000033602 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036143,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Sunstone Valley Warpstone",
+      "name_string_id": 440370,
+      "terrain_object_id": 1346725607,
+      "position": [
+        902.0522,
+        3.663198,
+        2235.3176
+      ],
+      "heading": -2.782342,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "capture",
+          "evidence": "The original server's AddNpc for this stone (2014-03 capture packets_3, actor 13125420056642): name id 440370, model 280, terrain_object_id 1346725607, replace_terrain_object 0, position (902.0522, 3.663198, 2235.3176), facing (-0.35157287, 0, -0.9361605), scale 1, animation 1, interactable, range 100; then 35/10 kind 6, 3, 0, name 440370"
+        },
+        {
+          "kind": "client",
+          "evidence": "client terrain chunk object: the 2014 client's own zone chunk FabledRealms_32_12.gcnk: the placed sg_warpstone_01.adr object at (902.139038, 2.06609654, 2235.62817), yaw -0.820305467, carries object id 1346725607. Client 00968c80 adopts that object as the actor's body when replace_terrain_object is 0, so no second rock is built. Global.Text.440370 = Sunstone Valley Warpstone (client locale en_us_data.dat); Models.txt 280 = sg_warpstone_01.adr"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) notifications: Sanctuary-main row NotificationType 6, IconId 3, NameId = the stone's own name id. Client handler 00932100 keys the icon on the second value after the type (gate 00932157) and Sanctuary's IconState is 0, so the icon id is sent in both slots; client NotificationImages.txt #ID 3 has a minimap layer"
+          "evidence": "(R) spawn_guid 100000036143 follows the stone rows' convention (100000000000 + Npcs.json Id), not the captured actor id. The captured sub-text id is 0; ours stays the template's -1 (both mean none)"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036307,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Stillwater Crossing Warpstone",
+      "name_string_id": 116623,
+      "terrain_object_id": 1254775835,
+      "position": [
+        -1270.0145,
+        -48.001792,
+        785.1116
+      ],
+      "heading": -0.38397255,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client terrain chunk object: the 2014 client's own zone chunk FabledRealms_12_-20.gcnk: the placed sg_warpstone_01.adr object at (-1270.01453, -49.5988922, 785.111572), yaw -0.383972555, carries object id 1254775835. Client 00968c80 adopts that object as the actor's body when replace_terrain_object is 0, so no second rock is built. Global.Text.116623 = Stillwater Crossing Warpstone (client locale en_us_data.dat); Models.txt 280 = sg_warpstone_01.adr"
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=36307 (NameId 116623, TerrainObjectId 1254775835, CursorId 17, NotificationType 6, IconId 3); src/Scripts/Zone/FabledRealms.lua spawnNpcWithGuid(36307)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No capture holds this stone. Model 280 with the terrain link is the captured Sunstone Valley stone's shape (the reference row says model 0). Position: the placed rock's x and z, lifted 1.5971 m as the captured Sunstone actor is over its rock; heading: the placed rock's yaw. The client takes the body's place from the terrain object either way. spawn_guid is 100000000000 + Npcs.json Id"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036308,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Blackspore Warpstone",
+      "name_string_id": 93509,
+      "terrain_object_id": 1254779212,
+      "position": [
+        -2128.6755,
+        -31.289516,
+        1044.8934
+      ],
+      "heading": -1.8325957,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client terrain chunk object: the 2014 client's own zone chunk FabledRealms_16_-36.gcnk: the placed sg_warpstone_01.adr object at (-2128.67554, -32.8866158, 1044.89343), yaw -1.83259571, carries object id 1254779212. Client 00968c80 adopts that object as the actor's body when replace_terrain_object is 0, so no second rock is built. Global.Text.93509 = Blackspore Warpstone (client locale en_us_data.dat); Models.txt 280 = sg_warpstone_01.adr"
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=36308 (NameId 93509, TerrainObjectId 1254779212, CursorId 17, NotificationType 6, IconId 3); src/Scripts/Zone/FabledRealms.lua spawnNpcWithGuid(36308)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No capture holds this stone. Model 280 with the terrain link is the captured Sunstone Valley stone's shape (the reference row says model 0). Position: the placed rock's x and z, lifted 1.5971 m as the captured Sunstone actor is over its rock; heading: the placed rock's yaw. The client takes the body's place from the terrain object either way. spawn_guid is 100000000000 + Npcs.json Id"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036309,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Rumble Ridge Warpstone",
+      "name_string_id": 440369,
+      "terrain_object_id": 1345844843,
+      "position": [
+        501.101,
+        71.54963,
+        1779.1543
+      ],
+      "heading": -0.82030547,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client terrain chunk object: the 2014 client's own zone chunk FabledRealms_24_4.gcnk: the placed sg_warpstone_01.adr object at (501.101013, 69.9525299, 1779.1543), yaw -0.820305467, carries object id 1345844843. Client 00968c80 adopts that object as the actor's body when replace_terrain_object is 0, so no second rock is built. Global.Text.440369 = Rumble Ridge Warpstone (client locale en_us_data.dat); Models.txt 280 = sg_warpstone_01.adr"
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=36309 (NameId 440369, TerrainObjectId 1345844843, CursorId 17, NotificationType 6, IconId 3); src/Scripts/Zone/FabledRealms.lua spawnNpcWithGuid(36309)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No capture holds this stone. Model 280 with the terrain link is the captured Sunstone Valley stone's shape (the reference row says model 0). Position: the placed rock's x and z, lifted 1.5971 m as the captured Sunstone actor is over its rock; heading: the placed rock's yaw. The client takes the body's place from the terrain object either way. spawn_guid is 100000000000 + Npcs.json Id"
         }
       ],
       "position_w": null

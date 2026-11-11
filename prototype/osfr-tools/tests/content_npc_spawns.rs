@@ -355,7 +355,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // soccer gates (3,203).
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs: Gribbit, placed from the video index (3,267).
-    assert_eq!(extra_rows.len(), 3271);
+    // The zone rocks added the four warpstone actors bound to the rocks that are part of the
+    // zone (3,271 -> 3,275).
+    assert_eq!(extra_rows.len(), 3275);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

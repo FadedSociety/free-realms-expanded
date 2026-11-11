@@ -20,7 +20,12 @@
 //!   0 on every row we send, and `+41` is never read by the handler. (R) naming for those.
 //!
 //! Sanctuary's rows name the first value after `kind` `IconId` and the second `IconState`; the
-//! client keys the icon on the second, so the content rows put the icon in both slots (R).
+//! client keys both the minimap indicator and the overhead icon on the second. The original
+//! server sent every warpstone kind 6 with 3 and then 0 (2014-03 captures, five stones; 1,015
+//! rows of that shape in all): a row the client reads and draws nothing for, since the branch
+//! at `00932151` skips both draws for a key of 0. Those rows keep image 0
+//! ([`Notification::validate_static`]); with 3 in the second slot the client hung image set 3
+//! over each stone and on the minimap, which the original never showed.
 
 use serde::Deserialize;
 
@@ -39,7 +44,7 @@ pub struct Notification {
     /// The notification type (+28): picks the type string and is passed to the minimap.
     #[serde(default)]
     pub kind: i32,
-    /// `NotificationImages.txt` key (+16); 1 or more, or the client skips the row.
+    /// `NotificationImages.txt` key (+16); at 0 the client draws nothing for the row.
     pub image_id: i32,
     /// Overhead icon argument (+8), 0 or more.
     #[serde(default)]
@@ -73,6 +78,13 @@ impl Notification {
         } else {
             None
         }
+    }
+
+    /// As [`Self::validate`], for an `npc_presentation.json` row: image 0 is accepted too, the
+    /// row the original server sent that draws nothing (the warpstones).
+    pub fn validate_static(&self) -> Option<&'static str> {
+        let image_id = if self.image_id == 0 { 1 } else { self.image_id };
+        Self { image_id, ..*self }.validate()
     }
 
     fn write(&self, guid: u64, bytes: &mut Vec<u8>) {

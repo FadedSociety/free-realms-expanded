@@ -35,15 +35,18 @@ const STONES: [(u64, [f32; 3], i32); 3] = [
     (100_000_033_602, [50.93, 32.43, 370.30], 20_830),
 ];
 
+/// The original server's stone row (2014-03 captures): kind 6, 3, image key 0, sub-text -1.
+/// The rows used to carry image 3 (R) on the stone's own extra row; they now come from
+/// `npc_presentation.json` like every other stone's.
 fn row(index: usize, guid: u64, name: i32) -> Marker {
     Marker {
         index,
         guid,
         kind: 6,
         state: 3,
-        image: 3,
+        image: 0,
         name,
-        subtext: 0,
+        subtext: -1,
     }
 }
 

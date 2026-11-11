@@ -83,7 +83,9 @@ impl Record {
         } else if self.notifications.len() > npc_notifications::MAX_ENTRIES {
             Some("too many notifications")
         } else {
-            self.notifications.iter().find_map(Notification::validate)
+            self.notifications
+                .iter()
+                .find_map(Notification::validate_static)
         }
     }
 }
@@ -227,12 +229,15 @@ mod tests {
             r#"{"name_string_id": 1, "relevance_flag": true}"#,
             r#"{"name_string_id": 1, "sub_text_name_string_id": 0}"#,
             r#"{"name_string_id": 1, "disposition": 5}"#,
-            r#"{"name_string_id": 1, "notifications": [{"image_id": 0, "name_id": 1}]}"#,
+            r#"{"name_string_id": 1, "notifications": [{"image_id": -1, "name_id": 1}]}"#,
         ] {
             assert!(Presentation::new(vec![row(bad)]).is_err(), "{bad}");
         }
         let twice = r#"{"name_string_id": 1, "cursor_id": 5}"#;
         assert!(Presentation::new(vec![row(twice), row(twice)]).is_err());
         assert!(Presentation::new(vec![row(twice)]).is_ok());
+        // Image 0 is the original server's warpstone row: read by the client, nothing drawn.
+        let stone = r#"{"name_string_id": 1, "notifications": [{"kind": 6, "state": 3, "image_id": 0, "name_id": 1}]}"#;
+        assert!(Presentation::new(vec![row(stone)]).is_ok());
     }
 }

@@ -36,9 +36,22 @@ use std::{
 };
 
 const STONE_MODEL: i32 = 280;
-/// The stones that are actors: the other four rocks (Blackspore, Stillwater Crossing, Rumble
-/// Ridge, Sunstone Valley) are part of the zone and need none to be seen.
-const STONES: usize = 14;
+/// Every stone has an actor. Four rocks (Blackspore, Stillwater Crossing, Rumble Ridge,
+/// Sunstone Valley) are part of the zone: their actor is bound to the zone's own rock and
+/// builds no second one, but without it the client shows no name and no "Press X" there.
+const STONES: usize = 18;
+/// The stones the login stream's snapshot holds; the four zone rocks are not among them.
+const LOGIN_STONES: usize = 14;
+/// (name id, the zone chunk's object id for the placed `sg_warpstone_01.adr`), read from the
+/// 2014 client's chunks FabledRealms_16_-36, 12_-20, 24_4 and 32_12. The last is also the id
+/// the original server sent (2014-03 capture). A wrong id leaves the actor with no body
+/// (client `00968c80`), so these are pinned, not just "non-zero".
+const ZONE_ROCKS: [(i64, i64); 4] = [
+    (93509, 1254779212),
+    (116623, 1254775835),
+    (440369, 1345844843),
+    (440370, 1346725607),
+];
 /// The dais is about 3 m across; nobody may stand on it or inside the rock.
 const DAIS_CLEAR_M: f32 = 2.5;
 
@@ -96,12 +109,24 @@ fn every_stone_is_sent_once_by_the_world_table_with_the_fields_the_client_draws(
         let (index, npc) = &near[0];
         // The original server's stone packets (Sanctuary, Lakeshore, Snowhill, Lavender Coast):
         // a plain interactable actor with no terrain link, at scale 1, in its stand animation.
+        // Sunstone Valley's is the same actor with the zone rock's object id and
+        // `replace_terrain_object` 0; the other three zone rocks follow it.
+        let name_id = row["name_string_id"].as_i64().unwrap();
+        let terrain = ZONE_ROCKS
+            .iter()
+            .find(|(rock, _)| *rock == name_id)
+            .map_or(0, |(_, id)| *id);
         assert_eq!(npc.actor_id, row["spawn_guid"].as_u64().unwrap(), "{name}");
-        assert_eq!(npc.name_string_id as i64, row["name_string_id"].as_i64().unwrap(), "{name}");
+        assert_eq!(npc.name_string_id as i64, name_id, "{name}");
         assert_eq!(
-            (npc.scale, npc.animation_id, npc.terrain_object_id, npc.is_interactable),
-            (1.0, 1, 0, 1),
+            (npc.scale, npc.animation_id, npc.is_interactable),
+            (1.0, 1, 1),
             "{name}"
+        );
+        assert_eq!(
+            (i64::from(npc.terrain_object_id), npc.replace_terrain_object),
+            (terrain, 0),
+            "{name}: the zone rock this actor is, or none"
         );
         assert_eq!(
             (npc.composite_effect_id, npc.hide_nameplate, npc.temporary_appearance),
@@ -122,11 +147,111 @@ fn every_stone_is_sent_once_by_the_world_table_with_the_fields_the_client_draws(
         };
         let notification = after(10);
         assert_eq!(&notification[8..16], &guid, "{name}: 35/10 guid");
+        // The captured row (reader `008db310`): one full record, kind 6, then 3 and 0. The
+        // second value is the image key; at 3 the client hung an icon over the rock and on
+        // the minimap that the original never showed (handler branch `00932151`).
+        let word = |at: usize| i32::from_le_bytes(notification[at..at + 4].try_into().unwrap());
+        assert_eq!(
+            (word(4), notification[16], notification.len()),
+            (1, 0, 47),
+            "{name}"
+        );
+        assert_eq!(
+            (word(17), word(21), word(25)),
+            (6, 3, 0),
+            "{name}: kind, 3, 0"
+        );
+        assert_eq!(
+            i64::from(word(33)),
+            name_id,
+            "{name}: the row names the stone"
+        );
         let cursor = after(12);
         // i32 count, u64 guid, has-cursor, cursor id 17 (use), flag 0: the captured entry.
         assert_eq!(&cursor[4..8], &1i32.to_le_bytes(), "{name}");
         assert_eq!(&cursor[8..16], &guid, "{name}: 35/12 guid");
         assert_eq!(&cursor[16..], &[1, 17, 0], "{name}: the use cursor");
+    }
+}
+
+#[test]
+fn each_zone_rock_has_its_actor_and_sunstone_valley_equals_the_captured_packet() {
+    let rows = stone_rows();
+    let table = NpcVisibility::load(&content_dir()).unwrap();
+    // All four rocks, each bound to its own object: a row lost or left unbound fails here.
+    let mut bound: Vec<(i64, i64)> = rows
+        .iter()
+        .filter(|row| !row["terrain_object_id"].is_null())
+        .map(|row| {
+            (
+                row["name_string_id"].as_i64().unwrap(),
+                row["terrain_object_id"].as_i64().unwrap(),
+            )
+        })
+        .collect();
+    bound.sort_unstable();
+    assert_eq!(bound, ZONE_ROCKS);
+    // Each stands within a metre of the rock the zone places (x, z of the chunk's object),
+    // which is where the point of the same name is found by walking (`travel.json`).
+    let placed = [
+        (93509, [-2128.6755, 1044.8934]),
+        (116623, [-1270.0145, 785.1116]),
+        (440369, [501.101, 1779.1543]),
+        (440370, [902.139, 2235.6282]),
+    ];
+    for (name_id, [x, z]) in placed {
+        let row = rows
+            .iter()
+            .find(|row| row["name_string_id"] == name_id)
+            .unwrap();
+        let off = level_distance(spot(row), [x, 0.0, z]);
+        assert!(off < 1.0, "{name_id}: {off:.2} m from its rock");
+    }
+    // Sunstone Valley is the one zone rock the 2014-03 captures hold. Every field of ours
+    // equals the original packet but the actor id (ours follows the stone rows' convention)
+    // and the line under the name (0 there, the template's -1 here; both draw none).
+    let row = rows
+        .iter()
+        .find(|row| row["name_string_id"] == 440370)
+        .unwrap();
+    let sent = stones_in(&view(&table, spot(row)))
+        .into_iter()
+        .map(|(_, npc)| npc)
+        .find(|npc| npc.name_string_id == 440370)
+        .unwrap();
+    let captured = NpcSpawn {
+        actor_id: sent.actor_id,
+        name_string_id: 440370,
+        model_id: STONE_MODEL,
+        chat_bubble_foreground_color: 408679,
+        chat_bubble_background_color: 13951728,
+        chat_bubble_size: 1,
+        scale: 1.0,
+        position: [902.0522, 3.663198, 2235.3176, 1.0],
+        rotation: sent.rotation,
+        animation_id: 1,
+        disposition: 1,
+        unknown_flag_16: 1,
+        terrain_object_id: 1346725607,
+        interact_range: 100,
+        walk_animation_id: -1,
+        run_animation_id: -1,
+        stand_animation_id: -1,
+        sub_text_name_string_id: -1,
+        area_definition_id: -1,
+        is_interactable: 1,
+        movement_type: 2,
+        active_profile: 8,
+        unknown_field_68: 3442,
+        ..NpcSpawn::default()
+    };
+    assert_eq!(sent, captured);
+    for (ours, theirs) in sent
+        .rotation
+        .iter()
+        .zip([-0.351_572_87, 0.0, -0.936_160_5, 0.0])
+    {
+        assert!((ours - theirs).abs() < 1e-6, "facing {:?}", sent.rotation);
     }
 }
 
@@ -151,7 +276,7 @@ fn no_stone_row_waits_for_the_login_stream() {
         .iter()
         .filter(|npc| npc["model_id"] == STONE_MODEL)
         .collect();
-    assert_eq!(login_stones.len(), STONES);
+    assert_eq!(login_stones.len(), LOGIN_STONES);
     for npc in login_stones {
         let at = |index: usize| npc["position"][index].as_f64().unwrap() as f32;
         assert!(

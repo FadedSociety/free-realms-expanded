@@ -681,7 +681,8 @@ fn an_absent_presentation_file_changes_nothing_and_a_bad_row_refuses_the_load() 
 
     for (index, bad) in [
         json!({"name_string_id": 7001, "cursor_id": 200}),
-        json!({"name_string_id": 7001, "notifications": [{"image_id": 0, "name_id": 1}]}),
+        // Image 0 is a row this table may hold (the original's warpstone row); below it is not.
+        json!({"name_string_id": 7001, "notifications": [{"image_id": -1, "name_id": 1}]}),
     ]
     .into_iter()
     .enumerate()

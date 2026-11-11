@@ -258,6 +258,12 @@ struct ExtraNpc {
     /// T555: the minimap and overhead notifications this actor shows (warpstones).
     #[serde(default)]
     notifications: Vec<Notification>,
+    /// AddNpc `terrain_object_id`: the zone's own placed object this actor is (the four
+    /// warpstone rocks that are part of the zone). With `replace_terrain_object` 0 the client
+    /// adopts that object as the actor's body and builds no model (`00968c80`); an id the
+    /// zone does not hold leaves the actor with no body at all.
+    #[serde(default)]
+    terrain_object_id: Option<i32>,
 }
 
 impl ExtraNpc {
@@ -557,6 +563,7 @@ impl NpcVisibility {
             if let Some(sub_text) = npc.sub_text_name_string_id {
                 spawn.sub_text_name_string_id = sub_text;
             }
+            spawn.terrain_object_id = npc.terrain_object_id.unwrap_or(0);
             spawn.position = [
                 npc.position[0],
                 npc.position[1],
