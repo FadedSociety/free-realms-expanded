@@ -5,6 +5,7 @@
       "id": 3150001,
       "job": 32,
       "title_string_id": 22526,
+      "intro_text_string_id": 24981,
       "giver_npc_id": 9000000076,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -84,6 +85,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T257: the client title block carries no description/intro/end-text ids for W1, so those fields stay absent (wire value 0); the offer intro and end screen are the documented lead text gap."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24981 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -1369,6 +1374,7 @@
       "id": 3150016,
       "job": 32,
       "title_string_id": 387606,
+      "intro_text_string_id": 387580,
       "giver_npc_id": 9000000205,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -1455,6 +1461,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T723: enabled on the round-3 spec: job_level profile 32 (Warrior) level 15, then the return Talk to Sir Whittington (a drawn Sanctuary legacy_data row). The client tags the lines Snowhill; the only documented spawn is Sanctuary, so the server follows the drawn row. The answer finds no offer line (387580 and 387594 are turn-away lines), so intro stays 0."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 387580 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -1807,6 +1817,7 @@
     {
       "id": 3150021,
       "title_string_id": 71504,
+      "intro_text_string_id": 71503,
       "giver_npc_id": 9000000085,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -1857,6 +1868,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 71503 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false

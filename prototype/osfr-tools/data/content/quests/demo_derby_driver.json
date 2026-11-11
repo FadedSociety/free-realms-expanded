@@ -4,6 +4,7 @@
     {
       "id": 3060001,
       "title_string_id": 117325,
+      "intro_text_string_id": 117356,
       "giver_npc_id": 9500000731,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -74,6 +75,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 117356 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -168,6 +173,7 @@
     {
       "id": 3060004,
       "title_string_id": 403450,
+      "intro_text_string_id": 393375,
       "giver_npc_id": 9000000295,
       "job": 49,
       "prerequisite_quest_ids": [],
@@ -263,6 +269,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T369: reward 5 coins / 10 profile-49 job XP with no items, following the T202 first-step rung; content bounds and the existing checked-arithmetic reward path still decide a refused grant."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393375 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -270,6 +280,7 @@
     {
       "id": 3060005,
       "title_string_id": 403451,
+      "intro_text_string_id": 6200001,
       "giver_npc_id": 9000000289,
       "job": 49,
       "prerequisite_quest_ids": [
@@ -396,6 +407,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T369: reward 20 coins / 25 profile-49 job XP with no items, the T202 chapter-step rung; content bounds and the existing checked-arithmetic reward path still decide a refused grant."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_license_to_drive_ce11d0) is Global.Text 6200001, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -403,6 +418,7 @@
     {
       "id": 3060006,
       "title_string_id": 403447,
+      "intro_text_string_id": 393372,
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -479,6 +495,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393372 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -1034,6 +1054,7 @@
     {
       "id": 3060012,
       "title_string_id": 403484,
+      "intro_text_string_id": 6200002,
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [
         3060042
@@ -1123,6 +1144,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_thunder_falls_crash_for_coin_881a87) is Global.Text 6200002, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -1131,6 +1156,7 @@
     {
       "id": 3060013,
       "title_string_id": 403448,
+      "intro_text_string_id": 393373,
       "giver_npc_id": 9000000289,
       "job": 49,
       "prerequisite_quest_ids": [
@@ -1230,6 +1256,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T741: end_text_string_id 402845 is the only completion line tied to this quest. It is a journal-style line, not NPC speech, and the 49/13 end-text field (QuestEndPacket::ReadFields 0x00c7b990, bytes 18..22) is the end screen's own line, not spoken dialogue, so the completion line is bound there; before T741 the 49/13 carried 0 and the end screen had no debrief line."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393373 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -2646,6 +2676,7 @@
     {
       "id": 3060031,
       "title_string_id": 403472,
+      "intro_text_string_id": 6200003,
       "giver_npc_id": 9500000467,
       "prerequisite_quest_ids": [
         3060030
@@ -2756,6 +2787,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_incomplete_set_ca2bf5) is Global.Text 6200003, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -2864,6 +2899,7 @@
     {
       "id": 3060033,
       "title_string_id": 403474,
+      "intro_text_string_id": 393399,
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [
         3060032
@@ -2946,6 +2982,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393399 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -3083,6 +3123,7 @@
     {
       "id": 3060035,
       "title_string_id": 403475,
+      "intro_text_string_id": 393400,
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [
         3060033
@@ -3176,6 +3217,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393400 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -3390,6 +3435,7 @@
     {
       "id": 3060038,
       "title_string_id": 403478,
+      "intro_text_string_id": 393403,
       "giver_npc_id": 9000000482,
       "prerequisite_quest_ids": [
         3060036
@@ -3486,6 +3532,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393403 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -3534,6 +3584,7 @@
     {
       "id": 3060040,
       "title_string_id": 403482,
+      "intro_text_string_id": 6200004,
       "giver_npc_id": 9000000111,
       "prerequisite_quest_ids": [
         3060029
@@ -3623,6 +3674,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_tangletrack_trio_40a446) is Global.Text 6200004, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -3632,6 +3687,7 @@
     {
       "id": 3060041,
       "title_string_id": 403480,
+      "intro_text_string_id": 393405,
       "giver_npc_id": 9000000111,
       "prerequisite_quest_ids": [
         3060045
@@ -3742,6 +3798,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393405 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -3950,6 +4010,7 @@
     {
       "id": 3060044,
       "title_string_id": 403485,
+      "intro_text_string_id": 393410,
       "giver_npc_id": 9000000289,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -3996,6 +4057,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393410 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false

@@ -157,7 +157,8 @@ fn every_refusal_changes_nothing() {
     let mut now = 1_000;
     let (derailed, missing) = (delivery_derailed(), gavin_gone_missing());
 
-    // Another job active: neither giver offers, a forged accept adds nothing.
+    // Another job active, Chef never learned (rc-0136: a learned Chef counts in another job and
+    // accepting switches into it): neither giver offers, a forged accept adds nothing.
     let cases = [
         (
             &COBBLESTONE,
@@ -177,7 +178,7 @@ fn every_refusal_changes_nothing() {
             &fixture,
             CHARACTER,
             ADVENTURER,
-            &[ADVENTURER, CHEF],
+            &[ADVENTURER],
             &[(BECOME_A_CHEF, &[1])],
         );
         let at = zone.at(CHARACTER, giver);

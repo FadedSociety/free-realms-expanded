@@ -116,10 +116,9 @@ fn brin_postman_level_twenty_is_offered_walked_and_paid_once() {
 fn the_wrong_job_changes_nothing() {
     let fixture = Fixture::new();
     let mut now = 1_000;
-    for (label, unlocked) in [
-        ("another job", &[ADVENTURER][..]),
-        ("job learned, not active", &[ADVENTURER, POSTMAN][..]),
-    ] {
+    // rc-0136: a learned Postman counts though inactive (accepting switches into it; Brin then
+    // offers his other Postman quests), so the wrong job is one never learned.
+    for (label, unlocked) in [("another job, Postman never learned", &[ADVENTURER][..])] {
         let mut game = zone_player_unlocked(&fixture, CHARACTER, ADVENTURER, unlocked);
         let brin = MAP.at(CHARACTER, BRIN);
         assert_no_offer(&mut game, &brin, BRIN, &mut now, label);

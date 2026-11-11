@@ -82,26 +82,15 @@ impl Gameplay {
             .max_by_key(|&job| (self.job_level(job), std::cmp::Reverse(job)))
     }
 
-    /// The 26/13 job switch, made by an entrance. `false`: the switch was refused (its chat
-    /// line is in `out`), and the caller keeps its own refusal.
+    /// The 26/13 job switch, made by an entrance (`Gameplay::switch_job`). `false`: the switch
+    /// was refused (its chat line is in `out`), and the caller keeps its own refusal.
     fn switch_job_for_entry(
         &mut self,
         job: i32,
         character: &CharacterState,
         out: &mut Outcome,
     ) -> io::Result<bool> {
-        let shown = self.profiles.as_ref().map_or(job, Profiles::shown);
-        let outfit_before = self.profile_attachments(shown)?;
-        let Some(changed) = self.stage_job_selection(job, out)? else {
-            return Ok(false);
-        };
-        // What the 26/13 switch sends after the activation.
-        out.replies.extend(self.ability_activation_for(job)?);
-        self.sync_player_level(out);
-        self.opening_equipment_events(out)?;
-        self.sync_world_stage(out)?;
-        self.announce_profile_outfit(character.guid, &outfit_before, changed, out)?;
-        Ok(true)
+        self.switch_job(job, character.guid, out)
     }
 
     /// Go (41/108) on the open battle start screen; client constructor

@@ -2,7 +2,7 @@
 // its result, with Undo where the API has one: an edit's undo key (add, remove, coins, quests, jobs: POST /undo) or
 // the inverse op (mute/unmute, ban/unban, jail/release, freeze/unfreeze).
 import { api } from './api.js';
-import { ask, toast, fail, dur, num, zoneLabel, questLabel } from './dom.js';
+import { ask, toast, fail, dur, num, plural, zoneLabel, questLabel, jobLabel } from './dom.js';
 import { live, notify } from './live.js';
 
 export const me = { name: '', role: '', permissions: null };
@@ -159,7 +159,24 @@ export async function quest(p, op, quest_id, questName) {
   const label = questName || questLabel(quest_id);
   if ((op === 'reset' || op === 'abandon') && !(await ask({ title: `${op === 'reset' ? 'Reset' : 'Abandon'} ${label}?`,
     body: op === 'reset' ? 'Their progress on it is cleared and it starts again.' : 'It leaves their quest log.', confirm: op === 'reset' ? 'Reset' : 'Abandon', danger: true }))) return null;
-  const out = await attempt(() => api.quests(p.character_id, op, Number(quest_id)), `${{ grant: 'Granted', complete: 'Completed', reset: 'Reset', abandon: 'Abandoned' }[op]} ${label}`,
+  // Complete also finishes the quests before it in its chain; the toast says how many.
+  const done = (r) => {
+    const before = r?.done?.length != null && Array.isArray(p.done) ? p.done.length : null;
+    const earlier = before == null ? 0 : r.done.length - before - 1;
+    return earlier > 0 ? ` and ${plural(earlier, 'earlier quest')}` : '';
+  };
+  const out = await attempt(() => api.quests(p.character_id, op, Number(quest_id)),
+    (r) => `${{ grant: 'Granted (active)', complete: 'Completed', reset: 'Reset', abandon: 'Abandoned' }[op]} ${label}${op === 'complete' ? done(r) : ''}`,
+    (r) => undoEdit({ ...r, character_id: p.character_id }));
+  changed(p.character_id);
+  return out;
+}
+
+// Jobs: `learn` gives one as its trainer does (`active` also switches to it); `activate` switches.
+export async function job(p, op, job_id, active = false) {
+  const label = jobLabel(job_id);
+  const text = op === 'learn' ? `Gave ${name(p)} the ${label} job${active ? ' and made it active' : ''}` : `${name(p)} is now a ${label}`;
+  const out = await attempt(() => api.jobs(p.character_id, job_id, op === 'learn' ? { op, active } : { op }), text,
     (r) => undoEdit({ ...r, character_id: p.character_id }));
   changed(p.character_id);
   return out;

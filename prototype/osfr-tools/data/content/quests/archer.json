@@ -1240,6 +1240,7 @@
       "id": 3010012,
       "job": 35,
       "title_string_id": 77597,
+      "intro_text_string_id": 77617,
       "giver_npc_id": 9000000106,
       "prerequisite_quest_ids": [
         3010011
@@ -1347,6 +1348,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T895: prerequisite is 3010011 (Archer: Pondblaster Payback), the guide's predecessor, now that it is wired (T671 had it follow 3010009 while 3010011 was disabled; 3010011 itself follows 3010009). Job gate 35: an Archer quest paying Archer XP, like 3010006."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 77617 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 77598,
@@ -1669,6 +1674,7 @@
     {
       "id": 3010018,
       "title_string_id": 388258,
+      "intro_text_string_id": 388257,
       "giver_npc_id": 9500000245,
       "prerequisite_quest_ids": [
         3010017
@@ -1721,6 +1727,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 388257 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -1992,6 +2002,7 @@
     {
       "id": 3010023,
       "title_string_id": 78404,
+      "intro_text_string_id": 78403,
       "giver_npc_id": 9000000156,
       "prerequisite_quest_ids": [
         3010022
@@ -2044,6 +2055,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 78403 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -2101,6 +2116,7 @@
     {
       "id": 3010025,
       "title_string_id": 388331,
+      "intro_text_string_id": 388330,
       "giver_npc_id": 9500000245,
       "prerequisite_quest_ids": [
         3010024
@@ -2153,6 +2169,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 388330 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false

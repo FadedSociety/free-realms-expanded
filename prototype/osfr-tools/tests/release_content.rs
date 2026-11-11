@@ -973,6 +973,29 @@ fn the_opening_labels_bind_and_carry_their_locale_rows() {
         let hash = u64::from(osfr_tools::world_text::locale_hash(id as i32));
         assert_eq!(rows.remove(&hash), Some(text), "mail text id {id}");
     }
+    // rc-0136 F1: the quest offers the stock locale has no line for say the wiki's text (R),
+    // each under its quest's intro id (6,200,001 and up).
+    let mut offers = 0;
+    for entry in fs::read_dir(content().join("quests")).unwrap() {
+        let doc = read_json(&entry.unwrap().path());
+        for quest in doc["records"].as_array().into_iter().flatten() {
+            let Some(id) = quest["intro_text_string_id"]
+                .as_i64()
+                .filter(|id| *id >= 6_200_000)
+            else {
+                continue;
+            };
+            let hash = u64::from(osfr_tools::world_text::locale_hash(
+                i32::try_from(id).unwrap(),
+            ));
+            let text = rows
+                .remove(&hash)
+                .unwrap_or_else(|| panic!("quest {} intro {id}", quest["id"]));
+            assert!(!text.trim().is_empty(), "quest {} intro {id}", quest["id"]);
+            offers += 1;
+        }
+    }
+    assert_eq!(offers, 25, "quest offer lines from the wiki");
     let mut used = std::collections::BTreeSet::new();
     for entry in journal["entries"].as_array().unwrap() {
         for (id, text) in [("name_id", "name"), ("description_id", "description")] {

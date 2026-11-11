@@ -171,7 +171,10 @@ fn short_of_the_gate_nothing_completes_or_pays() {
 #[test]
 fn another_job_is_not_offered_the_postman_gate() {
     let fixture = Fixture::new();
-    let mut game = player(&fixture, ADVENTURER);
+    // rc-0136: a learned Postman counts in another job, so this Adventurer never learned it.
+    let mut state = fixture.game(None).state();
+    seed_active_profile(&mut state, ADVENTURER, &[]);
+    let mut game = fixture.game(Some(state));
     let mut now = 1_000;
     assert_no_offer(&mut game, &enve(), ENVE, &mut now, "Enve for an Adventurer");
     let forged = quest_reply(QUEST, true);

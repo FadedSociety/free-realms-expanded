@@ -123,8 +123,13 @@ fn level_ten_gate_is_refused_to_the_wrong_job_and_the_wrong_point_in_the_line() 
     let mut now = 2_000;
     let forged = quest_reply(LEVEL_TEN, true);
 
-    // A Brawler who finished the referral is not offered the Ninja gate.
-    let mut brawler = save_for(&fixture, BRAWLER, 900, &[(STEALTH, 4)]);
+    // A Brawler who finished the referral is not offered the Ninja gate. rc-0136: a learned
+    // Ninja counts in another job, so this Brawler never learned Ninja.
+    let mut state = save_for(&fixture, BRAWLER, 900, &[(STEALTH, 4)]).state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.remove(&NINJA);
+    profiles.experience.remove(&NINJA);
+    let mut brawler = fixture.game(Some(state));
     assert_no_offer(&mut brawler, &ty, TY, &mut now, "Brawler at Ty");
     assert_packet_changes_nothing(&mut brawler, &ty, &forged, now, "a forged 49/2");
     assert_eq!(active_job(&brawler), BRAWLER);

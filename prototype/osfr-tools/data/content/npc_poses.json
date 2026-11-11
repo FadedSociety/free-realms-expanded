@@ -697,6 +697,12 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 9500001077,
+      "name": "Bat",
+      "keep_height": "(R) Going Batty's bat stands in Forgotten Caves under Sanctuary, 5 m ahead of the teleport arrival (travel.json row 63, y -63.66) at that arrival's floor height; the bake has no floor in this cave (the ground grid and the collision both answer the Sanctuary surface above)",
+      "source": "rc-0136 F1 (wiki fr_quest:Going_Batty tip: teleport to Forgotten Caves, the bat is just ahead)"
+    },
+    {
       "guid": 100000001239,
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:38), 4.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",

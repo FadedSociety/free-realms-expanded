@@ -98,9 +98,10 @@ fn end_text_id(packet: &[u8]) -> u32 {
     u32::from_le_bytes(packet[18..22].try_into().unwrap())
 }
 
-/// Every offer in this chapter currently carries intro 0: the T-1 locale slot is
-/// empty and no unambiguous intro line is recovered. That is a documented lead
-/// native-gap check, not an unasserted default.
+/// rc-0136: every offer in this chapter says the quest's own text, not the client's default
+/// "Can you help me?" (intro 0). House Call and Take Your Vitamins carry the offer lines the
+/// quest table matched to the client (24853, 24855); the Exam has no offer line in the client
+/// strings, so its offer says its description (23049, R).
 fn offer_checked(
     game: &mut Gameplay,
     character: &CharacterState,
@@ -109,10 +110,15 @@ fn offer_checked(
     now: u64,
 ) -> Outcome {
     let offered = offer(game, character, target, quest_id, now);
+    let expected = match quest_id {
+        HOUSE_CALL => 24_853,
+        VITAMINS => 24_855,
+        _ => 23_049,
+    };
     assert_eq!(
         offer_intro_text_id(&offered, quest_id),
-        0,
-        "quest {quest_id}: the 49/1 intro is still the documented lead gap"
+        expected,
+        "quest {quest_id}: the 49/1 intro is the quest's own line"
     );
     offered
 }

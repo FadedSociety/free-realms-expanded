@@ -8,7 +8,7 @@
 use super::super::*;
 use crate::character_admin::{
     AdminError, Amount, Change, CharacterView, CoinOp, Edit, EquippedRow, InventoryView, ItemRow,
-    JobRow, JobSet, MountRow, Pick, QuestRow, Removal, item_label,
+    JobRow, JobSet, MountRow, Pick, QuestOp, QuestRow, Removal, item_label,
 };
 use crate::inventory::EquippedItem;
 use crate::quest_engine::{QuestProgress, QuestStatus};
@@ -33,7 +33,13 @@ fn share_equip_changes(replies: &[Vec<u8>], out: &mut Outcome) {
 
 impl Gameplay {
     /// One staff write on this gameplay (a staged clone: the host commits it or drops it).
-    pub fn admin_edit(&mut self, edit: &Edit, now_ms: u64) -> Result<Outcome, AdminError> {
+    /// `guid` is the character's, for the job switch its neighbours see.
+    pub fn admin_edit(
+        &mut self,
+        edit: &Edit,
+        guid: u64,
+        now_ms: u64,
+    ) -> Result<Outcome, AdminError> {
         edit.check()?;
         // (R) A running activity can hold its own copy of the bag or the journal (a fishing
         // round's reward snapshot) and adopt it when it ends, which would drop this edit.
@@ -53,12 +59,28 @@ impl Gameplay {
             Edit::Coins(op, amount) => self.admin_coins(*op, *amount, &mut out)?,
             Edit::Quest(op, quest_id) => {
                 let engine = self.admin_quests()?;
-                let to = engine.admin_target(*quest_id, *op).map_err(refused)?;
-                let from = engine.state().quests.get(quest_id).cloned();
-                self.admin_quest(*quest_id, from, to, &mut out)?;
+                let earlier = match op {
+                    QuestOp::Complete => engine.admin_prerequisite_chain(*quest_id),
+                    _ => Vec::new(),
+                };
+                for id in earlier.into_iter().chain([*quest_id]) {
+                    let engine = self.admin_quests()?;
+                    let to = engine.admin_target(id, *op).map_err(refused)?;
+                    let from = engine.state().quests.get(&id).cloned();
+                    self.admin_quest(id, from, to, &mut out)?;
+                }
+                out.replies
+                    .push(chat::system("A GM changed your quest journal."));
             }
+            Edit::Job(job, JobSet::Learn { active }) => {
+                self.admin_learn(*job, &mut out)?;
+                if *active {
+                    self.admin_activate(*job, guid, &mut out)?;
+                }
+            }
+            Edit::Job(job, JobSet::Activate) => self.admin_activate(*job, guid, &mut out)?,
             Edit::Job(job, set) => self.admin_job(*job, *set, &mut out)?,
-            Edit::Apply(change) => self.admin_apply(change, &mut out)?,
+            Edit::Apply(change) => self.admin_apply(change, guid, &mut out)?,
         }
         out.changed = true;
         Ok(out)
@@ -327,8 +349,46 @@ impl Gameplay {
             .map_err(refused)?;
         self.append_npc_quest_outcome_synced(quest, out)?;
         self.refresh_npc_quest_eligibility(current_unix_seconds());
-        out.replies
-            .push(chat::system("A GM changed your quest journal."));
+        Ok(())
+    }
+
+    /// A job given as a trainer gives it (`teach_job`): unlocked, the starter outfit, the
+    /// client's job row and the quest gates. Staff skip the trainer's own rank rule.
+    fn admin_learn(&mut self, job: i32, out: &mut Outcome) -> Result<(), AdminError> {
+        let profiles =
+            (self.profiles.as_mut()).ok_or_else(|| refused("this character has no jobs"))?;
+        if profiles.is_staff_job(job) {
+            return Err(refused(format!("job {job} is a staff job")));
+        }
+        if !profiles.unlock(job)? {
+            return Err(refused(format!("the character knows job {job} already")));
+        }
+        self.teach_job(job, out)?;
+        out.replies.push(chat::system(
+            "A GM gave you a new job; it is in your job list.",
+        ));
+        Ok(())
+    }
+
+    /// The active job set through the job list's own switch (`switch_job`, the 26/13 path).
+    fn admin_activate(&mut self, job: i32, guid: u64, out: &mut Outcome) -> Result<(), AdminError> {
+        let profiles =
+            (self.profiles.as_ref()).ok_or_else(|| refused("this character has no jobs"))?;
+        if !profiles.state().unlocked.contains(&job) {
+            return Err(refused(format!("job {job} is not learned; give it first")));
+        }
+        if profiles.active() == job {
+            return Err(refused(format!("job {job} is active already")));
+        }
+        let mut switch = Outcome::default();
+        if !self.switch_job(job, guid, &mut switch)? {
+            return Err(refused(format!(
+                "job {job} cannot be worn: its outfit lacks Chest or Legs"
+            )));
+        }
+        out.changed |= switch.changed;
+        out.replies.extend(switch.replies);
+        out.nearby.extend(switch.nearby);
         Ok(())
     }
 
@@ -346,6 +406,7 @@ impl Gameplay {
         let xp = match set {
             JobSet::Level(level) => curve.xp_for(level),
             JobSet::Xp(xp) => xp,
+            JobSet::Learn { .. } | JobSet::Activate => return Err(refused("not an XP edit")),
         };
         if profiles.state().experience.get(&job).copied().unwrap_or(0) == xp {
             return Err(refused(format!("job {job} already has {xp} XP")));
@@ -394,7 +455,23 @@ impl Gameplay {
 
     /// An undo (or any recorded change): every touched part must still be at the change's
     /// before, then moves to its after.
-    fn admin_apply(&mut self, change: &Change, out: &mut Outcome) -> Result<(), AdminError> {
+    fn admin_apply(
+        &mut self,
+        change: &Change,
+        guid: u64,
+        out: &mut Outcome,
+    ) -> Result<(), AdminError> {
+        // The jobs are checked before anything moves: an undo of a learn after another job
+        // was learned or switched to is stale, not a refused switch.
+        let learned = self.profiles.as_ref().map(|p| &p.state().unlocked);
+        if (change.learned.as_ref())
+            .is_some_and(|[from, _]| !learned.is_some_and(|l| l.iter().eq(from)))
+        {
+            return Err(stale("the learned jobs"));
+        }
+        if (change.active_job).is_some_and(|[from, _]| self.active_profile() != Some(from)) {
+            return Err(stale("the active job"));
+        }
         if change.touches_inventory() {
             self.restore_inventory(change, out)?;
         }
@@ -410,6 +487,10 @@ impl Gameplay {
                 out,
             )?;
         }
+        if !change.quests.is_empty() {
+            out.replies
+                .push(chat::system("A GM changed your quest journal."));
+        }
         for job in &change.jobs {
             let have = self
                 .profiles
@@ -421,9 +502,45 @@ impl Gameplay {
             }
             self.set_job_xp(job.job_id, job.after, out)?;
         }
+        // A job learned again comes before a switch into it; one forgotten, after the switch
+        // away from it.
+        let grows = (change.learned.as_ref()).is_some_and(|[from, to]| to.len() > from.len());
+        if grows {
+            self.set_learned(change, out)?;
+        }
+        if let Some([_, to]) = change.active_job {
+            self.admin_activate(to, guid, out)?;
+        }
+        if !grows {
+            self.set_learned(change, out)?;
+        }
         out.replies.push(chat::system(
             "A GM undid an earlier change to your character.",
         ));
+        Ok(())
+    }
+
+    /// The learned jobs moved from the change's before to its after. A job learned again gets
+    /// its client row; a forgotten one stays on the client's list until the next login (R).
+    fn set_learned(&mut self, change: &Change, out: &mut Outcome) -> Result<(), AdminError> {
+        let Some([from, to]) = &change.learned else {
+            return Ok(());
+        };
+        let profiles =
+            (self.profiles.as_ref()).ok_or_else(|| refused("this character has no jobs"))?;
+        if !profiles.state().unlocked.iter().eq(from) {
+            return Err(stale("the learned jobs"));
+        }
+        let mut state = profiles.state().clone();
+        state.unlocked = to.iter().copied().collect();
+        let directory = (self.profile_content_directory.clone())
+            .ok_or_else(|| refused("this character has no job content"))?;
+        self.profiles = Some(Profiles::adopt(&self.profiles, &directory, state)?);
+        for &job in to.iter().filter(|job| !from.contains(job)) {
+            out.replies
+                .push(self.profiles()?.add_packet(job, &self.inventory)?);
+        }
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
         Ok(())
     }
 

@@ -249,12 +249,13 @@ fn cleetus_offers_both_quests_to_the_right_job() {
         QuestStatus::Offered
     );
 
-    // The offers are independent: neither client sees the other quest, and a third
-    // client on another active job is offered neither. The refusal leaves its open
-    // menu usable and the save unchanged.
+    // The offers are independent: neither client sees the other quest (each is offered its
+    // active job's first), and a third client who never learned either job is offered
+    // neither (rc-0136: a learned job counts even when another is active). The refusal leaves
+    // its open menu usable and the save unchanged.
     assert!(!has_quest(&brawler, COPPER_COLLECTION));
     assert!(!has_quest(&miner, FIGHTING_THE_PACK));
-    let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER, MINER, BRAWLER]);
+    let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER]);
     let mut now = 2_000;
     assert_no_offer(
         &mut adventurer,
@@ -371,18 +372,16 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     );
     assert_eq!(saved(&game), finished);
     assert_eq!(coins(&game), finished_coins);
-    // Back on Brawler, the only other live quest is Miner-gated, so a Talk at the giver
-    // has nothing eligible: the completed quest is not offered again.
+    // Back on Brawler, the completed quest is not offered again. The only other live quest is
+    // Miner-gated, and this player knows Miner, so that is the offer (rc-0136: a learned job
+    // counts; accepting switches into it, wiki "Brawler: Restless Rumors").
     let switched = send(&mut game, &character, &select_job(BRAWLER), now + 350);
     assert!(switched.changed, "the job switches back");
     assert_eq!(active_job(&game), BRAWLER);
-    let mut reoffer = now + 400;
-    assert_no_offer(
-        &mut game,
-        &character,
-        CLEETUS,
-        &mut reoffer,
-        "a completed Fighting the Pack",
+    offer(&mut game, &character, CLEETUS, COPPER_COLLECTION, now + 400);
+    assert_eq!(
+        quest_status(&game, FIGHTING_THE_PACK),
+        QuestStatus::Completed
     );
 
     // A sixth live kill after turn-in changes nothing.
@@ -508,8 +507,9 @@ fn wrong_job_wrong_target_and_replay_change_nothing() {
     let fixture = Fixture::new();
     let character = character_at(cleetus_position());
 
-    // A non-Brawler, non-Miner sees no offer; the open menu survives and the save stays.
-    let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER, MINER, BRAWLER]);
+    // A non-Brawler, non-Miner (neither job learned, rc-0136) sees no offer; the open menu
+    // survives and the save stays.
+    let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER]);
     assert_packet_changes_nothing(
         &mut adventurer,
         &character,

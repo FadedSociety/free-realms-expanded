@@ -280,12 +280,16 @@ fn idle_pass_sends_nothing() {
     assert_eq!(game.quest_marker_revision(), revision);
 }
 
-/// The job is part of quest eligibility, so a job switch refreshes it inside its own packet: the
-/// marker pass at the end of that packet sees it, and a later refused request moves nothing.
+/// The active job's level is part of quest eligibility (the player level), so a job switch
+/// refreshes it inside its own packet: the marker pass at the end of that packet sees it, and a
+/// later refused request moves nothing. rc-0136: every learned job counts for job quests, so the
+/// switch moves eligibility through the level, here a rank-3 Brawler from a rank-1 Adventurer.
 #[test]
 fn job_switch_settles_markers_in_its_own_packet() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut state = fixture.game(None).state();
+    state.profiles.as_mut().unwrap().experience.insert(43, 200);
+    let mut game = fixture.game(Some(state));
     let character = at_merigold();
     game.update_npc_visibility(&character).unwrap();
     let before = game.quest_marker_revision();
@@ -424,10 +428,10 @@ fn derby_entry_settles_markers_in_its_own_packet() {
     );
 }
 
-/// Every kart switch settles eligibility where the job changes: the race clears the derby job's
-/// '!' in its own reply, and a refused request after the exit sends no marker and moves nothing.
-/// L936: the exit changes no job (the player stays a Kart Driver, client 101319), so its reply
-/// puts nothing back; the player's next switch (into the derby) shows the '!' in that reply.
+/// Every kart switch settles eligibility where the job changes, and a refused request after the
+/// exit sends no marker and moves nothing. rc-0136: a job quest stays open to a player who knows
+/// the job, active or not (accepting switches into it), so the derby quest's '!' stays through the
+/// race, the exit (L936: the player stays a Kart Driver, client 101319) and the switch back.
 #[test]
 fn kart_race_switches_settle_markers_in_their_own_packets() {
     let (_fixture, mut game, character) = race_fixture(DERBY_PROFILE, KART_GATE);
@@ -442,8 +446,8 @@ fn kart_race_switches_settle_markers_in_their_own_packets() {
         2_000,
     );
     assert!(
-        cleared(&racing.replies).contains(&ROAD_GIVER),
-        "the Kart Driver cannot take the derby quest"
+        !cleared(&racing.replies).contains(&ROAD_GIVER),
+        "a Kart Driver who knows the derby job keeps the derby quest's '!'"
     );
     let back = send(
         &mut game,
@@ -454,7 +458,7 @@ fn kart_race_switches_settle_markers_in_their_own_packets() {
     assert_eq!(game.active_profile(), Some(KART_PROFILE));
     assert!(
         !shown(&back.replies).contains(&(ROAD_GIVER, AVAILABLE)),
-        "the exit keeps the Kart Driver job, so the derby quest stays hidden"
+        "the exit changes nothing on screen: the '!' never went away"
     );
     let driver = at(CRASH, "wilds.json");
     let menu = archer_entry::interact(&mut game, &driver, CRASH, 3_400);
@@ -467,8 +471,8 @@ fn kart_race_switches_settle_markers_in_their_own_packets() {
     );
     assert_eq!(game.active_profile(), Some(DERBY_PROFILE));
     assert!(
-        shown(&derby.replies).contains(&(ROAD_GIVER, AVAILABLE)),
-        "the switch into the derby job shows its quest in the entry reply"
+        !cleared(&derby.replies).contains(&ROAD_GIVER),
+        "the switch into the derby job keeps its quest's '!'"
     );
     send(&mut game, &driver, &[26, 0, 42, 0], 3_600);
     assert!(!game.derby_active());

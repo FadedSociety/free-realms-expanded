@@ -1169,15 +1169,47 @@ impl NpcInteraction {
     /// Candidate for the reconstructed Talk-to-offer policy (R). The client
     /// proves a generic 26/9 option list, not which server choice starts 49/1.
     pub fn offerable_quest_for_talk(&self, npc_id: u64, quests: &QuestEngine) -> Option<u32> {
-        let npc = self.content.npcs.get(&npc_id)?;
+        self.offerable_quest_for_talk_as(npc_id, quests, None)
+    }
+
+    /// As [`Self::offerable_quest_for_talk`], for a player in `active_job`: a giver of several
+    /// jobs' quests offers the active job's first (Cleetus' Brawler and Miner starters), then a
+    /// quest of another learned job, which accepting switches into (R).
+    pub fn offerable_quest_for_talk_as(
+        &self,
+        npc_id: u64,
+        quests: &QuestEngine,
+        active_job: Option<i32>,
+    ) -> Option<u32> {
+        let candidates = self.quest_candidates(npc_id, quests);
+        let offerable = |id: &&u32| quests.can_offer(**id, npc_id);
+        let in_job = |id: &&u32| {
+            active_job.is_none_or(|active| {
+                quests
+                    .required_profile(**id)
+                    .is_none_or(|job| job == active)
+            })
+        };
+        (candidates.iter().filter(in_job).find(offerable))
+            .or_else(|| candidates.iter().find(offerable))
+            .copied()
+    }
+
+    /// The quests a Talk with this giver may offer, in the order it tries them: the NPC row's
+    /// `quest_ids_given`, then the catalogue's quests naming it as giver, each once. Empty for an
+    /// NPC without the quest-giver role.
+    pub fn quest_candidates(&self, npc_id: u64, quests: &QuestEngine) -> Vec<u32> {
+        let Some(npc) = self.content.npcs.get(&npc_id) else {
+            return Vec::new();
+        };
         if !has_role(npc, NpcRole::QuestGiver) {
-            return None;
+            return Vec::new();
         }
         let mut seen = BTreeSet::new();
         let mut ids = npc.quest_ids_given.clone();
         ids.extend(quests.quest_ids_for_giver(npc_id));
-        ids.into_iter()
-            .find(|quest_id| seen.insert(*quest_id) && quests.can_offer(*quest_id, npc_id))
+        ids.retain(|quest_id| seen.insert(*quest_id));
+        ids
     }
 
     /// Reconstructed target association (R): same-zone NPC notes mark a quest title as a target.

@@ -7281,8 +7281,38 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:498; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1736 (ModelId=3848, ModelFileName=batmount_m_basic.adr, NameId=2241)."
         }
       ],
-      "position_w": null,
-      "content_key": 9500001077
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500001077,
+      "legacy_npc_id": null,
+      "content_key": 9500001077,
+      "model_id": 28,
+      "model_file_name": "bat_01.adr",
+      "name": "Bat",
+      "name_string_id": 2241,
+      "position": [
+        -916.586,
+        -63.6597,
+        401.482
+      ],
+      "heading": 2.0661,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3772 (ModelId=28, ModelFileName=bat_01.adr): the world's wild bat model; the Seaside 'Bat' (Id=1736) is the bat mount model (batmount_m_basic.adr) standing beside the Gold-Tipped Dragon (wyvern_m.adr), not a wild bat in the caverns."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 2241 'Bat' names it, as the Seaside spawn's NameId does."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Going Batty (3950200): the wiki's tip (eq2.fanbyte.com/wiki/fr_quest:Going_Batty) is to teleport to Forgotten Caves, where 'the bat will be just ahead of you, at the bottom of the hill'. The bat stands 5 m ahead of that teleport's arrival (travel.json row 63, (-912.19, -63.66, 399.11), heading -1.0755; facing (sin h, cos h)) on the arrival's own floor height, at least 2.5 m from Amoranth, Archmage Petulia and the changeling mages there, facing the player. The caverns' floor is in neither the baked collision nor Studio's probe (both answer the Sanctuary surface above), so the height is the arrival's."
+        }
+      ],
+      "position_w": null
     },
     {
       "spawn_guid": 100000001738,

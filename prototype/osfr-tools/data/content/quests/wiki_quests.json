@@ -312,6 +312,7 @@
     {
       "id": 3950083,
       "title_string_id": 36592,
+      "intro_text_string_id": 36591,
       "giver_npc_id": 9500001385,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -357,6 +358,10 @@
         {
           "kind": "wiki",
           "evidence": "Career Change (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_career_change_90e1e8)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36591 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 36593,
@@ -728,6 +733,7 @@
     {
       "id": 3950162,
       "title_string_id": 92592,
+      "intro_text_string_id": 92591,
       "giver_npc_id": 9500000694,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -773,6 +779,10 @@
         {
           "kind": "wiki",
           "evidence": "First Day Jitters (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_first_day_jitters_6e6631)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 92591 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 92593,
@@ -781,6 +791,7 @@
     {
       "id": 3950164,
       "title_string_id": 94562,
+      "intro_text_string_id": 94570,
       "giver_npc_id": 9500000622,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -826,6 +837,10 @@
         {
           "kind": "wiki",
           "evidence": "Fisher Poem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fisher_poem_d52b65)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 94570 (0.97) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -1835,6 +1850,7 @@
     {
       "id": 3950277,
       "title_string_id": 36507,
+      "intro_text_string_id": 36506,
       "giver_npc_id": 9500001436,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -1891,6 +1907,10 @@
         {
           "kind": "wiki",
           "evidence": "Need Bigger Bags (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_need_bigger_bags_1ded73)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36506 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 36508,
@@ -1899,6 +1919,7 @@
     {
       "id": 3950285,
       "title_string_id": 36830,
+      "intro_text_string_id": 36829,
       "giver_npc_id": 9500000747,
       "prerequisite_quest_ids": [
         3950286
@@ -1946,6 +1967,10 @@
         {
           "kind": "wiki",
           "evidence": "Noise Permit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noise_permit_4b200b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 36829 (0.92) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -2349,6 +2374,7 @@
     {
       "id": 3950358,
       "title_string_id": 15107,
+      "intro_text_string_id": 6200011,
       "giver_npc_id": 9500000531,
       "prerequisite_quest_ids": [
         3950360
@@ -2396,6 +2422,10 @@
         {
           "kind": "wiki",
           "evidence": "Seafoam is Picky (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b) is Global.Text 6200011, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 15108,
@@ -2556,6 +2586,7 @@
     {
       "id": 3950378,
       "title_string_id": 385690,
+      "intro_text_string_id": 385689,
       "giver_npc_id": 9500000502,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -2589,6 +2620,10 @@
         {
           "kind": "wiki",
           "evidence": "Snowhill Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowhill_warp_tests_6b5cc5)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 385689 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 385691,
@@ -2997,6 +3032,7 @@
     {
       "id": 3950414,
       "title_string_id": 16253,
+      "intro_text_string_id": 6200012,
       "giver_npc_id": 9500000177,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -3030,6 +3066,10 @@
         {
           "kind": "wiki",
           "evidence": "The Mighty Mekaletaliki! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b) is Global.Text 6200012, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 16257,
@@ -3080,6 +3120,7 @@
     {
       "id": 3950431,
       "title_string_id": 384769,
+      "intro_text_string_id": 384768,
       "giver_npc_id": 9500000016,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -3126,6 +3167,10 @@
         {
           "kind": "wiki",
           "evidence": "There's Silver in Those Hills (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_there_s_silver_in_those_hills_8ab960)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 384768 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 14,
@@ -3341,6 +3386,7 @@
     {
       "id": 3950438,
       "title_string_id": 17211,
+      "intro_text_string_id": 6200013,
       "giver_npc_id": 9500000118,
       "prerequisite_quest_ids": [
         3950437
@@ -3484,6 +3530,10 @@
         {
           "kind": "wiki",
           "evidence": "Toad Tag - Round 3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f) is Global.Text 6200013, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 115948,
@@ -4011,6 +4061,7 @@
     {
       "id": 3950850,
       "title_string_id": 37070,
+      "intro_text_string_id": 37069,
       "giver_npc_id": 9500001515,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -4069,6 +4120,10 @@
         {
           "kind": "wiki",
           "evidence": "Forgotten Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgotten_food_c114be)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 37069 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 103105,
@@ -4274,6 +4329,7 @@
     {
       "id": 3951126,
       "title_string_id": 16462,
+      "intro_text_string_id": 6200014,
       "giver_npc_id": 9500000096,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -4320,6 +4376,10 @@
         {
           "kind": "wiki",
           "evidence": "Barrels of Fun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda) is Global.Text 6200014, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -4576,6 +4636,7 @@
     {
       "id": 3951175,
       "title_string_id": 430164,
+      "intro_text_string_id": 430163,
       "giver_npc_id": 9500000523,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -4610,6 +4671,10 @@
         {
           "kind": "wiki",
           "evidence": "Coin Clean-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_coin_clean_up_8f77be)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 430163 (0.98) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -4883,6 +4948,7 @@
     {
       "id": 3951322,
       "title_string_id": 91524,
+      "intro_text_string_id": 91523,
       "giver_npc_id": 9500000651,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -4929,6 +4995,10 @@
         {
           "kind": "wiki",
           "evidence": "Missing Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_books_f69d3b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 91523 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 91525,
@@ -4937,6 +5007,7 @@
     {
       "id": 3951362,
       "title_string_id": 37984,
+      "intro_text_string_id": 37983,
       "giver_npc_id": 9500000280,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -4983,6 +5054,10 @@
         {
           "kind": "wiki",
           "evidence": "Picking Up Chicks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_picking_up_chicks_e4a523)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 37984, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -5045,6 +5120,7 @@
     {
       "id": 3951407,
       "title_string_id": 72066,
+      "intro_text_string_id": 72065,
       "giver_npc_id": 9500000111,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -5091,6 +5167,10 @@
         {
           "kind": "wiki",
           "evidence": "She Loves Me... Not (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_she_loves_me_not_2581d5)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 72065 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 72067,
@@ -5336,6 +5416,7 @@
     {
       "id": 3951494,
       "title_string_id": 38440,
+      "intro_text_string_id": 38439,
       "giver_npc_id": 9500000138,
       "prerequisite_quest_ids": [
         3951302
@@ -5407,6 +5488,10 @@
         {
           "kind": "wiki",
           "evidence": "X Marks the... Where is Everyone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_x_marks_the_where_is_everyone_4a4e74)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 38439 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -5705,6 +5790,7 @@
     {
       "id": 3951809,
       "title_string_id": 421001,
+      "intro_text_string_id": 421000,
       "giver_npc_id": 9500000743,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -5766,6 +5852,10 @@
         {
           "kind": "wiki",
           "evidence": "Curious Gift Baskets (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 421000 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 421002,
@@ -5774,6 +5864,7 @@
     {
       "id": 3951987,
       "title_string_id": 428826,
+      "intro_text_string_id": 428825,
       "giver_npc_id": 9000000045,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -5820,6 +5911,10 @@
         {
           "kind": "wiki",
           "evidence": "Popularly Healthy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_popularly_healthy_1cc042)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428825 (0.96) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 428827,
@@ -5961,6 +6056,7 @@
     {
       "id": 3952082,
       "title_string_id": 432195,
+      "intro_text_string_id": 432194,
       "giver_npc_id": 9000000136,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -6028,6 +6124,10 @@
         {
           "kind": "wiki",
           "evidence": "A Dark Future (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dark_future_4c3d3e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 432195, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -6160,6 +6260,7 @@
     {
       "id": 3952407,
       "title_string_id": 71596,
+      "intro_text_string_id": 71595,
       "giver_npc_id": 9500000310,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -6206,6 +6307,10 @@
         {
           "kind": "wiki",
           "evidence": "The Golden Bear of Greenwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_golden_bear_of_greenwood_4a95d2)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 71595 (0.98) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 71597,
@@ -6427,6 +6532,7 @@
     {
       "id": 3952619,
       "title_string_id": 400813,
+      "intro_text_string_id": 400812,
       "giver_npc_id": 9500000586,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -6498,6 +6604,10 @@
         {
           "kind": "wiki",
           "evidence": "Matching Wits (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_matching_wits_fe2285)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 400812 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 120,
@@ -6579,6 +6689,7 @@
     {
       "id": 3952686,
       "title_string_id": 413799,
+      "intro_text_string_id": 413798,
       "giver_npc_id": 9000000224,
       "prerequisite_quest_ids": [
         3040038
@@ -6668,6 +6779,10 @@
         {
           "kind": "wiki",
           "evidence": "Card Duelist: Four Round Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_four_round_challenge_00ca2e)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 413798 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 120,
@@ -6848,6 +6963,7 @@
     {
       "id": 3952926,
       "title_string_id": 3330,
+      "intro_text_string_id": 6200015,
       "giver_npc_id": 9500000490,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -6909,6 +7025,10 @@
         {
           "kind": "wiki",
           "evidence": "Oops! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81) is Global.Text 6200015, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 415276,
@@ -7055,6 +7175,7 @@
     {
       "id": 3953012,
       "title_string_id": 29629,
+      "intro_text_string_id": 29631,
       "giver_npc_id": 9500000848,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -7113,6 +7234,10 @@
         {
           "kind": "wiki",
           "evidence": "A Beautiful Friendship (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_beautiful_friendship_3cdd8f)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [title, description, intro, end] around title 29629, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -7282,6 +7407,7 @@
     {
       "id": 3953055,
       "title_string_id": 384095,
+      "intro_text_string_id": 384094,
       "giver_npc_id": 9500000002,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -7340,6 +7466,10 @@
         {
           "kind": "wiki",
           "evidence": "Blackspore's Most Wanted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blackspore_s_most_wanted_28d196)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 384094 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -7941,6 +8071,7 @@
     {
       "id": 3953116,
       "title_string_id": 415291,
+      "intro_text_string_id": 415290,
       "giver_npc_id": 9500000456,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -8064,6 +8195,10 @@
         {
           "kind": "wiki",
           "evidence": "Double, Double, Toil and Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 415290 (0.95) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 415292,
@@ -8073,6 +8208,7 @@
     {
       "id": 3953125,
       "title_string_id": 19155,
+      "intro_text_string_id": 6200016,
       "giver_npc_id": 9500000280,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -8167,6 +8303,10 @@
         {
           "kind": "wiki",
           "evidence": "Enough For Dinner (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959) is Global.Text 6200016, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -8174,6 +8314,7 @@
     {
       "id": 3953151,
       "title_string_id": 36840,
+      "intro_text_string_id": 36839,
       "giver_npc_id": 9500000781,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -8227,6 +8368,10 @@
         {
           "kind": "wiki",
           "evidence": "Flattery is Everything (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flattery_is_everything_7b54a6)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36839 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -8430,6 +8575,7 @@
     {
       "id": 3953164,
       "title_string_id": 70383,
+      "intro_text_string_id": 70382,
       "giver_npc_id": 9000000005,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -8512,6 +8658,10 @@
         {
           "kind": "wiki",
           "evidence": "Friendly Competition (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_friendly_competition_727cfd)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 70382 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 70384,
@@ -8520,6 +8670,7 @@
     {
       "id": 3953168,
       "title_string_id": 390121,
+      "intro_text_string_id": 390120,
       "giver_npc_id": 9500000278,
       "prerequisite_quest_ids": [
         3953285
@@ -8583,6 +8734,10 @@
         {
           "kind": "wiki",
           "evidence": "Furious Foraging (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_furious_foraging_3472cb)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 390120 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 390122,
@@ -8925,6 +9080,7 @@
     {
       "id": 3953183,
       "title_string_id": 72434,
+      "intro_text_string_id": 72438,
       "giver_npc_id": 9600000007,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -8962,6 +9118,10 @@
         {
           "kind": "wiki",
           "evidence": "Groceries for Terrence (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_groceries_for_terrence_6624dc)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 72438 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 72437,
@@ -8970,6 +9130,7 @@
     {
       "id": 3953188,
       "title_string_id": 102000,
+      "intro_text_string_id": 102006,
       "giver_npc_id": 9500000603,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -9028,6 +9189,10 @@
         {
           "kind": "wiki",
           "evidence": "Having a Ball (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_having_a_ball_9c7721)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 102006 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 102008,
@@ -9160,6 +9325,7 @@
     {
       "id": 3953277,
       "title_string_id": 101468,
+      "intro_text_string_id": 101474,
       "giver_npc_id": 9500000614,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -9213,6 +9379,10 @@
         {
           "kind": "wiki",
           "evidence": "Put a Leash on It! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_put_a_leash_on_it_60c05a)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 101474 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -9414,6 +9584,7 @@
     {
       "id": 3953295,
       "title_string_id": 406432,
+      "intro_text_string_id": 6200017,
       "giver_npc_id": 9500000559,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -9562,6 +9733,10 @@
         {
           "kind": "wiki",
           "evidence": "Sandstorm's Grand Opening (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef) is Global.Text 6200017, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -9787,6 +9962,7 @@
     {
       "id": 3953323,
       "title_string_id": 389648,
+      "intro_text_string_id": 389647,
       "giver_npc_id": 9500000659,
       "prerequisite_quest_ids": [
         3950348
@@ -9953,6 +10129,10 @@
         {
           "kind": "wiki",
           "evidence": "Something to Snack On (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_to_snack_on_465966)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 389648, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -10304,6 +10484,7 @@
     {
       "id": 3953373,
       "title_string_id": 390211,
+      "intro_text_string_id": 390210,
       "giver_npc_id": 9500000278,
       "prerequisite_quest_ids": [
         3953168
@@ -10352,6 +10533,10 @@
         {
           "kind": "wiki",
           "evidence": "Vegetable Medley (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_vegetable_medley_87584d)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 390210 (0.97) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true,
@@ -10686,6 +10871,7 @@
     {
       "id": 3953698,
       "title_string_id": 410462,
+      "intro_text_string_id": 410461,
       "giver_npc_id": 9000000339,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -10786,6 +10972,10 @@
         {
           "kind": "wiki",
           "evidence": "Bayou: Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bayou_catch_of_the_day_4bd84f)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 410461 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 137,
@@ -10971,6 +11161,7 @@
     {
       "id": 3953973,
       "title_string_id": 410288,
+      "intro_text_string_id": 410287,
       "giver_npc_id": 9500000162,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -11058,6 +11249,10 @@
         {
           "kind": "wiki",
           "evidence": "The Roach Coach (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_roach_coach_b4aa3b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 410287 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 137,
@@ -12182,6 +12377,7 @@
     {
       "id": 3954290,
       "title_string_id": 36436,
+      "intro_text_string_id": 36489,
       "giver_npc_id": 9500000142,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -12240,6 +12436,10 @@
         {
           "kind": "wiki",
           "evidence": "Urgent Missive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_urgent_missive_c9db84)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36489 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -12443,6 +12643,7 @@
     {
       "id": 3954475,
       "title_string_id": 3783,
+      "intro_text_string_id": 6200018,
       "giver_npc_id": 9500000690,
       "prerequisite_quest_ids": [
         3954688
@@ -12478,6 +12679,10 @@
         {
           "kind": "wiki",
           "evidence": "A Helping Hand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_helping_hand_f4bb2c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_helping_hand_f4bb2c) is Global.Text 6200018, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -12758,6 +12963,7 @@
     {
       "id": 3954573,
       "title_string_id": 428089,
+      "intro_text_string_id": 428088,
       "giver_npc_id": 9500000495,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -12844,6 +13050,10 @@
         {
           "kind": "wiki",
           "evidence": "Feeding the Crowd (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_crowd_b6c048)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428088 (0.97) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 428090,
@@ -12852,6 +13062,7 @@
     {
       "id": 3954580,
       "title_string_id": 409948,
+      "intro_text_string_id": 409947,
       "giver_npc_id": 9500000347,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -12921,6 +13132,10 @@
         {
           "kind": "wiki",
           "evidence": "Finicky Felines (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finicky_felines_c8dabf)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 409947 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 137,
@@ -13046,6 +13261,7 @@
     {
       "id": 3954585,
       "title_string_id": 41208,
+      "intro_text_string_id": 41207,
       "giver_npc_id": 9500000363,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -13140,6 +13356,10 @@
         {
           "kind": "wiki",
           "evidence": "Flickering Flames (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flickering_flames_9b734f)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 41207 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 41209,
@@ -13498,6 +13718,7 @@
     {
       "id": 3954610,
       "title_string_id": 400043,
+      "intro_text_string_id": 400817,
       "giver_npc_id": 9500000624,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -13578,6 +13799,10 @@
         {
           "kind": "wiki",
           "evidence": "Hidden Treasure (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hidden_treasure_537386)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 400817 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 400819,
@@ -13657,6 +13882,7 @@
     {
       "id": 3954617,
       "title_string_id": 101396,
+      "intro_text_string_id": 6200019,
       "giver_npc_id": 9500000626,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -13705,6 +13931,10 @@
         {
           "kind": "wiki",
           "evidence": "Horrible Hiccups (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_horrible_hiccups_700a03)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_horrible_hiccups_700a03) is Global.Text 6200019, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 389238,
@@ -13713,6 +13943,7 @@
     {
       "id": 3954631,
       "title_string_id": 410104,
+      "intro_text_string_id": 410103,
       "giver_npc_id": 9600000008,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -13793,6 +14024,10 @@
         {
           "kind": "wiki",
           "evidence": "Keeping the Bears at Bay (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keeping_the_bears_at_bay_6b2546)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 410103 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 137,
@@ -13802,6 +14037,7 @@
     {
       "id": 3954642,
       "title_string_id": 20096,
+      "intro_text_string_id": 6200020,
       "giver_npc_id": 9500000268,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -13876,6 +14112,10 @@
         {
           "kind": "wiki",
           "evidence": "Lost Little Sheep (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_little_sheep_95d89e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_little_sheep_95d89e) is Global.Text 6200020, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -13963,6 +14203,7 @@
     {
       "id": 3954657,
       "title_string_id": 72879,
+      "intro_text_string_id": 72878,
       "giver_npc_id": 9500003185,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -14008,6 +14249,10 @@
         {
           "kind": "wiki",
           "evidence": "No, Kitty! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_kitty_f9dc02)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 72878 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -14015,6 +14260,7 @@
     {
       "id": 3954662,
       "title_string_id": 428822,
+      "intro_text_string_id": 428821,
       "giver_npc_id": 9000000045,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -14123,6 +14369,10 @@
         {
           "kind": "wiki",
           "evidence": "Only the Freshest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_only_the_freshest_90c392)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428821 (0.91) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 428823,
@@ -14207,6 +14457,7 @@
     {
       "id": 3954688,
       "title_string_id": 91619,
+      "intro_text_string_id": 91618,
       "giver_npc_id": 9500000709,
       "prerequisite_quest_ids": [
         3950443
@@ -14294,6 +14545,10 @@
         {
           "kind": "wiki",
           "evidence": "Power Source (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_source_313708)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 91619, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 91620,
@@ -14513,6 +14768,7 @@
     {
       "id": 3954730,
       "title_string_id": 16503,
+      "intro_text_string_id": 91654,
       "giver_npc_id": 9500000674,
       "prerequisite_quest_ids": [
         3954475
@@ -14648,6 +14904,10 @@
         {
           "kind": "wiki",
           "evidence": "Strong Soil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_strong_soil_90814e)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 91654 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -14655,6 +14915,7 @@
     {
       "id": 3954740,
       "title_string_id": 429342,
+      "intro_text_string_id": 429341,
       "giver_npc_id": 9500000300,
       "prerequisite_quest_ids": [
         3950333
@@ -14750,6 +15011,10 @@
         {
           "kind": "wiki",
           "evidence": "The Great Scavenger Hunt (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_scavenger_hunt_02164b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 429341 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 429343,
@@ -15054,6 +15319,7 @@
     {
       "id": 3954801,
       "title_string_id": 45905,
+      "intro_text_string_id": 45907,
       "giver_npc_id": 9500003531,
       "prerequisite_quest_ids": [
         3954803
@@ -15114,6 +15380,10 @@
         {
           "kind": "wiki",
           "evidence": "Bean Nice Working with You (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bean_nice_working_with_you_badbde)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 45907 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 45906,
@@ -15270,6 +15540,7 @@
     {
       "id": 3954823,
       "title_string_id": 41793,
+      "intro_text_string_id": 41792,
       "giver_npc_id": 9500000189,
       "prerequisite_quest_ids": [
         3955059
@@ -15329,6 +15600,10 @@
         {
           "kind": "wiki",
           "evidence": "Button Down Mushrooms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_button_down_mushrooms_0a08b6)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 41792 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 41794,
@@ -15337,6 +15612,7 @@
     {
       "id": 3954832,
       "title_string_id": 41744,
+      "intro_text_string_id": 41743,
       "giver_npc_id": 9500000420,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -15383,6 +15659,10 @@
         {
           "kind": "wiki",
           "evidence": "Chores, What a Bore! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chores_what_a_bore_6e3949)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 41744, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -15390,6 +15670,7 @@
     {
       "id": 3954854,
       "title_string_id": 391804,
+      "intro_text_string_id": 391803,
       "giver_npc_id": 9500001005,
       "prerequisite_quest_ids": [
         3954977
@@ -15425,6 +15706,10 @@
         {
           "kind": "wiki",
           "evidence": "Done Deal (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_done_deal_355893)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 391803 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -15488,6 +15773,7 @@
     {
       "id": 3954876,
       "title_string_id": 385478,
+      "intro_text_string_id": 385477,
       "giver_npc_id": 9500000674,
       "prerequisite_quest_ids": [
         3954900
@@ -15523,6 +15809,10 @@
         {
           "kind": "wiki",
           "evidence": "Feel Better Flowers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feel_better_flowers_f19101)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 385478, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 385479,
@@ -16145,6 +16435,7 @@
     {
       "id": 3954982,
       "title_string_id": 386159,
+      "intro_text_string_id": 386158,
       "giver_npc_id": 9500000968,
       "prerequisite_quest_ids": [
         3954882
@@ -16213,6 +16504,10 @@
         {
           "kind": "wiki",
           "evidence": "Root of the Problem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_root_of_the_problem_52a24c)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 386158 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 45,
@@ -19570,6 +19865,7 @@
     {
       "id": 3955745,
       "title_string_id": 36483,
+      "intro_text_string_id": 36485,
       "giver_npc_id": 9500000180,
       "prerequisite_quest_ids": [
         3955821
@@ -19621,6 +19917,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 36485 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 36484,
@@ -19778,6 +20078,7 @@
     {
       "id": 3955781,
       "title_string_id": 72028,
+      "intro_text_string_id": 72027,
       "giver_npc_id": 9500004546,
       "prerequisite_quest_ids": [
         3955819
@@ -19853,6 +20154,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 72027 (1.00) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -19978,6 +20283,7 @@
     {
       "id": 3955806,
       "title_string_id": 91754,
+      "intro_text_string_id": 91753,
       "giver_npc_id": 9500000715,
       "prerequisite_quest_ids": [
         3954534
@@ -20075,6 +20381,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 91753 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 115028,
@@ -20083,6 +20393,7 @@
     {
       "id": 3955818,
       "title_string_id": 70140,
+      "intro_text_string_id": 6200021,
       "giver_npc_id": 9500000981,
       "prerequisite_quest_ids": [
         3955860
@@ -20155,6 +20466,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a) is Global.Text 6200021, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 70534,
@@ -20163,6 +20478,7 @@
     {
       "id": 3955819,
       "title_string_id": 72024,
+      "intro_text_string_id": 72023,
       "giver_npc_id": 9500004546,
       "prerequisite_quest_ids": [
         3955947
@@ -20232,6 +20548,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 72023 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 72025,
@@ -20354,6 +20674,7 @@
     {
       "id": 3955824,
       "title_string_id": 91044,
+      "intro_text_string_id": 91043,
       "giver_npc_id": 9500000012,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -20452,6 +20773,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 91043 (0.93) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 91045,
@@ -20561,6 +20886,7 @@
     {
       "id": 3955834,
       "title_string_id": 75538,
+      "intro_text_string_id": 6200022,
       "giver_npc_id": 9500000616,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -20643,6 +20969,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d) is Global.Text 6200022, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true
@@ -20876,6 +21206,7 @@
     {
       "id": 3955860,
       "title_string_id": 47082,
+      "intro_text_string_id": 6200023,
       "giver_npc_id": 9500000981,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -21090,6 +21421,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024) is Global.Text 6200023, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 47083,
@@ -21492,6 +21827,7 @@
     {
       "id": 3955895,
       "title_string_id": 427046,
+      "intro_text_string_id": 427045,
       "giver_npc_id": 9500000377,
       "prerequisite_quest_ids": [
         3955737
@@ -21625,6 +21961,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 427045 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 427047,
@@ -21756,6 +22096,7 @@
     {
       "id": 3955910,
       "title_string_id": 40520,
+      "intro_text_string_id": 40519,
       "giver_npc_id": 9500000346,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -21856,6 +22197,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 40519 (0.96) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -21994,6 +22339,7 @@
     {
       "id": 3955919,
       "title_string_id": 36927,
+      "intro_text_string_id": 36926,
       "giver_npc_id": 9600000001,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -22107,6 +22453,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 36926 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -22540,6 +22890,7 @@
     {
       "id": 3955941,
       "title_string_id": 72098,
+      "intro_text_string_id": 72097,
       "giver_npc_id": 9500000205,
       "prerequisite_quest_ids": [
         3954036
@@ -22694,6 +23045,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 72097 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 72099,
@@ -23666,6 +24021,7 @@
     {
       "id": 3956071,
       "title_string_id": 38582,
+      "intro_text_string_id": 38581,
       "giver_npc_id": 9000000335,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -23748,6 +24104,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 38581 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 38583,
@@ -25031,6 +25391,7 @@
     {
       "id": 3956165,
       "title_string_id": 71396,
+      "intro_text_string_id": 71395,
       "giver_npc_id": 9500000181,
       "prerequisite_quest_ids": [
         3956011
@@ -25217,6 +25578,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 71395 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 71397,
@@ -25305,6 +25670,7 @@
     {
       "id": 3957007,
       "title_string_id": 428037,
+      "intro_text_string_id": 428033,
       "giver_npc_id": 9500000461,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -25386,6 +25752,10 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 428036: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428033 (0.89) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 428035,
@@ -28526,6 +28896,7 @@
     {
       "id": 3957300,
       "title_string_id": 73006,
+      "intro_text_string_id": 73005,
       "giver_npc_id": 9000000043,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -28584,6 +28955,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 73005 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "job": 43,
@@ -29046,6 +29421,7 @@
     {
       "id": 3957432,
       "title_string_id": 29637,
+      "intro_text_string_id": 29639,
       "giver_npc_id": 9500000848,
       "prerequisite_quest_ids": [
         3957433
@@ -29110,6 +29486,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [title, description, intro, end] around title 29637, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -29117,6 +29497,7 @@
     {
       "id": 3957433,
       "title_string_id": 29633,
+      "intro_text_string_id": 29635,
       "giver_npc_id": 9500000848,
       "prerequisite_quest_ids": [
         3953012
@@ -29173,6 +29554,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [title, description, intro, end] around title 29633, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": true
@@ -29306,6 +29691,7 @@
     {
       "id": 3957507,
       "title_string_id": 390329,
+      "intro_text_string_id": 6200024,
       "giver_npc_id": 9500000544,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -29371,6 +29757,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_honey_18d904) is Global.Text 6200024, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 390489,
@@ -29617,6 +30007,7 @@
     {
       "id": 3957562,
       "title_string_id": 383025,
+      "intro_text_string_id": 383024,
       "giver_npc_id": 9000000505,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -29671,6 +30062,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 383025, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 383026,
@@ -30227,6 +30622,7 @@
     {
       "id": 3957854,
       "title_string_id": 389700,
+      "intro_text_string_id": 6200025,
       "giver_npc_id": 9500000874,
       "prerequisite_quest_ids": [
         3957391
@@ -30366,6 +30762,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4) is Global.Text 6200025, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true

@@ -278,6 +278,7 @@
     {
       "id": 3050005,
       "title_string_id": 4420053,
+      "intro_text_string_id": 4420052,
       "giver_npc_id": 9000000396,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -318,6 +319,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 4420053, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 4420054,

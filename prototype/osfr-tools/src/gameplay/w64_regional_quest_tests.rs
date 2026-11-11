@@ -102,8 +102,9 @@ fn live_quest_offers_require_real_level_and_the_active_job() {
     let mut profile = game.profiles.as_ref().unwrap().state().clone();
     assert!(profile.unlocked.contains(&43));
     assert_ne!(profile.active, 43);
-    profile.experience.insert(43, 200);
-    game.profiles = Some(Profiles::load(&reference(), Some(profile)).unwrap());
+    // rc-0136: the learned Brawler counts though inactive, at its own rank: 1 is below 3.
+    profile.experience.insert(43, 0);
+    game.profiles = Some(Profiles::load(&reference(), Some(profile.clone())).unwrap());
     game.bind_npc_quest_catalogue(&scratch, 1).unwrap();
     assert_eq!(
         game.npc_quests.as_ref().unwrap().state().pending_offer,
@@ -124,6 +125,16 @@ fn live_quest_offers_require_real_level_and_the_active_job() {
             .as_ref()
             .unwrap()
             .can_offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID)
+    );
+    profile.experience.insert(43, 200);
+    game.profiles = Some(Profiles::load(&reference(), Some(profile)).unwrap());
+    game.refresh_npc_quest_eligibility(0);
+    assert!(
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .can_offer(INTRODUCE_YOURSELF_ID, SAMANTHA_ID),
+        "a learned, inactive Brawler at rank 3 is offered the Brawler quest"
     );
     game.profiles
         .as_mut()
@@ -1138,7 +1149,12 @@ fn native_save_samantha_uses_localized_quest_offer_and_reply_state() {
         .find(|(_, profile)| *profile == active)
         .unwrap()
         .0;
-    assert_eq!(eligibility.job_levels.len(), 1);
+    // rc-0136: every learned job counts for a job quest's offer, not only the active one.
+    let profiles = game.profiles.as_ref().unwrap();
+    assert_eq!(
+        eligibility.job_levels.len(),
+        profiles.state().unlocked.len()
+    );
     assert_eq!(
         eligibility.job_levels.get(active_job),
         Some(&eligibility.player_level)

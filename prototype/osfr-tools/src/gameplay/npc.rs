@@ -224,7 +224,7 @@ impl Gameplay {
         if let Some(out) = self.npc_journal_49_15(inner)? {
             return Ok(Some(out));
         }
-        if let Some(out) = self.npc_quest_reply_49_2(inner)? {
+        if let Some(out) = self.npc_quest_reply_49_2(inner, character.guid)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_quest_end_49_14(inner)? {
@@ -557,7 +557,7 @@ impl Gameplay {
         Ok(None)
     }
 
-    fn npc_quest_reply_49_2(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
+    fn npc_quest_reply_49_2(&mut self, inner: &[u8], guid: u64) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[49, 0, 2, 0]) {
             let (quest_id, accept) = npc_interaction::decode_quest_reply_49_2(inner)
                 .map_err(|_| invalid("invalid quest accept/decline reply"))?;
@@ -597,6 +597,7 @@ impl Gameplay {
             // T361: an accept can complete a job-level goal the character already
             // meets. A refused or withdrawn accept starts no quest.
             if accepted {
+                self.switch_to_quest_job(quest_id, guid, &mut out)?;
                 self.sync_job_level_objectives(&mut out)?;
                 self.teach_quest_recipes(&mut out)?;
             }
@@ -686,10 +687,14 @@ impl Gameplay {
             if !self.direct_quests {
                 return Ok(Some(out));
             }
+            let active = self.active_profile();
             let next = self.npc_quests.as_ref().and_then(|engine| {
                 let giver = engine.turnin_npc_id(quest_id)?;
                 let interaction = self.npc_interaction.as_ref()?;
-                Some((giver, interaction.offerable_quest_for_talk(giver, engine)?))
+                Some((
+                    giver,
+                    interaction.offerable_quest_for_talk_as(giver, engine, active)?,
+                ))
             });
             if let Some((giver, next)) = next.filter(|_| completed) {
                 if let Some(engine) = self.npc_quests.as_mut() {
@@ -1666,10 +1671,11 @@ impl Gameplay {
         } else {
             // (R) The client leaves the 26/10-to-quest action unresolved; W67 chooses
             // Talk as the server action that starts the separate 49/1 quest window.
+            let active = self.active_profile();
             let quest_id = self.npc_quests.as_ref().and_then(|engine| {
                 self.npc_interaction
                     .as_ref()?
-                    .offerable_quest_for_talk(key, engine)
+                    .offerable_quest_for_talk_as(key, engine, active)
             });
             // Native runs 200411/201127: the offer window must sit on an
             // open NPC dialog, and the server's 26/4 EndDialog after the
@@ -1745,14 +1751,36 @@ impl Gameplay {
         } else {
             Some("no_eligible_quest")
         };
-        npc_event(select_event_with_reason(
-            runtime_guid,
-            Some(key),
-            option_id,
-            offer_outcome,
-            reason,
-        ));
+        let mut event =
+            select_event_with_reason(runtime_guid, Some(key), option_id, offer_outcome, reason);
+        if reason == Some("no_eligible_quest") {
+            event["quests"] = self.npc_offer_blocks(key);
+        }
+        npc_event(event);
         Ok(())
+    }
+
+    /// rc-0136: each quest this giver could offer and why it does not, for the operator's
+    /// `no_eligible_quest` line (job not learned or too low, level, the prerequisites still
+    /// missing, a live event off, already done ...): `[{"quest_id", "reason", ...}]`.
+    pub fn npc_offer_blocks(&self, npc_id: u64) -> serde_json::Value {
+        let (Some(engine), Some(interaction)) = (&self.npc_quests, &self.npc_interaction) else {
+            return serde_json::Value::Array(Vec::new());
+        };
+        let rows = interaction
+            .quest_candidates(npc_id, engine)
+            .into_iter()
+            .map(|quest_id| {
+                let mut row = (engine.offer_block(quest_id, npc_id)).map_or_else(
+                    || serde_json::json!({"reason": "offerable"}),
+                    |b| serde_json::json!(b),
+                );
+                if let Some(row) = row.as_object_mut() {
+                    row.insert("quest_id".into(), quest_id.into());
+                }
+                row
+            });
+        rows.collect()
     }
 
     /// T543: install the cursor and return its first 26/3. The actor is patched to the
@@ -2040,10 +2068,15 @@ pub(super) fn quest_offer_packet_with(
     // QuestStartHandler supplies its own card icon (454), Show Details and the
     // Accept/Decline buttons, so none are synthesized into this payload.
     let title_id = engine.title_string_id(quest_id).unwrap_or(0);
+    // The speech line: `ShowQuestStartScreen` (0x00a94be0) formats this id as
+    // QuestNpcIntroTextMessage, and 0 leaves the client's default "Can you help me?" (8125).
+    // A quest whose client strings hold no offer line says its own description instead (R).
+    let intro = (engine.intro_text_string_id(quest_id))
+        .or_else(|| engine.description_string_id(quest_id))
+        .unwrap_or(0);
     npc_interaction::encode_quest_offer_49_1(&npc_interaction::QuestOfferPacket49_1 {
         quest_id,
-        intro_text_string_id: intro_override
-            .unwrap_or_else(|| engine.intro_text_string_id(quest_id).unwrap_or(0)),
+        intro_text_string_id: intro_override.unwrap_or(intro),
         // Slot order probe-verified in native run 143124: dword 3 is the card
         // title and dword 4 the description; dwords 2 and 5 are not shown.
         field_2: title_id,

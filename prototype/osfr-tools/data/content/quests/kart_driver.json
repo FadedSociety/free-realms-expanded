@@ -296,6 +296,7 @@
     {
       "id": 3080003,
       "title_string_id": 394241,
+      "intro_text_string_id": 101158,
       "giver_npc_id": 9500000911,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -399,6 +400,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 101158 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 394242,
@@ -1225,6 +1230,7 @@
     {
       "id": 3080012,
       "title_string_id": 3509,
+      "intro_text_string_id": 6200005,
       "giver_npc_id": 9500000872,
       "prerequisite_quest_ids": [
         3080011
@@ -1307,6 +1313,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_wildwood_744691) is Global.Text 6200005, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -1906,6 +1916,7 @@
     {
       "id": 3080018,
       "title_string_id": 3522,
+      "intro_text_string_id": 6200006,
       "giver_npc_id": 9500000868,
       "prerequisite_quest_ids": [
         3080017
@@ -1988,6 +1999,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_icy_perfection_a75713) is Global.Text 6200006, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -2738,6 +2753,7 @@
     {
       "id": 3080026,
       "title_string_id": 3528,
+      "intro_text_string_id": 6200007,
       "giver_npc_id": 9500000164,
       "prerequisite_quest_ids": [
         3080025
@@ -2828,6 +2844,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_settling_the_score_eb0250) is Global.Text 6200007, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -2966,6 +2986,7 @@
     {
       "id": 3080028,
       "title_string_id": 3532,
+      "intro_text_string_id": 6200008,
       "giver_npc_id": 9000000273,
       "prerequisite_quest_ids": [
         3080027
@@ -3052,6 +3073,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_high_speed_chase_899393) is Global.Text 6200008, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 3533,
@@ -3603,6 +3628,7 @@
     {
       "id": 3080035,
       "title_string_id": 3581,
+      "intro_text_string_id": 6200009,
       "giver_npc_id": 9500000086,
       "prerequisite_quest_ids": [
         3080034
@@ -3681,6 +3707,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_burning_up_the_track_e4291b) is Global.Text 6200009, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "enabled": true,
@@ -4052,6 +4082,7 @@
     {
       "id": 3080039,
       "title_string_id": 3583,
+      "intro_text_string_id": 395304,
       "giver_npc_id": 9000000409,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -4102,6 +4133,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395304 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -4287,6 +4322,7 @@
     {
       "id": 3080043,
       "title_string_id": 3598,
+      "intro_text_string_id": 395326,
       "giver_npc_id": 9500000210,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -4333,6 +4369,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395326 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -4521,6 +4561,7 @@
     {
       "id": 3080047,
       "title_string_id": 3580,
+      "intro_text_string_id": 395347,
       "giver_npc_id": 9500000153,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -4567,6 +4608,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395347 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -4574,6 +4619,7 @@
     {
       "id": 3080048,
       "title_string_id": 3599,
+      "intro_text_string_id": 395353,
       "giver_npc_id": 9500000153,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -4628,6 +4674,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395353 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false

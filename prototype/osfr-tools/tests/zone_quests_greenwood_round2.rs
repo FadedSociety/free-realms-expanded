@@ -263,8 +263,9 @@ fn wrong_job_or_point_in_the_line_is_refused_and_changes_nothing() {
             ARCHER_5,
             HILFORN,
             &hilforn,
+            // rc-0136: a learned Archer would be offered it in another job, so not learned.
             "an Adventurer at Hilforn",
-            player(&fixture, ADVENTURER, &[ARCHER], &[(OATH, &[1])]),
+            player(&fixture, ADVENTURER, &[], &[(OATH, &[1])]),
         ),
         (
             ARCHER_5,

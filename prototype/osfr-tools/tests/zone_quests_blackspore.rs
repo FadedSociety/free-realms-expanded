@@ -168,9 +168,15 @@ fn each_gate_is_offered_waits_for_the_rank_and_is_paid_once() {
 
 #[test]
 fn only_the_active_job_is_offered_and_forged_accepts_change_nothing() {
-    for (id, giver, _) in GATES {
+    for (id, giver, job) in GATES {
         let fixture = Fixture::minimal(CHARACTER);
-        let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
+        // rc-0136: a learned job counts though inactive, so this Adventurer has not learned the
+        // gate's job (the opening's save knows Brawler).
+        let mut state = zone_player(&fixture, CHARACTER, ADVENTURER).state();
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.unlocked.remove(&job);
+        profiles.experience.remove(&job);
+        let mut game = fixture.game_as(CHARACTER, Some(state));
         let at_giver = MAP.at(CHARACTER, giver);
         let mut now = 1_000;
         assert_no_offer(&mut game, &at_giver, giver, &mut now, "another job");

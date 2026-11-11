@@ -211,9 +211,21 @@ fn only_a_licensed_derby_driver_is_offered_them_and_refusals_change_nothing() {
     let crash = MAP.at(CHARACTER, CRASH);
     let mut now = 1_000;
 
-    // Another job active: nothing is offered and a forged accept changes nothing.
-    let mut game = player(&fixture, ADVENTURER, TUCKER.before);
-    assert_no_offer(&mut game, &crash, CRASH, &mut now, "derby job not active");
+    // Another job active, the derby job never learned (rc-0136: a learned derby job counts in
+    // another job and accepting switches into it): nothing is offered and a forged accept
+    // changes nothing.
+    let mut state = player(&fixture, ADVENTURER, TUCKER.before).state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.remove(&DERBY_DRIVER);
+    profiles.experience.remove(&DERBY_DRIVER);
+    let mut game = fixture.game_as(CHARACTER, Some(state));
+    assert_no_offer(
+        &mut game,
+        &crash,
+        CRASH,
+        &mut now,
+        "derby job never learned",
+    );
     for case in [&BETTY, &TUCKER] {
         now += 100;
         assert_packet_changes_nothing(

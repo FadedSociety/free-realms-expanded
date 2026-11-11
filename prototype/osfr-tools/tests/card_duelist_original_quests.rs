@@ -17,9 +17,8 @@ mod card_duelist;
 
 use card_duelist::{
     CARD_DUELIST, CHARACTER, DOMINIC, ESTHER, ESTHER_THE_BRAINS, POE, POES_BEST_DECK, SAM, accept,
-    activate_card_duelist, assert_no_offer, at, card_duelist, coins, content_dir, counts,
-    fixture_with, learn_card_duelist, objective_complete, offer, pending_turnin, profile_xp,
-    quest_status, talk,
+    assert_no_offer, at, card_duelist, coins, content_dir, counts, fixture_with,
+    learn_card_duelist, objective_complete, offer, pending_turnin, profile_xp, quest_status, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -149,18 +148,10 @@ fn card_duelist_quests_need_the_job() {
     for npc in [POE, DOMINIC] {
         assert_no_offer(&mut game, &at(npc), npc, &mut now, "no Card Duelist job");
     }
-    // Learned but not the active job: still refused. Activating is the only change needed.
+    // rc-0136: learned but not the active job is offered too, as the original offered a job's
+    // quests to a player who knew the job (accepting switches into it, wiki "Brawler: Restless
+    // Rumors"); learning is the only change needed.
     learn_card_duelist(&mut game, &at(SAM), 2_000);
-    for npc in [POE, DOMINIC] {
-        assert_no_offer(
-            &mut game,
-            &at(npc),
-            npc,
-            &mut now,
-            "Card Duelist not active",
-        );
-    }
-    let mut game = activate_card_duelist(&fixture, &game, CHARACTER);
     assert_eq!(
         offered_reward(&mut game, &at(POE), POE, POES_BEST_DECK),
         (0, 300)

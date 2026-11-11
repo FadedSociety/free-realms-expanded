@@ -219,9 +219,22 @@ fn refusals_change_nothing() {
     for (label, active, xp, done) in [
         ("rank 14", MEDIC, RANK_FIFTEEN_XP - 100, true),
         ("no Achieve Level 5", MEDIC, RANK_TWENTY_XP, false),
-        ("Adventurer active", ADVENTURER, RANK_TWENTY_XP, true),
+        (
+            "Adventurer, Medic never learned",
+            ADVENTURER,
+            RANK_TWENTY_XP,
+            true,
+        ),
     ] {
         let mut game = player(&fixture, active, xp, done);
+        if active != MEDIC {
+            // rc-0136: a learned Medic counts in another job, so this player never learned it.
+            let mut state = game.state();
+            let profiles = state.profiles.as_mut().unwrap();
+            profiles.unlocked.remove(&MEDIC);
+            profiles.experience.remove(&MEDIC);
+            game = fixture.game_as(CHARACTER, Some(state));
+        }
         let callahan = MAP.at(CHARACTER, CALLAHAN);
         assert_no_offer(&mut game, &callahan, CALLAHAN, &mut now, label);
         // A forged accept for a quest never offered adds nothing.

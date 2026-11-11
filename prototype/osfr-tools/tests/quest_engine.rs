@@ -990,7 +990,20 @@ fn a_zero_goal_text_id_is_a_load_error() {
 
 #[test]
 fn split_quest_locale_ids_resolve_to_exported_rows() {
-    let locale_ids = exported_locale_ids();
+    let mut locale_ids = exported_locale_ids();
+    // rc-0136 F1: offer lines the stock locale lacks are rows the launcher adds
+    // (`data/release/locale-additions.json`, keyed by the id's row hash).
+    let additions: Value = serde_json::from_slice(
+        &fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/locale-additions.json"))
+            .unwrap(),
+    )
+    .unwrap();
+    let added: BTreeSet<u64> = (additions["rows"].as_array().unwrap().iter())
+        .filter_map(|row| row["hash"].as_u64())
+        .collect();
+    locale_ids.extend((6_200_001..6_201_000).filter(|id: &u32| {
+        added.contains(&u64::from(osfr_tools::world_text::locale_hash(*id as i32)))
+    }));
     let mut files: Vec<_> = fs::read_dir(split_quest_directory())
         .unwrap()
         .map(|entry| entry.unwrap().path())

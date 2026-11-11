@@ -510,19 +510,16 @@ fn the_snowy_scrimmage_is_offered_only_to_a_soccer_star() {
     assert_refused(&mut player, &quest_reply(SCRIMMAGE, true), "a forged 49/2");
     assert_refused(&mut player, &quest_end_reply(SCRIMMAGE), "a forged 49/14");
 
-    // Soccer Star unlocked but Brawler active: still nothing.
+    // rc-0136: Soccer Star learned but Brawler active is no longer refused by the job gate (a
+    // learned job counts; accepting switches into it). The chapter is played as a Soccer Star.
     player.learn();
     player.send(&select_job(BRAWLER));
     assert_eq!(active_job(&player.game), BRAWLER);
-    let mut now = player.stamp();
-    assert_no_offer(
-        &mut player.game,
-        &player.character,
-        LANDON,
-        &mut now,
-        "Soccer Star unlocked, Brawler active",
+    let blocks = player.game.npc_offer_blocks(LANDON);
+    assert!(
+        (blocks.as_array().unwrap().iter()).all(|row| row["reason"] != "job"),
+        "a learned Soccer Star is not refused by the job gate: {blocks}"
     );
-    player.now = now;
 
     // Active Soccer Star: the Talk dialogue lists the scrimmage and 49/1 carries its text.
     player.send(&select_job(SOCCER_STAR));

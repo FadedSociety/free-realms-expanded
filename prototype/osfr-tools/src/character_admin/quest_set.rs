@@ -35,9 +35,15 @@ impl QuestEngine {
                 if status == Some(&QuestStatus::Completed) {
                     return Err(format!("quest {quest_id} is already done"));
                 }
+                // A disabled quest is kept only as history, with no counters (`validate_state`).
+                let counts = if self.disabled.contains(&quest_id) {
+                    Vec::new()
+                } else {
+                    definition.objectives.iter().map(|o| o.required).collect()
+                };
                 Some(QuestProgress {
                     status: QuestStatus::Completed,
-                    counts: definition.objectives.iter().map(|o| o.required).collect(),
+                    counts,
                 })
             }
             QuestOp::Reset => {
@@ -157,6 +163,32 @@ impl QuestEngine {
             outbound: outbound.into_iter().map(OutboundMessage::Quest).collect(),
             ..QuestOutcome::default()
         })
+    }
+
+    /// The quests a staff Complete of `quest_id` finishes first: every quest its prerequisites
+    /// name, theirs in turn, earliest first, that is not done yet. Only the all-of lists: an
+    /// any-of gate names alternative branches, and finishing one would close the others (R).
+    pub fn admin_prerequisite_chain(&self, quest_id: u32) -> Vec<u32> {
+        fn visit(engine: &QuestEngine, id: u32, seen: &mut BTreeSet<u32>, out: &mut Vec<u32>) {
+            if !seen.insert(id) {
+                return;
+            }
+            let earlier = engine
+                .definitions
+                .get(&id)
+                .map(|d| d.prerequisite_quest_ids.as_slice());
+            for &before in earlier.unwrap_or_default() {
+                visit(engine, before, seen, out);
+            }
+            out.push(id);
+        }
+        let mut chain = Vec::new();
+        visit(self, quest_id, &mut BTreeSet::new(), &mut chain);
+        let done = |id: &u32| {
+            (self.state.quests.get(id)).is_some_and(|p| p.status == QuestStatus::Completed)
+        };
+        chain.retain(|id| *id != quest_id && self.definitions.contains_key(id) && !done(id));
+        chain
     }
 
     /// The quest's authored title, for the staff views.

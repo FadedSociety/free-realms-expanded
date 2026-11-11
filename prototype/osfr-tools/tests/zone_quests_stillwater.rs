@@ -154,14 +154,19 @@ fn the_flier_run_is_offered_walked_and_paid_once() {
 #[test]
 fn only_the_active_derby_driver_is_offered_it_and_forged_packets_change_nothing() {
     let fixture = Fixture::minimal(CHARACTER);
-    let mut game = player(&fixture, CHARACTER, ADVENTURER);
+    // rc-0136: a learned derby job counts though inactive, so this player never learned it.
+    let mut state = player(&fixture, CHARACTER, ADVENTURER).state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.remove(&DERBY_DRIVER);
+    profiles.experience.remove(&DERBY_DRIVER);
+    let mut game = fixture.game_as(CHARACTER, Some(state));
     let mut now = 1_000;
     assert_no_offer(
         &mut game,
         &kanan(CHARACTER),
         KANAN,
         &mut now,
-        "derby job not active",
+        "derby job never learned",
     );
     assert_packet_changes_nothing(
         &mut game,

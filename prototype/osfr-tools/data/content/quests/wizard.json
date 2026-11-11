@@ -1629,6 +1629,7 @@
     {
       "id": 3160020,
       "title_string_id": 22364,
+      "intro_text_string_id": 24871,
       "giver_npc_id": 9000000190,
       "prerequisite_quest_ids": [
         3160019
@@ -1685,6 +1686,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24871 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 22365,
@@ -2060,6 +2065,7 @@
     {
       "id": 3160026,
       "title_string_id": 22309,
+      "intro_text_string_id": 24975,
       "giver_npc_id": 9000000164,
       "prerequisite_quest_ids": [
         3160024
@@ -2228,6 +2234,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24975 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 22310,

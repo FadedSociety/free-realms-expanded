@@ -235,10 +235,12 @@ fn a_miner_is_offered_the_first_ore_quest_at_therin() {
     let mut miner = fixture.game(MINER, &[ADVENTURER, MINER]);
 
     let offered = offer(&mut miner, &character, THERIN, MINER_FIRST, 1_000);
+    // rc-0136: 23216 is empty, so the offer says the quest's description, not the client's
+    // default "Can you help me?" (an intro of 0).
     assert_offer_ids(
         &offer_packet(&offered, MINER_FIRST),
         MINER_FIRST,
-        0,
+        DESCRIPTION,
         TITLE,
         DESCRIPTION,
     );
@@ -254,19 +256,20 @@ fn a_miner_is_offered_the_first_ore_quest_at_therin() {
         "a second Talk while the offer is open",
     );
 
-    // A non-Miner is refused by the job gate: active Adventurer.
-    let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER, MINER]);
+    // A non-Miner (Miner never learned) is refused by the job gate.
+    let mut adventurer = fixture.game(ADVENTURER, &[ADVENTURER]);
     let mut now = 3_000;
     assert_no_offer(
         &mut adventurer,
         &character,
         THERIN,
         &mut now,
-        "an active Adventurer",
+        "an Adventurer who never learned Miner",
     );
 
-    // An unlocked, ranked-but-inactive Miner is still refused: the engine's job levels are
-    // built from the saved active profile only.
+    // rc-0136: an unlocked, ranked-but-inactive Miner is offered too: the engine's job levels
+    // are every learned job's, as the original offered a job's quests to a player who knew it
+    // (accepting switches into the job, wiki "Brawler: Restless Rumors").
     let mut state = Gameplay::load(fixture.path(), None)
         .expect("opening reference loads")
         .state();
@@ -277,14 +280,7 @@ fn a_miner_is_offered_the_first_ore_quest_at_therin() {
         experience: BTreeMap::from([(MINER, 200)]),
     });
     let mut inactive = fixture.game_with_state(state);
-    let mut now = 4_000;
-    assert_no_offer(
-        &mut inactive,
-        &character,
-        THERIN,
-        &mut now,
-        "a Miner who is unlocked and ranked but not active",
-    );
+    offer(&mut inactive, &character, THERIN, MINER_FIRST, 4_000);
 }
 
 #[test]
@@ -593,8 +589,9 @@ fn refusals_and_replay_change_nothing() {
     let mut now = 400;
     assert_no_offer(&mut miner, &trixi, TRIXI, &mut now, "a wrong NPC");
 
-    // A wrong active job cannot be offered the Miner quest.
-    let mut brawler = fixture.game(BRAWLER, &[ADVENTURER, MINER, BRAWLER]);
+    // A Brawler who never learned Miner cannot be offered the Miner quest (rc-0136: a learned
+    // Miner would be, active or not).
+    let mut brawler = fixture.game(BRAWLER, &[ADVENTURER, BRAWLER]);
     let mut now = 500;
     assert_no_offer(&mut brawler, &character, THERIN, &mut now, "a Brawler");
 
@@ -1171,8 +1168,8 @@ fn all_i_got_is_offered_after_the_first_ore() {
     let mut later = now + 300;
     assert_no_offer(&mut locked, &character, THERIN, &mut later, "a non-Miner");
 
-    // An unlocked, ranked Miner who is not the active job is refused too: the engine's job
-    // levels are built from the saved active profile only.
+    // rc-0136: an unlocked, ranked Miner who is not the active job is offered All I Got: the
+    // engine's job levels are every learned job's (accepting switches into it).
     let mut inactive_state = completed.clone();
     {
         let profiles = inactive_state
@@ -1184,14 +1181,7 @@ fn all_i_got_is_offered_after_the_first_ore() {
         profiles.experience.insert(MINER, 200);
     }
     let mut inactive = fixture.game_with_state(inactive_state);
-    let mut later = now + 400;
-    assert_no_offer(
-        &mut inactive,
-        &character,
-        THERIN,
-        &mut later,
-        "an unlocked-but-inactive Miner",
-    );
+    offer(&mut inactive, &character, THERIN, ALL_I_GOT, now + 400);
 }
 
 /// T334: the Talk to Trixi completes the one objective, opens the held 49/13 and the 49/14
@@ -1921,14 +1911,9 @@ fn smitty_then_copper_then_trixi_pays_once() {
         at + 500,
         "a replayed 49/2",
     );
-    let mut later = at + 600;
-    assert_no_offer(
-        &mut game,
-        &at_trixi,
-        TRIXI,
-        &mut later,
-        "Trixi after Rush Order",
-    );
+    // Rush Order is not offered again. rc-0136: this Brawler knows Miner, so Trixi offers the
+    // next Miner quest of her line (a learned job counts; accepting switches into it).
+    offer(&mut game, &at_trixi, TRIXI, 3_100_005, at + 600);
 }
 
 /// T411: an inactive Miner, an out-of-order or wrong NPC, a click 30 m outside the (R) 12 m
@@ -1945,11 +1930,11 @@ fn a_non_miner_wrong_npc_or_forged_request_changes_nothing() {
     let completed = donor.state();
 
     let mut state = completed.clone();
-    state
-        .profiles
-        .as_mut()
-        .expect("the fixture saves profiles")
-        .active = ADVENTURER;
+    let profiles = state.profiles.as_mut().expect("the fixture saves profiles");
+    profiles.active = ADVENTURER;
+    // rc-0136: a learned Miner counts though inactive, so this Adventurer never learned it.
+    profiles.unlocked.remove(&MINER);
+    profiles.experience.remove(&MINER);
     let mut adventurer = fixture.game_with_state(state);
     let mut later = now;
     assert_no_offer(
@@ -1957,7 +1942,7 @@ fn a_non_miner_wrong_npc_or_forged_request_changes_nothing() {
         &at_trixi,
         TRIXI,
         &mut later,
-        "an active Adventurer with Miner unlocked",
+        "an active Adventurer who never learned Miner",
     );
 
     let mut game = fixture.game_with_state(completed);

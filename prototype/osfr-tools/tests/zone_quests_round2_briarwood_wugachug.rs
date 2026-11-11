@@ -27,7 +27,7 @@ mod quest_target_sets;
 
 use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, active_job, assert_no_offer,
-    assert_packet_changes_nothing, coins, content_dir, counts, profile_xp, quest_end_reply,
+    assert_packet_changes_nothing, coins, content_dir, counts, offer, profile_xp, quest_end_reply,
     quest_reply, quest_status, reference_content, saved, seed_active_profile, seed_quest,
 };
 use osfr_tools::{
@@ -228,16 +228,12 @@ fn the_gates_hold_for_rank_and_job() {
                 .contains_key(&case.quest)
         );
 
-        // At the gate with another job active: job-locked, not only level-locked.
+        // rc-0136: at the gate with another job active it is offered too: the gate is the
+        // learned job's rank, not the active job (accepting switches into it).
         let mut other = player(&fixture, CHARACTER, ADVENTURER, case, case.gate());
         assert_ne!(active_job(&other), case.job);
-        assert_no_offer(
-            &mut other,
-            &giver,
-            MAP.actor(case.giver),
-            &mut now,
-            "another job active",
-        );
+        now += 10;
+        offer(&mut other, &giver, MAP.actor(case.giver), case.quest, now);
 
         // The same Talk offers it once the gate is met.
         let mut open = ready(&fixture, CHARACTER, case);

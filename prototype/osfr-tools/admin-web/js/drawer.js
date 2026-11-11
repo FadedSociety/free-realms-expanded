@@ -1,7 +1,7 @@
 // The player drawer: opened from anywhere, it slides in a player's profile with tabs and the GM action buttons.
 import { api } from './api.js';
 import { h, clear, icon, ask, ago, when, stamp, dur, num, pos, plural, initials, empty, badge, fail, field, toMs,
-  roleName, nameOf, zoneLabel, jobLabel, questLabel, accountLabel } from './dom.js';
+  roleName, nameOf, zoneLabel, jobLabel, questLabel, accountLabel, names } from './dom.js';
 import * as act from './actions.js';
 import { itemArt, pickItem } from './picker.js';
 
@@ -109,6 +109,30 @@ const facts = (rows) => h('dl', { class: 'facts' }, rows.filter(Boolean).map(([k
 const chipList = (list, fmt) => (list?.length ? h('div', { class: 'chips' }, list.map((x) => h('span', { class: 'chip' }, fmt(x)))) : h('p', { class: 'muted' }, 'None'));
 const label = (x) => (typeof x === 'string' ? x : x?.name ?? JSON.stringify(x));
 
+// The player's jobs, each switchable, and a form that gives a job the way a trainer does.
+function jobsPanel(p, jobs) {
+  const ok = act.can('jobs');
+  const known = new Set(jobs.map((j) => Number(j.job ?? j.job_id)));
+  const choices = Object.entries(names.jobs).filter(([id]) => !known.has(Number(id)))
+    .sort((a, b) => a[1].localeCompare(b[1]));
+  const pick = h('select', { class: 'input', 'aria-label': 'Job to give' },
+    choices.map(([id, n]) => h('option', { value: id }, `${n} (#${id})`)));
+  const active = h('input', { type: 'checkbox', checked: true, 'aria-label': 'Make it their active job' });
+  const list = jobs.length ? h('ul', { class: 'list' }, jobs.map((j) => {
+    const id = Number(j.job ?? j.job_id);
+    return h('li', { class: 'list-row' },
+      h('div', { class: 'list-main' }, h('strong', {}, jobLabel(id)),
+        h('span', { class: 'muted' }, `#${id}${j.level != null ? ` · level ${j.level}` : ''}`)),
+      h('div', { class: 'list-actions' }, j.active ? badge('Active', 'accent')
+        : h('button', { class: 'btn btn-sm', type: 'button', disabled: !ok, onclick: () => act.job(p, 'activate', id) }, 'Make active')));
+  })) : h('p', { class: 'muted' }, 'None');
+  return [list,
+    h('form', { class: 'row-form', onsubmit: (e) => { e.preventDefault(); if (pick.value) act.job(p, 'learn', Number(pick.value), active.checked); } },
+      pick, h('label', { class: 'check' }, active, 'Make it active'),
+      h('button', { class: 'btn btn-sm btn-primary', type: 'submit', disabled: !ok || !choices.length }, 'Give job')),
+    h('p', { class: 'muted' }, 'Gives the job the way its trainer does: the starter outfit and the job row. Make it active switches them into it, as their job list does.')];
+}
+
 const PANELS = {
   overview(body, p) {
     const pr = cur.profile;
@@ -132,7 +156,7 @@ const PANELS = {
       others.length ? section('Same account', h('div', { class: 'chips' }, others.map(([cid, n]) => h('button', { class: 'chip chip-btn', type: 'button', onclick: () => openPlayer(cid) }, n)))) : null,
       section('Location', facts([['Zone', zoneLabel(pr.location)], ['Position', pos(pr.location?.position) || 'Unknown']]),
         h('button', { class: 'btn btn-sm', type: 'button', onclick: () => act.sendFlow(p), disabled: !act.can('move') }, icon('pin', 16), 'Send to a place')),
-      section('Jobs', chipList(pr.jobs, (j) => `${jobLabel(j.job ?? j.name)}${j.level != null ? ` · level ${j.level}` : ''}${j.active ? ' · active' : ''}`)),
+      section('Jobs', jobsPanel(p, pr.jobs || [])),
       section('Mounts', chipList(pr.mounts, label)),
       section('Pets', chipList(pr.pets, label)));
   },
@@ -206,9 +230,10 @@ const PANELS = {
       info);
   },
 
-  quests(body, p) {
+  quests(body, who) {
     const norm = (x) => (x && typeof x === 'object' ? x : { quest_id: x });
     const q = { active: (cur.profile.quests?.active || []).map(norm), done: (cur.profile.quests?.done || []).map(norm) };
+    const p = { ...who, done: q.done };
     const qid = h('input', { class: 'input', type: 'number', min: 1, inputmode: 'numeric', placeholder: 'Quest id', 'aria-label': 'Quest id' });
     const ok = act.can('quests');
     const row = (x, buttons) => h('li', { class: 'list-row' },
@@ -216,9 +241,14 @@ const PANELS = {
         h('span', { class: 'muted' }, `#${x.quest_id}${x.step ? ` · ${x.step}` : ''}${x.finished ? ` · finished ${ago(x.finished)}` : ''}`)),
       h('div', { class: 'list-actions' }, buttons.map(([l, op, kind]) => h('button', { class: `btn btn-sm ${kind || 'btn-ghost'}`, type: 'button', disabled: !ok,
         onclick: () => act.quest(p, op, x.quest_id, x.name || questLabel(x.quest_id)) }, l))));
+    // Grant and Complete are different edits (rc-0136: a grant left the quest's earlier quests open).
+    const byId = (op) => () => { if (qid.value) act.quest(p, op, qid.value); else qid.focus(); };
     clear(body,
-      section('Grant a quest', h('form', { class: 'row-form', onsubmit: (e) => { e.preventDefault(); if (qid.value) act.quest(p, 'grant', qid.value); } },
-        qid, h('button', { class: 'btn btn-sm btn-primary', type: 'submit', disabled: !ok }, 'Grant'))),
+      section('A quest by id', h('div', { class: 'row-form' }, qid,
+        h('button', { class: 'btn btn-sm', type: 'button', disabled: !ok, onclick: byId('grant') }, 'Grant: start it'),
+        h('button', { class: 'btn btn-sm btn-primary', type: 'button', disabled: !ok, onclick: byId('complete') }, 'Complete: mark it done')),
+        h('p', { class: 'muted' }, 'Grant puts the quest in their journal as active, with its earlier quests left as they are. ',
+          h('strong', {}, 'Complete'), ' marks it done with every quest before it in its chain, so the next quest is offered.')),
       section(`Active (${q.active.length})`, q.active.length ? h('ul', { class: 'list' }, q.active.map((x) => row(x, [['Complete', 'complete', 'btn-accent'], ['Reset', 'reset'], ['Abandon', 'abandon', 'btn-danger-ghost']]))) : h('p', { class: 'muted' }, 'No active quests')),
       section(`Finished (${q.done.length})`, q.done.length ? h('ul', { class: 'list' }, q.done.map((x) => row(x, [['Reset', 'reset']]))) : h('p', { class: 'muted' }, 'None finished yet')));
   },

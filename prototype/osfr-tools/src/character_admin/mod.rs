@@ -199,9 +199,11 @@ pub enum CoinOp {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum QuestOp {
-    /// Active from the start, as if accepted (prerequisites are not asked).
+    /// Active from the start, as if accepted (prerequisites are not asked, and stay open).
     Grant,
-    /// Done without its turn-in reward.
+    /// Done without its turn-in reward, with every earlier quest its prerequisites name, as if
+    /// played through: the next quest of its chain is offered (rc-0136: Smoggo kept offering the
+    /// first quest of a chain whose second one was completed alone).
     Complete,
     /// Forgotten, so it can be offered again.
     Reset,
@@ -214,6 +216,13 @@ pub enum JobSet {
     /// The start of a level (1-20) on the job's own curve.
     Level(u32),
     Xp(u32),
+    /// Learned as a trainer teaches it (starter outfit, the client's job row, quest gates);
+    /// `active` also switches to it.
+    Learn {
+        active: bool,
+    },
+    /// Switched to, as the job list's 26/13 does; the job is learned already.
+    Activate,
 }
 
 /// One staff write. Every one runs on the character's gameplay (`Gameplay::admin_edit`).
@@ -297,6 +306,9 @@ impl Edit {
             Self::Quest(op, id) => format!("quest {op:?} {id}").to_lowercase(),
             Self::Job(job, JobSet::Level(level)) => format!("job {job} level {level}"),
             Self::Job(job, JobSet::Xp(xp)) => format!("job {job} xp {xp}"),
+            Self::Job(job, JobSet::Learn { active: false }) => format!("job {job} learn"),
+            Self::Job(job, JobSet::Learn { active: true }) => format!("job {job} learn, active"),
+            Self::Job(job, JobSet::Activate) => format!("job {job} active"),
             Self::Apply(_) => "undo".to_owned(),
         }
     }
@@ -338,6 +350,12 @@ pub struct Change {
     pub quests: Vec<QuestChange>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub jobs: Vec<JobChange>,
+    /// The learned jobs (profile ids, ascending) before and after.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub learned: Option<[Vec<i32>; 2]>,
+    /// The active job before and after.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_job: Option<[i32; 2]>,
 }
 
 impl Change {
@@ -396,12 +414,25 @@ impl Change {
             })
             .filter(|j| j.before != j.after)
             .collect();
+        let profiles = |state: &GameplayState| {
+            let p = state.profiles.as_ref()?;
+            Some((p.unlocked.iter().copied().collect::<Vec<_>>(), p.active))
+        };
+        let (learned, active_job) = match (profiles(before), profiles(after)) {
+            (Some((ub, ab)), Some((ua, aa))) => (
+                (ub != ua).then_some([ub, ua]),
+                (ab != aa).then_some([ab, aa]),
+            ),
+            _ => (None, None),
+        };
         Self {
             coins: (old.coins != new.coins).then_some([old.coins, new.coins]),
             stacks,
             equipment,
             quests,
             jobs,
+            learned,
+            active_job,
         }
     }
 
@@ -449,6 +480,8 @@ impl Change {
                     after: j.before,
                 })
                 .collect(),
+            learned: self.learned.clone().map(|[b, a]| [a, b]),
+            active_job: self.active_job.map(|[b, a]| [a, b]),
         }
     }
 }

@@ -304,15 +304,26 @@ struct JobBody {
     level: Option<u32>,
     #[serde(default)]
     xp: Option<u32>,
+    /// `learn` gives the job as a trainer does (`active` also switches to it); `activate`
+    /// switches to a job the character knows, as the job list does.
+    #[serde(default)]
+    op: Option<String>,
+    #[serde(default)]
+    active: bool,
 }
 
 pub(super) fn jobs(shared: &Shared, caller: &Caller, request: &Request, id: &str) -> Answer {
     caller.need("jobs")?;
     let guid = character_id(id)?;
     let body: JobBody = parse(request)?;
-    let set = match (body.level, body.xp) {
-        (Some(level), None) => JobSet::Level(level),
-        (None, Some(xp)) => JobSet::Xp(xp),
+    let set = match (body.op.as_deref(), body.level, body.xp) {
+        (Some("learn"), None, None) => JobSet::Learn {
+            active: body.active,
+        },
+        (Some("activate"), None, None) => JobSet::Activate,
+        (Some(_), ..) => return Err(error(400, "op is learn or activate, without a level or xp")),
+        (None, Some(level), None) => JobSet::Level(level),
+        (None, None, Some(xp)) => JobSet::Xp(xp),
         _ => return Err(error(400, "give a level or an xp, not both")),
     };
     edit(

@@ -753,3 +753,140 @@ fn admin_the_map_lists_zone_players_and_the_install_map() {
     assert!(empty["bounds"].is_null());
     assert_eq!(get(&mut rig, "/admin/api/map/x", Some(&mo)).status, 400);
 }
+
+/// rc-0136 F1: the panel gives a job the way a trainer does and switches to it the way the job
+/// list does (the client gets the 38/21 activation), admins only, one `jobs` row with the learned
+/// jobs and the active job before and after, undone by its key. Complete is not Grant: it
+/// finishes the quests before the one named, so the next quest of the chain is offered.
+#[test]
+fn admin_jobs_learn_and_switch_and_complete_finishes_the_chain() {
+    let Some((files, mut rig)) = panel("jobs", SESSION_TTL, None) else {
+        return;
+    };
+    let pip_key = rig.join(PIP).unwrap();
+    let pip = guid(PIP);
+    let (ada, mo) = (sign_in(&mut rig, ADA_HANDLE), sign_in(&mut rig, MO_HANDLE));
+    let base = format!("/admin/api/players/{pip}");
+    let gameplay = |rig: &Rig| {
+        rig.server.sessions[&pip_key]
+            .gateway
+            .gameplay()
+            .unwrap()
+            .state()
+    };
+    let before = gameplay(&rig).profiles.unwrap();
+    // A job with a starter outfit in the rig's opening content that Pip has not learned.
+    let job = [14, 11, 16, 35, 45]
+        .into_iter()
+        .find(|job| !before.unlocked.contains(job))
+        .unwrap();
+    let learn = json!({"job_id": job, "op": "learn", "active": true});
+    assert_eq!(
+        post(&mut rig, &format!("{base}/jobs"), learn.clone(), &mo).status,
+        403
+    );
+    told(&mut rig);
+    let learned = ok(post(&mut rig, &format!("{base}/jobs"), learn.clone(), &ada));
+    let row = |answer: &Value| {
+        (answer["jobs"].as_array().into_iter().flatten())
+            .find(|row| row["job_id"] == job)
+            .cloned()
+    };
+    assert_eq!(
+        row(&learned).map(|row| row["active"].clone()),
+        Some(json!(true)),
+        "{learned}"
+    );
+    let after = gameplay(&rig).profiles.unwrap();
+    assert!(after.unlocked.contains(&job) && after.active == job);
+    let sent = told(&mut rig).remove(&pip_key).unwrap_or_default();
+    assert!(
+        sent.iter()
+            .any(|m| m.windows(4).any(|w| w == [38, 0, 21, 0])),
+        "the switch reached the player's client as the job list's 38/21"
+    );
+    // Refusals change nothing and write no row: known already, a job never learned.
+    assert_eq!(
+        post(&mut rig, &format!("{base}/jobs"), learn, &ada).status,
+        422
+    );
+    let never = json!({"job_id": 137, "op": "activate"});
+    assert_eq!(
+        post(&mut rig, &format!("{base}/jobs"), never, &ada).status,
+        422
+    );
+    let mixed = json!({"job_id": job, "op": "learn", "level": 3});
+    assert_eq!(
+        post(&mut rig, &format!("{base}/jobs"), mixed, &ada).status,
+        400
+    );
+    let jobs = rows_of(&files, "jobs");
+    assert_eq!(jobs.len(), 1, "one row for the applied edit");
+    assert_eq!(jobs[0].before["active_job"], json!(before.active));
+    assert_eq!(jobs[0].after["active_job"], json!(job));
+    assert!(
+        !jobs[0].before["jobs_learned"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(job))
+    );
+    assert!(
+        jobs[0].after["jobs_learned"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(job))
+    );
+    // A second job given without the switch, then switched to through the job list's path; that
+    // switch's undo switches back. (The rig's synthetic Adventurer wears no creation clothes, so
+    // the switch back to it is refused as the client's profile swap would be: 422.)
+    let second = [14, 11, 16, 35, 45]
+        .into_iter()
+        .find(|other| *other != job && !before.unlocked.contains(other))
+        .unwrap();
+    let quiet = json!({"job_id": second, "op": "learn"});
+    ok(post(&mut rig, &format!("{base}/jobs"), quiet, &ada));
+    assert_eq!(
+        gameplay(&rig).profiles.unwrap().active,
+        job,
+        "learn alone does not switch"
+    );
+    let back = json!({"job_id": before.active, "op": "activate"});
+    assert_eq!(
+        post(&mut rig, &format!("{base}/jobs"), back, &ada).status,
+        422
+    );
+    let switch = json!({"job_id": second, "op": "activate"});
+    let switched = ok(post(&mut rig, &format!("{base}/jobs"), switch, &ada));
+    assert_eq!(gameplay(&rig).profiles.unwrap().active, second);
+    let undo = switched["undo"].as_str().unwrap().to_owned();
+    ok(post(
+        &mut rig,
+        "/admin/api/undo",
+        json!({"undo": undo}),
+        &ada,
+    ));
+    assert_eq!(
+        gameplay(&rig).profiles.unwrap().active,
+        job,
+        "the undo switched back"
+    );
+    // The first learn's undo is stale now (a job was learned since): refused, nothing changes.
+    let undo = learned["undo"].as_str().unwrap().to_owned();
+    assert_eq!(
+        post(&mut rig, "/admin/api/undo", json!({"undo": undo}), &ada).status,
+        409
+    );
+    assert_eq!(gameplay(&rig).profiles.unwrap().active, job);
+    // Complete finishes the chain before the quest: Smoggo's Sword, Slash and Smash, then
+    // Fighting is for the Birds! (the bundled catalogue). Grant would leave them open.
+    let complete = json!({"op": "complete", "quest_id": 3_957_750});
+    let done = ok(post(&mut rig, &format!("{base}/quests"), complete, &ada));
+    let ids: Vec<u64> = (done["done"].as_array().into_iter().flatten())
+        .filter_map(|row| row["quest_id"].as_u64())
+        .collect();
+    for quest in [3_955_917, 3_955_914, 3_957_750] {
+        assert!(ids.contains(&quest), "{quest} done: {done}");
+    }
+    let row = &rows_of(&files, "quests")[0];
+    assert_eq!(row.after["quests"]["3955917"], "completed", "{}", row.after);
+}

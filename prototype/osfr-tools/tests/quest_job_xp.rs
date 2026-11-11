@@ -321,13 +321,12 @@ fn chef_trainer_unlock_opens_the_job_gate_and_pays() {
             .contains(&CHEF),
         "the trainer must unlock Chef"
     );
-    // Unlocked is not enough: the gate reads the active job.
-    assert_no_offer(
-        &mut game,
-        &auguste,
-        AUGUSTE,
-        &mut now,
-        "Chef unlocked but inactive",
+    // rc-0136: unlocked is enough; the gate reads every learned job (accepting a Chef quest
+    // would switch into Chef). The line runs in Chef here, switched through the job list.
+    let blocks = game.npc_offer_blocks(AUGUSTE);
+    assert!(
+        (blocks.as_array().unwrap().iter()).all(|row| row["reason"] != "job"),
+        "a learned Chef is not refused by the job gate: {blocks}"
     );
     switch_job(&mut game, &simone, CHEF, now + 1);
 

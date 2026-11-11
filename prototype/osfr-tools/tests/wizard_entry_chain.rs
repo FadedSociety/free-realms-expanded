@@ -110,15 +110,11 @@ fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
         "Brawler at Fizzlesticks",
     );
 
-    // A Wizard the player has unlocked but is not playing is refused by the same job gate.
+    // rc-0136: a Wizard the player has learned but is not playing is offered the chapter too
+    // (a learned job counts; accepting switches into it, wiki "Brawler: Restless Rumors").
     let mut inactive = chapter_game_for(&fixture, CHARACTER, unlocked_wizard_state(&fixture));
-    assert_no_offer(
-        &mut inactive,
-        &character,
-        FIZZLESTICKS,
-        &mut now,
-        "inactive Wizard at Fizzlesticks",
-    );
+    now += 10;
+    offered_card(&mut inactive, &character, FIZZLESTICKS, BOOK, now);
 
     // The active Wizard sees the first chapter, and only the first chapter.
     let mut game = wizard_game(&fixture);

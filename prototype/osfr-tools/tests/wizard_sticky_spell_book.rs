@@ -578,14 +578,18 @@ fn a_non_wizard_or_missing_prerequisite_is_not_offered_and_changes_nothing() {
     let fixture = Fixture::new();
     let character = avatar_at(FIZZLESTICKS);
 
-    // A non-Wizard with both prior chapters complete gets no offer at Fizzlesticks.
-    let (mut game, mut now) = sticky_ready(&fixture, &character);
-    now += 10;
-    assert!(
-        send(&mut game, &character, &select_job(BRAWLER), now).changed,
-        "the active job switch is accepted"
-    );
+    // A non-Wizard (Wizard never learned) with both prior chapters complete gets no offer at
+    // Fizzlesticks. rc-0136: a learned Wizard would be offered it in another job, so the
+    // Wizard is taken off the save's learned jobs.
+    let (game, mut now) = sticky_ready(&fixture, &character);
+    let mut state = game.state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = BRAWLER;
+    profiles.unlocked.remove(&WIZARD);
+    profiles.experience.remove(&WIZARD);
+    let mut game = chapter_game_for(&fixture, CHARACTER, state);
     assert_eq!(active_job(&game), BRAWLER);
+    now += 10;
     assert_no_offer(
         &mut game,
         &character,

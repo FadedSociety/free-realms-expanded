@@ -17,7 +17,7 @@ mod npc_quest_chain;
 
 use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, active_job, assert_no_offer,
-    assert_packet_changes_nothing, coins, content_dir, counts, profile_xp, quest_end_reply,
+    assert_packet_changes_nothing, coins, content_dir, counts, offer, profile_xp, quest_end_reply,
     quest_reply, quest_status, read_json, saved, seed_active_profile,
 };
 use osfr_tools::{
@@ -167,7 +167,8 @@ fn iou_waits_for_the_band_gate_and_the_brawler_job() {
             .contains_key(&IOU)
     );
 
-    // At the gate with another job active: the quest is job-locked, not just level-locked.
+    // rc-0136: at the gate with another job active it is offered too: the gate is the learned
+    // Brawler's rank, not the active job (accepting switches into Brawler).
     let mut state = fixture.game_as(CHARACTER, None).state();
     seed_active_profile(&mut state, ADVENTURER, &[BRAWLER]);
     state
@@ -178,13 +179,8 @@ fn iou_waits_for_the_band_gate_and_the_brawler_job() {
         .insert(BRAWLER, xp_for_rank(min_rank()));
     let mut other_job = fixture.game_as(CHARACTER, Some(state));
     assert_ne!(active_job(&other_job), BRAWLER);
-    assert_no_offer(
-        &mut other_job,
-        &andrew,
-        ANDREW,
-        &mut now,
-        "an Adventurer-active player with a ranked Brawler",
-    );
+    now += 10;
+    offer(&mut other_job, &andrew, ANDREW, IOU, now);
 
     // The same Talk offers it once the gate is met.
     let mut ready = brawler(&fixture, CHARACTER, xp_for_rank(min_rank()));

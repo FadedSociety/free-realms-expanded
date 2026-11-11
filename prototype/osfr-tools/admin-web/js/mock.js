@@ -227,7 +227,8 @@ export function createMock(source) {
       const was = structuredClone(p.quests);
       const drop = (list) => list.filter((x) => x !== qid);
       if (b.op === 'grant') { if (active.includes(qid) || done.includes(qid)) bad(`${p.name} already has quest ${qid}`); active.push(qid); }
-      else if (b.op === 'complete') { if (!active.includes(qid)) bad(`Quest ${qid} is not active`); p.quests = { active: drop(active), done: [qid, ...done] }; }
+      // As the gateway: any quest not done yet completes (the gateway also completes the quests before it).
+      else if (b.op === 'complete') { if (done.includes(qid)) bad(`Quest ${qid} is already done`); p.quests = { active: drop(active), done: [qid, ...done] }; }
       else if (b.op === 'reset') p.quests = { active: [...drop(active), qid], done: drop(done) };
       else if (b.op === 'abandon') { if (!active.includes(qid)) bad(`Quest ${qid} is not active`); p.quests.active = drop(active); }
       else bad('op must be grant, complete, reset or abandon');
@@ -238,7 +239,21 @@ export function createMock(source) {
     },
     jobs({ id }, _, b) {
       const p = player(id);
-      const job = p.jobs.find((j) => j.job === Number(b.job_id)) || bad(`${p.name} has no job ${b.job_id}`);
+      const jobId = Number(b.job_id);
+      if (b.op === 'learn' || b.op === 'activate') {
+        const was = structuredClone(p.jobs);
+        const had = p.jobs.find((j) => j.job === jobId);
+        if (b.op === 'learn') {
+          if (had) bad(`${p.name} knows job ${jobId} already`);
+          if (!JOBS[jobId]) bad(`${jobId} is not a job`);
+          p.jobs.push({ job: jobId, xp: 0, level: 1, active: false });
+        } else if (!had) bad(`job ${jobId} is not learned; give it first`);
+        else if (had.active) bad(`job ${jobId} is active already`);
+        if (b.op === 'activate' || b.active) p.jobs.forEach((j) => { j.active = j.job === jobId; });
+        const undo = undoable(log('jobs', p, { jobs_learned: was.map((j) => j.job) }, { jobs_learned: p.jobs.map((j) => j.job) }), () => { p.jobs = was; });
+        return { jobs: p.jobs, undo };
+      }
+      const job = p.jobs.find((j) => j.job === jobId) || bad(`${p.name} has no job ${b.job_id}`);
       const before = job.xp;
       if (b.level != null) Object.assign(job, { level: intIn(b.level, 1, 20, 'Level'), xp: (intIn(b.level, 1, 20, 'Level') - 1) * 500 });
       else job.xp = intIn(b.xp, 0, 10_000_000, 'XP');

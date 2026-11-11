@@ -416,13 +416,8 @@ impl Gameplay {
             out.replies.push(chat::system(&denied.message()));
             return Ok(out);
         }
-        // The job is not made active; the player picks it in the job list (R).
-        // Inventory quest events are emitted once by the request boundary.
-        self.grant_starter_outfit(trainer.profile, true, &mut out)?;
-        out.replies
-            .push(self.profiles()?.add_packet(trainer.profile, &self.inventory)?);
-        out.changed = true;
-        let message = if self.inventory.has_required_profile_slots(trainer.profile) {
+        let selectable = self.teach_job(trainer.profile, &mut out)?;
+        let message = if selectable {
             format!(
                 "You learned the {} job. Pick it in your job list to switch.",
                 trainer.job
@@ -435,6 +430,43 @@ impl Gameplay {
         };
         out.replies.push(chat::system(&message));
         Ok(out)
+    }
+
+    /// What a trainer sends once its rules let `job` be learned (the job already unlocked): the
+    /// starter outfit, the client's job row and the quest gates, which now count the job. The job
+    /// is not made active; the player picks it in the job list (R). Inventory quest events are
+    /// emitted once by the request boundary. Whether the job's outfit can be worn.
+    pub(super) fn teach_job(&mut self, job: i32, out: &mut Outcome) -> io::Result<bool> {
+        self.grant_starter_outfit(job, true, out)?;
+        out.replies
+            .push(self.profiles()?.add_packet(job, &self.inventory)?);
+        out.changed = true;
+        // rc-0136: Caitlyn and Petal kept their job quests from a player who had just learned
+        // the job, because nothing refreshed the gate after a trainer's unlock.
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
+        Ok(self.inventory.has_required_profile_slots(job))
+    }
+
+    /// The 26/13 job switch, made by the server (an entrance, a job quest's accept, a GM): the
+    /// job list's own path, then what the client's switch sends after the activation. `false`:
+    /// the switch was refused (its chat line is in `out`).
+    pub(super) fn switch_job(
+        &mut self,
+        job: i32,
+        guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<bool> {
+        let shown = self.profiles.as_ref().map_or(job, Profiles::shown);
+        let outfit_before = self.profile_attachments(shown)?;
+        let Some(changed) = self.stage_job_selection(job, out)? else {
+            return Ok(false);
+        };
+        out.replies.extend(self.ability_activation_for(job)?);
+        self.sync_player_level(out);
+        self.opening_equipment_events(out)?;
+        self.sync_world_stage(out)?;
+        self.announce_profile_outfit(guid, &outfit_before, changed, out)?;
+        Ok(true)
     }
 
     /// Developer `realm level <1-20>`: set the active job's saved XP to that level. Moved out of

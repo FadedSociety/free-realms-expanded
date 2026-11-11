@@ -24,6 +24,9 @@ use std::{
 /// G3: the staff quest setter (`character_admin`), kept beside its module.
 #[path = "character_admin/quest_set.rs"]
 mod admin_set;
+#[path = "quest_offer_block.rs"]
+mod offer_block;
+pub use offer_block::OfferBlock;
 
 const MAX_OBJECTIVES: usize = 64;
 // A sanity bound on catalogue and save size, not a game rule: the wiki lists about 1,420 quests (1,337 live),
@@ -281,8 +284,8 @@ fn invalid(message: &'static str) -> io::Error {
 pub struct CharacterEligibility {
     /// Caller supplies the real active job level, never a client claim.
     pub player_level: u8,
-    /// (R) Jobs eligible for offers and their real levels. Supply only the active job
-    /// when enforcing a switch-job requirement; the engine does not infer profiles.
+    /// Jobs eligible for offers and their real levels: every learned job (rc-0136; accepting a
+    /// job quest switches into it). The engine does not infer profiles.
     pub job_levels: BTreeMap<String, u8>,
     pub member: bool,
     pub nonmember_quest_limit: usize,
@@ -2218,51 +2221,8 @@ impl QuestEngine {
     }
 
     fn offer_denial(&self, quest_id: u32, giver_npc_id: u64) -> Option<QuestDenial> {
-        let Some(definition) = self.definitions.get(&quest_id) else {
-            return Some(QuestDenial::Unavailable);
-        };
-        // (R) Incomplete content stays available to editors and saved state,
-        // but cannot be offered, even when `enabled` is accidentally true.
-        // T418: neither is a live event an admin has not opened.
-        if definition.objectives.is_empty()
-            || self.disabled.contains(&quest_id)
-            || self.event_closed(quest_id)
-        {
-            return Some(QuestDenial::Unavailable);
-        }
-        if definition.giver_npc_id != giver_npc_id {
-            return Some(QuestDenial::WrongGiver);
-        }
-        if self
-            .state
-            .pending_offer
-            .is_some_and(|pending| pending != quest_id)
-            || self.state.quests.get(&quest_id).is_some_and(|progress| {
-                matches!(
-                    progress.status,
-                    QuestStatus::Offered | QuestStatus::Active | QuestStatus::Completed
-                )
-            })
-        {
-            return Some(QuestDenial::Unavailable);
-        }
-        if let Some(denial) = self.requirement_denial(definition) {
-            return Some(denial);
-        }
-        let limit = if self.eligibility.member {
-            self.eligibility.member_quest_limit
-        } else {
-            self.eligibility.nonmember_quest_limit
-        };
-        let occupied = self
-            .state
-            .quests
-            .values()
-            .filter(|progress| {
-                matches!(progress.status, QuestStatus::Offered | QuestStatus::Active)
-            })
-            .count();
-        (occupied >= limit).then_some(QuestDenial::Limit)
+        self.offer_block(quest_id, giver_npc_id)
+            .map(|block| block.denial())
     }
 
     /// Accept a matching 49/2 reply after a pending 49/1 offer.
@@ -2777,52 +2737,8 @@ impl QuestEngine {
 
     /// The gates `offer_denial` and `accept` share, after the quest's own status.
     fn requirement_denial(&self, definition: &QuestDefinition) -> Option<QuestDenial> {
-        // T465: an excluded quest that is offered, active or completed closes this
-        // one, checked before the prerequisite (Lxzxrus b84b467: two exclusive
-        // branches behind one prerequisite were both offered). Abandoned reopens (R).
-        if self.exclusions.get(&definition.id).is_some_and(|ids| {
-            ids.iter().any(|id| {
-                self.state.quests.get(id).is_some_and(|progress| {
-                    matches!(
-                        progress.status,
-                        QuestStatus::Offered | QuestStatus::Active | QuestStatus::Completed
-                    )
-                })
-            })
-        }) {
-            return Some(QuestDenial::Unavailable);
-        }
-        if definition.prerequisite_quest_ids.iter().any(|id| {
-            self.state
-                .quests
-                .get(id)
-                .is_none_or(|progress| progress.status != QuestStatus::Completed)
-        }) {
-            return Some(QuestDenial::Prerequisite);
-        }
-        let completed = |id: &u32| {
-            (self.state.quests.get(id)).is_some_and(|p| p.status == QuestStatus::Completed)
-        };
-        if (self.any_prerequisites.get(&definition.id)).is_some_and(|ids| !ids.iter().any(completed))
-        {
-            return Some(QuestDenial::Prerequisite);
-        }
-        if definition
-            .requirements
-            .player_level
-            .is_some_and(|level| self.eligibility.player_level < level)
-        {
-            return Some(QuestDenial::Level);
-        }
-        if let Some((job, level)) = &definition.requirements.job {
-            if self.eligibility.job_levels.get(job).copied().unwrap_or(0) < *level {
-                return Some(QuestDenial::Job);
-            }
-        }
-        if definition.requirements.members_only && !self.eligibility.member {
-            return Some(QuestDenial::Membership);
-        }
-        None
+        self.requirement_block(definition)
+            .map(|block| block.denial())
     }
 }
 

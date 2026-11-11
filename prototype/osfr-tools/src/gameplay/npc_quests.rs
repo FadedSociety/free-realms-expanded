@@ -120,10 +120,11 @@ impl Gameplay {
             .flat_map(|engine| engine.job_profile_ids())
             .filter_map(|(job_id, profile_id)| {
                 let state = profile_state?;
-                if profile_id <= 0
-                    || profile_id != state.active
-                    || !state.unlocked.contains(&profile_id)
-                {
+                // Every learned job counts, not only the active one: the original offered a job's
+                // quests to a player who knew the job and switched them into it on accept (wiki
+                // "Brawler: Restless Rumors", "Brawler: Hewey's Escape!", "Chef: Auguste's Rush
+                // Orders"; `switch_to_quest_job`).
+                if profile_id <= 0 || !state.unlocked.contains(&profile_id) {
                     return None;
                 }
                 // L926: the job's own rank curve (Profiles::rank), as every other level read.
@@ -144,6 +145,31 @@ impl Gameplay {
             member_quest_limit: limits
                 .member
                 .map_or(100, |limit| usize::try_from(limit).unwrap_or(usize::MAX)),
+        }
+    }
+
+    /// A job quest accepted in another job switches the player into the quest's job, as the
+    /// original did (wiki "Brawler: Restless Rumors": "Accepting this quest will automatically
+    /// change you into the Brawler job, if you're not in it already"), through the job list's own
+    /// 26/13 path. A job whose outfit cannot dress stays unswitched (its chat line says why) and
+    /// the quest stays accepted (R); an unlearned job (a developer offer) is left alone.
+    pub(super) fn switch_to_quest_job(
+        &mut self,
+        quest_id: u32,
+        guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let job = self
+            .npc_quests
+            .as_ref()
+            .and_then(|e| e.required_profile(quest_id));
+        let learned =
+            |job| (self.profiles.as_ref()).is_some_and(|p| p.state().unlocked.contains(&job));
+        match job {
+            Some(job) if self.active_profile() != Some(job) && learned(job) => {
+                self.switch_job(job, guid, out).map(drop)
+            }
+            _ => Ok(()),
         }
     }
 

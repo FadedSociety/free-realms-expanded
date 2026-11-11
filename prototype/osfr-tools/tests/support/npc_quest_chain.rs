@@ -1040,13 +1040,18 @@ impl ZoneQuests {
             .find(|packet| has_family(packet, 49, 1, Some(quest.id)))
             .and_then(|packet| decode_quest_offer_49_1(packet).ok())
             .expect("the 49/1 card decodes");
+        // rc-0136: an offer with no intro id says its description (`quest_offer_packet_with`, R).
+        let mut expected = quest.card;
+        if expected[1] == 0 {
+            expected[1] = expected[2];
+        }
         assert_eq!(
             [
                 card.name_string_id,
                 card.intro_text_string_id,
                 card.description_string_id
             ],
-            quest.card,
+            expected,
             "quest {}: 49/1 title, intro and description",
             quest.id
         );

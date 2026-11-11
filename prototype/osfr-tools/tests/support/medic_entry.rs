@@ -271,9 +271,10 @@ pub fn assert_enabled_medic_chapter_records() {
         Some(u64::from(VITAMIN_XP))
     );
 
-    // End-screen locale ids: the two completion lines are recovered client text.
-    // The intro slots and the Take Your Vitamins end text stay 0; that is the
-    // documented lead native-gap, asserted here and in the packet-level helpers.
+    // End-screen locale ids: the two completion lines are recovered client text. The Take
+    // Your Vitamins end text stays 0. rc-0136: House Call and Take Your Vitamins carry the
+    // offer lines the quest table matched to the client; the Exam has none (its offer says its
+    // description, `quest_offer_packet_with`).
     assert_eq!(
         exam["end_text_string_id"].as_u64(),
         Some(u64::from(EXAM_END_TEXT))
@@ -283,9 +284,9 @@ pub fn assert_enabled_medic_chapter_records() {
         Some(u64::from(HOUSE_END_TEXT))
     );
     assert!(vitamins.get("end_text_string_id").is_none());
-    for record in [exam, house, vitamins] {
-        assert!(record.get("intro_text_string_id").is_none());
-    }
+    assert!(exam.get("intro_text_string_id").is_none());
+    assert_eq!(house["intro_text_string_id"].as_u64(), Some(24_853));
+    assert_eq!(vitamins["intro_text_string_id"].as_u64(), Some(24_855));
 
     // T278: the pick-up trip is a server-side position check at Sunflower's row,
     // followed by the recovered hand-off to Nurse Naia. No gather/collect goal is

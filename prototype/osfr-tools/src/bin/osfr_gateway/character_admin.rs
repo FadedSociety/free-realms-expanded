@@ -207,7 +207,7 @@ pub(crate) fn edit(
     let mut change = Change::default();
     let mut staging = |game: &mut Gameplay| -> Result<Outcome, AdminError> {
         let before = game.state();
-        let out = game.admin_edit(&edit, now_ms)?;
+        let out = game.admin_edit(&edit, target, now_ms)?;
         change = Change::between(&before, &game.state());
         if change.is_empty() {
             return Err(AdminError::Refused("that changes nothing".into()));
@@ -438,6 +438,16 @@ pub(crate) fn audit_row(
                 .collect::<serde_json::Map<String, serde_json::Value>>()
         };
         side("job_xp", jobs(true).into(), jobs(false).into());
+    }
+    if let Some([old, new]) = &change.learned {
+        side(
+            "jobs_learned",
+            serde_json::json!(old),
+            serde_json::json!(new),
+        );
+    }
+    if let Some([old, new]) = change.active_job {
+        side("active_job", old.into(), new.into());
     }
     after.insert("summary".into(), receipt.record.summary.clone().into());
     after.insert("online".into(), receipt.online.into());

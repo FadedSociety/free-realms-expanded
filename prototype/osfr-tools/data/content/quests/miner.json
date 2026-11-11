@@ -1826,6 +1826,7 @@
       "id": 3100019,
       "job": 14,
       "title_string_id": 387459,
+      "intro_text_string_id": 140703,
       "giver_npc_id": 9000000337,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -1900,6 +1901,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 140703 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 387460,
@@ -2236,6 +2241,7 @@
       "id": 3100023,
       "job": 14,
       "title_string_id": 387467,
+      "intro_text_string_id": 140705,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -2306,6 +2312,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T660: enabled from the lab quest-lines answer quest-lines/quests.json q3100023; the answer rates it live \"unsure\" and lab/references/quest-lines/flags.tsv flags neither its title 387467 nor its goal 387526, so the whole record is (R); the guide predecessor Miner: Smelting Secrets (disabled) is not stored as a prerequisite; the hand-in is the giver, Silverray (a drawn legacy_data row)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 140705 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 387468,
@@ -2417,6 +2427,7 @@
     {
       "id": 3100025,
       "title_string_id": 23656,
+      "intro_text_string_id": 24996,
       "giver_npc_id": 9000000169,
       "prerequisite_quest_ids": [
         3100024
@@ -2520,6 +2531,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24996 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 23657,

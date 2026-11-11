@@ -1444,7 +1444,14 @@ fn sabastian_offers_given_to_guard_after_honor_lost() {
 
     // A non-Brawler is not offered the Brawler hand-off. The captured opening inventory has no
     // Adventurer outfit, so the active profile is seeded in the save instead of a 26/13 switch.
-    let mut adventurer_game = with_active_job(&game, CHARACTER, ADVENTURER);
+    // rc-0136: a learned Brawler counts even when another job is active (accepting switches
+    // into it), so this player has not learned Brawler at all.
+    let mut state = game.state();
+    seed_active_profile(&mut state, ADVENTURER, &[]);
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.remove(&BRAWLER);
+    profiles.experience.remove(&BRAWLER);
+    let mut adventurer_game = load_game_for(CHARACTER, Some(state));
     assert_eq!(active_job(&adventurer_game), ADVENTURER);
     let before_adventurer = saved(&adventurer_game);
     now += 100;

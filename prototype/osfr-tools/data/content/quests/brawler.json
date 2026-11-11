@@ -3163,6 +3163,7 @@
     {
       "id": 3030036,
       "title_string_id": 388511,
+      "intro_text_string_id": 388510,
       "giver_npc_id": 9500000785,
       "prerequisite_quest_ids": [
         3030035
@@ -3215,6 +3216,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 388510 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false

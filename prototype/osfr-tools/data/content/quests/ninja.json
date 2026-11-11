@@ -1065,6 +1065,7 @@
       "id": 3110013,
       "job": 2,
       "title_string_id": 387205,
+      "intro_text_string_id": 6200010,
       "giver_npc_id": 9000000223,
       "prerequisite_quest_ids": [
         3110004
@@ -1141,6 +1142,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T662: enabled from quest-lines/quests.json q3110013 (live: yes, unflagged client strings); end text 387207 is the answer's completion line. The offer line was not located, so intro_text_string_id stays unset."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_achieve_level_10_e93190) is Global.Text 6200010, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
         }
       ],
       "description_string_id": 387206,
@@ -1414,6 +1419,7 @@
     {
       "id": 3110018,
       "title_string_id": 387209,
+      "intro_text_string_id": 93741,
       "giver_npc_id": 9500000766,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -1454,6 +1460,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 93741 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 387210,
@@ -1529,6 +1539,7 @@
     {
       "id": 3110020,
       "title_string_id": 78928,
+      "intro_text_string_id": 90222,
       "giver_npc_id": 9500000766,
       "prerequisite_quest_ids": [
         3110018
@@ -1581,6 +1592,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 90222 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -1839,6 +1854,7 @@
       "id": 3110024,
       "job": 2,
       "title_string_id": 387213,
+      "intro_text_string_id": 93743,
       "giver_npc_id": 9000000151,
       "prerequisite_quest_ids": [
         3110023
@@ -1935,6 +1951,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T665: job gate 2 (Ninja) so a non-Ninja is never offered a goal only a Ninja rank can finish. live 'unsure' in lab/references/quest-lines/quests.json q3110024 (no flagged line in lab/references/quest-lines/flags.tsv). Prerequisite 3110023 (Ice Troll Rampage) is the guide's order (Ninja.md F5 then F6); the answer calls it an order-only link, so it is a reconstructed gate (R)."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 93743 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 387214,

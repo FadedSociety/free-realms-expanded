@@ -93,6 +93,7 @@
     {
       "id": 3090002,
       "title_string_id": 10164,
+      "intro_text_string_id": 24852,
       "giver_npc_id": 9000000161,
       "prerequisite_quest_ids": [
         3090001
@@ -145,6 +146,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24852 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -153,6 +158,7 @@
       "id": 3090003,
       "job": 11,
       "title_string_id": 22989,
+      "intro_text_string_id": 24853,
       "giver_npc_id": 9000000161,
       "prerequisite_quest_ids": [
         3090001
@@ -271,6 +277,10 @@
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 3; the completion line 'By helping out with Doctor Gordon's workload, [player] found out why Greyli has been avoiding the hosptal.' is client locale hash 1171210927 = Global.Text 24266. end_text_string_id is that recovered completion line; the offer intro stays 0 because the title block's T-1 slot 22988 is empty and no unambiguous intro line is recovered."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24853 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 22990,
@@ -432,6 +442,7 @@
       "id": 3090005,
       "job": 11,
       "title_string_id": 23019,
+      "intro_text_string_id": 24855,
       "giver_npc_id": 9000000073,
       "prerequisite_quest_ids": [
         3090003
@@ -554,6 +565,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T197: the known Amateur Medic Scalpel reward is omitted because its exact item definition is not proven in the shipped catalogue; no invented item is granted."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24855 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 23020,
@@ -1061,6 +1076,7 @@
     {
       "id": 3090013,
       "title_string_id": 387532,
+      "intro_text_string_id": 387531,
       "giver_npc_id": 9000000052,
       "prerequisite_quest_ids": [],
       "objectives": [],
@@ -1097,6 +1113,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 387531 (0.99) (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -2288,6 +2308,7 @@
     {
       "id": 3090033,
       "title_string_id": 72972,
+      "intro_text_string_id": 76264,
       "giver_npc_id": 9000000072,
       "prerequisite_quest_ids": [
         3090032
@@ -2326,6 +2347,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 76264 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "enabled": false
@@ -2333,6 +2358,7 @@
     {
       "id": 3090034,
       "title_string_id": 412422,
+      "intro_text_string_id": 442228,
       "giver_npc_id": 9000000161,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -2378,6 +2404,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1962); the giver is the trainer Nurse Naia (9000000161), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "client",
+          "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 442228 (lab/reports/locale-id-to-text.json)."
         }
       ],
       "description_string_id": 412423,

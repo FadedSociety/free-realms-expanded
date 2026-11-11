@@ -233,17 +233,18 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
 #[test]
 fn only_the_active_miner_is_offered_the_gates() {
     let fixture = Fixture::new();
-    // Miner is learned but Adventurer is the active job, so the refusal below comes
-    // from the active-job gate and not from a missing job.
-    let mut game = zone_player_unlocked(&fixture, CHARACTER, ADVENTURER, &[ADVENTURER, MINER]);
+    // rc-0136: a learned Miner counts in another job (accepting switches into it, wiki
+    // "Brawler: Restless Rumors"), so the refusal below needs a player who never learned Miner.
+    let mut game = zone_player_unlocked(&fixture, CHARACTER, ADVENTURER, &[ADVENTURER]);
     assert!(
-        game.state()
+        !game
+            .state()
             .profiles
             .as_ref()
             .unwrap()
             .unlocked
             .contains(&MINER),
-        "the character learned Miner while Adventurer is active"
+        "the character never learned Miner"
     );
     let mut now = 1_000;
     assert_no_offer(

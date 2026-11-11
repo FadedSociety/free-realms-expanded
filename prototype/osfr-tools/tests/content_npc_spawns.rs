@@ -359,8 +359,10 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // P-quest-npcs: Gribbit, placed from the video index (3,267).
     // The zone rocks added the four warpstone actors bound to the rocks that are part of the
     // zone (3,271 -> 3,275). P-vendor-stock gave 23 vendors with reconstructed stock a body so
-    // their shops are reachable (3,275 + 23 = 3,298). P-banking: Yoink's body (3,299).
-    assert_eq!(extra_rows.len(), 3299);
+    // their shops are reachable (3,275 + 23 = 3,298). P-banking: Yoink's body (3,299). rc-0136
+    // F1: Going Batty's bat got its own body in Memorial Caverns; the Seaside bat mount stays as
+    // dressing (3,300).
+    assert_eq!(extra_rows.len(), 3300);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

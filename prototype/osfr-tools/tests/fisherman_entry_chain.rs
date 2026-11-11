@@ -809,30 +809,23 @@ fn the_chapter_is_gated_on_the_active_fisherman() {
     let xp = rig.fisherman_xp();
     let brawler_xp = profile_xp(&rig.game, BRAWLER_PROFILE);
 
-    // Fisherman is unlocked but no longer active: the content job gate hides the chapter,
-    // and the refusal keeps the open menu usable and the save bytes unchanged.
-    let mut now = rig.stamp();
-    assert_no_offer(
-        &mut rig.game,
-        &rig.character,
-        REED,
-        &mut now,
-        "Fisherman unlocked, Brawler active",
-    );
-    rig.now = now;
-    assert!(
-        rig.progress(LEARN_TO_FISH).is_none(),
-        "a gated quest is not even known"
-    );
-
-    // Switching back to the dressed Fisherman opens the chapter again, and the reward
-    // pays the explicit 137 profile, never the active Brawler.
-    let switched = rig.send(&select_job(FISHERMAN_PROFILE));
-    assert!(switched.changed, "the dressed Fisherman must re-activate");
+    // rc-0136: the gate is the learned Fisherman, not the active job. Fisherman is learned
+    // but Brawler is active, and the chapter is still offered: the original offered a job's
+    // quests to a player who knew the job and switched them into it on accept (wiki "Brawler:
+    // Restless Rumors"; `switch_to_quest_job`). A job never learned still refuses its quests
+    // (`rc0136_quest_offers::a_job_never_learned_still_blocks_its_quests_and_the_log_says_so`).
     let rows = rig.talk_at(REED);
     assert_eq!(quest_choice_title(&rows), Some(417_055));
     rig.offer(LEARN_TO_FISH);
     rig.accept_offer(LEARN_TO_FISH);
+    assert_eq!(
+        active_job(&rig.game),
+        FISHERMAN_PROFILE,
+        "accepting switches into Fisherman"
+    );
+
+    // Back on Brawler, the reward pays the explicit 137 profile, never the active Brawler.
+    rig.switch_to_brawler();
     rig.take_end(LEARN_TO_FISH, 0);
     rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.fisherman_xp(), xp + 25);

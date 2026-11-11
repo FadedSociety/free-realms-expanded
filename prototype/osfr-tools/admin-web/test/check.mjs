@@ -124,6 +124,20 @@ has(froze.state, ['character_id', 'invisible', 'spectating', 'following', 'flyin
 ok(froze.state.frozen.includes(pip.character_id), 'freeze lists the player');
 has(await call('names'), ['jobs', 'quests'], 'names');
 has(await call('jobs', id, {}, { job_id: prof.jobs[0].job, xp: 100 }), ['jobs', 'undo'], 'jobs');
+// rc-0136: the panel gives a job as its trainer does and switches to it; Complete is not Grant.
+const newJob = [43, 48, 120].find((j) => !prof.jobs.some((x) => x.job === j));
+const learned = await call('jobs', id, {}, { job_id: newJob, op: 'learn', active: true });
+ok(learned.jobs.some((j) => j.job === newJob && j.active) && typeof learned.undo === 'string', 'learn with active gives the job and switches to it');
+await assert.rejects(call('jobs', id, {}, { job_id: newJob, op: 'learn' }), /already/);
+const back = prof.jobs[0].job;
+ok((await call('jobs', id, {}, { job_id: back, op: 'activate' })).jobs.find((j) => j.job === back).active, 'activate switches back');
+await assert.rejects(call('jobs', id, {}, { job_id: 999, op: 'activate' }), /not learned/);
+const untouched = data.quests.find((q) => ![...prof.quests.active, ...prof.quests.done].includes(q.quest_id) && q.quest_id !== fresh).quest_id;
+ok((await call('quests', id, {}, { op: 'complete', quest_id: untouched })).done.includes(untouched), 'complete works on a quest never granted');
+await assert.rejects(call('quests', id, {}, { op: 'complete', quest_id: untouched }), /already done/);
+const drawerSrc = readFileSync(join(root, 'js', 'drawer.js'), 'utf8');
+ok(/Grant: start it/.test(drawerSrc) && /Complete: mark it done/.test(drawerSrc), 'the quest form names Grant and Complete apart');
+ok(/act\.job\(p, 'learn'/.test(drawerSrc) && /act\.job\(p, 'activate'/.test(drawerSrc), 'the jobs section gives and switches jobs');
 const job = await call('sendMail', {}, {}, { to: { everyone: true }, subject: 'Hi', body: 'Hello' });
 has(job, ['job_id', 'recipients'], 'mail send');
 ok(job.recipients === data.players.length, 'everyone means every character, online or not');

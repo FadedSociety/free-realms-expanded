@@ -346,14 +346,15 @@ fn dewey_offers_becoming_a_warrior_only_to_warriors() {
     assert!(!has_quest(&ordinary, W1));
     assert_eq!(pending_offer(&ordinary), None);
 
-    // An unlocked Warrior that is not the active job is refused by the job gate.
+    // rc-0136: an unlocked Warrior that is not the active job is offered W1 too (a learned job
+    // counts; accepting switches into it, wiki "Brawler: Restless Rumors"), and W4 still waits.
     let mut inactive = fixture.game(Some(complete_become_a(
         &fixture,
         CHARACTER,
         inactive_warrior_state(&fixture),
     )));
-    assert_no_offer(&mut inactive, &dewey, DEWEY, &mut now, "inactive Warrior");
-    assert!(!has_quest(&inactive, W1));
+    now += 10;
+    offer(&mut inactive, &dewey, DEWEY, W1, now);
     assert!(!has_quest(&inactive, W4));
 
     // The trainer menu still offers "Become a Warrior" once the rank gate is met (T201).
@@ -372,15 +373,9 @@ fn dewey_offers_becoming_a_warrior_only_to_warriors() {
         BRAWLER,
         "learning must not switch jobs"
     );
-    // Unlocking without activating Warrior still cannot open the quest.
-    assert_no_offer(
-        &mut trainer,
-        &dewey,
-        DEWEY,
-        &mut now,
-        "learned but inactive Warrior",
-    );
-    assert!(!has_quest(&trainer, W1));
+    // rc-0136: learning is enough; Dewey offers W1 at once (the trainer refreshes the gate).
+    now += 30;
+    offer(&mut trainer, &dewey, DEWEY, W1, now);
 
     // The active Warrior sees exactly one W1 offer.
     let mut game = warrior_game(&fixture);
@@ -994,7 +989,8 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     assert_eq!(w1["prerequisite_quest_ids"], serde_json::json!([]));
     assert_eq!(w1["objectives"][0]["npc_id"].as_u64(), Some(DEWEY));
     assert!(w1.get("description_string_id").is_none());
-    assert!(w1.get("intro_text_string_id").is_none());
+    // rc-0136: the quest table matched the wiki's offer line to Global.Text 24981.
+    assert_eq!(w1["intro_text_string_id"].as_u64(), Some(24_981));
     assert!(w1.get("end_text_string_id").is_none());
 
     let w4 = records
