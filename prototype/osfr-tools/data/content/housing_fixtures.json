@@ -13179,6 +13179,17 @@
       "tint_alias": "dyetint",
       "default_tint_id": 0,
       "provenance": "legacy-data:FreeRealms-Legacy@9e08202 ClientItemDefinitions.json Id=78583; client Models.txt id 4595"
+    },
+    {
+      "fixture_definition_id": 910900,
+      "item_definition_id": 910900,
+      "model_id": 4443,
+      "category": "53",
+      "lua_call": "",
+      "texture_alias": "",
+      "tint_alias": "dyetint",
+      "default_tint_id": 0,
+      "provenance": "(R) P-banking Storage Vault (data/content/bank.json vault_item_id): item 910900 in data/release/item-table-supplement.json; client Models.txt id 4443 hsg_storage_vault_01.adr; fixture definition id = item id; no texture alias is known for the model"
     }
   ]
 }

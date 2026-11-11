@@ -1075,11 +1075,13 @@ impl NpcInteraction {
         self.active
             .as_ref()
             .is_some_and(|active| active.npc_id == npc_id)
-            && self
-                .content
-                .npcs
-                .get(&npc_id)
-                .is_some_and(|npc| check_range(npc, self.in_house, zone_id, position).is_ok())
+            && self.in_reach(npc_id, zone_id, position)
+    }
+
+    /// Whether the player stands in reach of content NPC `npc_id` (the 26/8 range rule).
+    pub fn in_reach(&self, npc_id: u64, zone_id: u32, position: [f32; 3]) -> bool {
+        (self.content.npcs.get(&npc_id))
+            .is_some_and(|npc| check_range(npc, self.in_house, zone_id, position).is_ok())
     }
 
     /// (R) T773: remember the 26/3 a Talk actually sent: its exact rows and the page body

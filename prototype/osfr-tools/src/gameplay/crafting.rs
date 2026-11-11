@@ -641,7 +641,7 @@ impl Gameplay {
             .items
             .iter()
             .filter(|item| item.definition_id == definition && item.rental.is_none())
-            .map(|item| u64::from(item.count))
+            .map(|item| u64::from(item.spendable()))
             .sum()
     }
 

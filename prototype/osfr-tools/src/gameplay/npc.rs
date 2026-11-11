@@ -2,6 +2,7 @@
 use super::npc_quests::added_npcs;
 use super::*;
 
+mod bank;
 mod mailbox;
 
 impl Gameplay {
@@ -221,6 +222,10 @@ impl Gameplay {
         }
         // A warpstone has no content key: every stone opens the Atlas here (`travel.rs`).
         if let Some(out) = self.warpstone_click_26_8(inner, character)? {
+            return Ok(Some(out));
+        }
+        // P-banking: banker and vault clicks, 26/44, 42/17 and the Coin Shop's bank upgrades.
+        if let Some(out) = self.bank_packet(inner, character)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_interact_26_8(inner, character)? {
@@ -605,7 +610,7 @@ impl Gameplay {
                 });
             // (R) Preserve pre-existing stack counts even if the reconstructed 100-slot
             // limit is lower; any new slot still has to fit within that existing floor.
-            let bag_capacity = self.inventory.state().items.len().max(100);
+            let bag_capacity = self.inventory.state().bag_capacity();
             let reward_state =
                 RewardState::new(self.inventory.clone(), profile_state.clone(), bag_capacity)
                     .with_boost(self.consumable_effects.boost())

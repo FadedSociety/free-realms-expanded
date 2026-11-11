@@ -7841,7 +7841,7 @@
       ],
       "enemy_kind": null,
       "location_evidence": [
-        "Seaside"
+        "Seaside, by the Post Office (wiki Banking; Legacy spawn 1880)"
       ],
       "quests_given": [],
       "quest_ids_given": [],
@@ -7855,29 +7855,23 @@
       ],
       "services_reason": null,
       "position": [
-        -631.179513,
-        9.31,
-        -1040.837244
+        -402.0145,
+        10.66704,
+        -1143.474
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.8572989891886034,
+        -0.5619815565157079,
         0.0,
-        0.5148188449699553
+        0.8271497628218134
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 13,
-          "poi_name": "Seaside",
-          "match_score": 7
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, ...)); P-banking replaced the POI-13 golden-angle guess and the quarry troll body copied by name from wilds.json",
       "source": [
         {
           "kind": "client",
@@ -7890,6 +7884,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
         }
       ],
       "field_sources": {
@@ -8075,12 +8073,12 @@
         ],
         "location_evidence": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part E. Merchants and shops, row 133; source cell: [client] [wiki]"
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: Burglz in Seaside by the Post Office"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part E. Merchants and shops, row 133; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "quests_given": [
@@ -8163,64 +8161,60 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=13 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=13 NameId=3501 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           },
           {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "FreeRealms-Legacy src/Resources/PointOfInterests.json Id=162 'Banker' (data/content/travel.json id 162) at [-408.143, 11.0, -1140.247], 6.9 m from this spawn"
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=13 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=13 NameId=3501 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) No capture shows Burglz."
           }
         ],
         "greeting_string_id": [
@@ -8236,19 +8230,26 @@
         "model_id": [
           {
             "kind": "legacy-data",
-            "evidence": "data/content/npcs/wilds.json npc_id=9500001007 (same name)"
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ],
         "model_file_name": [
           {
             "kind": "legacy-data",
-            "evidence": "data/content/npcs/wilds.json npc_id=9500001007 (same name)"
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:607 (spawnNpcWithGuid(1880, 100000001880, -402.0145, 10.66704, -1143.474, -1.193559)) and src/Resources/Npcs.json Id=1880 (NameId=441415, ModelId=4106, ModelFileName=robgoblin_m_banker.adr); the same spawn is Sanctuary-main-20261019@10f129e FabledRealms.lua:597, 24 m from the Seaside Postboxes (spawn 1881)"
           }
         ]
       },
       "greeting_string_id": 441432,
-      "model_id": 167,
-      "model_file_name": "troll_peasant_02.adr"
+      "model_id": 4106,
+      "model_file_name": "robgoblin_m_banker.adr",
+      "heading": -1.193559
     },
     {
       "npc_id": 9500000564,

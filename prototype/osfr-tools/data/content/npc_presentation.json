@@ -169,6 +169,7 @@
     {"name_string_id": 439217, "name": "Skullz Thug", "cursor_id": 11, "disposition": 0},
     {"name_string_id": 440941, "name": "Cragara", "cursor_id": 17, "sub_text_name_string_id": 440942, "notifications": [{"kind": 1, "image_id": 381, "state": 344, "name_id": 440941, "subtext_id": 440942}]},
     {"name_string_id": 441072, "name": "Bezzle", "cursor_id": 17, "sub_text_name_string_id": 441416, "notifications": [{"kind": 1, "image_id": 380, "state": 343, "name_id": 441072, "subtext_id": 441416}]},
+    {"name_string_id": 441346, "name": "Yoink", "cursor_id": 17, "sub_text_name_string_id": 441418, "notifications": [{"kind": 1, "image_id": 380, "state": 343, "name_id": 441346, "subtext_id": 441418}]},
     {"name_string_id": 5100852, "name": "Punkin Plant", "cursor_id": 17},
     {"name_string_id": 5100853, "name": "Honeytwig Plant", "cursor_id": 17},
     {"name_string_id": 5100854, "name": "Stainberry Plant", "cursor_id": 17},

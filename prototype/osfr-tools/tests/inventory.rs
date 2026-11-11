@@ -23,6 +23,12 @@ fn item(id: i32, definition_id: i32) -> InventoryItem {
         activate_enabled: false,
     }
 }
+/// Take every banked unit back into the bag (P-banking: only those can be spent).
+fn unbank(inventory: &mut Inventory) {
+    let mut state = inventory.state().clone();
+    state.items.iter_mut().for_each(|item| item.stored_count = 0);
+    inventory.adopt_state(state).unwrap();
+}
 fn command(family: u16, opcode: u16, fields: &[i32]) -> Vec<u8> {
     let mut bytes = [family.to_le_bytes(), opcode.to_le_bytes()].concat();
     for field in fields {
@@ -54,7 +60,11 @@ fn serialize_item(item: &InventoryItem) -> Vec<u8> {
         bytes.extend(rental.upsells.to_le_bytes());
         bytes.extend(rental.bundle_id.to_le_bytes());
     }
-    bytes.extend(item.ability_count.to_le_bytes());
+    // P-banking: the dword the save calls `ability_count` is the client's stored count
+    // (`008fa4b0` -> +0x1c), so a banked stack sends its stored count there.
+    let stored = item.stored_count as i32;
+    let last = if stored > 0 { stored } else { item.ability_count };
+    bytes.extend(last.to_le_bytes());
     bytes.push(u8::from(item.activate_enabled));
     bytes
 }
@@ -470,6 +480,9 @@ fn invalid_requests_and_failed_grants_leave_all_state_unchanged() {
 fn authorized_consumption_updates_or_deletes_and_clears_equipment() {
     let f = Fixture::new();
     let mut inventory = f.inventory();
+    // P-banking: the fixture banks one unit of each stack; a banked unit cannot be spent.
+    assert!(inventory.consume(7, 2).is_err());
+    unbank(&mut inventory);
     let update = inventory.consume(7, 1).unwrap();
     assert_eq!(signed(&update.replies[0], 8), 1);
     let deleted = inventory.consume(7, 1).unwrap();
@@ -490,6 +503,9 @@ fn authorized_consumption_updates_or_deletes_and_clears_equipment() {
 fn definition_consumption_skips_rentals_and_is_all_or_nothing() {
     let f = Fixture::new();
     let mut inventory = f.inventory();
+    // P-banking: with one of the two units banked, the bag holds too few.
+    assert!(inventory.consume_definition(100, 2).is_err());
+    unbank(&mut inventory);
     let previous = inventory.state().clone();
     // Definition 101 is held only as a rental stack, and definition 100 only twice over.
     for (definition, quantity) in [(101, 1), (100, 3), (999, 1)] {

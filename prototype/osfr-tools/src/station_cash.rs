@@ -1406,7 +1406,7 @@ pub fn place_order(
             Ok(granted) => granted,
             Err(_) => return refusal(order, ORDER_FAILURE),
         };
-        if staged.state().items.len() > bag_capacity {
+        if staged.state().bag_stacks() > bag_capacity {
             return refusal(order, ORDER_FAILURE);
         }
         *inventory = staged;

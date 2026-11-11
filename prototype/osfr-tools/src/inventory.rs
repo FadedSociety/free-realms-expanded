@@ -89,7 +89,47 @@ pub struct InventoryState {
     pub next_instance_id: Option<i64>,
 }
 
+impl InventoryItem {
+    /// P-banking: the units a consume, a recipe or a hand-over may spend; banked ones are not in
+    /// the bag.
+    pub fn spendable(&self) -> u32 {
+        self.count.saturating_sub(self.stored_count)
+    }
+
+    /// The item record's last dword in the self data and a 38/2 add. It is the client's stored
+    /// count (`008fa4b0` reads it into +0x1c, the InStorage column `00cb1500` case 24), so a
+    /// banked stack logs in banked. Saves name it `ability_count` (the community serializer's
+    /// guess) and every save from before banking holds 0 there.
+    pub fn record_tail(&self) -> i32 {
+        match i32::try_from(self.stored_count) {
+            Ok(0) => self.ability_count,
+            Ok(stored) => stored,
+            Err(_) => i32::MAX,
+        }
+    }
+}
+
+/// (R) The bag holds 100 shown stacks. A record whose every unit is banked or applied is not in
+/// the bag: the client lists a record only while units are left after its stored and consumed
+/// ones (`00a6d9b0`).
+pub const BAG_STACKS: usize = 100;
+
 impl InventoryState {
+    /// Records the bag shows (units left after the stored and consumed ones).
+    pub fn bag_stacks(&self) -> usize {
+        let shown = |item: &&InventoryItem| {
+            item.count > item.consumed_count.saturating_add(item.stored_count)
+        };
+        self.items.iter().filter(shown).count()
+    }
+
+    /// The record count a reward, a buy or a trade may reach: `BAG_STACKS` shown stacks (or as
+    /// many as a legacy save already shows) plus every record the bag does not show.
+    pub fn bag_capacity(&self) -> usize {
+        let shown = self.bag_stacks();
+        shown.max(BAG_STACKS) + (self.items.len() - shown)
+    }
+
     /// The instance in native Weapon slot 7 for `profile`, 0 when the slot is
     /// empty. The one place that names the weapon slot: the cast gate
     /// (`equipped_weapon_for_class`), the toolbar label and the toolbar resend
@@ -986,6 +1026,8 @@ impl Inventory {
                 || item.count > i32::MAX as u32
                 || item.consumed_count > item.count
                 || item.stored_count > i32::MAX as u32
+                // P-banking: banked and consumed units are both parts of the count.
+                || item.stored_count.saturating_add(item.consumed_count) > item.count
                 || item.ability_count < 0
                 || !ids.insert(item.id)
                 || item
@@ -1352,7 +1394,8 @@ impl Inventory {
             .iter()
             .position(|item| item.id == item_id)
             .ok_or_else(|| invalid("unknown item"))?;
-        if quantity == 0 || quantity > staged.state.items[index].count {
+        // P-banking: banked units are not in the bag, so nothing spends them.
+        if quantity == 0 || quantity > staged.state.items[index].spendable() {
             return Err(invalid("invalid consumed quantity"));
         }
         let mut outcome = InventoryOutcome {
@@ -1402,7 +1445,8 @@ impl Inventory {
             .items
             .iter()
             .filter(|item| item.definition_id == definition_id && item.rental.is_none())
-            .map(|item| (item.id, item.count))
+            .map(|item| (item.id, item.spendable()))
+            .filter(|&(_, available)| available > 0)
             .collect();
         let mut outcome = InventoryOutcome {
             replies: Vec::new(),
@@ -1817,7 +1861,7 @@ fn write_item(bytes: &mut Vec<u8>, item: &InventoryItem) -> io::Result<()> {
         put(bytes, rental.upsells);
         put(bytes, rental.bundle_id);
     }
-    put(bytes, item.ability_count);
+    put(bytes, item.record_tail());
     bytes.push(u8::from(item.activate_enabled));
     Ok(())
 }

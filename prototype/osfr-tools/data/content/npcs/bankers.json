@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "region_page": "Snowhill",
+  "region_zone_id": 13,
+  "records": [
+    {
+      "npc_id": 9600200000,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Yoink",
+      "name_reason": null,
+      "name_string_id": 441346,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 441346
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Snowhill",
+      "zone_id": 13,
+      "zone_reason": null,
+      "region_pages": [
+        "Snowhill"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Robgoblin Banker"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Snowhill, by the Post Office (wiki Banking)"
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "A banker accepts no quest; a click opens storage (data/content/bank.json).",
+      "vendor_stock": null,
+      "vendor_stock_reason": "Bank storage, not a shop: data/content/bank.json lists this NPC as a banker.",
+      "services": [
+        "Bank storage"
+      ],
+      "services_reason": null,
+      "position": [
+        197.5614,
+        28.362642,
+        420.18814
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.7938775866463583,
+        0.0,
+        0.6080776080571901
+      ],
+      "placement": "reference_data",
+      "placement_source": "reference_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3880 (spawnNpcWithGuid(33662)); the Snowhill 'Banker' atlas row (travel.json 161) stands 5.7 m away",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-banking content key from the PB1 NPC id range 9600200000-9600200999."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking content key from the PB1 NPC id range 9600200000-9600200999."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking content key from the PB1 NPC id range 9600200000-9600200999."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Yoink has no Legacy NPC id; the reference spawn is Sanctuary-main's."
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json)"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json)"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json)"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json)"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json)"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          },
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          },
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          },
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441418 = Banker (Yoink's sub-text)"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: an ambient row; the bank route answers its click before any menu."
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) P-banking: a banker gives and takes no quest; a click opens storage (data/content/bank.json)."
+          }
+        ],
+        "services": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "wiki",
+            "evidence": "freerealms.fandom.com/wiki/Banking: the Robgoblin Bankers are Burglz in Seaside by the Post Office, Bezzle in Sanctuary by Poe Tatters and Yoink in Snowhill by the Post Office"
+          }
+        ],
+        "position": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          },
+          {
+            "kind": "reference",
+            "evidence": "data/content/travel.json id 161 'Banker' (Legacy PointOfInterests Id 161) at [202.673, 28.0, 417.93], 5.7 m from this spawn"
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) medium, as Bezzle's Sanctuary-main reference spawn"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) No capture shows Yoink."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.441431 = 'Yoink here! Robgoblin Banker ready to serve.' (lab/reports/locale-id-to-text.json; beside Bezzle's 441420 and Burglz's 441432)"
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33662 (NameId 441346, SubTextNameId 441418, ModelId 4106 robgoblin_m_banker.adr, CursorId 17); src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662, 100000033662, 197.5614, 28.362642, 420.18814, 1.83431902)"
+          }
+        ]
+      },
+      "greeting_string_id": 441431,
+      "heading": 1.83431902
+    }
+  ]
+}

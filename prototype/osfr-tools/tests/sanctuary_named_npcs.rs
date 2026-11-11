@@ -105,8 +105,8 @@ fn every_reference_row_is_drawn_once() {
     let rows = moved();
     assert_eq!(
         rows.len(),
-        104,
-        "T470 drew 90 named NPCs, T506 moved 19 more; T544 converted Gerold and Tevin; T883 moved Felipe, Murphy and Natali to the video index"
+        105,
+        "T470 drew 90 named NPCs, T506 moved 19 more; T544 converted Gerold and Tevin; T883 moved Felipe, Murphy and Natali to the video index; P-banking added Yoink"
     );
     let extras = extra_rows();
     let guids: BTreeSet<_> = extras

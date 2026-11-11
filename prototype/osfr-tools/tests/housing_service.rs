@@ -1488,7 +1488,8 @@ fn the_bundled_fixture_table_covers_the_placeable_items() {
     config.validate().expect("the generated table validates");
     assert_eq!(
         config.rows.len(),
-        1_198,
+        // P-banking: the Storage Vault (910900) adds one row.
+        1_199,
         "one row per placeable item: T518's item rows plus T869's model-joined placement rows"
     );
     // The generator sorts by item id, so a regenerated table reviews as a small diff.

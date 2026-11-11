@@ -338,6 +338,30 @@ impl Gameplay {
             .unwrap_or_default()
     }
 
+    /// P-banking: the item a fixture actor in the lot this character stands in was placed from.
+    pub(super) fn lot_fixture_item(&self, actor_guid: u64) -> Option<i32> {
+        let session = self.housing.as_ref().filter(|s| s.in_house())?;
+        let lot = session.service.lot(session.house?).ok()?;
+        let fixture = (lot.fixtures.iter())
+            .find(|f| crate::housing_service::fixture_actor_guid(f.fixture_guid) == actor_guid)?;
+        (session.service.config().rows.iter())
+            .find(|row| row.fixture_definition_id == fixture.fixture_definition_id)
+            .map(|row| row.item_definition_id)
+    }
+
+    /// P-banking: whether one of this character's own lots has `item` standing in it (a placed
+    /// fixture's item leaves the bag).
+    pub(super) fn has_placed(&self, item: i32) -> bool {
+        let Some(session) = self.housing.as_ref() else {
+            return false;
+        };
+        let Ok(row) = session.service.config().row_for_item_definition(item) else {
+            return false;
+        };
+        (self.own_house_lots().iter().flat_map(|lot| &lot.fixtures))
+            .any(|f| f.fixture_definition_id == row.fixture_definition_id)
+    }
+
     /// F874: one lot this character owns (never a visit's copy), cloned only when it is theirs.
     pub fn own_house_lot(&self, house_guid: u64) -> Option<crate::housing::LotSnapshot> {
         let session = (self.housing.as_ref()).filter(|s| s.service.has_own_lot(house_guid))?;

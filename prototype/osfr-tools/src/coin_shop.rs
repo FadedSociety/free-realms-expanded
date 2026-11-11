@@ -1363,7 +1363,7 @@ impl CoinShop {
     }
 }
 
-fn transaction_complete(
+pub(crate) fn transaction_complete(
     kind: u32,
     result: u32,
     transaction_id: u32,

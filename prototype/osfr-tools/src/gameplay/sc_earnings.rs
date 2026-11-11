@@ -71,10 +71,10 @@ impl Gameplay {
             })
     }
 
-    /// The reward bag capacity: 100 occupied stacks, or the current count when a legacy save
-    /// already exceeds it.
-    fn reward_bag_capacity(&self) -> usize {
-        self.inventory.state().items.len().max(100)
+    /// The reward bag capacity: 100 shown stacks, or the current count when a legacy save already
+    /// exceeds it, plus the banked and applied records the bag does not show.
+    pub(super) fn reward_bag_capacity(&self) -> usize {
+        self.inventory.state().bag_capacity()
     }
 
     /// Snapshot the inventory and profiles for a staged reward transaction. The Station Cash

@@ -280,9 +280,14 @@ fn npc_visibility_loads_content_caps_the_view_and_respects_startup_exclusions() 
             Some((npc["npc_id"].as_u64()?, position))
         })
         .unwrap();
+    // P-banking: a `reference_data` row is drawn by its extras body under its own id (Bezzle,
+    // and Yoink, whose npcs/bankers.json now sorts first), so it is not an undrawn row.
     let reconstructed_guid = regional_rows
         .iter()
-        .find(|npc| npc["placement"] != "legacy_data" && zone_and_position(npc).is_some())
+        .find(|npc| {
+            !matches!(npc["placement"].as_str(), Some("legacy_data" | "reference_data"))
+                && zone_and_position(npc).is_some()
+        })
         .and_then(|npc| npc["npc_id"].as_u64())
         .unwrap();
     let extras: serde_json::Value =

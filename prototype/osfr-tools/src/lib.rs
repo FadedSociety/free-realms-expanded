@@ -6,6 +6,7 @@ pub mod account_store;
 pub mod activity_portal;
 pub mod admin;
 pub mod area_banner;
+pub mod bank;
 pub mod base_ui;
 pub mod boombox;
 pub mod bundle_budget;

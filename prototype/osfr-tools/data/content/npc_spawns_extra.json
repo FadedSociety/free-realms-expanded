@@ -80419,6 +80419,42 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9600200000,
+      "legacy_npc_id": null,
+      "content_key": 9600200000,
+      "model_id": 4106,
+      "model_file_name": "robgoblin_m_banker.adr",
+      "name": "Yoink",
+      "name_string_id": 441346,
+      "position": [
+        197.5614,
+        28.362642,
+        420.18814
+      ],
+      "heading": 1.83431902,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3880 spawnNpcWithGuid(33662); src/Resources/Npcs.json Id=33662"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.441346 = Yoink (lab/reports/locale-id-to-text.json); Models.txt 4106 = robgoblin_m_banker.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-banking: the body of npcs/bankers.json 9600200000, the Snowhill Robgoblin Banker (wiki Banking: by the Post Office); a click opens storage (data/content/bank.json)"
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33662 SubTextNameId=441418"
+        }
+      ],
+      "position_w": null,
+      "sub_text_name_string_id": 441418
     }
   ]
 }

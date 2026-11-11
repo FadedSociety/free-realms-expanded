@@ -657,9 +657,15 @@ fn is_quest_binding_change_between(path: &str, old: &Value, new: &Value) -> bool
         // (FabledRealms.lua:4184, model 400) the same way Merk did; the move also rewrites the
         // row's location evidence and field provenance. `content_npc_placement.rs` and
         // `content_npc_spawns.rs` pin the resulting placement.
-        path.ends_with("/sanctuary.json")
+        let queen = path.ends_with("/sanctuary.json")
             && old["npc_id"].as_u64() == Some(9_500_000_519)
-            && old["placement"].as_str() == Some("unanchored")
+            && old["placement"].as_str() == Some("unanchored");
+        // P-banking: Burglz the Seaside banker's `poi_anchor` row moved to his Legacy spawn
+        // (FabledRealms.lua:607, model 4106) with the same fields.
+        let burglz = path.ends_with("/seaside.json")
+            && old["npc_id"].as_u64() == Some(9_500_000_563)
+            && old["placement"].as_str() == Some("poi_anchor");
+        (queen || burglz)
             && new["placement"].as_str() == Some("legacy_data")
             && without_fields(&quest_old, &QUEEN_LEGACY_FIELDS)
                 == without_fields(&quest_new, &QUEEN_LEGACY_FIELDS)

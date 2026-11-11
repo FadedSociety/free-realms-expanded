@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "source": [
+    "P-banking (src/bank). wiki: freerealms.fandom.com/wiki/Banking (added 2012-12-04): storage starts at 25 slots; identical items with the same tint stack in one slot; ten Coin Shop upgrades bought in order add 2, 4, 6, 8, 10, 20, 40, 60, 80 and 100 slots for 1,000 to 50,000 coins.",
+    "upgrades: the client's own bank upgrade items, FreeRealms-Legacy@9e08202 ClientItemDefinitions.json (AGPL-3.0-or-later) Ids 35853-35862 (Type 30, CategoryId 62, Param1 = the wiki's slots, names 19872-19891 '2-Slot Bank Upgrade 1' .. '100-Slot Bank Upgrade 10' with 'You must buy Upgrade N before Upgrade N+1'); the same ten ids are the category 62 rows of the shipped 165/1 dynamic list (data/content/startup/snapshot.json). The price is each definition's Cost in data/release/item-table-supplement.json.",
+    "bankers: Bezzle (npcs/sanctuary.json 9500000450, by Poe Tatters), Burglz (npcs/seaside.json 9500000563, the Seaside Post Office) and Yoink (npcs/bankers.json 9600200000, the Snowhill Post Office); the three 'Banker' atlas rows are data/content/travel.json ids 160-162.",
+    "(R) 35852 is the 50-Slot Bank Upgrade (names 19870/19871, Param1 50) the Marketplace sold for 100 Station Cash with no purchase limit (wiki). No Marketplace shelf lists bank upgrades here, so it is a repeatable Coin Shop upgrade outside the order, 25,000 coins (the ten upgrades' own rate, 500 coins a slot), adding 50 slots per copy.",
+    "(R) vault_item_id 910900 is the Storage Vault housing item (client model hsg_storage_vault_01.adr, Models.txt 4443), which opens the same storage from a lot. In June 2013 members got one free; the economy here is free for everyone, so the first storage visit of a character that owns none gives one (src/gameplay/npc/bank.rs give_vault_once)."
+  ],
+  "base_slots": 25,
+  "bankers": [9500000450, 9500000563, 9600200000],
+  "upgrades": [
+    {"item_id": 35853, "slots": 2},
+    {"item_id": 35854, "slots": 4},
+    {"item_id": 35855, "slots": 6},
+    {"item_id": 35856, "slots": 8},
+    {"item_id": 35857, "slots": 10},
+    {"item_id": 35858, "slots": 20},
+    {"item_id": 35859, "slots": 40},
+    {"item_id": 35860, "slots": 60},
+    {"item_id": 35861, "slots": 80},
+    {"item_id": 35862, "slots": 100},
+    {"item_id": 35852, "slots": 50, "repeatable": true}
+  ],
+  "vault_item_id": 910900
+}

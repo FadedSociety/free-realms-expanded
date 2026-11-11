@@ -328,7 +328,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs: seven quest people bound to spawns the world already drew (1,306).
     // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
-    assert_eq!(regional_legacy + regional_reconstructed, 1313);
+    // P-banking: Yoink, bound to his body below (1,314).
+    assert_eq!(regional_legacy + regional_reconstructed, 1314);
     assert!(
         regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"
@@ -358,8 +359,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // P-quest-npcs: Gribbit, placed from the video index (3,267).
     // The zone rocks added the four warpstone actors bound to the rocks that are part of the
     // zone (3,271 -> 3,275). P-vendor-stock gave 23 vendors with reconstructed stock a body so
-    // their shops are reachable (3,275 + 23 = 3,298).
-    assert_eq!(extra_rows.len(), 3298);
+    // their shops are reachable (3,275 + 23 = 3,298). P-banking: Yoink's body (3,299).
+    assert_eq!(extra_rows.len(), 3299);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

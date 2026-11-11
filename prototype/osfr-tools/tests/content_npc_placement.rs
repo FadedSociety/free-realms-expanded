@@ -370,6 +370,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs appended seven quest people bound to spawns the world already drew (unanchored, 1,306).
     // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
-    assert_eq!(npc_count, 1313);
+    // P-banking: Yoink (reference_data, bound to his body) in npcs/bankers.json (1,314).
+    assert_eq!(npc_count, 1314);
     println!("NPC placement sources: {counts:?}");
 }

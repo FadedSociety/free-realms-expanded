@@ -788,8 +788,8 @@ fn parse_inventory_item(cursor: &mut Cursor<'_>) -> io::Result<inventory::Invent
         id,
         count,
         consumed_count,
-        // (R) `stored_count` is not read or written by the self-data client
-        // serializer; the production inventory state keeps its existing value.
+        // A captured template's last dword stays `ability_count` (P-banking: the client reads it
+        // as the stored count, `InventoryItem::record_tail`); the live state owns the bank.
         stored_count: 0,
         last_cast_time,
         rental,
@@ -817,7 +817,7 @@ fn write_inventory_item(out: &mut Vec<u8>, item: &inventory::InventoryItem) -> i
         put_i32(out, rental.upsells);
         put_i32(out, rental.bundle_id);
     }
-    put_i32(out, item.ability_count);
+    put_i32(out, item.record_tail());
     put_u8(out, u8::from(item.activate_enabled));
     Ok(())
 }

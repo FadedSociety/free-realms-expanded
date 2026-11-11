@@ -201,7 +201,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
         .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("json"))
         .collect();
     npc_files.sort();
-    assert_eq!(npc_files.len(), 18);
+    // P-banking: npcs/bankers.json (Yoink).
+    assert_eq!(npc_files.len(), 19);
 
     let mut canonical_ids = HashSet::new();
     let mut resolved_reference_ids = HashSet::new();
@@ -531,7 +532,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // Lead 2026-11-10: counts combine P-quest-npcs with the 35-quest batch (L1123).
     // P-quest-npcs: seven quest people bound to spawns the world already drew (1,306).
     // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
-    assert_eq!(content_npcs.len(), 1313);
+    // P-banking: Yoink, bound to his body in npc_spawns_extra.json (1,314).
+    assert_eq!(content_npcs.len(), 1314);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),

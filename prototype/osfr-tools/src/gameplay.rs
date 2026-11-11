@@ -1484,7 +1484,7 @@ impl Gameplay {
             state.clone(),
             definitions,
             self.pets.equipped_instances(state),
-            state.items.len().max(100),
+            state.bag_capacity(),
         )
         .ok()
     }
@@ -1627,7 +1627,7 @@ impl Gameplay {
         for item in &self.inventory.state().items {
             if item.rental.is_none() {
                 let count = available.entry(item.definition_id).or_default();
-                *count = count.saturating_add(item.count);
+                *count = count.saturating_add(item.spendable());
             }
         }
         available.into_iter().collect()
@@ -2399,12 +2399,9 @@ impl Gameplay {
         if !inner.starts_with(&[108, 0]) && !inner.starts_with(&[152, 0]) {
             return Ok(None);
         }
-        let rewards = RewardState::new(
-            self.inventory.clone(),
-            self.reward_profiles(),
-            self.inventory.state().items.len().max(100),
-        )
-        .with_boost(self.consumable_effects.boost());
+        let capacity = self.reward_bag_capacity();
+        let rewards = RewardState::new(self.inventory.clone(), self.reward_profiles(), capacity)
+            .with_boost(self.consumable_effects.boost());
         let mut staged = self.progression_extras.clone();
         let change = staged.handle(inner, &rewards)?;
         if !change.handled {
