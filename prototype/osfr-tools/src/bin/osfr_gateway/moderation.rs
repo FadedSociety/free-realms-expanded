@@ -8,7 +8,7 @@
 //! `rules::run_with_change`, the session half through [`finish`], and write the same
 //! `admin::audit` row (`via` chat or panel) beside the account store.
 use super::*;
-use osfr_tools::admin::{self, Staff, audit};
+use osfr_tools::admin::{self, audit};
 use osfr_tools::chat;
 use osfr_tools::moderation::{self as rules, Action, Command};
 
@@ -54,14 +54,7 @@ fn run_chat(
         Ok(change) => change,
         Err(refusal) => return refusal,
     };
-    let name = session.social_identity.as_ref().map_or_else(
-        || format!("account {actor}"),
-        |identity| format!("{} {}", identity.name.first, identity.name.last).trim().to_owned(),
-    );
-    let staff = Staff {
-        account_id: actor,
-        name,
-    };
+    let staff = admin_http::chat_staff(session);
     let row = admin::moderation::sanction_row(&staff, command, change, None, None, "chat", now);
     if let Err(error) = audit::record(&audit::dir_for(path), &row) {
         eprintln!("admin audit: {error}");

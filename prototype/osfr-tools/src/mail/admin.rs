@@ -4,17 +4,17 @@
 //! A send resolves its recipients at once and then runs as a background job on its own thread,
 //! paced at `send_rate_per_second`, so even "everyone" never blocks the 50 ms world tick: the
 //! tick only drains the job's delivered list (`take_delivered`) to tell online recipients.
-//! Every send writes one audit row (`<mail dir>/audit.jsonl`, append only): who sent what to
-//! whom. G1's shared audit log is not on this base; integration can point `audit` at it.
+//! Every send writes one row to the staff audit log (`admin::audit`, the panel's Audit view):
+//! who sent what to whom, from which front end.
 
-use super::{
-    Attachments, LIMITS, Letter, MailError, mail_dir, mailbox_path, refused, unix_now,
-};
+use super::{Attachments, LIMITS, Letter, MailError, mailbox_path, refused, unix_now};
 use crate::account_store::{AccountRole, AccountStore};
+use crate::admin::audit;
+/// The staff member a send is audited under: the admin core's own.
+pub use crate::admin::Staff;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeSet,
-    io::Write,
     path::{Path, PathBuf},
     sync::{
         Arc, Mutex,
@@ -41,13 +41,6 @@ pub struct OnlineCharacter {
     pub guid: u64,
     pub zone: u32,
     pub role: AccountRole,
-}
-
-/// The staff member a send is audited under.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-pub struct Staff {
-    pub account_id: u64,
-    pub name: String,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
@@ -132,11 +125,13 @@ fn jobs_lock() -> std::sync::MutexGuard<'static, Vec<Arc<Job>>> {
 
 /// Queue `letter` for `to`. `item_ok` validates each attachment row against the item tables
 /// (the caller's: the sender's own inventory catalogue for chat, G3's item search for HTTP);
-/// a refusal queues nothing. The audit row is best effort, like every security log row: a
-/// failure is printed and never undoes the send.
+/// a refusal queues nothing. `via` is the front end (`chat` or `panel`) for the audit row,
+/// which is best effort, like every security log row: a failure is printed and never undoes
+/// the send.
 pub fn send(
     account_store: &Path,
     staff: &Staff,
+    via: &str,
     to: &To,
     letter: Letter,
     online: &[OnlineCharacter],
@@ -184,7 +179,29 @@ pub fn send(
         }
         jobs.push(Arc::clone(&job));
     }
-    audit(account_store, staff, &job.to_summary, total, job.id, &letter);
+    let target = match to {
+        To::Characters(guids) if guids.len() == 1 => (store.character(guids[0])).map(|record| {
+            audit::Target {
+                character_id: Some(record.guid),
+                account_id: Some(record.owner_account_id),
+                name: Some(record.identity.display_name()),
+            }
+        }),
+        _ => None,
+    };
+    audit::record_beside(account_store, &audit::Row {
+        time: unix_now(),
+        staff: staff.clone(),
+        action: "mail".into(),
+        target: target.unwrap_or_default(),
+        before: serde_json::Value::Null,
+        after: serde_json::json!({
+            "to": job.to_summary, "recipients": total, "job": job.id, "from": letter.from,
+            "subject": letter.subject, "attachments": letter.attachments,
+        }),
+        reason: None,
+        via: via.to_owned(),
+    });
     Ok(Receipt {
         job_id: job.id,
         recipients: total,
@@ -317,43 +334,4 @@ pub fn list_for(account_store: &Path, character: u64) -> Result<Vec<MailView>, M
             claimed: message.claimed,
         })
         .collect())
-}
-
-/// The audit file one realm's sends append to.
-pub fn audit_path(account_store: &Path) -> PathBuf {
-    mail_dir(account_store).join("audit.jsonl")
-}
-
-fn audit(
-    account_store: &Path,
-    staff: &Staff,
-    to_summary: &str,
-    recipients: usize,
-    job_id: u64,
-    letter: &Letter,
-) {
-    let row = serde_json::json!({
-        "time": unix_now(),
-        "action": "mail_send",
-        "staff_account": staff.account_id,
-        "staff": staff.name,
-        "to": to_summary,
-        "recipients": recipients,
-        "job": job_id,
-        "from": letter.from,
-        "subject": letter.subject,
-        "attachments": letter.attachments,
-    });
-    let path = audit_path(account_store);
-    let result = std::fs::create_dir_all(mail_dir(account_store)).and_then(|()| {
-        let mut file = std::fs::OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&path)?;
-        writeln!(file, "{row}")?;
-        file.sync_data()
-    });
-    if let Err(error) = result {
-        eprintln!("mail audit {}: {error}", path.display());
-    }
 }

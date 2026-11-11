@@ -44,10 +44,11 @@ export function render(root) {
   }
   function paintPowers() {
     const sp = act.spectating;
-    const ok = act.can('powers');
+    const ok = act.can('powers') && act.self.inGame;
     clear(powers,
+      act.self.inGame ? null : h('p', { class: 'muted small' }, 'Your own powers act on your character: sign in to the game with this account to use them. Freeze and send work without it.'),
       toggleRow('Invisible', 'Hidden from every other player\'s list and world.', act.self.invisible, ok, () => act.power(act.self.invisible ? 'visible' : 'invisible').then(paintPowers)),
-      toggleRow('God mode', 'You take no damage.', act.self.god, ok, () => act.power('god').then(paintPowers)),
+      toggleRow('Flight', 'The movement checks stop correcting you (the Rust client flies; the original client cannot). God mode is the chat command realm god.', act.self.flying, ok, () => act.power(act.self.flying ? 'land' : 'fly').then(paintPowers)),
       h('div', { class: 'power-row' },
         h('div', {}, h('strong', {}, 'Spectating'), h('p', { class: 'muted small' }, sp ? `Following ${sp.name}. You are hidden while you watch.` : 'Open a player and press Spectate to watch them.')),
         sp ? h('button', { class: 'btn btn-sm', type: 'button', onclick: () => act.power('unspectate').then(paintPowers) }, 'Stop') : null));
@@ -81,7 +82,8 @@ export function render(root) {
   paintZones();
   paint();
   paintPowers();
-  const powKey = () => `${act.self.invisible}|${act.self.god}|${act.spectating?.character_id}`;
+  act.refreshPowers();
+  const powKey = () => `${act.self.invisible}|${act.self.flying}|${act.self.inGame}|${act.spectating?.character_id}`;
   let shown = powKey();
   return onLive(() => {
     paintZones();

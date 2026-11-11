@@ -1,7 +1,7 @@
 // Entry point: picks live or mock data, signs in when the gateway asks for it, then runs the shell
 // (sidebar, top bar, hash router, Ctrl+K command bar, theme).
 import { api, detectMode, isMock, login, signOut } from './api.js';
-import { h, clear, icon, num, initials, savedTheme, setTheme, toggleTheme, roleName } from './dom.js';
+import { h, clear, icon, num, initials, names, savedTheme, setTheme, toggleTheme, roleName } from './dom.js';
 import { live, onLive, startLive } from './live.js';
 import * as act from './actions.js';
 import { openCommandBar } from './cmd.js';
@@ -66,6 +66,8 @@ async function onLogin(e) {
 }
 
 function start() {
+  // Job and quest names for ids; without them the panel shows the ids.
+  api.names().then((n) => { Object.assign(names, n); window.dispatchEvent(new Event('hashchange')); }).catch(() => {});
   $('boot').hidden = true;
   $('login').hidden = true;
   $('shell').hidden = false;

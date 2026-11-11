@@ -1,14 +1,15 @@
 // Every staff action, shared by the buttons and the command bar. Destructive ones confirm first; each one toasts
-// its result, with Undo where the API has the inverse (mute/unmute, ban/unban, freeze/unfreeze, add/remove, coins).
+// its result, with Undo where the API has one: an edit's undo key (add, remove, coins, quests, jobs: POST /undo) or
+// the inverse op (mute/unmute, ban/unban, jail/release, freeze/unfreeze).
 import { api } from './api.js';
-import { ask, toast, fail, dur, num, zoneLabel } from './dom.js';
+import { ask, toast, fail, dur, num, zoneLabel, questLabel } from './dom.js';
 import { live, notify } from './live.js';
 
 export const me = { name: '', role: '', permissions: null };
 // The server enforces roles; the panel only greys out what /me's permission list leaves out. A list that uses none
 // of these names (the gateway named its actions differently) greys out nothing rather than everything.
 const PERMS = new Set(['view', 'mute', 'unmute', 'kick', 'ban', 'unban', 'warn', 'jail', 'release', 'note', 'mail', 'announce',
-  'inventory', 'coins', 'quests', 'move', 'powers']);
+  'inventory', 'coins', 'quests', 'jobs', 'move', 'powers']);
 export const can = (perm) => {
   const list = me.permissions;
   return !Array.isArray(list) || list.includes('*') || list.includes(perm) || !list.some((x) => PERMS.has(x));
@@ -18,10 +19,13 @@ export const changed = (id) => window.dispatchEvent(new CustomEvent('admin:chang
 export const pending = { mail: null };
 const name = (p) => p.name || `#${p.character_id}`;
 
+// `undo` is a no-argument inverse, or `(out) => ...` for one that needs the answer (an edit's undo key): that one
+// is offered only when the answer has a key.
 async function attempt(fn, ok, undo) {
   try {
     const out = await fn();
-    if (ok) toast(typeof ok === 'function' ? ok(out) : ok, { undo });
+    const offer = undo && (undo.length ? (out?.undo ? () => undo(out) : undefined) : undo);
+    if (ok) toast(typeof ok === 'function' ? ok(out) : ok, { undo: offer });
     return out ?? true;
   } catch (e) {
     fail(e);
@@ -40,36 +44,57 @@ export function move(p, op) {
 }
 export async function sendFlow(p) {
   const zones = ZONES();
-  const v = await ask({ title: `Send ${name(p)} somewhere`, confirm: 'Send', fields: [
-    { name: 'zone', label: 'Zone', type: zones.length ? 'select' : 'text', options: zones, required: true },
-    { name: 'xyz', label: 'Position x, y, z (blank for the zone start)', placeholder: '0, 10, 0' }] });
+  // The gateway moves a player within the open world (zone 0) to a position.
+  const v = await ask({ title: `Send ${name(p)} somewhere`, body: 'Within the open world, to a position (the map and the online list show positions).',
+    confirm: 'Send', fields: [
+      { name: 'zone', label: 'Zone', type: zones.length ? 'select' : 'text', options: zones, value: '0', required: true },
+      { name: 'xyz', label: 'Position x, y, z', placeholder: '-1415, -28, 352', required: true }] });
   if (!v) return null;
   const xyz = v.xyz.split(/[\s,]+/).filter(Boolean).map(Number);
-  const to = xyz.length === 3 && xyz.every(Number.isFinite) ? { zone: v.zone, position: xyz } : { zone: v.zone };
+  if (xyz.length !== 3 || !xyz.every(Number.isFinite)) { fail(new Error('The position is three numbers: x, y, z')); return null; }
+  const to = { zone: /^\d+$/.test(v.zone) ? Number(v.zone) : v.zone, position: xyz };
   return attempt(() => api.move(p.character_id, 'send', to), (loc) => `Sent ${name(p)} to ${loc?.zone_name || 'the zone'}`)
     .then((r) => (changed(p.character_id), r));
 }
 
-// Powers. The contract's {state} shape is open, so the panel also remembers what it asked for this session.
+// Powers. The gateway answers each with its state: the staff member's own character (character_id null when it is
+// not in the game: then only freeze, unfreeze and send work) and every frozen or jailed player.
 export const frozen = new Set();
-export const self = { invisible: false, god: false };
+export const self = { invisible: false, flying: false, inGame: false };
 export let spectating = null;
+function takeState(state) {
+  if (!state) return;
+  live.powers = state;
+  self.invisible = !!state.invisible;
+  self.flying = !!state.flying;
+  self.inGame = state.character_id != null;
+  frozen.clear();
+  for (const id of state.frozen || []) frozen.add(id);
+  const watched = state.spectating;
+  spectating = watched == null ? null : spectating?.character_id === watched ? spectating
+    : live.online.find((x) => x.character_id === watched) || { character_id: watched, name: `#${watched}` };
+  notify();
+}
+export async function refreshPowers() {
+  try { takeState((await api.powerState()).state); } catch { /* the live poll shows connection errors */ }
+}
 export async function power(op, p) {
-  const out = await attempt(() => api.powers(op, p?.character_id), {
+  const out = await attempt(() => api.powers(op, p?.character_id), (r) => r?.message || {
     spectate: `Spectating ${p && name(p)}. You are hidden from other players.`, unspectate: 'Stopped spectating',
-    invisible: 'You are invisible', visible: 'You are visible again', god: 'God mode toggled',
+    invisible: 'You are invisible', visible: 'You are visible again', fly: 'Flight on', land: 'Flight off',
     freeze: `Froze ${p && name(p)}`, unfreeze: `Unfroze ${p && name(p)}` }[op],
   op === 'freeze' ? () => power('unfreeze', p) : op === 'unfreeze' ? () => power('freeze', p) : undefined);
-  if (out) {
-    if (op === 'freeze') frozen.add(p.character_id);
-    if (op === 'unfreeze') frozen.delete(p.character_id);
-    if (op === 'spectate' || op === 'unspectate') { spectating = op === 'spectate' ? p : null; self.invisible = !!spectating; }
-    if (op === 'invisible' || op === 'visible') self.invisible = op === 'invisible';
-    if (op === 'god') self.god = !self.god;
-    live.powers = out.state || null;
-    notify();
-  }
+  if (out) takeState(out.state);
   if (p) changed(p.character_id);
+  return out;
+}
+
+// An edit's undo by the key its answer or audit row holds.
+export async function undoEdit(row) {
+  const key = row?.after?.undo ?? row?.undo;
+  const who = row?.target?.character_id ?? row?.character_id;
+  const out = await attempt(() => api.undo(key), 'Undone', (r) => undoEdit(r));
+  if (who != null) changed(who);
   return out;
 }
 
@@ -105,8 +130,7 @@ export async function moderate(p, op, preset = {}) {
 // Inventory
 export async function giveItem(p, item, count = 1, equip = false) {
   const text = `Gave ${num(count)} × ${item.name || `item ${item.item_id}`} to ${name(p)}`;
-  const out = await attempt(() => api.addItem(p.character_id, item.item_id, count, equip), text,
-    () => attempt(() => api.removeItems(p.character_id, [{ item_id: item.item_id, count }]), 'Undone').then(() => changed(p.character_id)));
+  const out = await attempt(() => api.addItem(p.character_id, item.item_id, count, equip), text, (r) => undoEdit({ ...r, character_id: p.character_id }));
   changed(p.character_id);
   return out;
 }
@@ -114,13 +138,10 @@ export async function giveItem(p, item, count = 1, equip = false) {
 export async function removeItems(p, entries, { confirmed = false } = {}) {
   const what = entries.length === 1 ? `${entries[0].remove === 'all' ? '' : `${entries[0].remove} × `}${entries[0].name || entries[0].item_id}` : `${entries.length} stacks`;
   if (!confirmed && !(await ask({ title: `Remove ${what}?`, body: `From ${name(p)}'s ${entries.some((e) => e.equipped) ? 'equipment and bags' : 'bags'}.`, confirm: 'Remove', danger: true }))) return null;
-  const body = entries.map((e) => ({ ...(e.equipped || e.slot == null ? { item_id: e.item_id } : { slot: e.slot }), count: e.remove }));
-  const back = entries.map((e) => ({ item_id: e.item_id, name: e.name, count: e.remove === 'all' ? e.count : e.remove, equip: !!e.equipped }));
-  const out = await attempt(() => api.removeItems(p.character_id, body), `Removed ${what}`, async () => {
-    for (const b of back) await attempt(() => api.addItem(p.character_id, b.item_id, b.count, b.equip));
-    toast('Items put back');
-    changed(p.character_id);
-  });
+  // A bag stack by its slot (the stack's instance id); a worn item by the bag stack it wears.
+  const pick = (e) => (e.equipped ? (e.instance != null ? { slot: e.instance } : { item_id: e.item_id }) : e.slot != null ? { slot: e.slot } : { item_id: e.item_id });
+  const body = entries.map((e) => ({ ...pick(e), count: e.remove }));
+  const out = await attempt(() => api.removeItems(p.character_id, body), `Removed ${what}`, (r) => undoEdit({ ...r, character_id: p.character_id }));
   changed(p.character_id);
   return out;
 }
@@ -129,16 +150,17 @@ export async function coins(p, op, amount, before) {
   amount = Number(amount);
   if (op !== 'give' && !(await ask({ title: op === 'set' ? `Set ${name(p)}'s coins to ${num(amount)}?` : `Take ${num(amount)} coins from ${name(p)}?`, confirm: op === 'set' ? 'Set' : 'Take', danger: true }))) return null;
   const out = await attempt(() => api.coins(p.character_id, op, amount), (r) => `${name(p)} now has ${num(r.coins)} coins`,
-    before == null ? undefined : () => attempt(() => api.coins(p.character_id, 'set', before), `Coins back to ${num(before)}`).then(() => changed(p.character_id)));
+    (r) => undoEdit({ ...r, character_id: p.character_id }));
   changed(p.character_id);
   return out;
 }
 
 export async function quest(p, op, quest_id, questName) {
-  const label = questName || `quest ${quest_id}`;
+  const label = questName || questLabel(quest_id);
   if ((op === 'reset' || op === 'abandon') && !(await ask({ title: `${op === 'reset' ? 'Reset' : 'Abandon'} ${label}?`,
     body: op === 'reset' ? 'Their progress on it is cleared and it starts again.' : 'It leaves their quest log.', confirm: op === 'reset' ? 'Reset' : 'Abandon', danger: true }))) return null;
-  const out = await attempt(() => api.quests(p.character_id, op, Number(quest_id)), `${{ grant: 'Granted', complete: 'Completed', reset: 'Reset', abandon: 'Abandoned' }[op]} ${label}`);
+  const out = await attempt(() => api.quests(p.character_id, op, Number(quest_id)), `${{ grant: 'Granted', complete: 'Completed', reset: 'Reset', abandon: 'Abandoned' }[op]} ${label}`,
+    (r) => undoEdit({ ...r, character_id: p.character_id }));
   changed(p.character_id);
   return out;
 }

@@ -27,7 +27,7 @@ export const COMMANDS = [
   { name: 'unfreeze', args: ['player'], help: 'Let a frozen player move again', perm: 'powers', run: ([p]) => act.power('unfreeze', p) },
   { name: 'invisible', args: [], help: 'Hide yourself from other players', perm: 'powers', run: () => act.power('invisible') },
   { name: 'visible', args: [], help: 'Show yourself again', perm: 'powers', run: () => act.power('visible') },
-  { name: 'god', args: [], help: 'Toggle god mode (you take no damage)', perm: 'powers', run: () => act.power('god') },
+  { name: 'fly', args: [], help: 'Toggle the flight exemption (movement checks stop correcting you)', perm: 'powers', run: () => act.power(act.self.flying ? 'land' : 'fly') },
   { name: 'give', args: ['player', 'item', 'count?'], help: 'Give an item, e.g. give Pip 12345 5', perm: 'inventory', run: ([p, it, n]) => act.giveItem(p, it, n || 1) },
   { name: 'take', args: ['player', 'item', 'count?'], help: 'Take an item away (all of it unless you give a count)', perm: 'inventory',
     run: async ([p, it, n]) => {

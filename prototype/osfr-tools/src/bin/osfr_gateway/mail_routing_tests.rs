@@ -69,12 +69,17 @@ impl Files {
         admin::list_for(&self.store(), guid(index)).unwrap()
     }
 
+    /// The mail rows of the staff audit log (`admin::audit`, beside the account store).
     fn audit(&self) -> Vec<serde_json::Value> {
-        fs::read_to_string(admin::audit_path(&self.store()))
-            .unwrap_or_default()
-            .lines()
-            .map(|line| serde_json::from_str(line).unwrap())
-            .collect()
+        let mut rows = Vec::new();
+        let dir = osfr_tools::admin::audit::dir_for(&self.store());
+        osfr_tools::admin::audit::scan(&dir, |row| {
+            rows.push(serde_json::to_value(row).unwrap());
+            true
+        })
+        .unwrap();
+        rows.retain(|row| row["action"] == "mail");
+        rows
     }
 }
 
@@ -419,12 +424,13 @@ fn g2_mail_to_everyone_reaches_an_offline_save_and_its_next_login() {
     // The audit row: who sent what to whom.
     let audit = files.audit();
     assert_eq!(audit.len(), 1);
-    assert_eq!(audit[0]["action"], "mail_send");
-    assert_eq!(audit[0]["staff_account"], account(MO));
-    assert_eq!(audit[0]["staff"], "Mo Moderator");
-    assert_eq!(audit[0]["to"], "everyone");
-    assert_eq!(audit[0]["recipients"], CAST.len());
-    assert_eq!(audit[0]["subject"], "Patch notes");
+    assert_eq!(audit[0]["action"], "mail");
+    assert_eq!(audit[0]["via"], "chat");
+    assert_eq!(audit[0]["staff"]["account_id"], account(MO));
+    assert_eq!(audit[0]["staff"]["name"], "Mo Moderator");
+    assert_eq!(audit[0]["after"]["to"], "everyone");
+    assert_eq!(audit[0]["after"]["recipients"], CAST.len());
+    assert_eq!(audit[0]["after"]["subject"], "Patch notes");
 
     let oz = rig.join(OZ);
     let entered = rig.step();

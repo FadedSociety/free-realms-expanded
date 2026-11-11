@@ -1,5 +1,5 @@
 // Client for the admin HTTP API: one entry per route the gateway serves (the gm-panel contract, plus the login
-// challenge and logout G1 added). In mock mode (?mock=1, or when /admin/api/me does not exist) mock.js answers
+// challenge and logout G1 added, and job edits, undo by key, id names and the powers' state from integration). In mock mode (?mock=1, or when /admin/api/me does not exist) mock.js answers
 // the same calls from mock/*.json, in memory.
 import { createMock } from './mock.js';
 
@@ -17,6 +17,10 @@ export const ROUTES = {
   removeItems: ['POST', '/admin/api/players/{id}/inventory/remove'],
   coins: ['POST', '/admin/api/players/{id}/coins'],
   quests: ['POST', '/admin/api/players/{id}/quests'],
+  jobs: ['POST', '/admin/api/players/{id}/jobs'],
+  undo: ['POST', '/admin/api/undo'],
+  names: ['GET', '/admin/api/names'],
+  powerState: ['GET', '/admin/api/powers'],
   moderate: ['POST', '/admin/api/players/{id}/moderate'],
   notes: ['POST', '/admin/api/players/{id}/notes'],
   move: ['POST', '/admin/api/players/{id}/move'],
@@ -126,6 +130,10 @@ export const api = {
   removeItems: (cid, items) => req('removeItems', id(cid), null, { items }),
   coins: (cid, op, amount) => req('coins', id(cid), null, { op, amount }),
   quests: (cid, op, quest_id) => req('quests', id(cid), null, { op, quest_id }),
+  jobs: (cid, job_id, set) => req('jobs', id(cid), null, { job_id, ...set }),
+  undo: (key) => req('undo', {}, null, { undo: key }),
+  names: () => req('names'),
+  powerState: () => req('powerState'),
   moderate: (cid, op, minutes, reason) => req('moderate', id(cid), null, { op, ...(minutes ? { minutes } : {}), ...(reason ? { reason } : {}) }),
   notes: (cid, text) => req('notes', id(cid), null, { text }),
   move: (cid, op, to) => req('move', id(cid), null, to ? { op, to } : { op }),

@@ -91,8 +91,9 @@ fn exchange(rig: &mut Rig, raw: Vec<u8>) -> Response {
     let address = rig.server.admin.as_ref().unwrap().address;
     let client = std::thread::spawn(move || {
         let mut stream = TcpStream::connect(address).unwrap();
+        // Longer than the panel's own wait for a character edit (`admin_wire::EDIT_WAIT`).
         stream
-            .set_read_timeout(Some(Duration::from_secs(10)))
+            .set_read_timeout(Some(Duration::from_secs(40)))
             .unwrap();
         let _ = stream.write_all(&raw);
         let mut out = Vec::new();
@@ -279,10 +280,13 @@ fn admin_a_moderator_is_refused_admin_routes() {
     let ban_ada = post(&mut rig, &format!("/admin/api/players/{}/moderate", guid(ADA)), json!({"op": "ban"}), &mo);
     assert_eq!(ban_ada.status, 403);
     assert_eq!(files.sanctions(ADA), Sanctions::default());
-    // An admin reaches the same routes: real ones answer, other builders' stubs say 501.
+    // An admin reaches the same routes: real ones answer (a bad body is 400), the one left
+    // registered without a backend (the event stream) says 501.
     let ada = sign_in(&mut rig, ADA_HANDLE);
     assert_eq!(post(&mut rig, "/admin/api/announce", announce, &ada).status, 200);
-    let stub = post(&mut rig, &format!("/admin/api/players/{pip}/inventory/add"), json!({}), &ada);
+    let empty = post(&mut rig, &format!("/admin/api/players/{pip}/inventory/add"), json!({}), &ada);
+    assert_eq!(empty.status, 400);
+    let stub = get(&mut rig, "/admin/api/events", Some(&ada));
     assert_eq!(stub.status, 501);
     assert!(stub.json()["error"].as_str().unwrap().contains("not built yet"));
     let status = get(&mut rig, "/admin/api/status", Some(&ada)).json();
@@ -592,3 +596,7 @@ fn admin_icons_come_from_the_client_install() {
     assert_eq!(get(&mut rig, "/admin/icon/2147483647", Some(&mo)).status, 404);
     assert_eq!(get(&mut rig, "/admin/icon/abc", Some(&mo)).status, 400);
 }
+
+#[cfg(test)]
+#[path = "admin_wire_tests.rs"]
+mod wire;

@@ -49,7 +49,6 @@ fn failed(text: impl Into<String>) -> AdminError {
 }
 
 /// The bag and the worn items (moderators and admins).
-#[allow(dead_code)] // G1's `/players/{id}/inventory` route is the caller (lead integration)
 pub(crate) fn inventory(
     host: &Host,
     actor: &Actor,
@@ -59,7 +58,6 @@ pub(crate) fn inventory(
 }
 
 /// Coins, jobs and levels, quests, mounts, pets and collections (moderators and admins).
-#[allow(dead_code)] // G1's `/players/{id}` profile route is the caller (lead integration)
 pub(crate) fn profile(
     host: &Host,
     actor: &Actor,
@@ -69,7 +67,7 @@ pub(crate) fn profile(
 }
 
 /// Item definitions by name substring or id, a page at a time (moderators and admins).
-#[allow(dead_code)] // G1's `/items?q=` route is the caller (lead integration)
+#[allow(dead_code)] // the panel's `/items` searches on its HTTP thread (`admin_wire::items`)
 pub(crate) fn search_items(
     host: &Host,
     actor: &Actor,
@@ -127,7 +125,6 @@ pub(crate) fn coins(
     edit(host, actor, target, Edit::Coins(op, amount))
 }
 
-#[allow(dead_code)] // G1's `/players/{id}/quests` route is the caller (lead integration)
 pub(crate) fn quests(
     host: &mut Host,
     actor: &Actor,
@@ -138,7 +135,6 @@ pub(crate) fn quests(
     edit(host, actor, target, Edit::Quest(op, quest_id))
 }
 
-#[allow(dead_code)] // G1's job route is the caller (lead integration)
 pub(crate) fn jobs(
     host: &mut Host,
     actor: &Actor,
@@ -150,7 +146,6 @@ pub(crate) fn jobs(
 }
 
 /// Reverse an earlier write, refused (changing nothing) when the character moved on since.
-#[allow(dead_code)] // G1's audit-log undo is the caller (lead integration)
 pub(crate) fn undo(
     host: &mut Host,
     actor: &Actor,
@@ -358,6 +353,120 @@ fn load_offline(options: &Options, target: u64) -> Result<Gateway, AdminError> {
     Ok(gateway)
 }
 
+/// The staff audit log's action name for an edit.
+pub(crate) fn action(edit: &Edit) -> &'static str {
+    match edit {
+        Edit::AddItems { .. } => "inventory_add",
+        Edit::RemoveItems(_) => "inventory_remove",
+        Edit::Coins(..) => "coins",
+        Edit::Quest(..) => "quests",
+        Edit::Job(..) => "jobs",
+        Edit::Apply(_) => "undo",
+    }
+}
+
+/// (R) An edit row larger than this keeps its summary but not its change (no undo): the audit
+/// log refuses rows past 16 KiB.
+const ROW_BUDGET: usize = 14 * 1024;
+
+/// The staff audit row of one applied edit. `before` and `after` say in short what changed
+/// (coins, item stacks by item and count, worn rows, quest states, job XP); `after` also carries
+/// the whole change and the key `POST /admin/api/undo` takes to reverse it, when they fit.
+pub(crate) fn audit_row(
+    staff: osfr_tools::admin::Staff,
+    via: &str,
+    target: osfr_tools::admin::audit::Target,
+    edit: &Edit,
+    receipt: &Receipt,
+) -> osfr_tools::admin::audit::Row {
+    let change = &receipt.record.change;
+    let (mut before, mut after) = (serde_json::Map::new(), serde_json::Map::new());
+    let mut side = |key: &str, old: serde_json::Value, new: serde_json::Value| {
+        before.insert(key.into(), old);
+        after.insert(key.into(), new);
+    };
+    if let Some([old, new]) = change.coins {
+        side("coins", old.into(), new.into());
+    }
+    let stacks =
+        |pick: fn(&admin::StackChange) -> &Option<osfr_tools::inventory::InventoryItem>| {
+            (change.stacks.iter())
+                .filter_map(|stack| pick(stack).as_ref())
+                .map(|item| serde_json::json!({"item_id": item.definition_id, "count": item.count}))
+                .collect::<Vec<_>>()
+        };
+    if !change.stacks.is_empty() {
+        side(
+            "items",
+            stacks(|s| &s.before).into(),
+            stacks(|s| &s.after).into(),
+        );
+    }
+    if !change.equipment.is_empty() {
+        let worn = |at: usize| {
+            (change.equipment.iter())
+                .map(
+                    |rows| serde_json::json!({"slot": rows[at].slot, "instance": rows[at].item_id}),
+                )
+                .collect::<Vec<_>>()
+        };
+        side("worn", worn(0).into(), worn(1).into());
+    }
+    if !change.quests.is_empty() {
+        let quests =
+            |pick: fn(&admin::QuestChange) -> &Option<osfr_tools::quest_engine::QuestProgress>| {
+                (change.quests.iter())
+                    .map(|quest| {
+                        let status = pick(quest).as_ref().map(|progress| progress.status.clone());
+                        (quest.quest_id.to_string(), serde_json::json!(status))
+                    })
+                    .collect::<serde_json::Map<String, serde_json::Value>>()
+            };
+        side(
+            "quests",
+            quests(|q| &q.before).into(),
+            quests(|q| &q.after).into(),
+        );
+    }
+    if !change.jobs.is_empty() {
+        let jobs = |old: bool| {
+            (change.jobs.iter())
+                .map(|job| {
+                    let xp = if old { job.before } else { job.after };
+                    (job.job_id.to_string(), serde_json::Value::from(xp))
+                })
+                .collect::<serde_json::Map<String, serde_json::Value>>()
+        };
+        side("job_xp", jobs(true).into(), jobs(false).into());
+    }
+    after.insert("summary".into(), receipt.record.summary.clone().into());
+    after.insert("online".into(), receipt.online.into());
+    let mut row = osfr_tools::admin::audit::Row {
+        time: receipt.record.at_unix,
+        staff,
+        action: action(edit).to_owned(),
+        target,
+        before: before.into(),
+        after: after.clone().into(),
+        reason: None,
+        via: via.to_owned(),
+    };
+    let mut key = [0u8; 16];
+    if getrandom::getrandom(&mut key).is_ok() {
+        let mut undoable = after;
+        undoable.insert("change".into(), serde_json::json!(change));
+        undoable.insert("undo".into(), admin_http::hex(&key).into());
+        let full = osfr_tools::admin::audit::Row {
+            after: undoable.into(),
+            ..row.clone()
+        };
+        if serde_json::to_vec(&full).is_ok_and(|bytes| bytes.len() <= ROW_BUDGET) {
+            row = full;
+        }
+    }
+    row
+}
+
 /// After an admin's message commits: run its `realm give|take|coins <First Last> ...` words.
 /// `Gateway::staff_command` already refused every other role and answered usage errors.
 pub(super) fn run_chat(
@@ -411,7 +520,14 @@ pub(super) fn run_chat(
                     now_ms,
                     me: Some(&mut *session),
                 };
-                match edit(&mut host, &actor, guid, parsed.edit) {
+                let done = edit(&mut host, &actor, guid, parsed.edit.clone());
+                if let (Ok(receipt), Some(store)) = (&done, options.account_store.as_deref()) {
+                    let target = admin_http::audit_target(store, Some(guid));
+                    let staff = admin_http::chat_staff(session);
+                    let row = audit_row(staff, "chat", target, &parsed.edit, receipt);
+                    osfr_tools::admin::audit::record_beside(store, &row);
+                }
+                match done {
                     Ok(receipt) => format!(
                         "Done for character {guid}: {}{}.",
                         receipt.record.summary,
@@ -431,7 +547,6 @@ pub(super) fn run_chat(
     }
     Ok(())
 }
-
 #[cfg(test)]
 #[path = "g3_character_admin.rs"]
 mod tests;

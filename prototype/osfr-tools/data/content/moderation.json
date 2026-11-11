@@ -1,5 +1,10 @@
 {
   "schema_version": 1,
   "source": "reconstructed (R): L042 brief; OSFR #138 (4f028dc) takes any number of minutes, this server caps a timed mute or ban at one year",
-  "max_minutes": 525600
+  "max_minutes": 525600,
+  "jail": {
+    "zone_id": 0,
+    "position": [-260.0, 14.3, 680.0],
+    "source": "reconstructed (R): gm-panel integration; a flat, empty spot in The Wilds, 120 m from the nearest road (Studio probe: terrain floor, slope 4 to 6 degrees, open on every side)"
+  }
 }

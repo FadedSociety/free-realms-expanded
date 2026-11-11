@@ -45,8 +45,8 @@ export function render(root) {
 
   const tokenBox = h('div', { class: 'tokens' });
   const toInput = h('input', { class: 'token-input', placeholder: 'Player name, Everyone, Online, Role or Zone', 'aria-label': 'Recipients' });
-  const subject = h('input', { class: 'input', maxlength: 120, required: true, value: pre?.subject || '', placeholder: 'What is it about?' });
-  const body = h('textarea', { class: 'input', rows: 8, maxlength: 4000, placeholder: 'Write the message the player will read.' });
+  const subject = h('input', { class: 'input', maxlength: 60, required: true, value: pre?.subject || '', placeholder: 'What is it about?' });
+  const body = h('textarea', { class: 'input', rows: 8, maxlength: 1000, placeholder: 'Write the message the player will read.' });
   const coins = h('input', { class: 'input', type: 'number', min: 0, max: 1000000, inputmode: 'numeric', placeholder: '0' });
   const attachList = h('div', { class: 'attach-list' });
   const reach = h('p', { class: 'muted small', 'aria-live': 'polite' });
@@ -100,13 +100,13 @@ export function render(root) {
   function paintPreview() {
     const c = Number(coins.value) || 0;
     clear(preview,
-      h('div', { class: 'letter-from' }, h('span', { class: 'avatar', 'aria-hidden': 'true' }, icon('mail', 16)), h('span', {}, h('strong', {}, act.me.name || 'Staff'), h('span', { class: 'muted' }, 'just now'))),
+      h('div', { class: 'letter-from' }, h('span', { class: 'avatar', 'aria-hidden': 'true' }, icon('mail', 16)), h('span', {}, h('strong', {}, 'Free Realms'), h('span', { class: 'muted' }, 'just now'))),
       h('h3', { class: 'letter-subject' }, subject.value.trim() || 'No subject yet'),
       h('p', { class: 'letter-body' }, body.value || 'The message appears here as you type.'),
       attach.length || c ? h('div', { class: 'letter-attach' }, attach.map((a) => h('span', { class: 'letter-item', title: a.item.name }, itemArt(a.item, 'sm'), h('span', {}, `×${a.count}`))),
         c ? h('span', { class: 'letter-item' }, h('span', { class: 'art art-sm art-ph' }, icon('coins', 18)), h('span', {}, num(c))) : null,
       h('span', { class: 'btn btn-sm btn-primary letter-claim', 'aria-hidden': 'true' }, 'Claim')) : null);
-    counter.textContent = `${body.value.length} / 4000`;
+    counter.textContent = `${body.value.length} / 1000`;
   }
   function paint() { paintTokens(); paintAttach(); paintPreview(); paintReach(); }
 

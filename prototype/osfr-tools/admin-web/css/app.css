@@ -239,6 +239,7 @@ input[type="file"]::file-selector-button {
 .note-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 .change { color: var(--ink-3); overflow-wrap: anywhere; }
 .clip { display: block; max-width: 28ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.change.clip { max-width: 56ch; }
 .table-wrap { background: var(--surface); border-radius: var(--r-card); overflow-x: auto; }
 .table { width: 100%; border-collapse: collapse; }
 .table th { text-align: left; font-weight: 600; font-size: var(--fs-2); color: var(--ink-3); padding: 12px var(--s-4); white-space: nowrap; }

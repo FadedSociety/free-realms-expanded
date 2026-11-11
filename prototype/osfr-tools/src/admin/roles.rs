@@ -23,6 +23,7 @@ pub const ACTIONS: &[(&str, AccountRole)] = &[
     ("inventory", AccountRole::Admin),
     ("coins", AccountRole::Admin),
     ("quests", AccountRole::Admin),
+    ("jobs", AccountRole::Admin),
     ("move", AccountRole::Admin),
     ("powers", AccountRole::Admin),
 ];

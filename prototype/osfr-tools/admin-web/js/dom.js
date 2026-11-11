@@ -99,12 +99,21 @@ export function when(t) {
   const ms = toMs(t);
   return Number.isFinite(ms) ? new Date(ms).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
 }
+// The local date and time to the second, for the audit log.
+export function stamp(t) {
+  const ms = toMs(t);
+  return Number.isFinite(ms) ? new Date(ms).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+}
 // Labels for the gateway's raw values: roles are lowercase, accounts and jobs are numbers, zone names may be null,
 // audit staff and targets are objects, and an "until" past 1e15 (u64::MAX) means until lifted.
 export const roleName = (r) => (r ? String(r)[0].toUpperCase() + String(r).slice(1) : 'Player');
 export const nameOf = (x) => (x && typeof x === 'object' ? x.name ?? '' : x ?? '');
 export const zoneLabel = (p) => p?.zone_name || (p?.zone != null ? `Zone ${p.zone}` : 'Loading');
-export const jobLabel = (j) => (typeof j === 'string' ? j : j != null ? `Job ${j}` : '');
+// Names the gateway serves for ids (GET /admin/api/names): jobs by profile id, quests by id. Filled at sign-in;
+// an id it does not name shows as the id.
+export const names = { jobs: {}, quests: {} };
+export const jobLabel = (j) => (typeof j === 'string' ? j : j != null ? names.jobs[j] || `Job ${j}` : '');
+export const questLabel = (q) => names.quests[q] || `Quest ${q}`;
 export const accountLabel = (a) => (typeof a === 'number' ? `account ${a}` : a ?? '');
 export const untilText = (u) => (u == null ? '' : u >= 1e15 ? 'until lifted' : ago(u));
 export const num = (n) => (Number.isFinite(+n) ? (+n).toLocaleString() : String(n ?? ''));

@@ -18,16 +18,46 @@ pub(super) fn run(
     now_ms: u64,
     request: AdminMove,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let reply = move_character(admin, options, sessions, world, membership, now_ms, request)
-        .unwrap_or_else(|refusal| format!("Cannot move: {refusal}. Nothing changed."));
+    let by = Mover::of(admin);
+    let target = request.target.clone();
+    let moved = move_character(by, options, sessions, world, membership, now_ms, request);
+    if let (Ok(reply), Some(store)) = (&moved, options.account_store.as_deref()) {
+        let guid = match target {
+            MoveTarget::Guid(guid) => Some(guid),
+            MoveTarget::Name(name) => AccountStore::load(store)
+                .ok()
+                .and_then(|store| store.character_by_display_name(&name)),
+        };
+        admin_http::audit_chat(options, admin, "move", guid, json!({ "result": reply }));
+    }
+    let reply = moved.unwrap_or_else(|refusal| format!("Cannot move: {refusal}. Nothing changed."));
     admin
         .sender
         .queue_message(&wrap_application(&osfr_tools::chat::system(&reply)))?;
     Ok(())
 }
 
+/// Who asks for a move: the staff account, its session and its own character (both 0 for the
+/// web panel's staff member, who may have no character in the world).
+#[derive(Clone, Copy)]
+pub(super) struct Mover {
+    pub(super) account: u64,
+    pub(super) session: u64,
+    pub(super) character: u64,
+}
+
+impl Mover {
+    pub(super) fn of(session: &Session) -> Self {
+        Self {
+            account: session.account_guid,
+            session: session.id.0,
+            character: session.character_guid,
+        }
+    }
+}
+
 pub(super) fn move_character(
-    admin: &Session,
+    admin: Mover,
     options: &Options,
     sessions: &mut SessionMap,
     world: &mut SharedWorld,
@@ -55,7 +85,7 @@ pub(super) fn move_character(
         MoveTarget::Name(name) => store.character_by_display_name(name),
     }
     .ok_or("no single character has that name or GUID")?;
-    if guid == admin.character_guid {
+    if guid == admin.character {
         return Err("use realm goto to move yourself".into());
     }
     let owner = store
@@ -78,8 +108,8 @@ pub(super) fn move_character(
         })?,
     };
     let row = AdminMoveRow {
-        account_id: admin.account_guid,
-        session_id: admin.id.0,
+        account_id: admin.account,
+        session_id: admin.session,
         target_guid: guid,
         online: online.is_some(),
         from: (from.zone_id, from.position),

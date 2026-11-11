@@ -119,6 +119,18 @@ pub fn record(dir: &Path, row: &Row) -> io::Result<()> {
     replace_bytes(&segment(dir, number), &bytes)
 }
 
+/// Append `row` to the log beside `account_store`, for a front end with nobody to answer an error
+/// (chat, a mail job): a failure is printed, never undoes the action, and says whether it was stored.
+pub fn record_beside(account_store: &Path, row: &Row) -> bool {
+    match record(&dir_for(account_store), row) {
+        Ok(()) => true,
+        Err(error) => {
+            eprintln!("admin audit: the {} row was not written: {error}", row.action);
+            false
+        }
+    }
+}
+
 /// Every row, newest first, until `visit` returns false. Unreadable lines are skipped.
 pub fn scan(dir: &Path, mut visit: impl FnMut(Row) -> bool) -> io::Result<()> {
     // ponytail: reads whole segments newest first; an index per staff or player if the log

@@ -1,12 +1,15 @@
-// Mock admin API (mock mode): answers every route from mock/*.json in the shapes the gateway serves (the core routes
-// as G1 serves them, the mail, inventory and powers routes as the plan's contract has them), keeps writes in memory,
-// and walks the online players about so the live views move. All names and items are invented.
+// Mock admin API (mock mode): answers every route from mock/*.json in the shapes the gateway serves, keeps writes in
+// memory (an edit answers with an undo key, as the gateway's do), and walks the online players about so the live
+// views move. All players and items are invented; the job names are the game's.
 import { score } from './dom.js';
 
 const TIME_KEYS = new Set(['time', 'last_seen', 'created', 'sent', 'finished', 'muted_until', 'banned_until']);
 export const FOREVER = 18446744073709551615; // "until lifted" (u64::MAX); any value past 1e15 reads that way
 const PAGE = 50;
 const RANK = { player: 0, tester: 1, builder: 1, moderator: 2, admin: 3 };
+const JOBS = { 1: 'Adventurer', 2: 'Ninja', 4: 'Postman', 11: 'Medic', 12: 'Wizard', 14: 'Miner', 16: 'Blacksmith', 32: 'Warrior',
+  35: 'Archer', 43: 'Brawler', 45: 'Chef', 48: 'Kart Driver', 49: 'Demo Derby Driver', 52: 'Soccer Star', 120: 'Card Duelist',
+  121: 'Pet Trainer', 137: 'Fisherman' };
 
 class MockError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -44,7 +47,8 @@ export function createMock(source) {
   const { me, players, inventory, items, quests, zones, audit } = data;
   const jobs = data.mail.jobs;
   const boxes = data.mail.mailboxes;
-  const powers = { spectating: null, invisible: false, god: false, frozen: [] };
+  const powers = { spectating: null, following: null, invisible: false, flying: false, frozen: [], jailed: [] };
+  const undos = new Map();
   const sessionBase = new Map(players.map((p) => [p.character_id, p.session_s]));
   const heading = new Map(players.map((p, i) => [p.character_id, (i * 2.39) % (Math.PI * 2)]));
   let signedOut = false;
@@ -64,6 +68,14 @@ export function createMock(source) {
     audit.unshift(row);
     return row;
   };
+  // An edit's undo key, as the gateway's audit row and answer carry it.
+  const undoable = (row, inverse) => {
+    const key = hex(32);
+    row.after.undo = key;
+    undos.set(key, { inverse, target: row.target, used: false });
+    return key;
+  };
+  const powerState = () => ({ character_id: staffChar().character_id, ...powers });
 
   // Online players wander: a small step along a slowly turning heading, at most once a second.
   function step() {
@@ -162,8 +174,14 @@ export function createMock(source) {
         if (stack) stack.count += count;
         else inv.bags.push({ slot: nextSlot(inv), item_id: it.item_id, name: it.name, count, icon: null });
       }
-      log('inventory_add', p, {}, { item_id: it.item_id, count, equip: !!b.equip });
-      return inv;
+      const row = log('inventory_add', p, { items: [] }, { items: [{ item_id: it.item_id, name: it.name, count }] });
+      const undo = undoable(row, () => {
+        const stack = [...inv.bags, ...inv.equipped].find((e) => e.item_id === it.item_id);
+        if (stack) stack.count -= Math.min(stack.count, count);
+        inv.bags = inv.bags.filter((e) => e.count > 0);
+        inv.equipped = inv.equipped.filter((e) => e.count > 0);
+      });
+      return { ...inv, undo, online: p.online };
     },
     removeItems({ id }, _, b) {
       const p = player(id);
@@ -176,12 +194,19 @@ export function createMock(source) {
         if (!e) bad('That item is no longer there');
         const n = r.count === 'all' ? e.count : intIn(r.count, 1, e.count, 'Count');
         e.count -= n;
-        removed.push({ item_id: e.item_id, count: n });
+        removed.push({ item_id: e.item_id, name: e.name, count: n });
       }
       inv.bags = inv.bags.filter((e) => e.count > 0);
       inv.equipped = inv.equipped.filter((e) => e.count > 0);
-      log('inventory_remove', p, { items: removed }, {});
-      return inv;
+      const row = log('inventory_remove', p, { items: removed }, { items: [] });
+      const undo = undoable(row, () => {
+        for (const r of removed) {
+          const stack = inv.bags.find((e) => e.item_id === r.item_id);
+          if (stack) stack.count += r.count;
+          else inv.bags.push({ slot: nextSlot(inv), item_id: r.item_id, name: itemOf(r.item_id)?.name || `#${r.item_id}`, count: r.count, icon: null });
+        }
+      });
+      return { ...inv, undo, online: p.online };
     },
     coins({ id }, _, b) {
       const p = player(id);
@@ -191,28 +216,51 @@ export function createMock(source) {
       else if (b.op === 'take') { if (amount > p.coins) bad(`${p.name} has only ${p.coins} coins`); p.coins -= amount; }
       else if (b.op === 'set') p.coins = amount;
       else bad('op must be give, take or set');
-      log('coins', p, { coins: before }, { coins: p.coins });
-      return { coins: p.coins };
+      const undo = undoable(log('coins', p, { coins: before }, { coins: p.coins }), () => { p.coins = before; });
+      return { coins: p.coins, undo, online: p.online };
     },
     quests({ id }, _, b) {
       const p = player(id);
       const qid = Number(b.quest_id);
       if (!quests.some((x) => x.quest_id === qid)) bad(`No quest with id ${b.quest_id}`);
       const { active, done } = p.quests;
+      const was = structuredClone(p.quests);
       const drop = (list) => list.filter((x) => x !== qid);
       if (b.op === 'grant') { if (active.includes(qid) || done.includes(qid)) bad(`${p.name} already has quest ${qid}`); active.push(qid); }
       else if (b.op === 'complete') { if (!active.includes(qid)) bad(`Quest ${qid} is not active`); p.quests = { active: drop(active), done: [qid, ...done] }; }
       else if (b.op === 'reset') p.quests = { active: [...drop(active), qid], done: drop(done) };
       else if (b.op === 'abandon') { if (!active.includes(qid)) bad(`Quest ${qid} is not active`); p.quests.active = drop(active); }
       else bad('op must be grant, complete, reset or abandon');
-      log('quests', p, {}, { op: b.op, quest_id: qid });
-      return p.quests;
+      const row = log('quests', p, { quests: { [qid]: was.active.includes(qid) ? 'active' : was.done.includes(qid) ? 'completed' : null } },
+        { quests: { [qid]: p.quests.active.includes(qid) ? 'active' : p.quests.done.includes(qid) ? 'completed' : null } });
+      const undo = undoable(row, () => { p.quests = was; });
+      return { ...p.quests, undo };
+    },
+    jobs({ id }, _, b) {
+      const p = player(id);
+      const job = p.jobs.find((j) => j.job === Number(b.job_id)) || bad(`${p.name} has no job ${b.job_id}`);
+      const before = job.xp;
+      if (b.level != null) Object.assign(job, { level: intIn(b.level, 1, 20, 'Level'), xp: (intIn(b.level, 1, 20, 'Level') - 1) * 500 });
+      else job.xp = intIn(b.xp, 0, 10_000_000, 'XP');
+      const undo = undoable(log('jobs', p, { job_xp: { [job.job]: before } }, { job_xp: { [job.job]: job.xp } }), () => { job.xp = before; });
+      return { jobs: p.jobs, undo };
+    },
+    undo(_, __, b) {
+      const u = undos.get(b.undo) || (() => { throw new MockError(404, 'no edit has that undo key'); })();
+      if (u.used) throw new MockError(409, 'that edit was undone already');
+      u.used = true;
+      u.inverse();
+      const p = player(u.target.character_id);
+      log('undo', p, {}, { undid: b.undo });
+      return { ...invOf(p.character_id), character_id: p.character_id, online: p.online };
+    },
+    names() {
+      return { jobs: JOBS, quests: Object.fromEntries(quests.map((q) => [q.quest_id, q.name])) };
     },
     moderate({ id }, _, b) {
       const p = player(id);
       const ops = ['mute', 'unmute', 'kick', 'ban', 'unban', 'warn', 'jail', 'release'];
       if (!ops.includes(b.op)) bad('unknown op');
-      if (b.op === 'jail' || b.op === 'release') throw new MockError(501, `${b.op} is not built yet; it is wired in at integration`);
       const reason = String(b.reason ?? '').trim();
       if (reason.length > 500) bad('a reason is at most 500 characters');
       if (b.op === 'warn' && !reason) bad('a warning needs a reason');
@@ -223,6 +271,11 @@ export function createMock(source) {
       if (b.op === 'kick' && !p.online) throw new MockError(409, `${p.name} is not online`);
       if (b.op === 'unmute' && !s.muted) throw new MockError(409, `${p.name} is not muted`);
       if (b.op === 'unban' && !s.banned) throw new MockError(409, `${p.name} is not banned`);
+      const jailed = powers.jailed.includes(p.character_id);
+      if (b.op === 'jail' && jailed) throw new MockError(409, 'that player is already jailed');
+      if (b.op === 'release' && !jailed) throw new MockError(409, 'that player is not jailed');
+      if (b.op === 'jail') { powers.jailed.push(p.character_id); p.position = [-260, 14.3, 680]; }
+      if (b.op === 'release') powers.jailed = powers.jailed.filter((x) => x !== p.character_id);
       const before = Object.fromEntries(Object.entries(s).filter(([k, v]) => k.endsWith('_until') && v != null));
       const until = minutes ? now() + minutes * 60 : FOREVER;
       if (b.op === 'mute') Object.assign(s, { muted: true, muted_until: Math.max(s.muted_until ?? 0, until) });
@@ -230,7 +283,8 @@ export function createMock(source) {
       if (b.op === 'ban') Object.assign(s, { banned: true, banned_until: Math.max(s.banned_until ?? 0, until) });
       if (b.op === 'unban') Object.assign(s, { banned: false, banned_until: null });
       if (b.op === 'kick' || b.op === 'ban') { p.online = false; p.last_seen = now(); }
-      const after = b.op === 'warn' ? { delivered: p.online } : ['mute', 'unmute', 'ban', 'unban'].includes(b.op) ? { sanctions: { ...s }, minutes } : {};
+      const after = b.op === 'warn' ? { delivered: p.online } : ['mute', 'unmute', 'ban', 'unban'].includes(b.op) ? { sanctions: { ...s }, minutes }
+        : b.op === 'jail' || b.op === 'release' ? { jailed: b.op === 'jail', result: `${b.op === 'jail' ? 'Jailed' : 'Released'} ${p.name}.` } : {};
       const row = log(b.op, p, before, after, reason);
       p.moderation.unshift(row);
       return { op: b.op, row, moderation: p.moderation.slice(0, 50) };
@@ -245,7 +299,7 @@ export function createMock(source) {
     move({ id }, _, b) {
       const p = player(id);
       const staff = staffChar();
-      if (b.op === 'goto') { Object.assign(staff, location(p), { online: true }); log('move', p, {}, { op: 'goto' }); return location(staff); }
+      if (b.op === 'goto') { Object.assign(staff, location(p), { online: true }); log('goto', p, {}, { result: `Moved you to ${p.name}.` }); return location(staff); }
       if (b.op === 'bring') Object.assign(p, { zone: staff.zone, zone_name: staff.zone_name, position: staff.position.map((v, i) => (i === 1 ? v : v + 2)) });
       else if (b.op === 'send') {
         const to = b.to || bad('Send needs a destination');
@@ -256,7 +310,7 @@ export function createMock(source) {
           Object.assign(p, { zone: z.zone, zone_name: z.zone_name, position: ps });
         }
       } else bad('op must be goto, bring or send');
-      log('move', p, {}, { op: b.op, zone: p.zone_name });
+      log(b.op, p, {}, { result: `Moved ${p.name} to ${p.position.map(Math.round).join(', ')}.` });
       return location(p);
     },
     powers(_, __, b) {
@@ -267,11 +321,13 @@ export function createMock(source) {
       else if (b.op === 'invisible' || b.op === 'visible') powers.invisible = b.op === 'invisible';
       else if (b.op === 'freeze') { if (!powers.frozen.includes(need().character_id)) powers.frozen.push(tgt.character_id); }
       else if (b.op === 'unfreeze') powers.frozen = powers.frozen.filter((x) => x !== need().character_id);
-      else if (b.op === 'god') powers.god = !powers.god;
+      else if (b.op === 'fly' || b.op === 'land') powers.flying = b.op === 'fly';
       else bad('Unknown power');
-      log('powers', tgt, {}, { op: b.op });
-      return { state: powers };
+      const message = `Done: ${b.op}${tgt ? ` ${tgt.name}` : ''}.`;
+      log(b.op, tgt, {}, { result: message });
+      return { state: powerState(), message };
     },
+    powerState: () => ({ state: powerState() }),
     items(_, q) {
       const text = String(q.q || '').trim().toLowerCase();
       return items.map((it) => [it, String(it.item_id).startsWith(text) ? 5 : score(it.name, text)])

@@ -7,12 +7,14 @@
 //! - [`audit`]: the append-only staff audit log beside the account store.
 //! - [`roster`]: the online list, player search and profile reads.
 //! - [`moderation`]: the panel's moderation ops on top of `crate::moderation`, and warn.
-//! - [`icons`]: item icons read from the player's client install.
+//! - [`icons`]: item icons and zone map tiles read from the player's client install.
+//! - [`names`]: job and quest names for the ids the other reads give.
 use serde::Serialize;
 
 pub mod audit;
 pub mod icons;
 pub mod moderation;
+pub mod names;
 pub mod roles;
 pub mod roster;
 

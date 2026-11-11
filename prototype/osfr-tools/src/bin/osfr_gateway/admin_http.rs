@@ -22,8 +22,8 @@
 //!   to `Server::poll_admin`, which runs a few per step on the world loop and answers at once.
 //!   File work (the account store, saves, the audit log, icons) stays on the HTTP thread.
 //! - **Routes:** `lab/autopilot/opus/pieces/gm-panel/api-served.md`. Mail, inventory, coins,
-//!   quests, moves, powers, items and the map are registered, role-checked, and answer 501 until
-//!   G2, G3 and G5's facades are wired in.
+//!   quests, jobs, undo, moves, powers, items, names and the map call G2, G3 and G5's facades
+//!   (`admin_wire.rs`).
 use super::*;
 use osfr_tools::account_store::AccountRole;
 use osfr_tools::admin::{self, Staff, audit, moderation::Op, roles, roster};
@@ -39,6 +39,9 @@ use std::net::{IpAddr, TcpStream};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{MutexGuard, PoisonError, mpsc};
 use subtle::ConstantTimeEq;
+
+#[path = "admin_wire.rs"]
+mod wire;
 
 /// (R) Local bounds: request head and body, connections at once, staff sessions, a panel file.
 const MAX_HEAD: usize = 8 * 1024;
@@ -164,6 +167,8 @@ struct Shared {
     failures: Mutex<LoginFailures>,
     addresses: Mutex<KeyedBuckets<IpAddr>>,
     icons: Option<admin::icons::Icons>,
+    /// The item tables, loaded on first use (item search, names in audit rows, mail attachments).
+    catalogue: std::sync::OnceLock<Option<osfr_tools::inventory::Inventory>>,
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -238,6 +243,7 @@ pub(super) fn open(config: Config, options: &Options) -> Result<Option<Box<Admin
         icons: config
             .client
             .map(|install| admin::icons::Icons::new(install, options.content.clone())),
+        catalogue: std::sync::OnceLock::new(),
     });
     let stop = Arc::new(AtomicBool::new(false));
     let stopping = stop.clone();
@@ -466,6 +472,8 @@ fn route(shared: &Shared, request: &Request, peer: IpAddr) -> Reply {
         api(shared, request, rest, peer)
     } else if let Some(id) = path.strip_prefix("/admin/icon/") {
         icon(shared, request, id)
+    } else if let Some(zone) = path.strip_prefix("/admin/map-image/") {
+        wire::map_image(shared, request, zone)
     } else if request.method != "GET" {
         Err(error(405, "the panel's files are GET only"))
     } else if path.starts_with("/admin/") {
@@ -590,7 +598,7 @@ fn parse<T: serde::de::DeserializeOwned>(request: &Request) -> Result<T, Reply> 
     serde_json::from_slice(&request.body).map_err(|error_| error(400, &format!("bad JSON body: {error_}")))
 }
 
-fn hex(bytes: &[u8]) -> String {
+pub(super) fn hex(bytes: &[u8]) -> String {
     bytes
         .iter()
         .flat_map(|byte| [HEX[usize::from(byte >> 4)] as char, HEX[usize::from(byte & 15)] as char])
@@ -618,6 +626,16 @@ fn world<T: Send + 'static>(
     shared: &Shared,
     work: impl FnOnce(&mut Server) -> T + Send + 'static,
 ) -> Result<T, Reply> {
+    world_within(shared, WORLD_WAIT, work)
+}
+
+/// `world` with its own wait: a job that edits or loads a character (a save written, a backup
+/// taken) waits longer, so its answer and audit row are not lost to a slow step.
+fn world_within<T: Send + 'static>(
+    shared: &Shared,
+    patience: Duration,
+    work: impl FnOnce(&mut Server) -> T + Send + 'static,
+) -> Result<T, Reply> {
     let (answer, wait) = mpsc::channel();
     shared
         .jobs
@@ -625,7 +643,7 @@ fn world<T: Send + 'static>(
             let _ = answer.send(work(server));
         }))
         .map_err(|_| error(503, "the server is stopping"))?;
-    wait.recv_timeout(WORLD_WAIT)
+    wait.recv_timeout(patience)
         .map_err(|_| error(503, "the world loop did not answer in time"))
 }
 
@@ -696,26 +714,30 @@ fn api(shared: &Shared, request: &Request, rest: &str, peer: IpAddr) -> Answer {
         ("POST", ["players", id, "notes"]) => note(shared, &caller, request, id),
         ("POST", ["announce"]) => announce(shared, &caller, request),
         ("GET", ["audit"]) => caller.need("view").and_then(|()| audit_page(shared, request)),
-        // Registered for the other builders' facades; each answers 501 until it is wired in.
-        ("GET", ["players", _, "inventory"]) => stub(&caller, "view", "the inventory view (G3)"),
-        ("POST", ["players", _, "inventory", "add" | "remove"]) => {
-            stub(&caller, "inventory", "inventory editing (G3)")
+        // The other builders' facades (`admin_wire.rs`).
+        ("GET", ["players", id, "inventory"]) => wire::inventory(shared, &caller, id),
+        ("POST", ["players", id, "inventory", op @ ("add" | "remove")]) => {
+            wire::inventory_edit(shared, &caller, request, id, op)
         }
-        ("POST", ["players", _, "coins"]) => stub(&caller, "coins", "coin editing (G3)"),
-        ("POST", ["players", _, "quests"]) => stub(&caller, "quests", "quest editing (G3)"),
-        ("GET", ["items"]) => stub(&caller, "view", "the item search (G3)"),
-        ("GET", ["players", _, "mail"]) => stub(&caller, "view", "the mailbox view (G2)"),
-        ("GET", ["mail", "jobs"]) => stub(&caller, "mail", "mail jobs (G2)"),
-        ("POST", ["mail"]) => stub(&caller, "mail", "sending mail (G2)"),
-        ("POST", ["players", _, "move"]) => stub(&caller, "move", "moves (G5)"),
-        ("POST", ["powers"]) => stub(&caller, "powers", "GM powers (G5)"),
-        ("GET", ["map", _]) => stub(&caller, "view", "the live map (G5)"),
+        ("POST", ["players", id, "coins"]) => wire::coins(shared, &caller, request, id),
+        ("POST", ["players", id, "quests"]) => wire::quests(shared, &caller, request, id),
+        ("POST", ["players", id, "jobs"]) => wire::jobs(shared, &caller, request, id),
+        ("POST", ["undo"]) => wire::undo(shared, &caller, request),
+        ("GET", ["items"]) => wire::items(shared, &caller, request),
+        ("GET", ["names"]) => wire::names(shared, &caller),
+        ("GET", ["players", id, "mail"]) => wire::mailbox(shared, &caller, id),
+        ("GET", ["mail", "jobs"]) => wire::mail_jobs(&caller),
+        ("POST", ["mail"]) => wire::send_mail(shared, &caller, request),
+        ("POST", ["players", id, "move"]) => wire::move_player(shared, &caller, request, id),
+        ("GET", ["powers"]) => wire::powers_now(shared, &caller),
+        ("POST", ["powers"]) => wire::power(shared, &caller, request),
+        ("GET", ["map", zone]) => wire::map(shared, &caller, zone),
         ("GET", ["events"]) => stub(&caller, "view", "the event stream (poll every 2 s instead)"),
         _ => Err(error(404, "no such admin route")),
     }
 }
 
-/// A registered route whose builder has not landed: role-checked first, then 501.
+/// A registered route with nothing behind it: role-checked first, then 501.
 fn stub(caller: &Caller, action: &str, what: &str) -> Answer {
     caller.need(action)?;
     Err(error(501, &format!("{what} is not built yet; it is wired in at integration")))
@@ -914,22 +936,25 @@ pub(super) fn online_rows(world: &SharedWorld) -> Vec<roster::OnlineRow> {
         .collect()
 }
 
-/// `online_rows` with what only the sessions know: the account role and the session's length.
+/// `online_rows` with what only the sessions know: the account role, the session's length and
+/// the zone's name.
 fn online_now(server: &mut Server) -> Vec<roster::OnlineRow> {
-    let live: BTreeMap<u64, (AccountRole, u64)> = server
+    let live: BTreeMap<u64, (AccountRole, u64, Option<String>)> = server
         .sessions
         .values()
         .filter(|session| session.selected_character)
         .map(|session| {
             let length = session.session_start.elapsed().as_secs();
-            (session.character_guid, (session.gateway.role(), length))
+            let zone = session.gateway.runtime_zone().ok().map(|zone| zone.name);
+            (session.character_guid, (session.gateway.role(), length, zone))
         })
         .collect();
     let mut rows = online_rows(&server.world);
     for row in &mut rows {
-        if let Some((role, length)) = live.get(&row.character_id) {
+        if let Some((role, length, zone)) = live.get(&row.character_id) {
             row.role = Some(roles::name(*role));
             row.session_s = *length;
+            row.zone_name.clone_from(zone);
         }
     }
     rows
@@ -1007,6 +1032,53 @@ fn target(store: &AccountStore, guid: u64) -> Option<audit::Target> {
     })
 }
 
+/// The audit row's target for `guid` read from the account store at `store`: its account and
+/// name when the store has it, the id alone otherwise, empty for none.
+pub(super) fn audit_target(store: &Path, guid: Option<u64>) -> audit::Target {
+    let Some(guid) = guid else {
+        return audit::Target::default();
+    };
+    AccountStore::load(store)
+        .ok()
+        .and_then(|store| target(&store, guid))
+        .unwrap_or(audit::Target {
+            character_id: Some(guid),
+            ..audit::Target::default()
+        })
+}
+
+/// The staff member behind a chat command as the audit log names chat moderation: the account
+/// and its character's name.
+pub(super) fn chat_staff(session: &Session) -> Staff {
+    let account = session.account_guid;
+    let name = session.social_identity.as_ref().map_or_else(
+        || format!("account {account}"),
+        |identity| format!("{} {}", identity.name.first, identity.name.last).trim().to_owned(),
+    );
+    Staff {
+        account_id: account,
+        name,
+    }
+}
+
+/// One applied staff action typed in chat, in the staff audit log; best effort like the chat
+/// moderation row (a failure is printed, never undoes the action).
+pub(super) fn audit_chat(options: &Options, staff: &Session, action: &str, guid: Option<u64>, after: Value) {
+    let Some(store) = options.account_store.as_deref() else {
+        return;
+    };
+    audit::record_beside(store, &audit::Row {
+        time: unix_now(),
+        staff: chat_staff(staff),
+        action: action.to_owned(),
+        target: audit_target(store, guid),
+        before: Value::Null,
+        after,
+        reason: None,
+        via: "chat".into(),
+    });
+}
+
 /// One system line to every selected session of `account`; whether any received it.
 fn tell_account(server: &mut Server, account: u64, line: &str) -> bool {
     let bytes = wrap_application(&osfr_tools::chat::system(line));
@@ -1043,9 +1115,7 @@ fn moderate(shared: &Shared, caller: &Caller, request: &Request, id: &str) -> An
     let now = unix_now();
     let staff = caller.staff();
     let row = match op {
-        Op::Jail | Op::Release => {
-            return Err(error(501, "jail and release need the teleport powers (G5); not built yet"));
-        }
+        Op::Jail | Op::Release => wire::jail(shared, caller, guid, op == Op::Jail, reason)?,
         Op::Warn => {
             let reason = reason.ok_or_else(|| error(400, "a warning needs a reason"))?;
             let store = load_store(shared)?;

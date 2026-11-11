@@ -338,6 +338,9 @@ pub struct GmPowers {
     pub watching: BTreeMap<u64, Watch>,
     /// Frozen characters; their hold lives in their own movement token.
     pub frozen: BTreeSet<u64>,
+    /// Jailed characters (the panel's moderation `jail`): held like `frozen`, but kept across
+    /// their logouts until a release or a restart, so a relog does not walk out.
+    pub jailed: BTreeSet<u64>,
     /// Staff characters with the flight exemption.
     pub flying: BTreeSet<u64>,
     audit: VecDeque<AuditRow>,

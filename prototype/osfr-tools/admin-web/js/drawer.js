@@ -1,7 +1,7 @@
 // The player drawer: opened from anywhere, it slides in a player's profile with tabs and the GM action buttons.
 import { api } from './api.js';
-import { h, clear, icon, ask, ago, when, dur, num, pos, plural, initials, empty, badge, fail, field, toMs,
-  roleName, nameOf, zoneLabel, jobLabel, accountLabel } from './dom.js';
+import { h, clear, icon, ask, ago, when, stamp, dur, num, pos, plural, initials, empty, badge, fail, field, toMs,
+  roleName, nameOf, zoneLabel, jobLabel, questLabel, accountLabel } from './dom.js';
 import * as act from './actions.js';
 import { itemArt, pickItem } from './picker.js';
 
@@ -143,7 +143,10 @@ const PANELS = {
     try { inv = await api.inventory(cur.id); } catch (e) { if (body.isConnected) clear(body, empty(e.message, 'bag')); return; }
     if (!body.isConnected) return;
     const selected = new Set();
-    const entries = [...inv.equipped.map((e) => ({ ...e, equipped: true })), ...inv.bags];
+    // The gateway's worn rows name the job (profile) and slot number and the bag stack they wear (`instance`);
+    // each is one item.
+    const worn = (e) => ({ ...e, equipped: true, count: e.count ?? 1, slot: typeof e.slot === 'number' ? `slot ${e.slot}` : e.slot });
+    const entries = [...inv.equipped.map(worn), ...inv.bags];
     const info = h('p', { class: 'inv-info', 'aria-live': 'polite' }, 'Click items to select them. Delete removes the selection.');
     const removeBtn = h('button', { class: 'btn btn-sm btn-danger-ghost', type: 'button', disabled: true, onclick: () => removeSelected() }, icon('trash', 16), 'Remove');
     const sync = () => {
@@ -209,10 +212,10 @@ const PANELS = {
     const qid = h('input', { class: 'input', type: 'number', min: 1, inputmode: 'numeric', placeholder: 'Quest id', 'aria-label': 'Quest id' });
     const ok = act.can('quests');
     const row = (x, buttons) => h('li', { class: 'list-row' },
-      h('div', { class: 'list-main' }, h('strong', {}, x.name || `Quest ${x.quest_id}`),
+      h('div', { class: 'list-main' }, h('strong', {}, x.name || questLabel(x.quest_id)),
         h('span', { class: 'muted' }, `#${x.quest_id}${x.step ? ` · ${x.step}` : ''}${x.finished ? ` · finished ${ago(x.finished)}` : ''}`)),
       h('div', { class: 'list-actions' }, buttons.map(([l, op, kind]) => h('button', { class: `btn btn-sm ${kind || 'btn-ghost'}`, type: 'button', disabled: !ok,
-        onclick: () => act.quest(p, op, x.quest_id, x.name) }, l))));
+        onclick: () => act.quest(p, op, x.quest_id, x.name || questLabel(x.quest_id)) }, l))));
     clear(body,
       section('Grant a quest', h('form', { class: 'row-form', onsubmit: (e) => { e.preventDefault(); if (qid.value) act.quest(p, 'grant', qid.value); } },
         qid, h('button', { class: 'btn btn-sm btn-primary', type: 'submit', disabled: !ok }, 'Grant'))),
@@ -279,7 +282,7 @@ const PANELS = {
       h('div', { class: 'toolbar' }, h('span', { class: 'muted' }, `${plural(page.total, 'staff action')} on this player`),
         h('a', { class: 'btn btn-sm btn-ghost toolbar-end', href: `#/audit?player=${encodeURIComponent(cur.id)}`, onclick: () => hide() }, 'Open in Audit')),
       page.rows.length ? h('ul', { class: 'list' }, page.rows.map((r) => h('li', { class: 'list-row' },
-        h('div', { class: 'list-main' }, h('strong', {}, r.action), h('span', { class: 'muted' }, `${nameOf(r.staff)} · ${when(r.time)}${r.via === 'chat' ? ' · by chat command' : ''}`),
+        h('div', { class: 'list-main' }, h('strong', {}, r.action), h('span', { class: 'muted' }, `${nameOf(r.staff)} · ${stamp(r.time)}${r.via === 'chat' ? ' · by chat command' : ''}`),
           changeText(r) ? h('span', { class: 'small change' }, changeText(r)) : null)))) : empty('No staff actions yet', 'audit'));
   },
 };
@@ -287,13 +290,61 @@ const PANELS = {
 function stat(k, v) { return h('div', { class: 'mini-stat' }, h('span', { class: 'muted' }, k), h('strong', {}, v)); }
 export const attachText = (a) => {
   if (!a) return '';
-  const parts = [...(a.items || []).map((i) => `${i.count} × ${i.name || i.item_id}`), a.coins ? `${num(a.coins)} coins` : null].filter(Boolean);
+  // Rows are {item_id, count} from the routes, [item_id, count] in a mail audit row.
+  const rows = (a.items || []).map((i) => (Array.isArray(i) ? { item_id: i[0], count: i[1] } : i));
+  const parts = [...rows.map((i) => `${i.count} × ${i.name || `item #${i.item_id}`}`), a.coins ? `${num(a.coins)} coins` : null].filter(Boolean);
   return parts.length ? ` · ${parts.join(', ')}` : '';
 };
+// A staff audit row in words: what changed, before → after, with local times and names for ids, then the reason.
+// Keys the gateway keeps for undo (the change record, its key) are not shown.
+const HIDDEN = new Set(['undo', 'undid', 'change', 'summary', 'online', 'result', 'minutes']);
+const until = (u) => (u == null ? null : u >= 1e15 ? 'until lifted' : `until ${stamp(u)}`);
+const items = (list) => (list?.length ? list.map((i) => `${i.name || `item #${i.item_id}`} ×${num(i.count)}`).join(', ') : 'none');
+const word = (k) => k.replace(/_/g, ' ');
+function plain(k, v) {
+  if (v == null || v === '') return 'none';
+  if (typeof v === 'number' && /(_until|_at|^time|^sent)$/.test(k)) return v >= 1e15 ? 'until lifted' : stamp(v);
+  if (typeof v === 'boolean') return v ? 'yes' : 'no';
+  if (Array.isArray(v)) return v.length ? v.map((x) => plain(k, x)).join(', ') : 'none';
+  if (typeof v === 'object') return Object.entries(v).filter(([, x]) => x != null).map(([kk, x]) => `${word(kk)} ${plain(kk, x)}`).join(', ');
+  return typeof v === 'number' ? num(v) : String(v);
+}
+const audience = (to) => (to === 'all' ? 'everyone online' : to?.zone != null ? `zone ${to.zone}` : to?.role ? `every ${to.role}` : plain('to', to));
+function changes(r) {
+  const b = r.before && typeof r.before === 'object' ? r.before : {};
+  const a = r.after && typeof r.after === 'object' ? r.after : {};
+  const s = a.sanctions;
+  switch (r.action) {
+    case 'mute': case 'unmute':
+      return [`Chat: ${b.muted_until != null ? `muted ${until(b.muted_until)}` : 'can talk'} → ${s?.muted_until != null ? `muted ${until(s.muted_until)}` : 'can talk'}`];
+    case 'ban': case 'unban':
+      return [`Account: ${b.banned_until != null ? `banned ${until(b.banned_until)}` : 'in good standing'} → ${s?.banned_until != null ? `banned ${until(s.banned_until)}` : 'in good standing'}`];
+    case 'kick': return ['Disconnected'];
+    case 'warn': return [a.delivered ? 'Shown to the player in chat' : 'Kept on record; the player was offline'];
+    case 'note': return [`“${a.text ?? ''}”`];
+    case 'login': return [`Signed in as ${a.role ?? 'staff'}`];
+    case 'announce': return [`“${a.text ?? ''}” to ${audience(a.to)} as a ${a.style === 'banner' ? 'banner' : 'chat line'}, delivered to ${num(a.delivered ?? 0)}`];
+    case 'mail': return [`“${a.subject ?? ''}” to ${a.to ?? 'players'} (${plural(a.recipients ?? 0, 'recipient')})${attachText(a.attachments)}`];
+    default: break;
+  }
+  const lines = [];
+  if ('coins' in a || 'coins' in b) lines.push(`Coins ${num(b.coins ?? 0)} → ${num(a.coins ?? 0)}`);
+  if ('items' in a || 'items' in b) lines.push(`Items ${items(b.items)} → ${items(a.items)}`);
+  if ('worn' in a || 'worn' in b) lines.push(`Worn ${plain('worn', b.worn)} → ${plain('worn', a.worn)}`);
+  for (const id of new Set([...Object.keys(b.quests || {}), ...Object.keys(a.quests || {})])) {
+    lines.push(`${questLabel(id)}: ${b.quests?.[id] ?? 'none'} → ${a.quests?.[id] ?? 'none'}`);
+  }
+  for (const id of new Set([...Object.keys(b.job_xp || {}), ...Object.keys(a.job_xp || {})])) {
+    lines.push(`${jobLabel(Number(id))} XP ${num(b.job_xp?.[id] ?? 0)} → ${num(a.job_xp?.[id] ?? 0)}`);
+  }
+  const known = new Set([...HIDDEN, 'coins', 'items', 'worn', 'quests', 'job_xp']);
+  for (const k of new Set([...Object.keys(b), ...Object.keys(a)])) {
+    if (!known.has(k)) lines.push(k in b ? `${word(k)} ${plain(k, b[k])} → ${plain(k, a[k])}` : `${word(k)} ${plain(k, a[k])}`);
+  }
+  if (a.result) lines.push(a.result);
+  if (a.undid) lines.push('Undid an earlier edit');
+  return lines;
+}
 export function changeText(r) {
-  const s = (v) => (Array.isArray(v) ? v.map(s).join('; ')
-    : v && typeof v === 'object' ? Object.entries(v).filter(([, x]) => x != null && x !== '').map(([k, x]) => `${k.replace(/_/g, ' ')} ${s(x)}`).join(', ')
-      : String(v));
-  const set = (v) => v != null && !(typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length);
-  return [r.reason ? `Reason: ${r.reason}` : '', set(r.before) ? `Before: ${s(r.before)}` : '', set(r.after) ? `After: ${s(r.after)}` : ''].filter(Boolean).join(' → ');
+  return [...changes(r), r.reason ? `Reason: ${r.reason}` : ''].filter(Boolean).join(' · ');
 }

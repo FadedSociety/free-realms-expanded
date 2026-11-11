@@ -504,6 +504,11 @@ pub fn item_label(inventory: &Inventory, item_id: i32) -> (String, i32) {
 // ponytail: one pass over the table per search (~58k rows); a cached index if the panel's
 // typing ever makes it slow.
 pub fn search_items(content: &Path, query: &str, page: usize) -> io::Result<ItemPage> {
+    search_in(&Inventory::load(content, None)?, query, page)
+}
+
+/// [`search_items`] over item tables already loaded (the panel keeps one copy).
+pub fn search_in(inventory: &Inventory, query: &str, page: usize) -> io::Result<ItemPage> {
     let query = query.trim();
     if query.len() > MAX_QUERY {
         return Err(io::Error::new(
@@ -511,13 +516,12 @@ pub fn search_items(content: &Path, query: &str, page: usize) -> io::Result<Item
             "query is too long",
         ));
     }
-    let inventory = Inventory::load(content, None)?;
     let needle = query.to_lowercase();
     let id = query.parse::<i32>().ok();
     let hits: Vec<ItemHit> = inventory
         .definition_ids()
         .filter_map(|item_id| {
-            let (name, icon) = item_label(&inventory, item_id);
+            let (name, icon) = item_label(inventory, item_id);
             let hit = needle.is_empty()
                 || id == Some(item_id)
                 || (id.is_none() && name.to_lowercase().contains(&needle));

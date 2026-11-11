@@ -30,7 +30,8 @@ pub struct OnlineRow {
     pub role: Option<&'static str>,
     /// Absent while the session has no place in the world yet (loading).
     pub zone: Option<u32>,
-    /// (R) No zone-name table is loaded yet; always null.
+    /// The zone's scene name as the session knows it (`Gateway::runtime_zone`), e.g. the open
+    /// world's; null while loading.
     pub zone_name: Option<String>,
     pub position: Option<[f32; 3]>,
     pub job: Option<i32>,
@@ -345,7 +346,10 @@ pub fn profile(sources: &Sources, guid: u64, online: Option<&OnlineRow>, now: u6
             "last_seen": if online.is_some() { Some(now) } else { saved },
             "play_time_s": null,
         },
-        "location": {"online": online.is_some(), "zone": zone, "zone_name": null, "position": position},
+        "location": {
+            "online": online.is_some(), "zone": zone,
+            "zone_name": online.and_then(|row| row.zone_name.as_deref()), "position": position,
+        },
         "coins": gameplay["inventory"]["coins"],
         "jobs": jobs(gameplay, sources.content),
         "quests": quests(gameplay),

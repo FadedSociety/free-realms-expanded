@@ -13,8 +13,14 @@ Plain HTML, CSS and JavaScript modules. No build step, no dependencies, no reque
   type for `.js`; send `Cache-Control: no-cache` so an updated panel loads on the next visit.
 - The panel calls the JSON API at absolute paths under `/admin/api/` (the gm-panel API contract) and item icons at
   `/admin/icon/<item_id>`. `js/api.js` holds the route table; `test/check.mjs` pins it to the contract.
-- Sign-in: when `/admin/api/me` answers 401 the panel shows its sign-in form, posts `/admin/api/login`, keeps the
-  token in `sessionStorage` and sends it as `Authorization: Bearer <token>`. Any later 401 returns to the form.
+- The gateway finds this folder with `--admin-web DIR`, else `admin-web/` beside its executable (a release ships it
+  as `bin/admin-web/`), else the crate's own copy; `--admin-port N` turns the panel on at `127.0.0.1:N/admin/`.
+- Sign-in: when `/admin/api/me` answers 401 the panel shows its sign-in form, signs the gateway's challenge with the
+  staff member's launcher key file (`key.ed25519`, read in the page and never sent) and posts `/admin/api/login`.
+  The session is the gateway's HttpOnly cookie; every POST echoes the CSRF token from the login or `/me`. Any later
+  401 returns to the form.
+- Edits answer with an undo key; the toast's Undo and the Audit view's Undo post it to `/admin/api/undo`. Job and
+  quest names come from `/admin/api/names`; the live map draws north up, as the game's map does.
 - The panel polls `/admin/api/status` and `/admin/api/players/online` every 2 s while the tab is visible.
 - Works under a strict Content Security Policy (`default-src 'self'; img-src 'self' data:`, the `data:` for the
   favicon): no inline scripts or style attributes, no `eval`, and no HTML is ever built from API text.
@@ -25,7 +31,7 @@ server): it then reads `mock/*.json` and answers every route in memory, writes i
 the top bar. All names, items and numbers in `mock/` are invented. Item icons are neutral tiles in mock mode.
 
 To try it locally, serve this folder with any static server, e.g. `python -m http.server 8796` here, then open
-`http://127.0.0.1:8796/?mock=1`. Sign out and back in works in mock mode with any account and password.
+`http://127.0.0.1:8796/?mock=1`. Sign out and back in works in mock mode with any account handle.
 
 ## Layout
 - `css/tokens.css`: every colour, size, radius and timing, dark by default and light under `[data-theme="light"]`.

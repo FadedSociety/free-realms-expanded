@@ -20,7 +20,8 @@ const ok = (cond, msg) => { assert.ok(cond, msg); checks++; };
 for (const f of files.filter((f) => f.endsWith('.js'))) await import(pathToFileURL(f));
 checks++;
 
-// 2. Routes match the contract exactly (path parameter names normalised to {id}).
+// 2. Routes match the contract exactly (path parameter names normalised to {id}); job edits, undo by key, id names
+// and the powers' state came with the integration (api-served.md).
 const CONTRACT = `
 POST /admin/api/login/challenge
 POST /admin/api/login
@@ -35,6 +36,10 @@ POST /admin/api/players/{id}/inventory/add
 POST /admin/api/players/{id}/inventory/remove
 POST /admin/api/players/{id}/coins
 POST /admin/api/players/{id}/quests
+POST /admin/api/players/{id}/jobs
+POST /admin/api/undo
+GET /admin/api/names
+GET /admin/api/powers
 POST /admin/api/players/{id}/moderate
 POST /admin/api/players/{id}/notes
 POST /admin/api/players/{id}/move
@@ -87,7 +92,12 @@ has(inv, ['bags', 'equipped'], 'inventory');
 has(inv.bags[0], ['slot', 'item_id', 'name', 'count', 'icon'], 'inventory row');
 const items = await call('items', {}, { q: 'ore' });
 has(items[0], ['item_id', 'name', 'icon'], 'items row');
-ok((await call('addItem', id, {}, { item_id: items[0].item_id, count: 3 })).bags.some((b) => b.item_id === items[0].item_id), 'add puts the item in the bags');
+const added = await call('addItem', id, {}, { item_id: items[0].item_id, count: 3 });
+ok(added.bags.some((b) => b.item_id === items[0].item_id), 'add puts the item in the bags');
+ok(typeof added.undo === 'string', 'an edit answers with its undo key');
+ok(!(await call('undo', {}, {}, { undo: added.undo })).bags.some((b) => b.item_id === items[0].item_id && b.count >= 3), 'undo takes the add back');
+await assert.rejects(call('undo', {}, {}, { undo: added.undo }), (e) => e.status === 409);
+await call('addItem', id, {}, { item_id: items[0].item_id, count: 3 });
 ok(!(await call('removeItems', id, {}, { items: [{ item_id: items[0].item_id, count: 'all' }] })).bags.some((b) => b.item_id === items[0].item_id), 'remove all takes it out');
 ok((await call('coins', id, {}, { op: 'set', amount: 10 })).coins === 10, 'coins set');
 await assert.rejects(call('coins', id, {}, { op: 'take', amount: 11 }), /only 10 coins/);
@@ -100,13 +110,20 @@ await assert.rejects(call('moderate', id, {}, { op: 'warn' }), /reason/);
 await assert.rejects(call('moderate', id, {}, { op: 'unmute' }), (e) => e.status === 409);
 const forever = await call('moderate', id, {}, { op: 'mute' });
 ok(forever.row.after.sanctions.muted_until >= 1e15, 'a mute without minutes lasts until lifted');
-await assert.rejects(call('moderate', id, {}, { op: 'jail', reason: 'x' }), (e) => e.status === 501);
+ok((await call('moderate', id, {}, { op: 'jail', reason: 'x' })).row.after.jailed === true, 'jail holds the player');
+ok((await call('powerState')).state.jailed.includes(pip.character_id), 'the powers state lists the jailed');
+ok((await call('moderate', id, {}, { op: 'release' })).row.action === 'release', 'release lets go');
 const marigold = data.players.find((p) => p.name === 'Marigold Sunvale');
 await assert.rejects(call('moderate', { id: marigold.character_id }, {}, { op: 'kick' }), (e) => e.status === 403);
 const notes = await call('notes', id, {}, { text: 'hello' });
 ok(notes[0].after.text === 'hello', 'notes come back newest first');
 has(await call('move', id, {}, { op: 'goto' }), ['zone', 'zone_name', 'position'], 'move');
-has(await call('powers', {}, {}, { op: 'freeze', target: pip.character_id }), ['state'], 'powers');
+const froze = await call('powers', {}, {}, { op: 'freeze', target: pip.character_id });
+has(froze, ['state', 'message'], 'powers');
+has(froze.state, ['character_id', 'invisible', 'spectating', 'following', 'flying', 'frozen', 'jailed'], 'powers state');
+ok(froze.state.frozen.includes(pip.character_id), 'freeze lists the player');
+has(await call('names'), ['jobs', 'quests'], 'names');
+has(await call('jobs', id, {}, { job_id: prof.jobs[0].job, xp: 100 }), ['jobs', 'undo'], 'jobs');
 const job = await call('sendMail', {}, {}, { to: { everyone: true }, subject: 'Hi', body: 'Hello' });
 has(job, ['job_id', 'recipients'], 'mail send');
 ok(job.recipients === data.players.length, 'everyone means every character, online or not');

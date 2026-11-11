@@ -47,7 +47,12 @@ pub struct Icons {
     content: Option<PathBuf>,
     index: OnceLock<Index>,
     cache: Mutex<HashMap<i32, Option<Arc<[u8]>>>>,
+    /// Zone name -> its whole map picture and the world box it covers.
+    maps: Mutex<HashMap<String, Option<ZoneMap>>>,
 }
+
+/// A zone's map as one PNG, north up, and the world box `[min_x, min_z, max_x, max_z]` it covers.
+pub type ZoneMap = (Arc<[u8]>, [f32; 4]);
 
 impl Icons {
     /// `install` is the client folder (`FreeRealms.exe`, `Resources/`, the packs); `content` the
@@ -58,6 +63,7 @@ impl Icons {
             content,
             index: OnceLock::new(),
             cache: Mutex::new(HashMap::new()),
+            maps: Mutex::new(HashMap::new()),
         }
     }
 
@@ -74,6 +80,86 @@ impl Icons {
         }
         cache.insert(item_id, png.clone());
         png
+    }
+
+    /// A zone's map tiles from `<zone>_TileInfo.txt` in the packs, read the way this project's
+    /// Rust client reads them (`client-rs` `fr-ui` `minimap.rs`); empty for a zone with no map.
+    pub fn map_tiles(&self, zone: &str) -> Vec<MapTile> {
+        if zone.is_empty() || !zone.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_') {
+            return Vec::new();
+        }
+        let index = self.index.get_or_init(|| self.build());
+        let Some(list) = index.read(&format!("{zone}_TileInfo.txt")) else {
+            return Vec::new();
+        };
+        String::from_utf8_lossy(&list)
+            .lines()
+            .filter_map(|line| {
+                let mut fields = line.split('\t').map(str::trim);
+                let name = fields.next().filter(|name| !name.is_empty())?.to_owned();
+                let mut number = || fields.next()?.parse::<f32>().ok().filter(|n| n.is_finite());
+                let (x, _y, z, width, height) = (number()?, number()?, number()?, number()?, number()?);
+                (width > 0.0 && height > 0.0).then_some(MapTile { name, x, z, width, height })
+            })
+            .collect()
+    }
+
+    /// The zone's whole map in one picture, north (+x) up and east (+z) right as the game's map
+    /// lays its tiles, at most `side` pixels on its longer edge, each pixel sampled from the tile
+    /// under it; made on first use and kept. `None` for a zone with no map.
+    pub fn zone_map(&self, zone: &str, side: u32) -> Option<ZoneMap> {
+        let key = zone.to_ascii_lowercase();
+        // ponytail: the lock is held while a map is made (seconds, once per zone), so the panel's
+        // 2 s polls wait for the one picture instead of each making it; per-zone slots if that ever matters.
+        let mut maps = self.maps.lock().unwrap_or_else(PoisonError::into_inner);
+        if let Some(made) = maps.get(&key) {
+            return made.clone();
+        }
+        let made = self.compose(zone, side);
+        maps.insert(key, made.clone());
+        made
+    }
+
+    fn compose(&self, zone: &str, side: u32) -> Option<ZoneMap> {
+        let tiles = self.map_tiles(zone);
+        let index = self.index.get_or_init(|| self.build());
+        let low = |pick: fn(&MapTile) -> f32| tiles.iter().map(pick).reduce(f32::min);
+        let high = |pick: fn(&MapTile) -> f32| tiles.iter().map(pick).reduce(f32::max);
+        let (min_x, max_x) = (low(|t| t.x)?, high(|t| t.x + t.height)?);
+        let (min_z, max_z) = (low(|t| t.z)?, high(|t| t.z + t.width)?);
+        let per_metre = side as f32 / (max_x - min_x).max(max_z - min_z);
+        let (width, height) = (
+            ((max_z - min_z) * per_metre).ceil().clamp(1.0, side as f32) as usize,
+            ((max_x - min_x) * per_metre).ceil().clamp(1.0, side as f32) as usize,
+        );
+        let mut rgba = vec![0u8; width * height * 4];
+        for tile in &tiles {
+            let Some((tw, th, pixels)) = index.read(&tile.name).and_then(|bytes| decode_dds(&bytes)) else {
+                continue;
+            };
+            let (tw, th) = (tw as usize, th as usize);
+            if tw == 0 || th == 0 || pixels.len() < tw * th * 4 {
+                continue;
+            }
+            // Picture rows and columns whose middles fall in the tile.
+            let span = |from: f32, to: f32, end: usize| {
+                let first = (from * per_metre - 0.5).ceil().max(0.0) as usize;
+                first..((to * per_metre - 0.5).ceil().max(0.0) as usize).min(end)
+            };
+            let rows = span(max_x - (tile.x + tile.height), max_x - tile.x, height);
+            for row in rows {
+                let wx = max_x - (row as f32 + 0.5) / per_metre;
+                let ty = (((tile.x + tile.height - wx) / tile.height * th as f32) as usize).min(th - 1);
+                for col in span(tile.z - min_z, tile.z + tile.width - min_z, width) {
+                    let wz = min_z + (col as f32 + 0.5) / per_metre;
+                    let tx = (((wz - tile.z) / tile.width * tw as f32) as usize).min(tw - 1);
+                    let (from, to) = ((ty * tw + tx) * 4, (row * width + col) * 4);
+                    rgba[to..to + 4].copy_from_slice(&pixels[from..from + 4]);
+                }
+            }
+        }
+        let png = encode_png(width as u32, height as u32, &rgba);
+        Some((Arc::from(png), [min_x, min_z, max_x, max_z]))
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, HashMap<i32, Option<Arc<[u8]>>>> {
@@ -138,6 +224,12 @@ impl Index {
         let file = KINDS
             .iter()
             .find_map(|kind| self.files.get(self.sets.get(&(set, *kind))?))?;
+        let (width, height, rgba) = decode_dds(&self.read(file)?)?;
+        Some(encode_png(width, height, &rgba))
+    }
+
+    /// One file of the packs by name (any case), up to the size bound.
+    fn read(&self, file: &str) -> Option<Vec<u8>> {
         let entry = self.entries.get(&file.to_ascii_lowercase())?;
         if entry.len > MAX_ICON_BYTES {
             return None;
@@ -146,9 +238,19 @@ impl Index {
         pack.seek(SeekFrom::Start(u64::from(entry.offset))).ok()?;
         let mut bytes = vec![0; entry.len as usize];
         pack.read_exact(&mut bytes).ok()?;
-        let (width, height, rgba) = decode_dds(&bytes)?;
-        Some(encode_png(width, height, &rgba))
+        Some(bytes)
     }
+}
+
+/// One picture of a zone's map and the world square it covers: its south-west corner at world
+/// (`x`, `z`), `height` metres along +x (north) and `width` along +z (east).
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
+pub struct MapTile {
+    pub name: String,
+    pub x: f32,
+    pub z: f32,
+    pub width: f32,
+    pub height: f32,
 }
 
 /// A caret table (`#` header lines skipped); empty when the file cannot be read.

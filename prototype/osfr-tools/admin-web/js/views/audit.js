@@ -1,11 +1,16 @@
 // Audit: every staff action, filterable by staff member, player, action and time, newest first, paged.
 import { api } from '../api.js';
-import { h, clear, when, ago, debounce, fail, nameOf } from '../dom.js';
+import { h, clear, stamp, ago, debounce, fail, nameOf } from '../dom.js';
 import { changeText } from '../drawer.js';
+import * as act from '../actions.js';
 import { pageHead, table, pager, suggest } from '../ui.js';
 
 // The gateway's action names so far; the field also takes any other name.
-const ACTIONS = ['login', 'mute', 'unmute', 'kick', 'ban', 'unban', 'warn', 'note', 'announce', 'mail', 'inventory_add', 'inventory_remove', 'coins', 'quests', 'move', 'powers'];
+const ACTIONS = ['login', 'mute', 'unmute', 'kick', 'ban', 'unban', 'warn', 'jail', 'release', 'note', 'announce', 'mail', 'inventory_add',
+  'inventory_remove', 'coins', 'quests', 'jobs', 'undo', 'move', 'send', 'bring', 'goto', 'freeze', 'unfreeze', 'spectate', 'unspectate',
+  'invisible', 'visible', 'follow', 'unfollow', 'fly', 'waypoint'];
+// The permission an edit's undo needs, by its action (the gateway checks it again).
+const UNDO = { coins: 'coins', quests: 'quests', jobs: 'jobs' };
 const f = { staff: '', player: '', playerName: '', action: '', since: '', page: 1, per: 50 };
 
 export function render(root, query) {
@@ -31,19 +36,24 @@ export function render(root, query) {
     slot);
 
   const cols = [
-    { label: 'When', get: (r) => h('span', { title: when(r.time) }, ago(r.time)) },
+    { label: 'When', get: (r) => h('span', { title: ago(r.time) }, stamp(r.time)) },
     { label: 'Staff', get: (r) => nameOf(r.staff) },
     { label: 'Action', get: (r) => h('span', { class: 'badge' }, r.action) },
     { label: 'Target', get: (r) => nameOf(r.target), cls: 'hide-sm' },
     { label: 'Via', get: (r) => r.via ?? '', cls: 'hide-md' },
-    { label: 'Change', get: (r) => h('span', { class: 'change clip' }, changeText(r)), cls: 'hide-md' },
+    { label: 'Change', get: (r) => { const text = changeText(r); return h('span', { class: 'change clip', title: text }, text); }, cls: 'hide-md' },
+    { label: '', get: (r) => (r.after?.undo && !undone.has(r.after.undo) && act.can(UNDO[r.action] || 'inventory')
+      ? h('button', { class: 'btn btn-sm btn-ghost', type: 'button', onclick: async () => { if (await act.undoEdit(r)) load(); } }, 'Undo') : '') },
   ];
+  // Edits this page shows undone already (a newer row names their key): no Undo button for them.
+  let undone = new Set();
   let token = 0;
   async function load() {
     const mine = ++token;
     try {
       const d = await api.audit({ staff: f.staff, player: f.player, action: f.action, since: f.since ? Math.floor(new Date(f.since).getTime() / 1000) : '', page: f.page });
       if (mine !== token) return;
+      undone = new Set(d.rows.map((r) => r.after?.undid).filter(Boolean));
       if (d.page === 1 && d.rows.length && d.rows.length < d.total) f.per = d.rows.length;
       clear(slot, table(cols, d.rows, { empty: 'No staff action matches', caption: 'Audit log' }),
         pager(d.page || f.page, d.rows.length, d.page_size || f.per, d.total, (p) => { f.page = p; load(); }));

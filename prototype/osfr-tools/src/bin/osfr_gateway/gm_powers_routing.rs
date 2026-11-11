@@ -3,10 +3,16 @@
 //! table `can_run_realm_command`); an admin HTTP route calls `run` with a power that one of the
 //! `gm_powers` facade functions authorized. `tick` keeps each watcher on its target every
 //! server tick and puts back a freeze, flight or hidden presence a zone change replaced; `end`
-//! undoes a session's powers before its logout save. Every use writes one audit row (the
-//! security log when one is open, and `GmPowers::audit` for the panel). A refusal changes
-//! nothing and is told to the staff member alone.
+//! undoes a session's powers before its logout save. Every use writes one row to the security
+//! log when one is open (numbers only) and keeps it in `GmPowers::audit`; an applied use also
+//! writes one row to the staff audit log the panel reads (`admin::audit`). A refusal changes
+//! nothing and is told to the staff member alone. The web panel calls `run` through the staff
+//! member's own session, or `run_without_character` for the powers that act on another player
+//! alone; `jail` is the panel's moderation hold.
 use super::*;
+use admin_move::Mover;
+use osfr_tools::account_store::AccountRole;
+use osfr_tools::admin::{Staff, audit};
 use osfr_tools::chat;
 use osfr_tools::encounter::ZoneTransition;
 use osfr_tools::gameplay::{AdminMove, MoveTarget};
@@ -18,6 +24,29 @@ use osfr_tools::movement::StaffMotion;
 const LOCK_EPSILON_M: f32 = 0.05;
 const OPEN_WORLD_ZONE: u32 = 0;
 const WAYPOINT_FILE: &str = "gm-waypoints.json";
+/// The refusal for a panel power that moves, hides or answers the staff member's own character.
+pub(super) const NEEDS_CHARACTER: &str =
+    "that power works on your own character: sign in to the game with this account first";
+
+/// Who uses a power, for its audit rows: the staff account, its character in the world (0 for a
+/// panel call without one), the name the staff log shows and the front end (`chat`, `panel`).
+pub(super) struct Actor {
+    pub(super) account: u64,
+    pub(super) character: u64,
+    pub(super) staff: Staff,
+    pub(super) via: &'static str,
+}
+
+impl Actor {
+    fn chat(session: &Session) -> Self {
+        Self {
+            account: session.account_guid,
+            character: session.character_guid,
+            staff: admin_http::chat_staff(session),
+            via: "chat",
+        }
+    }
+}
 
 /// The `realm` pre-route, before gameplay stages the message: count and log the developer
 /// commands this role may not run (moved here from `dispatch_message_inner`), then run a GM
@@ -76,16 +105,20 @@ pub(super) fn chat(
     };
     // `realm goto <name>` that names no online player is still the developer teleport.
     if let Power::Goto(who) = &power
-        && online(world, session, who).is_err()
+        && online(world, session.character_guid, who).is_err()
     {
         return Ok(false);
     }
-    run(session, options, sessions, world, membership, now_ms, power)?;
+    let actor = Actor::chat(session);
+    let _told = run(
+        session, options, sessions, world, membership, now_ms, power, &actor,
+    )?;
     Ok(true)
 }
 
-/// Carry out `power` for `staff`, whose role the caller checked. Answers with one system line
-/// and writes one audit row.
+/// Carry out `power` for `staff`, whose role the caller checked. Answers with one system line,
+/// writes the audit rows, and gives back the reply or the refusal.
+#[allow(clippy::too_many_arguments)]
 pub(super) fn run(
     staff: &mut Session,
     options: &Options,
@@ -94,31 +127,157 @@ pub(super) fn run(
     membership: &mut World,
     now_ms: u64,
     power: Power,
-) -> Result<(), Box<dyn std::error::Error>> {
+    actor: &Actor,
+) -> Result<Result<String, String>, Box<dyn std::error::Error>> {
     let action = power.key();
-    let target = match &power {
-        Power::Spectate(who)
-        | Power::Freeze(who, _)
-        | Power::Follow(who, _)
-        | Power::Bring(who)
-        | Power::Goto(who)
-        | Power::Send(who, _) => online(world, staff, who).ok(),
-        _ => world
-            .gm
-            .watching
-            .get(&staff.character_guid)
-            .map(Watch::target),
-    };
+    let target = target_of(world, staff.character_guid, &power);
     let result = apply(staff, options, sessions, world, membership, now_ms, power);
     let reply = match &result {
         Ok(reply) => reply.clone(),
         Err(refusal) => format!("Cannot do that: {refusal}. Nothing changed."),
     };
-    audit(world, staff, action, target, result.is_ok());
+    audit(world, options, actor, action, target, &result);
     staff
         .sender
         .queue_message(&wrap_application(&chat::system(&reply)))?;
-    Ok(())
+    Ok(result)
+}
+
+/// A panel power for a staff member with no character in the world: those that act on another
+/// player alone (freeze, unfreeze, send). Every other power refuses with [`NEEDS_CHARACTER`].
+#[allow(clippy::too_many_arguments)]
+pub(super) fn run_without_character(
+    actor: &Actor,
+    role: AccountRole,
+    options: &Options,
+    sessions: &mut SessionMap,
+    world: &mut SharedWorld,
+    membership: &mut World,
+    now_ms: u64,
+    power: Power,
+) -> Result<String, String> {
+    let action = power.key();
+    let target = target_of(world, 0, &power);
+    let result = match power {
+        Power::Freeze(who, on) => freeze(role, 0, sessions, world, &who, on),
+        Power::Send(who, position) => {
+            let by = Mover {
+                account: actor.account,
+                session: 0,
+                character: 0,
+            };
+            let request = AdminMove {
+                target: move_target(who),
+                position,
+                rotation: None,
+            };
+            admin_move::move_character(by, options, sessions, world, membership, now_ms, request)
+        }
+        _ => return Err(NEEDS_CHARACTER.into()),
+    };
+    audit(world, options, actor, action, target, &result);
+    result
+}
+
+/// The character a power acts on, for its audit rows: the one named (a GUID as given, a name
+/// when one online player has it), else the one the staff member watches.
+fn target_of(world: &SharedWorld, me: u64, power: &Power) -> Option<u64> {
+    match power {
+        Power::Spectate(who)
+        | Power::Freeze(who, _)
+        | Power::Follow(who, _)
+        | Power::Bring(who)
+        | Power::Goto(who)
+        | Power::Send(who, _) => match who {
+            Who::Guid(guid) => Some(*guid),
+            Who::Name(_) => online(world, me, who).ok(),
+        },
+        _ => world.gm.watching.get(&me).map(Watch::target),
+    }
+}
+
+/// The panel's moderation hold: `on` sends `guid` to `spot` (online, or its save as `send`
+/// does) and holds it there with the staff freeze, across its relogs until a release or a
+/// restart; release lifts the hold where it stands. The caller checked the role and hierarchy
+/// and writes the audit row.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn jail(
+    account: u64,
+    options: &Options,
+    sessions: &mut SessionMap,
+    world: &mut SharedWorld,
+    membership: &mut World,
+    now_ms: u64,
+    guid: u64,
+    on: bool,
+    spot: [f32; 3],
+) -> Result<String, String> {
+    if world.gm.jailed.contains(&guid) == on {
+        return Err(if on {
+            "that player is already jailed".into()
+        } else {
+            "that player is not jailed".into()
+        });
+    }
+    let moved = if on {
+        let by = Mover {
+            account,
+            session: 0,
+            character: 0,
+        };
+        let request = AdminMove {
+            target: MoveTarget::Guid(guid),
+            position: spot,
+            rotation: None,
+        };
+        admin_move::move_character(by, options, sessions, world, membership, now_ms, request)?
+    } else {
+        String::new()
+    };
+    if on {
+        world.gm.jailed.insert(guid);
+    } else {
+        world.gm.jailed.remove(&guid);
+    }
+    // Online: held (or let go) at once and told; a pending relocation is left to the tick,
+    // which holds every jailed character. Offline: held from its next login.
+    let held = on || world.gm.frozen.contains(&guid);
+    if let Some(other) = session_key(world, guid).and_then(|key| sessions.get_mut(&key)) {
+        other
+            .gateway
+            .set_staff_motion(held.then_some(StaffMotion::Held));
+        let notice = if on {
+            "A GM has jailed you; you stay here until a GM releases you."
+        } else {
+            "A GM has released you from jail; you can move again."
+        };
+        let told = [client_freeze(held), chat::system(notice)]
+            .iter()
+            .try_for_each(|packet| other.sender.queue_message(&wrap_application(packet)));
+        if let Err(error) = told {
+            eprintln!("gm powers: jail notice to {guid}: {error}");
+        }
+    }
+    Ok(if on {
+        format!("Jailed {}. {moved}", name(world, guid))
+    } else {
+        format!("Released {}.", name(world, guid))
+    })
+}
+
+/// What the panel shows of the powers: those of the staff member's own character `me` (none
+/// when it is not in the world) and every frozen or jailed player.
+pub(super) fn state(world: &SharedWorld, me: Option<u64>) -> serde_json::Value {
+    let watch = me.and_then(|guid| world.gm.watching.get(&guid));
+    json!({
+        "character_id": me,
+        "invisible": me.is_some_and(|guid| world.players.is_hidden(guid)),
+        "spectating": match watch { Some(Watch::Spectate { target, .. }) => Some(*target), _ => None },
+        "following": match watch { Some(Watch::Follow { target, .. }) => Some(*target), _ => None },
+        "flying": me.is_some_and(|guid| world.gm.flying.contains(&guid)),
+        "frozen": world.gm.frozen,
+        "jailed": world.gm.jailed,
+    })
 }
 
 fn apply(
@@ -143,7 +302,7 @@ fn apply(
     }
     match power {
         Power::Spectate(who) => {
-            let target = online(world, staff, &who)?;
+            let target = online(world, staff.character_guid, &who)?;
             watch(staff, sessions, world, membership, now_ms, target, None)?;
             Ok(format!(
                 "Spectating {}. Nobody can see you; realm unspectate brings you back.",
@@ -151,7 +310,7 @@ fn apply(
             ))
         }
         Power::Follow(who, metres) => {
-            let target = online(world, staff, &who)?;
+            let target = online(world, staff.character_guid, &who)?;
             watch(
                 staff,
                 sessions,
@@ -194,7 +353,7 @@ fn apply(
                 "You are visible again.".into()
             })
         }
-        Power::Freeze(who, on) => freeze(staff, sessions, world, &who, on),
+        Power::Freeze(who, on) => freeze(staff.gateway.role(), guid, sessions, world, &who, on),
         Power::Bring(who) => {
             let here = staff.gateway.state();
             if here.zone_id != OPEN_WORLD_ZONE {
@@ -205,7 +364,15 @@ fn apply(
                 position: here.position,
                 rotation: None,
             };
-            admin_move::move_character(staff, options, sessions, world, membership, now_ms, request)
+            admin_move::move_character(
+                Mover::of(staff),
+                options,
+                sessions,
+                world,
+                membership,
+                now_ms,
+                request,
+            )
         }
         Power::Send(who, position) => {
             let request = AdminMove {
@@ -213,10 +380,18 @@ fn apply(
                 position,
                 rotation: None,
             };
-            admin_move::move_character(staff, options, sessions, world, membership, now_ms, request)
+            admin_move::move_character(
+                Mover::of(staff),
+                options,
+                sessions,
+                world,
+                membership,
+                now_ms,
+                request,
+            )
         }
         Power::Goto(who) => {
-            let target = online(world, staff, &who)?;
+            let target = online(world, guid, &who)?;
             gm_menu_routing::go_to(staff, target, sessions, world, membership, now_ms)
         }
         Power::Fly(on) => {
@@ -263,7 +438,7 @@ pub(super) fn tick(
             .sender
             .queue_message(&wrap_application(&chat::system(&line)))?;
     }
-    let motion = if world.gm.frozen.contains(&guid) {
+    let motion = if world.gm.frozen.contains(&guid) || world.gm.jailed.contains(&guid) {
         Some(StaffMotion::Held)
     } else if world.gm.flying.contains(&guid) {
         Some(StaffMotion::Flight)
@@ -564,16 +739,18 @@ fn presence(world: &mut SharedWorld, session: &Session, online: bool) -> Vec<Del
     deliveries
 }
 
-/// Hold `who` where it stands (35/32 to its client too), or release it. A moderator holds
-/// only a lower role.
+/// Hold `who` where it stands (35/32 to its client too), or release it, for a staff member of
+/// `role` whose own character is `me` (0: none). A moderator holds only a lower role; a jailed
+/// player is held by its jail and left to `jail`.
 fn freeze(
-    staff: &Session,
+    role: AccountRole,
+    me: u64,
     sessions: &mut SessionMap,
     world: &mut SharedWorld,
     who: &Who,
     on: bool,
 ) -> Result<String, String> {
-    let target = online(world, staff, who)?;
+    let target = online(world, me, who)?;
     if world.gm.frozen.contains(&target) == on {
         return Err(if on {
             "that player is already frozen".into()
@@ -584,10 +761,13 @@ fn freeze(
     if world.gm.watching.contains_key(&target) {
         return Err("that player is spectating or following".into());
     }
+    if world.gm.jailed.contains(&target) {
+        return Err("that player is jailed; release them from jail instead".into());
+    }
     let other = session_key(world, target)
         .and_then(|key| sessions.get_mut(&key))
         .ok_or("that player is not online")?;
-    if !staff.gateway.role().outranks(other.gateway.role()) {
+    if !role.outranks(other.gateway.role()) {
         return Err("you may freeze only a lower role".into());
     }
     if on && !other.gateway.is_world_loaded() {
@@ -708,21 +888,36 @@ fn waypoint(
     })
 }
 
-/// One audit row per power use, in the security log (numbers only) and in memory.
+/// The audit rows of one power use: the security log (numbers only) and memory every time, and
+/// the staff audit log (names and the reply, which the panel's Audit view shows) when applied.
 fn audit(
     world: &mut SharedWorld,
-    staff: &Session,
+    options: &Options,
+    actor: &Actor,
     action: &'static str,
     target: Option<u64>,
-    applied: bool,
+    result: &Result<String, String>,
 ) {
+    if let (Ok(reply), Some(store)) = (result, options.account_store.as_deref()) {
+        let row = audit::Row {
+            time: osfr_tools::moderation::unix_now(),
+            staff: actor.staff.clone(),
+            action: action.to_owned(),
+            target: admin_http::audit_target(store, target),
+            before: serde_json::Value::Null,
+            after: json!({ "result": reply }),
+            reason: None,
+            via: actor.via.to_owned(),
+        };
+        audit::record_beside(store, &row);
+    }
     let row = AuditRow {
         timestamp_ms: gm_powers::unix_ms(),
-        account_id: staff.account_guid,
-        character_guid: staff.character_guid,
+        account_id: actor.account,
+        character_guid: actor.character,
         action,
         target_guid: target,
-        applied,
+        applied: result.is_ok(),
     };
     let written = world
         .security
@@ -738,8 +933,8 @@ fn audit(
 }
 
 /// The online character `who` names (a GUID, or a displayed name ignoring case), never the
-/// caller.
-fn online(world: &SharedWorld, staff: &Session, who: &Who) -> Result<u64, String> {
+/// caller's own character `me`.
+fn online(world: &SharedWorld, me: u64, who: &Who) -> Result<u64, String> {
     let guid = match who {
         Who::Guid(guid) => Some(*guid).filter(|guid| world.active_sessions.contains_key(guid)),
         Who::Name(typed) => {
@@ -755,7 +950,7 @@ fn online(world: &SharedWorld, staff: &Session, who: &Who) -> Result<u64, String
         }
     }
     .ok_or("no single online player has that name")?;
-    if guid == staff.character_guid {
+    if guid == me {
         return Err("that is you".into());
     }
     Ok(guid)

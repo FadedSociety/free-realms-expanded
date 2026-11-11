@@ -77,6 +77,10 @@ fn start(
     if !can_run_realm_command(role, "mail") {
         return "Cannot do that: your account role does not allow this command.".into();
     }
+    // Attachments make items and coins, which only admins may write (the panel's rule too).
+    if !send.letter.attachments.is_empty() && role != AccountRole::Admin {
+        return "Cannot send mail: only admins may attach items or coins.".into();
+    }
     let Ok(accounts) = AccountStore::load(store) else {
         return "Cannot send mail: the account store is unavailable.".into();
     };
@@ -107,7 +111,7 @@ fn start(
         ..send.letter
     };
     // The sender's own session checked each attached item against its tables when it staged.
-    match admin::send(store, &staff, &to, letter, online, &|_, _| true) {
+    match admin::send(store, &staff, "chat", &to, letter, online, &|_, _| true) {
         Ok(receipt) => format!(
             "Mail queued for {} character{} (job {}).",
             receipt.recipients,

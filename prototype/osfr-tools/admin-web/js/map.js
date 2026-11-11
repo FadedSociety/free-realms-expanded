@@ -1,6 +1,7 @@
 // Live zone map: the zone's map art when the gateway has one (a flat field when it does not), a dot per player,
 // and the recent trail of the player being watched. Clicking or pressing Enter on a dot opens that player.
-// Assumes bounds = [min_x, min_z, max_x, max_z] in world units, with x across and z down the map.
+// bounds = [min_x, min_z, max_x, max_z] in world metres, drawn north up as the game's map lays its tiles:
+// +x (north) up and +z (east) to the right.
 import { svg } from './dom.js';
 import { live } from './live.js';
 
@@ -14,10 +15,10 @@ export function zoneMap({ onPick, label = 'Zone map' }) {
   function draw(data, zoneName, watchId) {
     last = [data, zoneName, watchId];
     const [x0, z0, x1, z1] = Array.isArray(data.bounds) && data.bounds.length === 4 ? data.bounds : [-500, -500, 500, 500];
-    const H = Math.round((W * (z1 - z0)) / (x1 - x0)) || 600;
+    const H = Math.round((W * (x1 - x0)) / (z1 - z0)) || 600;
     const k = W / (el.clientWidth || W); // keeps dots and labels the same on-screen size at any width
-    const X = (x) => ((x - x0) / (x1 - x0)) * W;
-    const Y = (z) => ((z - z0) / (z1 - z0)) * H;
+    const X = (p) => ((p[2] - z0) / (z1 - z0)) * W;
+    const Y = (p) => ((x1 - p[0]) / (x1 - x0)) * H;
     el.setAttribute('viewBox', `0 0 ${W} ${H}`);
     const players = data.players || [];
     const showNames = players.length <= 14 && el.clientWidth > 520;
@@ -26,10 +27,10 @@ export function zoneMap({ onPick, label = 'Zone map' }) {
       data.image ? svg('image', { href: data.image, width: W, height: H, preserveAspectRatio: 'none' })
         : svg('rect', { class: 'map-ground', width: W, height: H }),
       data.image ? null : svg('text', { class: 'map-name', x: W / 2, y: H / 2, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': Math.min(H / 4, W / 7) }, zoneName),
-      trail && trail.length > 1 ? svg('polyline', { class: 'map-trail', points: trail.map((p) => `${X(p[0])},${Y(p[2])}`).join(' '), 'stroke-width': 3 * k }) : null,
+      trail && trail.length > 1 ? svg('polyline', { class: 'map-trail', points: trail.map((p) => `${X(p)},${Y(p)}`).join(' '), 'stroke-width': 3 * k }) : null,
       ...players.map((p) => {
-        const cx = X(p.position[0]);
-        const cy = Y(p.position[2]);
+        const cx = X(p.position);
+        const cy = Y(p.position);
         const watched = String(p.character_id) === String(watchId);
         const g = svg('g', { class: `map-dot${watched ? ' is-watched' : ''}`, tabindex: '0', role: 'button', 'aria-label': `${p.name}, open player` },
           svg('title', {}, p.name),
