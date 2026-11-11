@@ -405,9 +405,9 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
         roles(&merchant).contains("vendor"),
         "the edited set must include a merchant"
     );
-    // T774: the vendor role alone no longer opens a window. Every merchant in this
-    // edited set has no priced `vendors.json` stock, so none may list Shop; the client
-    // must never open an empty merchant window.
+    // T774: the vendor role alone does not open a window; Shop is listed exactly when the
+    // merchant has priced `vendors.json` stock, so the client never opens an empty merchant
+    // window. P-vendor-stock (R) stocked Pucca De'Flor, so her menu lists Shop.
     let (zone, position) = service.location(MERCHANT).expect("merchant location");
     let menu = service
         .interact(MERCHANT, zone, position, None)
@@ -415,8 +415,8 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
     assert!(
         menu.options
             .iter()
-            .all(|option| option.action != NpcAction::Shop),
-        "a merchant without priced stock must not list Shop"
+            .any(|option| option.action == NpcAction::Shop),
+        "a merchant with priced stock lists Shop"
     );
     // P-quest-npcs: Ridwan now gives Studying Squirrels (the wiki's quest for him), as Anura got
     // The Toadal Truth before him, and no ambient row of this edited set is left without a quest.

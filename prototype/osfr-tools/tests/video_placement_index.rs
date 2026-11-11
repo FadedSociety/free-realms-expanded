@@ -101,18 +101,36 @@ fn moved_npcs_stand_at_their_index_positions() {
     );
 }
 
+/// P-vendor-stock (R): the four of the twelve that sell reconstructed stock. A priced vendor must
+/// be clickable (`tests/priced_vendors_drawable.rs`), so each has one extras body under its own
+/// content key, at the row's index position. The other eight stay undrawn and unbound.
+const STOCKED_VENDORS: [u64; 4] = [
+    9_500_000_380, // Duana
+    9_500_000_609, // Munchi Elwood
+    9_500_000_728, // Boomi McBam
+    9_500_000_555, // Bandy Randi
+];
+
 #[test]
 fn moved_npcs_stay_undrawn_and_unbound() {
     let base = NpcVisibility::load(&npc_visibility::content_dir()).unwrap();
     let rows = regional_rows();
-    for (id, name, ..) in NPCS {
+    for (id, name, x, z, ..) in NPCS {
         let row = rows
             .iter()
             .find(|row| row["npc_id"].as_u64() == Some(id))
             .unwrap();
-        assert_eq!(base.content_key(id), None, "{name} has a body");
         let seen = npc_visibility::seen_from(&base, xyz(&row["position"]));
-        assert!(seen.iter().all(|npc| npc.actor_id != id), "{name} drawn");
+        if STOCKED_VENDORS.contains(&id) {
+            assert_eq!(base.content_key(id), Some(id), "{name}: own key");
+            let bodies: Vec<_> = seen.iter().filter(|npc| npc.actor_id == id).collect();
+            assert_eq!(bodies.len(), 1, "{name}: one body");
+            let [bx, by, bz, _] = bodies[0].position;
+            assert_at([bx, by, bz], x, z, 1.0, name);
+        } else {
+            assert_eq!(base.content_key(id), None, "{name} has a body");
+            assert!(seen.iter().all(|npc| npc.actor_id != id), "{name} drawn");
+        }
         assert!(
             row["quest_ids_given"].as_array().unwrap().is_empty(),
             "{name}"

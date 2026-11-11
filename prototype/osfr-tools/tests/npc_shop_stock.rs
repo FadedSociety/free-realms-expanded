@@ -48,114 +48,53 @@ const MR_TWINKLE: u64 = 9_500_000_758;
 /// The NPC file that carries Mr. Twinkle's row.
 const MR_TWINKLE_FILE: &str = "snowhill.json";
 /// Vendor-role NPCs with at least one priced `vendors.json` row (P-kart-garage: the two speedway
-/// mechanics, Andrea Motorspark and Trevor Wilkes, sell the kart tree).
-const SHOP_VENDORS: usize = 98;
+/// mechanics, Andrea Motorspark and Trevor Wilkes, sell the kart tree). P-vendor-stock
+/// (R) stocked the 67 vendors with a knowable trade by analogy (`vendors.json`
+/// `provenance.p_vendor_stock`), so 165 of the 196 offer a Shop.
+const SHOP_VENDORS: usize = 165;
 /// Vendor-role NPCs with no priced stock: no Shop choice, so no empty window.
-const NO_SHOP_VENDORS: usize = 98;
+const NO_SHOP_VENDORS: usize = 31;
 /// The vendor-role NPCs that offer no Shop, pinned so a stock change or a new
-/// vendor without stock has to be a deliberate content edit. 94 have no resolved
-/// stock record (no item-level final-era evidence, a retired-only item, or an
-/// ambiguous variant); 2 name only an unpriced `Bait` row (Big J, Bluerose); the
-/// other 2 are the T230 ride vendors whose rides moved to the Marketplace.
+/// vendor without stock has to be a deliberate content edit. Each is listed with
+/// its reason in `vendors.json` `unstocked_vendors`: no trade (camp guards,
+/// recruits, trainers, the camp cook), aggregate records with no single NPC
+/// name, Station Cash Marketplace openers, the banker, the skate-minigame host,
+/// goods the coin store refuses (deeds, T871 housing fixtures), Muglap, whose
+/// only client name id reads "Coin Farmer Muglap", two duplicate records
+/// standing in another hub (the Sanctuary Tiger, the Seaside Chip Numbwing), and
+/// the owner's two calls (no ore and bars at Flashbang, no pets at Saffron).
 const NO_SHOP: &[u64] = &[
-    9_000_000_016,
-    9_000_000_021,
-    9_000_000_024,
-    9_000_000_027,
-    9_000_000_048,
-    9_000_000_079,
-    9_000_000_092,
-    9_000_000_101,
     9_000_000_106,
-    9_000_000_122,
     9_000_000_196,
     9_000_000_334,
     9_000_000_387,
-    9_000_000_487,
     9_500_000_005,
-    9_500_000_014,
-    9_500_000_051,
-    9_500_000_069,
-    9_500_000_072,
-    9_500_000_074,
-    9_500_000_113,
-    9_500_000_231,
-    9_500_000_235,
-    9_500_000_247,
-    9_500_000_279,
     9_500_000_283,
     9_500_000_284,
     9_500_000_285,
-    9_500_000_286,
     9_500_000_288,
     9_500_000_289,
     9_500_000_290,
     9_500_000_291,
-    9_500_000_292,
     9_500_000_309,
     9_500_000_313,
-    9_500_000_328,
-    9_500_000_331,
-    9_500_000_332,
-    9_500_000_350,
-    9_500_000_358,
-    9_500_000_376,
-    9_500_000_380,
-    9_500_000_385,
-    9_500_000_388,
-    9_500_000_391,
-    9_500_000_419,
-    9_500_000_442,
-    9_500_000_445,
-    9_500_000_454,
-    9_500_000_455,
-    9_500_000_457,
     9_500_000_463,
-    9_500_000_466,
     9_500_000_473,
     9_500_000_492,
-    9_500_000_515,
-    9_500_000_518,
     9_500_000_529,
     9_500_000_540,
-    9_500_000_545,
     9_500_000_549,
-    9_500_000_555,
     9_500_000_563,
     9_500_000_566,
-    9_500_000_569,
-    9_500_000_572,
     9_500_000_584,
-    9_500_000_589,
     9_500_000_593,
     9_500_000_596,
     9_500_000_601,
     9_500_000_608,
-    9_500_000_609,
-    9_500_000_616,
-    9_500_000_625,
-    9_500_000_653,
-    9_500_000_708,
-    9_500_000_728,
-    9_500_000_736,
-    9_500_000_739,
     9_500_000_748,
-    9_500_000_749,
-    9_500_000_750,
-    9_500_000_751,
     9_500_000_758,
-    9_500_000_774,
-    9_500_000_805,
-    9_500_000_811,
     9_500_000_852,
-    9_500_000_878,
-    9_500_000_880,
-    9_500_000_908,
-    9_500_000_924,
-    9_500_000_928,
     9_500_000_936,
-    9_500_000_987,
-    9_500_001_000,
 ];
 
 /// Every vendor-role NPC row, keyed by id, with its name for failure messages.

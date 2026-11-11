@@ -5,24 +5,24 @@
 //! and 1,081 grantable stock rows. The stale T019 note said 62 of 192; that number
 //! predates the later ride-vendor additions and does not match the checked catalogue.
 //!
-//! The six selected-hub NPC files contain 59 vendor-role records: 30 fully
+//! The six selected-hub NPC files contain 59 vendor-role records: 53 fully
 //! grantable `vendors.json` records (T275 made Bordon Cloo a vendor; T372 spawns
-//! the ten stocked rows that had no runtime actor), one resolved record whose
-//! only named stock has no purchasable price, and 28 records with no
-//! item-level stock evidence.
+//! the ten stocked rows that had no runtime actor; P-vendor-stock reconstructed
+//! the stock of 23 more by analogy, (R) per `vendors.json`
+//! `provenance.p_vendor_stock`, and gave the undrawn ones a body) and 6 records
+//! with nothing a coin shop sells: the Pet Adoption Center building, an
+//! aggregate record for anonymous shopkeepers, Edwin (his paintings are T871
+//! Station Cash fixtures), Gulsh (no Vaultberry row), Saffron (pets are earned,
+//! owner's call) and the Sanctuary Tiger record that stands in Blackspore.
 //! Every one is enumerated and either stocked or listed as an explicit,
 //! evidence-backed exception, so a new vendor or a newly empty window fails here
 //! instead of passing silently.
 //!
-//! This enumeration is **not** the T108 completion target. The brief asks for
-//! 20 additional fully grantable vendor records (or every reachable selected-hub
-//! vendor when fewer than 20 remain unresolved). Twenty-eight vendor rows are
-//! still unresolved, so the fallback cannot apply and the target is unmet; the
-//! ignored `at_least_twenty_more_selected_hub_vendors_are_fully_grantable` test
-//! keeps that target runnable. Neither an empty exception nor the one empty
-//! `vendors.json` record counts as a completed vendor. See
-//! `notes/Autopilot/F192.md` for the evidence search and the lead's accepted
-//! decision (2026-10-19): no stock is invented beyond retained evidence.
+//! The T108 completion target (20 additional fully grantable vendor records,
+//! 49 of 59 stocked and 39 reachable) was unmet while the lead's 2026-10-19
+//! decision kept stock to retained evidence (`notes/Autopilot/F192.md`). The
+//! owner's 2026-11-07 standing order to reconstruct missing server-side data by
+//! analogy lifted that limit, so the target test below now runs.
 
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
@@ -87,17 +87,18 @@ const BASELINE_GRANTABLE_STOCK_ROWS: usize = 1_041;
 /// content, not the completion target (see the selected-hub test below).
 const REQUIRED_ADDITIONAL_ROWS: usize = 20;
 /// Measured fully grantable vendor records. T230 emptied exactly Delvin and Cragara; T275's
-/// recovered Bordon Cloo stock brought the measured count to 96. It may be raised with a content
-/// change, never lowered silently.
-const REPRODUCED_FULLY_GRANTABLE_VENDORS: usize = 96;
+/// recovered Bordon Cloo stock brought the measured count to 96; P-vendor-stock's reconstructed
+/// stock (67 vendors, Delvin and Cragara among them) and P-kart-garage's two mechanics brought it
+/// to 165. It may be raised with a content change, never lowered silently.
+const REPRODUCED_FULLY_GRANTABLE_VENDORS: usize = 165;
 /// Every vendor-role record in the six selected-hub NPC files, split by the
 /// evidence available for its stock. The test asserts each count, so adding,
 /// removing or emptying a vendor needs a deliberate content change.
 const SELECTED_HUB_VENDOR_COUNT: usize = 59;
-const SELECTED_HUB_VENDOR_RECORD_COUNT: usize = 31;
-const SELECTED_HUB_STOCKED_VENDOR_COUNT: usize = 30;
-const SELECTED_HUB_RESOLVED_EMPTY_VENDOR_COUNT: usize = 1;
-const SELECTED_HUB_UNRESOLVED_VENDOR_COUNT: usize = 28;
+const SELECTED_HUB_VENDOR_RECORD_COUNT: usize = 53;
+const SELECTED_HUB_STOCKED_VENDOR_COUNT: usize = 53;
+const SELECTED_HUB_RESOLVED_EMPTY_VENDOR_COUNT: usize = 0;
+const SELECTED_HUB_UNRESOLVED_VENDOR_COUNT: usize = 6;
 /// `NpcVisibility::load` sends every data-backed `legacy_data` row and every
 /// renderable `npc_spawns_extra` row. T372 added the ten stocked selected-hub
 /// vendor spawns, so the spawned set was 40 (30 stocked, 10 unstocked) and no
@@ -106,9 +107,13 @@ const SELECTED_HUB_UNRESOLVED_VENDOR_COUNT: usize = 28;
 /// stocked/unresolved split too, so a placement swap between the two groups
 /// cannot keep the total while hiding a reachable-stock regression. L924 gave six
 /// more unstocked vendor-role NPCs a body, so the world draws them (54: 30 stocked, 24 unstocked).
-const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 54;
-const SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT: usize = 30;
-const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 24;
+/// P-vendor-stock stocked 23 hub vendors and drew the seven of them that had no body
+/// (56: 53 stocked, 3 unstocked; Edwin, Gulsh and Saffron are drawn without stock, and the
+/// undrawn three are the Adoption Center building, the aggregate shopkeeper record and the
+/// Sanctuary Tiger record that stands in Blackspore).
+const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 56;
+const SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT: usize = 53;
+const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 3;
 /// Stocked `vendors.json` records whose NPC placement has neither a `legacy_data`
 /// row nor an `npc_spawns_extra` actor, so the production visibility loader never
 /// spawns them. T372 spawned the last ten; this stays zero so a regression that
@@ -116,11 +121,10 @@ const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 24;
 const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_COUNT: usize = 0;
 const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS: &[u64] = &[];
 /// The brief's 20-additional-vendor target leaves 49 of the 59 selected-hub
-/// vendor rows fully grantable. Nothing sources that yet; the ignored target
-/// test below records the real requirement instead of treating the pre-T275
-/// 29/1/28 split as completion. Reachability is checked separately: 20 more
-/// *spawned* fully grantable vendors than the pre-T275 19, so unspawned stock
-/// cannot make the target look complete.
+/// vendor rows fully grantable. P-vendor-stock's reconstruction reaches 53; the
+/// target test below records the requirement. Reachability is checked
+/// separately: 20 more *spawned* fully grantable vendors than the pre-T275 19,
+/// so unspawned stock cannot make the target look complete.
 const T108_REQUIRED_STOCKED_VENDOR_COUNT: usize = 49;
 const T108_REQUIRED_SPAWNED_STOCKED_VENDOR_COUNT: usize = 39;
 const REPRESENTATIVE_ITEM: i32 = 76_427;
@@ -154,41 +158,15 @@ const fn unresolved_named(npc_id: u64) -> StockException {
     }
 }
 
-/// Every empty selected-hub vendor, with the evidence the counts rely on.
+/// Every empty selected-hub vendor, with the evidence the counts rely on. Each is
+/// also listed with its reason in `vendors.json` `unstocked_vendors`.
 const SELECTED_HUB_STOCK_EXCEPTIONS: &[StockException] = &[
-    unresolved(9_000_000_021),
-    StockException {
-        npc_id: 9_000_000_027,
-        source: "data/content/vendors.json record",
-        reason: "(R) Bait (57012) has a null stores.json purchase price and a NoSale client row.",
-    },
     unresolved(9_500_000_005),
-    unresolved(9_500_000_014),
-    unresolved(9_500_000_051),
-    unresolved(9_500_000_069),
-    unresolved(9_500_000_072),
-    unresolved(9_500_000_074),
-    unresolved(9_500_000_247),
-    unresolved(9_500_000_279),
-    unresolved(9_500_000_328),
-    unresolved(9_500_000_331),
-    unresolved(9_500_000_332),
-    unresolved(9_500_000_350),
-    unresolved(9_500_000_358),
-    unresolved(9_500_000_442),
-    unresolved(9_500_000_445),
-    unresolved_named(9_500_000_454),
-    unresolved(9_500_000_455),
-    unresolved(9_500_000_457),
     unresolved(9_500_000_463),
-    unresolved(9_500_000_466),
     unresolved_named(9_500_000_473),
     unresolved(9_500_000_492),
-    unresolved(9_500_000_515),
-    unresolved(9_500_000_518),
     unresolved(9_500_000_529),
     unresolved(9_500_000_540),
-    unresolved(9_500_000_545),
 ];
 
 fn content_dir() -> PathBuf {
@@ -547,11 +525,9 @@ fn the_selected_hub_vendors_have_nonempty_grantable_stock() {
         empty, expected_exceptions,
         "the selected-hub empty vendors changed; every exception needs a source and reason"
     );
-    // These are the known content-gap counts, not the brief's 49-vendor
-    // completion target: T275 stocked Bordon Cloo, so 30 records are stocked; 28
-    // rows still have no item-level final-era evidence
-    // and one resolved record exposes only an unbuyable Bait row. The ignored
-    // target test above keeps the real requirement visible.
+    // The content-gap counts: 53 records are stocked (30 from retained evidence,
+    // 23 reconstructed by P-vendor-stock), 6 rows have nothing a coin shop
+    // sells, and no resolved record is left exposing only an unbuyable row.
     assert_eq!(stocked, SELECTED_HUB_STOCKED_VENDOR_COUNT);
     assert_eq!(resolved_empty, SELECTED_HUB_RESOLVED_EMPTY_VENDOR_COUNT);
     assert_eq!(unresolved_empty, SELECTED_HUB_UNRESOLVED_VENDOR_COUNT);
@@ -668,15 +644,13 @@ fn assert_selected_hub_vendor_spawns(
     );
 }
 
-/// The brief's completion target, kept runnable but ignored: 20 additional
-/// fully grantable vendor records would leave 49 of 59 stocked, and 20 more
-/// spawned fully grantable vendors would leave 39 reachable. No retained source
-/// proves stock for 20 of the 28 unresolved rows (the wiki pages name no
-/// final-era items; the few item-level mentions are retired-2009 or
-/// variant/composite claims), so the lead accepted this unmet target on
-/// 2026-10-19 instead of invented content. See `notes/Autopilot/F192.md`.
+/// The brief's completion target: 20 additional fully grantable vendor records
+/// leave 49 of 59 stocked, and 20 more spawned fully grantable vendors leave 39
+/// reachable. It was ignored while the lead's 2026-10-19 decision kept stock to
+/// retained evidence (`notes/Autopilot/F192.md`); P-vendor-stock's (R)
+/// reconstruction by analogy (owner's standing order, 2026-11-07) reaches 53
+/// stocked and 53 reachable, so it runs.
 #[test]
-#[ignore = "T108 target unmet: 30 of 39 spawned (30 of 49 records) selected-hub vendors are stocked"]
 fn at_least_twenty_more_selected_hub_vendors_are_fully_grantable() {
     let content = content_dir();
     let vendors = read_json(&content.join("vendors.json"));
@@ -760,9 +734,10 @@ fn at_least_twenty_more_vendor_rows_are_fully_grantable() {
         );
     }
 
-    // T230 intentionally emptied exactly these two records: every row they listed was ride
-    // stock, now in the Station Cash Marketplace. Any other empty record is a silent stock loss
-    // and must be a deliberate content change.
+    // T230 emptied exactly two records (Cragara 9500000569 and Delvin 9500000572: every row they
+    // listed was ride stock, now in the Station Cash Marketplace); P-vendor-stock restocked both
+    // with non-ride goods. Any empty record is now a silent stock loss and must be a deliberate
+    // content change.
     let emptied: BTreeMap<u64, &str> = vendors["vendors"]
         .as_array()
         .expect("vendor records are an array")
@@ -785,8 +760,8 @@ fn at_least_twenty_more_vendor_rows_are_fully_grantable() {
         .collect();
     assert_eq!(
         emptied,
-        BTreeMap::from([(9_500_000_569, "Cragara"), (9_500_000_572, "Delvin")]),
-        "only the two T230 ride vendors may be emptied"
+        BTreeMap::new(),
+        "no vendor record may be left empty; a vendor without sellable goods leaves vendors.json"
     );
 
     assert!(

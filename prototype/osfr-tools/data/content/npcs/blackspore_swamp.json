@@ -34900,9 +34900,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2149.467709,
-        -32.948,
-        1039.527297
+        -2139.5,
+        -33.0,
+        1043.5
       ],
       "position_w": null,
       "rotation": [
@@ -34937,7 +34937,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-09: the POI spiral spot was 2-4 m under the hillside (probe stand.y -30.732, slope 41 deg); moved onto the flat 3.6 m from Cragara 9500000014, probe stand.y -33.0, slope 0 (world editor /api/probe). (R) Landing 2026-11-10: the quest stack drew Petra 9000000428 0.64 m from the review spot; moved 1.4 m to the free flat 3.9 m from Cragara 9500000014 and 1.8 m from Petra, probe stand.y -33.0, slope 0, every direction walkable (world editor /api/probe).",
       "source": [
         {
           "kind": "client",
@@ -37260,9 +37260,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2149.483267,
-        -32.948,
-        1044.618185
+        -2143.0,
+        -32.75,
+        1045.0
       ],
       "position_w": null,
       "rotation": [
@@ -37282,7 +37282,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-09: the POI spiral spot was under the hillside (probe stand.y -29.285, slope 17.5 deg); moved onto the flat 2.9 m from Cragara 9500000014, probe stand.y -32.75, slope 6.4 (world editor /api/probe).",
       "source": [
         {
           "kind": "client",

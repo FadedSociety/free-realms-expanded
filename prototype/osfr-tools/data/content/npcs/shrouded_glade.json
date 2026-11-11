@@ -2668,9 +2668,9 @@
       ],
       "services_reason": null,
       "position": [
-        11.2,
-        40.061,
-        1070.9
+        10.2,
+        39.996,
+        1071.9
       ],
       "position_w": null,
       "rotation": [
@@ -2684,7 +2684,7 @@
       "placement_confidence": "high",
       "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "Video archive placement index (2026-10-29): Baily Leafcutter solved at x=11.2 z=1070.9, error 3.5 m, 14 sightings in 7 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2.761469, 41.038, 1116.580615].",
+      "position_reason": "Video archive placement index (2026-10-29): Baily Leafcutter solved at x=11.2 z=1070.9, error 3.5 m, 14 sightings in 7 videos (dots), confidence high; height sampled from the zone-0 terrain grid. Replaces the reconstructed offset position [-2.761469, 41.038, 1116.580615]. (R) Landing 2026-11-10: the index point is 0.31 m from McMann 9500000702, a drawn row; the body stands 1.4 m off it (inside the 3.5 m index error), 1.7 m from McMann and from Perci Perriweather, probe stand.y 39.996, slope 4.0, every direction walkable (world editor /api/probe).",
       "source": [
         {
           "kind": "client",

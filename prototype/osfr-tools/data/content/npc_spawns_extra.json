@@ -60719,6 +60719,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33086 SubTextNameId=36"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 32 = fairy_m_farmer_01.adr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 32/fairy_m_farmer_01.adr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -60952,6 +60960,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33307 SubTextNameId=46438"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 557 = human_m_freestyle_11.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 557/human_m_freestyle_11.agr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -61651,6 +61667,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33416 SubTextNameId=15717"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 574 = fairy_m_blacksmith_01.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 574/fairy_m_blacksmith_01.agr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -61725,6 +61749,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33426 SubTextNameId=47154 TextureAlias=sanctuary_01 TintAlias=sanctuary_01_Blue"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 384 = fairy_sanctuary_f.adr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 384/fairy_sanctuary_f.adr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -62278,6 +62310,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33479 SubTextNameId=15717 TextureAlias=sanctuary_03 TintAlias=sanctuary_03_Blue"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 384 = fairy_sanctuary_f.adr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 384/fairy_sanctuary_f.adr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -62444,6 +62484,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33556 SubTextNameId=36"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 184 = human_m_freestyle_01.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 184/human_m_freestyle_01.agr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -62685,6 +62733,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33624 SubTextNameId=440942"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4103 = sogg_f_vendor.adr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 4103/sogg_f_vendor.adr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -62721,6 +62777,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33632 SubTextNameId=15717 TextureAlias=02 TintAlias=skyblue"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 49 = fairy_m_02.adr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 49/fairy_m_02.adr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -63201,6 +63265,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33730 SubTextNameId=3227"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 573 = fairy_f_freestyle_11.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 573/fairy_f_freestyle_11.agr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -63429,6 +63501,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m; the name matches 3 regional rows and this one (9500000774, Snowhill) is chosen by the T470 brief"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1963 = human_m_tiger_the_party_animal_holiday.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 1963/human_m_tiger_the_party_animal_holiday.agr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null
@@ -63635,6 +63715,14 @@
         {
           "kind": "reference",
           "evidence": "Sanctuary-main-20261019@10f129e Npcs.json Id=33964 SubTextNameId=3922"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1085 = human_m_soccerred.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 1085/human_m_soccerred.agr from the client model table; exact appearance is unrecovered."
         }
       ],
       "position_w": null,
@@ -79398,37 +79486,6 @@
       "content_key": 9500000480
     },
     {
-      "legacy_npc_id": null,
-      "model_id": 4499,
-      "model_file_name": "human_m_merchant_brawler_caucasian.agr",
-      "name": "Hank Fisticuffs",
-      "name_string_id": 90196,
-      "position": [
-        228.9,
-        23.445,
-        382.5
-      ],
-      "position_w": null,
-      "heading": -1.33,
-      "capture_match": null,
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "npc_name 90196 'Hank Fisticuffs'; the next string, 90197, reads 'Brawler & Ninja Weapons', his merchant title."
-        },
-        {
-          "kind": "video",
-          "evidence": "index.tsv: solved at x=236.6 z=385.3, error 4.0 m, 3 sightings, confidence high, placed_ok against record 9500000751 (8 m). Frame 0-8dyaBN6rs/00080 shows the plate at 10 m but not a readable body."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) Body 4499, the male brawler merchant, by his client title, seen in model-view; race not proven. Kept on the record's exact spot because tests/content_npc_placement.rs requires a bound spawn at a video_index record's position. No wiki page. Probe not run (position taken from the record)."
-        }
-      ],
-      "spawn_guid": 100000090068,
-      "content_key": 9500000751
-    },
-    {
       "spawn_guid": 100000090101,
       "legacy_npc_id": null,
       "model_id": 141,
@@ -79585,6 +79642,782 @@
         }
       ],
       "spawn_guid": 100000090057
+    },
+    {
+      "legacy_npc_id": null,
+      "model_id": 4499,
+      "model_file_name": "human_m_merchant_brawler_caucasian.agr",
+      "name": "Hank Fisticuffs",
+      "name_string_id": 90196,
+      "position": [
+        228.9,
+        23.445,
+        382.5
+      ],
+      "position_w": null,
+      "heading": -1.33,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "npc_name 90196 'Hank Fisticuffs'; the next string, 90197, reads 'Brawler & Ninja Weapons', his merchant title."
+        },
+        {
+          "kind": "video",
+          "evidence": "index.tsv: solved at x=236.6 z=385.3, error 4.0 m, 3 sightings, confidence high, placed_ok against record 9500000751 (8 m). Frame 0-8dyaBN6rs/00080 shows the plate at 10 m but not a readable body."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Body 4499, the male brawler merchant, by his client title, seen in model-view; race not proven. Kept on the record's exact spot because tests/content_npc_placement.rs requires a bound spawn at a video_index record's position. No wiki page. Probe not run (position taken from the record). (R) P-vendor-stock: spawn_guid changed from 100000090068 to the content key 9500000751, the convention of every other priced vendor spawn, so a 26/8 click on the content key opens his reconstructed shop."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4499 = human_m_merchant_brawler_caucasian.agr (the 2014 client model table; the body this row already draws)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this vendor now carries reconstructed stock, so the row is held to the priced-vendor rule (tests/priced_vendors_drawable.rs). The position is the placement this row already recorded, not a captured transform; the body is model 4499/human_m_merchant_brawler_caucasian.agr from the client model table; exact appearance is unrecovered."
+        }
+      ],
+      "spawn_guid": 9500000751,
+      "content_key": 9500000751
+    },
+    {
+      "spawn_guid": 9500000014,
+      "legacy_npc_id": null,
+      "content_key": 9500000014,
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr",
+      "name": "Cragara",
+      "name_string_id": 440941,
+      "position": [
+        -2141.023083,
+        -32.948,
+        1047.132912
+      ],
+      "heading": 0.712,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4103 = sogg_f_vendor.adr (the 2014 client's model table). The data/content/npcs/blackspore_swamp.json row 9500000014 (Cragara) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.440941 resolves to 'Cragara' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4103/sogg_f_vendor.adr is the snail vendor body Cragara's Snowhill spawn (9500000739) already uses; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000113,
+      "legacy_npc_id": null,
+      "content_key": 9500000113,
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr",
+      "name": "Cragara",
+      "name_string_id": 440941,
+      "position": [
+        -814.34033,
+        -21.029,
+        1629.889406
+      ],
+      "heading": 0.14,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4103 = sogg_f_vendor.adr (the 2014 client's model table). The data/content/npcs/briarwood.json row 9500000113 (Cragara) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.440941 resolves to 'Cragara' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4103/sogg_f_vendor.adr is the snail vendor body Cragara's Snowhill spawn (9500000739) already uses; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000376,
+      "legacy_npc_id": null,
+      "content_key": 9500000376,
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr",
+      "name": "Cragara",
+      "name_string_id": 440941,
+      "position": [
+        -1174.388701,
+        -34.879,
+        -435.463581
+      ],
+      "heading": 1.538,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4103 = sogg_f_vendor.adr (the 2014 client's model table). The data/content/npcs/merry_vale.json row 9500000376 (Cragara) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.440941 resolves to 'Cragara' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4103/sogg_f_vendor.adr is the snail vendor body Cragara's Snowhill spawn (9500000739) already uses; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000569,
+      "legacy_npc_id": null,
+      "content_key": 9500000569,
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr",
+      "name": "Cragara",
+      "name_string_id": 440941,
+      "position": [
+        -631.06,
+        9.61,
+        -1037.52
+      ],
+      "heading": 2.06,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4103 = sogg_f_vendor.adr (the 2014 client's model table). The data/content/npcs/seaside.json row 9500000569 (Cragara) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.440941 resolves to 'Cragara' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4103/sogg_f_vendor.adr is the snail vendor body Cragara's Snowhill spawn (9500000739) already uses; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Landing 2026-11-10: the row stands where the warpstone-rock build (L1125) put it, clear of the Seaside Warpstone; the vendor body follows it, probe stand.y 9.613, slope 2.9, every direction walkable (world editor /api/probe). The position is still a reconstruction, not a captured transform."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000811,
+      "legacy_npc_id": null,
+      "content_key": 9500000811,
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr",
+      "name": "Cragara",
+      "name_string_id": 440941,
+      "position": [
+        901.793117,
+        2.463198,
+        2245.920512
+      ],
+      "heading": -2.782342,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4103 = sogg_f_vendor.adr (the 2014 client's model table). The data/content/npcs/sunstone_valley.json row 9500000811 (Cragara) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.440941 resolves to 'Cragara' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4103/sogg_f_vendor.adr is the snail vendor body Cragara's Snowhill spawn (9500000739) already uses; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000069,
+      "legacy_npc_id": null,
+      "content_key": 9500000069,
+      "model_id": 1963,
+      "model_file_name": "human_m_tiger_the_party_animal_holiday.agr",
+      "name": "Tiger the Party Animal",
+      "name_string_id": 420171,
+      "position": [
+        -2139.5,
+        -33.0,
+        1043.5
+      ],
+      "heading": 0.712,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1963 = human_m_tiger_the_party_animal_holiday.agr (the 2014 client's model table). The data/content/npcs/blackspore_swamp.json row 9500000069 (Tiger the Party Animal) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.420171 resolves to 'Tiger the Party Animal' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 1963/human_m_tiger_the_party_animal_holiday.agr is Tiger's own named client body, as his Snowhill spawn (9500000774); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-09: the POI spiral spot was 2-4 m under the hillside (probe stand.y -30.732, slope 41 deg); moved onto the flat 3.6 m from Cragara 9500000014, probe stand.y -33.0, slope 0 (world editor /api/probe). The position is still a reconstruction, not a captured transform."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Landing 2026-11-10: the quest stack drew Petra 9000000428 0.64 m from the review spot; moved 1.4 m to the free flat 3.9 m from Cragara 9500000014 and 1.8 m from Petra, probe stand.y -33.0, slope 0, every direction walkable (world editor /api/probe). The position is still a reconstruction, not a captured transform."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000074,
+      "legacy_npc_id": null,
+      "content_key": 9500000074,
+      "model_id": 4500,
+      "model_file_name": "human_m_merchant_brawler_african.agr",
+      "name": "Trent Gingertuft",
+      "name_string_id": 72453,
+      "position": [
+        -2143.0,
+        -32.75,
+        1045.0
+      ],
+      "heading": 0.712,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4500 = human_m_merchant_brawler_african.agr (the 2014 client's model table). The data/content/npcs/blackspore_swamp.json row 9500000074 (Trent Gingertuft) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.72453 resolves to 'Trent Gingertuft' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4500/human_m_merchant_brawler_african.agr is a male human Brawler merchant body; the wiki gives his job, not his look; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-09: the POI spiral spot was under the hillside (probe stand.y -29.285, slope 17.5 deg); moved onto the flat 2.9 m from Cragara 9500000014, probe stand.y -32.75, slope 6.4 (world editor /api/probe). The position is still a reconstruction, not a captured transform."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000048,
+      "legacy_npc_id": null,
+      "content_key": 9000000048,
+      "model_id": 968,
+      "model_file_name": "human_m_racer_repair_guy.agr",
+      "name": "Clack",
+      "name_string_id": 5102704,
+      "position": [
+        -811.586319,
+        -21.029,
+        1631.222909
+      ],
+      "heading": 0.14,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 968 = human_m_racer_repair_guy.agr (the 2014 client's model table). The data/content/npcs/briarwood.json row 9000000048 (Clack) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5102704 resolves to 'Clack' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_zone_center placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 968/human_m_racer_repair_guy.agr is the kart repair-guy body for the Kart Driver Equipment vendor; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000279,
+      "legacy_npc_id": null,
+      "content_key": 9500000279,
+      "model_id": 1410,
+      "model_file_name": "fairy_f_merchant_shiny_straightshot.agr",
+      "name": "Shiny Straightshot",
+      "name_string_id": 115804,
+      "position": [
+        -2157.966,
+        -31.96,
+        373.505
+      ],
+      "heading": -1.797,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1410 = fairy_f_merchant_shiny_straightshot.agr (the 2014 client's model table). The data/content/npcs/farnum_farmstead.json row 9500000279 (Shiny Straightshot) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.115804 resolves to 'Shiny Straightshot' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 1410/fairy_f_merchant_shiny_straightshot.agr is her own named client body; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000122,
+      "legacy_npc_id": null,
+      "content_key": 9000000122,
+      "model_id": 214,
+      "model_file_name": "chugawug_m_greenwood_archer_01.adr",
+      "name": "Jormajorm",
+      "name_string_id": 5115,
+      "position": [
+        -1582.906579,
+        -45.37643,
+        -550.485412
+      ],
+      "heading": -0.21685,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 214 = chugawug_m_greenwood_archer_01.adr (the 2014 client's model table). The data/content/npcs/greenwood_forest.json row 9000000122 (Jormajorm) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5115 resolves to 'Jormajorm' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_zone_center placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 214/chugawug_m_greenwood_archer_01.adr is the male Greenwood Chugawug archer body (wiki: Chugawug man, Archer merchant); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000332,
+      "legacy_npc_id": null,
+      "content_key": 9500000332,
+      "model_id": 488,
+      "model_file_name": "chugawug_farmer_m.adr",
+      "name": "Coin Farmer Goldwupp",
+      "name_string_id": 429170,
+      "position": [
+        -440.456593,
+        -3.885,
+        189.620347
+      ],
+      "heading": -1.218,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 488 = chugawug_farmer_m.adr (the 2014 client's model table). The data/content/npcs/highroad_junction.json row 9500000332 (Coin Farmer Goldwupp) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.429170 resolves to 'Coin Farmer Goldwupp' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 488/chugawug_farmer_m.adr is the male Chugawug farmer body for a Coin Farmer; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000350,
+      "legacy_npc_id": null,
+      "content_key": 9500000350,
+      "model_id": 4509,
+      "model_file_name": "fairy_f_merchant_brawler_caucasian_skygoddess.agr",
+      "name": "Lacy Trembletoes",
+      "name_string_id": 46928,
+      "position": [
+        -738.030694,
+        9.09,
+        943.609314
+      ],
+      "heading": -2.673,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4509 = fairy_f_merchant_brawler_caucasian_skygoddess.agr (the 2014 client's model table). The data/content/npcs/lakeshore.json row 9500000350 (Lacy Trembletoes) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.46928 resolves to 'Lacy Trembletoes' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_zone_center placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4509/fairy_f_merchant_brawler_caucasian_skygoddess.agr is a female pixie Brawler merchant body; the wiki gives her job, not her look; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000380,
+      "legacy_npc_id": null,
+      "content_key": 9500000380,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Duana",
+      "name_string_id": 385854,
+      "position": [
+        -1094.5,
+        -38.95,
+        -430.5
+      ],
+      "heading": -2.036829,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 384 = fairy_sanctuary_f.adr (the 2014 client's model table). The data/content/npcs/merry_vale.json row 9500000380 (Duana) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.385854 resolves to 'Duana' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 384/fairy_sanctuary_f.adr is the generic female pixie body (wiki: a Merry Vale fairy); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000391,
+      "legacy_npc_id": null,
+      "content_key": 9500000391,
+      "model_id": 48,
+      "model_file_name": "fairy_m_01.adr",
+      "name": "Izzy Fast",
+      "name_string_id": 427564,
+      "position": [
+        -912.3,
+        -37.26,
+        -393.3
+      ],
+      "heading": 1.538,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 48 = fairy_m_01.adr (the 2014 client's model table). The data/content/npcs/merry_vale.json row 9500000391 (Izzy Fast) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.427564 resolves to 'Izzy Fast' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 48/fairy_m_01.adr is the generic male pixie body (wiki: a Merry Vale fairy); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000455,
+      "legacy_npc_id": null,
+      "content_key": 9500000455,
+      "model_id": 20,
+      "model_file_name": "human_rockstar_m.adr",
+      "name": "Bruce",
+      "name_string_id": 201,
+      "position": [
+        -1487.312612,
+        -35.049,
+        407.31693
+      ],
+      "heading": 0.24,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 20 = human_rockstar_m.adr (the 2014 client's model table). The data/content/npcs/sanctuary.json row 9500000455 (Bruce) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.201 resolves to 'Bruce' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 20/human_rockstar_m.adr is the male human rockstar body (wiki: a semi-retired rockstar); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000457,
+      "legacy_npc_id": null,
+      "content_key": 9500000457,
+      "model_id": 32,
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "name": "Buzz",
+      "name_string_id": 7602,
+      "position": [
+        -1409.709226,
+        -27.631,
+        356.99805
+      ],
+      "heading": 2.247,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 32 = fairy_m_farmer_01.adr (the 2014 client's model table). The data/content/npcs/sanctuary.json row 9500000457 (Buzz) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.7602 resolves to 'Buzz' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_zone_center placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 32/fairy_m_farmer_01.adr is the male pixie farmer body for the honey-cart owner; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000555,
+      "legacy_npc_id": null,
+      "content_key": 9500000555,
+      "model_id": 49,
+      "model_file_name": "fairy_m_02.adr",
+      "name": "Bandy Randi",
+      "name_string_id": 90233,
+      "position": [
+        -486.6,
+        -13.971,
+        -1199.8
+      ],
+      "heading": 2.06,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 49 = fairy_m_02.adr (the 2014 client's model table). The data/content/npcs/seaside.json row 9500000555 (Bandy Randi) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90233 resolves to 'Bandy Randi' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 49/fairy_m_02.adr is the generic male pixie body (wiki: male pixie); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000609,
+      "legacy_npc_id": null,
+      "content_key": 9500000609,
+      "model_id": 4518,
+      "model_file_name": "fairy_m_merchant_medic_asian_spark.agr",
+      "name": "Munchi Elwood",
+      "name_string_id": 90229,
+      "position": [
+        -547.0,
+        -6.81,
+        -1171.1
+      ],
+      "heading": 2.06,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4518 = fairy_m_merchant_medic_asian_spark.agr (the 2014 client's model table). The data/content/npcs/seaside.json row 9500000609 (Munchi Elwood) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90229 resolves to 'Munchi Elwood' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4518/fairy_m_merchant_medic_asian_spark.agr is a male pixie Medic merchant body (wiki: male pixie, Medic items); exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000653,
+      "legacy_npc_id": null,
+      "content_key": 9500000653,
+      "model_id": 4562,
+      "model_file_name": "fairy_m_merchant_warrior_caucasian_fire.agr",
+      "name": "Baily Leafcutter",
+      "name_string_id": 90246,
+      "position": [
+        10.2,
+        39.996,
+        1071.9
+      ],
+      "heading": 2.477,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4562 = fairy_m_merchant_warrior_caucasian_fire.agr (the 2014 client's model table). The data/content/npcs/shrouded_glade.json row 9500000653 (Baily Leafcutter) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90246 resolves to 'Baily Leafcutter' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4562/fairy_m_merchant_warrior_caucasian_fire.agr is a male pixie Warrior merchant body; the wiki gives his trade, not his look; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Landing 2026-11-10: the index point is 0.31 m from McMann 9500000702, a drawn row; the body stands 1.4 m off it (inside the 3.5 m index error), 1.7 m from McMann and from Perci Perriweather, probe stand.y 39.996, slope 4.0, every direction walkable (world editor /api/probe). The position is still a reconstruction, not a captured transform."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000728,
+      "legacy_npc_id": null,
+      "content_key": 9500000728,
+      "model_id": 4554,
+      "model_file_name": "human_m_merchant_warrior_african.agr",
+      "name": "Boomi McBam",
+      "name_string_id": 90190,
+      "position": [
+        229.55,
+        25.51,
+        430.5
+      ],
+      "heading": 1.487,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4554 = human_m_merchant_warrior_african.agr (the 2014 client's model table). The data/content/npcs/snowhill.json row 9500000728 (Boomi McBam) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90190 resolves to 'Boomi McBam' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4554/human_m_merchant_warrior_african.agr is a male human Warrior merchant body; the wiki gives his trade, not his look; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Landing 2026-11-10: the index point is 0.59 m from Fladnag 9500000746, and the review's 2 m offset left the index point (tests/video_placement_index.rs holds this row within 1 m of it); the body stands 0.95 m west of the index point, 1.4 m from Fladnag, probe stand.y 25.51 on the same hillside Fladnag stands on (slope 24.7 on the 2 m grid; no flatter spot lies inside both limits), every direction walkable (world editor /api/probe). The position is still a reconstruction, not a captured transform."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000750,
+      "legacy_npc_id": null,
+      "content_key": 9500000750,
+      "model_id": 4555,
+      "model_file_name": "human_m_merchant_warrior_asian.agr",
+      "name": "Hackum",
+      "name_string_id": 383267,
+      "position": [
+        44.444829,
+        30.987,
+        366.72066
+      ],
+      "heading": 1.487,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4555 = human_m_merchant_warrior_asian.agr (the 2014 client's model table). The data/content/npcs/snowhill.json row 9500000750 (Hackum) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.383267 resolves to 'Hackum' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4555/human_m_merchant_warrior_asian.agr is a male human Warrior merchant body; the wiki gives his trade, not his look; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000101,
+      "legacy_npc_id": null,
+      "content_key": 9000000101,
+      "model_id": 1590,
+      "model_file_name": "human_m_fisherman_01.agr",
+      "name": "Guppie",
+      "name_string_id": 409079,
+      "position": [
+        -1322.739479,
+        -64.82256,
+        902.505048
+      ],
+      "heading": 0.08236,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1590 = human_m_fisherman_01.agr (the 2014 client's model table). The data/content/npcs/stillwater_crossing.json row 9000000101 (Guppie) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.409079 resolves to 'Guppie' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 1590/human_m_fisherman_01.agr is the male human fisherman body for the lure vendor; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000878,
+      "legacy_npc_id": null,
+      "content_key": 9500000878,
+      "model_id": 4513,
+      "model_file_name": "human_m_merchant_medic_african.agr",
+      "name": "Bodkin",
+      "name_string_id": 382852,
+      "position": [
+        -414.4,
+        17.3,
+        -255.8
+      ],
+      "heading": -1.3558,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4513 = human_m_merchant_medic_african.agr (the 2014 client's model table). The data/content/npcs/wilds.json row 9500000878 (Bodkin) has no model binding, so the client body comes from the client model table."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.382852 resolves to 'Bodkin' in lab/reports/locale-id-to-text.json; the AddNpc name field is the Global.Text id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's video_archive_index placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4513/human_m_merchant_medic_african.agr is a male human Medic merchant body; the wiki gives his trade, not his look; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

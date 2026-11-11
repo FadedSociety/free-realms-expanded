@@ -68,6 +68,51 @@ const T372_SPAWNS: &[u64] = &[
     9_500_000_845,
 ];
 
+/// P-vendor-stock (R): the non-`legacy_data` vendors that gained reconstructed
+/// stock. 23 of them received a new `npc_spawns_extra.json` body in that slice
+/// (a same-race/job client model, the NPC row's reconstructed position, probed
+/// against the terrain); the rest already had one. With T372's 25 this is the
+/// whole non-legacy priced set.
+const VENDOR_STOCK_SPAWNS: &[u64] = &[
+    9_000_000_016,
+    9_000_000_024,
+    9_000_000_027,
+    9_000_000_048,
+    9_000_000_092,
+    9_000_000_101,
+    9_000_000_122,
+    9_500_000_014,
+    9_500_000_069,
+    9_500_000_074,
+    9_500_000_113,
+    9_500_000_279,
+    9_500_000_332,
+    9_500_000_350,
+    9_500_000_358,
+    9_500_000_376,
+    9_500_000_380,
+    9_500_000_391,
+    9_500_000_442,
+    9_500_000_445,
+    9_500_000_454,
+    9_500_000_455,
+    9_500_000_457,
+    9_500_000_466,
+    9_500_000_555,
+    9_500_000_569,
+    9_500_000_609,
+    9_500_000_653,
+    9_500_000_728,
+    9_500_000_736,
+    9_500_000_739,
+    9_500_000_749,
+    9_500_000_750,
+    9_500_000_751,
+    9_500_000_774,
+    9_500_000_811,
+    9_500_000_878,
+];
+
 /// The brief's representative subset; each row opens its real 165/10 coin window.
 const REPRESENTATIVE: &[u64] = &[
     9_500_000_482,
@@ -377,8 +422,16 @@ fn every_priced_vendor_is_drawable() {
         })
         .collect();
 
-    let expected: BTreeSet<u64> = T372_SPAWNS.iter().copied().collect();
-    assert_eq!(expected.len(), T372_SPAWNS.len(), "duplicate T372 spawn id");
+    let expected: BTreeSet<u64> = T372_SPAWNS
+        .iter()
+        .chain(VENDOR_STOCK_SPAWNS)
+        .copied()
+        .collect();
+    assert_eq!(
+        expected.len(),
+        T372_SPAWNS.len() + VENDOR_STOCK_SPAWNS.len(),
+        "duplicate T372 or vendor-stock spawn id"
+    );
     let non_legacy_priced: BTreeSet<u64> = vendors
         .iter()
         .filter(|vendor| {
@@ -389,7 +442,7 @@ fn every_priced_vendor_is_drawable() {
         .collect();
     assert_eq!(
         non_legacy_priced, expected,
-        "the priced vendors that are not legacy_data changed; T372's 25-row set is no longer exact"
+        "the priced vendors that are not legacy_data changed; the T372 and vendor-stock sets are no longer exact"
     );
 
     let missing: BTreeSet<u64> = vendors

@@ -60053,10 +60053,17 @@
             "kind": "legacy-data",
             "evidence": "data/content/npc_spawns_extra.json spawn_guid=9500000774 (same name)"
           }
+        ],
+        "body_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Review 2026-11-09 (P-vendor-stock): the body was removed because this Sanctuary record stands at the Blackspore POI 2 m from the Blackspore Tiger 9500000069; one Tiger per hub."
+          }
         ]
       },
-      "model_id": 1963,
-      "model_file_name": "human_m_tiger_the_party_animal_holiday.agr"
+      "model_id": null,
+      "model_file_name": null,
+      "body_reason": "(R) Review 2026-11-09 (P-vendor-stock): the body was removed. This Sanctuary record stands at the Blackspore POI 2 m from the Blackspore Tiger (9500000069), which keeps the body and the shop; one Tiger per hub. It is drawn again when a Sanctuary placement is found."
     },
     {
       "npc_id": 9500000541,

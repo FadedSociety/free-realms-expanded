@@ -10465,7 +10465,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Landing 2026-11-10: the row stands where the warpstone-rock build (L1125) put it, clear of the Seaside Warpstone; the vendor body follows it, probe stand.y 9.613, slope 2.9, every direction walkable (world editor /api/probe).",
       "source": [
         {
           "kind": "client",

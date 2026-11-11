@@ -75,10 +75,14 @@ const CONSUMERS: [(&str, &[&str], usize, usize, usize); 4] = [
     // Zipper 61006) are in the captured inventory, the rest resolve through the table.
     // P-games-window: the Super Star and Super Coin Booster rows (78, 81).
     // Mounts piece: 34 ride rows in the supplement (rides the original table lacks).
-    ("stores.json", &["item_id"], 17_900, 825, 17_258),
+    // P-vendor-stock: 116 RVS coin-price rows for the reconstructed vendor stock (25 of them in
+    // the captured inventory), every one a client item table row. Recipe 861 is not among them:
+    // it is a Learning to Crave the Flave pattern (`tests/zone_quests_sanctuary_r2.rs`).
+    ("stores.json", &["item_id"], 18_016, 850, 17_374),
     // P-kart-garage: the two mechanics' 280 kart ids (the same 13 captured), none shared with
-    // the other vendors' stock.
-    ("vendors.json", &["item_id", "item_ids"], 1_446, 341, 1_446),
+    // the other vendors' stock. P-vendor-stock: 435 more ids across 67 reconstructed shops (41
+    // captured), all table rows.
+    ("vendors.json", &["item_id", "item_ids"], 1_881, 382, 1_881),
     (
         "recipes.json",
         &["definition_id", "recipe_item_definition_id"],
