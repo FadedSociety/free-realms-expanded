@@ -37,7 +37,7 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     let effects = Effects::load(&directory).expect("consumables.json parses");
     let rows = effects.rows();
     assert!(
-        (90..=130).contains(&rows.len()),
+        (90..=220).contains(&rows.len()),
         "{} consumable rows, outside the content bounds",
         rows.len()
     );
@@ -103,31 +103,37 @@ fn the_shipped_rows_load_through_the_real_loader_with_their_client_checked_value
     // The retained joins: 23 food items and 69 transformation items after the exclusions, and
     // the nine birthday cakes (T557).
     let (mut heals, mut auras, mut transforms, mut cakes, mut boosts) = (0, 0, 0, 0, 0);
-    let mut strikes = 0;
+    let (mut strikes, mut scales, mut bursts, mut stats) = (0, 0, 0, 0);
     for row in rows {
         match row.effect {
             EffectKind::Heal { .. } => heals += 1,
             EffectKind::Aura { .. } => auras += 1,
             EffectKind::Transform { .. } => transforms += 1,
-            EffectKind::Scale { .. } => {}
+            EffectKind::Scale { .. } => scales += 1,
             EffectKind::PlacedCake { .. } => cakes += 1,
             EffectKind::Boost { .. } => boosts += 1,
             EffectKind::Strike { .. } => strikes += 1,
+            EffectKind::Burst { .. } => bursts += 1,
+            EffectKind::Stat { .. } => stats += 1,
         }
     }
-    assert_eq!(heals, 2);
-    assert_eq!(auras, 23);
+    // B1 (`scripts/event_effects.py`): the event, code and free-item consumables add 4 heals,
+    // 11 auras, 23 transforms (and fix 3), 2 scales, 16 bursts, 2 stat buffs, 2 coin boosters
+    // (the Prospector's Scrolls) and 2 placed props (Turkleton Treats, Glerga's Birthday Cake).
+    assert_eq!(heals, 6);
+    assert_eq!(auras, 34);
     assert_eq!(
-        transforms, 72,
+        transforms, 95,
         "L092: and the Scare Orb, Scare Sphere and Spook Sphere"
     );
+    assert_eq!((scales, bursts, stats), (2, 16, 2));
     let scare = effects.get(306).expect("Scare Orb");
     assert_eq!(scare.scare.map(|s| s.flee_ms), Some(4_000));
     assert!(effects.get(896).expect("Spook Sphere").scare.is_none());
-    assert_eq!(cakes, 9);
+    assert_eq!(cakes, 11);
     // L087: three +50% star boosters (ability 203), the Wheeler star and coin scrolls (wiki).
     // P-games-window: and the Super Coin Booster the minigame offer sells.
-    assert_eq!(boosts, 6);
+    assert_eq!(boosts, 8);
     // L088: the Frag and Flabbergast orbs and spheres; L089: Sleep, Unmoving and Confusion (wiki, client text).
     assert_eq!(strikes, 18, "L091: and the Blast Orb and Spheres");
     let blast = effects.get(3072).expect("Blast Orb");

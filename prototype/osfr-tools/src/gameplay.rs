@@ -407,7 +407,7 @@ pub struct Gameplay {
     game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
     group_credit: Option<Box<quest_combat::group_credit::Ledger>>, // PB2; never saved
     /// T474 live treat, cake and transformation effects (`gameplay/item_use.rs`); session-only, never saved.
-    consumable_effects: crate::consumable_effects::EffectStack,
+    consumable_effects: Box<crate::consumable_effects::EffectStack>, // boxed: B1 grew it
     world_challenge: Box<world_challenge::State>,
     offer_extras: Box<offer_extras::Extras>,
 }

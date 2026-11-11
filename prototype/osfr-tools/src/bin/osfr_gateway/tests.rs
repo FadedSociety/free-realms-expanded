@@ -1803,6 +1803,11 @@ mod f4_world_dressing;
 #[path = "l039_login_pose.rs"]
 pub(super) mod l039_login_pose;
 
+/// B1: one event consumable per effect kind through the session path: applied, then expired.
+#[cfg(test)]
+#[path = "b1_event_effects.rs"]
+mod b1_event_effects;
+
 /// L043 (lead): admin `realm move` of an online, loading or offline character, through a real
 /// `Server` in account-store mode.
 #[cfg(test)]

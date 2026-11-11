@@ -100,8 +100,8 @@ pub struct Effect {
     pub scare: Option<Scare>,
 }
 
-/// The seven row effects. A heal (to health) and a strike (L088, at enemies) are applied by the caller; the aura, transform, scale and boost
-/// become a [`consumable_effects::Spec`] that the caller applies through the shared effect stack;
+/// The nine row effects. A heal (to health) and a strike (L088, at enemies) are applied by the caller; the aura, transform, scale, boost,
+/// burst and stat (B1) become a [`consumable_effects::Spec`] the caller applies through the shared effect stack;
 /// a placed cake is put in the world by the host (T557).
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "snake_case")]
@@ -160,6 +160,22 @@ pub enum EffectKind {
     /// The cake row of `placed_cakes.json` this item places; it must be the item's own definition
     /// (the host refunds a refused place by definition). Never single-use.
     PlacedCake { row: i32 },
+    /// B1: a firework, party popper or spray: `composite_effect_id` plays for `duration_ms` on the
+    /// user, or with `at_target` on the actor the bar press aimed at (the user when it named none).
+    Burst {
+        composite_effect_id: i32,
+        duration_ms: u64,
+        #[serde(default)]
+        at_target: bool,
+    },
+    /// B1: a minigame buff (Timing, Talent, Matcher's and Maker's stats): character stat
+    /// `stat_id` is `value` for `duration_ms`.
+    Stat {
+        stat_id: i32,
+        value: i32,
+        duration_ms: u64,
+        icon_id: i32,
+    },
 }
 
 impl Effect {
@@ -226,6 +242,13 @@ impl Effect {
                     icon_id > 0
                         && duration(duration_ms)
                         && (1..=consumable_effects::MAX_BOOST_PERCENT).contains(&percent)
+                }
+                // A burst has no buff row, so no icon; a stat buff has one.
+                EffectKind::Burst { .. } | EffectKind::Stat { .. } => {
+                    self.spec().is_some_and(|spec| {
+                        (spec.icon_id > 0 || matches!(self.effect, EffectKind::Burst { .. }))
+                            && consumable_effects::admits(&spec).is_ok()
+                    })
                 }
                 EffectKind::Strike {
                     damage,
@@ -302,6 +325,11 @@ impl Effect {
 
     /// The effect-stack spec for a non-heal row; `None` for a heal.
     pub fn spec(&self) -> Option<consumable_effects::Spec> {
+        self.spec_aimed(0)
+    }
+
+    /// B1: the spec with an `at_target` burst aimed at `aimed` (0: the user).
+    fn spec_aimed(&self, aimed: u64) -> Option<consumable_effects::Spec> {
         let (kind, duration_ms, icon_id) = match self.effect {
             EffectKind::Heal { .. } | EffectKind::PlacedCake { .. } | EffectKind::Strike { .. } => {
                 return None;
@@ -348,6 +376,28 @@ impl Effect {
                 icon_id,
             } => (
                 consumable_effects::Kind::Boost { raises, percent },
+                duration_ms,
+                icon_id,
+            ),
+            EffectKind::Burst {
+                composite_effect_id,
+                duration_ms,
+                at_target,
+            } => (
+                consumable_effects::Kind::Burst {
+                    composite_effect_id,
+                    target: if at_target { aimed } else { 0 },
+                },
+                duration_ms,
+                0,
+            ),
+            EffectKind::Stat {
+                stat_id,
+                value,
+                duration_ms,
+                icon_id,
+            } => (
+                consumable_effects::Kind::Stat { stat_id, value },
                 duration_ms,
                 icon_id,
             ),
@@ -880,7 +930,7 @@ impl ItemBar {
                 ..Reply::default()
             });
         }
-        match self.consume(id, inventory, player, now_ms) {
+        match self.consume(id, inventory, player, now_ms, 0) {
             Ok(used) => {
                 // T789 follow-up: a refused 42/15 changed nothing, so it also keeps the
                 // confirmation it was checked with; only a successful use consumes it.
@@ -927,6 +977,11 @@ impl ItemBar {
         let (true, Some(binding)) = (on_self, binding) else {
             return Ok(refused());
         };
+        // B1: an aimed burst plays on the named actor; any other press names nobody.
+        let aimed = match request.target {
+            use_wire::Target::Guid(g) if thrown && g != player.guid => g,
+            _ => 0,
+        };
         if let Some(definition) = self.boombox_of(binding.item_instance_id, inventory) {
             // Every check first; the box is never spent, so only the recast changes.
             let usable = self.usable(binding.item_instance_id, inventory, player, now_ms);
@@ -940,7 +995,7 @@ impl ItemBar {
                 ..Reply::default()
             });
         }
-        match self.consume(binding.item_instance_id, inventory, player, now_ms) {
+        match self.consume(binding.item_instance_id, inventory, player, now_ms, aimed) {
             Ok(used) => {
                 let mut replies = used.replies;
                 replies.extend(self.refresh(inventory, now_ms)?);
@@ -963,12 +1018,14 @@ impl ItemBar {
 
     /// The one place an item is spent: every check first (including `EffectStack::admits`, which
     /// the caller's `apply` repeats on the same spec), then one consume and the recast stamp.
+    /// `aimed` is the actor an aimed burst plays on (0: the user).
     fn consume(
         &mut self,
         id: i32,
         inventory: &mut Inventory,
         player: &Player,
         now_ms: u64,
+        aimed: u64,
     ) -> Result<Use, Refusal> {
         self.usable(id, inventory, player, now_ms)?;
         let definition = inventory
@@ -984,7 +1041,7 @@ impl ItemBar {
         let heal_over = effect.heal_over();
         let strike = effect.strike();
         let scare = effect.scare;
-        let spec = effect.spec();
+        let spec = effect.spec_aimed(aimed);
         let place = match effect.effect {
             EffectKind::PlacedCake { row } => Some(row),
             _ => None,
@@ -1011,7 +1068,8 @@ impl ItemBar {
         })
     }
 
-    /// L088: whether instance `id` may be aimed at an enemy: a battle item, or (L092) a scare.
+    /// L088: whether instance `id` may be aimed at an enemy: a battle item, or (L092) a scare; B1:
+    /// or at anyone, an `at_target` burst.
     fn strikes(&self, id: i32, inventory: &Inventory) -> bool {
         inventory
             .state()
@@ -1020,7 +1078,10 @@ impl ItemBar {
             .find(|i| i.id == id)
             .and_then(|i| self.effects.get(i.definition_id))
             .is_some_and(|row| {
-                matches!(row.effect, EffectKind::Strike { .. }) || row.scare.is_some()
+                matches!(
+                    row.effect,
+                    EffectKind::Strike { .. } | EffectKind::Burst { at_target: true, .. }
+                ) || row.scare.is_some()
             })
     }
 

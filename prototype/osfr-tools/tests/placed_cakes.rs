@@ -99,7 +99,8 @@ fn shipped_rows_are_the_nine_cakes_with_sources_and_bounds() {
             })
             .collect()
     };
-    assert_eq!(models(boss), [2055, 1944, 1702]);
+    // B1: and Cakenstein (22), the item's own ability, per the Birthday Bash audit.
+    assert_eq!(models(boss), [2055, 1944, 1702, 22]);
     let regional = [
         (7966, 2082, 9392),
         (7967, 2083, 9393),
@@ -276,7 +277,7 @@ fn a_thousand_clicks_never_repeat_an_outcome_and_reach_every_one() {
         last = Some(model_id);
         seen.insert(model_id);
     }
-    assert_eq!(seen, BTreeSet::from([2055, 1944, 1702]));
+    assert_eq!(seen, BTreeSet::from([2055, 1944, 1702, 22]));
 }
 
 #[test]

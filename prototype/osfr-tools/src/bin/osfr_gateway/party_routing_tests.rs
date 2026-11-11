@@ -23,8 +23,8 @@ const NAMES: [&str; 3] = ["Alpha", "Beta", "Gamma"];
 const PRIVATE: i32 = 0x5000_0001;
 const FRIENDS: i32 = 0x5000_0002;
 const JOIN: i32 = 0x5000_0003;
-/// The boss cake's three transforms (`placed_cakes.json` row 7974).
-const BOSSES: [i32; 3] = [2055, 1944, 1702];
+/// The boss cake's four transforms (`placed_cakes.json` row 7974; B1 added Cakenstein, 22).
+const BOSSES: [i32; 4] = [2055, 1944, 1702, 22];
 const HOUR_MS: u64 = 3_600_000;
 
 fn guid(index: usize) -> u64 {

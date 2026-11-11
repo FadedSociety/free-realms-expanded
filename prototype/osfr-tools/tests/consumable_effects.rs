@@ -413,3 +413,103 @@ fn a_huge_boost_percent_clamps_instead_of_overflowing() {
     assert_eq!(boost.coins(u32::MAX), u32::MAX);
     assert_eq!(boost.coins(0), 0);
 }
+
+/// B1: a burst takes no slot and no buff row: four run at once, a fifth ends the oldest early,
+/// it plays on the named actor with the user as source, and each ends on time once.
+#[test]
+fn b1_bursts_run_four_at_once_and_each_ends_once() {
+    let burst = |target| Spec {
+        kind: Kind::Burst {
+            composite_effect_id: 16517,
+            target,
+        },
+        duration_ms: 10_000,
+        icon_id: 0,
+        name_id: 9042,
+    };
+    let mut stack = EffectStack::default();
+    let mut tags = Vec::new();
+    for n in 0..4 {
+        let (tag, emit) = stack.apply(GUID, POS, burst(0), n).unwrap();
+        assert_eq!(emit.to_self, emit.to_nearby, "no buff row, both lists see it");
+        let added = decode_add_composite_effect(&emit.to_self[0]).unwrap();
+        assert_eq!((added.guid, added.tag_id, added.source_guid), (GUID, tag, GUID));
+        tags.push(tag);
+    }
+    let (fifth, emit) = stack.apply(GUID, POS, burst(7), 4).unwrap();
+    assert_eq!(emit.to_nearby.len(), 2);
+    assert_eq!(
+        decode_remove_composite_effect(&emit.to_nearby[0]).unwrap(),
+        (GUID, tags[0]),
+        "the oldest gives way"
+    );
+    let added = decode_add_composite_effect(&emit.to_nearby[1]).unwrap();
+    assert_eq!((added.guid, added.tag_id, added.composite_effect_id), (7, fifth, 16517));
+    assert_eq!(added.source_guid, GUID, "the p2p beam draws from the user");
+    assert!(stack.visual().auras.is_empty(), "a burst is not an aura");
+
+    assert!(stack.tick(GUID, 10_000).is_empty(), "nothing is due before its 10 s");
+    let second = stack.tick(GUID, 10_001);
+    assert_eq!(
+        decode_remove_composite_effect(&second.to_nearby[0]).unwrap(),
+        (GUID, tags[1])
+    );
+    let ended = stack.tick(GUID, 10_004);
+    let gone: Vec<_> = ended
+        .to_nearby
+        .iter()
+        .map(|p| decode_remove_composite_effect(p).unwrap())
+        .collect();
+    assert_eq!(gone, [(GUID, tags[2]), (GUID, tags[3]), (7, fifth)]);
+    assert!(stack.tick(GUID, 60_000).is_empty());
+    assert_eq!(
+        stack.admits(&Spec {
+            kind: Kind::Burst {
+                composite_effect_id: 0,
+                target: 0
+            },
+            ..burst(0)
+        }),
+        Err(Refusal::Id)
+    );
+}
+
+/// B1: a minigame stat is the owner's 38/7 with a buff row; another stat buff replaces it and
+/// clears the first stat; the expiry sets 0; the stat goes out again after a zone change.
+#[test]
+fn b1_a_stat_buff_sets_its_stat_and_clears_it() {
+    let stat = |stat_id, value| Spec {
+        kind: Kind::Stat { stat_id, value },
+        duration_ms: 30 * MIN,
+        icon_id: 1234,
+        name_id: 5678,
+    };
+    let record = |packet: &[u8]| -> (u64, i32, i32, i32) {
+        let word = |at: usize| i32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
+        assert!(packet.starts_with(&[38, 0, 7, 0]) && word(12) == 1, "one record");
+        let guid = u64::from_le_bytes(packet[4..12].try_into().unwrap());
+        (guid, word(16), word(20), word(24))
+    };
+    let mut stack = EffectStack::default();
+    let (timing, emit) = stack.apply(GUID, POS, stat(27, 2), 0).unwrap();
+    assert!(emit.to_nearby.is_empty(), "a stat is the owner's");
+    assert_eq!(record(&emit.to_self[0]), (GUID, 27, 0, 2));
+    assert_eq!(decode_add_effect_tag(&emit.to_self[1]).unwrap().0, timing);
+    assert!(
+        stack
+            .resend_to_self(GUID, 1_000)
+            .iter()
+            .any(|p| p.starts_with(&[38, 0, 7, 0]) && record(p) == (GUID, 27, 0, 2))
+    );
+
+    let (talent, emit) = stack.apply(GUID, POS, stat(24, 2), 1_000).unwrap();
+    assert_eq!(record(&emit.to_self[0]), (GUID, 27, 0, 0), "Timing cleared first");
+    assert_eq!(decode_remove_effect_tag(&emit.to_self[1]).unwrap(), timing);
+    assert_eq!(record(&emit.to_self[2]), (GUID, 24, 0, 2));
+
+    let ended = stack.tick(GUID, 1_000 + 30 * MIN);
+    assert_eq!(record(&ended.to_self[0]), (GUID, 24, 0, 0));
+    assert_eq!(decode_remove_effect_tag(&ended.to_self[1]).unwrap(), talent);
+    assert_eq!(stack.admits(&stat(2, 2)), Err(Refusal::Stat), "speed is not a minigame stat");
+    assert_eq!(stack.admits(&stat(27, 0)), Err(Refusal::Stat));
+}

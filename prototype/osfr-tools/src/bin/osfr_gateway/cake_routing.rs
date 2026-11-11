@@ -183,8 +183,8 @@ mod tests {
     const BOSS: i32 = 7974;
     /// The bundled files the rig's content directory needs for a cake: the item rows and the table.
     const FILES: [&str; 2] = ["consumables.json", "placed_cakes.json"];
-    /// The boss cake's three outcomes (`placed_cakes.json`): models 2055, 1944 and 1702.
-    const BOSSES: [i32; 3] = [2055, 1944, 1702];
+    /// The boss cake's four outcomes (`placed_cakes.json`): models 2055, 1944, 1702 and (B1) 22.
+    const BOSSES: [i32; 4] = [2055, 1944, 1702, 22];
     const CLICKER: u64 = 2;
 
     /// The owner holds the boss cake on bar slot 0, and the world has the table the startup

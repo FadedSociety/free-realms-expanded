@@ -51,9 +51,18 @@
             }
           },
           "duration_ms": 1800000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 22,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
         }
       ],
-      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7974 (Boss Birthday Cake), outcomes resolved inline from its Transformations/FoodEffects (abilities 4370/4371/4372 = models 2055 stoneheart_m, 1944 snowmanboss, 1702 pumpkinprince_m_boss); client rows checked: Models.txt 2090 mkt_cakes_boss_birthday_01.adr, ClientLocaleDefinitions 30109, itemdefinitions 7974 (name id, ability id), ActorCompositeEffectDefinitions 16372, 16441, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention); one-shot animation 2001 amb_oneshot_01 (AnimationTypes.xml), every 10-20 s for 3 s (Sanctuary CakeItemDefinition defaults, R); (R) the roll is OSFR's: the item's own ActivatableAbilityId is 286 (Cakenstein, model 22), kept off the roll until the owner decides"
+      "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7974 (Boss Birthday Cake), outcomes resolved inline from its Transformations/FoodEffects (abilities 4370/4371/4372 = models 2055 stoneheart_m, 1944 snowmanboss, 1702 pumpkinprince_m_boss); client rows checked: Models.txt 2090 mkt_cakes_boss_birthday_01.adr, ClientLocaleDefinitions 30109, itemdefinitions 7974 (name id, ability id), ActorCompositeEffectDefinitions 16372, 16441, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention); one-shot animation 2001 amb_oneshot_01 (AnimationTypes.xml), every 10-20 s for 3 s (Sanctuary CakeItemDefinition defaults, R); B1: the fourth outcome is the item's own ActivatableAbilityId 286 (Cakenstein, model 22 cakenstein.adr): fandom Boss Cake 'turns you into Cakenstein, Stone Heart, Abominable Snowman or Pumpkin Prince' (the 2026-11-11 Birthday Bash audit)"
     },
     {
       "item_id": 7966,
@@ -285,6 +294,62 @@
         }
       ],
       "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7973 (Briarwood), outcomes resolved inline from its Transformations/FoodEffects (ability 285 = model 121 shroomgiant); client rows checked: Models.txt 2089 mkt_cakes_briarwood_01.adr, ClientLocaleDefinitions 9399, itemdefinitions 7973 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
+    },
+    {
+      "item_id": 77330,
+      "name_id": 134703,
+      "model_id": 2061,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 2033,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 600000
+        }
+      ],
+      "source": "B1 festival_of_hearts: fanbyte Turkleton_Treats 'you and your friends will turn into a chocolate bear', 'When clicked on, you will turn into a small chocolate bear for 10 minutes'; prop 2061 evnt_valentines_treat_basket_01.adr; bear 2033 teddybear_m_basic.adr (R); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 77459,
+      "name_id": 5170,
+      "model_id": 407,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 152,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "B1 birthday_bash: item text 'It's made out of real cakelings...'; prop 407 mkt_cakes_glerga_01.adr; outcome cakeling 152 cakeling_m_basic.adr and 30 minutes (R, as the regional birthday cakes); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
     }
   ]
 }

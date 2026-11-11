@@ -518,8 +518,10 @@ impl Rig {
         }
         let content = vendor_content(&scratch);
         let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        // B1: a `../release/...` entry lands beside inventory.json, as the release item table does.
         for file in files {
-            fs::copy(shipped.join(file), content.join(file)).unwrap();
+            let name = Path::new(file).file_name().unwrap();
+            fs::copy(shipped.join(file), content.join(name)).unwrap();
         }
         options.content = Some(content);
         options.dev_tools = true;

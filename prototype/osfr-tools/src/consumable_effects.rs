@@ -15,9 +15,15 @@
 //! * 35/41 and 35/42 composite effect on an actor: readers `008d7ad0` and `008d7bc0` (the
 //!   piece_056 encoders); 38/16 and 38/17 buff rows: `build_effect_tag`, reader `008d8870`.
 //!
+//! * 38/7 character stat (B1 minigame buffs): record reader `008e7640` (i32 id, i32 kind 0, i32).
+//!
 //! Aura resync (R): OSFR saw the client drop tags across a temporary-appearance change and ignore
 //! a repeated tag id, so every 35/14 or 35/15 is followed by 35/42 (old tag) and 35/41 (fresh
 //! tag) for each started aura. The buff id never changes.
+//!
+//! B1 (R): a burst (firework, popper, spray) is a 35/41 on the user or the aimed actor, with the
+//! user as source (the p2p beams draw from it), and its 35/42 when it ends. It has no buff row
+//! and no slot: up to [`MAX_BURSTS`] run at once, the oldest giving way.
 
 use crate::abilities::{
     build_effect_tag,
@@ -33,6 +39,12 @@ pub const MAX_DELAY_MS: u64 = 10_000;
 pub const MIN_SCALE: f32 = 0.25;
 pub const MAX_SCALE: f32 = 5.0;
 pub const MAX_BOOST_PERCENT: u32 = 1_000;
+pub const MAX_BURSTS: usize = 4;
+/// B1: the minigame stats a buff may set, all 0 at login (`CharacterStatDefinitions.txt` 23..=32:
+/// Matcher's Fortune, Talent, .., Timing 27, Maker's Advantage 29, Maker's Power 30; the captured
+/// startup stats hold none of them).
+pub const MINIGAME_STATS: std::ops::RangeInclusive<i32> = 23..=32;
+pub const MAX_STAT_VALUE: i32 = 100;
 
 // (R) Buff ids and world tags live in their own id ranges, far above the captured startup tags
 // (2 and 4), the job tags (composite ids such as 15255) and the power-up tags (definition ids).
@@ -79,6 +91,16 @@ pub fn encode_remove_temporary_appearance(guid: u64) -> Vec<u8> {
     bytes
 }
 
+/// 38/7 with one integer stat (`startup_catalogues::build_stat_update`'s layout, unframed).
+pub fn encode_stat(guid: u64, stat_id: i32, value: i32) -> Vec<u8> {
+    let mut bytes = vec![38, 0, 7, 0];
+    bytes.extend(guid.to_le_bytes());
+    for word in [1, stat_id, 0, value] {
+        bytes.extend(word.to_le_bytes());
+    }
+    bytes
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Kind {
     /// `poof_effect_id` 0 plays no poof.
@@ -99,6 +121,16 @@ pub enum Kind {
     Boost {
         raises: Boosted,
         percent: u32,
+    },
+    /// B1: a firework, party popper or spray on `target` (0 is the user), for the spec's duration.
+    Burst {
+        composite_effect_id: i32,
+        target: u64,
+    },
+    /// B1: a minigame buff: character stat `stat_id` is `value` while live and 0 after.
+    Stat {
+        stat_id: i32,
+        value: i32,
     },
 }
 
@@ -154,6 +186,8 @@ pub enum Refusal {
     Id,
     /// L087: a booster percent outside `1..=MAX_BOOST_PERCENT`.
     Percent,
+    /// B1: a stat outside [`MINIGAME_STATS`] or a value outside `1..=MAX_STAT_VALUE`.
+    Stat,
 }
 
 /// Packets for one `apply`, `tick` or `strip`. 38/16 and 38/17 go to the owner only because the
@@ -194,16 +228,26 @@ struct Live {
     world_tag: Option<i32>,
 }
 
+/// B1: one live burst: the actor it plays on, its world tag and when it ends.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct Burst {
+    on: u64,
+    tag: i32,
+    ends_at: u64,
+}
+
 const TRANSFORM: usize = 0;
 const AURA: usize = 1;
 const SCALE: usize = 2;
 const STARS: usize = 3;
 const COINS: usize = 4;
+const STAT: usize = 5;
 
 /// One player's live effects. Session-only: nothing here is saved.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EffectStack {
-    slots: [Option<Live>; 5],
+    slots: [Option<Live>; 6],
+    bursts: Vec<Burst>,
     next_buff_id: i32,
     next_world_tag: i32,
 }
@@ -211,7 +255,8 @@ pub struct EffectStack {
 impl Default for EffectStack {
     fn default() -> Self {
         Self {
-            slots: [None; 5],
+            slots: [None; 6],
+            bursts: Vec::new(),
             next_buff_id: BUFF_ID_BASE,
             next_world_tag: WORLD_TAG_BASE,
         }
@@ -248,6 +293,15 @@ pub fn admits(spec: &Spec) -> Result<(), Refusal> {
         Kind::Scale { scale } if !(MIN_SCALE..=MAX_SCALE).contains(&scale) => Err(Refusal::Scale),
         Kind::Boost { percent, .. } if !(1..=MAX_BOOST_PERCENT).contains(&percent) => {
             Err(Refusal::Percent)
+        }
+        Kind::Burst {
+            composite_effect_id,
+            ..
+        } if composite_effect_id <= 0 => Err(Refusal::Id),
+        Kind::Stat { stat_id, value }
+            if !MINIGAME_STATS.contains(&stat_id) || !(1..=MAX_STAT_VALUE).contains(&value) =>
+        {
+            Err(Refusal::Stat)
         }
         _ => Ok(()),
     }
@@ -300,6 +354,17 @@ impl EffectStack {
                 raises: Boosted::Coins,
                 ..
             } => COINS,
+            Kind::Stat { .. } => STAT,
+            Kind::Burst {
+                composite_effect_id,
+                target,
+            } => {
+                let on = if target == 0 { guid } else { target };
+                let tag = self.burst(guid, on, composite_effect_id, &mut emit);
+                let ends_at = now_ms.saturating_add(spec.duration_ms);
+                self.bursts.push(Burst { on, tag, ends_at });
+                return Ok((tag, emit));
+            }
         };
         if let Some(old) = self.slots[slot].take() {
             retire(guid, old, false, &mut emit);
@@ -342,12 +407,30 @@ impl EffectStack {
                 emit.to_self.push(row);
                 self.slots[SCALE] = Some(live);
             }
-            Kind::Boost { .. } => {
+            Kind::Stat { stat_id, value } => {
+                emit.to_self.push(encode_stat(guid, stat_id, value));
+                emit.to_self.push(row);
+                self.slots[STAT] = Some(live);
+            }
+            Kind::Boost { .. } | Kind::Burst { .. } => {
                 emit.to_self.push(row);
                 self.slots[slot] = Some(live);
             }
         }
         Ok((buff_id, emit))
+    }
+
+    /// B1: starts a burst on `on` with a fresh world tag, making room first when
+    /// [`MAX_BURSTS`] are live (the oldest ends early). The caller records it.
+    fn burst(&mut self, guid: u64, on: u64, composite_effect_id: i32, emit: &mut Emit) -> i32 {
+        if self.bursts.len() >= MAX_BURSTS {
+            let oldest = self.bursts.remove(0);
+            emit.both(encode_remove_composite_effect(oldest.on, oldest.tag));
+        }
+        let live: Vec<i32> = self.bursts.iter().map(|b| b.tag).collect();
+        let tag = next_id(&mut self.next_world_tag, WORLD_TAG_BASE, &live);
+        emit.both(encode_add_composite_effect(on, tag, composite_effect_id, guid));
+        tag
     }
 
     /// Starts delayed auras and expires each effect exactly once. Allocates nothing when
@@ -371,10 +454,19 @@ impl EffectStack {
         if due(&self.slots[SCALE]) {
             self.end(guid, SCALE, &mut emit);
         }
-        for slot in [STARS, COINS] {
+        for slot in [STARS, COINS, STAT] {
             if due(&self.slots[slot]) {
                 self.end(guid, slot, &mut emit);
             }
+        }
+        if self.bursts.iter().any(|b| now_ms >= b.ends_at) {
+            self.bursts.retain(|b| {
+                let live = now_ms < b.ends_at;
+                if !live {
+                    emit.both(encode_remove_composite_effect(b.on, b.tag));
+                }
+                live
+            });
         }
         emit
     }
@@ -423,6 +515,9 @@ impl EffectStack {
         }
         for (tag, composite) in visual.auras {
             packets.push(encode_add_composite_effect(guid, tag, composite, guid));
+        }
+        if let Some(Kind::Stat { stat_id, value }) = self.slots[STAT].map(|l| l.spec.kind) {
+            packets.push(encode_stat(guid, stat_id, value));
         }
         for live in self.slots.iter().flatten() {
             let remaining = live.ends_at.saturating_sub(now_ms);
@@ -511,6 +606,8 @@ fn retire(guid: u64, live: Live, revert: bool, emit: &mut Emit) {
             }
         }
         Kind::Scale { .. } if revert => emit.both(encode_update_scale(guid, 1.0)),
+        // A replacing buff sets its own stat after this, so the old one is always cleared.
+        Kind::Stat { stat_id, .. } => emit.to_self.push(encode_stat(guid, stat_id, 0)),
         _ => {}
     }
     emit.to_self.push(encode_remove_effect_tag(live.buff_id));
