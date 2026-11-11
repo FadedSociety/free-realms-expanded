@@ -90,7 +90,7 @@ impl EncounterEngine {
     }
 
     /// GUIDs the opening, dungeons and battles already claim: a field enemy may not reuse one.
-    pub(super) fn claimed_guids(&self) -> BTreeSet<u64> {
+    pub(in crate::encounter) fn claimed_guids(&self) -> BTreeSet<u64> {
         self.content
             .world_enemies
             .iter()
@@ -305,6 +305,10 @@ impl EncounterEngine {
             });
         }
         self.battles = battles;
+        // The doors and starters of `entrances.json` beside this file join the list.
+        if let Some(directory) = path.parent() {
+            self.place_entrances(directory)?;
+        }
         self.rebuild_behaviours()
     }
 
@@ -331,7 +335,11 @@ impl EncounterEngine {
             ));
         }
         self.staged(|engine| {
-            let old: BTreeSet<u32> = engine.battles.iter().map(|b| b.id).collect();
+            // A fight file's arena row is not this file's, though an entrance starts it.
+            let fights = engine.fight_state.fights.clone();
+            let old: BTreeSet<u32> = (engine.battles.iter().map(|b| b.id))
+                .filter(|id| !fights.contains_key(id))
+                .collect();
             // This file owns these dungeon rows: drop them before the read, or
             // a battle that reuses its own spawner GUIDs collides with itself.
             Arc::make_mut(&mut engine.content)

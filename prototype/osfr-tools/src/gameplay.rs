@@ -4235,7 +4235,7 @@ impl Gameplay {
         }
         // Go on a battle start screen (41/108): the owning module runs the
         // prize gate and keeps the screen open on a refusal.
-        if inner.starts_with(&[41, 0, 108, 0]) && self.handle_battle_go(character, &mut out)? {
+        if self.is_battle_go(inner) && self.handle_battle_go(character, &mut out)? {
             return Ok(out);
         }
         // A paid revive (41/122) charges the wallet with the revive (`knockout.rs`).

@@ -147,8 +147,18 @@ impl EncounterEngine {
     /// (guid, name, name id, model id, position).
     /// (guid, name, name id, model, position, overhead icon image id).
     pub fn battle_spawners(&self) -> Vec<(u64, String, i32, i32, [f32; 3], i32)> {
+        self.starters(false)
+    }
+
+    /// The doors and starters of `entrances.json`, in the shape of [`Self::battle_spawners`].
+    pub fn entrance_spawners(&self) -> Vec<(u64, String, i32, i32, [f32; 3], i32)> {
+        self.starters(true)
+    }
+
+    fn starters(&self, entrances: bool) -> Vec<(u64, String, i32, i32, [f32; 3], i32)> {
         self.battles
             .iter()
+            .filter(|b| self.entrance(b.spawner.guid).is_some() == entrances)
             .map(|b| {
                 (
                     b.spawner.guid,
@@ -310,6 +320,13 @@ impl EncounterEngine {
         if distance(position, at) > BATTLE_SCREEN_RADIUS {
             return EncounterOutcome::default();
         }
+        // A closed entrance refuses; the straight launch offers its one-entry menu.
+        if let Some(answer) = self.entrance_click(guid) {
+            return answer;
+        }
+        let Some(b) = self.battles.iter().find(|b| b.spawner.guid == guid) else {
+            return EncounterOutcome::default();
+        };
         let instance = self.state.next_instance_id;
         let prizes = b.prizes.clone();
         let (id, icon, title, description, objective, difficulty, count) = (
@@ -435,6 +452,9 @@ impl EncounterEngine {
     ) {
         let ground = self.ground();
         for b in &self.battles {
+            if self.fight_state.doors.fixed(b.spawner.guid) {
+                continue;
+            }
             let home = b.spawner.position;
             let w = self.field_sim.wander.entry(b.id).or_insert(Wander {
                 position: home,

@@ -12,6 +12,7 @@ use super::brain::Act;
 use super::*;
 
 mod bind;
+pub mod entrances;
 pub mod fight;
 pub mod run;
 
@@ -163,6 +164,8 @@ pub struct FightState {
     pub(super) fights: Arc<BTreeMap<u32, Arc<Fight>>>,
     /// Chance drops of the fights that are not `field_battles.json` rows.
     pub(super) drops: Arc<BTreeMap<u32, Vec<battle_drops::BattleDrop>>>,
+    /// The placed entrances of `entrances.json` (`director/entrances.rs`).
+    pub(super) doors: Arc<entrances::Doors>,
     pub(super) seen: Seen,
     /// When this player went down inside the fight.
     pub(super) down_since: Option<u64>,

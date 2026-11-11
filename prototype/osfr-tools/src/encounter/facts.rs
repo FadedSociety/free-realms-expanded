@@ -108,7 +108,8 @@ impl EncounterEngine {
                 .dungeon()
                 .map_or(self.content.world.zone_id, |d| d.zone.zone_id),
             area: None,
-            fight: self.state.active.as_ref().map(|a| a.encounter_id),
+            fight: (self.state.active.as_ref())
+                .map(|a| self.fight_state.doors.fight(a.encounter_id)),
             solo: !shared
                 && self.arena.acting.is_none()
                 && self

@@ -118,6 +118,8 @@ pub struct SharedFieldState {
     pub(super) last_tick: Option<u64>,
     pub(super) template: Arc<Content>,
     pub(super) battles: Arc<Vec<FieldBattle>>,
+    /// Heading and scale of the entrances among `battles` (`director/entrances.rs`).
+    pub(super) doors: Arc<director::entrances::Doors>,
 }
 
 impl SharedFieldState {
@@ -319,6 +321,10 @@ impl SharedFieldState {
             let at = self.position(guid).unwrap_or(b.spawner.position);
             spawn.position = [at[0], at[1], at[2], 1.];
             spawn.rotation = [0., 0., 1., 0.];
+            if let Some((heading, scale)) = self.doors.pose(guid) {
+                spawn.rotation = [heading.sin(), 0., heading.cos(), 0.];
+                spawn.scale = scale;
+            }
             // Same literal-name writer used by passive NPC startup.
             spawn.npc_name = b.spawner.name.clone();
             return Ok([
@@ -366,6 +372,7 @@ impl EncounterEngine {
             last_tick: None,
             template: self.content.clone(),
             battles: Arc::new(self.battles.clone()),
+            doors: self.fight_state.doors.clone(),
         })
     }
 
@@ -430,6 +437,10 @@ impl EncounterEngine {
                 return Ok(None);
             }
             return Ok(Some(SharedFieldAction::Ability { slot, target }));
+        }
+        // The straight launch's own menu pick is a Go: the personal route handles it.
+        if self.entrance_picked(inner) {
+            return Ok(None);
         }
         if inner.starts_with(&[26, 0, 8, 0]) || inner.starts_with(&[26, 0, 10, 0]) {
             let interaction = inner[2] == 8;

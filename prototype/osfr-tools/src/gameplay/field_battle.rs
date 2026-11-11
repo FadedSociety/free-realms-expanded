@@ -65,6 +65,45 @@ impl Gameplay {
         }
     }
 
+    /// Go: 41/108 from the start card, or the client's own pick of an entrance's one-entry
+    /// "Fight" menu (the straight launch of `entrances.json`).
+    pub(super) fn is_battle_go(&self, inner: &[u8]) -> bool {
+        inner.starts_with(&[41, 0, 108, 0])
+            || (self.encounter.as_ref()).is_some_and(|encounter| encounter.entrance_picked(inner))
+    }
+
+    /// (R) The job an entrance switches a player into: their highest combat job (the lowest
+    /// id on a tie). The live server switched too (41/120, text 634, in capture p12); which
+    /// job it chose is not known.
+    fn entry_combat_job(&self) -> Option<i32> {
+        let (profiles, abilities) = (self.profiles.as_ref()?, self.abilities.as_ref()?);
+        (profiles.state().unlocked.iter().copied())
+            .filter(|&job| abilities.supports_basic(job))
+            .max_by_key(|&job| (self.job_level(job), std::cmp::Reverse(job)))
+    }
+
+    /// The 26/13 job switch, made by an entrance. `false`: the switch was refused (its chat
+    /// line is in `out`), and the caller keeps its own refusal.
+    fn switch_job_for_entry(
+        &mut self,
+        job: i32,
+        character: &CharacterState,
+        out: &mut Outcome,
+    ) -> io::Result<bool> {
+        let shown = self.profiles.as_ref().map_or(job, Profiles::shown);
+        let outfit_before = self.profile_attachments(shown)?;
+        let Some(changed) = self.stage_job_selection(job, out)? else {
+            return Ok(false);
+        };
+        // What the 26/13 switch sends after the activation.
+        out.replies.extend(self.ability_activation_for(job)?);
+        self.sync_player_level(out);
+        self.opening_equipment_events(out)?;
+        self.sync_world_stage(out)?;
+        self.announce_profile_outfit(character.guid, &outfit_before, changed, out)?;
+        Ok(true)
+    }
+
     /// Go (41/108) on the open battle start screen; client constructor
     /// 0x008b6e70 and sender 0x00938f00. Returns false when no battle is
     /// pending so the caller can use the ordinary encounter handler.
@@ -75,13 +114,20 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<bool> {
         // The opening route that calls this always has class content loaded.
-        let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
+        let Some(mut profile) = self.profiles.as_ref().map(Profiles::active) else {
             return Ok(false);
         };
-        if let Some(required) = self
-            .encounter
-            .as_ref()
-            .and_then(|encounter| encounter.pending_battle_level_refusal(self.job_level(profile)))
+        let combat_job = |game: &Self, job: i32| {
+            (game.abilities.as_ref()).is_some_and(|abilities| abilities.supports_basic(job))
+        };
+        // An entrance's card (only it has a notice; read before Go consumes the card) enters
+        // in the player's best combat job, so the level gate reads that job.
+        let notice = (self.encounter.as_ref())
+            .and_then(|encounter| encounter.entrance_job_notice(character.guid));
+        let switch = (notice.zip(self.entry_combat_job())).filter(|_| !combat_job(self, profile));
+        let entry_job = switch.as_ref().map_or(profile, |(_, job)| *job);
+        if let Some(required) = (self.encounter.as_ref())
+            .and_then(|encounter| encounter.pending_battle_level_refusal(self.job_level(entry_job)))
         {
             out.replies.push(chat::system(
                 &crate::activity_portal::Refusal::LevelTooLow(required).message(),
@@ -99,11 +145,13 @@ impl Gameplay {
             self.refuse_battle(battle, profile, UNAVAILABLE_BATTLE_PRIZE, out);
             return Ok(true);
         }
-        if !self
-            .abilities
-            .as_ref()
-            .is_some_and(|abilities| abilities.supports_basic(profile))
+        if let Some((notice, job)) = switch
+            && self.switch_job_for_entry(job, character, out)?
         {
+            out.replies.push(notice);
+            profile = job;
+        }
+        if !combat_job(self, profile) {
             // The start screen hides the HUD; keep it up so Switch Jobs is
             // reachable, then Go again or close.
             self.refuse_battle(

@@ -260,7 +260,7 @@ impl EncounterEngine {
         if self.active() || self.fight_state.fights.is_empty() {
             return Ok(());
         }
-        let fights = self.fight_state.fights.clone();
+        let (fights, doors) = (self.fight_state.fights.clone(), self.fight_state.doors.clone());
         let mut changed = false;
         for fight in fights.values().filter(|f| f.entry.battle_row) {
             let Some(at) = self.content.dungeons.iter().position(|d| d.id == fight.id) else {
@@ -283,7 +283,7 @@ impl EncounterEngine {
             }
             let row = &mut Arc::make_mut(&mut self.content).dungeons[at];
             row.enemies = enemies;
-            row.zone = fight.zone();
+            row.zone = doors.complete(fight.zone());
             if goal_text(fight) > 0 {
                 row.objective_id = goal_text(fight);
             }
@@ -315,7 +315,9 @@ impl EncounterEngine {
         let Some(id) = self.state.active.as_ref().map(|a| a.encounter_id) else {
             return;
         };
-        out.facts.push(FightFact::Entered { fight: id });
+        out.facts.push(FightFact::Entered {
+            fight: self.fight_state.doors.fight(id),
+        });
         self.fight_state.seen = Seen::default();
         self.fight_state.down_since = None;
         self.fight_state.saved = None;

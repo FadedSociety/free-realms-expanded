@@ -30,7 +30,9 @@ Credits
   its
   layout.rs and wire.rs, and data/content/world_challenges.json adapt its in-world challenge
   code (Challenges/ChallengeManager.cs, ChallengeLayout.cs, the HUD packets) and rows
-  (Resources/Challenges.json).
+  (Resources/Challenges.json). data/content/entrances.json takes its scene rows from the fork's zone
+  table and battle layouts (Resources/Zones/*.json: zone ids, sky names, arrival points;
+  Resources/Battles.json: exit points and first-wave positions).
 - FreeRealmsLocaleTools, used to build the client's text packs.
 - fr-adr-toolkit, used to check our reading of the client's actor and model files.
 - League-Soccer (awest813) and GameplayFootball, for the soccer ball physics and AI we adapted (Apache-2.0).

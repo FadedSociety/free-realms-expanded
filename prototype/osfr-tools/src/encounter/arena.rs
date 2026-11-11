@@ -255,8 +255,10 @@ impl EncounterEngine {
         if let Some(active) = self.state.active.as_mut() {
             active.phase = EncounterPhase::Won;
         }
-        out.win_completed = Some(id);
-        out.facts.push(FightFact::Won { fight: id });
+        // An entrance's run counts as the battle it opens.
+        let fight = self.fight_state.doors.fight(id);
+        out.win_completed = Some(fight);
+        out.facts.push(FightFact::Won { fight });
         // The cave rewards once; overworld battles every win (R).
         // Repeatable battles are never recorded: their ids are not in the
         // opening content that validates `rewarded` at load.
@@ -305,7 +307,7 @@ impl EncounterEngine {
             .push(combat_flag(133, a.encounter_id, a.instance_id, false));
         out.feedback = Some("Knocked out. Close the results to leave.".into());
         out.facts.push(FightFact::Lost {
-            fight: a.encounter_id,
+            fight: self.fight_state.doors.fight(a.encounter_id),
         });
         self.run_end(false, now_ms, out);
     }

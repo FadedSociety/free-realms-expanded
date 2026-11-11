@@ -860,11 +860,20 @@ impl NpcVisibility {
 
     /// Add every battle spawner as a static actor, with its combat marker (T879).
     pub fn add_battle_spawners(&mut self, engine: &crate::encounter::EncounterEngine) {
-        for (guid, name, name_id, model_id, position, icon) in engine.battle_spawners() {
+        let starters = engine.battle_spawners().into_iter();
+        for (guid, name, name_id, model_id, position, icon) in
+            starters.chain(engine.entrance_spawners())
+        {
             self.add_static_actor(guid, &name, name_id, model_id, position, icon);
         }
         for (guid, marker) in engine.battle_markers() {
             self.set_notifications(guid, vec![marker]);
+        }
+        // A door faces the way its point of interest does, at its own scale.
+        for npc in (Arc::make_mut(&mut self.by_zone).values_mut()).flatten() {
+            if let Some((heading, scale)) = engine.entrance_pose(npc.spawn.actor_id) {
+                (npc.spawn.rotation, npc.spawn.scale) = (facing(heading), scale);
+            }
         }
     }
 
