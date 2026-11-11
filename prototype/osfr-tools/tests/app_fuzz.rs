@@ -1103,6 +1103,9 @@ fn t3_source_inventory_covers_all_gateway_labels_and_gameplay_dispatch_families(
     );
 }
 
+/// The two corpus tests' hang guard: far above their quiet-machine run time (about 60 s).
+const HANG_GUARD: Duration = Duration::from_secs(900);
+
 #[test]
 fn t3_routed_hostile_corpus_content_and_trace_on_off() {
     let start = Instant::now();
@@ -1132,8 +1135,10 @@ fn t3_routed_hostile_corpus_content_and_trace_on_off() {
         "W90 routed corpus: {count} mutations, elapsed {:?}",
         start.elapsed()
     );
-    // A hang guard, not a benchmark: the corpus alone takes about 60 s in a debug build now.
-    assert!(start.elapsed() < Duration::from_secs(120));
+    // A hang guard, not a benchmark: the corpus alone takes about 60 s in a debug build on a quiet
+    // machine, and over 400 s while the merge gate shares it with builders (2026-11-11), so the
+    // guard catches a hang, not a busy machine.
+    assert!(start.elapsed() < HANG_GUARD);
 }
 
 #[test]
@@ -1865,7 +1870,7 @@ fn t3_active_movies_reject_hostile_headers_and_out_of_phase_rewards() {
         start.elapsed()
     );
     // A hang guard, not a benchmark, like the routed corpus above.
-    assert!(start.elapsed() < Duration::from_secs(120));
+    assert!(start.elapsed() < HANG_GUARD);
 }
 
 fn race_observations(snapshot: &Snapshot) -> u32 {
