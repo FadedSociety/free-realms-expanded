@@ -176,8 +176,11 @@ impl AccountStoreLock {
         let deadline = std::time::Instant::now() + wait;
         let mut file = loop {
             match OpenOptions::new().write(true).create_new(true).open(&path) {
+                // Windows answers PermissionDenied, not AlreadyExists, while the holder's
+                // removal of the lock is in flight (delete pending): held all the same.
                 Err(error)
-                    if error.kind() == io::ErrorKind::AlreadyExists
+                    if (error.kind() == io::ErrorKind::AlreadyExists
+                        || cfg!(windows) && error.kind() == io::ErrorKind::PermissionDenied)
                         && std::time::Instant::now() < deadline =>
                 {
                     std::thread::sleep(std::time::Duration::from_millis(10));
@@ -1007,8 +1010,45 @@ mod tests {
             std::thread::sleep(std::time::Duration::from_millis(100));
             drop(guard);
         });
-        drop(AccountStoreLock::acquire(&path).unwrap());
+        // The deadline is an upper bound, not a pace: on a loaded disk the holder's removal
+        // alone has taken 300 ms, which with its 100 ms of work outran `LOCK_WAIT`.
+        drop(AccountStoreLock::acquire_within(&path, PATIENCE).unwrap());
         holder.join().unwrap();
+    }
+
+    /// Upper bound for a wait on another thread's file work; never a pace.
+    const PATIENCE: std::time::Duration = std::time::Duration::from_secs(60);
+
+    /// A writer that arrives while the holder's removal is still in flight gets Windows'
+    /// delete-pending answer (PermissionDenied, not AlreadyExists) and waits that out too.
+    #[cfg(windows)]
+    #[test]
+    fn a_writer_waits_out_a_lock_whose_removal_is_in_flight() {
+        use std::os::windows::fs::OpenOptionsExt;
+        let path =
+            std::env::temp_dir().join(format!("osfr-lock-pending-{}.json", std::process::id()));
+        let guard = AccountStoreLock::acquire(&path).unwrap();
+        // A delete-on-close handle removes the lock the old way: while `pin` is open the name
+        // stays, delete-pending, and nothing can be created under it.
+        let open = |flags| {
+            let mut options = OpenOptions::new();
+            options.access_mode(0x0001_0000).share_mode(7); // DELETE; share read, write, delete
+            options.custom_flags(flags).open(&guard.0).unwrap()
+        };
+        let pin = open(0);
+        drop(open(0x0400_0000)); // FILE_FLAG_DELETE_ON_CLOSE
+        let refused = AccountStoreLock::acquire_within(&path, Default::default());
+        assert!(
+            matches!(refused, Err(error) if error.kind() == io::ErrorKind::PermissionDenied),
+            "the lock name is not delete-pending"
+        );
+        let release = std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_millis(50));
+            drop(pin);
+        });
+        drop(AccountStoreLock::acquire_within(&path, PATIENCE).unwrap());
+        release.join().unwrap();
+        std::mem::forget(guard); // its file went with `pin`
     }
 
     /// L042: a writer refused by a held lock, and a lock its guard fails to remove (which refuses

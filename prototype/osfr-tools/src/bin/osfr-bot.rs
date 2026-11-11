@@ -586,6 +586,55 @@ impl Bot {
         }
     }
 
+    /// Run `work` while the `bystanders` keep acknowledging and retransmitting on another
+    /// thread. A bot nobody services never acknowledges, and the gateway ends a session whose
+    /// reliable data stays unacknowledged for 10 s (40 retries, 250 ms apart), so a scenario
+    /// must not leave one bot idle while another logs in or waits.
+    #[cfg(test)]
+    pub fn serviced_while<R>(
+        bystanders: &mut [&mut Bot],
+        work: impl FnOnce() -> R,
+    ) -> Result<R, String> {
+        use std::sync::atomic::{AtomicBool, Ordering::Relaxed};
+        struct Done<'a>(&'a AtomicBool);
+        impl Drop for Done<'_> {
+            fn drop(&mut self) {
+                self.0.store(true, Relaxed);
+            }
+        }
+        let done = AtomicBool::new(false);
+        std::thread::scope(|scope| {
+            let pump = scope.spawn(|| {
+                while !done.load(Relaxed) {
+                    for bot in bystanders.iter_mut() {
+                        bot.service()?;
+                    }
+                }
+                Ok::<_, String>(())
+            });
+            let out = {
+                let _done = Done(&done); // also on a panic in `work`, or the scope never ends
+                work()
+            };
+            match pump.join() {
+                Ok(serviced) => serviced.map(|()| out),
+                Err(panic) => std::panic::resume_unwind(panic),
+            }
+        })
+    }
+
+    /// `wait_for` with the `bystanders` serviced; a bystander's failure is the error.
+    #[cfg(test)]
+    pub fn wait_for_beside(
+        &mut self,
+        bystanders: &mut [&mut Bot],
+        timeout: Duration,
+        predicate: impl Fn(&[u8]) -> bool,
+    ) -> Result<Vec<u8>, String> {
+        Self::serviced_while(bystanders, || self.wait_for(timeout, predicate))
+            .map_err(|error| format!("a bystander bot failed: {error}"))?
+    }
+
     pub fn login(&mut self) -> Result<(), String> {
         let timeout = Duration::from_millis(self.config.expect_timeout_ms);
         let message = login_message(self.config.guid, &self.config.ticket, &self.config.version);

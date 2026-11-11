@@ -632,8 +632,8 @@ fn a_saved_pet_is_summoned_seen_by_two_players_and_dismissed() {
         .expect("B: neighbour sees pet actor");
 
     // A late arrival receives the saved roster and the existing pet actor.
-    let mut c = rig.connect(2, "petC");
-    c.wait_for(T, |m| is_pet_actor(m, actor))
+    let mut c = bot::Bot::serviced_while(&mut [&mut a, &mut b], || rig.connect(2, "petC")).unwrap();
+    c.wait_for_beside(&mut [&mut a, &mut b], T, |m| is_pet_actor(m, actor))
         .unwrap_or_else(|e| panic!("C: late pet actor missing ({e}); got {}", tail(&c)));
 
     // The client's serializer-shaped dismiss (u32 id word, action 0) removes the

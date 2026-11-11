@@ -717,6 +717,13 @@ fn tail(bot: &bot::Bot) -> String {
     format!("{:?}", &bot.received[from..])
 }
 
+/// Run `work` with the scenario's other live bots serviced meanwhile. A bot left idle stops
+/// acknowledging, and the gateway ends its session after 10 s (`Bot::serviced_while`).
+fn beside<R>(bystanders: &mut [&mut bot::Bot], work: impl FnOnce() -> R) -> R {
+    bot::Bot::serviced_while(bystanders, work)
+        .unwrap_or_else(|e| panic!("a bystander bot failed: {e}"))
+}
+
 fn disconnect(mut bot: bot::Bot) {
     bot.disconnect();
 }
@@ -1034,11 +1041,11 @@ fn emote_and_dance_reach_a_second_bot() {
     sees(&mut b, rig.accounts[0].guid, "emoteB: A is in the field");
 
     raw(&mut a, &quick_chat(WAVE, "FixtureA"));
-    b.wait_for(T, |m| is_quick_chat(m, WAVE))
+    b.wait_for_beside(&mut [&mut a], T, |m| is_quick_chat(m, WAVE))
         .expect("emote 135 not delivered to the second bot");
 
     raw(&mut a, &quick_chat(DANCE, "FixtureA"));
-    b.wait_for(T, |m| is_quick_chat(m, DANCE))
+    b.wait_for_beside(&mut [&mut a], T, |m| is_quick_chat(m, DANCE))
         .expect("Dance (184) not delivered to the second bot");
     disconnect(a);
     disconnect(b);
@@ -1601,7 +1608,7 @@ fn neighbours_see_equipment_and_job_changes_live() {
     b.pump(Duration::from_millis(600)).unwrap();
     // B knows A, so its client can resolve the actor a 35/6 names.
     assert!(
-        b.wait_for(T, |m| m.starts_with(&[35, 0, 1, 0])
+        b.wait_for_beside(&mut [&mut a], T, |m| m.starts_with(&[35, 0, 1, 0])
             && m.get(4..12) == Some(&guid.to_le_bytes()[..]))
             .is_ok(),
         "B did not receive A's AddPc: {}",
@@ -1616,7 +1623,7 @@ fn neighbours_see_equipment_and_job_changes_live() {
     unequip.extend(1i32.to_le_bytes());
     raw(&mut a, &unequip);
     let message = b
-        .wait_for(T, |m| {
+        .wait_for_beside(&mut [&mut a], T, |m| {
             equip_change(m, guid).is_some_and(|change| change.slot == CHEST_SLOT)
         })
         .expect("the neighbour did not see the unequip");
@@ -1632,7 +1639,7 @@ fn neighbours_see_equipment_and_job_changes_live() {
     equip.extend(CHEST_SLOT.to_le_bytes());
     raw(&mut a, &equip);
     let message = b
-        .wait_for(T, |m| {
+        .wait_for_beside(&mut [&mut a], T, |m| {
             equip_change(m, guid)
                 .is_some_and(|change| change.slot == CHEST_SLOT && change.item == chest_item)
         })
@@ -1642,7 +1649,10 @@ fn neighbours_see_equipment_and_job_changes_live() {
     // A replay changes nothing and tells nobody.
     raw(&mut a, &equip);
     assert!(
-        b.wait_for(Duration::from_secs(2), |m| equip_change(m, guid).is_some())
+        b.wait_for_beside(&mut [&mut a], Duration::from_secs(2), |m| equip_change(
+            m, guid
+        )
+        .is_some())
             .is_err(),
         "a no-op equip was broadcast"
     );
@@ -1652,7 +1662,7 @@ fn neighbours_see_equipment_and_job_changes_live() {
     switch.extend(UNLOCKED_JOB.to_le_bytes());
     raw(&mut a, &switch);
     let message = b
-        .wait_for(T, |m| equipped_change(m, guid).is_some())
+        .wait_for_beside(&mut [&mut a], T, |m| equipped_change(m, guid).is_some())
         .expect("the neighbour did not see the job switch");
     let (count, models, trailing) = equipped_change(&message, guid).unwrap();
     assert!(count >= 5, "the new outfit is not just a hat: {count}");
@@ -1661,8 +1671,10 @@ fn neighbours_see_equipment_and_job_changes_live() {
         models.iter().any(|model| model.starts_with("brawler_")),
         "{models:?}"
     );
-    let saved = rig.save_when(Some(&mut a), 0, "the job switch", |save| {
-        save["gameplay"]["profiles"]["active"] == json!(UNLOCKED_JOB)
+    let saved = beside(&mut [&mut b], || {
+        rig.save_when(Some(&mut a), 0, "the job switch", |save| {
+            save["gameplay"]["profiles"]["active"] == json!(UNLOCKED_JOB)
+        })
     });
     assert_eq!(saved["gameplay"]["profiles"]["active"], json!(UNLOCKED_JOB));
 
@@ -1671,8 +1683,10 @@ fn neighbours_see_equipment_and_job_changes_live() {
     refused.extend(LOCKED_JOB.to_le_bytes());
     raw(&mut a, &refused);
     assert!(
-        b.wait_for(Duration::from_secs(2), |m| equipped_change(m, guid)
-            .is_some())
+        b.wait_for_beside(&mut [&mut a], Duration::from_secs(2), |m| equipped_change(
+            m, guid
+        )
+        .is_some())
             .is_err(),
         "a refused switch was broadcast"
     );
@@ -1699,24 +1713,26 @@ fn neighbours_see_equipment_and_job_changes_live() {
         unequip.extend(slot.to_le_bytes());
         unequip.extend(UNLOCKED_JOB.to_le_bytes());
         raw(&mut a, &unequip);
-        b.wait_for(T, |m| {
+        b.wait_for_beside(&mut [&mut a], T, |m| {
             equip_change(m, guid).is_some_and(|change| {
                 change.slot == slot && change.profile == UNLOCKED_JOB && change.item == 0
             })
         })
         .unwrap_or_else(|e| panic!("the neighbour missed slot {slot} unequip ({e})"));
     }
-    rig.save_when(Some(&mut a), 0, "the empty outfit", |save| {
-        save["gameplay"]["inventory"]["equipment"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .filter(|entry| entry["profile_id"] == json!(UNLOCKED_JOB))
-            .all(|entry| entry["item_id"] == json!(0))
+    beside(&mut [&mut b], || {
+        rig.save_when(Some(&mut a), 0, "the empty outfit", |save| {
+            save["gameplay"]["inventory"]["equipment"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|entry| entry["profile_id"] == json!(UNLOCKED_JOB))
+                .all(|entry| entry["item_id"] == json!(0))
+        })
     });
     raw(&mut a, &switch);
     let message = b
-        .wait_for(T, |m| equipped_change(m, guid).is_some())
+        .wait_for_beside(&mut [&mut a], T, |m| equipped_change(m, guid).is_some())
         .expect("the neighbour did not see the same-job outfit repair");
     let (count, models, _) = equipped_change(&message, guid).unwrap();
     assert!(count >= 5, "the repaired outfit is incomplete: {count}");
@@ -1724,24 +1740,28 @@ fn neighbours_see_equipment_and_job_changes_live() {
         models.iter().any(|model| model.starts_with("brawler_")),
         "{models:?}"
     );
-    rig.save_when(Some(&mut a), 0, "the repaired outfit", |save| {
-        save["gameplay"]["inventory"]["equipment"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|entry| {
-                entry["profile_id"] == json!(UNLOCKED_JOB)
-                    && entry["item_id"].as_i64().is_some_and(|item| item != 0)
-            })
+    beside(&mut [&mut b], || {
+        rig.save_when(Some(&mut a), 0, "the repaired outfit", |save| {
+            save["gameplay"]["inventory"]["equipment"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|entry| {
+                    entry["profile_id"] == json!(UNLOCKED_JOB)
+                        && entry["item_id"].as_i64().is_some_and(|item| item != 0)
+                })
+        })
     });
 
     // A viewer who arrives after the switch gets the new outfit in AddPc.
-    disconnect(b);
-    std::thread::sleep(Duration::from_millis(1_500));
-    let mut late = rig.connect(1, "lookLate");
-    late.pump(Duration::from_millis(600)).unwrap();
+    // The gateway has logged B out before the same account logs in again, and A stays
+    // serviced through that login, which under load takes longer than A may stay silent.
+    let mut late = beside(&mut [&mut a], || {
+        logout(&rig, b, "B leaves");
+        rig.connect(1, "lookLate")
+    });
     let add_pc = late
-        .wait_for(T, |m| {
+        .wait_for_beside(&mut [&mut a], T, |m| {
             m.starts_with(&[35, 0, 1, 0]) && m.get(4..12) == Some(&guid.to_le_bytes()[..])
         })
         .expect("the late viewer did not receive A's AddPc");

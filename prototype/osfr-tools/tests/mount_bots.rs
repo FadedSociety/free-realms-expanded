@@ -671,10 +671,11 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     );
 
     // C arrives later and is shown the ride and the rider's attachment.
-    let mut c = rig.connect(2, "mountC");
-    c.wait_for(T, |m| is_ride_actor(m, ride))
+    let mut c =
+        bot::Bot::serviced_while(&mut [&mut a, &mut b], || rig.connect(2, "mountC")).unwrap();
+    c.wait_for_beside(&mut [&mut a, &mut b], T, |m| is_ride_actor(m, ride))
         .unwrap_or_else(|e| panic!("C: no ride actor ({e}); got {}", tail(&c)));
-    c.wait_for(T, |m| is_mount_reply(m, 2, ga))
+    c.wait_for_beside(&mut [&mut a, &mut b], T, |m| is_mount_reply(m, 2, ga))
         .expect("C: sees A mounted");
 
     // One 168/3 dismounts and removes the ride for everybody; the emote works again.
@@ -760,21 +761,22 @@ fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail()
     assert_eq!(ride_move[10..], rider_move[10..], "same pose and state");
 
     // C arrives later: A's AddPc carries the native mount block, then the ride actor and 168/2.
-    let mut c = rig.connect(2, "followC");
+    let mut c =
+        bot::Bot::serviced_while(&mut [&mut a, &mut b], || rig.connect(2, "followC")).unwrap();
     let add_pc = c
-        .wait_for(T, |m| is_add_pc_of(m, ga))
+        .wait_for_beside(&mut [&mut a, &mut b], T, |m| is_add_pc_of(m, ga))
         .unwrap_or_else(|e| panic!("C: no AddPc of A ({e}); got {}", tail(&c)));
     let block = &add_pc[add_pc.len() - 40..add_pc.len() - 20];
     assert_eq!(block[..8], ride.to_le_bytes(), "mount guid");
     assert_eq!(block[8..12], 0_i32.to_le_bytes(), "seat");
     assert_eq!(block[12..16], 1_i32.to_le_bytes(), "queue position");
     assert_eq!(block[16..], 0.0_f32.to_le_bytes(), "lift");
-    c.wait_for(T, |m| is_ride_actor(m, ride))
+    c.wait_for_beside(&mut [&mut a, &mut b], T, |m| is_ride_actor(m, ride))
         .expect("C: ride actor");
-    c.wait_for(T, |m| is_mount_reply(m, 2, ga))
+    c.wait_for_beside(&mut [&mut a, &mut b], T, |m| is_mount_reply(m, 2, ga))
         .expect("C: sees A mounted");
     walk(&mut a, ga, start, &[1.5]);
-    c.wait_for(T, |m| is_move_of(m, ride))
+    c.wait_for_beside(&mut [&mut a, &mut b], T, |m| is_move_of(m, ride))
         .unwrap_or_else(|e| panic!("C: the ride did not follow ({e}); got {}", tail(&c)));
 
     // Put away: the ride is gone and A's next move is A's alone.
