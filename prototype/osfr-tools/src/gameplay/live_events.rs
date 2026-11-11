@@ -412,7 +412,7 @@ impl Gameplay {
         // The answer describes the toggles as the file now holds them, not the last poll.
         let view = |areas: &ClientAreas| {
             let mut view = areas.clone();
-            let hands = event_calendar::read_hands(&live, unix_ms).unwrap_or_else(|_| {
+            let hands = areas.read_hands(&live, unix_ms).unwrap_or_else(|_| {
                 event_calendar::Hands {
                     modes: view.hand_modes().clone(),
                     ..Default::default()
@@ -453,7 +453,12 @@ impl Gameplay {
             (mode, (mode != Mode::Calendar).then(edge).flatten())
         });
         if let Err(error) = event_calendar::write_toggle(&live, key, toggle, unix_ms) {
-            return format!("Could not save the event toggle: {error}. Nothing changed.");
+            // An unreadable file may hold other events' toggles: it is never written over.
+            return format!(
+                "The event toggle was not saved: {error}. Nothing changed; repair or delete \
+                 {} in the live world, then try again.",
+                event_calendar::OVERRIDES_FILE
+            );
         }
         let view = view(areas);
         let active = view.0.calendar().active_at(&view.0, unix_ms).join(", ");

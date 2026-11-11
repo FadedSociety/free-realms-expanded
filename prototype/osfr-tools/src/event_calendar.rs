@@ -15,7 +15,8 @@
 //! * by hand: an event's `mode` is `calendar` (the two rules above), `on` or `off`, and a hand
 //!   toggle (`realm event season <key> on|off|calendar|default`, kept in the live world's
 //!   `event_overrides.json`) wins over the content's mode until the event's next calendar edge
-//!   (the start or end its dates and rotations give it next) or until an admin clears it,
+//!   (the first start or end its dates and rotations give it after the toggle was set, by
+//!   the calendar as it is when the lapse is checked) or until an admin clears it,
 //!   whichever comes first; an event the calendar never moves keeps its toggle until cleared.
 //!   The file outlives a restart, so a toggle does too. `run_on_real_dates: false` turns every
 //!   `calendar` event off, so nothing starts unless someone switches it on.
@@ -557,19 +558,37 @@ impl EventCalendar {
 struct OverridesFile {
     schema_version: u32,
     modes: BTreeMap<String, Mode>,
-    /// Event key to the unix ms its toggle lapses at (the event's next calendar edge when it
-    /// was set). A key absent here holds until an admin clears it.
+    /// Event key to the unix ms a lapsing toggle was set at. Its lapse is the event's first
+    /// calendar edge after that instant, worked out from the calendar as it is when asked, so
+    /// a retuned window or clock offset moves the lapse with it.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    since: BTreeMap<String, u64>,
+    /// Event key to the lapse as it stood when the toggle was set: for a reader of the file,
+    /// and the lapse itself for a file written before `since` existed. A key in neither map
+    /// holds until an admin clears it.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     until: BTreeMap<String, u64>,
 }
 
 impl OverridesFile {
-    /// Drop the toggles that have lapsed by `unix_ms`, and any stray lapse time.
-    fn in_force(mut self, unix_ms: u64) -> Self {
-        let Self { modes, until, .. } = &mut self;
-        modes.retain(|key, _| until.get(key).is_none_or(|at| unix_ms < *at));
-        until.retain(|key, _| modes.contains_key(key));
-        self
+    /// The toggles in force at `unix_ms`, each with its lapse. `edge(key, since)` is the
+    /// event's first calendar edge after `since` ([`EventCalendar::next_edge`]).
+    fn in_force(self, unix_ms: u64, edge: &dyn Fn(&str, u64) -> Option<u64>) -> Hands {
+        let mut hands = Hands::default();
+        for (key, mode) in self.modes {
+            let lapse = match self.since.get(&key) {
+                Some(since) => edge(&key, *since),
+                None => self.until.get(&key).copied(),
+            };
+            if lapse.is_some_and(|at| unix_ms >= at) {
+                continue;
+            }
+            if let Some(at) = lapse {
+                hands.until.insert(key.clone(), at);
+            }
+            hands.modes.insert(key, mode);
+        }
+        hands
     }
 }
 
@@ -591,7 +610,12 @@ fn read_file(live_dir: &Path) -> io::Result<OverridesFile> {
     };
     let file: OverridesFile =
         serde_json::from_slice(&bytes).map_err(|error| invalid(&path, error))?;
-    if file.schema_version != 1 || file.modes.len() > MAX_EVENTS || file.until.len() > MAX_EVENTS {
+    let sized = |map: &BTreeMap<String, u64>| map.len() <= MAX_EVENTS;
+    if file.schema_version != 1
+        || file.modes.len() > MAX_EVENTS
+        || !sized(&file.until)
+        || !sized(&file.since)
+    {
         return Err(invalid(&path, "needs schema_version 1 and at most 64 modes"));
     }
     Ok(file)
@@ -603,14 +627,16 @@ pub fn read_overrides(live_dir: &Path) -> io::Result<BTreeMap<String, Mode>> {
     Ok(read_file(live_dir)?.modes)
 }
 
-/// The hand toggles of `live_dir` in force at `unix_ms`: a toggle whose `until` has passed is
-/// no toggle. Errors as [`read_overrides`]; a poll then keeps the toggles it had.
-pub fn read_hands(live_dir: &Path, unix_ms: u64) -> io::Result<Hands> {
-    let file = read_file(live_dir)?.in_force(unix_ms);
-    Ok(Hands {
-        modes: file.modes,
-        until: file.until,
-    })
+/// The hand toggles of `live_dir` in force at `unix_ms`: a toggle whose lapse has passed is no
+/// toggle. `edge(key, since)` is the event's first calendar edge after `since`; callers with a
+/// season table use [`ClientAreas::read_hands`]. Errors as [`read_overrides`]; a poll then
+/// keeps the toggles it had.
+pub fn read_hands(
+    live_dir: &Path,
+    unix_ms: u64,
+    edge: &dyn Fn(&str, u64) -> Option<u64>,
+) -> io::Result<Hands> {
+    Ok(read_file(live_dir)?.in_force(unix_ms, edge))
 }
 
 /// Set (`Some`) or clear (`None`) one event's hand toggle, held until it is cleared. Returns
@@ -619,30 +645,34 @@ pub fn write_override(live_dir: &Path, key: &str, mode: Option<Mode>) -> io::Res
     write_toggle(live_dir, key, mode.map(|mode| (mode, None)), 0)
 }
 
-/// Set (`Some`: the mode, and the unix ms it lapses at, if ever) or clear (`None`) one event's
-/// hand toggle at `unix_ms`; toggles that have lapsed by then leave the file with it. Returns
-/// whether the toggles in force changed.
+/// Set (`Some`: the mode, and the unix ms it lapses at by today's calendar, if ever) or clear
+/// (`None`) one event's hand toggle at `unix_ms`. A toggle with a lapse is stored with the
+/// instant it was set, and lapses at the event's first calendar edge after that, whatever the
+/// calendar says by then; one without holds until cleared. Returns whether the file changed.
+///
+/// # Errors
+/// A file that exists but cannot be read or parsed is left alone and the toggle refused: it
+/// may hold other events' toggles, and writing over it would end them.
 pub fn write_toggle(
     live_dir: &Path,
     key: &str,
     toggle: Option<(Mode, Option<u64>)>,
     unix_ms: u64,
 ) -> io::Result<bool> {
-    // A file nobody can read is replaced, so an admin can always repair it with one command.
-    let (mut file, readable) = match read_file(live_dir) {
-        Ok(file) => (file.in_force(unix_ms), true),
-        Err(_) => (OverridesFile::default(), false),
-    };
+    let mut file = read_file(live_dir)?;
     let before = (file.modes.get(key).copied()).map(|mode| (mode, file.until.get(key).copied()));
-    if readable && before == toggle {
+    // The same toggle again is no write, unless the stored one may have lapsed since.
+    if before == toggle && toggle.is_none_or(|(_, until)| until.is_none_or(|at| unix_ms < at)) {
         return Ok(false);
     }
     file.modes.remove(key);
     file.until.remove(key);
+    file.since.remove(key);
     if let Some((mode, until)) = toggle {
         file.modes.insert(key.to_owned(), mode);
         if let Some(until) = until {
             file.until.insert(key.to_owned(), until);
+            file.since.insert(key.to_owned(), unix_ms);
         }
     }
     file.schema_version = 1;
@@ -677,12 +707,18 @@ impl HandWatch {
     }
 
     /// The toggles in force when the file changed since the last poll (always on the first
-    /// one) or one of them lapsed: the clock passed its `until`, the event's next calendar edge
-    /// when it was set, so the calendar has the event again from that edge on. Only a
+    /// one) or one of them lapsed: the clock passed the event's first calendar edge after the
+    /// toggle was set (`edge`, as [`read_hands`]), so the calendar has the event again from
+    /// that edge on. The edge is asked of the calendar this process loaded, never trusted from
+    /// the file, so a restart over a retuned window lapses the toggle at the new edge. Only a
     /// missing file means "no toggles": one that cannot be read or parsed changes nothing (an
     /// event held by hand must not end, and take journals with it, over a torn write), is not
     /// remembered as seen, and is logged once per version.
-    pub fn poll(&mut self, unix_ms: u64) -> Option<BTreeMap<String, Mode>> {
+    pub fn poll(
+        &mut self,
+        unix_ms: u64,
+        edge: &dyn Fn(&str, u64) -> Option<u64>,
+    ) -> Option<BTreeMap<String, Mode>> {
         // A clock that went backwards by more than the poll interval polls at once.
         if unix_ms < self.next_ms && self.next_ms - unix_ms <= POLL_MS {
             return None;
@@ -697,7 +733,7 @@ impl HandWatch {
         if self.seen == Some(stamp) && self.lapse.is_none_or(|at| unix_ms < at) {
             return None;
         }
-        match read_hands(&self.live_dir, unix_ms) {
+        match read_hands(&self.live_dir, unix_ms, edge) {
             Ok(hands) => {
                 self.seen = Some(stamp);
                 self.lapse = hands.until.values().copied().min();

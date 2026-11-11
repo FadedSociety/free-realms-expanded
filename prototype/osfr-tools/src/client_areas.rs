@@ -216,6 +216,17 @@ impl ClientAreas {
         self
     }
 
+    /// The hand toggles `live_dir` holds that are in force at `unix_ms`, each lapse worked out
+    /// from this table's calendar ([`crate::event_calendar::read_hands`]).
+    pub fn read_hands(
+        &self,
+        live_dir: &Path,
+        unix_ms: u64,
+    ) -> io::Result<crate::event_calendar::Hands> {
+        let edge = |key: &str, since: u64| self.calendar.next_edge(key, self, since);
+        crate::event_calendar::read_hands(live_dir, unix_ms, &edge)
+    }
+
     /// The hand toggles in force: event key to mode.
     pub fn hand_modes(&self) -> &BTreeMap<String, crate::event_calendar::Mode> {
         &self.modes
@@ -361,8 +372,14 @@ impl ClientAreas {
     /// the same clock.
     pub fn season_changes(&mut self, unix_ms: u64) -> Vec<Vec<u8>> {
         self.season_changed = false;
-        if let Some(hand) = self.hand.as_mut().and_then(|hand| hand.poll(unix_ms)) {
-            self.set_hand_modes(hand);
+        // The watch steps out while it polls, so a lapse can be asked of this table's calendar.
+        if let Some(mut hand) = self.hand.take() {
+            let edge = |key: &str, since: u64| self.calendar.next_edge(key, self, since);
+            let modes = hand.poll(unix_ms, &edge);
+            self.hand = Some(hand);
+            if let Some(modes) = modes {
+                self.set_hand_modes(modes);
+            }
         }
         let minute = unix_ms / 60_000;
         if self.content.seasons.is_empty() || self.checked_minute == Some(minute) {

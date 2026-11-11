@@ -20,7 +20,7 @@ use osfr_tools::{
     account_store::AccountRole,
     chat,
     client_areas::ClientAreas,
-    event_calendar::{EventCalendar, Mode, read_hands, read_overrides, write_override, write_toggle},
+    event_calendar::{EventCalendar, Mode, read_overrides, write_override, write_toggle},
     gameplay::Gameplay,
     quest_engine::QuestStatus,
     character_store::CharacterState,
@@ -484,7 +484,23 @@ fn a_toggle_file_nobody_can_read_ends_nothing() {
         assert_eq!(game.state().npc_quests, before, "{garbage:?} changed the journal");
     }
     assert!(read_overrides(&live).is_err());
-    // One command repairs it, and only then does `off` end the event.
+    // A toggle is refused over a file nobody can read: it may hold other events' toggles, so
+    // it is never written over, whatever is asked.
+    let file = live.join("event_overrides.json");
+    let broken = fs::read(&file).unwrap();
+    for command in ["realm spring_eggstravaganza off", "realm halloween on", "realm halloween default"] {
+        let refused = realm(&mut game, command, &mut now);
+        assert!(refused.starts_with("The event toggle was not saved:"), "{command}: {refused}");
+        assert!(refused.contains("Nothing changed") && refused.contains("event_overrides.json"));
+        assert_eq!(fs::read(&file).unwrap(), broken, "{command} wrote over the file");
+    }
+    assert!(write_toggle(&live, "halloween", Some((Mode::On, None)), JULY).is_err());
+    assert!(write_override(&live, "halloween", None).is_err());
+    clock(&mut game, JULY, &mut now);
+    assert_eq!(status(&game, EGG_HUNT), Some(QuestStatus::Active), "a refused toggle ended it");
+    // With the file out of the way the admin's command works again, and only then does `off`
+    // end the event. A file that is simply absent is no obstacle.
+    fs::remove_file(&file).unwrap();
     settle();
     let off = realm(&mut game, "/spring_eggstravaganza off", &mut now);
     assert!(off.contains("off, not running"), "{off}");
@@ -819,8 +835,8 @@ fn a_hand_toggle_lapses_at_the_next_calendar_edge_and_outlives_a_restart() {
     assert_eq!(switches(&areas.season_changes(end)), [(10, false)]);
     // The file still stores the lapsed toggle; nothing reads it as one.
     assert_eq!(read_overrides(&live.0).unwrap().len(), 1);
-    assert_eq!(read_hands(&live.0, start).unwrap(), Default::default());
-    assert_eq!(read_hands(&live.0, start - 1).unwrap().until.get("fest"), Some(&start));
+    assert_eq!(areas.read_hands(&live.0, start).unwrap(), Default::default());
+    assert_eq!(areas.read_hands(&live.0, start - 1).unwrap().until.get("fest"), Some(&start));
 
     // Off inside the next window: it lapses when that window ends, so the year after runs.
     let (inside, ends, next) = (unix(2028, 2, 1) + DAY / 2, unix(2028, 2, 3), unix(2029, 2, 1));
@@ -914,4 +930,100 @@ fn a_toggle_typed_in_chat_outlives_a_restart_and_gives_way_to_the_dates() {
     assert_eq!(cleared, back);
     let usage = realm(&mut game, "realm summer_camp sometimes", &mut now);
     assert!(usage.starts_with("Usage: realm halloween on|off|calendar"), "{usage}");
+}
+
+/// The season file of [`fest`] with Fest on other days, or under another clock offset.
+fn retune(dir: &Scratch, first: (u8, u8), last: (u8, u8), utc_offset_minutes: i32) {
+    let areas = json!({
+        "schema_version": 1, "utc_offset_minutes": utc_offset_minutes,
+        "switchable": {"area_ids": [10], "source": "test"},
+        "seasons": [{"name": "Fest", "start_month": first.0, "start_day": first.1,
+                     "end_month": last.0, "end_day": last.1, "area_ids": [10], "source": "test"}],
+    });
+    fs::write(dir.0.join("client_areas.json"), areas.to_string()).unwrap();
+}
+
+/// A toggle's lapse is asked of the calendar the server runs now, not kept from the day it was
+/// set: when the window (or the clock offset) is retuned and the server restarts while an `on`
+/// is pending, the toggle carries the event to the new start. Trusting the stored instant
+/// would end the event at the old start, and take started quests with it, until the new one.
+#[test]
+fn a_pending_toggle_follows_a_window_retuned_before_it_lapses() {
+    let dir = fest("retune", fest_calendar(true, "calendar"));
+    let live = Scratch::new("retune-live");
+    let load = || ClientAreas::load(&dir.0).unwrap().watching(&live.0);
+    let fest_on = |areas: &ClientAreas, ms: u64| areas.is_season_active("Fest", ms);
+    let old_start = unix(2027, 2, 1);
+
+    // On in July, with Fest on February 1 and 2: the lapse is February 1.
+    let areas = load();
+    let edge = areas.calendar().next_edge("fest", &areas, JULY);
+    assert_eq!(edge, Some(old_start));
+    assert!(write_toggle(&live.0, "fest", Some((Mode::On, edge)), JULY).unwrap());
+    assert_eq!(areas.read_hands(&live.0, JULY).unwrap().until.get("fest"), Some(&old_start));
+
+    // Fest moves to March 1 and 2 and the server restarts. The file still says February 1.
+    retune(&dir, (3, 1), (3, 2), 0);
+    let (new_start, new_end) = (unix(2027, 3, 1), unix(2027, 3, 3));
+    let mut areas = load();
+    assert!(areas.season_changes(JULY + DAY).is_empty(), "the baseline");
+    assert_eq!(areas.read_hands(&live.0, JULY + DAY).unwrap().until.get("fest"), Some(&new_start));
+    // Across the old instant and the weeks after it: still on by hand, no switch, no gap.
+    for at in [old_start - 60_000, old_start, old_start + DAY, new_start - 60_000] {
+        assert!(areas.season_changes(at).is_empty(), "the event blinked at {at}");
+        assert!(fest_on(&areas, at) && areas.hand_modes().contains_key("fest"), "{at}");
+        assert_eq!(areas.calendar().open_quests(&areas, at), BTreeSet::from([7]), "{at}");
+    }
+    // The new start takes the event over; the new end stops it.
+    assert!(areas.season_changes(new_start).is_empty());
+    assert!(areas.hand_modes().is_empty() && fest_on(&areas, new_start));
+    assert_eq!(switches(&areas.season_changes(new_end)), [(10, false)]);
+
+    // The clock offset is part of the calendar too: two hours east, the edge is two hours
+    // sooner, for a toggle already in the file.
+    settle();
+    let inside = unix(2028, 3, 1) + DAY / 2;
+    assert!(write_toggle(&live.0, "fest", Some((Mode::Off, Some(unix(2028, 3, 3)))), inside).unwrap());
+    retune(&dir, (3, 1), (3, 2), 120);
+    let mut areas = load();
+    let sooner = unix(2028, 3, 3) - 120 * 60_000;
+    assert_eq!(areas.read_hands(&live.0, inside).unwrap().until.get("fest"), Some(&sooner));
+    areas.poll(sooner - 60_000);
+    assert_eq!(areas.hand_modes().get("fest"), Some(&Mode::Off));
+    areas.poll(sooner);
+    assert!(areas.hand_modes().is_empty());
+
+    // A window retuned away altogether leaves no edge: the toggle holds until it is cleared.
+    fs::write(dir.0.join("event_calendar.json"), fest_calendar(false, "calendar").to_string())
+        .unwrap();
+    let areas = load();
+    let far = unix(2030, 1, 1);
+    assert_eq!(areas.read_hands(&live.0, far).unwrap().modes.get("fest"), Some(&Mode::Off));
+    assert!(areas.read_hands(&live.0, far).unwrap().until.is_empty());
+
+    // A file from before the set time was stored has only the instant: that is its lapse.
+    let old = json!({"schema_version": 1, "modes": {"fest": "on"}, "until": {"fest": old_start}});
+    fs::write(live.0.join("event_overrides.json"), old.to_string()).unwrap();
+    assert_eq!(areas.read_hands(&live.0, old_start - 1).unwrap().modes.len(), 1);
+    assert!(areas.read_hands(&live.0, old_start).unwrap().modes.is_empty());
+}
+
+/// `realm <key>` is a toggle for every event key, so a key must not be a realm command of its
+/// own. The loader's key rule would take `quest` or `help`; no shipped key may be one.
+#[test]
+fn no_shipped_event_key_is_a_realm_command_word() {
+    use osfr_tools::account_store::can_run_realm_command;
+    // The words every role may type (`Gameplay::developer_command_denied`), then the lists of
+    // the two roles the role table names commands for.
+    const ORDINARY: [&str; 13] = [
+        "help", "status", "quest", "quests", "attack", "respawn", "inventory", "exit", "retry",
+        "accept", "turnin", "redeem", "race",
+    ];
+    let areas = ClientAreas::load(&content_dir()).unwrap();
+    for key in areas.calendar().keys() {
+        assert!(!ORDINARY.contains(&key) && !["event", "season", "reload"].contains(&key), "{key}");
+        for role in [AccountRole::Builder, AccountRole::Moderator] {
+            assert!(!can_run_realm_command(role, key), "{key} is a {role:?} realm command");
+        }
+    }
 }
