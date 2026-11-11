@@ -1,0 +1,3990 @@
+{
+  "schema_version": 1,
+  "source": [
+    "F6 (op-P-npc-life, 2026-11-11): the idle pose each passive world actor is drawn in, sent as the AddNpc animation_id (35/2 reader 00921a10; dispatch 0092f460 stores it at actor +0x51c, the idle base ProxiedCharacter__Process 00973200 plays at rest through 00958240). The original server set it per actor: 3 of the 23 captured AddNpc rows (startup/snapshot.json) carry 2100 amb_loop_01.",
+    "models: a role default per client Models.txt id. Every id is an AmbientLoops slot (client AnimationTypes.xml) that the model's own .adr binds to a clip (section 9, AnimationSlotRecordRead 007e6190); the clip names are quoted per row. A model with several loops gives each spawn one by GUID (src/npc_life.rs). tests/npc_life.rs re-reads every .adr.",
+    "spawns: per-actor choices. animation_id 1 keeps loc_stand (the client then fidgets on its own, 00970b60). keep_height gives a body the floor would move the evidence that its authored height is right; every other body is set onto the floor at load.",
+    "props: client models that are things, not bodies (no walk, run, emote, fidget or combat clip in their own .adr); they keep the height they were placed at, because the warpstones of the original server stand 0.8-1.0 m and its radio 1.6 m above the floor (startup/snapshot.json): the origin of a prop is not its foot. Bodies are set onto the floor.",
+    "Evidence: the model clips (client), video frames where quoted, the 2014 prop placements (fires, bedrolls) for camp rows; everything else is (R), inferred from the model's own clips and the row's role."
+  ],
+  "models": [
+    {
+      "model_ids": [
+        382
+      ],
+      "model_file_name": "dwarf_miner_m.adr",
+      "role": "miner",
+      "animation_ids": [
+        2100,
+        2110,
+        2120
+      ],
+      "source": "video wstXCsranVg (\"Elite Exploration Coin: Miner Difficulties\", the Singing Crystal Mines) frames 00092, 00096 and 00126: an unnamed dwarf miner bends over the crystal pile beside the cart track, a pick swing, not loc_stand. The loops are the model's own pick swings at the ground, a rock and sideways (R: which swing each miner plays; swingpick_wall needs a wall and sleep_sitting a seat, so neither is a default). Clips: 2100 dwarf_miner_m_amb_swingpick_ground_loop; 2110 dwarf_miner_m_amb_swingpick_rock_loop; 2120 dwarf_miner_m_amb_swingpick_sideways_loop"
+    },
+    {
+      "model_ids": [
+        38
+      ],
+      "model_file_name": "human_m_miner_01.adr",
+      "role": "miner",
+      "animation_ids": [
+        2100,
+        2110,
+        2120
+      ],
+      "source": "(R) the model's own mining loops: mining high, mining low, inspecting rocks. Clips: 2100 human_miner_m_amb_mininghigh_loop; 2110 human_miner_m_amb_mininglow_loop; 2120 human_miner_m_amb_inspectingrocks_loop"
+    },
+    {
+      "model_ids": [
+        744
+      ],
+      "model_file_name": "human_blackspore_miner_m.adr",
+      "role": "miner",
+      "animation_ids": [
+        2100,
+        2110,
+        2120
+      ],
+      "source": "(R) the Blackspore miner body's own mining loops: mining high, mining low, inspecting rocks. Clips: 2100 human_miner_m_amb_mininghigh_loop; 2110 human_miner_m_amb_mininglow_loop; 2120 human_miner_m_amb_inspectingrocks_loop"
+    },
+    {
+      "model_ids": [
+        15
+      ],
+      "model_file_name": "chugawug_m_miner_01.adr",
+      "role": "miner",
+      "animation_ids": [
+        2100,
+        2120
+      ],
+      "source": "(R) the chugawug miner's own mining and sweeping loops; its conveyor loop needs a conveyor, so it is not a default. Clips: 2100 chugawug_miner_amb_mining_loop; 2120 chugawug_miner_amb_sweeping_loop"
+    },
+    {
+      "model_ids": [
+        33
+      ],
+      "model_file_name": "fairy_m_miner_01.adr",
+      "role": "miner",
+      "animation_ids": [
+        2100,
+        2110
+      ],
+      "source": "(R) the pixie miner's own two mining loops. Clips: 2100 fairy_m_amb_mining_loop_01; 2110 fairy_m_amb_mining_loop_02"
+    },
+    {
+      "model_ids": [
+        10
+      ],
+      "model_file_name": "ghostdwarf_m_miner_01.adr",
+      "role": "miner",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) the ghost dwarf miner's own mining loop (dwarfghost_mine); slash and scare are attacks. Clips: 2100 dwarfghost_amb_mine_loop"
+    },
+    {
+      "model_ids": [
+        166,
+        167
+      ],
+      "model_file_name": "troll_peasant_01.adr, troll_peasant_02.adr",
+      "role": "miner",
+      "animation_ids": [
+        2130,
+        2140,
+        2160
+      ],
+      "source": "(R) the troll peasant's own pick swings (sideways, rock, ground); fire, crouch and scared are scene loops. Clips: 2130 trolls_amb_pick_sideways_loop; 2140 trolls_amb_pick_rock_loop; 2160 trolls_amb_pick_ground_loop"
+    },
+    {
+      "model_ids": [
+        488
+      ],
+      "model_file_name": "chugawug_farmer_m.adr",
+      "role": "farmer",
+      "animation_ids": [
+        2100,
+        2110
+      ],
+      "source": "(R) the chugawug farmer's own hoeing and shoveling loops. Clips: 2100 chugawug_farmer_amb_hoeing_loop; 2110 chugawug_farmer_amb_shoveling_loop"
+    },
+    {
+      "model_ids": [
+        250
+      ],
+      "model_file_name": "chugawug_farmer_f.adr",
+      "role": "farmer",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) the chugawug farmer's own hoeing loop. Clips: 2100 chugawug_farmer_amb_hoeing_loop"
+    },
+    {
+      "model_ids": [
+        145
+      ],
+      "model_file_name": "cow.adr",
+      "role": "grazer",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) a cow grazes: the model's only idle loop, standeat. Clips: 2100 cow_amb_standeat_loop"
+    },
+    {
+      "model_ids": [
+        137,
+        139
+      ],
+      "model_file_name": "pig.adr, warthog.adr",
+      "role": "grazer",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) a hog eats: the model's own hog_eat loop. Clips: 2100 hog_amb_eat_loop"
+    },
+    {
+      "model_ids": [
+        3240,
+        350,
+        348
+      ],
+      "model_file_name": "ewe.adr, ewe_shaved.adr",
+      "role": "grazer",
+      "animation_ids": [
+        2110
+      ],
+      "source": "(R) a sheep grazes: the model's own eatheaddown loop. Clips: 2110 ewe_amb_eatheaddown_loop"
+    },
+    {
+      "model_ids": [
+        3693,
+        129
+      ],
+      "model_file_name": "birds_crow_farming.adr, birds_owl.adr",
+      "role": "grazer",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) a bird stands on the ground: the model's only idle loop, groundstand. Clips: 2100 birds_amb_groundstand_loop"
+    },
+    {
+      "model_ids": [
+        50,
+        540,
+        1561
+      ],
+      "model_file_name": "cat_longhair.adr, cat_shorthair.adr, cat_shorthair_comicbook_morningstar.agr",
+      "role": "cat",
+      "animation_ids": [
+        2110
+      ],
+      "source": "(R) a cat crouches and stalks: the model's own stand_stalk loop (sneak_slow walks). Clips: 2110 cat_loc_stand_stalk_loop"
+    },
+    {
+      "model_ids": [
+        7,
+        8,
+        9,
+        688,
+        690
+      ],
+      "model_file_name": "humanchild_f_skirtandtunic.adr, humanchild_m_afro.adr, humanchild_m_swirltrimbig.adr, humanchild_m_tshirtwithbaggypants.adr, humanchild_m_tshirtwithbeltbig.adr",
+      "role": "child",
+      "animation_ids": [
+        2100
+      ],
+      "source": "Sanctuary NpcAmbient.json (Sanctuary-main-20261019@10f129e, already in npc_ambient.json) sits human children on idle 2100 for three of these models; every human child model's only idle loop is sitting (R for the others). Clips: 2100 human_f_child_amb_sit_loop"
+    },
+    {
+      "model_ids": [
+        241,
+        12,
+        242,
+        11
+      ],
+      "model_file_name": "fairychild_f_pigtailsdress.adr, fairychild_f_sleevesandshorts.adr, fairychild_m_mohawkshorts.adr, fairychild_m_pointyhair.adr",
+      "role": "child",
+      "animation_ids": [
+        2110
+      ],
+      "source": "(R) the pixie child's own sit loop, as the human children sit; hide and chase are game loops. Clips: 2110 fairy_f_child_amb_sit_loop"
+    },
+    {
+      "model_ids": [
+        1059
+      ],
+      "model_file_name": "human_m_daresben.adr",
+      "role": "band",
+      "animation_ids": [
+        2100,
+        2110,
+        2120
+      ],
+      "source": "(R) the rock-star body's own singing loops. Clips: 2100 rockstar_loop_singing_loop_01; 2110 rockstar_loop_singing_loop_02; 2120 rockstar_loop_singing_loop_03"
+    },
+    {
+      "model_ids": [
+        1061
+      ],
+      "model_file_name": "human_m_daresmatt.adr",
+      "role": "band",
+      "animation_ids": [
+        2110
+      ],
+      "source": "(R) the rock-star drummer's own song loop. Clips: 2110 rockstar_drums_song_loop"
+    },
+    {
+      "model_ids": [
+        1060
+      ],
+      "model_file_name": "human_m_daresmartin.adr",
+      "role": "band",
+      "animation_ids": [
+        2100,
+        2110,
+        2120
+      ],
+      "source": "(R) the rock-star bassist's own bass loops. Clips: 2100 rockstar_bass_loop_01; 2110 rockstar_bass_loop_02; 2120 rockstar_bass_loop_03"
+    },
+    {
+      "model_ids": [
+        20
+      ],
+      "model_file_name": "human_rockstar_m.adr",
+      "role": "band",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) the rock-star guitarist's own strum loop. Clips: 2100 human_rockstar_m_amb_strum"
+    },
+    {
+      "model_ids": [
+        4618
+      ],
+      "model_file_name": "monkey_m_shuffle.adr",
+      "role": "band",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) the DJ monkey's own turntable loop. Clips: 2100 monkey_emo_turntable"
+    },
+    {
+      "model_ids": [
+        1787
+      ],
+      "model_file_name": "penguin_surfer_01.adr",
+      "role": "surfer",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) the surfer penguin's only idle loop, sitting on its board. Clips: 2100 penguin_amb_surf_sit_idle"
+    },
+    {
+      "model_ids": [
+        4051,
+        3954
+      ],
+      "model_file_name": "dwarf_engineer.adr, dwarf_m_jarvus.adr",
+      "role": "engineer",
+      "animation_ids": [
+        2100
+      ],
+      "source": "(R) the dwarf engineer's own fixing loop. Clips: 2100 dwarf_m_engineer_fix_loop"
+    },
+    {
+      "model_ids": [
+        667,
+        668
+      ],
+      "model_file_name": "chugawug_m_01_blue_drinking.agr, chugawug_m_02_ltgreen_drinking.agr",
+      "role": "drinker",
+      "animation_ids": [
+        2140,
+        2150
+      ],
+      "source": "(R) the \"drinking\" chugawug body's own sit-and-drink and stand-and-drink loops. Clips: 2140 chugawug_amb_sitdrink_loop; 2150 chugawug_amb_standdrink_loop"
+    }
+  ],
+  "spawns": [
+    {
+      "guid": 9000000030,
+      "name": "Braldan Stoneaxe",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000034,
+      "name": "Bruno Battlerock",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000114,
+      "name": "Jarvus",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000115,
+      "name": "Jeni Shortfuse",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9000000170,
+      "name": "Poe Tatters",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9000000173,
+      "name": "Postmaster Lane",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9000000191,
+      "name": "Sasparilla Brewmaster Wugawump",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 2.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9000000201,
+      "name": "Shimmer Shinyaxe",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000233,
+      "name": "Waterwings",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 6.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9000000335,
+      "name": "Grosh",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000402,
+      "name": "Merigold",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9000000472,
+      "name": "Sorin",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000476,
+      "name": "Spruce Waynehammer",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9000000487,
+      "name": "Tennin",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000013,
+      "name": "Cracked Claw",
+      "keep_height": "stands level with the 2014 placement cave_entrance_facade_01_naturalcool.adr (1.7 m away, -0.04 m), 0.8 m below the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000020,
+      "name": "Drake Sullenfangs",
+      "keep_height": "stands level with the 2014 placement bs_tree_root_group_02.adr (3.7 m away, +0.13 m), 0.9 m below the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000083,
+      "name": "Admiral Fishfinder",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000096,
+      "name": "Bubaba",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000097,
+      "name": "Burgo",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000133,
+      "name": "Freidi",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000136,
+      "name": "Geomancer Hailstorm",
+      "keep_height": "stands level with the 2014 placement cave_entrance_facade_01_natural.adr (2.3 m away, -0.01 m), 1.7 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000138,
+      "name": "Glimmer",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000173,
+      "name": "Marasmius",
+      "keep_height": "stands level with the 2014 placement cave_entrance_facade_01_natural.adr (1.8 m away, +0.02 m), 0.7 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000203,
+      "name": "Randall",
+      "keep_height": "stands level with the 2014 placement bw_boulder_02.adr (3.2 m away, -0.12 m), 0.6 m below the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000207,
+      "name": "Sera / Bella",
+      "keep_height": "stands level with the 2014 placement sh_gates_01.adr (1.6 m away, +0.24 m), 0.9 m below the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000217,
+      "name": "Sperry",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000231,
+      "name": "Whigguma",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000239,
+      "name": "Xandril",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000247,
+      "name": "Jennifer",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000255,
+      "name": "Roosey",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 2.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000291,
+      "name": "Burnetta",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000332,
+      "name": "Coin Farmer Goldwupp",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000371,
+      "name": "Arianna",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000409,
+      "name": "Morrie",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 3.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000443,
+      "name": "Barin Battlerock",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000448,
+      "name": "Bellis",
+      "keep_height": "stands level with the 2014 placement wc_table_02.adr (2.2 m away, -0.02 m), 0.8 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000455,
+      "name": "Bruce",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000465,
+      "name": "Commander Kiggle",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000467,
+      "name": "Dani",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000470,
+      "name": "Drone Fauzz",
+      "keep_height": "(R) bixie_m_elite_guard.adr swims, floats or perches: 0.9 m below the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000478,
+      "name": "Finklestein",
+      "keep_height": "stands level with the 2014 placement evnt_halloween_doordeco_03.adr (2.6 m away, -0.17 m), 0.7 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000479,
+      "name": "Finnie",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000492,
+      "name": "Gulsh",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000497,
+      "name": "Jacque",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000500,
+      "name": "Jili",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000511,
+      "name": "Orchid",
+      "keep_height": "stands level with the 2014 placement ss_deco_flower_02.adr (3.1 m away, -0.10 m), 0.8 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000512,
+      "name": "Pirri",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000515,
+      "name": "Pucca De'Flor",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000520,
+      "name": "Quills",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000527,
+      "name": "Ruby",
+      "keep_height": "stands level with the 2014 placement evnt_halloween_candybag_02.adr (2.6 m away, -0.08 m), 0.8 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000529,
+      "name": "Saffron",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000550,
+      "name": "Ashby Purrl",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000561,
+      "name": "Brendan",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000563,
+      "name": "Burglz",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000591,
+      "name": "Jolly Roger",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000623,
+      "name": "Seaspray",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 2.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000671,
+      "name": "Druid of the Viper",
+      "keep_height": "stands level with the 2014 placement gl_tulips_02.adr (3.6 m away, -0.24 m), 0.7 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000719,
+      "name": "Tran",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000792,
+      "name": "Melanie",
+      "keep_height": "stands level with the 2014 placement mkt_baitbucket_01.adr (2.6 m away, -0.03 m), 1.1 m above the baked floor: that is its floor, which the bake has no collision for",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000880,
+      "name": "Broogle",
+      "animation_id": 1,
+      "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
+    },
+    {
+      "guid": 9500000900,
+      "name": "Funnel Bindweed",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000909,
+      "name": "Hogosh",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000945,
+      "name": "Sleeping Panther",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000990,
+      "name": "Ninjawug Bixie-rider",
+      "keep_height": "(R) chugawug_m_ninjawug_bixie_rider_01.adr swims, floats or perches: 0.7 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500001012,
+      "name": "Treasure Chest",
+      "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 3.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001239,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:38), 4.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001240,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:39), 1.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001241,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:40), 4.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001263,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:62), 1.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001289,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:75), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001290,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:76), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001291,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:77), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001292,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:78), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001301,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:87), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001302,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:88), 0.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001303,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:89), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001365,
+      "name": "Commodore Kraken",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:142), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001378,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:151), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001439,
+      "name": "Carolyn",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:206), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001441,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:208), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001474,
+      "name": null,
+      "animation_id": 2130,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.66 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_m_amb_eat_01"
+    },
+    {
+      "guid": 100000001475,
+      "name": null,
+      "animation_id": 2130,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.92 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_m_amb_eat_01"
+    },
+    {
+      "guid": 100000001476,
+      "name": null,
+      "animation_id": 2140,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.73 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_bruiser_amb_eat_03"
+    },
+    {
+      "guid": 100000001494,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:261), 2.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001527,
+      "name": null,
+      "animation_id": 2140,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01_smoldering.adr 3.21 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_m_amb_eat_02"
+    },
+    {
+      "guid": 100000001528,
+      "name": null,
+      "animation_id": 2120,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01_smoldering.adr 3.22 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_bruiser_amb_eat_01"
+    },
+    {
+      "guid": 100000001537,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:304), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001602,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:369), 2.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001613,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:380), 3.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001797,
+      "name": "Mystic Glint",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:557), 0.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001800,
+      "name": "Meika Dozen",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:560), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001808,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:568), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001809,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:569), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001810,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:570), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001818,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:578), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001852,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:611), 1.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001888,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:646), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001889,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:647), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001909,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:667), 2.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001912,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:670), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001913,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:671), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001914,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:672), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001916,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:674), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001917,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:675), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001918,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:676), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001922,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:680), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001940,
+      "name": "Taffy Dozen",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:698), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001947,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:705), 5.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001979,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:736), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002000,
+      "name": "Father Dozen",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:757), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002024,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:780), 5.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002025,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:781), 5.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002026,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:782), 5.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002210,
+      "name": "Free the Balloons",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:962), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002223,
+      "name": "Fuddle",
+      "animation_id": 2130,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 1.88 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_m_amb_eat_01"
+    },
+    {
+      "guid": 100000002281,
+      "name": null,
+      "animation_id": 2100,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.13 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_sitbyfire_loop"
+    },
+    {
+      "guid": 100000002324,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1069), 2.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002325,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1070), 3.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002326,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1071), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002338,
+      "name": "Maximus Axegrinder",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1082), 0.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002351,
+      "name": "Scotty Trackrunner",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1095), 0.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002385,
+      "name": "Ellandra Shieldbreaker",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1128), 0.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002395,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1138), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002402,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1145), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002403,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1146), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002404,
+      "name": "Bryan",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1147), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002405,
+      "name": "Riya",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1148), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002411,
+      "name": "Dasher Fancypants",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1154), 0.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002422,
+      "name": "Guard Hardin",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1165), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002427,
+      "name": "Bertaboo",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1170), 1.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002428,
+      "name": "Rika",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1171), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002430,
+      "name": "Pinke",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1173), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002431,
+      "name": "Pritti",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1174), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002432,
+      "name": "Drake",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1175), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002433,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1176), 0.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002434,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1177), 0.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002435,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1178), 1.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002445,
+      "name": "Hal",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1188), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002446,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1189), 2.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002450,
+      "name": "Hawthorn",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1193), 1.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002467,
+      "name": "Marty",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1210), 0.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002510,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1253), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002511,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1254), 1.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002512,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1255), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002513,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1256), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002514,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1257), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002515,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1258), 1.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002516,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1259), 0.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002517,
+      "name": null,
+      "animation_id": 2100,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 2.11 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_sitbyfire_loop"
+    },
+    {
+      "guid": 100000002531,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1274), 2.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002554,
+      "name": "Snarts",
+      "animation_id": 2120,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 2.61 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own robgoblin_bruiser_amb_eat_01"
+    },
+    {
+      "guid": 100000002588,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1331), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002666,
+      "name": "Ursine Vine",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1409), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002674,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1417), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002708,
+      "name": "Magicbloom",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1451), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002711,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1454), 3.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002742,
+      "name": null,
+      "animation_id": 2100,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.53 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_sitbyfire_loop"
+    },
+    {
+      "guid": 100000002743,
+      "name": "Smapplebap",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1486), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002775,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1518), 1.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002782,
+      "name": "Private Dogamug",
+      "animation_id": 2120,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.39 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standattention_loop"
+    },
+    {
+      "guid": 100000002787,
+      "name": null,
+      "animation_id": 2100,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.14 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_sitbyfire_loop"
+    },
+    {
+      "guid": 100000002841,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1584), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002846,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1589), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002847,
+      "name": null,
+      "animation_id": 2130,
+      "source": "(R) lies on the 2014 bedroll placement sh_primitive_bedroll_01.adr 0.28 m away: the model's own chugawug_amb_sleepingonground_loop"
+    },
+    {
+      "guid": 100000002850,
+      "name": null,
+      "animation_id": 2100,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.54 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_sitbyfire_loop"
+    },
+    {
+      "guid": 100000002855,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1598), 8.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002856,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1599), 7.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002865,
+      "name": null,
+      "animation_id": 2110,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 2.99 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfire_loop"
+    },
+    {
+      "guid": 100000002866,
+      "name": null,
+      "animation_id": 2110,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.16 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfire_loop"
+    },
+    {
+      "guid": 100000002867,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1610), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002876,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1619), 3.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002877,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1620), 3.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002878,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1621), 3.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002881,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1624), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002955,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1698), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003055,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1798), 1.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003067,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1810), 1.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003068,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1811), 7.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003080,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1823), 5.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003084,
+      "name": "Courtney Lakebash",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1827), 1.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003085,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1828), 2.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003089,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1832), 2.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003090,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1833), 1.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003096,
+      "name": "Alpha Wolf",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1839), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003151,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1894), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003245,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1988), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003246,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1989), 0.1 m below the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003248,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:1991) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003249,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:1992) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003250,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:1993) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003251,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:1994) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003275,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2018) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003277,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2020) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003278,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2021) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003279,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2022) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003280,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2023) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003281,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2024) places the fairy cultist camp 2 to 28 m above the baked floor at Merry Vale (-780, -700): the cultists stand on the hideout's raised platforms, which have no collision in the lab bake (R until a native frame shows them)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003296,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2039), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003300,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2043), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003334,
+      "name": "Rocco",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2077), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003393,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2136), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003395,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2138), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003413,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2156), 1.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003478,
+      "name": null,
+      "animation_id": 2110,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 2.1 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfire_loop"
+    },
+    {
+      "guid": 100000003479,
+      "name": null,
+      "animation_id": 2120,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.17 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfirewarmbutt_loop"
+    },
+    {
+      "guid": 100000003480,
+      "name": null,
+      "animation_id": 2110,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.07 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfire_loop"
+    },
+    {
+      "guid": 100000003482,
+      "name": null,
+      "animation_id": 2110,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 2.08 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfire_loop"
+    },
+    {
+      "guid": 100000003485,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2228), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003486,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2229), 1.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003493,
+      "name": "Bandit Patrolman",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2236), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003497,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2240), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003504,
+      "name": "Ninja Apprentice",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2247), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003506,
+      "name": "Ninja Apprentice",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2249), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003508,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2251), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003512,
+      "name": "Ninja Ambusher",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2255), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003585,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2328), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003586,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2329), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003689,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2369), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003736,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2415), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003737,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2416), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003746,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2425), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003766,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2445) places these four Blackspore swamp crays at one height, 4.2 m above the baked floor: a raised swamp deck the bake has no collision for (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003767,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2446) places these four Blackspore swamp crays at one height, 4.2 m above the baked floor: a raised swamp deck the bake has no collision for (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003768,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2447) places these four Blackspore swamp crays at one height, 4.2 m above the baked floor: a raised swamp deck the bake has no collision for (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003769,
+      "name": null,
+      "keep_height": "Legacy spawn script (FreeRealms-Legacy Scripts/Zone/FabledRealms.lua:2448) places these four Blackspore swamp crays at one height, 4.2 m above the baked floor: a raised swamp deck the bake has no collision for (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003777,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2456), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003782,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2461), 4.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003783,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2462), 2.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003794,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2467), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003801,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2474), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003805,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2477), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003806,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2478), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003901,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2568), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003930,
+      "name": "Robgoblin Mechanic",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2597), 1.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003931,
+      "name": "Robgoblin Mechanic",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2598), 10.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003969,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2636), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000003971,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2638), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004076,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2742), 3.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004084,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2750), 0.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004098,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2764), 12.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004183,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2849), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004217,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2883), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004247,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2913), 9.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004248,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2914), 9.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004249,
+      "name": "Jake Quickpaw",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2915), 11.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004250,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2916), 14.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004251,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2917), 11.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004252,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2918), 10.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004253,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2919), 4.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004254,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2920), 7.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004255,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2921), 8.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004256,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2922), 6.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004257,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2923), 5.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004263,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2929), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004299,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2965), 10.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004309,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2975), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004312,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2978), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004337,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3003), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004344,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3010), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004347,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3013), 3.9 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004367,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3032), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004370,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3035), 2.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004371,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3036), 2.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004372,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3037), 2.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004373,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3038), 2.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004388,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3053), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004410,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3074), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004411,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3075), 6.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004412,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3076), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004414,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3078), 6.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004415,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3079), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004468,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3132), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004509,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3173), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004511,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3175), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004601,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3235), 4.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004602,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3236), 7.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004603,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3237), 9.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004606,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3240), 0.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004639,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3273), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004660,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3294), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004792,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3359), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004807,
+      "name": "Sandscale Magus",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3374), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004812,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3379), 0.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004817,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3384), 3.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004826,
+      "name": null,
+      "animation_id": 2120,
+      "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.38 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_standbyfirewarmbutt_loop"
+    },
+    {
+      "guid": 100000004834,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3401), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004835,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3402), 0.7 m below the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004851,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3418), 7.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004852,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3419), 6.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004853,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3420), 4.6 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004854,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3421), 6.2 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004855,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3422), 5.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004856,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3423), 3.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004858,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3425), 4.4 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004865,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3432), 1.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004866,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3433), 1.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000006476,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3522), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000006493,
+      "name": "David",
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:3529), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000023619,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4150), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000023641,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4168), 9.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000031504,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4201), 2.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000031505,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4202), 2.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000031513,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4203), 2.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000031514,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4204), 2.8 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000032599,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4242), 2.0 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000032602,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4243), 2.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000032603,
+      "name": null,
+      "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:4244), 2.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000033456,
+      "name": "Lakeshore Duck",
+      "keep_height": "(R) duck_f_01.adr swims, floats or perches: 0.6 m below the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000036129,
+      "name": "Vulture",
+      "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 0.5 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000036135,
+      "name": "Vulture",
+      "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 11.8 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000036139,
+      "name": "Vulture",
+      "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 16.6 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000036145,
+      "name": "Vulture",
+      "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 8.9 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000036153,
+      "name": "Vulture",
+      "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 0.1 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000036154,
+      "name": "Vulture",
+      "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 0.1 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111666,
+      "name": null,
+      "keep_height": "(R) butterfly.adr swims, floats or perches: 0.1 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111668,
+      "name": null,
+      "keep_height": "(R) butterfly.adr swims, floats or perches: 0.3 m below the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111726,
+      "name": null,
+      "keep_height": "(R) toad.adr swims, floats or perches: 0.4 m below the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111727,
+      "name": null,
+      "keep_height": "(R) toad.adr swims, floats or perches: 0.3 m below the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111731,
+      "name": null,
+      "keep_height": "(R) toad.adr swims, floats or perches: 0.4 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111891,
+      "name": null,
+      "keep_height": "(R) birds_raven.adr swims, floats or perches: 0.3 m above the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 5642803637794111892,
+      "name": null,
+      "keep_height": "(R) birds_raven.adr swims, floats or perches: 0.8 m below the baked floor",
+      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    }
+  ],
+  "props": [
+    {
+      "model_ids": [
+        17
+      ],
+      "source": "present_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        18
+      ],
+      "source": "present_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        20
+      ],
+      "source": "human_rockstar_m.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        27
+      ],
+      "source": "mail_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        37
+      ],
+      "source": "dwarf_m_miner_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        68
+      ],
+      "source": "sh_icecube_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        69
+      ],
+      "source": "widget_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        80
+      ],
+      "source": "bw_sack_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        83
+      ],
+      "source": "sh_barrel_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        84
+      ],
+      "source": "sh_crate_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        85
+      ],
+      "source": "sh_crate_barrel_combo_03.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        104
+      ],
+      "source": "sh_table_battlepets_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        113
+      ],
+      "source": "bw_mushroom_door_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        156
+      ],
+      "source": "sg_treasure_hunter_plank_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        185
+      ],
+      "source": "sh_primitive_radio_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        194
+      ],
+      "source": "sh_dynamite_pile_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        196
+      ],
+      "source": "sh_pick_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        197
+      ],
+      "source": "sh_shovel_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        204
+      ],
+      "source": "bw_campfire_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        226
+      ],
+      "source": "sg_chugawug_targets_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        228
+      ],
+      "source": "sh_mailbox_blue_group_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        231
+      ],
+      "source": "bw_brazier_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        243
+      ],
+      "source": "evnt_anniversary_fireworks_cart_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        244
+      ],
+      "source": "sg_changeling_fairy_cage_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        245
+      ],
+      "source": "sg_fairy_flora_01_flower01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        246
+      ],
+      "source": "sg_fairy_flora_02_flower01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        248
+      ],
+      "source": "sg_collection_node_flowers_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        249
+      ],
+      "source": "sg_collection_node_mushrooms_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        251
+      ],
+      "source": "sh_cave_entrance_bat_cave_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        252
+      ],
+      "source": "sh_telephone_booth_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        256
+      ],
+      "source": "sg_fairy_flora_03_flower03.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        259
+      ],
+      "source": "sg_harvesting_node_ore_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        265
+      ],
+      "source": "sg_bixie_storagevat_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        268
+      ],
+      "source": "sg_mail_package_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        269
+      ],
+      "source": "sg_pies.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        271
+      ],
+      "source": "invisible_cube.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        273
+      ],
+      "source": "sg_anvil_stump_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        274
+      ],
+      "source": "sg_farming_node_common_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        276
+      ],
+      "source": "sg_robgoblin_junkpile_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        279
+      ],
+      "source": "sg_robgoblin_trunk_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        280
+      ],
+      "source": "sg_warpstone_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        290
+      ],
+      "source": "hum_console_ps2_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        291
+      ],
+      "source": "hum_console_ps3_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        305
+      ],
+      "source": "hum_dining_table_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        308
+      ],
+      "source": "sh_table_battlechair01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        309
+      ],
+      "source": "sg_gametable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        310
+      ],
+      "source": "sg_archaeologist_tool_node_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        315
+      ],
+      "source": "evnt_anniversary_fireworks_wagon_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        316
+      ],
+      "source": "sh_musicstand_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        317
+      ],
+      "source": "sg_collection_node_shells_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        319
+      ],
+      "source": "sg_dogbone.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        323
+      ],
+      "source": "evnt_presents_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        325
+      ],
+      "source": "sh_table_wartable01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        326
+      ],
+      "source": "sg_collection_node_leaves_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        333
+      ],
+      "source": "sg_collection_node_robgoblin_junkpile_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        335
+      ],
+      "source": "sh_sign01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        336
+      ],
+      "source": "sg_sign01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        340
+      ],
+      "source": "sg_mailbox_group_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        347
+      ],
+      "source": "sg_cauldron_node_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        349
+      ],
+      "source": "bowl_basic.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        370
+      ],
+      "source": "bw_flag_01_blue.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        371
+      ],
+      "source": "bw_flag_01_green.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        374
+      ],
+      "source": "bw_flag_01_red.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        387
+      ],
+      "source": "sg_practicedummy_nodes_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        415
+      ],
+      "source": "fairy_m_geoffrey.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        419
+      ],
+      "source": "sg_cooking_table_nodes_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        432
+      ],
+      "source": "sg_cauldron_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        453
+      ],
+      "source": "sh_bush_rose_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        482
+      ],
+      "source": "butterfly_insect.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        516
+      ],
+      "source": "sg_eyeglasses_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        521
+      ],
+      "source": "sh_bucket_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        529
+      ],
+      "source": "sg_gold_coin_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        533
+      ],
+      "source": "wc_mug_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        541
+      ],
+      "source": "ss_deco_flower_04.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        544
+      ],
+      "source": "sg_rock_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        560
+      ],
+      "source": "hsg_brazier_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        561
+      ],
+      "source": "hsg_flag_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        584
+      ],
+      "source": "sg_papers_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        587
+      ],
+      "source": "sg_mining_node_ore_briarwood_copper_01.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        611
+      ],
+      "source": "sg_mining_node_ore_naturaldirt_tin_01.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        650
+      ],
+      "source": "sg_collection_node_leaves_rare_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        670
+      ],
+      "source": "sg_collection_node_flowers_rare_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        671
+      ],
+      "source": "sg_collection_node_robgoblin_junkpile_rare_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        672
+      ],
+      "source": "sg_collection_node_shells_rare_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        673
+      ],
+      "source": "sg_dirt_mound_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        674
+      ],
+      "source": "sg_collection_node_mushrooms_rare_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        678
+      ],
+      "source": "sg_tents_med_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        691
+      ],
+      "source": "sg_collection_node_crate_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        720
+      ],
+      "source": "loot_chest_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        721
+      ],
+      "source": "robgoblin_jester_m.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        722
+      ],
+      "source": "sg_collection_node_spring_rare_01.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        723
+      ],
+      "source": "sg_collection_node_springs_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        724
+      ],
+      "source": "sg_collection_node_fossils_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        789
+      ],
+      "source": "bw_thorn_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        795
+      ],
+      "source": "sh_playingcards_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        796
+      ],
+      "source": "sh_playingcards_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        797
+      ],
+      "source": "sg_book_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        800
+      ],
+      "source": "sg_book_brown_01.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        807
+      ],
+      "source": "loot_bag_big_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        812
+      ],
+      "source": "env_icon_briarwood.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        813
+      ],
+      "source": "env_icon_chugawug.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        814
+      ],
+      "source": "env_icon_merryvale.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        815
+      ],
+      "source": "env_icon_sanctuary.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        816
+      ],
+      "source": "env_icon_seaside.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        818
+      ],
+      "source": "env_icon_snowhill.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        844
+      ],
+      "source": "sg_brownbag_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        845
+      ],
+      "source": "sg_collection_node_fossils_rare_01.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        847
+      ],
+      "source": "sg_fireworks_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        849
+      ],
+      "source": "sg_foodtray_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        854
+      ],
+      "source": "sg_signinbook_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        856
+      ],
+      "source": "sg_soccerball_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        861
+      ],
+      "source": "ss_sunscreen_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        883
+      ],
+      "source": "sg_garage_tire_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        899
+      ],
+      "source": "ss_surfboard_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        902
+      ],
+      "source": "sg_broken_racecar_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        903
+      ],
+      "source": "sg_derby_car_crusher_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        904
+      ],
+      "source": "sg_derby_junk_car_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        910
+      ],
+      "source": "sg_mailbox_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        925
+      ],
+      "source": "sg_chugawug_jug_03_orange.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        930
+      ],
+      "source": "sg_dpo_flower_01_red.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        947
+      ],
+      "source": "env_icon_blackspore.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        953
+      ],
+      "source": "env_icon_shrouded_glade.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        996
+      ],
+      "source": "sg_dpo_flower_01_yellow.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1002
+      ],
+      "source": "sg_sign01_tavern.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1003
+      ],
+      "source": "sg_sign01_townhall.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1006
+      ],
+      "source": "sh_sign01_dayspa.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1007
+      ],
+      "source": "sh_sign01_fisherman.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1027
+      ],
+      "source": "robgoblin_m_bobgoblin.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1049
+      ],
+      "source": "sg_fishing_boat_oar_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1050
+      ],
+      "source": "bw_cart_ransacked_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1062
+      ],
+      "source": "bw_boombox_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1073
+      ],
+      "source": "freestyle_human_m_head_motorcyclehelmetplain.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1075
+      ],
+      "source": "mkt_baitbucket_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1076
+      ],
+      "source": "sg_car_crystals_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1077
+      ],
+      "source": "sg_carkeys_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1078
+      ],
+      "source": "sg_racecar_antonio_taurino_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1079
+      ],
+      "source": "sg_racecar_linx_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1080
+      ],
+      "source": "sg_racecar_pirate_flames_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1081
+      ],
+      "source": "sg_racecar_samuel_bunker_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1082
+      ],
+      "source": "sg_racecar_striped_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1086
+      ],
+      "source": "sh_cart_fair_vendor_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1137
+      ],
+      "source": "dm_card_frtire_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1147
+      ],
+      "source": "dm_card_fltire_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1157
+      ],
+      "source": "dm_card_brtire_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1167
+      ],
+      "source": "dm_card_bltire_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1177
+      ],
+      "source": "dm_card_exhaust_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1234
+      ],
+      "source": "ktdm_eng_pirate_topgear_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1274
+      ],
+      "source": "kt_kart07_body_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1383
+      ],
+      "source": "sg_garage_toolbox_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1398
+      ],
+      "source": "eng_usa_crystal_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1400
+      ],
+      "source": "dm_eng_usa_frontgear_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1525
+      ],
+      "source": "drake_m_mount.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1596
+      ],
+      "source": "sg_2fish_trout_big_3meter.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1630
+      ],
+      "source": "sv_broken_bottles_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1631
+      ],
+      "source": "sv_bucket_01.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1632
+      ],
+      "source": "sv_tumbleweeds_01_still.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1726
+      ],
+      "source": "evnt_halloween_candybag_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1733
+      ],
+      "source": "sh_forge_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1740
+      ],
+      "source": "ss_pir_firepower_pickup_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1748
+      ],
+      "source": "ss_pir_tiny_dmg_fort_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1757
+      ],
+      "source": "evnt_winter_holiday_snowballs_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1765
+      ],
+      "source": "hsg_dining_table_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1776
+      ],
+      "source": "evnt_winter_holiday_tree_presents_03.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1787
+      ],
+      "source": "penguin_surfer_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1789
+      ],
+      "source": "evnt_world_party_luau_chug_drum_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1815
+      ],
+      "source": "gw_precursor_artifact_02_combined.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1855
+      ],
+      "source": "hsg_instruments_drumset_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1886
+      ],
+      "source": "hsg_stool_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1905
+      ],
+      "source": "sg_treasure_chest_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1913
+      ],
+      "source": "sg_spawner_human_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1914
+      ],
+      "source": "sg_spawner_robgoblin_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1931
+      ],
+      "source": "evnt_cliff_diving_ring_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1938
+      ],
+      "source": "sg_spawner_wolf_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1939
+      ],
+      "source": "evnt_world_party_luau_campfire_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        1960
+      ],
+      "source": "evnt_winter_holiday_party_banner_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2012
+      ],
+      "source": "hsg_rug_square_03.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2037
+      ],
+      "source": "sword_ar_ag_weapon_trainingsword.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2040
+      ],
+      "source": "trex_mount.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2061
+      ],
+      "source": "evnt_valentines_treat_basket_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2062
+      ],
+      "source": "event_valentines_rose_wilted_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2064
+      ],
+      "source": "wyvern_m.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2091
+      ],
+      "source": "hsg_cashnut_oak_01_day1_harvest.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2098
+      ],
+      "source": "horse_f.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2099
+      ],
+      "source": "horse_m.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2109
+      ],
+      "source": "horse_pegasus.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2134
+      ],
+      "source": "hsg_fireworks_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2138
+      ],
+      "source": "hsg_firecracker_box_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2183
+      ],
+      "source": "hsg_tents_small_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        2184
+      ],
+      "source": "hsg_tents_small_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3089
+      ],
+      "source": "hsg_mine_lamp_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3097
+      ],
+      "source": "hsg_well_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3106
+      ],
+      "source": "hsg_fishrack_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3107
+      ],
+      "source": "hsg_floral_lamp_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3115
+      ],
+      "source": "hsg_chair_throne_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3123
+      ],
+      "source": "hsg_tree_fallen_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3124
+      ],
+      "source": "hsg_tree_spooky_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3140
+      ],
+      "source": "hsg_sack_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3141
+      ],
+      "source": "hsg_sack_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3142
+      ],
+      "source": "hsg_sack_03.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3148
+      ],
+      "source": "hsg_wugachug_mug_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3149
+      ],
+      "source": "hsg_archway_blackspore_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3153
+      ],
+      "source": "hsg_picnic_table_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3167
+      ],
+      "source": "sh_microphone_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3171
+      ],
+      "source": "hsg_checkpoint_track_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3172
+      ],
+      "source": "hsg_checkpoint_track_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3175
+      ],
+      "source": "hsg_domoposter_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3177
+      ],
+      "source": "hsg_fishing_boat_tied_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3180
+      ],
+      "source": "hsg_int_hum_bed_01_lrg_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3182
+      ],
+      "source": "hsg_int_hum_coffeetable_01_med_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3187
+      ],
+      "source": "hsg_int_hum_diningtable_01_lrg_bbe.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3209
+      ],
+      "source": "trex_armor_mount.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3366
+      ],
+      "source": "ball_m_bowlingball.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3375
+      ],
+      "source": "ball_m_moon.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3381
+      ],
+      "source": "human_m_mannequin_chatty.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3410
+      ],
+      "source": "farming_farmers_market_lv1_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3417
+      ],
+      "source": "farming_dirt_mound_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3456
+      ],
+      "source": "farming_root_chugaroot_stalk_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3519
+      ],
+      "source": "farming_well_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3628
+      ],
+      "source": "overworld_spiralmint_bush_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3629
+      ],
+      "source": "overworld_bush_stickfruit_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3630
+      ],
+      "source": "overworld_root_chugaroot_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3631
+      ],
+      "source": "overworld_root_wildroot_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3633
+      ],
+      "source": "overworld_vinelow_gummyfruit_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3635
+      ],
+      "source": "sg_chugawug_sacks_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3636
+      ],
+      "source": "sg_chugawug_sacks_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3644
+      ],
+      "source": "overworld_vinelow_choychoy_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3646
+      ],
+      "source": "farming_bush_wugafruit_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3651
+      ],
+      "source": "overworld_bush_bumbleberry_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3652
+      ],
+      "source": "overworld_bush_snowberry_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3653
+      ],
+      "source": "overworld_tree_rainleaf_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3654
+      ],
+      "source": "overworld_tree_starnut_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3655
+      ],
+      "source": "overworld_tree_sunleaf_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3656
+      ],
+      "source": "overworld_vinehigh_moonbean_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3666
+      ],
+      "source": "overworld_bush_stainberry_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3668
+      ],
+      "source": "overworld_tree_briarapple_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3669
+      ],
+      "source": "overworld_tree_honeytwig_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3735
+      ],
+      "source": "overworld_vinelow_briarmelon_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3781
+      ],
+      "source": "hsg_ranchhouse_flag_pole_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3823
+      ],
+      "source": "hsg_spooky_log_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3832
+      ],
+      "source": "mkt_jar_of_jitterbugs_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3836
+      ],
+      "source": "sg_spot_the_difference_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3848
+      ],
+      "source": "batmount_m_basic.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3850
+      ],
+      "source": "hsg_block_01_ice_tcg.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3865
+      ],
+      "source": "hsg_painting_order_duel_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3915
+      ],
+      "source": "sh_corkboard_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3930
+      ],
+      "source": "cat_shorthair_plain.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3936
+      ],
+      "source": "fairy_druid_m_headmaster.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3956
+      ],
+      "source": "gloam_m_boss.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4010
+      ],
+      "source": "gw_anvil_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4015
+      ],
+      "source": "sg_mining_node_blacksporesilver_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4016
+      ],
+      "source": "sg_mining_node_briarwoodgold_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4018
+      ],
+      "source": "sg_mining_node_northernwildstin_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4019
+      ],
+      "source": "sg_mining_node_snowhillcopper_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4020
+      ],
+      "source": "sg_mining_node_snowhillminecopper_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4021
+      ],
+      "source": "sg_mining_node_southernwildsiron_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4022
+      ],
+      "source": "sg_mining_node_sunstonecopper_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4033
+      ],
+      "source": "robgoblin_m_freddieslowhands.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4039
+      ],
+      "source": "chugawug_m_grimyfoot.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4043
+      ],
+      "source": "cactusgiant_m_cactusjack.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4048
+      ],
+      "source": "gw_roadhouse_01_gas.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4049
+      ],
+      "source": "gw_sign_roadhouse_fw_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4057
+      ],
+      "source": "env_icon_sunstone_valley.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4097
+      ],
+      "source": "mkt_boombox_headbanger_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4098
+      ],
+      "source": "mkt_boombox_wakyscifi_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4144
+      ],
+      "source": "mkt_fart_block_c_major_a1.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4152
+      ],
+      "source": "mkt_piano_block_c_major_a1.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4179
+      ],
+      "source": "hsg_tcg_column.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4203
+      ],
+      "source": "sg_eggbasket_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4210
+      ],
+      "source": "lepregoblin_m_basic.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4218
+      ],
+      "source": "hsg_wanted_poster_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4219
+      ],
+      "source": "dwarf_m_rumblekingdon.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4222
+      ],
+      "source": "hoverring_m_default.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4225
+      ],
+      "source": "overworld_root_tumtumnip_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4226
+      ],
+      "source": "overworld_vinelow_punkin_harvestable_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4440
+      ],
+      "source": "elf_m_chugzy.agr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4441
+      ],
+      "source": "hoverring_m_copter.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4468
+      ],
+      "source": "chugawug_m_ninjawug_bixie_rider_general_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4470
+      ],
+      "source": "chugawug_m_bugawug_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4512
+      ],
+      "source": "tank_m_ranger.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4531
+      ],
+      "source": "hsg_cren_large6_wall_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4532
+      ],
+      "source": "hsg_cren_small2_wall_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4534
+      ],
+      "source": "hsg_princess_tower_corner_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4535
+      ],
+      "source": "hsg_princess_tower_corner_flatwall_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4536
+      ],
+      "source": "hsg_rook_tower_corner_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4537
+      ],
+      "source": "hsg_rook_tower_corner_crenwall_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4538
+      ],
+      "source": "hsg_rook_tower_corner_flatwall_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4546
+      ],
+      "source": "sg_troll_hut_02_snow.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4579
+      ],
+      "source": "mkt_halloween_dispenser_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4590
+      ],
+      "source": "jet_m_default.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4591
+      ],
+      "source": "mech_m_combiner.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4618
+      ],
+      "source": "monkey_m_shuffle.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        4735
+      ],
+      "source": "hsg_rock_lump.adr: no walk, run, emote, fidget or combat clip"
+    }
+  ]
+}

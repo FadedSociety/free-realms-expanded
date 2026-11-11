@@ -10,18 +10,18 @@
       ],
       "model_file_name": "chugawug_f_01.adr",
       "animation_ids": [
-        3302,
-        3306
+        3316,
+        3333
       ],
       "min_interval_ms": 3796,
       "max_interval_ms": 5563,
       "conversation_animation_ids": [
-        3302,
-        3306
+        3316,
+        3333
       ],
       "conversation_min_gap_ms": 495,
       "conversation_max_gap_ms": 3702,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_f_01.adr (R); client slots emo_applaud(3302), emo_cheer(3306); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_f_01.adr (R); client slots emo_applaud(3302), emo_cheer(3306); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); F6 (op-P-npc-life): animation_ids: 3302 emo_applaud, 3306 emo_cheer dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3333 emo_wave (R); conversation_animation_ids: 3302 emo_applaud, 3306 emo_cheer dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3333 emo_wave (R)"
     },
     {
       "model_ids": [
@@ -41,18 +41,18 @@
       ],
       "model_file_name": "chugawug_m_01_blue_drinking.agr",
       "animation_ids": [
-        3302,
-        3306
+        3316,
+        3333
       ],
       "min_interval_ms": 3807,
       "max_interval_ms": 5604,
       "conversation_animation_ids": [
-        3302,
-        3306
+        3316,
+        3333
       ],
       "conversation_min_gap_ms": 129,
       "conversation_max_gap_ms": 3610,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_01_blue_drinking.agr (R); client slots emo_applaud(3302), emo_cheer(3306); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_01_blue_drinking.agr (R); client slots emo_applaud(3302), emo_cheer(3306); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); F6 (op-P-npc-life): animation_ids: 3302 emo_applaud, 3306 emo_cheer dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3333 emo_wave (R); conversation_animation_ids: 3302 emo_applaud, 3306 emo_cheer dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3333 emo_wave (R)"
     },
     {
       "model_ids": [
@@ -60,18 +60,18 @@
       ],
       "model_file_name": "chugawug_m_02.adr",
       "animation_ids": [
-        3306,
-        3302
+        3316,
+        3333
       ],
       "min_interval_ms": 3809,
       "max_interval_ms": 5712,
       "conversation_animation_ids": [
-        3306,
-        3302
+        3316,
+        3333
       ],
       "conversation_min_gap_ms": 411,
       "conversation_max_gap_ms": 3282,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_02.adr (R); client slots emo_cheer(3306), emo_applaud(3302); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_02.adr (R); client slots emo_cheer(3306), emo_applaud(3302); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); F6 (op-P-npc-life): animation_ids: 3306 emo_cheer, 3302 emo_applaud dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3333 emo_wave (R); conversation_animation_ids: 3306 emo_cheer, 3302 emo_applaud dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3333 emo_wave (R)"
     },
     {
       "model_ids": [
@@ -383,18 +383,16 @@
       ],
       "model_file_name": "fairychild_m_mohawkshorts.adr",
       "animation_ids": [
-        3306,
-        3302
+        3306
       ],
       "min_interval_ms": 3874,
       "max_interval_ms": 8954,
       "conversation_animation_ids": [
-        3306,
-        3302
+        3306
       ],
       "conversation_min_gap_ms": 317,
       "conversation_max_gap_ms": 3183,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairychild_m_mohawkshorts.adr (R); client slots emo_cheer(3306), emo_applaud(3302); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairychild_m_mohawkshorts.adr (R); client slots emo_cheer(3306), emo_applaud(3302); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); F6 (op-P-npc-life): animation_ids: 3302 emo_applaud dropped (the model's .adr has no such clip); conversation_animation_ids: 3302 emo_applaud dropped (the model's .adr has no such clip)"
     },
     {
       "model_ids": [
@@ -640,15 +638,12 @@
       ],
       "model_file_name": "human_m_miner_01.adr",
       "animation_ids": [
-        3335,
-        3317,
-        3102,
         3112,
         3101
       ],
       "min_interval_ms": 5180,
       "max_interval_ms": 84411,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_miner_01.adr (R); client slots emo_yes(3335), emo_no(3317), emo_talk_inquire(3102), emo_talk_angry_long(3112), emo_talk_basic(3101)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_miner_01.adr (R); client slots emo_yes(3335), emo_no(3317), emo_talk_inquire(3102), emo_talk_angry_long(3112), emo_talk_basic(3101); F6 (op-P-npc-life): animation_ids: 3335 emo_yes, 3317 emo_no, 3102 emo_talk_inquire dropped (the model's .adr has no such clip)"
     },
     {
       "model_ids": [
@@ -656,18 +651,15 @@
       ],
       "model_file_name": "humanchild_f_skirtandtunic.adr",
       "animation_ids": [
-        3302,
-        3306,
         3101,
         2101,
-        2103,
         2102
       ],
       "min_interval_ms": 3910,
       "max_interval_ms": 19289,
       "conversation_animation_ids": [
-        3302,
-        3306
+        3316,
+        3101
       ],
       "conversation_min_gap_ms": 170,
       "conversation_max_gap_ms": 3118,
@@ -675,7 +667,7 @@
         2100
       ],
       "idle_interval_ms": 3621,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_f_skirtandtunic.adr (R); client slots emo_applaud(3302), emo_cheer(3306), emo_talk_basic(3101), amb_loop_01_fidget_01(2101), amb_loop_01_fidget_03(2103), amb_loop_01_fidget_02(2102); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); IdleAnimationIds/IdleIntervalMs values (R)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_f_skirtandtunic.adr (R); client slots emo_applaud(3302), emo_cheer(3306), emo_talk_basic(3101), amb_loop_01_fidget_01(2101), amb_loop_01_fidget_03(2103), amb_loop_01_fidget_02(2102); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); IdleAnimationIds/IdleIntervalMs values (R); F6 (op-P-npc-life): animation_ids: 3302 emo_applaud, 3306 emo_cheer, 2103 amb_loop_01_fidget_03 dropped (the model's .adr has no such clip); conversation_animation_ids: 3302 emo_applaud, 3306 emo_cheer dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3101 emo_talk_basic (R)"
     },
     {
       "model_ids": [
@@ -713,8 +705,6 @@
       ],
       "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
       "animation_ids": [
-        3306,
-        3302,
         2103,
         2101,
         2102
@@ -722,8 +712,8 @@
       "min_interval_ms": 3865,
       "max_interval_ms": 17034,
       "conversation_animation_ids": [
-        3306,
-        3302
+        3316,
+        3101
       ],
       "conversation_min_gap_ms": 95,
       "conversation_max_gap_ms": 2688,
@@ -731,7 +721,7 @@
         2100
       ],
       "idle_interval_ms": 3802,
-      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_m_tshirtwithbeltbig.adr (R); client slots emo_cheer(3306), emo_applaud(3302), amb_loop_01_fidget_03(2103), amb_loop_01_fidget_01(2101), amb_loop_01_fidget_02(2102); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); IdleAnimationIds/IdleIntervalMs values (R)"
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_m_tshirtwithbeltbig.adr (R); client slots emo_cheer(3306), emo_applaud(3302), amb_loop_01_fidget_03(2103), amb_loop_01_fidget_01(2101), amb_loop_01_fidget_02(2102); ConversationAnimationIds/ConversationMinGapMs/ConversationMaxGapMs values (R); IdleAnimationIds/IdleIntervalMs values (R); F6 (op-P-npc-life): animation_ids: 3306 emo_cheer, 3302 emo_applaud dropped (the model's .adr has no such clip); conversation_animation_ids: 3306 emo_cheer, 3302 emo_applaud dropped (the model's .adr has no such clip); refilled with its own 3316 emo_laugh, 3101 emo_talk_basic (R)"
     },
     {
       "model_ids": [

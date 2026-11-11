@@ -26,6 +26,15 @@ const HEADER: usize = 8 + 4 * 5;
 /// Heights are stored in decimetres; this marks a node no triangle covers.
 const EMPTY: i16 = i16::MIN;
 const SCALE: f32 = 10.0;
+/// F6: how far above a body [`Terrain::floor_at`] looks for its ground. The client grounds a
+/// moved MovementType-2 actor the same way: `010ba6e0` casts from Y+2 down to Y-2000 and takes
+/// the first collision hit, so a body up to 2 m into the ground still finds its own floor.
+pub const FLOOR_CAST_LIFT_M: f32 = 2.0;
+/// (R) How far above a body a placed object's top still counts as its floor (a body sunk into a
+/// deck). Higher tops are not lifted onto: the baked collision includes surfaces such as the sea
+/// at Seaside, where the original enemies wade 1.1 m under them (`field_enemies` homes).
+pub const FLOOR_STEP_UP_M: f32 = 0.5;
+const FLOOR_CAST_DEPTH_M: f32 = 2_000.0;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct HeightGrid {
@@ -236,6 +245,30 @@ impl Terrain {
 
     pub fn height_at(&self, zone: u32, x: f32, z: f32) -> Option<f32> {
         self.zones.get(&zone)?.height_at(x, z)
+    }
+
+    /// F6: the floor a body placed at `p` stands on: the higher of the height grid, when it is
+    /// at most `FLOOR_CAST_LIFT_M` above the feet, and the highest baked collision top (a deck,
+    /// a floor, a ledge) at most `FLOOR_STEP_UP_M` above them. Ground further up is a roof (a
+    /// cave under the hills). `None` when nothing lies below: off the grid, or a cave with no
+    /// baked floor.
+    pub fn floor_at(&self, zone: u32, p: [f32; 3]) -> Option<f32> {
+        let ground = self.height_at(zone, p[0], p[2]);
+        let ground = ground.filter(|h| *h <= p[1] + FLOOR_CAST_LIFT_M);
+        let from = p[1] + FLOOR_STEP_UP_M;
+        let top = self
+            .obstacles
+            .surface_below(zone, p[0], p[2], from, FLOOR_CAST_DEPTH_M);
+        ground.into_iter().chain(top).reduce(f32::max)
+    }
+
+    /// Grids built in memory, no obstacles (unit tests).
+    #[cfg(test)]
+    pub(crate) fn from_grids(grids: impl IntoIterator<Item = (u32, HeightGrid)>) -> Self {
+        Self {
+            zones: grids.into_iter().collect(),
+            ..Self::default()
+        }
     }
 
     pub fn grid(&self, zone: u32) -> Option<&HeightGrid> {

@@ -1385,9 +1385,8 @@ impl Gameplay {
     }
 
     pub fn set_terrain(&mut self, terrain: Option<std::sync::Arc<crate::terrain::Terrain>>) {
-        if let Some(encounter) = self.encounter.as_mut() {
-            encounter.set_terrain(terrain.clone());
-        }
+        self.encounter.iter_mut().for_each(|e| e.set_terrain(terrain.clone()));
+        self.npc_visibility.iter_mut().for_each(|v| v.set_floor(terrain.clone()));
         self.terrain = terrain;
     }
 

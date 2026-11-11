@@ -255,18 +255,20 @@ fn ambient_rows_name_client_slots_and_models() {
     }
 
     // The handoff case: the client maps chugawug_f_01.adr to model 13, whose
-    // applaud/cheer row is the one the gateway test drives.
+    // row is the one the gateway test drives. F6: Sanctuary's applaud/cheer ids
+    // are clips that .adr lacks, so the row plays its own laugh and wave
+    // (tests/npc_life.rs checks every id against the model's slots).
     let chugawug = rows
         .iter()
         .find(|row| row["model_file_name"] == "chugawug_f_01.adr")
         .expect("the chugawug row is imported");
     assert_eq!(chugawug["model_ids"], serde_json::json!([13]));
-    assert_eq!(chugawug["animation_ids"], serde_json::json!([3302, 3306]));
+    assert_eq!(chugawug["animation_ids"], serde_json::json!([3316, 3333]));
     assert_eq!(chugawug["min_interval_ms"], 3796);
     assert_eq!(chugawug["max_interval_ms"], 5563);
     assert_eq!(
         chugawug["conversation_animation_ids"],
-        serde_json::json!([3302, 3306])
+        serde_json::json!([3316, 3333])
     );
     assert_eq!(chugawug["conversation_min_gap_ms"], 495);
     assert_eq!(chugawug["conversation_max_gap_ms"], 3702);
@@ -292,7 +294,7 @@ fn ambient_rows_name_client_slots_and_models() {
         .expect("the child conversation/idle row is imported");
     assert_eq!(
         child["conversation_animation_ids"],
-        serde_json::json!([3302, 3306])
+        serde_json::json!([3316, 3101])
     );
     assert_eq!(child["conversation_min_gap_ms"], 170);
     assert_eq!(child["conversation_max_gap_ms"], 3118);

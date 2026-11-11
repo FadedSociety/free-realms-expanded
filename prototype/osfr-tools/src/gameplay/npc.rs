@@ -64,6 +64,11 @@ impl Gameplay {
         self.npc_visibility.as_ref()?.model_of(guid)
     }
 
+    /// F6: the passive actor table, read-only (the floor and pose audit reads every row).
+    pub fn npc_table(&self) -> Option<&crate::world::NpcVisibility> {
+        self.npc_visibility.as_ref()
+    }
+
     /// T753: the world zone/region/place table `NpcVisibility::load` read, or `None`
     /// when the content set has no `regions.json`. The later zone slices call this.
     pub fn region_table(&self) -> Option<&crate::world_regions::RegionTable> {

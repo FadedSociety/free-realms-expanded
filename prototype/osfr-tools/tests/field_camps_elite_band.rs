@@ -229,9 +229,10 @@ const EXISTING_GROUPS: [&str; 10] = [
 /// this slice appended to them. Any changed, reordered or reformatted prefix
 /// field (including evidence text) changes this digest, except the placement
 /// of the 12 MID/HIGH rows T415 moved (`placement_masked`); the value is the
-/// pre-T415 prefix's masked digest.
+/// pre-T415 prefix's masked digest. F6 (op-P-npc-life) set two Hooligan homes onto the floor
+/// (`scripts/npc_floor.py`), which moved this value.
 const EXISTING_PREFIX_SHA256: &str =
-    "30411707307c43dbf7544bd3748306f6777fa29a033028d4de720c379f3eb749";
+    "bce6bdfe646eae5ff97d10a43a0a137c4e0df41f462f55bad38210e046fac9cf";
 
 /// The existing level-10 and level-14 controls used to prove the actor level,
 /// not the player level, selects the reward band.

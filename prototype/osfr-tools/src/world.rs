@@ -6,6 +6,7 @@
 use crate::{
     content::{ContentDb, Dungeon, NpcSpawn as ContentNpcSpawn, Rotation, Zone},
     nameplate::{self, Kind},
+    npc_life::{self, Life},
     npc_notifications::{self, Notification},
     npc_presentation::{self, Cursor, Presentation},
     startup_messages::{self, ZoneDetails},
@@ -104,6 +105,30 @@ impl VisibleNpc {
         }
         Ok(packets)
     }
+
+    /// F6: its idle pose, unless its AddNpc already carries another id (a boombox box), then
+    /// its floor.
+    fn settle(&mut self, life: &Life, zone: u32) {
+        if self.spawn.animation_id == npc_life::STAND {
+            if let Some(id) = life.pose(self.spawn.actor_id, self.spawn.model_id) {
+                self.spawn.animation_id = id;
+            }
+        }
+        self.ground(life, zone);
+    }
+
+    /// F6: a body onto its floor, keeping the AddNpc's own offset from the row. A row that is
+    /// one of the zone's placed objects (`terrain_object_id`) is that object and stays.
+    fn ground(&mut self, life: &Life, zone: u32) {
+        if self.spawn.terrain_object_id != 0 {
+            return;
+        }
+        let (guid, model) = (self.spawn.actor_id, self.spawn.model_id);
+        if let Some(floor) = life.floor(zone, guid, model, self.position) {
+            self.spawn.position[1] += floor - self.position[1];
+            self.position[1] = floor;
+        }
+    }
 }
 
 #[derive(Clone, Default)]
@@ -132,6 +157,8 @@ pub struct NpcVisibility {
     seasons: Option<Arc<crate::client_areas::ClientAreas>>,
     /// T775: a pinned unix-ms clock for tests and clock checks; `None` follows the wall clock.
     season_clock: Option<u64>,
+    /// F6: idle poses (`npc_poses.json`) and, from [`Self::set_floor`], the floor.
+    life: Arc<Life>,
 }
 
 /// (R) One candidate in the common passive/hostile NPC budget. Engaged actors
@@ -471,6 +498,7 @@ impl NpcVisibility {
             regions,
             seasons,
             season_clock,
+            life: Arc::new(Life::load(content_dir)?),
             ..Self::default()
         };
         let presentation = read_presentation(content_dir)?;
@@ -538,10 +566,9 @@ impl NpcVisibility {
             result.content_keys.insert(npc.npc_id, npc.npc_id);
             let mut notifications = Vec::new();
             let cursor = presentation.apply(&mut spawn, &mut notifications);
-            Arc::make_mut(&mut result.by_zone)
-                .entry(draw_zone)
-                .or_default()
-                .push(VisibleNpc {
+            result.push(
+                draw_zone,
+                VisibleNpc {
                     spawn,
                     name: npc.name,
                     position,
@@ -549,7 +576,8 @@ impl NpcVisibility {
                     season: None,
                     notifications,
                     cursor,
-                });
+                },
+            );
         }
         if anchors.is_empty() {
             return Err(invalid("NPC content has no positioned regional anchors"));
@@ -599,10 +627,9 @@ impl NpcVisibility {
             }
             let mut notifications = npc.notifications;
             let cursor = presentation.apply(&mut spawn, &mut notifications);
-            Arc::make_mut(&mut result.by_zone)
-                .entry(OPEN_WORLD_ZONE)
-                .or_default()
-                .push(VisibleNpc {
+            result.push(
+                OPEN_WORLD_ZONE,
+                VisibleNpc {
                     spawn,
                     name: npc.name,
                     position: npc.position,
@@ -610,7 +637,8 @@ impl NpcVisibility {
                     season: npc.season,
                     notifications,
                     cursor,
-                });
+                },
+            );
         }
         let placements = content_dir.join("npc_placements.json");
         if placements.is_file() {
@@ -770,11 +798,7 @@ impl NpcVisibility {
         let hide = nameplate::hidden(model_id, &spawn.npc_name, Kind::Npc, None);
         spawn.hide_nameplate = u8::from(hide);
         apply_reach(&self.station_reach, &mut spawn);
-        let npcs = Arc::make_mut(&mut self.by_zone)
-            .entry(OPEN_WORLD_ZONE)
-            .or_default();
-        npcs.retain(|npc| npc.spawn.actor_id != placement.guid);
-        npcs.push(VisibleNpc {
+        self.replace(VisibleNpc {
             spawn,
             name: placement.name.clone(),
             position: p,
@@ -784,7 +808,6 @@ impl NpcVisibility {
             notifications: Vec::new(),
             cursor: None,
         });
-        npcs.sort_by_key(|npc| npc.spawn.actor_id);
         self.placed.insert(placement.guid);
     }
 
@@ -859,12 +882,7 @@ impl NpcVisibility {
     /// or its invisible effect companion. Shown by proximity like every static actor.
     pub(crate) fn add_prepared_actor(&mut self, spawn: NpcSpawn, name: String, position: [f32; 3]) {
         self.revision = self.revision.wrapping_add(1);
-        let actor_id = spawn.actor_id;
-        let npcs = Arc::make_mut(&mut self.by_zone)
-            .entry(OPEN_WORLD_ZONE)
-            .or_default();
-        npcs.retain(|npc| npc.spawn.actor_id != actor_id);
-        npcs.push(VisibleNpc {
+        self.replace(VisibleNpc {
             spawn,
             name: Some(name),
             position,
@@ -875,7 +893,43 @@ impl NpcVisibility {
             notifications: Vec::new(),
             cursor: None,
         });
+    }
+
+    /// F6: the one way a row enters the table. It takes its idle pose and, once the session's
+    /// terrain is known, its floor ([`crate::npc_life`]); load sorts the rows once at the end.
+    fn push(&mut self, zone: u32, mut npc: VisibleNpc) {
+        npc.settle(&self.life, zone);
+        Arc::make_mut(&mut self.by_zone)
+            .entry(zone)
+            .or_default()
+            .push(npc);
+    }
+
+    /// [`Self::push`] into the open world in place of any row with the same actor id.
+    fn replace(&mut self, mut npc: VisibleNpc) {
+        npc.settle(&self.life, OPEN_WORLD_ZONE);
+        let npcs = Arc::make_mut(&mut self.by_zone)
+            .entry(OPEN_WORLD_ZONE)
+            .or_default();
+        npcs.retain(|old| old.spawn.actor_id != npc.spawn.actor_id);
+        npcs.push(npc);
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
+    }
+
+    /// F6: ground every row on the session's terrain, and every row added later. The first
+    /// terrain stays: rows are grounded once from their authored height.
+    pub fn set_floor(&mut self, terrain: Option<Arc<crate::terrain::Terrain>>) {
+        let Some(terrain) = terrain.filter(|_| !self.life.has_floor()) else {
+            return;
+        };
+        Arc::make_mut(&mut self.life).set_floor(terrain);
+        let life = Arc::clone(&self.life);
+        for (zone, npcs) in Arc::make_mut(&mut self.by_zone).iter_mut() {
+            for npc in npcs {
+                npc.ground(&life, *zone);
+            }
+        }
+        self.revision = self.revision.wrapping_add(1);
     }
 
     /// Add every battle spawner as a static actor, with its combat marker (T879).
@@ -965,6 +1019,20 @@ impl NpcVisibility {
                 let model_id = u32::try_from(npc.spawn.model_id).ok()?;
                 Some((npc.spawn.actor_id, model_id, npc.position))
             })
+    }
+
+    /// F6: every row this table draws, by draw zone, as its AddNpc carries it (excluded rows,
+    /// such as field enemies drawn by the encounter, are not this table's).
+    pub fn drawn_spawns(&self) -> impl Iterator<Item = (u32, &NpcSpawn)> + '_ {
+        self.by_zone
+            .iter()
+            .flat_map(|(zone, npcs)| npcs.iter().map(move |npc| (*zone, &npc.spawn)))
+            .filter(|(_, spawn)| !self.excluded.contains(&spawn.actor_id))
+    }
+
+    /// F6: the pose table and floor every row was settled with.
+    pub fn life(&self) -> &Life {
+        &self.life
     }
 
     /// Model and position of a loaded actor, including one hidden from this
@@ -1186,7 +1254,7 @@ pub(crate) fn content_spawn_template() -> NpcSpawn {
         chat_bubble_background_color: 13_951_728,
         chat_bubble_size: 1,
         scale: 1.0,
-        animation_id: 1,
+        animation_id: npc_life::STAND,
         disposition: 1,
         unknown_flag_16: 1,
         interact_range: 100,
