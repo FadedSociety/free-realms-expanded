@@ -1517,6 +1517,11 @@ impl PetService {
         self.roster.pets.iter().find(|pet| pet.id == pet_id)
     }
 
+    /// Pets in the saved roster (the Pet Owner achievement).
+    pub fn pet_count(&self) -> usize {
+        self.roster.pets.len()
+    }
+
     pub fn active_pet_id(&self) -> Option<u32> {
         self.active.map(|active| active.pet_id)
     }

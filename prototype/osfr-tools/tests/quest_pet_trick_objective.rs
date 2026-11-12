@@ -326,8 +326,19 @@ fn other_trick_changes_nothing() {
         quest_packets(&performed).is_empty(),
         "a different trick sends no quest packet"
     );
-    assert!(!performed.changed);
-    assert_eq!(saved(&game), before, "a different trick changes nothing");
+    // C7 (L1184): any trick moves the Tricky achievement counter, so the save changes; that
+    // progress is the only thing a different trick changes.
+    assert!(performed.changed);
+    let without_progress = |bytes: Vec<u8>| {
+        let mut value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        value["progression_extras"].take();
+        value
+    };
+    assert_eq!(
+        without_progress(saved(&game)),
+        without_progress(before),
+        "a different trick changes nothing but achievement progress"
+    );
 }
 
 #[test]

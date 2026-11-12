@@ -961,6 +961,7 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
     assert_eq!(traffic(&refused.replies), unlocks(pet, 999_999));
     assert!(refused.nearby.is_empty() && !refused.changed);
 
+    let saved_before = serde_json::to_value(game.state()).unwrap();
     let accepted = game
         .handle_in_world(&perform_trick(TRICK), &who, start + 20)
         .unwrap();
@@ -974,7 +975,14 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
         ]
     );
     assert_eq!(traffic(&accepted.nearby), vec![owner]);
-    assert!(!accepted.changed);
+    // The trick moves the Tricky achievement counter (C7), so the save changes: that progress
+    // is the only thing it changes.
+    assert!(accepted.changed);
+    let mut saved_after = serde_json::to_value(game.state()).unwrap();
+    let mut before = saved_before;
+    let progress = saved_after["progression_extras"].take();
+    assert_ne!(progress, before["progression_extras"].take(), "the trick counts for Tricky");
+    assert_eq!(saved_after, before, "nothing but achievement progress changed");
 
     let pet_plays = animation_packet(actor, trick_row(TRICK).animation_id, false);
     let at_delay = game

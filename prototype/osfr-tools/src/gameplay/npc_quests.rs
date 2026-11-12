@@ -312,12 +312,14 @@ impl Gameplay {
         out: &mut Outcome,
     ) -> io::Result<()> {
         self.pet_earn_quest_event(&event);
+        let achievement_events = self.achievement_events_for(&event);
         if let Some(engine) = &mut self.npc_quests {
             // PB2: the one place credit is granted; a shared event also waits for the group.
             let result =
                 super::quest_combat::group_credit::credit(engine, event, &mut self.group_credit)?;
             self.append_npc_quest_outcome_synced(result, out)?;
         }
+        self.apply_achievement_events(achievement_events, out);
         // Quest events also arrive from movement, ticks and automatic outcomes, not only
         // `handle_in_world`. Synchronize here so a goal opened on any of those paths is
         // registered with the client in the same outcome.
@@ -436,6 +438,7 @@ impl Gameplay {
                 self.credit_minigame(id, game_over_result(packet), out)?;
             } else {
                 self.pet_earn_minigame(id);
+                self.achievement_minigame_win(id, out);
                 self.npc_quest_event(
                     crate::quest_engine::QuestEvent::FinishMinigame { minigame_id: id },
                     out,

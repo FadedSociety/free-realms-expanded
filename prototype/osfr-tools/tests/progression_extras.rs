@@ -735,7 +735,8 @@ fn source_content_ids_are_unique_and_locale_backed() {
             .iter()
             .filter(|row| row["counter_key"].is_string())
             .count(),
-        90
+        318,
+        "every row has a counter key; the whole-table test checks what each one means"
     );
 
     assert_eq!(promotional_packet(1, &[1, 2]).unwrap()[..4], [114, 0, 1, 0]);
@@ -761,11 +762,352 @@ fn shipped_achievement_rules_join_every_title_by_name() {
     let bindings =
         AchievementBindings::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
             .unwrap();
-    assert_eq!(bindings.rules().len(), 90);
-    assert_eq!(bindings.title_bindings().len(), 17);
-    assert!(
-        bindings.claim_bindings().is_empty(),
-        "the shipped recovery has no confirmed achievement item grants"
-    );
+    // Every row except the five retired Pet Trainer ranks has a rule (and so does each title).
+    assert!(bindings.rules().len() >= 313);
+    assert!(bindings.title_bindings().len() >= 17);
     assert_eq!(bindings.job_slug(1), Some("adventurer"));
+}
+
+/// Why each `waiting:<event>` row has no trigger yet: the game, hook or data it needs does not
+/// exist. The first segment after `waiting:` is the key; a new waiting row must be listed here.
+const WAITING: &[(&str, &str)] = &[
+    ("group_clear", "the win does not carry the group size (the shared arena is F5's)"),
+    ("quest_title", "the wiki questline's last quest has no record in the quest files"),
+    ("quest_disabled", "the target quest's record is disabled (no objectives yet)"),
+    ("dungeon_no_fight", "the dungeon record names no fight yet (F5 maps it)"),
+    ("enemy_missing", "no enemy of that name exists in the enemy or fight files"),
+    ("recipes_unlearnable", "learn_recipe refuses recipes with no pattern item; quests teach 8 of 36"),
+    ("questline", "the questline has no quest records yet"),
+    ("quest_repeat_completions", "quest state keeps no count of repeat completions"),
+    ("pvp_duel_won", "there is no player-versus-player duel"),
+    ("pvp_duel_won_with_gleam", "no PvP duel and no Gleam Strength buff"),
+    ("pvp_duel_won_with_gloam", "no PvP duel and no Gloam Power buff"),
+    ("pvp_duel_won_with_buff", "no PvP duel and no Gleam/Gloam buff"),
+    ("cow_tipped", "no cow-tipping interaction exists"),
+    ("checkers_win", "checkers.rs raises no minigame result (MG's file)"),
+    ("chess_win", "chess_service.rs raises no minigame result (MG's file)"),
+    ("coins_rewarded", "no lifetime count of coins paid by rewards (rewards.rs, shared)"),
+    ("style_card_equipped", "style_card_use.rs raises no event (CE's file)"),
+    ("marketplace_visited", "the Marketplace window open is not an event (F3's file)"),
+    ("rocket_launched", "housing placement raises no event (PL's files)"),
+    ("house_items_max", "housing placement raises no item count (PL's files)"),
+    ("house_visited", "housing visits raise no event (PL's files)"),
+    ("house_customized", "housing customization raises no event (PL's files)"),
+    ("tcg_cards_played", "the card DLL plays the game; the server sees only win/loss and time"),
+    ("tcg_cards_played_type", "the card DLL plays the game; the server sees only win/loss and time"),
+    ("tcg_battle_margin", "the card DLL plays the game; the server sees only win/loss and time"),
+    ("tcg_game_turns", "the card DLL plays the game; the server sees only win/loss and time"),
+    ("tcg_cards_destroyed", "the card DLL plays the game; the server sees only win/loss and time"),
+    ("tcg_point_margin", "the card DLL plays the game; the server sees only win/loss and time"),
+    ("spooktacular_three_of_three", "the One/Two/Three of Three fight is not built"),
+    ("spooktacular_great_scare", "The Great Scare quest is not built"),
+    ("spectral_spectacles_equipped", "no Spectral Spectacles item hook"),
+    ("costume_shop_visited", "no Dress Up! costume shop visit event"),
+    ("gifting_tree_gift", "the Snowhill Gifting Tree is not built"),
+    ("snowhill_presents_solved", "the present-thief quest is not built"),
+    ("gifting_tree_saved", "the Snowhill Gifting Tree is not built"),
+    ("snow_days_dailies", "the Snow Days dailies are not all built"),
+    ("snowball_fighting_win", "Snowball Fighting (SB) is being built; it raises this event"),
+    ("eight_bit_meep_summoned", "the 8-Bit Meep pet is not built"),
+    ("love_arrows_hit_stone_heart", "the Stone Heart arrow game is not built"),
+];
+
+#[test]
+fn every_achievement_has_a_trigger_or_a_stated_reason() {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let read = |name: &str| -> Value {
+        serde_json::from_slice(&fs::read(root.join(name)).unwrap()).unwrap()
+    };
+    let table = read("achievements.json");
+    let rows = table["definitions"].as_array().unwrap();
+    let number = |row: &Value| -> u32 {
+        row["key"]
+            .as_str()
+            .unwrap()
+            .split(':')
+            .nth(2)
+            .unwrap()
+            .parse()
+            .unwrap()
+    };
+    // quest id -> enabled
+    let mut quests_by_id = BTreeMap::new();
+    for entry in fs::read_dir(root.join("quests")).unwrap() {
+        let quests: Value =
+            serde_json::from_slice(&fs::read(entry.unwrap().path()).unwrap()).unwrap();
+        for record in quests["records"].as_array().unwrap() {
+            quests_by_id.insert(
+                record["id"].as_u64().unwrap(),
+                record["enabled"].as_bool().unwrap_or(false),
+            );
+        }
+    }
+    let bindings = AchievementBindings::load(&root).unwrap();
+    let enemy_names: Vec<&str> = bindings.enemy_names().collect();
+    let has_fight = |dungeon: &str| {
+        fs::read_to_string(root.join("dungeons").join(format!("{dungeon}.json")))
+            .is_ok_and(|text| text.contains("\"fight_id\""))
+    };
+    let mount_ids: BTreeSet<u64> = read("mounts.json")["mounts"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|m| m["id"].as_u64().unwrap())
+        .collect();
+    // Winning settles that raise the result: the five songs, checkers (21) and the chess rows.
+    let chess = read("chess.json");
+    let mut win_ids: BTreeSet<u64> = BTreeSet::from([21, chess["hosted_row"]["row_id"].as_u64().unwrap()]);
+    win_ids.extend(chess["rows"].as_array().unwrap().iter().map(|r| r["row_id"].as_u64().unwrap()));
+    let region_ids: BTreeSet<u64> = read("regions.json")["regions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|r| r["id"].as_u64().unwrap())
+        .chain([0])
+        .collect();
+    let mut song_ids: BTreeSet<u64> = read("music_game.json")["games"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|g| g["game_id"].as_u64().unwrap())
+        .collect();
+    song_ids.extend(win_ids.iter().copied());
+    let jobs = read("jobs.json");
+    let job_ids: BTreeSet<&str> = jobs["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|j| j["id"].as_str().unwrap())
+        .collect();
+
+    let mut problems = Vec::new();
+    for row in rows {
+        let name = row["name"].as_str().unwrap();
+        let Some(key) = row["counter_key"].as_str() else {
+            problems.push(format!("{name}: no counter_key"));
+            continue;
+        };
+        let (kind, arg) = key.split_once(':').unwrap_or((key, ""));
+        let threshold = row["threshold"].as_u64();
+        match kind {
+            "retired" => {
+                // Pet Trainer was removed 2009-12-14 (A-V check); only its five rank rows.
+                if !name.starts_with("Pet Trainer: Level") || arg.is_empty() || threshold.is_some()
+                {
+                    problems.push(format!("{name}: retired without the Pet Trainer reason"));
+                }
+                continue;
+            }
+            "waiting" => {
+                let mut parts = arg.split(':');
+                let event = parts.next().unwrap();
+                let what = parts.next().unwrap_or("");
+                if !WAITING.iter().any(|(e, why)| *e == event && !why.is_empty()) {
+                    problems.push(format!("{name}: waiting on '{event}' with no stated reason"));
+                }
+                // A stated reason must still be true.
+                match event {
+                    "dungeon_no_fight" if has_fight(what) => {
+                        problems.push(format!("{name}: {what} has a fight now: bind it"));
+                    }
+                    "quest_disabled" => {
+                        if quests_by_id.get(&what.parse().unwrap_or(0)) != Some(&false) {
+                            problems.push(format!("{name}: quest {what} is not a disabled record"));
+                        }
+                    }
+                    "enemy_missing" if enemy_names.iter().any(|n| n.contains(what)) => {
+                        problems.push(format!("{name}: an enemy named {what} exists now: bind it"));
+                    }
+                    _ => {}
+                }
+            }
+            "job_rank" => {
+                if !job_ids.contains(arg) {
+                    problems.push(format!("{name}: unknown job {arg}"));
+                }
+            }
+            "quest_done" => {
+                if quests_by_id.get(&arg.parse::<u64>().unwrap_or(0)) != Some(&true) {
+                    problems.push(format!("{name}: quest {arg} is not an enabled record"));
+                }
+            }
+            "mounts_owned_of" => {
+                for id in arg.split('|') {
+                    if !mount_ids.contains(&id.parse::<u64>().unwrap_or(0)) {
+                        problems.push(format!("{name}: no mount {id}"));
+                    }
+                }
+            }
+            "dungeon_clear" => {
+                if !has_fight(arg) {
+                    problems.push(format!("{name}: dungeon {arg} names no fight, so it can never clear"));
+                }
+            }
+            "minigame_win" => {
+                for id in arg.split('|') {
+                    if !song_ids.contains(&id.parse::<u64>().unwrap_or(0)) {
+                        problems.push(format!("{name}: minigame {id} has no producer of the win"));
+                    }
+                }
+            }
+            "kill" => {
+                let mut parts = arg.splitn(2, ':');
+                let region = parts.next().unwrap().parse::<u64>().unwrap_or(u64::MAX);
+                let pattern = parts.next().unwrap_or("");
+                if !region_ids.contains(&region)
+                    || pattern.is_empty()
+                    || !enemy_names.iter().any(|n| n.contains(pattern))
+                {
+                    problems.push(format!("{name}: kill key {key} matches no enemy"));
+                }
+            }
+            "completed_of" => {
+                for n in arg.split('|') {
+                    let n: u32 = n.parse().unwrap_or(0);
+                    let child = rows.iter().find(|r| number(r) == n);
+                    if child.is_none_or(|c| {
+                        c["counter_key"].as_str().unwrap_or("").starts_with("retired")
+                    }) {
+                        problems.push(format!("{name}: sum row names {n}, missing or retired"));
+                    }
+                }
+            }
+            "quest_completed_count" | "pet_trick" | "consumable_use" | "tcg_win"
+            | "tcg_win_under" | "join_dance_team" | "job_rank_max" | "opening_complete"
+            | "pets_owned" | "mounts_owned" | "recipes_all" => {}
+            other => problems.push(format!("{name}: unknown counter kind {other}")),
+        }
+        if threshold.is_none_or(|t| t == 0) {
+            problems.push(format!("{name}: no threshold"));
+        }
+    }
+    assert!(problems.is_empty(), "{} rows:\n{}", problems.len(), problems.join("\n"));
+}
+
+#[test]
+fn item_rewards_are_queued_as_claims_for_the_items_the_tables_hold() {
+    let bindings =
+        AchievementBindings::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
+            .unwrap();
+    let claims: BTreeMap<&str, Vec<i32>> = bindings
+        .claim_bindings()
+        .iter()
+        .map(|c| {
+            (
+                c.achievement_key.as_str(),
+                c.grant.items.iter().map(|i| i.definition_id).collect(),
+            )
+        })
+        .collect();
+    let by_number = |n: &str| {
+        claims
+            .iter()
+            .find(|(k, _)| k.contains(&format!(":{n}:")))
+            .map(|(_, v)| v.clone())
+    };
+    assert_eq!(by_number("309"), Some(vec![911083])); // Mini Holiday Tree
+    assert_eq!(by_number("311"), Some(vec![911084])); // Green Santa Hat
+    assert_eq!(by_number("313"), Some(vec![76623])); // Lump of Coal
+    assert_eq!(by_number("318"), Some(vec![911045])); // Stone Heart's Pink Bear
+    assert_eq!(by_number("269"), Some(vec![911257])); // Commander Kluggenkrush
+    // Every bound item is a row of the client item tables.
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    let mut ids = BTreeSet::new();
+    for file in ["item-table.json", "item-table-supplement.json"] {
+        let table: Value = serde_json::from_slice(&fs::read(root.join(file)).unwrap()).unwrap();
+        ids.extend(table["rows"].as_array().unwrap().iter().map(|r| r[0].as_i64().unwrap()));
+    }
+    for (key, items) in &claims {
+        for item in items {
+            assert!(ids.contains(&i64::from(*item)), "{key}: item {item} is in no item table");
+        }
+    }
+}
+
+/// A bounded reader written from the client's: `badc70` reads a count then `0093ca50` records;
+/// each record holds the reward bundle `008e7930` (69 bytes when empty) and an objective list
+/// (`0092b050` -> `008fd770`). It fails on any short read, like the client's error byte.
+struct ClientReader<'a> {
+    bytes: &'a [u8],
+    at: usize,
+}
+
+impl ClientReader<'_> {
+    fn take(&mut self, n: usize) -> &[u8] {
+        let end = self.at + n;
+        assert!(end <= self.bytes.len(), "short read at {}", self.at);
+        let out = &self.bytes[self.at..end];
+        self.at = end;
+        out
+    }
+    fn u32(&mut self) -> u32 {
+        u32::from_le_bytes(self.take(4).try_into().unwrap())
+    }
+    fn bundle(&mut self) {
+        let bundle = self.take(69);
+        assert!(bundle.iter().all(|b| *b == 0), "an empty bundle is 69 zero bytes (T202)");
+    }
+}
+
+#[test]
+fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
+    let bindings =
+        AchievementBindings::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
+            .unwrap();
+    let mut state = progression_extras::AchievementState::default();
+    let done = &bindings.client_rows()[3];
+    state.completed.insert(done.key.clone());
+    let packet = bindings.initialize_packet(&state);
+    assert_eq!(&packet[..6], &[150, 0, 4, 0, 0, 0], "family 150, subtype 4");
+    let mut reader = ClientReader { bytes: &packet, at: 6 };
+    let count = reader.u32() as usize;
+    assert_eq!(count, bindings.client_rows().len());
+    assert!(count > 100 && count < 313, "only rows with a name id are sent: {count}");
+    for row in bindings.client_rows() {
+        assert_eq!(reader.u32(), row.client_id, "the record key leads, as the list reader keys it");
+        assert_ne!(row.name_id, 0, "no nameless record in the window");
+        assert_eq!(reader.u32(), row.name_id);
+        assert_eq!(reader.u32(), row.description_id);
+        reader.take(1 + 16 + 4); // bool, two i64, i32
+        reader.bundle();
+        assert_eq!(reader.u32(), 1, "one objective");
+        reader.take(4 * 4 + 1); // key, definition id, name, description, bool
+        reader.bundle();
+        let state_value = reader.u32();
+        let current = reader.u32();
+        let required = reader.u32();
+        reader.take(4 + 1 + 4); // extra, bool, i32
+        reader.take(8); // IconData id and tint
+        reader.take(8); // two trailing i32
+        let completed = reader.take(1)[0];
+        reader.take(4);
+        assert_eq!(required, row.threshold);
+        let this_done = row.key == done.key;
+        assert_eq!((completed == 1, state_value == 2), (this_done, this_done));
+        assert_eq!(current == required, this_done, "only the completed row shows full progress");
+    }
+    assert_eq!(reader.at, packet.len(), "the reader consumes exactly the packet");
+}
+
+#[test]
+fn a_nameless_row_is_counted_but_sends_nothing() {
+    let bindings =
+        AchievementBindings::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
+            .unwrap();
+    let sent: BTreeSet<&str> = bindings.client_rows().iter().map(|r| r.key.as_str()).collect();
+    let rule = bindings
+        .rules()
+        .iter()
+        .find(|r| !sent.contains(r.key.as_str()))
+        .expect("some rows have no name id");
+    let mut progression = AchievementProgression::new(
+        vec![rule.clone()],
+        progression_extras::AchievementState::default(),
+    )
+    .unwrap();
+    let fixture = InventoryFixture::new();
+    let rewards = fixture.state();
+    let out = progression.observe(&rule.counter_key, rule.threshold, &rewards).unwrap();
+    assert_eq!(out.newly_completed, vec![rule.key.clone()], "still completes server-side");
+    assert!(out.packets.is_empty(), "but no 150/7 or 150/3 reaches the client");
 }

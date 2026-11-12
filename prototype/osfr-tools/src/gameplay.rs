@@ -391,7 +391,9 @@ pub struct Gameplay {
     /// W178 titles and claim history, staged with the rest of this character.
     progression_extras: crate::progression_extras::ProgressionExtras,
     /// Data-driven achievement counters and exact title-name bindings.
-    achievement_bindings: crate::progression_extras::AchievementBindings,
+    achievement_bindings: Arc<crate::progression_extras::AchievementBindings>,
+    /// The last overworld region the player stood in (`gameplay/progression.rs`); never saved.
+    achievement_session: Box<progression::AchievementSession>,
     /// T450 exploration coins and their catalogue; `None` unless both files exist.
     collections: Option<Arc<collection_pickup::CollectionWorld>>,
     /// Player housing (`gameplay/housing.rs`); `None` when the content has no `houses.json`.
@@ -691,7 +693,8 @@ impl Gameplay {
         let progression_extras = crate::progression_extras::ProgressionExtras::load(
             state.as_ref().and_then(|s| s.progression_extras.clone()),
         )?;
-        let achievement_bindings = crate::progression_extras::AchievementBindings::load(directory)?;
+        let achievement_bindings =
+            Arc::new(crate::progression_extras::AchievementBindings::load(directory)?);
         let (
             inventory,
             quests,
@@ -1305,6 +1308,7 @@ impl Gameplay {
                 .with_earn_rules_in(directory),
             progression_extras,
             achievement_bindings,
+            achievement_session: Box::default(),
             collections,
             housing,
             dormant: Arc::new(dormant),
@@ -1850,7 +1854,8 @@ impl Gameplay {
             self.append_item_bar(character.guid, now_ms, &mut out)?;
             self.enter_world(character, now_ms, &mut out);
             self.sync_client_objectives(&mut out);
-            self.sync_achievement_progress(&mut out, None)?;
+            self.append_achievement_definitions(&mut out);
+            self.sync_achievement_at_login(&mut out)?;
             return Ok(out);
         };
         let mut out = Outcome::default();
@@ -1931,7 +1936,8 @@ impl Gameplay {
         out.replies.push(self.recipe_replace_all_packet()?);
         self.enter_world(character, now_ms, &mut out);
         self.sync_client_objectives(&mut out);
-        self.sync_achievement_progress(&mut out, None)?;
+        self.append_achievement_definitions(&mut out);
+        self.sync_achievement_at_login(&mut out)?;
         Ok(out)
     }
 
@@ -2000,6 +2006,7 @@ impl Gameplay {
 
     pub fn tick(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         let counters_before = self.achievement_counters();
+        self.note_achievement_region(character);
         let fishing = self.supervise_fishing(character, now_ms)?;
         let fishing = self.supervise_pirates(fishing, now_ms)?;
         let mut out = self.tick_world(character, now_ms)?;
@@ -2154,6 +2161,7 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         let counters_before = self.achievement_counters();
+        self.note_achievement_region(character);
         self.offer_extras.boosts.inbound(inner);
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
         self.sync_activity_list(&mut out);

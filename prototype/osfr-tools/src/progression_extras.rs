@@ -26,7 +26,7 @@ pub use collection_ledger::{
 };
 
 // Local safety bounds, not recovered historical limits (R).
-const MAX_COUNTER: u32 = 1_000_000;
+const MAX_COUNTER: u32 = 10_000_000;
 const MAX_PACKET_BYTES: usize = 1024 * 1024;
 const MAX_CLAIM_ITEMS: usize = 256;
 const MAX_CLAIM_HISTORY: usize = 4096;
@@ -226,6 +226,25 @@ pub struct AchievementBindings {
     title_bindings: Vec<AchievementTitleBinding>,
     claim_bindings: Vec<AchievementClaimBinding>,
     job_slugs: BTreeMap<i32, String>,
+    /// Fight id (the id a win reports) -> dungeon record id, from `dungeons/*.json` goals.
+    dungeon_by_fight: BTreeMap<u32, String>,
+    /// Enemy definition id -> lower-case enemy name, from `enemies.json` and the fight files.
+    kind_names: BTreeMap<u32, String>,
+    /// What the client's achievement window needs to know about each live row (150/4).
+    client_rows: Vec<AchievementClientRow>,
+}
+
+/// One row of the achievement window: the fields the client record `0093ca50` carries.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AchievementClientRow {
+    pub key: String,
+    pub client_id: u32,
+    pub name_id: u32,
+    pub description_id: u32,
+    pub icon_id: u32,
+    pub trophy_id: u32,
+    pub trophy_points: u32,
+    pub threshold: u32,
 }
 
 impl AchievementBindings {
@@ -271,6 +290,7 @@ impl AchievementBindings {
         let mut rules = Vec::new();
         let mut title_bindings = Vec::new();
         let mut claim_bindings = Vec::new();
+        let mut client_rows = Vec::new();
         for definition in achievements.definitions {
             let (Some(client_id), Some(counter_key), Some(threshold)) = (
                 definition.client_id,
@@ -280,6 +300,22 @@ impl AchievementBindings {
                 continue;
             };
             let reward = definition.reward.unwrap_or_default();
+            // (R) A row with no name text id is left out of the window (150/4) and never sent a
+            // 150/7 or 150/3: the client would show it blank. It is still counted and saved
+            // server-side, and appears once a name id exists.
+            let named = definition.name_id.filter(|id| *id != 0);
+            if let Some(name_id) = named {
+                client_rows.push(AchievementClientRow {
+                key: definition.key.clone(),
+                client_id,
+                name_id,
+                description_id: definition.description_id.unwrap_or(0),
+                icon_id: definition.image_id.or(definition.image_set_id).unwrap_or(0),
+                trophy_id: reward.client_trophy_id.unwrap_or(0),
+                trophy_points: reward.trophy_points,
+                threshold,
+                });
+            }
             let item_ids: BTreeSet<_> = reward
                 .item_ids
                 .clone()
@@ -288,7 +324,7 @@ impl AchievementBindings {
                 .collect();
             rules.push(AchievementRule {
                 key: definition.key.clone(),
-                client_id: Some(client_id),
+                client_id: named.map(|_| client_id),
                 counter_key,
                 objective_id: 1,
                 threshold,
@@ -349,7 +385,64 @@ impl AchievementBindings {
             title_bindings,
             claim_bindings,
             job_slugs,
+            dungeon_by_fight: load_dungeon_fights(source)?,
+            kind_names: load_kind_names(source)?,
+            client_rows,
         })
+    }
+
+    /// 150/4 AchievementInitialize: every live row, so the client's window knows it before a
+    /// 150/7 progress or 150/3 completion arrives (the client ignores those for an unknown id,
+    /// `00badec0` cases 3 and 7). Layout from the client reader `bade40` -> `badc70` (a count,
+    /// then one `0093ca50` record each); the fields marked (R) are placed by name, not proven.
+    pub fn initialize_packet(&self, state: &AchievementState) -> Vec<u8> {
+        let mut packet = packet_u16_u32(150, 4);
+        put_u32(&mut packet, self.client_rows.len() as u32);
+        for row in &self.client_rows {
+            let done = state.completed.contains(&row.key);
+            let current = if done {
+                row.threshold
+            } else {
+                state.counters.get(&row.key).copied().unwrap_or(0).min(row.threshold)
+            };
+            put_u32(&mut packet, row.client_id);
+            put_u32(&mut packet, row.name_id); // (R)
+            put_u32(&mut packet, row.description_id); // (R)
+            packet.push(0);
+            packet.extend([0u8; 16]); // two i64
+            put_u32(&mut packet, 0);
+            packet.extend([0u8; 69]); // empty reward bundle `008e7930`
+            put_u32(&mut packet, 1); // one objective, the counter
+            put_u32(&mut packet, 1); // key
+            put_u32(&mut packet, 1); // definition id (the rules' objective id)
+            put_u32(&mut packet, row.name_id);
+            put_u32(&mut packet, row.description_id);
+            packet.push(0);
+            packet.extend([0u8; 69]);
+            put_u32(&mut packet, if done { 2 } else { 1 });
+            put_u32(&mut packet, current);
+            put_u32(&mut packet, row.threshold);
+            put_u32(&mut packet, 0);
+            packet.push(0);
+            put_u32(&mut packet, 0);
+            put_u32(&mut packet, row.icon_id); // (R) IconData id
+            put_u32(&mut packet, 0); // IconData tint
+            put_u32(&mut packet, row.trophy_points); // (R) record +340
+            put_u32(&mut packet, row.trophy_id); // (R) record +344
+            packet.push(u8::from(done)); // record +352
+            put_u32(&mut packet, 0); // record +348 (R)
+        }
+        packet
+    }
+
+    /// The dungeon whose goals name this fight, for a `dungeon_clear:<dungeon>` counter.
+    pub fn dungeon_for_fight(&self, fight: u32) -> Option<&str> {
+        self.dungeon_by_fight.get(&fight).map(String::as_str)
+    }
+
+    /// Lower-case enemy name for a kill's definition id.
+    pub fn kind_name(&self, kind: u32) -> Option<&str> {
+        self.kind_names.get(&kind).map(String::as_str)
     }
 
     pub fn rules(&self) -> &[AchievementRule] {
@@ -366,6 +459,97 @@ impl AchievementBindings {
 
     pub fn job_slug(&self, profile_id: i32) -> Option<&str> {
         self.job_slugs.get(&profile_id).map(String::as_str)
+    }
+}
+
+fn collect_fight_ids(value: &serde_json::Value, out: &mut BTreeSet<u32>) {
+    match value {
+        serde_json::Value::Object(map) => {
+            for (key, inner) in map {
+                match (key.as_str(), inner.as_u64().and_then(|id| u32::try_from(id).ok())) {
+                    ("fight_id", Some(id)) => {
+                        out.insert(id);
+                    }
+                    _ => collect_fight_ids(inner, out),
+                }
+            }
+        }
+        serde_json::Value::Array(items) => items.iter().for_each(|item| collect_fight_ids(item, out)),
+        _ => {}
+    }
+}
+
+/// Dungeon record id by fight id. Missing content yields an empty map; a dungeon whose goals
+/// name no fight yet simply cannot be cleared until its record gains one.
+fn load_dungeon_fights(source: &Path) -> io::Result<BTreeMap<u32, String>> {
+    let mut map = BTreeMap::new();
+    let Ok(entries) = fs::read_dir(source.join("dungeons")) else {
+        return Ok(map);
+    };
+    let mut paths: Vec<_> = entries.filter_map(|entry| entry.ok().map(|e| e.path())).collect();
+    paths.sort();
+    for path in paths.into_iter().filter(|p| p.extension().is_some_and(|e| e == "json")) {
+        let value: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path)?).map_err(|_| invalid("invalid dungeon content"))?;
+        for record in value["records"].as_array().into_iter().flatten() {
+            let Some(id) = record["record"]["id"].as_str() else {
+                continue;
+            };
+            let mut fights = BTreeSet::new();
+            collect_fight_ids(&record["record"], &mut fights);
+            for fight in fights {
+                map.entry(fight).or_insert_with(|| id.to_owned());
+            }
+        }
+    }
+    Ok(map)
+}
+
+fn load_kind_names(source: &Path) -> io::Result<BTreeMap<u32, String>> {
+    let mut names = BTreeMap::new();
+    let path = source.join("enemies.json");
+    if path.is_file() {
+        let value: serde_json::Value = serde_json::from_slice(&fs::read(path)?)
+            .map_err(|_| invalid("invalid enemy content"))?;
+        for row in value["definitions"].as_array().into_iter().flatten() {
+            if let (Some(id), Some(name)) = (
+                row["definition_id"].as_u64().and_then(|id| u32::try_from(id).ok()),
+                row["kind"].as_str(),
+            ) {
+                names.insert(id, name.to_lowercase());
+            }
+        }
+    }
+    // Enemies that exist only in a fight file's `kinds` (the camp and dungeon fights).
+    if let Ok(entries) = fs::read_dir(source.join("fights")) {
+        let mut paths: Vec<_> = entries.filter_map(|e| e.ok().map(|e| e.path())).collect();
+        paths.sort();
+        for path in paths.into_iter().filter(|p| p.extension().is_some_and(|e| e == "json")) {
+            let value: serde_json::Value = serde_json::from_slice(&fs::read(&path)?)
+                .map_err(|_| invalid("invalid fight content"))?;
+            for kind in value["kinds"].as_object().into_iter().flat_map(|m| m.values()) {
+                if let (Some(id), Some(name)) = (
+                    kind["definition_id"].as_u64().and_then(|id| u32::try_from(id).ok()),
+                    kind["name"].as_str(),
+                ) {
+                    if id != 0 {
+                        names.entry(id).or_insert_with(|| name.to_lowercase());
+                    }
+                }
+            }
+        }
+    }
+    Ok(names)
+}
+
+impl AchievementBindings {
+    /// Every enemy name the kill rules can match (the whole-table test checks each pattern).
+    pub fn enemy_names(&self) -> impl Iterator<Item = &str> {
+        self.kind_names.values().map(String::as_str)
+    }
+
+    pub fn client_rows(&self) -> &[AchievementClientRow] {
+        &self.client_rows
     }
 }
 
@@ -1531,6 +1715,10 @@ impl ProgressionExtras {
 
     pub fn achievement_state(&self) -> AchievementState {
         self.achievements.clone()
+    }
+
+    pub fn achievement_state_ref(&self) -> &AchievementState {
+        &self.achievements
     }
 
     pub fn set_achievement_state(&mut self, state: AchievementState) {

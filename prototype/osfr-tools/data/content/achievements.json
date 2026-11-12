@@ -28,8 +28,8 @@
     "original_server_ids_unrecovered": true,
     "definition_name_ids_assigned": 187,
     "definition_description_ids_assigned": 226,
-    "counter_bindings_assigned_r": 90,
-    "counter_bindings_unresolved": 228,
+    "counter_bindings_assigned_r": 313,
+    "counter_bindings_unresolved": 0,
     "trophy_crosswalk_rows": 318
   },
   "client_categories": [
@@ -842,8 +842,8 @@
       "client_category_id": null,
       "name": "Hometown Smithy",
       "description": "Collect all of the Sacred Grove Blacksmithing recipes.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "recipes_all:blacksmith:lt100",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Sacred Smithy",
@@ -868,8 +868,8 @@
       "client_category_id": null,
       "name": "Sunny Smithy",
       "description": "Collect all of the Sunstone Valley Blacksmithing Recipes.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:recipes_unlearnable:blacksmith_ge100",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Platinum Trophy - 25 Points; Title: Sunny Smithy",
@@ -1992,8 +1992,8 @@
       "client_category_id": null,
       "name": "Pet Trainer: Level 4",
       "description": "Reach Level 4 as a Pet Trainer.",
-      "threshold": 3,
-      "counter_key": "job_rank:pet_trainer",
+      "threshold": null,
+      "counter_key": "retired:job_removed_2009-12-14",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2016,8 +2016,8 @@
       "client_category_id": null,
       "name": "Pet Trainer: Level 8",
       "description": "Reach Level 8 as a Pet Trainer.",
-      "threshold": 7,
-      "counter_key": "job_rank:pet_trainer",
+      "threshold": null,
+      "counter_key": "retired:job_removed_2009-12-14",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2040,8 +2040,8 @@
       "client_category_id": null,
       "name": "Pet Trainer: Level 12",
       "description": "Reach Level 8 as a Pet Trainer.",
-      "threshold": 11,
-      "counter_key": "job_rank:pet_trainer",
+      "threshold": null,
+      "counter_key": "retired:job_removed_2009-12-14",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2064,8 +2064,8 @@
       "client_category_id": null,
       "name": "Pet Trainer: Level 16",
       "description": "Reach Level 16 as a Pet Trainer.",
-      "threshold": 15,
-      "counter_key": "job_rank:pet_trainer",
+      "threshold": null,
+      "counter_key": "retired:job_removed_2009-12-14",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -2088,8 +2088,8 @@
       "client_category_id": null,
       "name": "Pet Trainer: Level 20",
       "description": "Reach Level 20 as a Pet Trainer.",
-      "threshold": 19,
-      "counter_key": "job_rank:pet_trainer",
+      "threshold": null,
+      "counter_key": "retired:job_removed_2009-12-14",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: The Pet Whisperer",
@@ -2602,8 +2602,8 @@
       "client_category_id": null,
       "name": "Natural Born Leader",
       "description": "Eligible to create a guild.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 15,
+      "counter_key": "job_rank_max",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points; Guild Name Change",
@@ -2626,8 +2626,8 @@
       "client_category_id": null,
       "name": "Master of Levels",
       "description": "Reach Level 20 On all Jobs.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 16,
+      "counter_key": "completed_of:005|010|015|022|027|032|037|042|047|052|057|062|072|077|082|087",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Diamond Trophy - 40 Points; Hat of Hats",
@@ -2650,8 +2650,8 @@
       "client_category_id": null,
       "name": "Blast Off!",
       "description": "Launch a Rocket Ship inside a house.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:rocket_launched",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2674,8 +2674,8 @@
       "client_category_id": null,
       "name": "Builder",
       "description": "Place 100 items in your house.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 100,
+      "counter_key": "waiting:house_items_max",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2698,8 +2698,8 @@
       "client_category_id": null,
       "name": "Decorator",
       "description": "Place 1,000 items in a single house or lot.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1000,
+      "counter_key": "waiting:house_items_max",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -2722,8 +2722,8 @@
       "client_category_id": null,
       "name": "Home Maker",
       "description": "Place 5,000 items in a single house or lot.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5000,
+      "counter_key": "waiting:house_items_max",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points",
@@ -2746,8 +2746,8 @@
       "client_category_id": null,
       "name": "Architect",
       "description": "Place 9,999 items in a single house or lot.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 9999,
+      "counter_key": "waiting:house_items_max",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Platinum Trophy - 25 Points; Title: Homemaker",
@@ -2772,8 +2772,8 @@
       "client_category_id": null,
       "name": "House Warmer",
       "description": "Visit another player's house.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:house_visited",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2796,8 +2796,8 @@
       "client_category_id": null,
       "name": "Designer",
       "description": "Use a housing customization on your house.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:house_customized",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2820,8 +2820,8 @@
       "client_category_id": null,
       "name": "Music Student",
       "description": "Complete the Feeling the Beat - Very Easy Minigame.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:201",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2844,8 +2844,8 @@
       "client_category_id": null,
       "name": "Frontman",
       "description": "Complete the Feeling the Beat - Easy Minigame.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:202",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2868,8 +2868,8 @@
       "client_category_id": null,
       "name": "Music Teacher",
       "description": "Complete the Feeling the Beat - Medium Minigame.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:203",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2892,8 +2892,8 @@
       "client_category_id": null,
       "name": "Composer",
       "description": "Complete the Feeling the Beat - Hard Minigame.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:204",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2916,8 +2916,8 @@
       "client_category_id": null,
       "name": "Conductor",
       "description": "Complete the Feeling the Beat - Very Hard Minigame.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:205",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2940,8 +2940,8 @@
       "client_category_id": null,
       "name": "Maestro",
       "description": "Complete all 5 Feeling the Beat Minigames.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "completed_of:097|098|099|100|101",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Title: Maestro",
@@ -2966,8 +2966,8 @@
       "client_category_id": null,
       "name": "Don't be Tippin'",
       "description": "Tip 10 Cows.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:cow_tipped",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -2990,8 +2990,8 @@
       "client_category_id": null,
       "name": "Checkers Boss",
       "description": "Win a game of Checkers.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:21",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3014,8 +3014,8 @@
       "client_category_id": null,
       "name": "Chess Master",
       "description": "Win a game of Chess.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "minigame_win:20|65|66|67",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3038,8 +3038,8 @@
       "client_category_id": null,
       "name": "Bixie Hive",
       "description": "Complete the Bixie Hive combat encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:bixie_hive",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3062,8 +3062,8 @@
       "client_category_id": null,
       "name": "Cracked Claw Caverns",
       "description": "Complete the Cracked Claw Caverns encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:cracked_claw_caverns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3086,8 +3086,8 @@
       "client_category_id": null,
       "name": "Hot Springs Haven",
       "description": "Complete the Hot Springs Haven encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:hot_springs_haven",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3110,8 +3110,8 @@
       "client_category_id": null,
       "name": "Sheep Watch",
       "description": "Complete the Sheep Watch encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:sheep_watch",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3134,8 +3134,8 @@
       "client_category_id": null,
       "name": "Tavern Cellar",
       "description": "Complete the Tavern Cellar encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:tavern_cellar",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3158,8 +3158,8 @@
       "client_category_id": null,
       "name": "Arachnia's Lair",
       "description": "Complete the Arachnia's Lair encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:arachnia_s_lair",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3182,8 +3182,8 @@
       "client_category_id": null,
       "name": "Danger Peaks",
       "description": "Complete the Danger Peaks encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:danger_peaks",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3206,8 +3206,8 @@
       "client_category_id": null,
       "name": "Den of Secrets",
       "description": "Complete the Den of Secrets encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:den_of_secrets",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3230,8 +3230,8 @@
       "client_category_id": null,
       "name": "Highroad Hijinx",
       "description": "Complete the Highroad Hijinx encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:highroad_hijinx",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3254,8 +3254,8 @@
       "client_category_id": null,
       "name": "Robgoblin Treasure Trove",
       "description": "Complete the Robgoblin Treasure Trove encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:robgoblin_treasure_trove",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3278,8 +3278,8 @@
       "client_category_id": null,
       "name": "Sweetwater Climb",
       "description": "Complete the Sweetwater Climb encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:sweetwater_climb",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3302,8 +3302,8 @@
       "client_category_id": null,
       "name": "The Bat Cave!",
       "description": "Complete the The Bat Cave! encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:the_bat_cave",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3326,8 +3326,8 @@
       "client_category_id": null,
       "name": "Bone Bog Cemetery",
       "description": "Complete the Bone Bog Cemetery encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:bone_bog_cemetery",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3350,8 +3350,8 @@
       "client_category_id": null,
       "name": "Bristlewood Glade",
       "description": "Complete the Bristlewood Glade encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:bristlewood_glade",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3374,8 +3374,8 @@
       "client_category_id": null,
       "name": "Deep Mines",
       "description": "Complete the Deep Mines encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:deep_mines",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3398,8 +3398,8 @@
       "client_category_id": null,
       "name": "Floren Forest",
       "description": "Complete the Floren Forest encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:floren_forest",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3422,8 +3422,8 @@
       "client_category_id": null,
       "name": "Forgotten Caves",
       "description": "Complete the Forgotten Caves encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:forgotten_caves",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3446,8 +3446,8 @@
       "client_category_id": null,
       "name": "Howling Hills",
       "description": "Complete the Howling Hills encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:howling_hills",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3470,8 +3470,8 @@
       "client_category_id": null,
       "name": "Misty Mountain",
       "description": "Complete the Misty Mountain encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:misty_mountain",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3494,8 +3494,8 @@
       "client_category_id": null,
       "name": "Mushroom Cavern",
       "description": "Complete the Mushroom Cavern encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:mushroom_cavern",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3518,8 +3518,8 @@
       "client_category_id": null,
       "name": "The Snarling Hedges",
       "description": "Complete the The Snarling Hedges encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:the_snarling_hedges",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3542,8 +3542,8 @@
       "client_category_id": null,
       "name": "Bandit Hideout!",
       "description": "Complete the Bandit Hideout! encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:bandit_hideout",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3566,8 +3566,8 @@
       "client_category_id": null,
       "name": "Briar Patch",
       "description": "Complete the Briar Patch encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:briar_patch",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3590,8 +3590,8 @@
       "client_category_id": null,
       "name": "Croaking Vale",
       "description": "Complete the Croaking Vale encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:croaking_vale",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3614,8 +3614,8 @@
       "client_category_id": null,
       "name": "Darvon's Descent",
       "description": "Complete the Darvon's Descent encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:darvon_s_descent",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3638,8 +3638,8 @@
       "client_category_id": null,
       "name": "Frostfang Caverns",
       "description": "Complete the Frostfang Caverns encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:frostfang_caverns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3662,8 +3662,8 @@
       "client_category_id": null,
       "name": "Grexan's Camp",
       "description": "Complete the Grexan's Camp encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:grexan_s_camp",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3686,8 +3686,8 @@
       "client_category_id": null,
       "name": "Mugwort's Hollow",
       "description": "Complete the Mugwort's Hollow encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:mugwort_s_hollow",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3710,8 +3710,8 @@
       "client_category_id": null,
       "name": "Treeleaf's Retreat",
       "description": "Complete the Treeleaf's Retreat encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:treeleaf_s_retreat",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3734,8 +3734,8 @@
       "client_category_id": null,
       "name": "Vale of the Ancients",
       "description": "Complete the Vale of the Ancients encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:vale_of_the_ancients",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3758,8 +3758,8 @@
       "client_category_id": null,
       "name": "Briarheart Caverns",
       "description": "Complete the Briarheart Caverns encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:briarheart_caverns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3782,8 +3782,8 @@
       "client_category_id": null,
       "name": "Cray Caves",
       "description": "Complete the Cray Caves encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:cray_caves",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3806,8 +3806,8 @@
       "client_category_id": null,
       "name": "Dark Spore Depths",
       "description": "Complete the Dark spore Depths encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:dark_spore_depths",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3830,8 +3830,8 @@
       "client_category_id": null,
       "name": "Forest Troll Fort",
       "description": "Complete the Forest Troll Fort encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:forest_troll_fort",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3854,8 +3854,8 @@
       "client_category_id": null,
       "name": "Haunted Mines",
       "description": "Complete the Haunted Mines encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:dungeon_no_fight:haunted_mines",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3878,8 +3878,8 @@
       "client_category_id": null,
       "name": "Snowy Canyon",
       "description": "Complete the Snowy Canyon encounter.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "dungeon_clear:snowy_canyon",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -3902,8 +3902,8 @@
       "client_category_id": null,
       "name": "Group: Bixie Hive",
       "description": "Complete the Bixie Hive encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:bixie_hive",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -3926,8 +3926,8 @@
       "client_category_id": null,
       "name": "Group: Cracked Claw Carverns",
       "description": "Complete the Cracked Claw Caverns encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:cracked_claw_caverns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -3950,8 +3950,8 @@
       "client_category_id": null,
       "name": "Group: Hot Springs Haven",
       "description": "Complete the Hot Springs Haven encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:hot_springs_haven",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -3974,8 +3974,8 @@
       "client_category_id": null,
       "name": "Group: Sheep Watch",
       "description": "Complete the Sheep Watch encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:sheep_watch",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -3998,8 +3998,8 @@
       "client_category_id": null,
       "name": "Group: Tavern Cellar",
       "description": "Complete the Tavern Cellar encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:tavern_cellar",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4022,8 +4022,8 @@
       "client_category_id": null,
       "name": "Group: Arachnia's Lair",
       "description": "Complete the Arachnia's Lair encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:arachnia_s_lair",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4046,8 +4046,8 @@
       "client_category_id": null,
       "name": "Group: Danger Peaks",
       "description": "Complete the Danger Peaks encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:danger_peaks",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4070,8 +4070,8 @@
       "client_category_id": null,
       "name": "Group: Den of Secrets",
       "description": "Complete the Den of Secrets encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:den_of_secrets",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4094,8 +4094,8 @@
       "client_category_id": null,
       "name": "Group: Highroad Hijinx",
       "description": "Complete the Highroad Hijinx encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:highroad_hijinx",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4118,8 +4118,8 @@
       "client_category_id": null,
       "name": "Group: Robgoblin Treasure Trove",
       "description": "Complete the Robgoblin Treasure Trove encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:robgoblin_treasure_trove",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4142,8 +4142,8 @@
       "client_category_id": null,
       "name": "Group: Sweetwater Climb",
       "description": "Complete the Sweetwater Climb encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:sweetwater_climb",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4166,8 +4166,8 @@
       "client_category_id": null,
       "name": "Group: The Bat Cave!",
       "description": "Complete the The Bat Cave! encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:the_bat_cave",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4190,8 +4190,8 @@
       "client_category_id": null,
       "name": "Group: Bone Bog Cemetery",
       "description": "Complete the Bone Bog Cemetery encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:bone_bog_cemetery",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4214,8 +4214,8 @@
       "client_category_id": null,
       "name": "Group: Bristlewood Glade",
       "description": "Complete the Bristlewood Glade encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:bristlewood_glade",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4238,8 +4238,8 @@
       "client_category_id": null,
       "name": "Group: Deep Mines",
       "description": "Complete the Deep Mines encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:deep_mines",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4262,8 +4262,8 @@
       "client_category_id": null,
       "name": "Group: Floren Forest",
       "description": "Complete the Floren Forest encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:floren_forest",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4286,8 +4286,8 @@
       "client_category_id": null,
       "name": "Group: Forgotten Caves",
       "description": "Complete the Forgotten Caves encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:forgotten_caves",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4310,8 +4310,8 @@
       "client_category_id": null,
       "name": "Group: Howling Hills",
       "description": "Complete the Howling Hills encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:howling_hills",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4334,8 +4334,8 @@
       "client_category_id": null,
       "name": "Group: Misty Mountain",
       "description": "Complete the Misty Mountain encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:misty_mountain",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4358,8 +4358,8 @@
       "client_category_id": null,
       "name": "Group: Mushroom Cavern",
       "description": "Complete the Mushroom Cavern encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:mushroom_cavern",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4382,8 +4382,8 @@
       "client_category_id": null,
       "name": "Group: The Snarling Hedges",
       "description": "Complete the The Snarling Hedges encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:the_snarling_hedges",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4406,8 +4406,8 @@
       "client_category_id": null,
       "name": "Group: Bandit Hideout!",
       "description": "Complete the Bandit Hideout! encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:bandit_hideout",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4430,8 +4430,8 @@
       "client_category_id": null,
       "name": "Group: Briar Patch",
       "description": "Complete the Briar Patch encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:briar_patch",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4454,8 +4454,8 @@
       "client_category_id": null,
       "name": "Group: Croaking Vale",
       "description": "Complete the Croaking Vale encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:croaking_vale",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4478,8 +4478,8 @@
       "client_category_id": null,
       "name": "Group: Darvon's Descent",
       "description": "Complete the Darvon's Descent encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:darvon_s_descent",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4502,8 +4502,8 @@
       "client_category_id": null,
       "name": "Group: Frostfang Caverns",
       "description": "Complete the Frostfang Caverns encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:frostfang_caverns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4526,8 +4526,8 @@
       "client_category_id": null,
       "name": "Group: Grexan's Camp",
       "description": "Complete the Grexan's Camp encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:grexan_s_camp",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4550,8 +4550,8 @@
       "client_category_id": null,
       "name": "Group: Mugwort's Hollow",
       "description": "Complete the Mugwort's Hollow encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:mugwort_s_hollow",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4574,8 +4574,8 @@
       "client_category_id": null,
       "name": "Group: Treeleaf's Retreat",
       "description": "Complete the Treeleaf's Retreat encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:treeleaf_s_retreat",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4598,8 +4598,8 @@
       "client_category_id": null,
       "name": "Group: Vale of the Ancients",
       "description": "Complete the Vale of the Ancients encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:vale_of_the_ancients",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4622,8 +4622,8 @@
       "client_category_id": null,
       "name": "Group: Briarheart Caverns",
       "description": "Complete the Briarheart Caverns encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:briarheart_caverns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4646,8 +4646,8 @@
       "client_category_id": null,
       "name": "Group: Cray Caves",
       "description": "Complete the Cray Caves encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:cray_caves",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4670,8 +4670,8 @@
       "client_category_id": null,
       "name": "Group: Dark Spore Depths",
       "description": "Complete the Dark spore Depths encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:dark_spore_depths",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4694,8 +4694,8 @@
       "client_category_id": null,
       "name": "Group: Forest Troll Fort",
       "description": "Complete the Forest Troll Fort encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:forest_troll_fort",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4718,8 +4718,8 @@
       "client_category_id": null,
       "name": "Group: Haunted Mines",
       "description": "Complete the Haunted Mines encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:haunted_mines",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4742,8 +4742,8 @@
       "client_category_id": null,
       "name": "Group: Snowy Canyon",
       "description": "Complete the Snowy Canyon encounter with a full group.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:group_clear:snowy_canyon",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4766,8 +4766,8 @@
       "client_category_id": null,
       "name": "Duelist",
       "description": "Win a Duel!",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:pvp_duel_won",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4790,8 +4790,8 @@
       "client_category_id": null,
       "name": "Arrested Development I",
       "description": "Defeat 5 Thugawugs in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:1:thugawug",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4814,8 +4814,8 @@
       "client_category_id": null,
       "name": "Arrested Development II",
       "description": "Defeat 50 Thugawugs in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:1:thugawug",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4838,8 +4838,8 @@
       "client_category_id": null,
       "name": "Arrested Development III",
       "description": "Defeat 500 Thugawugs in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:1:thugawug",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4862,8 +4862,8 @@
       "client_category_id": null,
       "name": "Bad Doggie I",
       "description": "Defeat 5 Ice Wolves in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:8:wolf",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4886,8 +4886,8 @@
       "client_category_id": null,
       "name": "Bad Doggie II",
       "description": "Defeat 50 Ice Wolves in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:8:wolf",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4910,8 +4910,8 @@
       "client_category_id": null,
       "name": "Bad Doggie III",
       "description": "Defeat 500 Ice Wolves in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:8:wolf",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -4934,8 +4934,8 @@
       "client_category_id": null,
       "name": "Bixie-B-Gone I",
       "description": "Defeat 5 Bixies in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:1:bixie",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4958,8 +4958,8 @@
       "client_category_id": null,
       "name": "Bixie-B-Gone II",
       "description": "Defeat 50 Bixies in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:1:bixie",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -4982,8 +4982,8 @@
       "client_category_id": null,
       "name": "Bixie-B-Gone III",
       "description": "Defeat 500 Bixies in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:1:bixie",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5006,8 +5006,8 @@
       "client_category_id": null,
       "name": "Boiled Cray I",
       "description": "Defeat 5 Cray in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:6:cray",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5030,8 +5030,8 @@
       "client_category_id": null,
       "name": "Boiled Cray II",
       "description": "Defeat 50 Cray in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:6:cray",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5054,8 +5054,8 @@
       "client_category_id": null,
       "name": "Boiled Cray III",
       "description": "Defeat 500 Cray in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:6:cray",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5078,8 +5078,8 @@
       "client_category_id": null,
       "name": "Bugging Out I",
       "description": "Defeat 5 Bixies near Wugachug",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:9:bixie",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5102,8 +5102,8 @@
       "client_category_id": null,
       "name": "Bugging Out II",
       "description": "Defeat 50 Bixies near Wugachug",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:9:bixie",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5126,8 +5126,8 @@
       "client_category_id": null,
       "name": "Bugging Out III",
       "description": "Defeat 500 Bixies near Wugachug",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:9:bixie",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5150,8 +5150,8 @@
       "client_category_id": null,
       "name": "Cultist Converter I",
       "description": "Defeat 5 Fairy Cultists in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:1:fairy cultist",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5174,8 +5174,8 @@
       "client_category_id": null,
       "name": "Cultist Converter II",
       "description": "Defeat 50 Fairy Cultists in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:1:fairy cultist",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5198,8 +5198,8 @@
       "client_category_id": null,
       "name": "Cultist Converter III",
       "description": "Defeat 500 Fairy Cultists in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:1:fairy cultist",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5222,8 +5222,8 @@
       "client_category_id": null,
       "name": "Don't be a Troll I",
       "description": "Defeat 5 Ice Trolls in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:8:ice troll",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5246,8 +5246,8 @@
       "client_category_id": null,
       "name": "Don't be a Troll II",
       "description": "Defeat 50 Ice Trolls in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:8:ice troll",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5270,8 +5270,8 @@
       "client_category_id": null,
       "name": "Don't be a Troll III",
       "description": "Defeat 500 Ice Trolls in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:8:ice troll",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5294,8 +5294,8 @@
       "client_category_id": null,
       "name": "Honorable End I",
       "description": "Defeat 5 Ghost Ninjas in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:6:ghost ninja",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5318,8 +5318,8 @@
       "client_category_id": null,
       "name": "Honorable End II",
       "description": "Defeat 50 Ghost Ninjas in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:6:ghost ninja",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5342,8 +5342,8 @@
       "client_category_id": null,
       "name": "Honorable End III",
       "description": "Defeat 500 Ghost Ninjas in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:6:ghost ninja",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5366,8 +5366,8 @@
       "client_category_id": null,
       "name": "Flock of Swoopers I",
       "description": "Defeat 5 Swoopers in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:6:swooper",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5390,8 +5390,8 @@
       "client_category_id": null,
       "name": "Flock of Swoopers II",
       "description": "Defeat 50 Swoopers in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:6:swooper",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5414,8 +5414,8 @@
       "client_category_id": null,
       "name": "Flock of Swoopers III",
       "description": "Defeat 500 Swoopers in Seaside.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:6:swooper",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5438,8 +5438,8 @@
       "client_category_id": null,
       "name": "Freaking Out I",
       "description": "Defeat 5 Ninjas in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:1:ninja",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5462,8 +5462,8 @@
       "client_category_id": null,
       "name": "Freaking Out II",
       "description": "Defeat 50 Ninjas in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:1:ninja",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5486,8 +5486,8 @@
       "client_category_id": null,
       "name": "Freaking Out III",
       "description": "Defeat 500 Ninjas in Southern Wilds.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:1:ninja",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5510,8 +5510,8 @@
       "client_category_id": null,
       "name": "If a Tree Falls I",
       "description": "Defeat 5 Floren",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:0:floren",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5534,8 +5534,8 @@
       "client_category_id": null,
       "name": "If a Tree Falls II",
       "description": "Defeat 50 Floren",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:0:floren",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5558,8 +5558,8 @@
       "client_category_id": null,
       "name": "If a Tree Falls III",
       "description": "Defeat 500 Floren",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:0:floren",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5582,8 +5582,8 @@
       "client_category_id": null,
       "name": "Not Quite Yeti I",
       "description": "Defeat 5 Yetis in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "kill:8:yeti",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5606,8 +5606,8 @@
       "client_category_id": null,
       "name": "Not Quite Yeti II",
       "description": "Defeat 50 Yetis in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "kill:8:yeti",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5630,8 +5630,8 @@
       "client_category_id": null,
       "name": "Not Quite Yeti III",
       "description": "Defeat 500 Yetis in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "kill:8:yeti",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5654,8 +5654,8 @@
       "client_category_id": null,
       "name": "When Pigs Fly I",
       "description": "Defeat 5 Ninjawugs",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "waiting:enemy_missing:ninjawug",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5678,8 +5678,8 @@
       "client_category_id": null,
       "name": "When Pigs Fly II",
       "description": "Defeat 50 Ninjawugs",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "waiting:enemy_missing:ninjawug",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -5702,8 +5702,8 @@
       "client_category_id": null,
       "name": "When Pigs Fly III",
       "description": "Defeat 500 Ninjawugs",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500,
+      "counter_key": "waiting:enemy_missing:ninjawug",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -5726,8 +5726,8 @@
       "client_category_id": null,
       "name": "Marksman",
       "description": "Complete the Archer Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_disabled:3010034",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Marksman",
@@ -5752,8 +5752,8 @@
       "client_category_id": null,
       "name": "Master Smith",
       "description": "Complete the Blacksmith Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Blacksmith: Helping the Hospital",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Master Smith",
@@ -5778,8 +5778,8 @@
       "client_category_id": null,
       "name": "The Big Brawler",
       "description": "Complete the Brawler Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Brawler: Prized Brawlers",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Street Fighter",
@@ -5804,8 +5804,8 @@
       "client_category_id": null,
       "name": "Duelist",
       "description": "Complete the Card Duelist Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3040028",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Card Commander",
@@ -5830,8 +5830,8 @@
       "client_category_id": null,
       "name": "The Iron Chef",
       "description": "Complete the Chef Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3050033",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Cookie",
@@ -5856,8 +5856,8 @@
       "client_category_id": null,
       "name": "Demolisher",
       "description": "Complete the Demo Derby Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3060042",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Demolisher",
@@ -5882,8 +5882,8 @@
       "client_category_id": null,
       "name": "Rageracer",
       "description": "Complete the Kart Driver Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_disabled:3080048",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Racer",
@@ -5908,8 +5908,8 @@
       "client_category_id": null,
       "name": "Ninja Shadow Master",
       "description": "Complete the Ninja Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Ninja: Stilling the Waters",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Flying Dragon",
@@ -5934,8 +5934,8 @@
       "client_category_id": null,
       "name": "Doctor",
       "description": "Complete the Medic Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_disabled:3090033",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Doctor",
@@ -5960,8 +5960,8 @@
       "client_category_id": null,
       "name": "Postmaster",
       "description": "Complete the Postman Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3130033",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Postmaster",
@@ -5986,8 +5986,8 @@
       "client_category_id": null,
       "name": "Striker",
       "description": "Complete the Soccer Star Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3140010",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Striker",
@@ -6012,8 +6012,8 @@
       "client_category_id": null,
       "name": "Dwarven Smithy",
       "description": "Complete the Rumble Ridge Blacksmith Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:The Search for Golmie Greasebeard",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Title: Desert Smith",
@@ -6038,8 +6038,8 @@
       "client_category_id": null,
       "name": "Warlord",
       "description": "Complete the Warrior Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Warrior: Rescue and Reclaim",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Warlord",
@@ -6064,8 +6064,8 @@
       "client_category_id": null,
       "name": "Arcane Master",
       "description": "Complete the Wizard Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_disabled:3160034",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Arcane Master",
@@ -6090,8 +6090,8 @@
       "client_category_id": null,
       "name": "A Shattered Past",
       "description": "Complete the Shattered Past Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3040041",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -6114,8 +6114,8 @@
       "client_category_id": null,
       "name": "The Dark Cheater",
       "description": "Complete the Baron Von Darkcheat Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3040057",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -6138,8 +6138,8 @@
       "client_category_id": null,
       "name": "A True Hero",
       "description": "Complete the Heroes Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:questline:heroes",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -6162,8 +6162,8 @@
       "client_category_id": null,
       "name": "rumble-Rumble- RUMBLEDOME!",
       "description": "Complete the Rumbledome TCG Questline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3040063",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -6308,8 +6308,8 @@
       "client_category_id": null,
       "name": "Realm Defender",
       "description": "Complete the Chapter 1 Storyline.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_disabled:3000050",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Story Teller",
@@ -6334,8 +6334,8 @@
       "client_category_id": null,
       "name": "Master of Stories",
       "description": "Complete the following job questlines.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 14,
+      "counter_key": "completed_of:218|219|220|221|222|223|224|225|226|227|228|229|230|231",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Diamond Trophy - 40 Points; Quester Hat",
@@ -6358,8 +6358,8 @@
       "client_category_id": null,
       "name": "...And So It Begins",
       "description": "Complete the tutorial.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "opening_complete",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points; Character Name Change",
@@ -6382,8 +6382,8 @@
       "client_category_id": null,
       "name": "Bixie in Your Bonnet",
       "description": "Complete Into the Hive.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Into the Hive",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6406,8 +6406,8 @@
       "client_category_id": null,
       "name": "Thugawhomped",
       "description": "Complete Stompenmugg.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Stompenmugg",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6430,8 +6430,8 @@
       "client_category_id": null,
       "name": "Jojo's Mojo Dojo",
       "description": "Complete Dojo Mojo.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Dojo Mojo",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6454,8 +6454,8 @@
       "client_category_id": null,
       "name": "Tidal Power",
       "description": "Complete Stemming the Tide.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:Stemming the Tide",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6478,8 +6478,8 @@
       "client_category_id": null,
       "name": "Cash Cow",
       "description": "Earn 500,000 coins through rewards.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 500000,
+      "counter_key": "waiting:coins_rewarded",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -6502,8 +6502,8 @@
       "client_category_id": null,
       "name": "Loaded",
       "description": "Earn 1,000,000 coins through rewards.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1000000,
+      "counter_key": "waiting:coins_rewarded",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points",
@@ -6526,8 +6526,8 @@
       "client_category_id": null,
       "name": "Filthy Rich",
       "description": "Earn 5,000,000 coins through rewards.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5000000,
+      "counter_key": "waiting:coins_rewarded",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Platinum Trophy - 25 Points; Title: Millionaire",
@@ -6552,8 +6552,8 @@
       "client_category_id": null,
       "name": "Pet Owner",
       "description": "Obtain a pet!",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "pets_owned",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6576,8 +6576,8 @@
       "client_category_id": null,
       "name": "Stylist",
       "description": "Equip a style card.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:style_card_equipped",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6600,8 +6600,8 @@
       "client_category_id": null,
       "name": "Rider",
       "description": "Obtain a mount.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "mounts_owned",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6624,8 +6624,8 @@
       "client_category_id": null,
       "name": "Tricky",
       "description": "Perform a trick with your pet.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "pet_trick",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6648,8 +6648,8 @@
       "client_category_id": null,
       "name": "Performer",
       "description": "Perform 15 tricks with your pet.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 15,
+      "counter_key": "pet_trick",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -6672,8 +6672,8 @@
       "client_category_id": null,
       "name": "Entertainer",
       "description": "Perform 50 tricks with your pet.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "pet_trick",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points",
@@ -6696,8 +6696,8 @@
       "client_category_id": null,
       "name": "Consumerist",
       "description": "Use a consumable.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "consumable_use",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6720,8 +6720,8 @@
       "client_category_id": null,
       "name": "Window Shopper",
       "description": "Visit the Marketplace.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:marketplace_visited",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6744,8 +6744,8 @@
       "client_category_id": null,
       "name": "United We Stand",
       "description": "Collect all 5 Mechanical Combiner Rides!",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "mounts_owned_of:13421|13456|13457|13458|13459",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Wonderous Trophy - 0 Points",
@@ -6768,8 +6768,8 @@
       "client_category_id": null,
       "name": "Banshee Boss",
       "description": "Played 10 Chaos cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played:chaos",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6792,8 +6792,8 @@
       "client_category_id": null,
       "name": "Demo Demon",
       "description": "Played 10 Machine cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played:machine",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6816,8 +6816,8 @@
       "client_category_id": null,
       "name": "Giant Toad",
       "description": "Played 10 Nature cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played:nature",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6840,8 +6840,8 @@
       "client_category_id": null,
       "name": "Ninja Master",
       "description": "Played 10 Order cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played:order",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6864,8 +6864,8 @@
       "client_category_id": null,
       "name": "Master of Spheres",
       "description": "Completed all four sphere card play achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:260|261|262|263",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Necrolaceous Card",
@@ -6888,8 +6888,8 @@
       "client_category_id": null,
       "name": "Creature Controller",
       "description": "Played 10 creatures in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played_type:creature",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6912,8 +6912,8 @@
       "client_category_id": null,
       "name": "Resource Wrangler",
       "description": "Played 10 resources in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played_type:resource",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6936,8 +6936,8 @@
       "client_category_id": null,
       "name": "Hat Tricks",
       "description": "Played 10 tricks in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played_type:trick",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6960,8 +6960,8 @@
       "client_category_id": null,
       "name": "Hero of Heroes",
       "description": "Played 10 heroes in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_played_type:hero",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -6984,15 +6984,15 @@
       "client_category_id": null,
       "name": "Master of Card Types",
       "description": "Completed all four card type play achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:265|266|267|268",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Commander Kluggenkrush Card",
         "trophy_points": 10,
         "title_names": [],
         "client_trophy_id": 6,
-        "item_ids": null,
+        "item_ids": [911257],
         "source_tag": "wiki"
       },
       "wiki_section": "Trading Card Game|TCG",
@@ -7008,8 +7008,8 @@
       "client_category_id": null,
       "name": "Crusher",
       "description": "Won a battle by 4.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "waiting:tcg_battle_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7032,8 +7032,8 @@
       "client_category_id": null,
       "name": "Destroyer",
       "description": "Won a battle by 8.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 8,
+      "counter_key": "waiting:tcg_battle_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7056,8 +7056,8 @@
       "client_category_id": null,
       "name": "Exterminator",
       "description": "Won a battle by 12.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 12,
+      "counter_key": "waiting:tcg_battle_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7080,8 +7080,8 @@
       "client_category_id": null,
       "name": "Annihilator",
       "description": "Won a battle by 16.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 16,
+      "counter_key": "waiting:tcg_battle_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7104,8 +7104,8 @@
       "client_category_id": null,
       "name": "Master of Battles",
       "description": "Completed all four battle margin achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:270|271|272|273",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Miss Artie Card",
@@ -7128,8 +7128,8 @@
       "client_category_id": null,
       "name": "Novice",
       "description": "Won 1 game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "tcg_win",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7152,8 +7152,8 @@
       "client_category_id": null,
       "name": "Professional",
       "description": "Won 10 games.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "tcg_win",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7176,8 +7176,8 @@
       "client_category_id": null,
       "name": "Veteran",
       "description": "Won 50 games.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 50,
+      "counter_key": "tcg_win",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7200,8 +7200,8 @@
       "client_category_id": null,
       "name": "Champion",
       "description": "Won 100 games.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 100,
+      "counter_key": "tcg_win",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7224,8 +7224,8 @@
       "client_category_id": null,
       "name": "Master of Victories",
       "description": "Complete all four game win achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:275|276|277|278",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Treeleaf Card",
@@ -7248,8 +7248,8 @@
       "client_category_id": null,
       "name": "Make It Last",
       "description": "Played a game that lasted 10 turns.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_game_turns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7272,8 +7272,8 @@
       "client_category_id": null,
       "name": "Marathon",
       "description": "Played a game that lasted 15 turns.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 15,
+      "counter_key": "waiting:tcg_game_turns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7296,8 +7296,8 @@
       "client_category_id": null,
       "name": "Unending Conflict",
       "description": "Played a game that lasted 25 turns.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 25,
+      "counter_key": "waiting:tcg_game_turns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7320,8 +7320,8 @@
       "client_category_id": null,
       "name": "Eternal Struggle",
       "description": "Played a game that lasted 30 turns.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 30,
+      "counter_key": "waiting:tcg_game_turns",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7344,8 +7344,8 @@
       "client_category_id": null,
       "name": "Master of Turns",
       "description": "Completed all four game time achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:280|281|282|283",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Vittorio Card",
@@ -7368,8 +7368,8 @@
       "client_category_id": null,
       "name": "Chaos Crusher",
       "description": "Destroyed 10 Chaos cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_destroyed:chaos",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7392,8 +7392,8 @@
       "client_category_id": null,
       "name": "Machine Mauler",
       "description": "Destroyed 10 Machine cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_destroyed:machine",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7416,8 +7416,8 @@
       "client_category_id": null,
       "name": "Nature Neutralizer",
       "description": "Destroyed 10 Nature cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_destroyed:nature",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7440,8 +7440,8 @@
       "client_category_id": null,
       "name": "Order Obliterator",
       "description": "Destroyed 10 Order cards in a single game.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 10,
+      "counter_key": "waiting:tcg_cards_destroyed:order",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7464,8 +7464,8 @@
       "client_category_id": null,
       "name": "Master of Destruction",
       "description": "Complete all four card destruction achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:285|286|287|288",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Sergeant Cargug Card",
@@ -7488,8 +7488,8 @@
       "client_category_id": null,
       "name": "Power Nap",
       "description": "Won a game in less than 5 minutes.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "tcg_win_under:300",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7512,8 +7512,8 @@
       "client_category_id": null,
       "name": "Fast-Talker",
       "description": "Won a game in less than 4 minutes.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "tcg_win_under:240",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7536,8 +7536,8 @@
       "client_category_id": null,
       "name": "Speedy Postman",
       "description": "Won a game in less than 3 minutes.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "tcg_win_under:180",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7560,8 +7560,8 @@
       "client_category_id": null,
       "name": "Speed Demon",
       "description": "Won a game in less than 2 minutes.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "tcg_win_under:120",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7584,8 +7584,8 @@
       "client_category_id": null,
       "name": "Master of Minutes",
       "description": "Completed all four game time achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:290|291|292|293",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; ? Card",
@@ -7608,8 +7608,8 @@
       "client_category_id": null,
       "name": "Victory Lap",
       "description": "Won a game by 1 point.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:tcg_point_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7632,8 +7632,8 @@
       "client_category_id": null,
       "name": "Four the Win",
       "description": "Won a game by 4 points.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "waiting:tcg_point_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7656,8 +7656,8 @@
       "client_category_id": null,
       "name": "Overkill",
       "description": "Won a game by 8 points.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 8,
+      "counter_key": "waiting:tcg_point_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7680,8 +7680,8 @@
       "client_category_id": null,
       "name": "Maximum",
       "description": "Won a game by 12 points.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 12,
+      "counter_key": "waiting:tcg_point_margin",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7704,8 +7704,8 @@
       "client_category_id": null,
       "name": "Master of Points",
       "description": "Completed all four point margin achievements.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 4,
+      "counter_key": "completed_of:295|296|297|298",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Master Kart Builder Card",
@@ -7728,8 +7728,8 @@
       "client_category_id": null,
       "name": "One Down",
       "description": "Defeat One, Two or Three of Three",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:spooktacular_three_of_three",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -7752,8 +7752,8 @@
       "client_category_id": null,
       "name": "Three Less",
       "description": "Defeat One, Two and Three of Three",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 3,
+      "counter_key": "waiting:spooktacular_three_of_three",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Platinum Trophy - 25 Points; Pumpkin Carver",
@@ -7776,8 +7776,8 @@
       "client_category_id": null,
       "name": "Prince Slayer",
       "description": "Complete The Great Scare for Ghost Hunter",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:spooktacular_great_scare",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Platinum Trophy - 25 Points",
@@ -7800,8 +7800,8 @@
       "client_category_id": null,
       "name": "Ghost Vision",
       "description": "Acquire and equip the Spectral Spectacles",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:spectral_spectacles_equipped",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points",
@@ -7824,8 +7824,8 @@
       "client_category_id": null,
       "name": "Costume Shopper",
       "description": "Visit the Dress Up! costume shop in Sanctuary during the Super Spooktacular",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:costume_shop_visited",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7848,8 +7848,8 @@
       "client_category_id": null,
       "name": "In the Pack",
       "description": "Join Team Werewolf",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "join_dance_team:werewolf",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Wonderous Trophy - 0 Points",
@@ -7872,8 +7872,8 @@
       "client_category_id": null,
       "name": "Undead for Life",
       "description": "Join Team Vampire",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "join_dance_team:vampire",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Wonderous Trophy - 0 Points",
@@ -7896,8 +7896,8 @@
       "client_category_id": null,
       "name": "'Tis the Season",
       "description": "Receive your first gift from the Gifting Tree.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3951040",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -7920,8 +7920,8 @@
       "client_category_id": null,
       "name": "Holiday Detective",
       "description": "Discover who is snatching presents in Snowhill.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "quest_done:3951995",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -7944,15 +7944,15 @@
       "client_category_id": null,
       "name": "O, Gifting Tree...",
       "description": "Save the Snowhill Gifting Tree and receive its thank you gift.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:gifting_tree_saved",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Mini Holiday Tree",
         "trophy_points": 15,
         "title_names": [],
         "client_trophy_id": 7,
-        "item_ids": null,
+        "item_ids": [911083],
         "source_tag": "wiki"
       },
       "wiki_section": "Snow Days",
@@ -7968,8 +7968,8 @@
       "client_category_id": null,
       "name": "Santa's Little Helper",
       "description": "Complete each Snow Days daily quest at least once.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:snow_days_dailies",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -7992,15 +7992,15 @@
       "client_category_id": null,
       "name": "Snowballer",
       "description": "Defend Snowhill from the Abominable Snowman and retrieve your reward.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:snowball_fighting_win",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Green Santa Hat",
         "trophy_points": 15,
         "title_names": [],
         "client_trophy_id": 7,
-        "item_ids": null,
+        "item_ids": [911084],
         "source_tag": "wiki"
       },
       "wiki_section": "Snow Days",
@@ -8016,8 +8016,8 @@
       "client_category_id": null,
       "name": "Coal Carrier",
       "description": "Complete Snowman Showdown for Everett 5 times.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 5,
+      "counter_key": "waiting:quest_repeat_completions:3954720",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points",
@@ -8040,15 +8040,15 @@
       "client_category_id": null,
       "name": "Coal Train",
       "description": "Complete Snowman Showdown for Everett 20 times.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 20,
+      "counter_key": "waiting:quest_repeat_completions:3954720",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Platinum Trophy - 25 Points; Lump of Coal",
         "trophy_points": 25,
         "title_names": [],
         "client_trophy_id": 8,
-        "item_ids": null,
+        "item_ids": [76623],
         "source_tag": "wiki"
       },
       "wiki_section": "Snow Days",
@@ -8064,8 +8064,8 @@
       "client_category_id": null,
       "name": "8-Bit Hero",
       "description": "Summon an 8-Bit Meep pet after completing Momma Meepster's quest.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1,
+      "counter_key": "waiting:eight_bit_meep_summoned",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Bronze Trophy - 5 Points",
@@ -8088,8 +8088,8 @@
       "client_category_id": null,
       "name": "Gleam Hero",
       "description": "Win 17 PVP Duels for the Choosing Sides daily quest with Gleam Strength buff active during HeroRealms Month.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 17,
+      "counter_key": "waiting:pvp_duel_won_with_gleam",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points;",
@@ -8112,8 +8112,8 @@
       "client_category_id": null,
       "name": "Gloam Villain",
       "description": "Win 17 PVP Duels for the Choosing Sides daily quest with Gloam Power buff active during HeroRealms Month.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 17,
+      "counter_key": "waiting:pvp_duel_won_with_gloam",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points;",
@@ -8136,8 +8136,8 @@
       "client_category_id": null,
       "name": "Epic Dueler",
       "description": "Win 30 duels with either Gleam Strength or Gloam Power buff active.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 30,
+      "counter_key": "waiting:pvp_duel_won_with_buff",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Silver Trophy - 10 Points; Epic Gleam Hero Outfit OR Epic Gloam Villain Outfit",
@@ -8160,15 +8160,15 @@
       "client_category_id": null,
       "name": "Bowheart",
       "description": "Hit Stone Heart with 1000 love arrows.",
-      "threshold": null,
-      "counter_key": null,
+      "threshold": 1000,
+      "counter_key": "waiting:love_arrows_hit_stone_heart",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Stone Heart's Pink Bear",
         "trophy_points": 15,
         "title_names": [],
         "client_trophy_id": 7,
-        "item_ids": null,
+        "item_ids": [911045],
         "source_tag": "wiki"
       },
       "wiki_section": "Festival of Hearts",
@@ -8181,7 +8181,7 @@
   ],
   "gaps": [
     "Original server-assigned achievement and objective IDs are not captured; current definition IDs are local (R) assignments.",
-    "No per-achievement icon IDs or native event bindings were recovered. Counter keys are reconstructed (R) and limited to job-rank and completed-quest-count events.",
+    "No per-achievement icon IDs or native event bindings were recovered. Counter keys are reconstructed (R); the events they use are listed in counter_binding_report.",
     "Wiki reward tiers crosswalk to client trophy rows, but no per-achievement trophy assignment was captured from the original server.",
     "Server reward grants remain unrecovered."
   ],
@@ -10537,1168 +10537,54 @@
     "image_set_source": "AchievementTrophies.txt image_set_id, joined through reward.client_trophy_id."
   },
   "counter_binding_report": {
-    "provenance": "(R) Mapping of wiki text onto current Rust progression outputs; these keys are data bindings, not recovered original server bindings.",
-    "job_rank_rows": 85,
-    "quest_completed_count_rows": 5,
-    "unresolved_rows": 228,
-    "job_rank_semantics": "One increment per rank increase from initial rank 1; thresholds are target rank minus 1.",
-    "quest_completed_count_semantics": "One increment per accepted completed quest; threshold is the wiki count.",
-    "unresolved_reason": "Remaining rows need per-questline, dungeon, minigame/TCG, item-set, PvP, or event-specific evidence and stable event keys.",
-    "unbound_rows_by_section": {
-      ":Category:Lots|Housing": 7,
-      "Combat": 112,
-      "Events": 4,
-      "Festival of Hearts": 1,
-      "Items": 12,
-      "Jobs": 4,
-      "Mini-Games|Minigames": 9,
-      "Quests": 25,
-      "Snow Days": 7,
-      "Super Spooktacular|Spooktacular": 7,
-      "Trading Card Game|TCG": 40
+    "provenance": "(R) Mapping of wiki text onto the server events and saved state that already exist. Counter keys are data bindings, not recovered original server bindings.",
+    "retired_rows": 5,
+    "retired_reason": "Pet Trainer was removed 2009-12-14 (fandom Pet_Trainer; fanbyte Obsolete Jobs); its five rank rows have no trigger on purpose (A-V check).",
+    "live_rows": 189,
+    "waiting_rows": 124,
+    "counter_classes": {
+      "completed_of": 11,
+      "consumable_use": 1,
+      "dungeon_clear": 20,
+      "job_rank": 80,
+      "job_rank_max": 1,
+      "join_dance_team": 2,
+      "kill": 36,
+      "minigame_win": 7,
+      "mounts_owned": 1,
+      "mounts_owned_of": 1,
+      "opening_complete": 1,
+      "pet_trick": 3,
+      "pets_owned": 1,
+      "quest_completed_count": 5,
+      "quest_done": 10,
+      "recipes_all": 1,
+      "retired": 5,
+      "tcg_win": 4,
+      "tcg_win_under": 4,
+      "waiting": 124
     },
-    "unbound_rows": [
-      {
-        "key": "wiki:achievement:016:hometown-smithy",
-        "name": "Hometown Smithy",
-        "wiki_section": "Jobs"
-      },
-      {
-        "key": "wiki:achievement:017:sunny-smithy",
-        "name": "Sunny Smithy",
-        "wiki_section": "Jobs"
-      },
-      {
-        "key": "wiki:achievement:088:natural-born-leader",
-        "name": "Natural Born Leader",
-        "wiki_section": "Jobs"
-      },
-      {
-        "key": "wiki:achievement:089:master-of-levels",
-        "name": "Master of Levels",
-        "wiki_section": "Jobs"
-      },
-      {
-        "key": "wiki:achievement:090:blast-off",
-        "name": "Blast Off!",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:091:builder",
-        "name": "Builder",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:092:decorator",
-        "name": "Decorator",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:093:home-maker",
-        "name": "Home Maker",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:094:architect",
-        "name": "Architect",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:095:house-warmer",
-        "name": "House Warmer",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:096:designer",
-        "name": "Designer",
-        "wiki_section": ":Category:Lots|Housing"
-      },
-      {
-        "key": "wiki:achievement:097:music-student",
-        "name": "Music Student",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:098:frontman",
-        "name": "Frontman",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:099:music-teacher",
-        "name": "Music Teacher",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:100:composer",
-        "name": "Composer",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:101:conductor",
-        "name": "Conductor",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:102:maestro",
-        "name": "Maestro",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:103:don-t-be-tippin",
-        "name": "Don't be Tippin'",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:104:checkers-boss",
-        "name": "Checkers Boss",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:105:chess-master",
-        "name": "Chess Master",
-        "wiki_section": "Mini-Games|Minigames"
-      },
-      {
-        "key": "wiki:achievement:106:bixie-hive",
-        "name": "Bixie Hive",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:107:cracked-claw-caverns",
-        "name": "Cracked Claw Caverns",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:108:hot-springs-haven",
-        "name": "Hot Springs Haven",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:109:sheep-watch",
-        "name": "Sheep Watch",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:110:tavern-cellar",
-        "name": "Tavern Cellar",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:111:arachnia-s-lair",
-        "name": "Arachnia's Lair",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:112:danger-peaks",
-        "name": "Danger Peaks",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:113:den-of-secrets",
-        "name": "Den of Secrets",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:114:highroad-hijinx",
-        "name": "Highroad Hijinx",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:115:robgoblin-treasure-trove",
-        "name": "Robgoblin Treasure Trove",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:116:sweetwater-climb",
-        "name": "Sweetwater Climb",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:117:the-bat-cave",
-        "name": "The Bat Cave!",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:118:bone-bog-cemetery",
-        "name": "Bone Bog Cemetery",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:119:bristlewood-glade",
-        "name": "Bristlewood Glade",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:120:deep-mines",
-        "name": "Deep Mines",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:121:floren-forest",
-        "name": "Floren Forest",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:122:forgotten-caves",
-        "name": "Forgotten Caves",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:123:howling-hills",
-        "name": "Howling Hills",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:124:misty-mountain",
-        "name": "Misty Mountain",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:125:mushroom-cavern",
-        "name": "Mushroom Cavern",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:126:the-snarling-hedges",
-        "name": "The Snarling Hedges",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:127:bandit-hideout",
-        "name": "Bandit Hideout!",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:128:briar-patch",
-        "name": "Briar Patch",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:129:croaking-vale",
-        "name": "Croaking Vale",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:130:darvon-s-descent",
-        "name": "Darvon's Descent",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:131:frostfang-caverns",
-        "name": "Frostfang Caverns",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:132:grexan-s-camp",
-        "name": "Grexan's Camp",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:133:mugwort-s-hollow",
-        "name": "Mugwort's Hollow",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:134:treeleaf-s-retreat",
-        "name": "Treeleaf's Retreat",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:135:vale-of-the-ancients",
-        "name": "Vale of the Ancients",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:136:briarheart-caverns",
-        "name": "Briarheart Caverns",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:137:cray-caves",
-        "name": "Cray Caves",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:138:dark-spore-depths",
-        "name": "Dark Spore Depths",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:139:forest-troll-fort",
-        "name": "Forest Troll Fort",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:140:haunted-mines",
-        "name": "Haunted Mines",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:141:snowy-canyon",
-        "name": "Snowy Canyon",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:142:group-bixie-hive",
-        "name": "Group: Bixie Hive",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:143:group-cracked-claw-carverns",
-        "name": "Group: Cracked Claw Carverns",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:144:group-hot-springs-haven",
-        "name": "Group: Hot Springs Haven",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:145:group-sheep-watch",
-        "name": "Group: Sheep Watch",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:146:group-tavern-cellar",
-        "name": "Group: Tavern Cellar",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:147:group-arachnia-s-lair",
-        "name": "Group: Arachnia's Lair",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:148:group-danger-peaks",
-        "name": "Group: Danger Peaks",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:149:group-den-of-secrets",
-        "name": "Group: Den of Secrets",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:150:group-highroad-hijinx",
-        "name": "Group: Highroad Hijinx",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:151:group-robgoblin-treasure-trove",
-        "name": "Group: Robgoblin Treasure Trove",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:152:group-sweetwater-climb",
-        "name": "Group: Sweetwater Climb",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:153:group-the-bat-cave",
-        "name": "Group: The Bat Cave!",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:154:group-bone-bog-cemetery",
-        "name": "Group: Bone Bog Cemetery",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:155:group-bristlewood-glade",
-        "name": "Group: Bristlewood Glade",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:156:group-deep-mines",
-        "name": "Group: Deep Mines",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:157:group-floren-forest",
-        "name": "Group: Floren Forest",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:158:group-forgotten-caves",
-        "name": "Group: Forgotten Caves",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:159:group-howling-hills",
-        "name": "Group: Howling Hills",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:160:group-misty-mountain",
-        "name": "Group: Misty Mountain",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:161:group-mushroom-cavern",
-        "name": "Group: Mushroom Cavern",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:162:group-the-snarling-hedges",
-        "name": "Group: The Snarling Hedges",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:163:group-bandit-hideout",
-        "name": "Group: Bandit Hideout!",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:164:group-briar-patch",
-        "name": "Group: Briar Patch",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:165:group-croaking-vale",
-        "name": "Group: Croaking Vale",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:166:group-darvon-s-descent",
-        "name": "Group: Darvon's Descent",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:167:group-frostfang-caverns",
-        "name": "Group: Frostfang Caverns",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:168:group-grexan-s-camp",
-        "name": "Group: Grexan's Camp",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:169:group-mugwort-s-hollow",
-        "name": "Group: Mugwort's Hollow",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:170:group-treeleaf-s-retreat",
-        "name": "Group: Treeleaf's Retreat",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:171:group-vale-of-the-ancients",
-        "name": "Group: Vale of the Ancients",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:172:group-briarheart-caverns",
-        "name": "Group: Briarheart Caverns",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:173:group-cray-caves",
-        "name": "Group: Cray Caves",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:174:group-dark-spore-depths",
-        "name": "Group: Dark Spore Depths",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:175:group-forest-troll-fort",
-        "name": "Group: Forest Troll Fort",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:176:group-haunted-mines",
-        "name": "Group: Haunted Mines",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:177:group-snowy-canyon",
-        "name": "Group: Snowy Canyon",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:178:duelist",
-        "name": "Duelist",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:179:arrested-development-i",
-        "name": "Arrested Development I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:180:arrested-development-ii",
-        "name": "Arrested Development II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:181:arrested-development-iii",
-        "name": "Arrested Development III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:182:bad-doggie-i",
-        "name": "Bad Doggie I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:183:bad-doggie-ii",
-        "name": "Bad Doggie II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:184:bad-doggie-iii",
-        "name": "Bad Doggie III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:185:bixie-b-gone-i",
-        "name": "Bixie-B-Gone I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:186:bixie-b-gone-ii",
-        "name": "Bixie-B-Gone II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:187:bixie-b-gone-iii",
-        "name": "Bixie-B-Gone III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:188:boiled-cray-i",
-        "name": "Boiled Cray I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:189:boiled-cray-ii",
-        "name": "Boiled Cray II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:190:boiled-cray-iii",
-        "name": "Boiled Cray III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:191:bugging-out-i",
-        "name": "Bugging Out I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:192:bugging-out-ii",
-        "name": "Bugging Out II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:193:bugging-out-iii",
-        "name": "Bugging Out III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:194:cultist-converter-i",
-        "name": "Cultist Converter I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:195:cultist-converter-ii",
-        "name": "Cultist Converter II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:196:cultist-converter-iii",
-        "name": "Cultist Converter III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:197:don-t-be-a-troll-i",
-        "name": "Don't be a Troll I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:198:don-t-be-a-troll-ii",
-        "name": "Don't be a Troll II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:199:don-t-be-a-troll-iii",
-        "name": "Don't be a Troll III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:200:honorable-end-i",
-        "name": "Honorable End I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:201:honorable-end-ii",
-        "name": "Honorable End II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:202:honorable-end-iii",
-        "name": "Honorable End III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:203:flock-of-swoopers-i",
-        "name": "Flock of Swoopers I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:204:flock-of-swoopers-ii",
-        "name": "Flock of Swoopers II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:205:flock-of-swoopers-iii",
-        "name": "Flock of Swoopers III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:206:freaking-out-i",
-        "name": "Freaking Out I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:207:freaking-out-ii",
-        "name": "Freaking Out II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:208:freaking-out-iii",
-        "name": "Freaking Out III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:209:if-a-tree-falls-i",
-        "name": "If a Tree Falls I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:210:if-a-tree-falls-ii",
-        "name": "If a Tree Falls II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:211:if-a-tree-falls-iii",
-        "name": "If a Tree Falls III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:212:not-quite-yeti-i",
-        "name": "Not Quite Yeti I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:213:not-quite-yeti-ii",
-        "name": "Not Quite Yeti II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:214:not-quite-yeti-iii",
-        "name": "Not Quite Yeti III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:215:when-pigs-fly-i",
-        "name": "When Pigs Fly I",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:216:when-pigs-fly-ii",
-        "name": "When Pigs Fly II",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:217:when-pigs-fly-iii",
-        "name": "When Pigs Fly III",
-        "wiki_section": "Combat"
-      },
-      {
-        "key": "wiki:achievement:218:marksman",
-        "name": "Marksman",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:219:master-smith",
-        "name": "Master Smith",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:220:the-big-brawler",
-        "name": "The Big Brawler",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:221:duelist",
-        "name": "Duelist",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:222:the-iron-chef",
-        "name": "The Iron Chef",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:223:demolisher",
-        "name": "Demolisher",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:224:rageracer",
-        "name": "Rageracer",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:225:ninja-shadow-master",
-        "name": "Ninja Shadow Master",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:226:doctor",
-        "name": "Doctor",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:227:postmaster",
-        "name": "Postmaster",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:228:striker",
-        "name": "Striker",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:229:dwarven-smithy",
-        "name": "Dwarven Smithy",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:230:warlord",
-        "name": "Warlord",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:231:arcane-master",
-        "name": "Arcane Master",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:232:a-shattered-past",
-        "name": "A Shattered Past",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:233:the-dark-cheater",
-        "name": "The Dark Cheater",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:234:a-true-hero",
-        "name": "A True Hero",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:235:rumble-rumble-rumbledome",
-        "name": "rumble-Rumble- RUMBLEDOME!",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:241:realm-defender",
-        "name": "Realm Defender",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:242:master-of-stories",
-        "name": "Master of Stories",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:243:and-so-it-begins",
-        "name": "...And So It Begins",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:244:bixie-in-your-bonnet",
-        "name": "Bixie in Your Bonnet",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:245:thugawhomped",
-        "name": "Thugawhomped",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:246:jojo-s-mojo-dojo",
-        "name": "Jojo's Mojo Dojo",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:247:tidal-power",
-        "name": "Tidal Power",
-        "wiki_section": "Quests"
-      },
-      {
-        "key": "wiki:achievement:248:cash-cow",
-        "name": "Cash Cow",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:249:loaded",
-        "name": "Loaded",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:250:filthy-rich",
-        "name": "Filthy Rich",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:251:pet-owner",
-        "name": "Pet Owner",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:252:stylist",
-        "name": "Stylist",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:253:rider",
-        "name": "Rider",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:254:tricky",
-        "name": "Tricky",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:255:performer",
-        "name": "Performer",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:256:entertainer",
-        "name": "Entertainer",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:257:consumerist",
-        "name": "Consumerist",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:258:window-shopper",
-        "name": "Window Shopper",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:259:united-we-stand",
-        "name": "United We Stand",
-        "wiki_section": "Items"
-      },
-      {
-        "key": "wiki:achievement:260:banshee-boss",
-        "name": "Banshee Boss",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:261:demo-demon",
-        "name": "Demo Demon",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:262:giant-toad",
-        "name": "Giant Toad",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:263:ninja-master",
-        "name": "Ninja Master",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:264:master-of-spheres",
-        "name": "Master of Spheres",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:265:creature-controller",
-        "name": "Creature Controller",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:266:resource-wrangler",
-        "name": "Resource Wrangler",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:267:hat-tricks",
-        "name": "Hat Tricks",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:268:hero-of-heroes",
-        "name": "Hero of Heroes",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:269:master-of-card-types",
-        "name": "Master of Card Types",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:270:crusher",
-        "name": "Crusher",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:271:destroyer",
-        "name": "Destroyer",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:272:exterminator",
-        "name": "Exterminator",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:273:annihilator",
-        "name": "Annihilator",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:274:master-of-battles",
-        "name": "Master of Battles",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:275:novice",
-        "name": "Novice",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:276:professional",
-        "name": "Professional",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:277:veteran",
-        "name": "Veteran",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:278:champion",
-        "name": "Champion",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:279:master-of-victories",
-        "name": "Master of Victories",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:280:make-it-last",
-        "name": "Make It Last",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:281:marathon",
-        "name": "Marathon",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:282:unending-conflict",
-        "name": "Unending Conflict",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:283:eternal-struggle",
-        "name": "Eternal Struggle",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:284:master-of-turns",
-        "name": "Master of Turns",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:285:chaos-crusher",
-        "name": "Chaos Crusher",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:286:machine-mauler",
-        "name": "Machine Mauler",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:287:nature-neutralizer",
-        "name": "Nature Neutralizer",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:288:order-obliterator",
-        "name": "Order Obliterator",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:289:master-of-destruction",
-        "name": "Master of Destruction",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:290:power-nap",
-        "name": "Power Nap",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:291:fast-talker",
-        "name": "Fast-Talker",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:292:speedy-postman",
-        "name": "Speedy Postman",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:293:speed-demon",
-        "name": "Speed Demon",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:294:master-of-minutes",
-        "name": "Master of Minutes",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:295:victory-lap",
-        "name": "Victory Lap",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:296:four-the-win",
-        "name": "Four the Win",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:297:overkill",
-        "name": "Overkill",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:298:maximum",
-        "name": "Maximum",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:299:master-of-points",
-        "name": "Master of Points",
-        "wiki_section": "Trading Card Game|TCG"
-      },
-      {
-        "key": "wiki:achievement:300:one-down",
-        "name": "One Down",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:301:three-less",
-        "name": "Three Less",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:302:prince-slayer",
-        "name": "Prince Slayer",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:303:ghost-vision",
-        "name": "Ghost Vision",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:304:costume-shopper",
-        "name": "Costume Shopper",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:305:in-the-pack",
-        "name": "In the Pack",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:306:undead-for-life",
-        "name": "Undead for Life",
-        "wiki_section": "Super Spooktacular|Spooktacular"
-      },
-      {
-        "key": "wiki:achievement:307:tis-the-season",
-        "name": "'Tis the Season",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:308:holiday-detective",
-        "name": "Holiday Detective",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:309:o-gifting-tree",
-        "name": "O, Gifting Tree...",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:310:santa-s-little-helper",
-        "name": "Santa's Little Helper",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:311:snowballer",
-        "name": "Snowballer",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:312:coal-carrier",
-        "name": "Coal Carrier",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:313:coal-train",
-        "name": "Coal Train",
-        "wiki_section": "Snow Days"
-      },
-      {
-        "key": "wiki:achievement:314:8-bit-hero",
-        "name": "8-Bit Hero",
-        "wiki_section": "Events"
-      },
-      {
-        "key": "wiki:achievement:315:gleam-hero",
-        "name": "Gleam Hero",
-        "wiki_section": "Events"
-      },
-      {
-        "key": "wiki:achievement:316:gloam-villain",
-        "name": "Gloam Villain",
-        "wiki_section": "Events"
-      },
-      {
-        "key": "wiki:achievement:317:epic-dueler",
-        "name": "Epic Dueler",
-        "wiki_section": "Events"
-      },
-      {
-        "key": "wiki:achievement:318:bowheart",
-        "name": "Bowheart",
-        "wiki_section": "Festival of Hearts"
+    "counter_vocabulary": "job_rank:<job>, quest_completed_count, dungeon_clear:<dungeon> (needs a fight in the dungeon record), kill:<region>:<enemy name part> (region 0 = anywhere; names from enemies.json and the fight files), minigame_win:<id>|<id> (a winning settle: MinigameResult, or the id-only win of a song/cooking run), pet_trick, consumable_use, tcg_win, tcg_win_under:<s>, join_dance_team:<team>, quest_done:<id> (an enabled quest), completed_of:<nnn>|<nnn> (a sum of other rows), job_rank_max, opening_complete, pets_owned, mounts_owned, mounts_owned_of:<mount id>|<mount id>, recipes_all:blacksmith:lt100; waiting:<event> is raised by a game or hook that does not exist yet (reason table in tests/progression_extras.rs); retired:<reason> has no trigger on purpose.",
+    "event_notes": "Event counters add amounts. Rows that mean a maximum (tcg_battle_margin, tcg_game_turns, tcg_point_margin, house_items_max) must be raised by a later hook as a value to compare, not as increments. Every group member gets +1 for each battle kill, the same as quest credit (R): in a group of four the 500-kill rows fill four times as fast.",
+    "item_rewards": {
+      "bound_as_claims": {
+        "Mini Holiday Tree 911083": "row 309",
+        "Green Santa Hat 911084": "row 311",
+        "Lump of Coal 76623": "row 313",
+        "Stone Heart's Pink Bear 911045": "row 318",
+        "Commander Kluggenkrush 911257": "row 269"
+      },
+      "dropped_with_reason": {
+        "Hat of Hats (row 089)": "no item row (locale 10022)",
+        "Quester Hat (row 242)": "no item row (locale 10023)",
+        "Character Name Change (row 243)": "a service, not an item (locale 436312)",
+        "Guild Name Change (row 088)": "a service, not an item (locale 442619)",
+        "TCG cards (rows 264, 274, 279, 284, 289, 294, 299)": "card collection, not inventory; no item row",
+        "Pumpkin Carver (row 301)": "no item row (locale 5102449)",
+        "Epic Gleam Hero or Epic Gloam Villain outfit (row 317)": "no item row",
+        "S.M.A.C.M. (row 259)": "no mount row; the ride this achievement awards"
       }
-    ]
+    }
   },
   "image_report": {
     "achievement_definition_icon_ids_resolved": 0,

@@ -207,3 +207,49 @@ fn a_pick_is_the_quests_click_and_only_its_difficulty_credits() {
     play_to_a_win(&mut game, &at, instance, 1_000, 51_000, 37_000);
     assert_eq!(counts(&game, READY_TO_ROCK), [1, 1, 0], "the novice win");
 }
+
+fn achievement_done(game: &Gameplay, number: &str) -> bool {
+    let tag = format!(":{number}:");
+    game.progression_extras
+        .achievement_state_ref()
+        .completed
+        .iter()
+        .any(|key| key.contains(&tag))
+}
+
+/// C7: a song win reaches the achievements through the real 39/18 settle (the id-only path),
+/// not through a hand-built event.
+#[test]
+fn winning_a_song_at_the_stand_completes_its_feeling_the_beat_row() {
+    let (mut game, at) = game_at(STAND_AT);
+    assert!(!achievement_done(&game, "097"));
+    let picked = pick_song(&mut game, &at, STAND, 388_938, 1_000);
+    let (instance, game_id) = offered(&picked).expect("the pick offers the song");
+    assert_eq!(game_id, 201);
+    // Starting the song and a loss-free pick count nothing.
+    assert!(!achievement_done(&game, "097"));
+    play_to_a_win(&mut game, &at, instance, 1_000, 2_000, 37_000);
+    assert!(achievement_done(&game, "097"), "Music Student");
+    assert!(!achievement_done(&game, "098"), "Frontman needs song 202");
+    let picked = pick_song(&mut game, &at, STAND, 388_939, 50_000);
+    let (instance, game_id) = offered(&picked).expect("song 202");
+    assert_eq!(game_id, 202);
+    play_to_a_win(&mut game, &at, instance, 1_000, 51_000, 40_000);
+    assert!(achievement_done(&game, "098"), "Frontman");
+}
+
+/// C7: the client ignores 150/3 and 150/7 for an achievement it was never told about, so entering
+/// the world sends the definitions (150/4).
+#[test]
+fn entering_the_world_sends_the_achievement_definitions() {
+    let (mut game, at) = game_at(STAND_AT);
+    let out = game.initialize_world(&at, 1_000).unwrap();
+    let packets: Vec<_> = out
+        .replies
+        .iter()
+        .filter(|p| p.starts_with(&[150, 0, 4, 0, 0, 0]))
+        .collect();
+    assert_eq!(packets.len(), 1, "one 150/4 on world entry");
+    let rows = u32::from_le_bytes(packets[0][6..10].try_into().unwrap());
+    assert!(rows >= 150 && rows < 313, "the live and waiting rows are all in the window: {rows}");
+}
