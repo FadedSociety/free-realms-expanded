@@ -506,6 +506,8 @@ fn admin_a_static_path_escape_is_refused() {
     let script = get(&mut rig, "/admin/app.js", None);
     assert_eq!((script.status, script.header("content-type")), (200, Some("text/javascript; charset=utf-8")));
     assert_eq!(get(&mut rig, "/admin", None).status, 301);
+    let root = get(&mut rig, "/", None);
+    assert_eq!((root.status, root.header("location")), (301, Some("/admin/")));
     for path in [
         "/admin/../secret.txt",
         "/admin/%2e%2e/secret.txt",

@@ -465,7 +465,8 @@ fn route(shared: &Shared, request: &Request, peer: IpAddr) -> Reply {
         return reply;
     }
     let path = request.path.as_str();
-    if path == "/admin" {
+    // The bare root sends people to the panel too (owner RC test 2026-11-11: `/` answered "not found").
+    if path == "/admin" || path == "/" {
         let mut reply = error(301, "moved to /admin/");
         reply.headers.push("Location: /admin/".into());
         return reply;
