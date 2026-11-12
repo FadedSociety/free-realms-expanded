@@ -2,11 +2,12 @@
 //!
 //! Proven binding (`notes/Research/Cave Results Score Binding.md`): TOTAL SCORE
 //! is the fifth i32 (Points) of the `39/47` row whose Order/Score-Type is 4.
-//! The lead's policy reuses the existing local objective award as the won
-//! total and sends zero on a loss, without inventing kill points or historical
-//! score. The win golden below is the exact byte output of the independently
-//! compiled pinned community writer with `Value = 4`, `Points = 5000`
-//! (`lab/reports/cave-score-binding-20261009T121500Z/writer-probe.log`).
+//! rc-0136 (the owner: "the score system always shows 5000"): the card is the
+//! run's own, as a fight file's is: 300 an enemy, a time bonus of 100,000 less
+//! 500 a second after the first, 25,000 for the knockout left and 5,000 a goal
+//! (the captured battle record, packet 62). A loss keeps its kill points only.
+//! The golden's 39/47 header (state, game and instance) is the independently
+//! compiled community writer's (`lab/reports/cave-score-binding-20261009T121500Z`).
 use osfr_tools::{
     character_store::CharacterState,
     encounter::{EncounterEngine, EncounterPhase},
@@ -198,15 +199,30 @@ fn won_total_row_carries_the_local_objective_award() {
     );
     let scores = frame(&won, 47).expect("win score rows");
     assert_eq!(
-        hex(scores),
-        WIN_GOLDEN,
-        "the win 39/47 must equal the compiled community writer with total 5000"
+        hex(&scores[..15]),
+        WIN_GOLDEN[..30],
+        "the 39/47 header is the compiled community writer's"
     );
     let rows = score_rows(scores);
-    assert_eq!(rows[0].0, "scoreEnemiesDefeated");
-    assert_eq!(rows[0].1, [-1, 0, 4, -1, 0], "defeat count stays actual");
-    assert_eq!(rows[1].0, "scoreTotalScore");
-    assert_eq!(rows[1].1, [-1, 4, -1, -1, 5000]);
+    let names: Vec<&str> = rows.iter().map(|(name, _)| name.as_str()).collect();
+    assert_eq!(
+        names,
+        [
+            "scoreEnemiesDefeated",
+            "scoreTimeBonus",
+            "scorePlayerKnockouts",
+            "scoreObjectives",
+            "scoreTotalScore"
+        ]
+    );
+    assert_eq!(rows[0].1, [-1, 0, 4, -1, 4 * 300], "defeat count stays actual");
+    // The legacy run's clock starts when the arena loads (0) and stops at the last kill.
+    let seconds = (now - 700) as i32 / 1000;
+    let bonus = 100_000 - 500 * (seconds - 1).max(0);
+    assert_eq!(rows[1].1, [-1, 2, seconds, -1, bonus], "time row: a clock");
+    assert_eq!(rows[2].1, [-1, 1, 1, 1, 25_000], "the knockout left, count / max");
+    assert_eq!(rows[3].1, [-1, 3, 1, 1, 5_000], "the goal");
+    assert_eq!(rows[4].1, [-1, 4, -1, -1, 1_200 + bonus + 25_000 + 5_000]);
 }
 
 #[test]
@@ -228,8 +244,10 @@ fn loss_total_row_stays_zero_and_keeps_the_real_defeat_count() {
     );
     let scores = frame(&loss, 47).expect("loss score rows");
     let rows = score_rows(scores);
-    assert_eq!(rows[0].1, [-1, 0, 3, -1, 0], "three real defeats");
-    assert_eq!(rows[1].1, [-1, 4, -1, -1, 0], "a loss awards no total");
+    assert_eq!(rows[0].1, [-1, 0, 3, -1, 900], "three real defeats");
+    assert_eq!(rows[1].1[4], 0, "a loss earns no time bonus");
+    assert_eq!(rows[2].1, [-1, 1, 0, 1, 0], "nor the knockout one");
+    assert_eq!(rows[4].1, [-1, 4, -1, -1, 900], "a loss keeps its kills only");
 }
 
 #[test]

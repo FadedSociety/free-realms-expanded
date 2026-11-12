@@ -50,7 +50,7 @@
       "definition_id": 950187,
       "name": "Robgoblin Geomancer!",
       "name_id": 42053,
-      "model_id": 1914,
+      "model_id": 191,
       "rank": "boss",
       "boss": true
     },
@@ -248,6 +248,14 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): model 191 robgoblin_m_mage.adr, a robgoblin caster for the boss; 1914 sg_spawner_robgoblin_01.adr is the starter's junk-pile prop, not a fighter."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): this row is the battle's starter, the prop 2014 drew it as (the Snarler's den: video 5-IM2pBh2yY frames 01048 and 01080, red name, crossed swords, Press X; capture p12 t=546051.7 model 1938). The fight's own kind carries the body its waves fight with."
     }
   ]
 }

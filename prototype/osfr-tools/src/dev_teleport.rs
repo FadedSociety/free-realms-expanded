@@ -77,6 +77,18 @@ pub struct Relocation {
     pub rotation: [f32; 3],
 }
 
+impl Relocation {
+    /// The arrival stood on the ground (`Terrain::snapped`, the rule enemies follow): the
+    /// standoff keeps the actor's own height [`STANDOFF`] metres away, which on a slope is under
+    /// the hillside (rc-0136: `realm goto Bixie Hive` arrived 3.2 m below it and fell).
+    pub fn on_ground(mut self, terrain: Option<&crate::terrain::Terrain>, zone: u32) -> Self {
+        if let Some(terrain) = terrain {
+            self.position = terrain.snapped(zone, self.position);
+        }
+        self
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Command {
     Reply(String),
@@ -749,5 +761,68 @@ mod tests {
                 other.name
             );
         }
+    }
+
+    /// rc-0136: `realm goto Bixie Hive` put the player 5 m from the door at the door's own
+    /// height, 3.2 m under the rising hillside, and the client let them fall. The arrival now
+    /// stands on the ground through the one rule enemies use; a cave door far below the surface
+    /// keeps its own height.
+    #[test]
+    fn a_goto_arrival_stands_on_the_ground_and_a_cave_door_keeps_its_height() {
+        let mut grid = crate::terrain::HeightGrid::new([-20.0, -20.0], [20.0, 20.0], 1.0).unwrap();
+        // The ground rises 1 m per metre east of x = 0, from 0 m.
+        let at = |x: f32, z: f32| [x, x.max(0.0), z];
+        for (a, b, c) in [
+            (at(-20.0, -20.0), at(0.0, -20.0), at(0.0, 20.0)),
+            (at(-20.0, -20.0), at(0.0, 20.0), at(-20.0, 20.0)),
+            (at(0.0, -20.0), at(20.0, -20.0), at(20.0, 20.0)),
+            (at(0.0, -20.0), at(20.0, 20.0), at(0.0, 20.0)),
+        ] {
+            grid.add_triangle([a, b, c]);
+        }
+        let dir = std::env::temp_dir().join(format!("osfr-goto-ground-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("zone_0.hgt"), grid.to_bytes()).unwrap();
+        let terrain = crate::terrain::Terrain::load_heights(&dir).unwrap();
+        let _ = std::fs::remove_dir_all(&dir);
+        let door = Target {
+            heading: Some(std::f32::consts::FRAC_PI_2), // faces +x, up the slope
+            ..actor(7, "Bixie Hive", 0, [0.0, 0.0, 0.0])
+        };
+        let Some(Command::Relocate { relocation, .. }) = handle(
+            "goto bixie hive",
+            &[door.clone()],
+            &character(0, [-10.0, 0.0, 0.0]),
+        ) else {
+            panic!("the door relocates");
+        };
+        assert!((relocation.position[0] - STANDOFF).abs() < 1e-3);
+        assert_eq!(
+            relocation.position[1], 0.0,
+            "the door's own height, 5 m under"
+        );
+        let grounded = relocation.clone().on_ground(Some(&terrain), 0);
+        assert!(
+            (grounded.position[1] - STANDOFF).abs() < 0.01,
+            "{grounded:?}"
+        );
+        assert_eq!(grounded.rotation, relocation.rotation);
+        // No terrain, another zone, or a door deep under the surface: unchanged.
+        assert_eq!(relocation.clone().on_ground(None, 0), relocation);
+        assert_eq!(
+            relocation.clone().on_ground(Some(&terrain), 411),
+            relocation
+        );
+        let cave = Relocation {
+            position: [5.0, -40.0, 0.0],
+            ..relocation
+        };
+        assert_eq!(cave.clone().on_ground(Some(&terrain), 0), cave);
+        // Within SETTLED_M of the ground a placement is at rest and keeps its own height.
+        let settled = Relocation {
+            position: [10.0, 10.05, 0.0],
+            ..relocation
+        };
+        assert_eq!(settled.clone().on_ground(Some(&terrain), 0), settled);
     }
 }

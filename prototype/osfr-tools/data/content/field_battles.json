@@ -44,10 +44,14 @@
             -0.6,
             175.0
           ],
-          "max_health": 900,
-          "damage": 4,
+          "max_health": 1726,
+          "damage": 25,
           "boss": true,
-          "skittish": true
+          "skittish": true,
+          "rank": "tough",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         },
         {
           "guid": 100000096002,
@@ -61,11 +65,15 @@
             -0.6,
             173.0
           ],
-          "max_health": 140,
-          "damage": 3,
+          "max_health": 260,
+          "damage": 25,
           "boss": false,
-          "summon_below_percent": 75,
-          "scale": 0.65
+          "summon_below_percent": 70,
+          "scale": 0.65,
+          "rank": "minion",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         },
         {
           "guid": 100000096003,
@@ -79,11 +87,15 @@
             -0.6,
             173.0
           ],
-          "max_health": 140,
-          "damage": 3,
+          "max_health": 260,
+          "damage": 25,
           "boss": false,
-          "summon_below_percent": 75,
-          "scale": 0.65
+          "summon_below_percent": 70,
+          "scale": 0.65,
+          "rank": "minion",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         },
         {
           "guid": 100000096004,
@@ -97,11 +109,15 @@
             -0.6,
             173.0
           ],
-          "max_health": 140,
-          "damage": 3,
+          "max_health": 260,
+          "damage": 25,
           "boss": false,
           "summon_below_percent": 50,
-          "scale": 0.65
+          "scale": 0.65,
+          "rank": "minion",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         },
         {
           "guid": 100000096005,
@@ -115,11 +131,15 @@
             -0.6,
             173.0
           ],
-          "max_health": 140,
-          "damage": 3,
+          "max_health": 760,
+          "damage": 25,
           "boss": false,
           "summon_below_percent": 50,
-          "scale": 0.65
+          "scale": 0.65,
+          "rank": "normal",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         },
         {
           "guid": 100000096006,
@@ -133,11 +153,15 @@
             -0.6,
             173.0
           ],
-          "max_health": 140,
-          "damage": 3,
+          "max_health": 760,
+          "damage": 25,
           "boss": false,
-          "summon_below_percent": 25,
-          "scale": 0.65
+          "summon_below_percent": 30,
+          "scale": 0.65,
+          "rank": "normal",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         },
         {
           "guid": 100000096007,
@@ -151,11 +175,15 @@
             -0.6,
             173.0
           ],
-          "max_health": 140,
-          "damage": 3,
+          "max_health": 760,
+          "damage": 25,
           "boss": false,
-          "summon_below_percent": 25,
-          "scale": 0.65
+          "summon_below_percent": 30,
+          "scale": 0.65,
+          "rank": "normal",
+          "behaviour": {
+            "attack_ms": 2300
+          }
         }
       ],
       "reward_coins": 25,
@@ -183,6 +211,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) prize list: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354, Small Health Potion 11002 (ids, names and icons from the client item catalogue). Modelled on the wiki's per-job dungeon 'Medic Prize Wheel' (Robgoblin Treasure Trove: Battle Item Mystery Pack, Medic's Power Shard of Vitality II, ...); the original Troll Summoner Madness prizes and their job-specific wheels are unknown; one is awarded at random per win"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 (2026-11-11) tuning, the owner's 'felt way too easy': the 2014 numbers of design 5.2/5.3 at the battle's tier 1 instead of the old rows' 900/140 health and 4/3 damage (x3.72 and x0.5 at load: 3348 and 521 health, 2 a hit, read off the owner's run). Summoner rank tough, 1726 health (video: 1,650-2,100 at difficulty 1; about four 444 hits at level 4); it still fights beside its helpers as the owner's 2026-10-15 design has it, though no video shows it strike. Scoutlings rank minion (260), Ragelings normal (760), every one 25 raw a hit every 2.3 s (S12; Bixie anchor 25). Summon pace after the 2009 ladder (ENEM 4.1: helpers at about 70 % and 40 %): pairs at 70, 50 and 30 % (was 75 / 50 / 25), the Ragelings last. Values are rows here and the rank tables in combat_scale.json."
         }
       ],
       "nameplate_image_id": 11970,
@@ -1152,7 +1184,7 @@
       "spawner": {
         "guid": 100001231000,
         "definition_id": 930073,
-        "model_id": 4547,
+        "model_id": 51,
         "name_id": 2245,
         "name": "Yeti",
         "texture_alias": "",
@@ -1169,7 +1201,7 @@
         {
           "guid": 100001231001,
           "definition_id": 930073,
-          "model_id": 4547,
+          "model_id": 51,
           "name_id": 2245,
           "name": "Yeti",
           "texture_alias": "",
@@ -1185,7 +1217,7 @@
         {
           "guid": 100001231002,
           "definition_id": 930073,
-          "model_id": 4547,
+          "model_id": 51,
           "name_id": 2245,
           "name": "Yeti",
           "texture_alias": "",
@@ -1201,7 +1233,7 @@
         {
           "guid": 100001231003,
           "definition_id": 930073,
-          "model_id": 4547,
+          "model_id": 51,
           "name_id": 2245,
           "name": "Yeti",
           "texture_alias": "",
@@ -1217,6 +1249,10 @@
       ],
       "reward_coins": 25,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 (2026-11-11): the yetis that fight wear model 51 sasquatch_01.adr, the yeti body (its .adr names the skeleton sasquatch.dsk); 4547 sh_standard_yeti_01.adr is a banner with no skeleton, the look of the Frosty Yeti who starts Petty Yetis! (BJX fork Npcs.json 33589 and 33816, reference spawns, wear 4547 as the battle's starters; its wave Yeti 46010 wears 51). The battle's overworld marker is its visible, wandering Yeti, so it wears the body too (as battle 96's marker is the walking Troll Summoner); the Petty Yetis entrance's Frosty Yeti starter keeps the banner."
+        },
         {
           "kind": "client",
           "evidence": "Global.Text id 93274 resolves 'Petty Yetis!', 116757 resolves 'Yeti thieves are harassing the travelers of Snowhill! Find and defeat them!', and 116824 resolves 'Take down the yetis!' (lab/reports/locale-id-to-text.json; en_us_data.dat lines 110648, 83806 and 31209). Models.txt line 3529 maps 4547 to sh_standard_yeti_01.adr; catalog.tsv line 59605 contains pack_14/002627.adr."

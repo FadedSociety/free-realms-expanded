@@ -272,7 +272,7 @@ impl EncounterEngine {
         if after_ms > 0 {
             out.replies.push(animation(guid, DOWN_ANIMATION, false));
         }
-        out.replies.push(enemy_hp(guid, health, max_health));
+        out.replies.extend(enemy_health(guid, health, max_health));
         true
     }
 
@@ -628,7 +628,7 @@ impl EncounterEngine {
             }
             out.replies.push(self.spawn(a, *position, 0));
             out.replies
-                .push(enemy_hp(a.guid, a.max_health, a.max_health));
+                .extend(enemy_health(a.guid, a.max_health, a.max_health));
             out.replies
                 .push(animation(a.guid, visuals.spawn_animation, false));
             guids.push(a.guid);
@@ -775,7 +775,7 @@ impl EncounterEngine {
         self.arena.forget(guid);
         out.replies.push(self.spawn(next, position, 0));
         out.replies
-            .push(enemy_hp(next.guid, health, next.max_health));
+            .extend(enemy_health(next.guid, health, next.max_health));
         if next.boss {
             out.replies.push(boss_display(next.guid, true));
         }
@@ -942,7 +942,7 @@ impl EncounterEngine {
                 out.replies.push(remove(guid));
                 out.replies
                     .push(self.spawn(&shown, position, flags.disposition.unwrap_or(0)));
-                out.replies.push(enemy_hp(guid, health, shown.max_health));
+                out.replies.extend(enemy_health(guid, health, shown.max_health));
                 if shown.boss {
                     out.replies.push(boss_display(guid, true));
                 }

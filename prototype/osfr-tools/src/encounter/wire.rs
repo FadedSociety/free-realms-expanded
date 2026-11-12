@@ -45,35 +45,6 @@ pub(super) fn game_over(won: bool, instance: i32, id: u32) -> Vec<u8> {
     }
     b
 }
-pub(super) fn end_scores(active: &ActiveEncounter) -> Vec<u8> {
-    end_scores_packet(
-        active.instance_id,
-        active.encounter_id,
-        active.enemies.iter().filter(|e| e.health == 0).count() as i32,
-        active.phase == EncounterPhase::Won,
-    )
-}
-
-pub(super) fn end_scores_packet(instance: i32, id: u32, defeated: i32, won: bool) -> Vec<u8> {
-    let mut b = minigame(47, instance, id);
-    b.extend(2_i32.to_le_bytes());
-    // These are original localization keys and score types. Only the Order-4
-    // total row changes with the outcome: a won run reports the local
-    // objective award, a loss reports zero. Defeat counts stay actual and no
-    // per-kill points or historical score are invented.
-    let total = if won { OBJECTIVE_AWARD_SCORE } else { 0 };
-    for (name, order, value, points) in [
-        ("scoreEnemiesDefeated", 0_i32, defeated, 0_i32),
-        ("scoreTotalScore", 4_i32, -1, total),
-    ] {
-        b.extend((name.len() as i32).to_le_bytes());
-        b.extend(name.as_bytes());
-        for field in [-1, order, value, -1, points] {
-            b.extend(field.to_le_bytes());
-        }
-    }
-    b
-}
 pub(super) fn objective(sub: u8, id: i32, value: i32) -> Vec<u8> {
     let mut b = 45_u16.to_le_bytes().to_vec();
     b.push(sub);
@@ -122,6 +93,20 @@ pub(super) fn enemy_hp(guid: u64, hp: u32, max: u32) -> Vec<u8> {
         b.extend(v.to_le_bytes());
     }
     b
+}
+/// An enemy's health as the client must hold it: the 35/5 bar over its head, then the 35/35
+/// health statement (show 0, delta 0: live sent that shape for every regen tick, C13). Only
+/// 35/35 and 32/7 set the actor's current and maximum health (`PlayerHitpointEvent`,
+/// `008ba940` writes +0x160 / +0x15c), and those two fields are what the boss bar reads
+/// (`BaseClient.Bosses` cell getter `00a79eb0`, columns 2 and 3); the 35/5 handler (dispatch
+/// `0092f460` case 5) only moves the nameplate bar. 32/7 alone subtracts its damage from the
+/// client's copy (`00a2ba40`), which is zero until a statement sets it.
+pub(super) fn enemy_health(guid: u64, hp: u32, max: u32) -> [Vec<u8>; 2] {
+    let wire = |v: u32| i32::try_from(v).unwrap_or(i32::MAX);
+    [
+        enemy_hp(guid, hp, max),
+        hitpoints(guid, guid, false, wire(max), wire(hp), 0, false),
+    ]
 }
 pub(super) fn boss_display(guid: u64, on: bool) -> Vec<u8> {
     let mut b = header(32, 9);
@@ -351,10 +336,11 @@ pub struct PlayerHit {
 }
 
 /// Every packet of one player hit, in order. Today: the swing (35/8 animation 1099), 32/7
-/// carrying the kit's impact effect when the hit names one, and the enemy bar (35/5). The
-/// live shape is `WireData::player_hit_live`, chosen in `player_hit_packets`.
+/// carrying the kit's impact effect when the hit names one, and the enemy's health (35/5 and
+/// the 35/35 statement the boss bar reads). The live shape is `WireData::player_hit_live`,
+/// chosen in `player_hit_packets`.
 pub fn player_hit(h: &PlayerHit) -> Vec<Vec<u8>> {
-    let mut packets = Vec::with_capacity(3);
+    let mut packets = Vec::with_capacity(4);
     if h.swing {
         packets.push(animation(h.attacker, 1099, false));
     }
@@ -367,7 +353,7 @@ pub fn player_hit(h: &PlayerHit) -> Vec<Vec<u8>> {
         h.effect.unwrap_or(0),
         [h.critical, false],
     ));
-    packets.push(enemy_hp(h.target, h.health, h.max_health));
+    packets.extend(enemy_health(h.target, h.health, h.max_health));
     packets
 }
 

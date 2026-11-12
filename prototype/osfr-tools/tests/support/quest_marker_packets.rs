@@ -32,26 +32,50 @@ fn guid(bytes: &[u8], at: usize) -> u64 {
     u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap())
 }
 
-/// Every 35/10 row and every 35/11 guid in `packets`, in order.
+/// Every 35/10 row and every 35/11 guid in `packets`, in order. A compact row (u64 guid, u8 1,
+/// i32 kind, u8: 14 bytes, the open-world enemy's dot) carries no state, image or names, so
+/// those read 0 (`compact_rows` tells the two apart).
 pub fn markers(packets: &[Vec<u8>]) -> (Vec<Marker>, Vec<u64>) {
     let (mut shown, mut cleared) = (Vec::new(), Vec::new());
     for (index, packet) in packets.iter().enumerate() {
         let rows = |size: usize| (0..word(packet, 4) as usize).map(move |row| 8 + row * size);
         if packet.starts_with(&[35, 0, 10, 0]) {
-            shown.extend(rows(39).map(|at| Marker {
-                index,
-                guid: guid(packet, at),
-                kind: word(packet, at + 9),
-                state: word(packet, at + 13),
-                image: word(packet, at + 17),
-                name: word(packet, at + 25),
-                subtext: word(packet, at + 29),
-            }));
+            let mut at = 8;
+            for _ in 0..word(packet, 4) {
+                let full = packet[at + 8] == 0;
+                shown.push(Marker {
+                    index,
+                    guid: guid(packet, at),
+                    kind: word(packet, at + 9),
+                    state: if full { word(packet, at + 13) } else { 0 },
+                    image: if full { word(packet, at + 17) } else { 0 },
+                    name: if full { word(packet, at + 25) } else { 0 },
+                    subtext: if full { word(packet, at + 29) } else { 0 },
+                });
+                at += if full { 39 } else { 14 };
+            }
+            assert_eq!(at, packet.len(), "no bytes left after the 35/10 rows");
         } else if packet.starts_with(&[35, 0, 11, 0]) {
             cleared.extend(rows(16).map(|at| guid(packet, at)));
         }
     }
     (shown, cleared)
+}
+
+/// The guids of every compact 35/10 row in `packets`, in order.
+pub fn compact_rows(packets: &[Vec<u8>]) -> Vec<u64> {
+    let mut found = Vec::new();
+    for packet in packets.iter().filter(|p| p.starts_with(&[35, 0, 10, 0])) {
+        let mut at = 8;
+        for _ in 0..word(packet, 4) {
+            let full = packet[at + 8] == 0;
+            if !full {
+                found.push(guid(packet, at));
+            }
+            at += if full { 39 } else { 14 };
+        }
+    }
+    found
 }
 
 /// The position of the 35/2 AddNpc that spawns `actor`.

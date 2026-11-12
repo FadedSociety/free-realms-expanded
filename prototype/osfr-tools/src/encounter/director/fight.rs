@@ -123,6 +123,25 @@ pub struct Score {
     pub per_objective: u32,
 }
 
+/// The score values a packet-62 record carries, in its order: quick-completion time, value and
+/// loss, then per enemy, knockout reward and penalty (C16's battle record: 1, 100,000, 500, 300,
+/// 25,000, 5,000 for a row with no fight file).
+impl From<&crate::encounter::wire::Settings> for Score {
+    fn from(s: &crate::encounter::wire::Settings) -> Self {
+        let [time, value, loss, enemy, reward, penalty] = s.ints.map(|v| v.max(0) as u32);
+        Self {
+            per_enemy: enemy,
+            per_knockout_left: reward,
+            knockout_penalty: penalty,
+            quick_value: value,
+            quick_loss_per_s: loss,
+            quick_time_s: time,
+            objective_multiplier: s.float_b,
+            ..Self::default()
+        }
+    }
+}
+
 impl Default for Score {
     fn default() -> Self {
         Self {

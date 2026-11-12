@@ -51,7 +51,7 @@
       "definition_id": 3592,
       "name": "Frostfang Snarler",
       "name_id": 78096,
-      "model_id": 1938,
+      "model_id": 177,
       "rank": "normal"
     }
   },
@@ -208,6 +208,14 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): the Snarlers that fight (the battle's waves, and the quest-gated field one) wear model 177 wolf_evil.adr, the Frostfang family's body (card 78097 'A pack of hungry wolves'; the fork's waves are Frostfang Wolves). The den sg_spawner_wolf_01.adr (1938) is the battle starter's look, as 2014 drew it."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): this row is the battle's starter, the prop 2014 drew it as (the Snarler's den: video 5-IM2pBh2yY frames 01048 and 01080, red name, crossed swords, Press X; capture p12 t=546051.7 model 1938). The fight's own kind carries the body its waves fight with."
     },
     {
       "kind": "reconstructed",

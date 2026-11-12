@@ -305,6 +305,7 @@ impl SharedFieldState {
             .iter()
             .find(|f| f.actor.guid == guid && f.present && f.state.health > 0)
         {
+            let [bar, statement] = enemy_health(guid, f.state.health, f.actor.max_health);
             return Ok([
                 Some(spawn_actor(
                     &self.template.template,
@@ -312,8 +313,9 @@ impl SharedFieldState {
                     f.state.position,
                     0,
                 )),
-                field_marker::packet(guid, f.marker),
-                Some(enemy_hp(guid, f.state.health, f.actor.max_health)),
+                field_marker::enemy(guid, f.marker),
+                Some(bar),
+                Some(statement),
                 // Late observers start with current status and motion (R).
                 Some(animation(
                     guid,

@@ -4,8 +4,10 @@
 //!
 //! `field_camps.json` lists camps. A camp names an `enemies.json` definition (stats and the
 //! kill-credit definition id), a level, the field policy (respawn, aggro, leash, behaviour,
-//! drop table) and the `spawn_guid` of every body it takes over. Each body keeps its position,
-//! model, texture and name from `npc_spawns_extra.json`, so there is one placement store; the
+//! drop table) and the `spawn_guid` of every body it takes over. Each body keeps its position
+//! and name from `npc_spawns_extra.json`, so there is one placement store, and wears the
+//! definition's model (and texture) when its own differs: the catalogue is the kind's look
+//! (rc-0136: a body bound to the wolf-den prop drew a 'dog house' that bit). The
 //! field GUID is the body's GUID, so the passive copy is hidden by the same exclusion that hides
 //! `field_enemies.json` rows (`Gameplay` excludes `field_guids`). Rows are expanded into the
 //! rows `field_enemies.json` produces and then validated by the same code
@@ -55,6 +57,9 @@ struct Definition {
     id: String,
     kind: String,
     definition_id: i32,
+    model_id: i32,
+    #[serde(default)]
+    texture_alias: String,
     name_string_id: i32,
     max_health: u32,
     damage: u32,
@@ -149,14 +154,19 @@ impl EncounterEngine {
                     .get(&guid)
                     .filter(|body| body.capture_match.is_none())
                     .ok_or_else(|| invalid("field camp member is not a drawn extras body"))?;
+                let (model_id, texture_alias) = if body.model_id == definition.model_id {
+                    (body.model_id, &body.texture_alias)
+                } else {
+                    (definition.model_id, &definition.texture_alias)
+                };
                 let actor = FieldActor {
                     actor: Actor {
                         guid,
                         definition_id: definition.definition_id,
-                        model_id: body.model_id,
+                        model_id,
                         name_id: body.name_string_id.unwrap_or(definition.name_string_id),
                         name: body.name.clone().unwrap_or_else(|| definition.kind.clone()),
-                        texture_alias: body.texture_alias.clone(),
+                        texture_alias: texture_alias.clone(),
                         position: body.position,
                         max_health: definition.max_health,
                         damage: definition.damage,

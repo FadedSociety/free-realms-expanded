@@ -19943,29 +19943,29 @@
       "definition_id": 930073,
       "enemy_id": "yeti",
       "kind": "Yeti",
-      "model_id": 4547,
-      "adr": "sh_standard_yeti_01.adr",
+      "model_id": 51,
+      "adr": "sasquatch_01.adr",
       "models_txt": {
         "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
-        "line": 3529,
+        "line": 52,
         "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
-        "model_id": 4547,
-        "filename": "sh_standard_yeti_01.adr",
+        "model_id": 51,
+        "filename": "sasquatch_01.adr",
         "row_scale": "0.000000",
-        "description": ""
+        "description": "Combat NPC"
       },
       "catalog": {
         "path": "lab/extracted/client-assets/catalog.tsv",
-        "line": 59605,
-        "extracted_path": "pack_14/002627.adr",
+        "line": 19361,
+        "extracted_path": "pack_05/001651.adr",
         "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
-        "asset_sha256": "b4e72b812ff31239869505f4c5592fec875c2825a48246e0ff9bde0ecc672cf0"
+        "asset_sha256": "ccbce7843ce69216085e4c9560dfca5a4273e7075965bba33c99f62499db501b"
       },
       "catalog_status": "present",
       "name_binding_status": "R",
       "match_method": "client_locale_plus_model_table",
       "matched_tokens": [],
-      "binding_evidence": "Client locale id 2245 resolves to 'Yeti'; Models.txt maps 4547 to sh_standard_yeti_01.adr; the catalog contains the asset. (R) Yetis maps to the exact singular client name and the standard yeti model.",
+      "binding_evidence": "Client locale id 2245 resolves to 'Yeti'; Models.txt line 52 maps 51 to sasquatch_01.adr (Combat NPC); the catalog contains the asset. (R) rc-0136 (2026-11-11): the yetis that fight wear model 51 sasquatch_01.adr, the yeti body (its .adr names the skeleton sasquatch.dsk); 4547 sh_standard_yeti_01.adr is a banner with no skeleton, the look of the Frosty Yeti who starts Petty Yetis! (BJX fork Npcs.json 33589 and 33816, reference spawns, wear 4547 as the battle's starters; its wave Yeti 46010 wears 51).",
       "adr_closure": {
         "reader": "not_applicable",
         "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
@@ -20631,21 +20631,21 @@
       "definition_id": 2529,
       "enemy_id": "frostfang_growler",
       "kind": "Frostfang Growler",
-      "model_id": 3284,
-      "adr": "wolf_generic.adr",
+      "model_id": 176,
+      "adr": "wolf.adr",
       "models_txt": {
         "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
-        "line": 2470,
+        "line": 177,
         "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
-        "model_id": 3284,
-        "filename": "wolf_generic.adr",
+        "model_id": 176,
+        "filename": "wolf.adr",
         "row_scale": "0.000000",
         "description": ""
       },
       "catalog": {
         "path": "lab/extracted/client-assets/catalog.tsv",
-        "line": 10255,
-        "extracted_path": "pack_03/000417.adr",
+        "line": 5644,
+        "extracted_path": "pack_01/002214.adr",
         "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
       },
       "catalog_status": "present",
@@ -20655,7 +20655,7 @@
         "frostfang",
         "growler"
       ],
-      "binding_evidence": "T699: reference actor definition 2529 (Npcs.json ModelId 3284, wolf_generic.adr) shares model 3284 with the quest target 'Frostfang Growler' (locale 104067). Kill target of q3030012 objective 0.0.",
+      "binding_evidence": "rc-0136 (2026-11-11): model 176 wolf.adr, the model live sent for every Frostfang Growler (111 AddNpc rows in p12.pcap and packets_3.pcapng); 3284 wolf_generic.adr was the reference row's.",
       "adr_closure": null,
       "runtime_scale": null,
       "texture_alias": "",
@@ -22395,28 +22395,28 @@
       "definition_id": 3936,
       "enemy_id": "robgoblin_kaboomer",
       "kind": "Robgoblin Kaboomer",
-      "model_id": 4202,
-      "adr": "robgoblin_m_junkmaster.adr",
+      "model_id": 1682,
+      "adr": "robgoblin_m_master.adr",
       "models_txt": {
         "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
-        "line": 3384,
+        "line": 1656,
         "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
-        "model_id": 4202,
-        "filename": "robgoblin_m_junkmaster.adr",
+        "model_id": 1682,
+        "filename": "robgoblin_m_master.adr",
         "row_scale": "0.000000",
         "description": ""
       },
       "catalog": {
         "path": "lab/extracted/client-assets/catalog.tsv",
-        "line": 51480,
-        "extracted_path": "Assets_001.pack",
+        "line": 18758,
+        "extracted_path": "pack_05/001048.adr",
         "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
       },
       "catalog_status": "present",
       "name_binding_status": "R",
       "match_method": "reference_npc_row_plus_client_locale",
       "matched_tokens": [],
-      "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 6720 reads 'Robgoblin Kaboomer', Models.txt line 3384 maps 4202 to robgoblin_m_junkmaster.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "binding_evidence": "rc-0136 (2026-11-11): model 1682 robgoblin_m_master.adr, the model live sent for every Robgoblin Kaboomer (10 AddNpc rows in packets_3.pcapng, 2014-03); 4202 robgoblin_m_junkmaster.adr was the reference row's.",
       "capture": null
     },
     {

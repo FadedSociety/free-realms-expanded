@@ -57,7 +57,7 @@
       "definition_id": 3593,
       "name": "Ice Troll Scout",
       "name_id": 116741,
-      "model_id": 4546,
+      "model_id": 100,
       "rank": "boss",
       "boss": true
     }
@@ -252,6 +252,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/ice_troll_scout.json."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): the Ice Troll Scout that fights wears model 100 troll_ice.adr, the body of the fork battle's Ice Trolls (BJX Battles.json Id 83; its Npcs.json 46053 'Ice Troll'); 4546 sg_troll_hut_02_snow.adr is the scout's hut with no skeleton, the starter's look (entrance ice_troll_scout)."
     }
   ]
 }

@@ -49,7 +49,7 @@
       "definition_id": 4162,
       "name": "Hooligan Bullies!",
       "name_id": 74753,
-      "model_id": 1913,
+      "model_id": 203,
       "rank": "normal"
     },
     "hooligan_scrapper": {
@@ -264,6 +264,14 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): model 203 human_m_hooligan_brawler_01.agr (the Hooligan's body); the fight's waves field this kind, and 1913 sg_spawner_human_01.adr is the battle starter's tent prop (Legacy NPC 4162), not a fighter."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): this row is the battle's starter, the prop 2014 drew it as (the Snarler's den: video 5-IM2pBh2yY frames 01048 and 01080, red name, crossed swords, Press X; capture p12 t=546051.7 model 1938). The fight's own kind carries the body its waves fight with."
     }
   ]
 }

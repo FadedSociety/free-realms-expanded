@@ -60,7 +60,7 @@
       "definition_id": 2529,
       "name": "Frostfang Growler",
       "name_id": 104067,
-      "model_id": 3284,
+      "model_id": 176,
       "rank": "normal"
     },
     "frostfang_howler": {
@@ -464,6 +464,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "capture",
+      "evidence": "rc-0136 (2026-11-11): model 176 wolf.adr, the model live sent for every Frostfang Growler (111 AddNpc rows in p12.pcap and packets_3.pcapng); 3284 wolf_generic.adr was the reference row's."
     }
   ]
 }

@@ -59,6 +59,8 @@ enum Event {
 pub struct ScoreCard {
     pub enemies: u32,
     pub enemy_points: u32,
+    /// Seconds from the start of the fight to its end (the Time Bonus row's clock).
+    pub seconds: u32,
     pub time_bonus: u32,
     pub knockouts_left: u32,
     pub knockouts_allowed: u32,
@@ -68,6 +70,39 @@ pub struct ScoreCard {
     pub bonus_goals: u32,
     pub bonus_points: u32,
     pub total: u32,
+}
+
+impl ScoreCard {
+    /// The points of a card whose counts are filled in. Fixed by the live results cards: 300 an
+    /// enemy, 100,000 less 500 a second after the first, 25,000 for knockouts unused (Seaside
+    /// Swoopers: 17 = 5100, 3:07 = 7000, 3/3 = 25,000, total 42,600; video archive, evidence-
+    /// enemies.md). (R) the penalty per knockout used and the goal award. A lost or unfinished
+    /// run keeps what was done and earns neither bonus.
+    pub fn scored(mut self, s: &Score, won: bool) -> Self {
+        let late = self.seconds.saturating_sub(s.quick_time_s);
+        let used = self.knockouts_allowed.saturating_sub(self.knockouts_left);
+        self.enemy_points = self.enemies.saturating_mul(s.per_enemy);
+        self.goal_points = self.goals.saturating_mul(s.per_objective);
+        self.bonus_points = self.bonus_goals.saturating_mul(s.per_objective);
+        (self.time_bonus, self.knockout_points) = if won {
+            (
+                (s.quick_value).saturating_sub(late.saturating_mul(s.quick_loss_per_s)),
+                (s.per_knockout_left).saturating_sub(used.saturating_mul(s.knockout_penalty)),
+            )
+        } else {
+            (0, 0)
+        };
+        self.total = [
+            self.enemy_points,
+            self.time_bonus,
+            self.knockout_points,
+            self.goal_points,
+            self.bonus_points,
+        ]
+        .into_iter()
+        .fold(0, u32::saturating_add);
+        self
+    }
 }
 
 /// A run as it is saved with the character. Every field has a default, so an older save loads;
@@ -195,12 +230,13 @@ impl Run {
         run
     }
 
-    /// A run of a row that has no fight file.
-    pub(in crate::encounter) fn legacy(fight: u32) -> Self {
+    /// A run of a row that has no fight file; its clock times the results card.
+    pub(in crate::encounter) fn legacy(fight: u32, now_ms: u64) -> Self {
         Self {
             fight,
             legacy: true,
             group: 1,
+            started: Some(now_ms),
             ..Self::default()
         }
     }
@@ -375,14 +411,11 @@ impl Run {
 
     /// The score of the run as it stands at `now` (R: the arithmetic; the values are data).
     pub fn score(&self, now_ms: u64) -> ScoreCard {
-        let s = &self.def.rules.score;
         let end = if self.ended.is_some() {
             self.ended_at
         } else {
             now_ms
         };
-        let seconds = (end.saturating_sub(self.started.unwrap_or(end)) / 1000) as u32;
-        let late = seconds.saturating_sub(s.quick_time_s);
         let count = |bonus: bool| {
             self.def
                 .objectives
@@ -391,39 +424,16 @@ impl Run {
                 .filter(|(o, g)| o.bonus == bonus && g.state == GoalState::Done)
                 .count() as u32
         };
-        let allowed = self.def.knockouts();
-        let mut card = ScoreCard {
+        ScoreCard {
             enemies: self.kills,
-            enemy_points: self.kills.saturating_mul(s.per_enemy),
-            time_bonus: s
-                .quick_value
-                .saturating_sub(late.saturating_mul(s.quick_loss_per_s)),
+            seconds: (end.saturating_sub(self.started.unwrap_or(end)) / 1000) as u32,
             knockouts_left: self.knockouts_left(),
-            knockouts_allowed: allowed,
-            knockout_points: s
-                .per_knockout_left
-                .saturating_sub(self.knockouts.saturating_mul(s.knockout_penalty)),
+            knockouts_allowed: self.def.knockouts(),
             goals: count(false),
-            goal_points: count(false).saturating_mul(s.per_objective),
             bonus_goals: count(true),
-            bonus_points: count(true).saturating_mul(s.per_objective),
-            total: 0,
-        };
-        if self.ended != Some(true) {
-            // A lost or unfinished run keeps what was done and earns no bonus.
-            card.time_bonus = 0;
-            card.knockout_points = 0;
+            ..ScoreCard::default()
         }
-        card.total = [
-            card.enemy_points,
-            card.time_bonus,
-            card.knockout_points,
-            card.goal_points,
-            card.bonus_points,
-        ]
-        .into_iter()
-        .fold(0, u32::saturating_add);
-        card
+        .scored(&self.def.rules.score, self.ended == Some(true))
     }
 
     /// (done, of, failed) of goal `i` as the run stands.

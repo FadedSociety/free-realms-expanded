@@ -397,9 +397,9 @@ impl EncounterEngine {
             let f = &self.field_sim.enemies[*i];
             out.replies.push(self.spawn(&f.actor, f.state.position, 0));
             out.replies
-                .extend(field_marker::packet(f.actor.guid, f.marker));
+                .extend(field_marker::enemy(f.actor.guid, f.marker));
             out.replies
-                .push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
+                .extend(enemy_health(f.actor.guid, f.state.health, f.actor.max_health));
         }
         if !shown.is_empty() {
             let guids: Vec<u64> = shown
@@ -426,8 +426,8 @@ impl EncounterEngine {
         for f in &self.field_sim.enemies {
             if f.present && f.state.health > 0 {
                 packets.push(self.spawn(&f.actor, f.state.position, 0));
-                packets.extend(field_marker::packet(f.actor.guid, f.marker));
-                packets.push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
+                packets.extend(field_marker::enemy(f.actor.guid, f.marker));
+                packets.extend(enemy_health(f.actor.guid, f.state.health, f.actor.max_health));
                 alive.push(f.actor.guid);
             }
         }
@@ -817,7 +817,7 @@ impl EncounterEngine {
                         if f.state.health != f.actor.max_health {
                             f.state.health = f.actor.max_health;
                             out.replies
-                                .push(enemy_hp(guid, f.state.health, f.actor.max_health));
+                                .extend(enemy_health(guid, f.state.health, f.actor.max_health));
                             out.changed = true;
                         }
                         self.field_sim.attacks.remove(&guid);
@@ -945,9 +945,9 @@ impl EncounterEngine {
             }
             out.replies.push(self.spawn(&f.actor, f.state.position, 0));
             out.replies
-                .extend(field_marker::packet(f.actor.guid, f.marker));
+                .extend(field_marker::enemy(f.actor.guid, f.marker));
             out.replies
-                .push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
+                .extend(enemy_health(f.actor.guid, f.state.health, f.actor.max_health));
             out.replies.push(relevance(&[f.actor.guid], false));
             out.changed = true;
         }

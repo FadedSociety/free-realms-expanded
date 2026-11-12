@@ -732,6 +732,11 @@ fn every_battle_has_a_valid_non_empty_roster() {
                 "battle {id}: enemy {} summon/dormant disagreement",
                 index + 1
             );
+            if authored["rank"].is_string() {
+                // rc-0136: a row that names its own rank takes the rank's numbers at the
+                // battle's tier instead (battle 96; `rc0136_combat` checks them).
+                continue;
+            }
             let authored_health = u32_field(authored, "max_health");
             // The loader scales every arena actor by the combat scale and the
             // difficulty's level factor (R). Difficulty 1 has factor x1, so the

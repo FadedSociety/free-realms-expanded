@@ -6,8 +6,9 @@
 //! finished or abandoned run stay apart.
 //!
 //! Combat: every player is a Brawler (3 m reach: the rig walks up to the enemy, then hits) at
-//! level 4 (one hit is 444, so the 75% crossing is two hits) or level 16 (2,382, so a win takes
-//! a few). Client layouts: 36/10 writer `00a342e0`, 35/5 enemy health, 35/2 AddNpc `00921a10`,
+//! level 4 (one hit is 444, so the 70% crossing is two hits), level 12 (1,357: against battle
+//! 96's 1,726-health summoner, rc-0136, one hit calls every helper in and the next wins) or
+//! level 16 (2,372, which fells the summoner in one hit). Client layouts: 36/10 writer `00a342e0`, 35/5 enemy health, 35/2 AddNpc `00921a10`,
 //! 32/7 attack processed, 39/18 game over, 39/45 prize wheel (see `encounter.rs`).
 #[path = "../src/bin/osfr-bot.rs"]
 #[allow(dead_code)]
@@ -30,7 +31,7 @@ use osfr_tools::{
 use std::{collections::BTreeSet, time::Duration};
 
 const SUMMONER: u64 = 100_000_096_001;
-/// The summoner's minions: two per 75/50/25% tier.
+/// The summoner's minions: two per 70/50/30% tier (Scoutlings 260 health, Ragelings 760).
 const MINIONS: [u64; 6] = [
     100_000_096_002,
     100_000_096_003,
@@ -263,7 +264,7 @@ fn a_refused_hit_changes_nothing_in_the_shared_run() {
 
 #[test]
 fn a_win_pays_every_member_once_and_a_close_returns_only_that_member() {
-    let mut rig = Rig::fighters(2, BRAWLER, 16);
+    let mut rig = Rig::fighters(2, BRAWLER, 12);
     let battles = field_battle_fixture::battles();
     let row = field_battle_fixture::battle(&battles, BATTLE).clone();
     let prizes = prize_ids(&row);
@@ -331,7 +332,7 @@ fn a_win_pays_every_member_once_and_a_close_returns_only_that_member() {
 /// results and the run is not frozen; once B's save works again, a later tick pays B once.
 #[test]
 fn a_member_whose_win_save_fails_is_paid_once_on_a_later_tick() {
-    let mut rig = Rig::fighters(2, BRAWLER, 16);
+    let mut rig = Rig::fighters(2, BRAWLER, 12);
     let battles = field_battle_fixture::battles();
     let row = field_battle_fixture::battle(&battles, BATTLE).clone();
     let prizes = prize_ids(&row);
@@ -412,15 +413,17 @@ fn two_parties_at_one_marker_run_apart() {
 fn a_disconnecting_member_leaves_the_fight_and_its_enemies_turn_on_the_other() {
     let mut rig = Rig::fighters(2, BRAWLER, 4);
     let run = join(&mut rig, A, B);
-    // A calls the 75% tier in; B then hits one minion, which survives it and so is B's.
+    // A calls the 70% and 50% tiers in; B then hits the strongest minion up (a Rageling, 760),
+    // which survives a level-4 hit and so is B's.
     for _ in 0..8 {
         if !awake(&arena_of(&rig, A).unwrap().1).is_empty() {
             break;
         }
         rig.land(A, SUMMONER);
     }
-    let minion = *awake(&arena_of(&rig, A).unwrap().1)
-        .first()
+    let (_, arena) = arena_of(&rig, A).unwrap();
+    let minion = (awake(&arena).into_iter())
+        .max_by_key(|guid| (health(&arena, *guid), *guid))
         .expect("a minion is up");
     rig.land(B, minion);
     let (_, arena) = arena_of(&rig, B).unwrap();
@@ -541,7 +544,7 @@ fn hit_answer(messages: &[Vec<u8>]) -> Vec<Vec<u8>> {
 
 /// A solo player's one hit, alone or with a grouped fight going on in another run.
 fn solo_hit(grouped_fight: bool) -> Vec<Vec<u8>> {
-    let mut rig = Rig::fighters(4, BRAWLER, 16);
+    let mut rig = Rig::fighters(4, BRAWLER, 12);
     // C and D fight alone: the party is dissolved so that neither is invited or joined.
     rig.leave_party(C);
     if grouped_fight {

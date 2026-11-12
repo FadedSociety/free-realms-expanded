@@ -64,7 +64,7 @@
       "definition_id": 3936,
       "name": "Robgoblin Kaboomer",
       "name_id": 6720,
-      "model_id": 4202,
+      "model_id": 1682,
       "rank": "normal"
     }
   },
@@ -323,6 +323,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "capture",
+      "evidence": "rc-0136 (2026-11-11): model 1682 robgoblin_m_master.adr, the model live sent for every Robgoblin Kaboomer (10 AddNpc rows in packets_3.pcapng, 2014-03); 4202 robgoblin_m_junkmaster.adr was the reference row's."
     }
   ]
 }

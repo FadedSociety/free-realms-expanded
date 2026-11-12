@@ -59,7 +59,7 @@
       "definition_id": 930073,
       "name": "Yeti",
       "name_id": 2245,
-      "model_id": 4547,
+      "model_id": 51,
       "rank": "normal"
     },
     "yeti_sentry": {
@@ -479,6 +479,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/snowy_canyon.json."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0136 (2026-11-11): the Yetis that fight wear model 51 sasquatch_01.adr, the yeti body the fork's wave Yeti 46010 wears; 4547 sh_standard_yeti_01.adr is a banner with no skeleton, the Frosty Yeti starter's look."
     }
   ]
 }

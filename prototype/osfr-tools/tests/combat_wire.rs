@@ -417,7 +417,7 @@ fn the_live_player_hit_is_cast_launch_hitpoints_and_bar() {
     assert_eq!(plain[0], wire::animation(7, 1099, false));
     let classic = wire::player_hit(&hit);
     let heads: Vec<[u8; 4]> = classic.iter().map(|p| p[..4].try_into().unwrap()).collect();
-    assert_eq!(heads, [[35, 0, 8, 0], [32, 0, 7, 0], [35, 0, 5, 0]]);
+    assert_eq!(heads, [[35, 0, 8, 0], [32, 0, 7, 0], [35, 0, 5, 0], [35, 0, 35, 0]]);
     assert_eq!(classic[1][36..40], [0; 4], "the classic hit names no effect");
 }
 

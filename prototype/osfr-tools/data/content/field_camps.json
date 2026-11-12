@@ -289,17 +289,12 @@
       "behaviour": "field_roamer",
       "power_up_table": "standard",
       "members": [
-        100000001597,
         100000002568,
         100000002569,
         100000003154,
         100000003155,
         100000003382,
         100000003780,
-        100000004416,
-        100000004417,
-        100000004418,
-        100000004419,
         100000004506,
         100000004507,
         100000006251
@@ -312,6 +307,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json snake; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 (2026-11-11): the five snakes within 120 m of the Bone Bog Cemetery point of interest (1597, 4416-4419) left this camp: they start the Snakes in a Maze! battle (entrances.json), as the owner asked. The reference server defines all of these snakes neutral (scenery)."
         }
       ]
     },
@@ -359,29 +358,6 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
-        }
-      ]
-    },
-    {
-      "id": "frostfang-snarler-frostfang-snarler",
-      "definition": "frostfang_snarler",
-      "level": 13,
-      "respawn_seconds": 120,
-      "aggro_range": 8.0,
-      "leash_radius": 12.0,
-      "behaviour": "field_roamer",
-      "power_up_table": "standard",
-      "members": [
-        100000003592
-      ],
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 1938 (spawn_guid 100000003592..100000003592); npc-interactivity census 2026-10-29 section 7, record def:1938:78096:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) Stats and kill-credit definition id come from enemies.json frostfang_snarler; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
         }
       ]
     },

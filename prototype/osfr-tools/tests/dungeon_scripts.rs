@@ -155,9 +155,10 @@ fn every_dungeon_record_runs_its_fight_or_says_why() {
         }
         mapped.push(id);
     }
-    // 75 guides: 27 run their fight (8 with nothing left out, 19 with a goal the evidence does
-    // not place, each named in the record), 48 run nothing, each with its reason.
-    assert_eq!((mapped.len(), fallback.len()), (27, 48), "{mapped:?}");
+    // 75 guides: 28 run their fight (9 with nothing left out, 19 with a goal the evidence does
+    // not place, each named in the record), 47 run nothing, each with its reason. rc-0136 placed
+    // the Snakes in a Maze starter, so its guide runs fight 14038.
+    assert_eq!((mapped.len(), fallback.len()), (28, 47), "{mapped:?}");
     assert_eq!(bonus, ["bixie_hive"], "the one bonus goal the evidence places");
 }
 

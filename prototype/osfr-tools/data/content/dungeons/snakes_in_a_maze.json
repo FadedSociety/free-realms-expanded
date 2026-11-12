@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14038,
+                "goal": "main",
+                "count": 10,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14038.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) No script runs (scripts/dungeon_fights.py): no entrance is placed for it (entrances.json lists it held, parked or not at all)."
+                "evidence": "(R) Goals map onto fights/14038.json (scripts/dungeon_fights.py)."
               }
             ]
           }

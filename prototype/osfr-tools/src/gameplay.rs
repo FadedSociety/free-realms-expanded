@@ -2956,6 +2956,7 @@ impl Gameplay {
         match result {
             dev_teleport::Command::Reply(text) => out.replies.push(chat::system(&text)),
             dev_teleport::Command::Relocate { reply, relocation } => {
+                let relocation = relocation.on_ground(self.terrain.as_deref(), character.zone_id);
                 self.relocate(relocation, reply, character, out)?;
             }
         }
@@ -2978,8 +2979,7 @@ impl Gameplay {
         Ok(())
     }
 
-    /// Moves the staged character inside the zone. The gateway owns the 38/12
-    /// packet and the saved position, so bytes and save cannot diverge.
+    /// Moves the staged character in the zone; the gateway owns the 38/12 packet and the save.
     fn apply_relocation(
         &mut self,
         relocation: dev_teleport::Relocation,

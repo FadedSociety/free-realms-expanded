@@ -61,14 +61,16 @@ fn brawler() -> Gameplay {
     game
 }
 
-/// `realm sim 96` (the Troll Summoner battle) before the move, captured at base `75e3d982`.
+/// `realm sim 96` (the Troll Summoner battle) before the move, captured at base `75e3d982`;
+/// rc-0136 retuned the battle to its tier's 2014 numbers (the level 1 bot now loses half its
+/// health where it lost 80).
 const SIM_96: [&str; 6] = [
     "Battle 96, job 43 (scripted bot):",
-    "  level  1: won in 14s, lowest health 420/500, dealt 6474 (0 crits)",
-    "  level  5: won in 7s, lowest health 843/875, dealt 5432 (0 crits)",
-    "  level 10: won in 5s, lowest health 1721/1761, dealt 6474 (0 crits)",
-    "  level 15: won in 0s, lowest health 3545/3545, dealt 3348 (0 crits)",
-    "  level 20: won in 0s, lowest health 7135/7135, dealt 3348 (0 crits)",
+    "  level  1: won in 7s, lowest health 250/500, dealt 3266 (0 crits)",
+    "  level  5: won in 7s, lowest health 525/875, dealt 4786 (0 crits)",
+    "  level 10: won in 0s, lowest health 1761/1761, dealt 1726 (0 crits)",
+    "  level 15: won in 0s, lowest health 3545/3545, dealt 1726 (0 crits)",
+    "  level 20: won in 0s, lowest health 7135/7135, dealt 1726 (0 crits)",
 ];
 
 #[test]
@@ -262,7 +264,9 @@ fn the_frozen_wire_interface_keeps_the_bytes_the_engine_sent_before() {
         ..Default::default()
     });
     let heads: Vec<&[u8]> = hit.iter().map(|p| &p[..4]).collect();
-    assert_eq!(heads, [[35, 0, 8, 0], [32, 0, 7, 0], [35, 0, 5, 0]]);
+    // rc-0136: the 35/35 health statement the boss bar reads follows the nameplate bar.
+    assert_eq!(heads, [[35, 0, 8, 0], [32, 0, 7, 0], [35, 0, 5, 0], [35, 0, 35, 0]]);
+    assert_eq!(hit[3], wire::hitpoints(9, 9, false, 100, 70, 0, false));
     assert_eq!(hit[1].len(), 4 + 24 + 12 + 2 + 8);
     assert_eq!(hit[1][28..32], 30_i32.to_le_bytes());
     assert_eq!(hit[1][40], 1, "the critical flag");
@@ -277,7 +281,7 @@ fn the_frozen_wire_interface_keeps_the_bytes_the_engine_sent_before() {
         swing: false,
         ..Default::default()
     });
-    assert_eq!(quiet.len(), 2, "an ability hit plays no swing");
+    assert_eq!(quiet.len(), 3, "an ability hit plays no swing");
     // The classic hit carries the kit's impact effect in 32/7 and nothing else new.
     let named = wire::player_hit(&wire::PlayerHit {
         attacker: 1,

@@ -175,6 +175,8 @@ fn every_named_enemy_body_is_routed_unless_it_belongs_elsewhere() {
         "Surfmonger Arthur",
         "The Pumpkin Prince",
         "Stone Heart's Hideaway",
+        // rc-0136: the Snarler den is the Frostfang Snarlers battle's starter (entrances.json).
+        "Frostfang Snarler",
         "Ninja Apprentice",
         "Robgoblin Tinkerer",
         "Robgoblin Mechanic",
@@ -211,7 +213,6 @@ fn every_named_enemy_body_is_routed_unless_it_belongs_elsewhere() {
         "Stealthy Despoiler",
         "Shady Smuggler",
         "Troll Guard",
-        "Frostfang Snarler",
         "Evil Postman",
         "Brutus the Brute",
         "Thugawug Thug!",

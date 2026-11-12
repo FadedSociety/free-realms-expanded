@@ -175,7 +175,7 @@ impl EncounterEngine {
     pub fn receive_arena_damage(&mut self, damage: u32, now_ms: u64) -> EncounterOutcome {
         let mut out = EncounterOutcome::default();
         self.take_enemy_damage(damage, now_ms, &mut out);
-        self.present_results(&mut out);
+        self.present_results(now_ms, &mut out);
         out
     }
 
@@ -200,7 +200,7 @@ impl EncounterEngine {
         }
         out.changed = true;
         self.win_run(now_ms, &mut out);
-        self.present_results(&mut out);
+        self.present_results(now_ms, &mut out);
         out
     }
 
@@ -476,7 +476,7 @@ mod tests {
 
     const BATTLE: u32 = 96;
     const SUMMONER: u64 = 100_000_096_001;
-    /// The two minions of the 75% tier.
+    /// The two minions of the first (70%) tier.
     const TIER_75: [u64; 2] = [100_000_096_002, 100_000_096_003];
     /// Where a player stands to hit the summoner (3 m reach, summoner at 136, 175).
     const NEAR: [f32; 3] = [136., -0.6, 173.];
@@ -531,8 +531,8 @@ mod tests {
         result
     }
 
-    /// Two members hit one summoner: one canonical health drops by both hits, the 75% threshold
-    /// is crossed once, and the one minion set is the same for both.
+    /// Two members hit one summoner: one canonical health drops by both hits, the first (70%)
+    /// threshold is crossed once, and the one minion set is the same for both.
     #[test]
     fn two_members_share_one_summoner_and_one_minion_set() {
         let (dir, mut a, mut b, mut arena) = run_of_two();
@@ -547,8 +547,8 @@ mod tests {
             full - 2 * dealt,
             "both hits count once each"
         );
-        // The next hit crosses 75%: exactly one set of minions appears.
-        arena.enemies[0].health = full * 75 / 100 + dealt / 2;
+        // The next hit crosses 70% (rc-0136 ladder): exactly one set of minions appears.
+        arena.enemies[0].health = full * 70 / 100 + dealt / 2;
         let summoned = |out: &EncounterOutcome| {
             out.replies
                 .iter()

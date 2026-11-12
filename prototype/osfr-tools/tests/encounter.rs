@@ -104,7 +104,8 @@ fn results_count_real_defeats_on_loss_restore_and_retry() {
             .iter()
             .find(|p| p.starts_with(&[39, 0, 47]))
             .unwrap();
-        assert_eq!(i32::from_le_bytes(packet[15..19].try_into().unwrap()), 2);
+        // rc-0136: enemies, time, knockouts, goals and the total (was the fixed pair).
+        assert_eq!(i32::from_le_bytes(packet[15..19].try_into().unwrap()), 5);
         let name_len = i32::from_le_bytes(packet[19..23].try_into().unwrap()) as usize;
         assert_eq!(&packet[23..23 + name_len], b"scoreEnemiesDefeated");
         let count_at = 23 + name_len + 8;

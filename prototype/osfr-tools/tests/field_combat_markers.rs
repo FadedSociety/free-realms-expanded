@@ -1,5 +1,6 @@
 //! T879: field enemies and battle spawners show a kind-3 "Combat" marker (35/10), sent right
-//! after the actor's 35/2. The rows are content (`combat_marker` in `field_enemies.json` and
+//! after the actor's 35/2. rc-0136: a field enemy sends the compact row (guid, kind) live sent
+//! for every fighting actor; a battle spawner keeps the full, named row. The rows are content (`combat_marker` in `field_enemies.json` and
 //! `field_battles.json`, per-actor override or `"off"`), so every expectation is read from the
 //! shipped files. Every path that spawns a field enemy is driven through the production engine:
 //! the zone-ready batch, a quest unlock, a respawn, and the shared-field `initialization`; the
@@ -20,7 +21,7 @@ mod json_support;
 mod quest_marker_packets;
 
 use field_enemy_fixture::{Fixture, content_dir, spawned};
-use quest_marker_packets::{Marker, markers, spawn_index};
+use quest_marker_packets::{Marker, compact_rows, markers, spawn_index};
 
 /// The shipped battle whose spawner the battle tests use.
 const BATTLE: u32 = 96;
@@ -56,6 +57,19 @@ fn expected(shared: &Value, guid: u64, own_name: i64) -> Marker {
         image: shared["image_id"].as_i64().unwrap() as i32,
         name: name.unwrap_or(own_name) as i32,
         subtext: shared["subtext_id"].as_i64().unwrap_or(0) as i32,
+    }
+}
+
+/// The compact row a field enemy sends for the `combat_marker` row `shared`: its kind only.
+fn enemy_marker(shared: &Value, guid: u64) -> Marker {
+    Marker {
+        index: 0,
+        guid,
+        kind: shared["kind"].as_i64().unwrap() as i32,
+        state: 0,
+        image: 0,
+        name: 0,
+        subtext: 0,
     }
 }
 
@@ -102,11 +116,12 @@ fn shipped_content_marks_every_always_on_enemy_as_combat() {
         let guid = row["guid"].as_u64().unwrap();
         assert_eq!(
             marker_after_spawn(&packets, guid),
-            Some(expected(shared, guid, row["name_id"].as_i64().unwrap())),
+            Some(enemy_marker(shared, guid)),
             "enemy {guid}"
         );
     }
     assert_eq!(markers(&packets).0.len(), always_on.len());
+    assert_eq!(compact_rows(&packets).len(), always_on.len(), "every one compact");
     assert!(
         markers(&packets).1.is_empty(),
         "no 35/11: the marker dies with the actor"
@@ -129,11 +144,7 @@ fn a_quest_unlocked_enemy_is_marked_when_it_appears() {
     let packets = engine.set_active_quests(&BTreeSet::from([quest])).replies;
     assert_eq!(
         marker_after_spawn(&packets, guid),
-        Some(expected(
-            &file["combat_marker"],
-            guid,
-            row["name_id"].as_i64().unwrap()
-        ))
+        Some(enemy_marker(&file["combat_marker"], guid))
     );
 }
 
@@ -141,9 +152,7 @@ fn a_quest_unlocked_enemy_is_marked_when_it_appears() {
 fn a_respawned_enemy_gets_its_marker_again() {
     const WOLF: u64 = 131_000_102_001;
     let file = field_file();
-    let name = field_enemy_fixture::shipped_row(WOLF).unwrap()["name_id"]
-        .as_i64()
-        .unwrap();
+    assert!(field_enemy_fixture::shipped_row(WOLF).is_some());
     let mut engine = Fixture::shipped().load();
     engine.on_zone_ready(11, 0).unwrap();
     let home = engine
@@ -176,7 +185,7 @@ fn a_respawned_enemy_gets_its_marker_again() {
     }
     assert_eq!(
         marker_after_spawn(&back.expect("the wolf respawns"), WOLF),
-        Some(expected(&file["combat_marker"], WOLF, name))
+        Some(enemy_marker(&file["combat_marker"], WOLF))
     );
 }
 
@@ -190,11 +199,7 @@ fn the_shared_field_view_sends_the_marker_after_the_spawn() {
     let packets = field.initialization(guid).unwrap();
     assert_eq!(
         marker_after_spawn(&packets, guid),
-        Some(expected(
-            &file["combat_marker"],
-            guid,
-            row["name_id"].as_i64().unwrap()
-        ))
+        Some(enemy_marker(&file["combat_marker"], guid))
     );
 }
 
@@ -210,7 +215,7 @@ fn content_edits_change_the_packet_with_no_code_change() {
         .collect();
     let [off, own, plain] = [always_on[0], always_on[1], always_on[2]];
     let own_row =
-        json!({"kind": 3, "image_id": 25, "name_id": 77, "subtext_id": 55, "hide_overhead": true});
+        json!({"kind": 8, "image_id": 25, "name_id": 77, "subtext_id": 55, "hide_overhead": true});
     rewrite(&fixture, |file| {
         file["combat_marker"]["image_id"] = json!(26);
         for enemy in file["enemies"].as_array_mut().unwrap() {
@@ -226,17 +231,17 @@ fn content_edits_change_the_packet_with_no_code_change() {
     // Switched off: still spawned, no 35/10.
     assert!(spawn_index(&packets, off).is_some());
     assert_eq!(marker_after_spawn(&packets, off), None);
-    // Its own row wins over the shared one.
-    let mut mine = expected(&own_row, own, 0);
-    mine.state = 0;
-    assert_eq!(marker_after_spawn(&packets, own), Some(mine));
-    // Everyone else follows the edited shared row.
-    let name = rows.iter().find(|row| row["guid"] == plain).unwrap()["name_id"]
-        .as_i64()
-        .unwrap();
-    let mut shared = expected(&file["combat_marker"], plain, name);
-    shared.image = 26;
-    assert_eq!(marker_after_spawn(&packets, plain), Some(shared));
+    // Its own row wins over the shared one (the compact row carries the kind).
+    assert_eq!(
+        marker_after_spawn(&packets, own),
+        Some(enemy_marker(&own_row, own))
+    );
+    // Everyone else follows the edited shared row; the image is not on a compact row.
+    assert!(rows.iter().any(|row| row["guid"] == plain));
+    assert_eq!(
+        marker_after_spawn(&packets, plain),
+        Some(enemy_marker(&file["combat_marker"], plain))
+    );
 }
 
 #[test]

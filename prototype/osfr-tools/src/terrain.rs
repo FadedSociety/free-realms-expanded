@@ -14,7 +14,7 @@
 //! objects with their own collision, so `height_at` reports the ground under them.
 //! T534: `obstacles()` loads the `zone_<id>.obs` files the bake writes beside the
 //! grids, so a mover can refuse a wall and stand on a bridge deck.
-use crate::{le, obstacles::Obstacles};
+use crate::{le, npc_life::SETTLED_M, obstacles::Obstacles};
 use std::{
     collections::HashMap,
     fs,
@@ -197,6 +197,10 @@ impl HeightGrid {
     }
 }
 
+/// (R) A floor or ground more than this far from a placed height is another level (a cave door
+/// deep under the hills, a roof far above), so [`Terrain::snapped`] keeps the placement's height.
+pub const MAX_SNAP: f32 = 6.0;
+
 /// Height grids per zone id, loaded from `zone_<id>.hgt` files.
 #[derive(Debug, Default)]
 pub struct Terrain {
@@ -245,6 +249,21 @@ impl Terrain {
 
     pub fn height_at(&self, zone: u32, x: f32, z: f32) -> Option<f32> {
         self.zones.get(&zone)?.height_at(x, z)
+    }
+
+    /// The one ground rule for enemies, markers and `realm goto` arrivals: `position` set onto its
+    /// floor ([`Self::floor_at`], the rule the shipped content is placed by) or, with no floor
+    /// under it, onto the ground grid above it (rc-0136: `realm goto Bixie Hive` arrived 3.2 m
+    /// under the hillside). A placement within [`SETTLED_M`] of it is at rest and keeps its
+    /// height, so the shipped homes do not move; one farther than [`MAX_SNAP`] keeps it too.
+    pub fn snapped(&self, zone: u32, mut position: [f32; 3]) -> [f32; 3] {
+        let near = |h: &f32| (h - position[1]).abs() <= MAX_SNAP;
+        let floor = self.floor_at(zone, position).filter(near);
+        let floor = floor.or_else(|| self.height_at(zone, position[0], position[2]).filter(near));
+        if let Some(floor) = floor.filter(|h| (h - position[1]).abs() > SETTLED_M) {
+            position[1] = floor;
+        }
+        position
     }
 
     /// F6: the floor a body placed at `p` stands on: the higher of the height grid, when it is

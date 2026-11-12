@@ -51,12 +51,12 @@ const ROWS: [(&str, i64, i64, u64, bool); 22] = [
     ("smuggler_hannah", 1551, 685, 77319, true),
     ("skullz_brawler", 3965, 4011, 439761, false),
     ("hewey_the_bear", 1237, 91, 5734, true),
-    ("frostfang_growler", 2529, 3284, 104067, false),
+    ("frostfang_growler", 2529, 176, 104067, false), // rc-0136: live sent wolf.adr
     ("troll_roughguard", 3115, 77, 36237, false),
     ("willow_slamdash", 3066, 1296, 19366, false),
     ("troll_spider_trainer", 3148, 77, 5135, false),
     ("troll_naturalist", 3135, 77, 5234, false),
-    ("frostfang_snarler", 3592, 1938, 78096, false),
+    ("frostfang_snarler", 3592, 1938, 78096, false), // the battle starter's den (2014 video)
     ("battle_warthog", 4857, 139, 23196, false),
     ("foreman_ironfist", 1495, 10, 71199, true),
     ("queen_arachnia", 2714, 53, 3592, true),

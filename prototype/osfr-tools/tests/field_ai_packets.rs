@@ -196,6 +196,12 @@ enum Frame {
         hp: u32,
         max: u32,
     },
+    /// 35/35 with show 0 and no delta: the health statement the boss bar reads (rc-0136).
+    Statement {
+        guid: u64,
+        hp: i32,
+        max: i32,
+    },
     PlayerHp {
         hp: u32,
         max: u32,
@@ -263,6 +269,14 @@ fn frames(out: &EncounterOutcome) -> Vec<Frame> {
                         hp: u32_at(packet, 12),
                         max: u32_at(packet, 16),
                     },
+                    35 => {
+                        assert_eq!((packet.len(), packet[20], i32_at(packet, 29)), (34, 0, 0));
+                        Frame::Statement {
+                            guid: u64_at(packet, 12),
+                            hp: i32_at(packet, 25),
+                            max: i32_at(packet, 21),
+                        }
+                    }
                     _ => panic!(
                         "unexpected field-AI reply {family}/{sub} ({} bytes)",
                         packet.len()
@@ -500,6 +514,11 @@ fn evade_returns_home_heals_and_stands() {
                 guid: FIELD_GUID,
                 hp: combat_scale::enemy_health(1000),
                 max: combat_scale::enemy_health(1000),
+            },
+            Frame::Statement {
+                guid: FIELD_GUID,
+                hp: combat_scale::enemy_health(1000) as i32,
+                max: combat_scale::enemy_health(1000) as i32,
             },
         ]
     );

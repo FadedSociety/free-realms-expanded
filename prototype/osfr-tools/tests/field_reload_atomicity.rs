@@ -459,7 +459,8 @@ fn a_successful_enemy_reload_despawns_before_it_respawns() {
 
     assert_eq!(
         kinds(&packets),
-        vec![(35, 3), (35, 2), (35, 5), (35, 12)],
+        // rc-0136: the 35/35 health statement follows the nameplate bar.
+        vec![(35, 3), (35, 2), (35, 5), (35, 35), (35, 12)],
         "35/3 despawns come before the spawn, HP and relevance frames"
     );
     assert_eq!(

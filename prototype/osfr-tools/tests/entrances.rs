@@ -90,8 +90,9 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
         .count();
     assert_eq!(
         (table.entrances.len(), doors, table.scenes.len()),
-        (50, 35, 44),
-        "35 dungeon doors and 15 battle starters in 44 scenes"
+        (56, 35, 46),
+        "35 dungeon doors and 21 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
+         Legacy spawner huts, two of them in scenes of their own)"
     );
     for row in &table.entrances {
         let actor = spawners.iter().find(|actor| actor.0 == row.guid);
@@ -127,15 +128,17 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
             row.id
         );
     }
-    // The evidence proves 63 entrances: each is placed, or held with its reason. The other 55
-    // are parked, each with its reason.
+    // The evidence proves 73 entrances: each is placed, or held with its reason (rc-0136 placed
+    // Snakes in a Maze at a Bone Bog snake, (R), proved the nine Legacy spawner huts the fork's
+    // Battles.json names as starters, five open and four held, and holds the second Ice Troll
+    // Scout hut). The other 46 are parked, each with its reason.
     let proven_held = (table.held.iter())
         .filter(|held| held.reason.starts_with("proven, held: "))
         .count();
     let parked = (table.held.iter())
         .filter(|held| held.reason.starts_with("parked: "))
         .count();
-    assert_eq!((table.entrances.len() + proven_held, parked), (63, 55));
+    assert_eq!((table.entrances.len() + proven_held, parked), (73, 46));
     assert_eq!(table.held.len(), proven_held + parked);
     let placed: BTreeSet<&str> = table.entrances.iter().map(|row| row.id.as_str()).collect();
     for held in &table.held {
@@ -269,6 +272,7 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
         open,
         // Lead 2026-11-11: the combat quests' fight files (fights/14xxx.json) open 21 more.
         // Fix F5: the dungeon guides' fights built from the fork battles open five more.
+        // rc-0136: five Legacy spawner huts open their combat-quest fights.
         [
             "arachnia_s_lair",
             "bandit_hideout",
@@ -280,21 +284,27 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             "danger_peaks",
             "darvon_s_descent",
             "deep_mines",
+            "explosive_robgoblins",
             "floren_forest",
             "forest_troll_fort",
             "frostfang_caverns",
             "frostfang_growler",
             "frostfang_snarlers",
             "grexan_s_camp",
+            "hooligan_bullies",
             "hot_springs_haven",
             "howling_hills",
             "ice_troll_scout",
             "moldy_shamblers",
             "mugwort_s_hollow",
             "petty_yetis",
+            "robgoblin_adept_trouble",
+            "robgoblin_geomancer",
             "robgoblin_treasure_trove",
+            "robgoblin_troublemakers",
             "shady_smugglers",
             "sheep_watch",
+            "snakes_in_a_maze",
             "snowy_canyon",
             "sweetwater_climb",
             "tanglewood_fort",

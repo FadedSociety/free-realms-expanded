@@ -348,10 +348,13 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
         }
     }
 
-    /// Give a row of a ranked kind its catalogue numbers; false when its kind has no rank.
+    /// Give a row of a ranked kind its catalogue numbers, or a row that names its own `rank`
+    /// that rank's numbers at the tier; false when neither has a rank.
     fn rank_enemy(&self, a: &mut Actor, tier: u8) -> bool {
+        let own = |rank| (self.enemy_health(rank, tier, 1), self.enemy_hit(rank, tier));
         let Some((health, hit)) = (self.catalogue.by_kind(a.definition_id))
             .and_then(|definition| self.kind_numbers(definition, Some(tier), 1))
+            .or_else(|| a.rank.map(own))
         else {
             return false;
         };

@@ -343,8 +343,8 @@ fn every_drawn_model_is_a_body_or_a_listed_prop_by_its_own_clips() {
 
 /// Field enemy homes (`field_enemies.json` and the camp bodies) stand on the collision floor at
 /// rest, within half a metre, unless `npc_poses.json` keeps the body's height with its evidence.
-/// The encounter still sets a home on the height grid within 6 m when it runs with terrain
-/// (`encounter::Ground::snap`); the data no longer depends on that.
+/// The encounter grounds a home by the same floor (`Terrain::snapped`) and moves none of those
+/// on it (`tests/rc0136_combat.rs`); a kept body's leash home is still the floor below it.
 #[test]
 fn field_enemy_homes_stand_on_the_floor() {
     let Some(terrain) = terrain() else { return };

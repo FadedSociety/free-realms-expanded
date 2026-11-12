@@ -59,8 +59,8 @@ pub use self::wire::{animation, zone_begin_packet};
 // The packet writers live in `wire`; the sibling modules reach them through `super::*`.
 #[allow(unused_imports)]
 use self::wire::{
-    attack_processed, boss_display, combat_flag, encounter_header, encounter_state, end_scores,
-    end_scores_packet, enemy_hp, game_over, header, menu, minigame, movement, objective,
+    attack_processed, boss_display, combat_flag, encounter_header, encounter_state,
+    enemy_health, enemy_hp, game_over, header, menu, minigame, movement, objective,
     objective_complete, player_hp, relevance, remove, replace_string, respawn_hide, rules,
     spawn_actor,
 };
@@ -96,9 +96,9 @@ pub fn is_pickup_guid(guid: u64) -> bool {
 const POWER_UP_PICKUP_EFFECT: i32 = 15509;
 /// The client's own tutorial line, shown when a second stored kind is refused.
 const ONE_POWER_UP_TEXT: &str = "You can have one power up active at a time.";
-/// Local reconstructed objective award. The original encounter scoring table
-/// was not recovered, so the completed objective's value doubles as the won
-/// total; a loss awards nothing and no per-kill points are invented.
+/// (R) The points a finished goal is worth (its 45/3 award), the `per_objective` default of
+/// a fight's score; the results card adds it to kills, time and knockouts left
+/// (`director::bind::results_card`).
 const OBJECTIVE_AWARD_SCORE: i32 = 5000;
 const EXIT: i32 = 101;
 const RETRY: i32 = 102;
@@ -229,9 +229,9 @@ struct Actor {
     #[serde(default)]
     power_up_table: Option<String>,
     // The rows below are read by the combat pieces only; the engine itself reads `dormant`.
-    /// The catalogue rank (P4); absent follows `boss` (Boss or Normal).
+    /// The catalogue rank (P4); absent follows `boss` (Boss or Normal). A battle row may name
+    /// its own when its kind has no catalogue row (`CombatScale::rank_enemy`).
     #[serde(default)]
-    #[allow(dead_code)]
     rank: Option<Rank>,
     /// Tags that goals, rules and kill facts name (P3, P5, P6).
     #[serde(default)]
@@ -679,40 +679,27 @@ pub struct FieldParticipant {
 #[derive(Clone)]
 struct Ground(Option<(Arc<Terrain>, u32)>);
 
-/// (R) Terrain more than this far from the height an enemy would otherwise
-/// have is a bridge, building or ledge above or below it (the grid holds only
-/// terrain), so the enemy keeps its own height there.
-const MAX_SNAP: f32 = 6.0;
+use crate::terrain::MAX_SNAP;
 
 impl Ground {
-    /// Snap a position onto the ground; off the grid, or where the ground is
-    /// far away (a bridge), it keeps its height.
+    /// Snap a position onto the ground (`Terrain::snapped`, the one rule).
     fn snap(&self, p: &mut [f32; 3]) {
-        if let Some(h) = self
-            .0
-            .as_ref()
-            .and_then(|(t, zone)| t.height_at(*zone, p[0], p[2]))
-        {
-            if (h - p[1]).abs() <= MAX_SNAP {
-                p[1] = h;
-            }
+        if let Some((t, zone)) = self.0.as_ref() {
+            *p = t.snapped(*zone, *p);
         }
     }
     fn snapped(&self, mut p: [f32; 3]) -> [f32; 3] {
         self.snap(&mut p);
         p
     }
-    /// Field motion must not cross missing terrain or snap over a ledge (R).
-    /// Without a terrain grid, retain the authored/interpolated height.
-    fn field_position(&self, mut p: [f32; 3]) -> Option<[f32; 3]> {
-        if let Some((terrain, zone)) = &self.0 {
-            let height = terrain.height_at(*zone, p[0], p[2])?;
-            if (height - p[1]).abs() > MAX_SNAP {
-                return None;
-            }
-            p[1] = height;
-        }
-        Some(p)
+    /// Field motion must not cross missing terrain or snap over a ledge (R); where it may, the
+    /// step stands on the one ground rule. Without a terrain grid, retain the authored height.
+    fn field_position(&self, p: [f32; 3]) -> Option<[f32; 3]> {
+        let Some((terrain, zone)) = &self.0 else {
+            return Some(p);
+        };
+        let height = terrain.height_at(*zone, p[0], p[2])?;
+        ((height - p[1]).abs() <= MAX_SNAP).then(|| terrain.snapped(*zone, p))
     }
 }
 
@@ -1307,7 +1294,7 @@ impl EncounterEngine {
         {
             if a.stages.contains(&self.state.world_stage) && s.health > 0 {
                 packets.push(self.spawn(a, s.position, 0));
-                packets.push(enemy_hp(a.guid, s.health, a.max_health));
+                packets.extend(enemy_health(a.guid, s.health, a.max_health));
                 active.push(a.guid);
             }
         }
@@ -1394,7 +1381,7 @@ impl EncounterEngine {
         for (a, s) in d.enemies.iter().zip(&active.enemies) {
             if s.health > 0 && !s.dormant {
                 out.replies.push(self.spawn(a, s.position, 0));
-                out.replies.push(enemy_hp(a.guid, s.health, a.max_health));
+                out.replies.extend(enemy_health(a.guid, s.health, a.max_health));
                 guids.push(a.guid);
                 if a.boss {
                     out.replies.push(boss_display(a.guid, true));
@@ -1432,7 +1419,7 @@ impl EncounterEngine {
             self.run_resume(now_ms, &mut out);
         }
         self.enemies_spawned(&guids, now_ms, &mut out);
-        self.present_results(&mut out);
+        self.present_results(now_ms, &mut out);
         Ok(out)
     }
 
@@ -1882,7 +1869,7 @@ impl EncounterEngine {
                 );
             }
         }
-        self.present_results(&mut out);
+        self.present_results(now_ms, &mut out);
         Ok(out)
     }
 
@@ -2147,11 +2134,11 @@ impl EncounterEngine {
             );
         }
         self.take_enemy_damage(total_damage, now_ms, &mut out);
-        self.present_results(&mut out);
+        self.present_results(now_ms, &mut out);
         Ok(out)
     }
 
-    fn present_results(&mut self, out: &mut EncounterOutcome) {
+    fn present_results(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
         if self.results_presented {
             return;
         }
@@ -2171,7 +2158,7 @@ impl EncounterEngine {
             }
             // The original Flash screen automatically closes if Lua has no
             // score/stat/reward pages. Populate its score data before Show.
-            out.replies.push(end_scores(active));
+            out.replies.push(self.results_card(active, now_ms));
             // Native OnGameOver only stores results. LeaveMiniGame (39/19)
             // calls the Lua score screen; zoning here would cover that screen.
             out.replies

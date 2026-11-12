@@ -18,14 +18,16 @@ const FOLLOW_M: f32 = 8.0;
 /// (R) A freed captive's run for the way out: how far, and how long until it is gone.
 const FLEE_M: f32 = 6.0;
 const FLEE_MS: u64 = 3_000;
-/// Score row types on the results card (39/47). 0 and 4 are the two rows the engine has
-/// always sent; (R) the others' order.
+/// Results rows (39/47): the client's names (code-string table: 117298, 9005, 117309, 16375,
+/// 117302, 117296) and score types as `scorescreen.gfx` `ScoreItem.update` draws them: 0 a
+/// count, 1 and 3 count / max, 2 the count as a clock (seconds), 4 the total. The client's own
+/// goal rows (`009bb030`) are type 3 as well.
 const SCORE_ROWS: [(&str, i32); 6] = [
     ("scoreEnemiesDefeated", 0),
-    ("scoreTimeBonus", 1),
-    ("scorePlayerKnockouts", 2),
+    ("scoreTimeBonus", 2),
+    ("scorePlayerKnockouts", 1),
     ("scoreObjectives", 3),
-    ("scoreBonusObjectives", 5),
+    ("scoreBonusObjectives", 3),
     ("scoreTotalScore", 4),
 ];
 
@@ -110,7 +112,7 @@ fn exit_door(fight: &Fight) -> Option<Actor> {
 fn score_packet(instance: i32, id: u32, card: &ScoreCard, primary: u32, bonus: u32) -> Vec<u8> {
     let rows = [
         (card.enemies as i32, -1, card.enemy_points),
-        (-1, -1, card.time_bonus),
+        (card.seconds as i32, -1, card.time_bonus),
         (
             card.knockouts_left as i32,
             card.knockouts_allowed as i32,
@@ -331,7 +333,7 @@ impl EncounterEngine {
             let fight = self.fight_state.fights.get(&id).cloned();
             self.run.run = Some(match fight.filter(|f| self.compiled(f)) {
                 Some(fight) => begin(&fight, &self.party()),
-                None => Run::legacy(id),
+                None => Run::legacy(id, now_ms),
             });
         }
         let Some(run) = self.fight_run() else {
@@ -410,7 +412,7 @@ impl EncounterEngine {
             Some(fight) => saved
                 .and_then(|saved| Run::restore(&fight, &saved, now_ms))
                 .unwrap_or_else(|| begin(&fight, &self.party())),
-            None => Run::legacy(id),
+            None => Run::legacy(id, now_ms),
         };
         self.run.run = Some(run);
         self.fight_state.seen = Seen::default();
@@ -703,7 +705,7 @@ impl EncounterEngine {
                         .div_ceil(u64::from(max));
                     let left = u64::from(run.health[i]).saturating_sub(lost.max(1)) as u32;
                     run.set_health(guid, left);
-                    out.replies.push(enemy_hp(
+                    out.replies.extend(enemy_health(
                         guid,
                         (u64::from(max) * u64::from(left) / 100) as u32,
                         max,
@@ -853,7 +855,7 @@ impl EncounterEngine {
                 }
                 out.replies.push(self.spawn(a, at, 0));
                 out.replies
-                    .push(enemy_hp(a.guid, a.max_health, a.max_health));
+                    .extend(enemy_health(a.guid, a.max_health, a.max_health));
                 if a.boss {
                     out.replies.push(boss_display(a.guid, true));
                 }
@@ -1101,6 +1103,24 @@ impl EncounterEngine {
         out.replies
             .push(minigame(19, active.instance_id, active.encounter_id));
         self.results_presented = true;
+    }
+
+    /// The results card of a row with no fight file (a `field_battles.json` battle, the cave):
+    /// the rows and arithmetic of a fight file's card, with the captured battle record's values
+    /// (packet 62, C16). Such a run is lost at its first knockout, so a won one has its one left.
+    pub(in crate::encounter) fn results_card(&self, active: &ActiveEncounter, now_ms: u64) -> Vec<u8> {
+        let won = active.phase == EncounterPhase::Won;
+        let started = (self.run.run.as_ref()).filter(|run| run.legacy).and_then(|run| run.started);
+        let card = ScoreCard {
+            enemies: active.enemies.iter().filter(|e| e.health == 0).count() as u32,
+            seconds: started.map_or(0, |at| (now_ms.saturating_sub(at) / 1000) as u32),
+            knockouts_left: u32::from(won),
+            knockouts_allowed: 1,
+            goals: u32::from(won),
+            ..ScoreCard::default()
+        }
+        .scored(&Score::from(&self.wire_data().settings.battle), won);
+        score_packet(active.instance_id, active.encounter_id, &card, 1, 0)
     }
 
     /// The run was just won or lost (the results follow).

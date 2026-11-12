@@ -2074,7 +2074,7 @@
       "kind": "Yeti",
       "actor_kind_id": 930073,
       "definition_id": 930073,
-      "model_id": 4547,
+      "model_id": 51,
       "name_string_id": 2245,
       "texture_alias": "",
       "level": null,
@@ -2093,7 +2093,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 2245 resolves to 'Yeti' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:3529 maps model_id=4547 to sh_standard_yeti_01.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:59605 contains pack_14/002627.adr (128 bytes, CRC32 71ba6afa, SHA256 b4e72b812ff31239869505f4c5592fec875c2825a48246e0ff9bde0ecc672cf0; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Yetis maps to the exact singular client name and the standard yeti model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 2245 resolves to 'Yeti' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:3529 maps model_id=4547 to sh_standard_yeti_01.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:59605 contains pack_14/002627.adr (128 bytes, CRC32 71ba6afa, SHA256 b4e72b812ff31239869505f4c5592fec875c2825a48246e0ff9bde0ecc672cf0; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Yetis maps to the exact singular client name. (R) rc-0136 (2026-11-11): the yetis that fight wear model 51 sasquatch_01.adr, the yeti body (its .adr names the skeleton sasquatch.dsk); 4547 sh_standard_yeti_01.adr is a banner with no skeleton, the look of the Frosty Yeti who starts Petty Yetis! (BJX fork Npcs.json 33589 and 33816, reference spawns, wear 4547 as the battle's starters; its wave Yeti 46010 wears 51). Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
     },
     {
       "id": "ocean_cray",
@@ -2594,7 +2594,7 @@
       "kind": "Frostfang Growler",
       "actor_kind_id": 2529,
       "definition_id": 2529,
-      "model_id": 3284,
+      "model_id": 176,
       "name_string_id": 104067,
       "texture_alias": "",
       "level": 9,
@@ -2613,7 +2613,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was recovered for this quest target; grant no per-kill reward."
       },
-      "source": "(R) actor_kind_id/definition_id 2529 is the FreeRealms-Legacy Npcs.json row 2529 (no NameId, unnamed reference, model 3284 wolf_generic.adr); name_string_id 104067 is the client locale string 'Frostfang Growler' (lab/reports/locale-id-to-text.json); model 3284 maps to wolf_generic.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 and to client-assets catalog.tsv:10255 (pack_03/000417.adr). Kill target of q3030012 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 9, health 260 and damage 23 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. Live catalogue: rank normal measured at tier 1 from capture p12 t=546232..546321 (2014-03-31), battle Frostfang Growlers at difficulty 1: Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7, speeds 3.0 / 6.0; 760 = 279 x 2.724. (R) hit 5 is the bite read on a geared level 20 (5 or 3), its raw value is unknown; (R) home speed 10. The capture's model is 176 (wolf.adr); this row keeps 3284. max_health, damage and level here are kept for the dormant loader only.",
+      "source": "(R) actor_kind_id/definition_id 2529 is the FreeRealms-Legacy Npcs.json row 2529 (no NameId, unnamed reference, model 3284 wolf_generic.adr); name_string_id 104067 is the client locale string 'Frostfang Growler' (lab/reports/locale-id-to-text.json); model 3284 maps to wolf_generic.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:2470 and to client-assets catalog.tsv:10255 (pack_03/000417.adr). Kill target of q3030012 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 9, health 260 and damage 23 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. Live catalogue: rank normal measured at tier 1 from capture p12 t=546232..546321 (2014-03-31), battle Frostfang Growlers at difficulty 1: Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7, speeds 3.0 / 6.0; 760 = 279 x 2.724. (R) hit 5 is the bite read on a geared level 20 (5 or 3), its raw value is unknown; (R) home speed 10. The capture's model is 176 (wolf.adr); this row keeps 3284. max_health, damage and level here are kept for the dormant loader only. rc-0136 (2026-11-11): model 176 wolf.adr, the model live sent for every Frostfang Growler (111 AddNpc rows in p12.pcap and packets_3.pcapng); 3284 wolf_generic.adr was the reference row's.",
       "rank": "normal",
       "tier": 1,
       "hit": 5,
@@ -4578,7 +4578,7 @@
       "kind": "Robgoblin Kaboomer",
       "actor_kind_id": 3936,
       "definition_id": 3936,
-      "model_id": 4202,
+      "model_id": 1682,
       "name_string_id": 6720,
       "texture_alias": "",
       "level": null,
@@ -4597,7 +4597,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "[reference] lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id 3936, 3937, 3944, 3945, 3951, 3952: Name 'Robgoblin Kaboomer', NameId 6720, ModelId 4202 (robgoblin_m_junkmaster.adr). [reference] BJX fork Npcs.json Id 3936, 3937, 3944, 3945, 3951: Name 'Robgoblin Kaboomer', NameId 6720, ModelId 4202 (robgoblin_m_junkmaster.adr), disposition None, scale None; an upstream row. [client] Global.Text 6720 'Robgoblin Kaboomer' (lab/reports/locale-id-to-text.json): the name exists in the 2014 client. [reconstructed] (R) rank 'normal', behaviour, speeds (design 5.3 small-enemy row) and tags are local; definition id: reference Npcs.json Id 3936, as the shipped rows 4115 and 1294 do. Health and damage come from rank and tier (design 5.2, 5.3). (R) max_health 180 and damage 15 are the level-one baseline of the shipped rows of this rank; fights and the catalogue take the rank's numbers instead.",
+      "source": "[reference] lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id 3936, 3937, 3944, 3945, 3951, 3952: Name 'Robgoblin Kaboomer', NameId 6720, ModelId 4202 (robgoblin_m_junkmaster.adr). [reference] BJX fork Npcs.json Id 3936, 3937, 3944, 3945, 3951: Name 'Robgoblin Kaboomer', NameId 6720, ModelId 4202 (robgoblin_m_junkmaster.adr), disposition None, scale None; an upstream row. [client] Global.Text 6720 'Robgoblin Kaboomer' (lab/reports/locale-id-to-text.json): the name exists in the 2014 client. [reconstructed] (R) rank 'normal', behaviour, speeds (design 5.3 small-enemy row) and tags are local; definition id: reference Npcs.json Id 3936, as the shipped rows 4115 and 1294 do. Health and damage come from rank and tier (design 5.2, 5.3). (R) max_health 180 and damage 15 are the level-one baseline of the shipped rows of this rank; fights and the catalogue take the rank's numbers instead. rc-0136 (2026-11-11): model 1682 robgoblin_m_master.adr, the model live sent for every Robgoblin Kaboomer (10 AddNpc rows in packets_3.pcapng, 2014-03); 4202 robgoblin_m_junkmaster.adr was the reference row's.",
       "rank": "normal",
       "speeds": {
         "walk": 4.5,
