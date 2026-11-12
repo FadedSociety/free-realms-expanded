@@ -468,6 +468,32 @@ TABLE = [
         "of Holidays 2012: 'you must then purchase the bow for SC'; (R) 49") for d in range(1, 13)],
 ]
 
+# Ride families (owner 2026-11-11: "mounts in the Marketplace grouped with their colours"). The
+# stock client's colour picker is a dye tint of one item (bundle IsTintable + AvailableTintGroupId,
+# `009a56d0` cases 28-30, Lua GetTintGroupData), not a choice between the separate ride item
+# definitions our colours are, so each family is a Marketplace sub-category under its ride type
+# instead, listing its rides together. A family is every mounts.json ride sharing one model;
+# (key, model id, category id (R: clear of the client's MarketplaceCategoryIds), client name id).
+RIDE_FAMILIES = [
+    ("dragon", 2064, 7001, 5658),         # Dragons: Scaled, Gold-Tipped, Chrome
+    ("pegasus", 2109, 7002, 5656),        # Pegasus: Pegasus, Hearts Pegasus, Pegasus Unicorn
+    ("tiger", 3026, 7003, 4770),          # Tigers: Tiger, Saber-Tooth Tiger
+    ("stallion", 2099, 7004, 5659),       # Horses: the three Stallions
+    ("t_rex", 2040, 7005, 156910),        # T-Rexes: Spotted, Striped
+    ("hoverboard", 503, 7006, 156950),    # Hoverboards: Clockwork, Dwarftech
+    ("lawn_chair", 4439, 7007, 442689),   # Lawn Chair: Lawn Chair, Star Lawn Chair
+    ("surfboard", 3033, 7008, 5093),      # Surfboards: Surfboard, Wooden, Basalt
+    ("turkey", 4622, 7009, 5102766),      # (R) no plural string: named after Roasted Turkey
+    ("hero_bike", 4751, 7010, 435237),    # (R) Bikes: Valiant Gleam Cycle, Lawless Gloam Chopper
+]
+MOUNTS = ROOT / "content/mounts.json"
+
+# Bundle group 6 (Top Sellers) fills the welcome window's Popular Items carousel. Event gating
+# leaves only Jasper and the Beach Ball listed out of season, so these year-round legacy store
+# rides are appended (never removed: the rest of station_cash.bundle_groups stays hand-editable).
+POPULAR_GROUP = 6
+POPULAR_YEAR_ROUND = [76856, 76855, 76768, 76863, 76867]  # Scaled, Gold-Tipped, Pegasus, Tiger, Stallion
+
 # Vendor rows the audit removes: (npc_id, item_id, reason).
 VENDOR_DROPS = [
     (9500000545, 9095, "birthday_bash: no source has an NPC vendor for the Sanctuary Birthday "
@@ -666,6 +692,48 @@ def main():
         if after.get("stock_per_event"):
             stats[(unit, "limited")] += 1
 
+    # Ride families: every listed Station Cash row of a family's rides carries its key and its
+    # own ride name as the variant; the family list goes into station_cash.ride_families.
+    mounts = json.loads(MOUNTS.read_text(encoding="utf-8"))["mounts"]
+    current = lambda item_id: changed.get(item_id) or added.get(item_id) or rows.get(item_id)
+    family_rows, family_parents = {}, {}
+    for key, model, _, _ in RIDE_FAMILIES:
+        for mount in (m for m in mounts if m["model_id"] == model):
+            for item_id in mount["item_definition_id_candidates"]:
+                row = current(item_id)
+                if row is None or row.get("sc_price") is None or row.get("earn_only"):
+                    continue
+                family_rows[item_id] = (key, mount["name"])
+                family_parents.setdefault(key, set()).add(row.get("ride_category"))
+    for key, parents in family_parents.items():
+        if len(parents) != 1 or None in parents:
+            raise SystemExit(f"ride family {key} spans ride categories {parents}")
+    for item_id, row in list(rows.items()) + list(added.items()):
+        wanted_family = family_rows.get(item_id)
+        base = OrderedDict(current(item_id))
+        had = (base.get("family"), base.get("variant"))
+        base.pop("family", None)
+        base.pop("variant", None)
+        if wanted_family:
+            base["family"], base["variant"] = wanted_family
+        if (base.get("family"), base.get("variant")) != had:
+            stats[("rides", "family")] += 1
+        if item_id in added:
+            added[item_id] = base
+        elif dump(base) != dump(rows[item_id]):
+            changed[item_id] = base
+        else:
+            changed.pop(item_id, None)
+    families_config, orders = [], Counter()
+    for key, _, category_id, name_id in RIDE_FAMILIES:
+        if key not in family_parents:
+            continue
+        parent = next(iter(family_parents[key]))
+        orders[parent] += 1
+        families_config.append(OrderedDict(key=key, category_id=category_id,
+                                           category_name_id=name_id,
+                                           display_order=orders[parent], parent=parent))
+
     for item_id, after in changed.items():
         index = row_at[item_id]
         comma = "," if lines[index].endswith(",") else ""
@@ -697,7 +765,16 @@ def main():
     for shelf in config["item_shelves"]:
         extra = SHELF_CATEGORIES.get(shelf["category_id"], [])
         shelf["item_category_ids"] = sorted(set(shelf["item_category_ids"]) | set(extra))
-    new_text = new_text[:at] + prefix + dump(config) + "," + new_text[end:]
+    for group in config["bundle_groups"]:
+        if group["id"] == POPULAR_GROUP:
+            group["item_ids"] += [i for i in POPULAR_YEAR_ROUND if i not in group["item_ids"]]
+    shaped = OrderedDict()
+    for name, item in config.items():
+        if name != "ride_families":
+            shaped[name] = item
+        if name == "ride_categories":
+            shaped["ride_families"] = families_config
+    new_text = new_text[:at] + prefix + dump(shaped) + "," + new_text[end:]
     parsed = json.loads(new_text)  # the patched file must still parse, row for row
     ids = [item["item_id"] for item in parsed["items"]]
     if len(ids) != len(set(ids)) or len(ids) != len(rows) + len(added):
@@ -725,11 +802,13 @@ def main():
             dropped += 1
     new_vendor_text = json.dumps(vendors, indent=2, ensure_ascii=True).replace("\n", "\r\n") + "\r\n"
 
-    units = sorted({unit for unit, _ in stats})
+    units = sorted({unit for unit, kind in stats if kind != "family"})
     for unit in units:
         print(unit + ": " + ", ".join(f"{kind} {stats[(unit, kind)]}" for kind in
                                       ("currency", "price", "added", "removed", "gated", "limited",
                                        "kept on SC")))
+    print(f"ride families: {len(families_config)} ({sum(1 for _ in family_rows)} rows); "
+          f"rows whose family changed: {stats[('rides', 'family')]}")
     print(f"vendor rows dropped: {dropped}; entries waiting for an item row: {len(waiting)}")
     for unit in sorted({entry["audit"] for entry in waiting}):
         names = [entry["element"] for entry in waiting if entry["audit"] == unit]

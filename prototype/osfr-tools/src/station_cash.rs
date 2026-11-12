@@ -130,6 +130,8 @@ const MAX_ITEM_SHELF_KEYS: usize = 256;
 /// (R) Bounds for the bundle groups and the new-item list; the ids themselves are content.
 const MAX_BUNDLE_GROUPS: usize = 32;
 const MAX_BUNDLE_GROUP_ITEMS: usize = 256;
+/// (R) Bound for the B2 ride families; the families themselves are content.
+const MAX_RIDE_FAMILIES: usize = 128;
 
 /// (R) Sanity bounds for `sc_rewards.json`; every amount is content, these only bound it.
 pub const MAX_EARN_SC: u32 = 10_000;
@@ -173,6 +175,21 @@ pub struct RideCategoryShelf {
     pub category_id: u32,
     pub category_name_id: u32,
     pub display_order: u32,
+}
+
+/// B2 (owner: "mounts grouped with their colours"): one ride family, a category under its ride
+/// sub-category that lists the family's rides together (the stock client offers no choice
+/// between item definitions inside one bundle: its colour picker is a dye tint of one item, see
+/// `stores.json` notes). `category_id` doubles as the 66/6 group key, as the ride children's do.
+/// A row joins the family its `family` key names; every family row must be a ride of `parent`.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RideFamilyShelf {
+    pub key: String,
+    pub category_id: u32,
+    pub category_name_id: u32,
+    pub display_order: u32,
+    pub parent: RideCategory,
 }
 
 /// T657: a top-level Marketplace category for rows that are neither rides nor boomboxes.
@@ -226,6 +243,9 @@ pub struct Config {
     /// T526: the ride sub-categories under Rides. Empty keeps the pre-T526 single Rides category;
     /// non-empty must name all four, so every `ride_category` row has its child.
     pub ride_categories: Vec<RideCategoryShelf>,
+    /// B2: the ride families under the ride sub-categories (see [`RideFamilyShelf`]). Empty lists
+    /// every ride straight under its sub-category, as before.
+    pub ride_families: Vec<RideFamilyShelf>,
     /// T657: the top-level categories for every other listing. A listed non-ride row that no shelf
     /// names is refused at load, so no non-ride row falls back to the Rides parent.
     pub item_shelves: Vec<ItemShelf>,
@@ -256,6 +276,7 @@ impl Default for Config {
             category_group_id: 1,
             boombox_shelf: None,
             ride_categories: Vec::new(),
+            ride_families: Vec::new(),
             item_shelves: Vec::new(),
             bundle_groups: Vec::new(),
             new_item_ids: Vec::new(),
@@ -284,6 +305,7 @@ impl Config {
                     || shelf.category_group_id == self.category_group_id
             })
             || !self.ride_categories_valid()
+            || !self.ride_families_valid()
             || !self.item_shelves_valid()
             || !self.bundle_groups_valid()
             || !self.sc_price_scale.is_finite()
@@ -338,6 +360,39 @@ impl Config {
             }
         }
         self.ride_categories.len() == 4
+    }
+
+    /// B2: each family has a key (1-64 bytes), a name, its own id (also its group key, clear of
+    /// every other shelf's) and an order unique under its parent, which must be configured.
+    fn ride_families_valid(&self) -> bool {
+        let mut keys = BTreeSet::new();
+        let mut ids = BTreeSet::new();
+        let mut orders = BTreeSet::new();
+        self.ride_families.len() <= MAX_RIDE_FAMILIES
+            && self.ride_families.iter().all(|family| {
+                (1..=64).contains(&family.key.len())
+                    && keys.insert(family.key.as_str())
+                    && ids.insert(family.category_id)
+                    && orders.insert((family.parent, family.display_order))
+                    && family.category_id != 0
+                    && family.category_name_id != 0
+                    && family.display_order != 0
+                    && !self.base_reserved(family.category_id)
+                    && (self.ride_categories.iter()).any(|ride| ride.key == family.parent)
+                    && !(self.ride_categories.iter())
+                        .any(|ride| ride.category_id == family.category_id)
+                    && !(self.item_shelves.iter())
+                        .any(|shelf| shelf.category_id == family.category_id)
+            })
+    }
+
+    /// B2: the index of the family `key` names, for a row's `family`.
+    pub fn family_index(&self, key: &str) -> Option<u16> {
+        let index = self
+            .ride_families
+            .iter()
+            .position(|family| family.key == key)?;
+        u16::try_from(index).ok()
     }
 
     /// T657: each item shelf needs its own id, order and name; every item category and item type
@@ -419,6 +474,7 @@ impl Config {
         &self,
         kind: RowKind,
         ride_category: Option<RideCategory>,
+        family: Option<u16>,
         category_id: Option<u32>,
         item_type: i32,
         ride: bool,
@@ -436,6 +492,12 @@ impl Config {
                 .map(|shelf| shelf.category_group_id)
                 .ok_or_else(|| invalid("boombox row without a shelf")),
             RowKind::Ride => {
+                // B2: a family row of the family's own ride type lists in the family; one tagged
+                // with another type keeps its type, so a stray tag never hides a ride.
+                let family = family.and_then(|index| self.ride_families.get(usize::from(index)));
+                if let Some(family) = family.filter(|family| ride_category == Some(family.parent)) {
+                    return Ok(family.category_id);
+                }
                 if ride_category.is_some() {
                     return self.ride_group(ride_category);
                 }
@@ -866,6 +928,8 @@ pub struct StoreRow {
     pub sc_price: u32,
     pub kind: RowKind,
     pub ride_category: Option<RideCategory>,
+    /// B2: the row's ride family (`Config::family_index`), or none.
+    pub family: Option<u16>,
     pub category_id: Option<u32>,
 }
 
@@ -929,6 +993,7 @@ impl Catalogue {
                 sc_price,
                 kind,
                 ride_category,
+                family,
                 category_id,
             } = row;
             if item_id <= 0 || sc_price == 0 || sc_price > MAX_PRICE_SC {
@@ -946,6 +1011,7 @@ impl Catalogue {
             let group = config.listing_group(
                 kind,
                 ride_category,
+                family,
                 category_id,
                 presentation.item_type,
                 ride,
@@ -1037,6 +1103,19 @@ impl Catalogue {
             parent_id: config.category_id,
             display_order: shelf.display_order,
         });
+        // B2: each ride family under its ride sub-category (a third level; R until a native run).
+        let families = config.ride_families.iter().filter_map(|family| {
+            let parent = (config.ride_categories.iter()).find(|ride| ride.key == family.parent)?;
+            Some(TreeNode {
+                shelf: Shelf {
+                    category_id: family.category_id,
+                    category_name_id: family.category_name_id,
+                    category_group_id: family.category_id,
+                },
+                parent_id: parent.category_id,
+                display_order: family.display_order,
+            })
+        });
         std::iter::once(TreeNode {
             shelf: rides,
             parent_id: 0,
@@ -1049,6 +1128,7 @@ impl Catalogue {
         }))
         .chain(item_shelves)
         .chain(children)
+        .chain(families)
         .collect()
     }
 

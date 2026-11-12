@@ -100,6 +100,29 @@ fn the_welcome_splash_wallet_request_brings_the_popular_items_group() {
     );
 }
 
+/// Native 2026-11-12: with no event running, the event-gated Top Sellers dropped out and the
+/// welcome panel read "undefined". The year-round members alone must fill the carousel.
+#[test]
+fn popular_items_stay_filled_when_no_event_is_running() {
+    let mut shop = shipped_shop();
+    shop.follow_events(|_| None);
+    let outcome = shop.handle(&[66, 0, 10, 0]).expect("wallet request");
+    let packet = outcome
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 9, 0]))
+        .expect("66/9 bundle groups");
+    let groups = bundle_groups(packet);
+    let (_, _, bundles) = groups
+        .iter()
+        .find(|(id, _, _)| *id == 6)
+        .expect("group 6 is sent out of season");
+    assert!(bundles.len() >= 6, "a full carousel out of season: {bundles:?}");
+    for bundle in bundles {
+        assert!(shop.sc_catalogue().listing(*bundle).is_some(), "{bundle} is listed");
+    }
+}
+
 #[test]
 fn new_items_are_flagged_and_everything_else_is_not() {
     let shop = shipped_shop();

@@ -452,3 +452,79 @@ fn a_malformed_event_or_stock_field_is_refused_at_load() {
         );
     }
 }
+
+/// Owner follow-up: each ride family is one Marketplace sub-category under its ride type, holding
+/// the family's rides (the stock client's colour picker tints one item; it cannot pick between
+/// the separate ride items a family is made of).
+#[test]
+fn ride_families_list_together_under_their_ride_type() {
+    let shop = shop_from(&stores(), 0, 0);
+    let catalogue = shop.sc_catalogue();
+    let config = catalogue.config();
+    let dragons = (config.ride_families.iter())
+        .find(|family| family.key == "dragon")
+        .expect("the dragon family");
+    for item in [76_856, 76_855, 77_471] {
+        let listing = catalogue.listing(item).expect("a dragon is listed");
+        assert_eq!(
+            listing.group, dragons.category_id,
+            "{item} lists in its family"
+        );
+    }
+    let winged = (config.ride_categories.iter())
+        .find(|ride| ride.key == dragons.parent)
+        .expect("the family's ride type");
+    // The 66/7 tree names the family under its ride type, and the 66/6 groups carry it.
+    let packets = station_cash::catalogue_packets(catalogue);
+    let tree = (packets.iter())
+        .find(|packet| packet.starts_with(&[66, 0, 7, 0]))
+        .expect("the category tree");
+    assert!(
+        contains_u32(tree, dragons.category_id) && contains_u32(tree, dragons.category_name_id)
+    );
+    assert!(contains_u32(tree, winged.category_id));
+    // 25 rides in 10 families: the ride types show 52 entries where they showed 67.
+    let rows = rows();
+    let family_rows = (rows.values())
+        .filter(|row| row["family"].is_string())
+        .count();
+    assert_eq!((config.ride_families.len(), family_rows), (10, 25));
+    for row in rows.values().filter(|row| row["family"].is_string()) {
+        assert!(
+            row["variant"].is_string(),
+            "{}: a family row names its variant",
+            row["item_id"]
+        );
+    }
+}
+
+#[test]
+fn an_unknown_family_is_refused_and_a_stray_one_keeps_its_ride_type() {
+    let scratch = Scratch::new("families");
+    let edit = |label: &str, change: fn(&mut Value)| {
+        let mut stores: Value = serde_json::from_slice(&fs::read(stores()).unwrap()).unwrap();
+        for row in stores["items"].as_array_mut().unwrap() {
+            if row["item_id"] == 76_856 {
+                change(row);
+            }
+        }
+        let path = scratch.0.join(format!("{label}.json"));
+        fs::write(&path, serde_json::to_vec(&stores).unwrap()).unwrap();
+        path
+    };
+    // A key no family names is refused at load.
+    let unknown = edit("unknown", |row| row["family"] = "no_such_family".into());
+    assert!(
+        StoreCatalogue::load(&unknown).is_err(),
+        "an unknown family is refused"
+    );
+    // A row of another ride type keeps its type: a stray family tag never hides a ride.
+    let stray = edit("stray", |row| row["ride_category"] = "mechanical".into());
+    let shop = shop_from(&stray, 0, 0);
+    let config = shop.sc_catalogue().config();
+    let mechanical = (config.ride_categories.iter())
+        .find(|ride| ride.category_id == 5)
+        .expect("the Mechanical ride type");
+    let listing = shop.sc_catalogue().listing(76_856).expect("still listed");
+    assert_eq!(listing.group, mechanical.category_id);
+}

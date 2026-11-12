@@ -151,6 +151,14 @@ struct StoreItem {
     /// B2: rows sharing one stock counter (every colour and gender row of an outfit).
     #[serde(default)]
     stock_group: Option<String>,
+    /// B2: the ride family (`station_cash.ride_families` key) the row lists under; a key no family
+    /// names is refused at load.
+    #[serde(default)]
+    family: Option<String>,
+    /// B2: the row's own colour or variant label inside its family (content for the Studio and
+    /// for a client that draws a colour picker; the stock client shows each row's own name).
+    #[serde(default)]
+    variant: Option<String>,
 }
 
 /// B2: the season tags and the limited-stock groups of `items`, refusing a malformed one: a key
@@ -263,6 +271,16 @@ impl StoreCatalogue {
             }
         }
         (catalogue.seasonal, catalogue.limits) = event_index(&catalogue.items)?;
+        let config = &catalogue.station_cash;
+        if (catalogue.items.iter()).any(|item| {
+            (item.family.as_deref()).is_some_and(|key| config.family_index(key).is_none())
+                || (item.variant.as_deref())
+                    .is_some_and(|label| label.is_empty() || label.len() > 64)
+        }) {
+            return Err(invalid(
+                "store row names an unknown ride family or a bad variant",
+            ));
+        }
         Ok(catalogue)
     }
 
@@ -395,6 +413,8 @@ impl CoinShop {
                     sc_price,
                     kind,
                     ride_category: item.ride_category,
+                    family: (item.family.as_deref())
+                        .and_then(|key| catalogue.station_cash.family_index(key)),
                     category_id: item.category_id,
                 })
             }),

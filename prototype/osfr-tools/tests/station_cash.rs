@@ -1883,7 +1883,7 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     // T495/T526/T657: Rides and Boombox are top level, then the three T657 item shelves, then the
     // four ride sub-categories under Rides. The ids and names are the client's real Marketplace
     // categories (Legacy `StoreBundleCategories.json`); each shelf id is its own 66/6 group key.
-    let shelves = [
+    let mut shelves = vec![
         (
             config.category_id,
             config.category_name_id,
@@ -1904,6 +1904,15 @@ fn catalogue_navigation_packets_match_the_client_readers() {
         (4, 5_101_132, 4, config.category_id, 30),
         (5, 5_101_133, 5, config.category_id, 40),
     ];
+    // B2: the ride families, each under its ride sub-category.
+    shelves.extend(config.ride_families.iter().map(|family| {
+        let parent = (config.ride_categories.iter())
+            .find(|ride| ride.key == family.parent)
+            .expect("the family's ride type")
+            .category_id;
+        let id = family.category_id;
+        (id, family.category_name_id, id, parent, family.display_order)
+    }));
     // T657: a node's count is its own bundles plus its descendants', the number the client
     // recomputes (`00c37e70`).
     let under = |selected: u32| -> u32 {
@@ -1943,9 +1952,9 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     assert_eq!(
         reader.u32() as usize,
         shelves.len(),
-        "eleven categories (T657 adds three item shelves, L094 the Mystery Chests shelf, P-games-window Goods and Services)"
+        "eleven categories (T657 adds three item shelves, L094 the Mystery Chests shelf, P-games-window Goods and Services) and B2's ride families"
     );
-    for (category, name, _, parent, order) in shelves {
+    for (category, name, _, parent, order) in shelves.iter().copied() {
         assert_eq!(reader.u32(), category, "category map key");
         assert_eq!(reader.u32(), category, "category id");
         assert_eq!(reader.u32(), name, "category name id");
@@ -1970,7 +1979,7 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 6);
     assert_eq!(reader.u32() as usize, shelves.len(), "nine category groups");
-    for (category, _, group, _, _) in shelves {
+    for (category, _, group, _, _) in shelves.iter().copied() {
         assert_eq!(reader.u32(), group, "group map key");
         assert_eq!(reader.u32(), group, "group id");
         assert_eq!(reader.u32(), 1, "one category id");
