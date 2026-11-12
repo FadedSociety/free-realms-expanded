@@ -19,7 +19,8 @@
 //!
 //! T553: a harvest pool may name the MiniGameData Harvesting game its nodes start (`game_id`,
 //! a `harvesting::REGIONS` id; the farm plots of Queensfields 109, Perry's Pastures 115 and
-//! Lakesfield 117). The mushrooms name none and start the engine's own game 111. A plot sends its
+//! Lakesfield 117, and C10's bushels of Farnum's Farm 111, Chugaroot Farm 113 and Thorny Tillage
+//! 119). The mushrooms name none and start the engine's own game 111. A plot sends its
 //! `terrain_object_id` in the AddNpc with `replace_terrain_object` 0, which binds the actor to the
 //! terrain's own plot instead of drawing a second model (client `00968c80`, see `NodePresentation`).
 
@@ -29,6 +30,7 @@ use crate::{
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
     nameplate::{self, Kind},
     npc_notifications::{self, Notification},
+    npc_presentation::Cursor,
     power_ups::{Rng, pick_weighted},
     startup_world::NpcSpawn,
     world::{NpcVisibility, content_spawn_template},
@@ -151,8 +153,9 @@ pub struct HarvestNodeType {
     #[serde(default)]
     pub extra_composite_effect_ids: Vec<u32>,
     pub interact_range: u32,
-    /// The client cursor row (`Resources/Cursors.txt` 20 = `cursor_interaction_mining.cur`).
-    /// Loaded only: the AddNpc crosswalk has no cursor field, so nothing is sent from it.
+    /// The client cursor row (`Resources/Cursors.txt` 20 = `cursor_interaction_mining.cur`),
+    /// sent as each drawn node's 35/12 entry ([`NodePresentation::cursor`]); at most 127, and 0
+    /// sends none, which leaves the node unclickable.
     pub cursor_id: u32,
     pub placement_y_offset: f32,
     /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes.
@@ -352,6 +355,11 @@ pub struct NodePresentation {
     pub texture_alias: Option<String>,
     /// T555: the type's notifications, sent after the node's 35/2.
     pub notifications: Vec<Notification>,
+    /// rc-0136 F4 gather 2: the type's 35/12 hover cursor, sent after the node's 35/2. Its
+    /// has-cursor byte is what makes the client treat the node as something to click
+    /// (`SetCharacterStateFlags` 00962f30 sets bit 0x20 of +0x145, which `sub_95FFA0` reads for
+    /// the X prompt `00baf6e0` and the click). `None` on companions and on a type with cursor 0.
+    pub cursor: Option<Cursor>,
     /// T553: AddNpc `terrain_object_id` (the farm plots; `replace_terrain_object` stays 0).
     /// Client `00968c80` (ProxiedCharacter init) looks the id up in the zone's terrain table; found
     /// and not replacing, the proxied character adopts the terrain object as its actor and builds
@@ -781,6 +789,17 @@ fn add_sites(
         {
             return Err(bad("node range or respawn out of bounds"));
         }
+        // rc-0136 F4 gather 2: a node is clickable only through its 35/12 cursor, a signed byte
+        // in the client; 0 sends none.
+        let cursor = match node_type.cursor_id {
+            0 => None,
+            id => Some(
+                u8::try_from(id)
+                    .ok()
+                    .filter(|id| *id <= 127)
+                    .ok_or_else(|| bad("node cursor out of bounds"))?,
+            ),
+        };
         // T553: only the Chef harvest file starts regional games, and only ones the client names.
         // P-quest-games: a Miner pool may start one of the client's ore rows (the rich veins 92-100
         // beside the Games window's 91-99); `mining.json` must offer it or the click is refused.
@@ -865,6 +884,7 @@ fn add_sites(
             }
         };
         presentation.scale = Some(node_type.scale);
+        presentation.cursor = cursor.map(|id| Cursor { id, flag: false });
         presentation.name_id = node_type.name_id;
         presentation.texture_alias = texture_alias;
         presentation
@@ -921,6 +941,7 @@ pub fn apply_node_changes(visibility: &mut NpcVisibility, changes: Vec<NodeChang
                     visibility
                         .set_notifications(node.guid, node.presentation.notifications.clone());
                 }
+                visibility.set_cursor(node.guid, node.presentation.cursor);
                 if let Some(companion) = companion_actor(&node) {
                     visibility.add_prepared_actor(
                         node_spawn(&companion, false),

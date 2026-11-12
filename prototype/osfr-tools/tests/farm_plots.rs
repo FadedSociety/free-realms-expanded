@@ -146,7 +146,8 @@ fn every_plot_is_placed_and_names_its_regions_game() {
         .actors()
         .filter(|actor| actor.model_id == PLOT_MODEL)
         .collect();
-    assert_eq!(placed.len(), 13, "every recovered plot is active");
+    // The 13 recovered plots and C10's 15 bushels (Farnum's Farm, Chugaroot Farm, Thorny Tillage).
+    assert_eq!(placed.len(), 28, "every recovered plot and C10 bushel is active");
     for (_, game, count) in POOLS {
         let of_game: Vec<_> = placed
             .iter()

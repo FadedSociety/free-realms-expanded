@@ -217,6 +217,51 @@
         "max_active_nodes": "(R) every recovered plot is active; no recovered cap",
         "respawn_seconds": "(R) 60, same as the mushroom pool; no recovered timer"
       }
+    },
+    {
+      "key": "farnums-farm",
+      "zone_definition_id": 0,
+      "node_type": "farm-plot",
+      "max_active_nodes": 6,
+      "respawn_seconds": 60,
+      "game_id": 111,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "game_id": "client MiniGameData row 111 (type 8) = Farnum's Farm Harvesting; harvesting.rs REGIONS 111; wiki: \"can be started at any Bushel\" there",
+        "placement": "(R) rc-0136 C10: the 6 bushel objects (sg_harvesting_node_farm_01.adr) of the Farnum Farmstead (Rucks, the harvesting rival, 6 m) in the client zone objects (world-object dump 2026-10-15); Sanctuary places no plot here",
+        "max_active_nodes": "(R) every bushel is active, as the recovered farms",
+        "respawn_seconds": "(R) 60, as the recovered farms"
+      }
+    },
+    {
+      "key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "node_type": "farm-plot",
+      "max_active_nodes": 6,
+      "respawn_seconds": 60,
+      "game_id": 113,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "game_id": "client MiniGameData row 113 (type 8) = Chugaroot Farm Harvesting; harvesting.rs REGIONS 113; wiki: \"can be started at any Bushel\" there",
+        "placement": "(R) rc-0136 C10: the 6 bushel objects (sg_harvesting_node_farm_01.adr) of the Wugachug (Farmer Murglot, the Chugaroot farmer, 11 m) in the client zone objects (world-object dump 2026-10-15); Sanctuary places no plot here",
+        "max_active_nodes": "(R) every bushel is active, as the recovered farms",
+        "respawn_seconds": "(R) 60, as the recovered farms"
+      }
+    },
+    {
+      "key": "thorny-tillage",
+      "zone_definition_id": 0,
+      "node_type": "farm-plot",
+      "max_active_nodes": 3,
+      "respawn_seconds": 60,
+      "game_id": 119,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "game_id": "client MiniGameData row 119 (type 8) = Thorny Tillage Harvesting; harvesting.rs REGIONS 119; wiki: \"can be started at any Bushel\" there",
+        "placement": "(R) rc-0136 C10: the 3 bushel objects (sg_harvesting_node_farm_01.adr) of the Brambleback Farm, Briarwood (Farmer Brambleback, 41 m) in the client zone objects (world-object dump 2026-10-15); Sanctuary places no plot here",
+        "max_active_nodes": "(R) every bushel is active, as the recovered farms",
+        "respawn_seconds": "(R) 60, as the recovered farms"
+      }
     }
   ],
   "spawns": [
@@ -1883,6 +1928,261 @@
       "source_tags": {
         "row": "Sanctuary-main-20261019 src/Scripts/Zone/FabledRealms.lua:4099 spawnNpcWithGuid(33941, 100000033941, -91.77587, 10.384476, 210.14299, -1.57079633); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33941 (ModelId 274, CursorId 18, ReplaceTerrainObject false)",
         "terrain_object_id": "Sanctuary-main-20261019 src/Resources/Npcs.json Id=33941 TerrainObjectId 1254789831. Sent in the AddNpc with replace_terrain_object 0: client 00968c80 adopts the terrain object as the actor instead of building model 274, so the plot draws once. (R) packet-field wiring by name and behaviour, native check pending"
+      }
+    },
+    {
+      "id": 1254767917,
+      "pool_key": "farnums-farm",
+      "zone_definition_id": 0,
+      "position": [
+        -2188.477783203125,
+        -32.000003814697266,
+        370.922119140625
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254767917,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254767917 of Farnum's Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254768145,
+      "pool_key": "farnums-farm",
+      "zone_definition_id": 0,
+      "position": [
+        -2173.8359375,
+        -31.999998092651367,
+        396.95654296875
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254768145,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254768145 of Farnum's Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254768111,
+      "pool_key": "farnums-farm",
+      "zone_definition_id": 0,
+      "position": [
+        -2172.74853515625,
+        -32.0,
+        375.5407409667969
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254768111,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254768111 of Farnum's Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254768112,
+      "pool_key": "farnums-farm",
+      "zone_definition_id": 0,
+      "position": [
+        -2155.10693359375,
+        -32.0,
+        381.46527099609375
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254768112,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254768112 of Farnum's Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254768110,
+      "pool_key": "farnums-farm",
+      "zone_definition_id": 0,
+      "position": [
+        -2154.770263671875,
+        -32.129638671875,
+        348.87255859375
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254768110,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254768110 of Farnum's Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254768087,
+      "pool_key": "farnums-farm",
+      "zone_definition_id": 0,
+      "position": [
+        -2139.208740234375,
+        -32.155059814453125,
+        374.80316162109375
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254768087,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254768087 of Farnum's Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254787429,
+      "pool_key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "position": [
+        42.57026672363281,
+        30.798608779907227,
+        -335.3297119140625
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254787429,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254787429 of Chugaroot Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254787431,
+      "pool_key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "position": [
+        43.08815383911133,
+        28.213035583496094,
+        -352.36383056640625
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254787431,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254787431 of Chugaroot Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254787432,
+      "pool_key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "position": [
+        44.935707092285156,
+        28.811677932739258,
+        -344.7467346191406
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254787432,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254787432 of Chugaroot Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254787430,
+      "pool_key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "position": [
+        59.109458923339844,
+        29.943431854248047,
+        -336.855712890625
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254787430,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254787430 of Chugaroot Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254787639,
+      "pool_key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "position": [
+        66.5109634399414,
+        31.59300422668457,
+        -357.4496765136719
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254787639,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254787639 of Chugaroot Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254787641,
+      "pool_key": "chugaroot-farm",
+      "zone_definition_id": 0,
+      "position": [
+        70.62369537353516,
+        31.997737884521484,
+        -336.2881774902344
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254787641,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254787641 of Chugaroot Farm Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254797419,
+      "pool_key": "thorny-tillage",
+      "zone_definition_id": 0,
+      "position": [
+        -718.7046508789062,
+        -45.161231994628906,
+        2082.6923828125
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254797419,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254797419 of Thorny Tillage Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254797420,
+      "pool_key": "thorny-tillage",
+      "zone_definition_id": 0,
+      "position": [
+        -710.9265747070312,
+        -45.2021484375,
+        2064.63671875
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254797420,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254797420 of Thorny Tillage Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
+      }
+    },
+    {
+      "id": 1254797573,
+      "pool_key": "thorny-tillage",
+      "zone_definition_id": 0,
+      "position": [
+        -693.8950805664062,
+        -45.30874252319336,
+        2067.010498046875
+      ],
+      "heading": 0.0,
+      "terrain_object_id": 1254797573,
+      "source_tag": "reconstructed_R",
+      "source_tags": {
+        "row": "(R) rc-0136 C10: the bushel object 1254797573 of Thorny Tillage Harvesting (client zone objects (world-object dump 2026-10-15)): its position; the id doubles as the spawn id. Heading is not drawn",
+        "terrain_object_id": "the client object itself, sent with replace_terrain_object 0 as the recovered plots are: client 00968c80 adopts it as the actor"
       }
     }
   ]

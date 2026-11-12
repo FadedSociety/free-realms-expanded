@@ -4,8 +4,14 @@
 //! what a click gets (`Click`): a plant gives its harvest item once per regrow time for this
 //! player, a figure says its line. Range and busy follow the gathering nodes; a refusal or a
 //! spent plant answers one chat line and changes nothing.
+//!
+//! C10: an Archaeology Node (a dig-site prop with no content NPC row, `dig_sites.json`) starts
+//! its hunt on click through the Games window row's own gates (`begin_portal_game`).
 use super::*;
-use crate::harvest_nodes::Denied;
+use crate::{
+    activity_portal::Kind,
+    harvest_nodes::{Denied, Gather},
+};
 
 /// (R) Click reach for dressing, the gathering nodes' `interact_range`.
 const REACH_M: f32 = 12.0;
@@ -23,6 +29,29 @@ impl Gameplay {
         if self.content_npc_key(target).is_some() {
             return Ok(None);
         }
+        let in_reach = |at: [f32; 3]| {
+            let reach = (at.iter().zip(character.position))
+                .map(|(a, b)| (a - b).powi(2))
+                .sum::<f32>();
+            reach <= REACH_M * REACH_M
+        };
+        let dig = (self.npc_interaction.as_ref())
+            .and_then(|table| table.dig_site_game(target))
+            .zip(self.npc_visibility.as_ref().and_then(|world| world.actor_position(target)));
+        if let Some((game, at)) = dig {
+            npc_interaction::decode_npc_interact_26_8(inner)
+                .map_err(|_| invalid("invalid NPC interaction request"))?;
+            if !in_reach(at) {
+                return Ok(Some(Outcome {
+                    replies: vec![chat::system(&Denied::TooFar.message())],
+                    ..Outcome::default()
+                }));
+            }
+            let hunt = Kind::Gather {
+                gather: Gather::Artifact,
+            };
+            return self.begin_portal_game(game, hunt, character, now_ms).map(Some);
+        }
         let Some((click, position, name, picked_until)) = self
             .npc_visibility
             .as_ref()
@@ -33,12 +62,7 @@ impl Gameplay {
         npc_interaction::decode_npc_interact_26_8(inner)
             .map_err(|_| invalid("invalid NPC interaction request"))?;
         let mut out = Outcome::default();
-        let reach = position
-            .iter()
-            .zip(character.position)
-            .map(|(a, b)| (a - b).powi(2))
-            .sum::<f32>();
-        if !(reach <= REACH_M * REACH_M) {
+        if !in_reach(position) {
             out.replies
                 .push(chat::system(&Denied::TooFar.message()));
             return Ok(Some(out));
@@ -47,10 +71,18 @@ impl Gameplay {
             out.replies.push(chat::system(&Denied::Busy.message()));
             return Ok(Some(out));
         }
+        let name = name.as_deref().unwrap_or("plant");
         if let Some(line) = click.say_string_id {
             out.replies.push(chat::string_say(target, line));
         }
         let Some(item) = click.item_id else {
+            // (R) rc-0136 F4 gather 2: a kind with no served item (Wildroot, Briarapple) still
+            // answers, so the click is never silent.
+            if click.say_string_id.is_none() {
+                out.replies.push(chat::system(&format!(
+                    "There is nothing to gather from the {name} right now."
+                )));
+            }
             return Ok(Some(out));
         };
         if now_ms < picked_until {
@@ -79,10 +111,8 @@ impl Gameplay {
         if let Some(visibility) = staged.npc_visibility.as_mut() {
             visibility.pick(target, now_ms.saturating_add(regrow_ms));
         }
-        out.replies.push(chat::system(&format!(
-            "You gathered from the {}.",
-            name.as_deref().unwrap_or("plant")
-        )));
+        out.replies
+            .push(chat::system(&format!("You gathered from the {name}.")));
         npc_event(serde_json::json!({
             "event": "dressing_harvest", "guid": target, "item": item
         }));

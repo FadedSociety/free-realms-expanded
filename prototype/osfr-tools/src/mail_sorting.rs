@@ -13,7 +13,8 @@
 //!
 //! Reconstructed (R): which four items each town asks for, the board tuning (the farming
 //! board's) and the payout, which is no item and Postman XP per sorted run like the Miner's and
-//! Chef's. Only the Games window starts it (no world node); L106: its rows ask the live Postman rank
+//! Chef's. The Games window and a town postbox's Mail Sorting row (`gameplay/npc/mailbox.rs`, the
+//! same gates) start it; there is no gathering node. L106: its rows ask the live Postman rank
 //! floors (`rank_floor`).
 
 /// L106: the Postman rank a town's sorting asks. The live Games window rows carried

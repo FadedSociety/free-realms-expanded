@@ -7,6 +7,10 @@
 
 #[path = "support/json.rs"]
 mod json;
+#[path = "support/pickup_packets.rs"]
+mod pickup_packets;
+#[path = "support/quest_marker_packets.rs"]
+mod quest_marker_packets;
 #[path = "support/node_content.rs"]
 mod node_content;
 
@@ -1425,8 +1429,10 @@ fn t550_plant() -> (u64, [f32; 3]) {
         serde_json::from_slice(&fs::read(content.join("npc_spawns_extra.json")).unwrap()).unwrap();
     let presentation: Value =
         serde_json::from_slice(&fs::read(content.join("npc_presentation.json")).unwrap()).unwrap();
-    let answered: Vec<u64> = (presentation["records"].as_array().unwrap().iter())
-        .filter(|row| row.get("click").is_some())
+    // rc-0136 F4 gather 2: every wild plant answers a click now; the plant this suite clicks is
+    // one whose kind has no served item (an empty `click`), which gives nothing.
+    let empty: Vec<u64> = (presentation["records"].as_array().unwrap().iter())
+        .filter(|row| row.get("click").is_some_and(|click| click == &json!({})))
         .filter_map(|row| row["name_string_id"].as_u64())
         .collect();
     let row = extras["records"]
@@ -1436,7 +1442,7 @@ fn t550_plant() -> (u64, [f32; 3]) {
         .filter(|row| {
             row["name_string_id"]
                 .as_u64()
-                .is_none_or(|id| !answered.contains(&id))
+                .is_some_and(|id| empty.contains(&id))
         })
         .find(|row| {
             row["model_file_name"]
@@ -1463,14 +1469,29 @@ fn a_plant_click_opens_nothing_and_changes_nothing() {
     assert!(!nodes.is_node(guid), "a harvest plant became a gather node");
 
     let fixture = Fixture::new(MINING);
-    let mut gateway = fixture.near(fixture.state(true, true));
-    // Stand on the plant; the click is the same 26/8 an ordinary player sends
-    // (client constructor 0x008b6bc0 stores the u64 target and one trailing byte).
-    move_pose(&mut gateway, at, 2_000);
+    // Log in standing on the plant (gather 2: the plant now checks reach); the click is the same
+    // 26/8 an ordinary player sends (client constructor 0x008b6bc0 stores the u64 target and one
+    // trailing byte).
+    let spot = NodeActor {
+        guid,
+        name: String::new(),
+        model_id: 0,
+        position: at,
+        presentation: Default::default(),
+    };
+    let mut gateway = fixture.gateway_at(fixture.state(true, true), &spot, 0.0);
     let before = gateway.snapshot();
     let before_bytes = serde_json::to_vec(&before).unwrap();
     let clicked = click(&mut gateway, guid, 2_100);
-    assert!(clicked.replies.is_empty(), "a decoration click replied");
+    assert_eq!(
+        chat_text(&clicked),
+        "There is nothing to gather from the Wildroot Plant right now.\n",
+        "the click answers one line"
+    );
+    assert!(
+        inners(&clicked).iter().all(|p| p.starts_with(&[15, 0, 3, 0])),
+        "and opens nothing"
+    );
     assert!(!clicked.gameplay_changed, "a decoration click persisted");
     assert_eq!(gateway.snapshot(), before, "a plant click changed state");
     assert_eq!(
@@ -1480,6 +1501,202 @@ fn a_plant_click_opens_nothing_and_changes_nothing() {
     );
     assert!(active(&gateway, MINING).is_none());
     assert!(active(&gateway, HARVEST).is_none());
+}
+
+/// rc-0136 F4 gather 2 (owner, build 3a3280a3: "there are flowers in front of the dog house and
+/// it still wont let me gather them", the Pile of Flowers at the Frostfang Snarler den). Every
+/// placed gathering node and every wild plant, in every zone, on the shipped content: drawn with
+/// a 35/12 cursor, without which the client never offers an actor as a click
+/// (`SetCharacterStateFlags` 00962f30), and a click is answered with a game, an item or a chat
+/// line; a job gate names the job. A wild plant gives its bundle or says it has nothing.
+#[test]
+fn every_placed_plant_and_node_is_clickable_and_answers() {
+    let data = Path::new(env!("CARGO_MANIFEST_DIR")).join("data");
+    let (dir, base) = shipped_world();
+    let nodes = GatheringNodes::load(&data.join("content")).unwrap().unwrap();
+    let mut rows: Vec<(u64, [f32; 3], String, bool)> = nodes
+        .actors()
+        .map(|actor| (actor.guid, actor.position, actor.name.clone(), false))
+        .collect();
+    let extras = json::read(&data.join("content/npc_spawns_extra.json"));
+    for row in extras["records"].as_array().unwrap() {
+        let wild = row["model_file_name"]
+            .as_str()
+            .is_some_and(|model| model.starts_with("overworld_") && model.contains("_harvestable_"));
+        if wild {
+            rows.push((
+                row["spawn_guid"].as_u64().unwrap(),
+                serde_json::from_value(row["position"].clone()).unwrap(),
+                row["name"].as_str().unwrap_or("an unnamed plant").to_owned(),
+                true,
+            ));
+        }
+    }
+    assert!(rows.iter().any(|row| row.3) && rows.iter().any(|row| !row.3));
+    let mut faults = Vec::new();
+    for (guid, at, name, wild) in &rows {
+        let mut game = base.clone();
+        let who = CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: *at,
+            rotation: [1.0, 0.0, 0.0],
+        };
+        let drawn = game.update_npc_visibility(&who).unwrap();
+        let Some(spawned) = quest_marker_packets::spawn_index(&drawn, *guid) else {
+            faults.push(format!("{guid} {name}: not drawn"));
+            continue;
+        };
+        // The cursor entry follows the actor's own 35/2 in the batch that draws it.
+        let cursor = drawn.iter().position(|packet| {
+            (quest_marker_packets::cursors(std::slice::from_ref(packet)).iter())
+                .any(|(id, cursor, _)| id == guid && cursor.is_some())
+        });
+        if !cursor.is_some_and(|at| at > spawned) {
+            faults.push(format!("{guid} {name}: no 35/12 cursor, so the client cannot click it"));
+        }
+        let held = |game: &Gameplay| -> u32 {
+            game.state().inventory.items.iter().map(|item| item.count).sum()
+        };
+        let before = held(&game);
+        let request = NpcInteractRequest {
+            target: *guid,
+            trailing_flag: false,
+        };
+        let replies = game.handle_in_world(&request.encode(), &who, 10_000).unwrap().replies;
+        let said = |needle: &str| pickup_packets::said(&replies, needle);
+        if replies.is_empty() {
+            faults.push(format!("{guid} {name}: the click is not answered"));
+        } else if said("Your bag is full") || said("You cannot gather that right now") {
+            faults.push(format!("{guid} {name}: an empty bag is refused"));
+        } else if *wild && said("You gathered from the") {
+            if held(&game) != before + 1 {
+                faults.push(format!("{guid} {name}: says it gave a bundle, the bag disagrees"));
+            }
+        } else if *wild && !said("There is nothing to gather") {
+            faults.push(format!("{guid} {name}: the plant neither gives nor explains"));
+        }
+    }
+    let _ = fs::remove_dir_all(&dir);
+    assert!(faults.is_empty(), "{} of {} rows: {faults:#?}", faults.len(), rows.len());
+}
+
+/// The shipped content (`data/content` with the `data/release` overlay) in a scratch folder and
+/// its fresh gameplay, as a release loads it: the opening campaign stays, since the Type8 games
+/// (mining, harvesting, the hunt) load only beside it. The caller removes the folder.
+fn shipped_world() -> (PathBuf, Gameplay) {
+    let data = Path::new(env!("CARGO_MANIFEST_DIR")).join("data");
+    let dir = std::env::temp_dir().join(format!(
+        "osfr-shipped-world-{}-{}",
+        std::process::id(),
+        NEXT.fetch_add(1, Ordering::Relaxed)
+    ));
+    copy_dir(&data.join("content"), &dir);
+    copy_dir(&data.join("release"), &dir);
+    let game = Gameplay::load(&dir, None).unwrap();
+    (dir, game)
+}
+
+/// C10: the bushels of the three farms that had none (Farnum's Farm, Wugachug's Chugaroot Farm,
+/// Brambleback's Thorny Tillage) start their own farm's game for a Chef, and a player without the
+/// Chef job is refused on the same click with the job line, nothing saved.
+#[test]
+fn c10_the_new_farm_bushels_start_their_own_games_and_refuse_a_player_without_the_job() {
+    for region in [111, 113, 119] {
+        let game = Game {
+            region: Some(region),
+            ..PLOT
+        };
+        let fixture = Fixture::new(game).with_shipped_harvesting().with_release_items();
+        let mut jobless = fixture.near(fixture.state(false, false));
+        let before = jobless.snapshot();
+        let refused = click(&mut jobless, fixture.node.guid, 2_000);
+        assert_eq!(
+            chat_text(&refused).trim_end(),
+            "You need to be a Chef to gather that.",
+            "a bushel of game {region} without the job"
+        );
+        assert!(!refused.gameplay_changed, "the refusal saved");
+        assert_eq!(jobless.snapshot(), before, "the refusal changed state");
+
+        let mut chef = fixture.ready();
+        tick(&mut chef, 1_500);
+        let started = click(&mut chef, fixture.node.guid, 2_000);
+        let named = harvesting::region(region).unwrap();
+        assert_eq!(
+            started_game(&started),
+            (region, named.name_id, named.description_id),
+            "a bushel of game {region}"
+        );
+        assert!(active(&chef, game).is_some(), "game {region} is offered");
+    }
+}
+
+/// C10: the Legacy dig-site props start the hunts Sanctuary's `Stations.json` gives them, through
+/// the Games window row's gates (`begin_portal_game`): Ramirez's Dig Site in Blackspore starts
+/// Artifacts Schmartifacts! (57), Tyrone's its own dig (682). A busy player and one out of reach
+/// are refused, and a refusal starts nothing.
+#[test]
+fn c10_a_dig_site_prop_starts_its_hunt_through_the_games_window_gates() {
+    const RAMIREZ: u64 = 100_000_001_469;
+    const TYRONE: u64 = 100_000_001_588;
+    let (dir, fresh) = shipped_world();
+    let mut state = fresh.state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.insert(artifact_hunt::ADVENTURER_PROFILE_ID);
+    let base = Gameplay::load(&dir, Some(state)).unwrap();
+    let extras = json::read(&dir.join("npc_spawns_extra.json"));
+    let at = |guid: u64| -> [f32; 3] {
+        let row = (extras["records"].as_array().unwrap().iter())
+            .find(|row| row["spawn_guid"] == guid)
+            .unwrap_or_else(|| panic!("{guid}: no extra row"));
+        serde_json::from_value(row["position"].clone()).unwrap()
+    };
+    let standing = |position: [f32; 3]| CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position,
+        rotation: [1.0, 0.0, 0.0],
+    };
+    let request = |target: u64| {
+        NpcInteractRequest {
+            target,
+            trailing_flag: false,
+        }
+        .encode()
+    };
+    let hunting = |game: &Gameplay| {
+        serde_json::to_value(game.state()).unwrap()["artifact_hunt"]["active"]["instance_id"]
+            .is_i64()
+    };
+    for (prop, hunt) in [(RAMIREZ, 57), (TYRONE, 682)] {
+        let mut game = base.clone();
+        let who = standing(at(prop));
+        let started = game.handle_in_world(&request(prop), &who, 10_000).unwrap();
+        let packets: Vec<&[u8]> = started.replies.iter().map(Vec::as_slice).collect();
+        assert!(
+            packets.iter().any(|packet| packet.starts_with(&[39, 0, 16])),
+            "{prop} answered {:?}",
+            packets.iter().map(|p| String::from_utf8_lossy(p)).collect::<Vec<_>>()
+        );
+        assert_eq!(started_game_in(&packets).0, hunt, "{prop} starts game {hunt}");
+        assert!(hunting(&game), "{prop}: the hunt is offered");
+        let busy = game.handle_in_world(&request(prop), &who, 11_000).unwrap().replies;
+        assert!(
+            pickup_packets::said(&busy, "Finish what you are doing first."),
+            "{prop}: a second click while the hunt is on is refused"
+        );
+        assert!(!busy.iter().any(|packet| packet.starts_with(&[39, 0, 16])));
+    }
+    let mut game = base.clone();
+    let [x, y, z] = at(RAMIREZ);
+    let far = game
+        .handle_in_world(&request(RAMIREZ), &standing([x + 30.0, y, z]), 10_000)
+        .unwrap()
+        .replies;
+    assert!(pickup_packets::said(&far, "Move closer"), "30 m away is out of reach");
+    assert!(!hunting(&game), "and starts nothing");
+    let _ = fs::remove_dir_all(&dir);
 }
 
 #[test]
@@ -1504,12 +1721,13 @@ fn node_content_is_bounded_and_unique() {
     // for their own pool of three, so all nine crates are live (1,051 -> 1,054); collections' 14 on top.
     // Combat quests on: 6 spots for 2 pick-ups behind combat quests (sap samples, junk) (1,074).
     // Combat quests wave 2 (quest_wire.py): 9 spots for the Kart Driver karts, mugs and keys and 4
-    // for the Purr...fect Secret cat bowls (1,087).
-    assert_eq!(actors.len(), 1087);
+    // for the Purr...fect Secret cat bowls (1,087). C10: the 15 bushels of Farnum's Farm,
+    // Chugaroot Farm and Thorny Tillage (1,102).
+    assert_eq!(actors.len(), 1102);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 1087);
+    assert_eq!(ids.len(), 1102);
     assert!(
         actors
             .iter()
@@ -1521,8 +1739,12 @@ fn node_content_is_bounded_and_unique() {
 /// The game a started run advertises: the 39/16 info packet's header game id, then its name and
 /// description ids (`mining.rs` `info_packet`).
 fn started_game(outcome: &GatewayOutcome) -> (i32, i32, i32) {
-    let info = inners(outcome)
-        .into_iter()
+    started_game_in(&inners(outcome))
+}
+
+/// The game, name and description ids of the 39/16 info packet among `packets` (inner bodies).
+fn started_game_in(packets: &[&[u8]]) -> (i32, i32, i32) {
+    let info = (packets.iter())
         .find(|packet| packet.starts_with(&[39, 0, 16]))
         .expect("a 39/16 info packet");
     let at = |offset: usize| i32::from_le_bytes(info[offset..offset + 4].try_into().unwrap());

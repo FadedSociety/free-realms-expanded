@@ -18,6 +18,8 @@
 
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
+#[path = "support/quest_marker_packets.rs"]
+mod quest_marker_packets;
 
 use gateway_vendor::{bundle, inner_packets, interact, login, select, send, wrap};
 use osfr_tools::{
@@ -401,6 +403,44 @@ fn shop_items(packet: &[u8]) -> BTreeSet<i32> {
             i32::try_from(entry.item_id).expect("shop item id fits i32")
         })
         .collect()
+}
+
+/// rc-0136 F4 (owner: "vendors show no bag or vendor icon"): every NPC `vendors.json` stocks
+/// is drawn with a vendor icon (a 35/10 row with an image) and a hover cursor (35/12): its own
+/// `npc_presentation.json` row's, or the marker the world table derives for a stocked vendor.
+#[test]
+fn every_stocked_vendor_draws_a_vendor_icon_and_a_cursor() {
+    let content = content_dir();
+    let visibility =
+        NpcVisibility::load(&content).expect("the production NPC visibility loader loads");
+    let targets: BTreeMap<u64, _> = (visibility.teleport_targets(0).into_iter())
+        .map(|target| (target.guid, target))
+        .collect();
+    let stocked: Vec<u64> = (read_json(&content.join("vendors.json"))["vendors"].as_array())
+        .expect("vendor records")
+        .iter()
+        .filter(|vendor| vendor["item_ids"].as_array().is_some_and(|ids| !ids.is_empty()))
+        .map(|vendor| vendor["npc_id"].as_u64().expect("vendor NPC id"))
+        .collect();
+    assert!(!stocked.is_empty(), "the shipped content stocks vendors");
+    let mut faults = Vec::new();
+    for npc in &stocked {
+        let Some(target) = targets.get(npc) else {
+            faults.push(format!("{npc}: not drawn in the open world"));
+            continue;
+        };
+        let packets = visibility.clone().update(0, target.position).unwrap();
+        let (rows, _) = quest_marker_packets::markers(&packets);
+        if !rows.iter().any(|row| row.guid == *npc && row.image > 0) {
+            faults.push(format!("{npc} {}: no vendor icon", target.name));
+        }
+        if !(quest_marker_packets::cursors(&packets).iter())
+            .any(|(guid, cursor, _)| guid == npc && cursor.is_some())
+        {
+            faults.push(format!("{npc} {}: no hover cursor", target.name));
+        }
+    }
+    assert!(faults.is_empty(), "{} of {} stocked vendors: {faults:#?}", faults.len(), stocked.len());
 }
 
 #[test]

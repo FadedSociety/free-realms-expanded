@@ -60,7 +60,8 @@ pub struct Record {
     pub click: Option<Click>,
 }
 
-/// A click answer for world dressing: a wild plant's harvest, a figure's line, or both.
+/// A click answer for world dressing: a wild plant's harvest, a figure's line, or both. An
+/// empty click answers that the plant has nothing to gather (a kind with no served item).
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Click {
@@ -103,10 +104,11 @@ impl Record {
         } else if self.notifications.len() > npc_notifications::MAX_ENTRIES {
             Some("too many notifications")
         } else if self.click.is_some_and(|click| {
-            click.item_id.is_none_or(|id| id < 1) && click.say_string_id.is_none_or(|id| id < 1)
+            click.item_id.is_some_and(|id| id < 1)
+                || click.say_string_id.is_some_and(|id| id < 1)
                 || click.regrow_seconds > MAX_REGROW_SECONDS
         }) {
-            Some("a click gives no positive item or line, or regrows after more than a day")
+            Some("a click item or line id is not positive, or regrows after more than a day")
         } else {
             self.notifications
                 .iter()
@@ -161,6 +163,29 @@ impl Presentation {
             flag: row.relevance_flag,
         })
     }
+}
+
+/// rc-0136 F4 vendors: what a stocked vendor (`vendors.json`) shows when its own row gives it no
+/// icon or no cursor. Sanctuary's merchant row (`NotificationImages.txt` 12, the coin bag in a
+/// context bubble, under the NPC's name and sub-text), the one 29 stocked vendors' rows carry,
+/// and the use cursor 17 on hover. Data-derived: no row is listed per vendor.
+pub fn vendor_marker(
+    spawn: &NpcSpawn,
+    notifications: &mut Vec<Notification>,
+    cursor: Option<Cursor>,
+) -> Option<Cursor> {
+    if notifications.is_empty() {
+        notifications.push(Notification {
+            kind: 1,
+            image_id: 12,
+            state: 1,
+            name_id: spawn.name_string_id,
+            subtext_id: spawn.sub_text_name_string_id.max(0),
+            hide_overhead: false,
+            enabled: true,
+        });
+    }
+    cursor.or(Some(Cursor { id: 17, flag: false }))
 }
 
 /// 35/12 for `(runtime actor guid, cursor)` entries, each with the has-cursor flag set.

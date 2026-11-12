@@ -264,8 +264,9 @@ fn legacy_mushroom_and_mining_files_still_load_with_the_new_fields_defaulted() {
             harvest.spawns.len()
         ),
         // T553: the two mushroom types, their two pools and 76 spawns, plus the farm-plot
-        // type, its three regional pools and 13 plots.
-        (3, 5, 89)
+        // type, its three regional pools and 13 plots; C10: three more farms' pools and their
+        // 15 bushels.
+        (3, 8, 104)
     );
     assert!(harvest.gaps.drop_items_without_entry.is_empty());
     assert!(
@@ -352,13 +353,19 @@ fn the_gathering_loader_reads_collection_nodes() {
     let nodes = GatheringNodes::load(&dir.0)
         .unwrap()
         .expect("the quest node file");
-    // A wiki pick-up type adds only its client name line (`name_id`).
+    // A wiki pick-up type adds only its client name line (`name_id`). rc-0136 F4 gather 2: every
+    // node also sends its type's 35/12 cursor, without which the client cannot click it.
     assert!(
         nodes.actors().all(|actor| NodePresentation {
             name_id: None,
+            cursor: None,
             ..actor.presentation.clone()
         } == template_presentation()),
         "quest actors must keep the captured AddNpc template fields"
+    );
+    assert!(
+        nodes.actors().all(|actor| actor.presentation.cursor.is_some()),
+        "every quest pick-up is clickable"
     );
     assert!(
         nodes.actors().any(|actor| actor.presentation.name_id.is_some()),
@@ -402,13 +409,16 @@ fn the_gathering_loader_reads_collection_nodes() {
         } else {
             // rc-0136 F4: the old copper type also carries the other veins' pick (35/10,
             // `NotificationImages.txt` 340); every other field stays the captured template's.
+            // gather 2: and the veins' mining cursor (20), so the client can click it.
             let mut fields = presentation.clone();
             let pick = std::mem::take(&mut fields.notifications);
+            let cursor = fields.cursor.take();
             assert_eq!(
                 fields,
                 template_presentation(),
                 "the old copper type keeps the captured template fields"
             );
+            assert_eq!(cursor.map(|cursor| cursor.id), Some(20), "the veins' cursor");
             assert!(
                 pick.iter().any(|row| row.image_id == 340),
                 "the old copper type shows the veins' pick"

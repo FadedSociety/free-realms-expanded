@@ -669,6 +669,11 @@ impl NpcInteraction {
         unknown
     }
 
+    /// C10: the game a dig site starts, for its content NPC or its world prop alike.
+    pub fn dig_site_game(&self, npc: u64) -> Option<u32> {
+        self.content.dig_sites.get(&npc).map(|&(game, _)| game)
+    }
+
     /// (R) Make each Tower Defense table clickable, its games listed in its menu.
     pub fn set_tower_defense_tables(&mut self, tables: &TableMenus) {
         let content = Arc::make_mut(&mut self.content);
@@ -1553,6 +1558,19 @@ fn validate_npc(npc: &NpcRecord) -> io::Result<()> {
         return Err(invalid("invalid NPC content record"));
     }
     Ok(())
+}
+
+/// rc-0136 F4 vendors: the NPCs `content_dir`'s `vendors.json` stocks (a working shop), for the
+/// world table's vendor marker; none without the file. The shop loader validates the rows.
+pub fn stocked_vendor_ids(content_dir: &Path) -> io::Result<BTreeSet<u64>> {
+    let path = content_dir.join("vendors.json");
+    if !path.is_file() {
+        return Ok(BTreeSet::new());
+    }
+    let file: VendorFile = serde_json::from_slice(&read_bounded(&path, MAX_VENDOR_FILE_BYTES)?)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    let stocked = file.vendors.into_iter().filter(|vendor| !vendor.item_ids.is_empty());
+    Ok(stocked.map(|vendor| vendor.npc_id).collect())
 }
 
 fn read_bounded(path: &Path, limit: u64) -> io::Result<Vec<u8>> {

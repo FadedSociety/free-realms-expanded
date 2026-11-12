@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "(R) Which prop opens which dig. The games are the client's MiniGameData 681-683 (TYPE 8, Artifact Hunt's icon 912); the props are placed beside the people whose quests name them.",
+  "source": "(R) Which prop opens which dig. The games are the client's MiniGameData 681-683 (TYPE 8, Artifact Hunt's icon 912); the props are placed beside the people whose quests name them. C10: the four Legacy dig-site props (world props with no NPC row: Ramirez's 100000001469, Tyrone's 100000001588, Wellington's 100000002732, Ambrose's 100000003495) start on click the games Sanctuary's Stations.json gives them (1469: 57 Artifacts Schmartifacts!; 1588: 682; 2732: 683; 3495: 681), through the Games window row's gates.",
   "sites": [
     {
       "npc_id": 9500002001,
@@ -16,6 +16,26 @@
       "npc_id": 9500002003,
       "game_id": 683,
       "name_id": 413708
+    },
+    {
+      "npc_id": 100000001469,
+      "game_id": 57,
+      "name_id": 35604
+    },
+    {
+      "npc_id": 100000001588,
+      "game_id": 682,
+      "name_id": 413707
+    },
+    {
+      "npc_id": 100000002732,
+      "game_id": 683,
+      "name_id": 413708
+    },
+    {
+      "npc_id": 100000003495,
+      "game_id": 681,
+      "name_id": 413706
     }
   ]
 }

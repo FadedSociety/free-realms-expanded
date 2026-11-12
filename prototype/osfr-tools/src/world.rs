@@ -525,6 +525,7 @@ impl NpcVisibility {
             ..Self::default()
         };
         let presentation = read_presentation(content_dir)?;
+        let stocked = crate::npc_interaction::stocked_vendor_ids(content_dir)?;
         let vendors = regional
             .iter()
             .filter(|npc| npc.roles.iter().any(|role| role == "vendor"));
@@ -588,7 +589,10 @@ impl NpcVisibility {
             named.mark(&mut spawn, npc.npc_id, name, npc.hide_nameplate);
             result.content_keys.insert(npc.npc_id, npc.npc_id);
             let mut notifications = Vec::new();
-            let cursor = presentation.apply(&mut spawn, &mut notifications);
+            let mut cursor = presentation.apply(&mut spawn, &mut notifications);
+            if stocked.contains(&npc.npc_id) {
+                cursor = npc_presentation::vendor_marker(&spawn, &mut notifications, cursor);
+            }
             result.push(
                 draw_zone,
                 VisibleNpc {
@@ -651,7 +655,10 @@ impl NpcVisibility {
                 result.content_keys.insert(npc.spawn_guid, content_key);
             }
             let mut notifications = npc.notifications;
-            let cursor = presentation.apply(&mut spawn, &mut notifications);
+            let mut cursor = presentation.apply(&mut spawn, &mut notifications);
+            if stocked.contains(&key) {
+                cursor = npc_presentation::vendor_marker(&spawn, &mut notifications, cursor);
+            }
             result.push(
                 OPEN_WORLD_ZONE,
                 VisibleNpc {
@@ -991,6 +998,17 @@ impl NpcVisibility {
             .or_default();
         if let Some(npc) = npcs.iter_mut().find(|npc| npc.spawn.actor_id == actor_id) {
             npc.notifications = notifications;
+        }
+    }
+
+    /// rc-0136 F4 gather 2: an open-world actor's 35/12 hover cursor, sent with its next draw.
+    pub(crate) fn set_cursor(&mut self, actor_id: u64, cursor: Option<Cursor>) {
+        self.revision = self.revision.wrapping_add(1);
+        let npcs = Arc::make_mut(&mut self.by_zone)
+            .entry(OPEN_WORLD_ZONE)
+            .or_default();
+        if let Some(npc) = npcs.iter_mut().find(|npc| npc.spawn.actor_id == actor_id) {
+            npc.cursor = cursor;
         }
     }
 

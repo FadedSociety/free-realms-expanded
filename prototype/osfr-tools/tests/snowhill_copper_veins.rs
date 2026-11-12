@@ -355,7 +355,7 @@ fn every_recovered_vein_stands_on_the_client_terrain() {
 #[test]
 fn the_client_names_the_model_the_import_uses() {
     // `Resources/Cursors.txt` 20 = `cursor_interaction_mining.cur` (checked when importing;
-    // `cursor_id` is loaded but not sent, so no gate depends on it).
+    // `cursor_id` is the vein's 35/12 cursor, the field that lets the client click it).
     let models = read_models();
     let files = models
         .get(&i64::from(COPPER_MODEL))

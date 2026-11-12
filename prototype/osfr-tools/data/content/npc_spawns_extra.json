@@ -6100,8 +6100,9 @@
       "legacy_npc_id": 1672,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         60.35813,
         30.2598,
@@ -6110,6 +6111,10 @@
       "heading": -1.36712,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:438; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1672 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6122,8 +6127,9 @@
       "legacy_npc_id": 1673,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         60.02091,
         30.29517,
@@ -6132,6 +6138,10 @@
       "heading": -3.098211,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:439; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1673 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6144,8 +6154,9 @@
       "legacy_npc_id": 1674,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         59.75573,
         30.33897,
@@ -6154,6 +6165,10 @@
       "heading": -0.71631,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:440; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1674 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6166,8 +6181,9 @@
       "legacy_npc_id": 1675,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         59.21969,
         30.33588,
@@ -6176,6 +6192,10 @@
       "heading": 1.242838,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:441; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1675 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6188,8 +6208,9 @@
       "legacy_npc_id": 1676,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         61.89958,
         30.79851,
@@ -6198,6 +6219,10 @@
       "heading": -1.151273,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:442; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1676 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6210,8 +6235,9 @@
       "legacy_npc_id": 1677,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         61.94714,
         30.71619,
@@ -6220,6 +6246,10 @@
       "heading": -1.432172,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:443; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1677 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6232,8 +6262,9 @@
       "legacy_npc_id": 1678,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         62.31076,
         30.6885,
@@ -6242,6 +6273,10 @@
       "heading": 1.606202,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:444; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1678 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6254,8 +6289,9 @@
       "legacy_npc_id": 1679,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         62.42534,
         30.62117,
@@ -6264,6 +6300,10 @@
       "heading": 1.218383,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:445; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1679 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6276,8 +6316,9 @@
       "legacy_npc_id": 1680,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         65.06073,
         31.10696,
@@ -6286,6 +6327,10 @@
       "heading": -2.894842,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:446; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1680 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6298,8 +6343,9 @@
       "legacy_npc_id": 1681,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         64.66558,
         31.11787,
@@ -6308,6 +6354,10 @@
       "heading": -1.401383,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:447; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1681 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6320,8 +6370,9 @@
       "legacy_npc_id": 1682,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         64.60204,
         31.18207,
@@ -6330,6 +6381,10 @@
       "heading": -1.397627,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:448; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1682 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6342,8 +6397,9 @@
       "legacy_npc_id": 1683,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         64.33127,
         31.21353,
@@ -6352,6 +6408,10 @@
       "heading": -0.570706,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:449; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1683 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6364,8 +6424,9 @@
       "legacy_npc_id": 1684,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         67.98422,
         31.66985,
@@ -6374,6 +6435,10 @@
       "heading": -1.303196,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:450; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1684 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6386,8 +6451,9 @@
       "legacy_npc_id": 1685,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         67.65744,
         31.68587,
@@ -6396,6 +6462,10 @@
       "heading": -2.950445,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:451; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1685 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6408,8 +6478,9 @@
       "legacy_npc_id": 1686,
       "model_id": 3644,
       "model_file_name": "overworld_vinelow_choychoy_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Choychoy Plant",
+      "name_string_id": 5100851,
+      "hide_nameplate": true,
       "position": [
         67.2644,
         31.68859,
@@ -6418,6 +6489,10 @@
       "heading": 0.726603,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100851 'Choychoy Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Choychoy Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:452; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1686 (ModelId=3644, ModelFileName=overworld_vinelow_choychoy_harvestable_01.adr, NameId=None)."
@@ -6452,8 +6527,8 @@
       "legacy_npc_id": 1688,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         50.49508,
         29.08036,
@@ -6462,6 +6537,10 @@
       "heading": -2.960291,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:454; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1688 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6474,8 +6553,8 @@
       "legacy_npc_id": 1689,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         51.20314,
         29.07269,
@@ -6484,6 +6563,10 @@
       "heading": 0.222563,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:455; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1689 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6496,8 +6579,8 @@
       "legacy_npc_id": 1690,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         51.07137,
         28.98404,
@@ -6506,6 +6589,10 @@
       "heading": 1.728538,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:456; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1690 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6518,8 +6605,8 @@
       "legacy_npc_id": 1691,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         48.75441,
         28.81859,
@@ -6528,6 +6615,10 @@
       "heading": 0.783027,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:457; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1691 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6540,8 +6631,8 @@
       "legacy_npc_id": 1692,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         48.39539,
         28.74384,
@@ -6550,6 +6641,10 @@
       "heading": 1.85343,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:458; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1692 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6562,8 +6657,8 @@
       "legacy_npc_id": 1693,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         48.13314,
         28.82903,
@@ -6572,6 +6667,10 @@
       "heading": -1.888827,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:459; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1693 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6584,8 +6683,8 @@
       "legacy_npc_id": 1694,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         45.81937,
         28.54935,
@@ -6594,6 +6693,10 @@
       "heading": 2.560801,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:460; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1694 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6606,8 +6709,8 @@
       "legacy_npc_id": 1695,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         46.31599,
         28.56962,
@@ -6616,6 +6719,10 @@
       "heading": -0.807552,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:461; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1695 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6628,8 +6735,8 @@
       "legacy_npc_id": 1696,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         46.42214,
         28.65003,
@@ -6638,6 +6745,10 @@
       "heading": -0.717596,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:462; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1696 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -6650,8 +6761,8 @@
       "legacy_npc_id": 1701,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         57.41598,
         29.7292,
@@ -6660,6 +6771,10 @@
       "heading": -3.067639,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:466; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1701 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6672,8 +6787,8 @@
       "legacy_npc_id": 1702,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         57.81274,
         29.86054,
@@ -6682,6 +6797,10 @@
       "heading": 0.066798,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:467; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1702 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6694,8 +6813,8 @@
       "legacy_npc_id": 1703,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         55.30616,
         29.70758,
@@ -6704,6 +6823,10 @@
       "heading": -1.449397,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:468; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1703 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6716,8 +6839,8 @@
       "legacy_npc_id": 1704,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         51.87032,
         29.62932,
@@ -6726,6 +6849,10 @@
       "heading": 1.654822,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:469; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1704 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6738,8 +6865,8 @@
       "legacy_npc_id": 1705,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         49.23829,
         29.76057,
@@ -6748,6 +6875,10 @@
       "heading": 0.127283,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:470; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1705 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6760,8 +6891,8 @@
       "legacy_npc_id": 1706,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         46.44733,
         29.89911,
@@ -6770,6 +6901,10 @@
       "heading": -1.466052,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:471; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1706 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6782,8 +6917,8 @@
       "legacy_npc_id": 1707,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         43.93711,
         29.74194,
@@ -6792,6 +6927,10 @@
       "heading": 1.724169,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:472; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1707 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6804,8 +6943,8 @@
       "legacy_npc_id": 1708,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         45.88523,
         29.60772,
@@ -6814,6 +6953,10 @@
       "heading": -2.982647,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:473; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1708 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6826,8 +6969,8 @@
       "legacy_npc_id": 1709,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         47.77553,
         29.50831,
@@ -6836,6 +6979,10 @@
       "heading": -1.411851,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:474; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1709 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6848,8 +6995,8 @@
       "legacy_npc_id": 1710,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         55.2445,
         29.57555,
@@ -6858,6 +7005,10 @@
       "heading": 0.941734,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:475; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1710 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6870,8 +7021,8 @@
       "legacy_npc_id": 1711,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         53.43419,
         29.46662,
@@ -6880,6 +7031,10 @@
       "heading": -0.902176,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:476; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1711 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6892,8 +7047,8 @@
       "legacy_npc_id": 1712,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         51.79216,
         29.3877,
@@ -6902,6 +7057,10 @@
       "heading": 2.85204,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:477; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1712 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6914,8 +7073,8 @@
       "legacy_npc_id": 1713,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         49.40195,
         29.45456,
@@ -6924,6 +7083,10 @@
       "heading": 1.682621,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:478; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1713 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -6936,8 +7099,8 @@
       "legacy_npc_id": 1714,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         61.68607,
         30.20604,
@@ -6946,6 +7109,10 @@
       "heading": 1.281874,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:479; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1714 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -6958,8 +7125,8 @@
       "legacy_npc_id": 1715,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         61.96166,
         30.269,
@@ -6968,6 +7135,10 @@
       "heading": 3.009627,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:480; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1715 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -6980,8 +7151,8 @@
       "legacy_npc_id": 1716,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         62.10993,
         30.31101,
@@ -6990,6 +7161,10 @@
       "heading": 2.072731,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:481; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1716 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7002,8 +7177,8 @@
       "legacy_npc_id": 1717,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         62.09669,
         30.38138,
@@ -7012,6 +7187,10 @@
       "heading": -0.016392,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:482; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1717 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7024,8 +7203,8 @@
       "legacy_npc_id": 1718,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         64.16084,
         30.62295,
@@ -7034,6 +7213,10 @@
       "heading": -3.069832,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:483; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1718 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7046,8 +7229,8 @@
       "legacy_npc_id": 1719,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         64.52998,
         30.70478,
@@ -7056,6 +7239,10 @@
       "heading": 0.126507,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:484; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1719 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7068,8 +7255,8 @@
       "legacy_npc_id": 1720,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         64.70138,
         30.75274,
@@ -7078,6 +7265,10 @@
       "heading": 2.896208,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:485; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1720 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7090,8 +7281,8 @@
       "legacy_npc_id": 1721,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         64.87138,
         30.79709,
@@ -7100,6 +7291,10 @@
       "heading": -0.372523,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:486; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1721 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7112,8 +7307,8 @@
       "legacy_npc_id": 1722,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         66.78532,
         31.14518,
@@ -7122,6 +7317,10 @@
       "heading": 0.644567,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:487; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1722 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7134,8 +7333,8 @@
       "legacy_npc_id": 1723,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         67.06854,
         31.17294,
@@ -7144,6 +7343,10 @@
       "heading": -1.34838,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:488; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1723 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7156,8 +7359,8 @@
       "legacy_npc_id": 1724,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         67.32461,
         31.24048,
@@ -7166,6 +7369,10 @@
       "heading": -1.399941,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:489; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1724 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7178,8 +7385,8 @@
       "legacy_npc_id": 1725,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         67.3551,
         31.29059,
@@ -7188,6 +7395,10 @@
       "heading": -2.224081,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:490; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1725 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7200,8 +7411,8 @@
       "legacy_npc_id": 1726,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         70.16441,
         31.98484,
@@ -7210,6 +7421,10 @@
       "heading": 1.670646,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:491; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1726 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -7222,8 +7437,8 @@
       "legacy_npc_id": 1727,
       "model_id": 3630,
       "model_file_name": "overworld_root_chugaroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Chugaroot Plant",
+      "name_string_id": 434506,
       "position": [
         70.65176,
         32.11529,
@@ -7232,6 +7447,10 @@
       "heading": 1.689301,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434506 'Chugaroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Chugaroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:492; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1727 (ModelId=3630, ModelFileName=overworld_root_chugaroot_harvestable_01.adr, NameId=None)."
@@ -19464,8 +19683,8 @@
       "legacy_npc_id": 2540,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         -2122.528,
         -56.22014,
@@ -19474,6 +19693,10 @@
       "heading": -2.036677,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1283; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2540 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -19486,8 +19709,8 @@
       "legacy_npc_id": 2541,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         -2120.438,
         -56.28033,
@@ -19496,6 +19719,10 @@
       "heading": 2.642192,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1284; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2541 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -19508,8 +19735,8 @@
       "legacy_npc_id": 2542,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         -2118.751,
         -56.12447,
@@ -19518,6 +19745,10 @@
       "heading": 1.591112,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1285; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2542 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -19530,8 +19761,8 @@
       "legacy_npc_id": 2543,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         -2120.264,
         -56.26946,
@@ -19540,6 +19771,10 @@
       "heading": -3.004464,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1286; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2543 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -19552,8 +19787,8 @@
       "legacy_npc_id": 2544,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         -2124.22,
         -56.40356,
@@ -19562,6 +19797,10 @@
       "heading": 3.046037,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1287; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2544 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -19574,8 +19813,8 @@
       "legacy_npc_id": 2545,
       "model_id": 3653,
       "model_file_name": "overworld_tree_rainleaf_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Rainleaf Plant",
+      "name_string_id": 434158,
       "position": [
         -2122.555,
         -56.47639,
@@ -19584,6 +19823,10 @@
       "heading": 0.517833,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434158 'Rainleaf Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Rainleaf Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1288; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2545 (ModelId=3653, ModelFileName=overworld_tree_rainleaf_harvestable_01.adr, NameId=None)."
@@ -19596,8 +19839,8 @@
       "legacy_npc_id": 2546,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         -2116.325,
         -56.67786,
@@ -19606,6 +19849,10 @@
       "heading": 0.130585,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1289; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2546 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -19618,8 +19865,8 @@
       "legacy_npc_id": 2547,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         -2115.959,
         -56.67803,
@@ -19628,6 +19875,10 @@
       "heading": 0.671702,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1290; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2547 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -19640,8 +19891,8 @@
       "legacy_npc_id": 2548,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         -2114.544,
         -56.67729,
@@ -19650,6 +19901,10 @@
       "heading": -0.454817,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1291; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2548 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -19662,8 +19917,8 @@
       "legacy_npc_id": 2549,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         -2114.601,
         -56.67791,
@@ -19672,6 +19927,10 @@
       "heading": -1.674304,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1292; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2549 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -19684,8 +19943,8 @@
       "legacy_npc_id": 2550,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         -2112.939,
         -56.67794,
@@ -19694,6 +19953,10 @@
       "heading": 1.513774,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1293; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2550 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -19706,8 +19969,8 @@
       "legacy_npc_id": 2551,
       "model_id": 3633,
       "model_file_name": "overworld_vinelow_gummyfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Gummyfruit Plant",
+      "name_string_id": 434163,
       "position": [
         -2113.188,
         -56.67574,
@@ -19716,6 +19979,10 @@
       "heading": -2.950919,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434163 'Gummyfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Gummyfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1294; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2551 (ModelId=3633, ModelFileName=overworld_vinelow_gummyfruit_harvestable_01.adr, NameId=None)."
@@ -20247,8 +20514,9 @@
       "legacy_npc_id": 2592,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -714.0933,
         -45.20403,
@@ -20257,6 +20525,10 @@
       "heading": -1.879734,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1335; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2592 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20269,8 +20541,9 @@
       "legacy_npc_id": 2593,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -717.0393,
         -45.08807,
@@ -20279,6 +20552,10 @@
       "heading": -1.894731,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1336; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2593 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20291,8 +20568,9 @@
       "legacy_npc_id": 2594,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -719.7939,
         -44.90307,
@@ -20301,6 +20579,10 @@
       "heading": -1.894733,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1337; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2594 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20313,8 +20595,9 @@
       "legacy_npc_id": 2595,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -723.0681,
         -45.16337,
@@ -20323,6 +20606,10 @@
       "heading": -1.775568,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1338; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2595 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20335,8 +20622,8 @@
       "legacy_npc_id": 2596,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -723.1519,
         -45.11929,
@@ -20345,6 +20632,10 @@
       "heading": 1.328078,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1339; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2596 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20357,8 +20648,8 @@
       "legacy_npc_id": 2597,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -719.9608,
         -44.98482,
@@ -20367,6 +20658,10 @@
       "heading": 1.305126,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1340; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2597 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20379,8 +20674,8 @@
       "legacy_npc_id": 2598,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -716.6314,
         -45.02867,
@@ -20389,6 +20684,10 @@
       "heading": 1.296396,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1341; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2598 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20401,8 +20700,8 @@
       "legacy_npc_id": 2599,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -713.3304,
         -44.88271,
@@ -20411,6 +20710,10 @@
       "heading": 1.296397,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1342; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2599 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20423,8 +20726,8 @@
       "legacy_npc_id": 2600,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -710.3646,
         -45.13998,
@@ -20433,6 +20736,10 @@
       "heading": 1.476597,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1343; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2600 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20445,8 +20752,9 @@
       "legacy_npc_id": 2601,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -707.1214,
         -45.20671,
@@ -20455,6 +20763,10 @@
       "heading": -1.936877,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1344; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2601 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -20467,8 +20779,9 @@
       "legacy_npc_id": 2602,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -710.0024,
         -45.17023,
@@ -20477,6 +20790,10 @@
       "heading": -1.89847,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1345; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2602 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -20489,8 +20806,9 @@
       "legacy_npc_id": 2603,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -713.6205,
         -45.09092,
@@ -20499,6 +20817,10 @@
       "heading": -1.877867,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1346; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2603 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -20511,8 +20833,9 @@
       "legacy_npc_id": 2604,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -717.0944,
         -45.11617,
@@ -20521,6 +20844,10 @@
       "heading": -1.837896,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1347; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2604 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -20533,8 +20860,9 @@
       "legacy_npc_id": 2605,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -720.4891,
         -45.08878,
@@ -20543,6 +20871,10 @@
       "heading": -1.810662,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1348; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2605 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -20555,8 +20887,8 @@
       "legacy_npc_id": 2606,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -703.8281,
         -45.12302,
@@ -20565,6 +20897,10 @@
       "heading": -1.94735,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1349; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2606 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -20577,8 +20913,8 @@
       "legacy_npc_id": 2607,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -707.0765,
         -44.97206,
@@ -20587,6 +20923,10 @@
       "heading": -1.909327,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1350; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2607 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -20599,8 +20939,8 @@
       "legacy_npc_id": 2608,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -710.9586,
         -45.11017,
@@ -20609,6 +20949,10 @@
       "heading": -1.913806,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1351; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2608 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -20621,8 +20965,8 @@
       "legacy_npc_id": 2609,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -713.847,
         -44.96101,
@@ -20631,6 +20975,10 @@
       "heading": -1.85512,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1352; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2609 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -20643,8 +20991,8 @@
       "legacy_npc_id": 2610,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -716.5787,
         -45.15627,
@@ -20653,6 +21001,10 @@
       "heading": -1.855118,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1353; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2610 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -20819,8 +21171,9 @@
       "legacy_npc_id": 2619,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -698.3785,
         -45.23908,
@@ -20829,6 +21182,10 @@
       "heading": -1.828267,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1362; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2619 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20841,8 +21198,9 @@
       "legacy_npc_id": 2620,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -701.5861,
         -45.12166,
@@ -20851,6 +21209,10 @@
       "heading": -1.839051,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1363; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2620 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20863,8 +21225,9 @@
       "legacy_npc_id": 2621,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -704.9568,
         -45.06124,
@@ -20873,6 +21236,10 @@
       "heading": -1.895074,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1364; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2621 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20885,8 +21252,9 @@
       "legacy_npc_id": 2622,
       "model_id": 3735,
       "model_file_name": "overworld_vinelow_briarmelon_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarmelon Plant",
+      "name_string_id": 434541,
+      "hide_nameplate": true,
       "position": [
         -708.0392,
         -45.12888,
@@ -20895,6 +21263,10 @@
       "heading": -1.895074,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434541 'Briarmelon Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarmelon Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1365; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2622 (ModelId=3735, ModelFileName=overworld_vinelow_briarmelon_harvestable_01.adr, NameId=None)."
@@ -20907,8 +21279,8 @@
       "legacy_npc_id": 2623,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -696.6523,
         -45.22352,
@@ -20917,6 +21289,10 @@
       "heading": -1.864469,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1366; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2623 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20929,8 +21305,8 @@
       "legacy_npc_id": 2624,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -699.8035,
         -44.88564,
@@ -20939,6 +21315,10 @@
       "heading": -1.866212,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1367; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2624 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20951,8 +21331,8 @@
       "legacy_npc_id": 2625,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -703.1411,
         -45.10107,
@@ -20961,6 +21341,10 @@
       "heading": -1.902203,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1368; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2625 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20973,8 +21357,8 @@
       "legacy_npc_id": 2626,
       "model_id": 3656,
       "model_file_name": "overworld_vinehigh_moonbean_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Moonbean Plant",
+      "name_string_id": 434507,
       "position": [
         -705.9103,
         -44.98809,
@@ -20983,6 +21367,10 @@
       "heading": -1.902201,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434507 'Moonbean Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Moonbean Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1369; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2626 (ModelId=3656, ModelFileName=overworld_vinehigh_moonbean_harvestable_01.adr, NameId=None)."
@@ -20995,8 +21383,8 @@
       "legacy_npc_id": 2627,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -697.8428,
         -45.1312,
@@ -21005,6 +21393,10 @@
       "heading": -1.820286,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1370; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2627 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -21017,8 +21409,8 @@
       "legacy_npc_id": 2628,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -700.8588,
         -44.94806,
@@ -21027,6 +21419,10 @@
       "heading": -1.761599,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1371; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2628 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -21039,8 +21435,8 @@
       "legacy_npc_id": 2629,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -704.1153,
         -45.14088,
@@ -21049,6 +21445,10 @@
       "heading": -1.77286,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1372; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2629 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -21061,8 +21461,9 @@
       "legacy_npc_id": 2630,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -697.966,
         -45.1641,
@@ -21071,6 +21472,10 @@
       "heading": -1.643449,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1373; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2630 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -21083,8 +21488,9 @@
       "legacy_npc_id": 2631,
       "model_id": 3668,
       "model_file_name": "overworld_tree_briarapple_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Briarapple Plant",
+      "name_string_id": 435448,
+      "hide_nameplate": true,
       "position": [
         -701.1895,
         -45.1641,
@@ -21093,6 +21499,10 @@
       "heading": -1.693575,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 435448 'Briarapple Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Briarapple Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1374; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2631 (ModelId=3668, ModelFileName=overworld_tree_briarapple_harvestable_01.adr, NameId=None)."
@@ -29444,8 +29854,9 @@
       "legacy_npc_id": 3159,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2165.396,
         -31.96,
@@ -29454,6 +29865,10 @@
       "heading": 2.803467,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1902; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3159 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -29466,8 +29881,9 @@
       "legacy_npc_id": 3160,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2164.331,
         -31.96,
@@ -29476,6 +29892,10 @@
       "heading": 2.770532,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1903; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3160 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -29488,8 +29908,9 @@
       "legacy_npc_id": 3161,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2163.126,
         -31.96,
@@ -29498,6 +29919,10 @@
       "heading": 2.770526,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1904; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3161 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -29510,8 +29935,9 @@
       "legacy_npc_id": 3162,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2161.874,
         -31.96,
@@ -29520,6 +29946,10 @@
       "heading": 2.770526,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1905; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3162 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -29532,8 +29962,9 @@
       "legacy_npc_id": 3163,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2160.606,
         -31.96,
@@ -29542,6 +29973,10 @@
       "heading": 2.770526,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1906; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3163 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -29554,8 +29989,8 @@
       "legacy_npc_id": 3164,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2161.098,
         -31.96,
@@ -29564,6 +29999,10 @@
       "heading": 2.754612,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1907; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3164 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -29576,8 +30015,8 @@
       "legacy_npc_id": 3165,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2159.89,
         -31.96,
@@ -29586,6 +30025,10 @@
       "heading": 2.768385,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1908; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3165 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -29598,8 +30041,8 @@
       "legacy_npc_id": 3166,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2158.236,
         -31.96,
@@ -29608,6 +30051,10 @@
       "heading": 2.794565,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1909; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3166 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -29620,8 +30067,8 @@
       "legacy_npc_id": 3167,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2156.952,
         -31.96,
@@ -29630,6 +30077,10 @@
       "heading": 2.813498,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1910; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3167 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -29642,8 +30093,8 @@
       "legacy_npc_id": 3168,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2155.844,
         -31.96,
@@ -29652,6 +30103,10 @@
       "heading": 2.820613,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1911; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3168 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -29664,8 +30119,8 @@
       "legacy_npc_id": 3169,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2154.05,
         -31.96,
@@ -29674,6 +30129,10 @@
       "heading": 2.785832,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1912; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3169 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29686,8 +30145,8 @@
       "legacy_npc_id": 3170,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2152.919,
         -31.96001,
@@ -29696,6 +30155,10 @@
       "heading": 2.762578,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1913; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3170 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29708,8 +30171,8 @@
       "legacy_npc_id": 3171,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2151.69,
         -31.96,
@@ -29718,6 +30181,10 @@
       "heading": 2.762578,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1914; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3171 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29730,8 +30197,8 @@
       "legacy_npc_id": 3172,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2150.525,
         -31.96,
@@ -29740,6 +30207,10 @@
       "heading": 2.762578,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1915; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3172 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29752,8 +30223,8 @@
       "legacy_npc_id": 3173,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2149.307,
         -31.96,
@@ -29762,6 +30233,10 @@
       "heading": 2.762598,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1916; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3173 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29774,8 +30249,8 @@
       "legacy_npc_id": 3174,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2150.981,
         -31.95999,
@@ -29784,6 +30259,10 @@
       "heading": 2.796148,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1917; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3174 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29796,8 +30275,8 @@
       "legacy_npc_id": 3175,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2149.934,
         -31.96,
@@ -29806,6 +30285,10 @@
       "heading": 2.767222,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1918; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3175 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29818,8 +30301,8 @@
       "legacy_npc_id": 3176,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2148.773,
         -31.96,
@@ -29828,6 +30311,10 @@
       "heading": 2.767222,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1919; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3176 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29840,8 +30327,8 @@
       "legacy_npc_id": 3177,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2147.487,
         -31.96,
@@ -29850,6 +30337,10 @@
       "heading": 2.767222,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1920; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3177 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29862,8 +30353,8 @@
       "legacy_npc_id": 3178,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2146.143,
         -31.96001,
@@ -29872,6 +30363,10 @@
       "heading": 2.767222,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1921; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3178 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29884,8 +30379,8 @@
       "legacy_npc_id": 3179,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2145.227,
         -31.96,
@@ -29894,6 +30389,10 @@
       "heading": 2.812991,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1922; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3179 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29906,8 +30405,8 @@
       "legacy_npc_id": 3180,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2144.123,
         -31.96,
@@ -29916,6 +30415,10 @@
       "heading": 2.784515,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1923; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3180 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29928,8 +30431,8 @@
       "legacy_npc_id": 3181,
       "model_id": 3631,
       "model_file_name": "overworld_root_wildroot_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Wildroot Plant",
+      "name_string_id": 434545,
       "position": [
         -2142.963,
         -31.96,
@@ -29938,6 +30441,10 @@
       "heading": 2.784515,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434545 'Wildroot Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Wildroot Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1924; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3181 (ModelId=3631, ModelFileName=overworld_root_wildroot_harvestable_01.adr, NameId=None)."
@@ -29950,8 +30457,8 @@
       "legacy_npc_id": 3182,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2170.766,
         -31.96,
@@ -29960,6 +30467,10 @@
       "heading": 2.803914,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1925; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3182 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29972,8 +30483,8 @@
       "legacy_npc_id": 3183,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2169.5,
         -31.96,
@@ -29982,6 +30493,10 @@
       "heading": 2.769488,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1926; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3183 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -29994,8 +30509,8 @@
       "legacy_npc_id": 3184,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2168.344,
         -31.96,
@@ -30004,6 +30519,10 @@
       "heading": 2.769493,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1927; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3184 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30016,8 +30535,8 @@
       "legacy_npc_id": 3185,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2167.073,
         -31.95999,
@@ -30026,6 +30545,10 @@
       "heading": 2.769491,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1928; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3185 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30038,8 +30561,8 @@
       "legacy_npc_id": 3186,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2165.758,
         -31.96,
@@ -30048,6 +30571,10 @@
       "heading": 2.769488,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1929; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3186 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30060,8 +30587,8 @@
       "legacy_npc_id": 3187,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2175.136,
         -31.96,
@@ -30070,6 +30597,10 @@
       "heading": 2.74935,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1930; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3187 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30082,8 +30613,8 @@
       "legacy_npc_id": 3188,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2175.375,
         -31.96,
@@ -30092,6 +30623,10 @@
       "heading": 2.754818,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1931; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3188 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -30104,8 +30639,8 @@
       "legacy_npc_id": 3189,
       "model_id": 3666,
       "model_file_name": "overworld_bush_stainberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stainberry Plant",
+      "name_string_id": 5100854,
       "position": [
         -2171.804,
         -31.96,
@@ -30114,6 +30649,10 @@
       "heading": 2.745648,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100854 'Stainberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stainberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1932; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3189 (ModelId=3666, ModelFileName=overworld_bush_stainberry_harvestable_01.adr, NameId=None)."
@@ -30126,8 +30665,9 @@
       "legacy_npc_id": 3190,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2179.27,
         -31.96,
@@ -30136,6 +30676,10 @@
       "heading": 2.750807,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1933; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3190 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -30148,8 +30692,9 @@
       "legacy_npc_id": 3191,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2178.153,
         -31.96,
@@ -30158,6 +30703,10 @@
       "heading": 2.735109,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1934; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3191 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -30170,8 +30719,9 @@
       "legacy_npc_id": 3192,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2176.789,
         -31.96,
@@ -30180,6 +30730,10 @@
       "heading": 2.745243,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1935; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3192 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -30192,8 +30746,9 @@
       "legacy_npc_id": 3193,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2175.608,
         -31.96,
@@ -30202,6 +30757,10 @@
       "heading": 2.745242,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1936; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3193 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -30214,8 +30773,9 @@
       "legacy_npc_id": 3194,
       "model_id": 4225,
       "model_file_name": "overworld_root_tumtumnip_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Tumtumnip Plant",
+      "name_string_id": 5100855,
+      "hide_nameplate": true,
       "position": [
         -2174.424,
         -31.96,
@@ -30224,6 +30784,10 @@
       "heading": 2.74525,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 5100855 'Tumtumnip Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Tumtumnip Plant has. Its model is on the nameplate shown list, so the name stays hidden (L1156: plants show none)."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1937; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3194 (ModelId=4225, ModelFileName=overworld_root_tumtumnip_harvestable_01.adr, NameId=None)."
@@ -30236,8 +30800,8 @@
       "legacy_npc_id": 3195,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2182.489,
         -31.96,
@@ -30246,6 +30810,10 @@
       "heading": 2.701248,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1938; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3195 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30258,8 +30826,8 @@
       "legacy_npc_id": 3196,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2181.059,
         -31.96,
@@ -30268,6 +30836,10 @@
       "heading": 2.687001,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1939; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3196 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30280,8 +30852,8 @@
       "legacy_npc_id": 3197,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2179.893,
         -31.96,
@@ -30290,6 +30862,10 @@
       "heading": 2.738524,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1940; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3197 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30302,8 +30878,8 @@
       "legacy_npc_id": 3198,
       "model_id": 3629,
       "model_file_name": "overworld_bush_stickfruit_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Stickfruit Plant",
+      "name_string_id": 434504,
       "position": [
         -2178.558,
         -31.95999,
@@ -30312,6 +30888,10 @@
       "heading": 2.706435,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434504 'Stickfruit Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Stickfruit Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1941; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3198 (ModelId=3629, ModelFileName=overworld_bush_stickfruit_harvestable_01.adr, NameId=None)."
@@ -30324,8 +30904,8 @@
       "legacy_npc_id": 3199,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2185.011,
         -31.96,
@@ -30334,6 +30914,10 @@
       "heading": 2.731867,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1942; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3199 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30346,8 +30930,8 @@
       "legacy_npc_id": 3200,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2183.777,
         -31.95999,
@@ -30356,6 +30940,10 @@
       "heading": 2.731869,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1943; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3200 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30368,8 +30956,8 @@
       "legacy_npc_id": 3201,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2182.569,
         -31.95996,
@@ -30378,6 +30966,10 @@
       "heading": 2.742459,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1944; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3201 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30390,8 +30982,8 @@
       "legacy_npc_id": 3202,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2173.23,
         -31.96,
@@ -30400,6 +30992,10 @@
       "heading": 2.773126,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1945; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3202 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30412,8 +31008,8 @@
       "legacy_npc_id": 3203,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2172.179,
         -31.96,
@@ -30422,6 +31018,10 @@
       "heading": 2.758119,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1946; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3203 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30434,8 +31034,8 @@
       "legacy_npc_id": 3204,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2171.047,
         -31.96,
@@ -30444,6 +31044,10 @@
       "heading": 2.742326,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1947; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3204 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -30456,8 +31060,8 @@
       "legacy_npc_id": 3205,
       "model_id": 3628,
       "model_file_name": "overworld_spiralmint_bush_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Spiralmint Plant",
+      "name_string_id": 434025,
       "position": [
         -2169.794,
         -31.96,
@@ -30466,6 +31070,10 @@
       "heading": 2.72429,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434025 'Spiralmint Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Spiralmint Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1948; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3205 (ModelId=3628, ModelFileName=overworld_spiralmint_bush_harvestable_01.adr, NameId=None)."
@@ -45508,8 +46116,8 @@
       "legacy_npc_id": 4145,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1678.36,
         -29.79772,
@@ -45518,6 +46126,10 @@
       "heading": -0.347579,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2811; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4145 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -45530,8 +46142,8 @@
       "legacy_npc_id": 4146,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1674.31,
         -25.79717,
@@ -45540,6 +46152,10 @@
       "heading": 2.815924,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2812; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4146 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -45552,8 +46168,8 @@
       "legacy_npc_id": 4147,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1663.5,
         -18.01948,
@@ -45562,6 +46178,10 @@
       "heading": -3.069041,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2813; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4147 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -45574,8 +46194,8 @@
       "legacy_npc_id": 4148,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1679.006,
         -15.08761,
@@ -45584,6 +46204,10 @@
       "heading": -0.57799,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2814; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4148 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -45596,8 +46220,8 @@
       "legacy_npc_id": 4149,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1676.57,
         -14.6975,
@@ -45606,6 +46230,10 @@
       "heading": -0.481858,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2815; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4149 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -45618,8 +46246,8 @@
       "legacy_npc_id": 4150,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1665.622,
         -14.86334,
@@ -45628,6 +46256,10 @@
       "heading": -0.148243,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2816; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4150 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -45640,8 +46272,8 @@
       "legacy_npc_id": 4151,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1692.079,
         -11.5547,
@@ -45650,6 +46282,10 @@
       "heading": -1.072706,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2817; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4151 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -56322,8 +56958,8 @@
       "legacy_npc_id": 4867,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1632.431,
         -19.82099,
@@ -56332,6 +56968,10 @@
       "heading": -3.014824,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3434; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4867 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -56344,8 +56984,8 @@
       "legacy_npc_id": 4868,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1645.471,
         -23.82111,
@@ -56354,6 +56994,10 @@
       "heading": -2.044067,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3435; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4868 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
@@ -56366,8 +57010,8 @@
       "legacy_npc_id": 4869,
       "model_id": 3651,
       "model_file_name": "overworld_bush_bumbleberry_harvestable_01.adr",
-      "name": null,
-      "name_string_id": null,
+      "name": "Bumbleberry Plant",
+      "name_string_id": 434044,
       "position": [
         -1665.241,
         -15.91954,
@@ -56376,6 +57020,10 @@
       "heading": -1.902593,
       "capture_match": null,
       "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) rc-0136 F4 gather 2: the Legacy row has no NameId; it takes its kind's client name 434044 'Bumbleberry Plant' so the name-keyed npc_presentation.json row gives it the 35/12 cursor and the click answer every other Bumbleberry Plant has."
+        },
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3436; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4869 (ModelId=3651, ModelFileName=overworld_bush_bumbleberry_harvestable_01.adr, NameId=None)."
