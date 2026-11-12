@@ -1735,9 +1735,13 @@ impl Gameplay {
         }
         if !started_conversation {
             let (rows, pages) = npc_interaction::dialogue_rows(&context, quest_choice);
-            let mut dialogue =
-                dialogue_packet_rows(context.body_string_id.unwrap_or(0), rows.clone())
-                    .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
+            // rc-0136: never an empty box (body 0). The step's line or the greeting, else the
+            // quest line, else "Hello!"; `tests/npc_no_offer_lines.rs` checks each is stock.
+            let body = (context.body_string_id.filter(|id| *id != 0))
+                .or_else(|| self.npc_quests.as_ref()?.talk_line(key))
+                .unwrap_or(NO_OFFER_LINE);
+            let mut dialogue = dialogue_packet_rows(body, rows.clone())
+                .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
             patch_npc_actor(&mut dialogue, runtime_guid);
             self.last_npc_dialogue = Some((zone_id, runtime_guid, key, dialogue.clone()));
             // A quest offer is shown alone, like the original: the 49/1 window
@@ -1907,6 +1911,9 @@ fn shop_open_event(guid: u64, content_key: u64, item_count: usize) -> serde_json
 ///   held screen is patched here when 26/6 releases it.
 /// Gives the HUD back after the quest window (`00a99220`, `ScriptsBase.lua:15700`).
 const DISMISS_QUEST_26_29: [u8; 4] = [26, 0, 29, 0];
+/// (R) Stock `Global.Text.139503` "Hello!": the Talk body of an NPC with no greeting and no
+/// quest line. A 26/3 body of 0 is an empty text box (rc-0136 recheck: Rizzle, Vladimir).
+const NO_OFFER_LINE: u32 = 139_503;
 
 pub(super) fn patch_npc_actor(packet: &mut [u8], npc_guid: u64) {
     let guid = npc_guid.to_le_bytes();

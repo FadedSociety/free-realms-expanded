@@ -1365,7 +1365,8 @@ fn clicking_a_bound_quest_npc_returns_its_greeting_body() {
 #[test]
 fn an_unbound_row_still_sends_the_existing_empty_body() {
     // A blank enabled-quest target (Hrugagu) and a non-quest ambient control must
-    // both send body 0 and never inherit a neighbour's line.
+    // both send the stock "Hello!" (rc-0136: body 0 was an empty box) and never inherit a
+    // neighbour's line.
     let mut interaction = service();
     let visibility = NpcVisibility::load(&content_dir()).expect("NPC visibility loads");
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
@@ -1391,8 +1392,8 @@ fn an_unbound_row_still_sends_the_existing_empty_body() {
         let (dialogue, _, _) = in_world_talk(&mut game, file, npc_id, npc_id % 1_000);
         assert_eq!(
             body_dword(&dialogue),
-            0,
-            "NPC {npc_id}: the router still encodes a zero body"
+            139_503,
+            "NPC {npc_id}: the router sends the stock Hello!, not a zero body"
         );
         assert!(
             BINDINGS

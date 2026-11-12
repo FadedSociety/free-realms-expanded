@@ -842,12 +842,12 @@ fn two_players_see_the_same_line_and_a_blank_stays_blank() {
         _ => panic!("the refused choice must leave the menu usable"),
     }
 
-    // The real router still encodes 26/3 with a zero body for the blank and the
-    // row's own id for the bound row.
+    // rc-0136: the real router sends the stock "Hello!" (139503), never a zero body for the
+    // blank, and the row's own id for the bound row.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     assert_eq!(
         gameplay_talk_body(&mut game, blank.file, blank.npc_id),
-        0,
+        139_503,
         "a blank row must not inherit a neighbour's body"
     );
     assert_eq!(

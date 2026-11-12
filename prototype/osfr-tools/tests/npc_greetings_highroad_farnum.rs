@@ -640,11 +640,12 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         Err(NpcInteractionError::UnknownNpc)
     ));
 
-    // The real router still encodes 26/3 with a zero body and no invented id.
+    // rc-0136: the real router sends the stock "Hello!" (139503), never a zero body, and
+    // no invented id.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     assert_eq!(
         gameplay_talk_body(&mut game, "highroad_junction.json", blank),
-        0,
+        139_503,
         "no invented locale id"
     );
 

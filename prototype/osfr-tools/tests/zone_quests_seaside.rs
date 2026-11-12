@@ -94,7 +94,8 @@ const TOURING: Quest = Quest {
     steps: &[
         Step::Visit(KOODINI),
         Step::Visit(BOARDWALK),
-        Step::Talk(DIGGY, 0),
+        // No step line and no greeting: the stock "Hello!" (rc-0136), never an empty box.
+        Step::Talk(DIGGY, 139_503),
     ],
     turnin: COLE,
     end_text: 93_422,

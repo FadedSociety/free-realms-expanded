@@ -542,7 +542,8 @@ fn a_missing_or_zero_greeting_still_falls_back() {
         _ => panic!("the blank menu stays usable"),
     }
 
-    // The real router still encodes 26/3 with a zero body, and no bound body is a name id.
+    // rc-0136: the real router sends the stock "Hello!" (139503), never a zero body, and
+    // no bound body is a name id.
     let records: BTreeMap<u64, Value> = npc_records("sanctuary.json")
         .into_iter()
         .map(|record| (record["npc_id"].as_u64().expect("npc id"), record))
@@ -550,7 +551,7 @@ fn a_missing_or_zero_greeting_still_falls_back() {
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     assert_eq!(
         gameplay_talk_body(&mut game, "sanctuary.json", BLANK),
-        0,
+        139_503,
         "no invented locale id"
     );
     for row in &NEW_GREETINGS {

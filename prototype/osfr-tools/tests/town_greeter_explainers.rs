@@ -525,7 +525,8 @@ fn an_npc_without_explainer_rows_keeps_the_plain_dialogue() {
     );
     let mut game = new_game();
     let dialogue = talk(&mut game, &blank);
-    assert_eq!(dialogue.initial_dwords[0], 0, "no body without a greeting");
+    // rc-0136: without a greeting the body is the stock "Hello!" (139503), never 0.
+    assert_eq!(dialogue.initial_dwords[0], 139_503, "Hello! without a greeting");
     assert_eq!(
         dialogue.choices,
         vec![goodbye_dialogue_choice()],

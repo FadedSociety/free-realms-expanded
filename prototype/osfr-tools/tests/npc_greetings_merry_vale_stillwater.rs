@@ -961,12 +961,13 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         "zero is not a recovered greeting id"
     );
 
-    // The real router still encodes 26/3 with a zero body and no borrowed id.
+    // rc-0136: the real router sends the stock "Hello!" (139503), never a zero body, and
+    // no borrowed id.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     for (file, npc_id) in blanks {
         assert_eq!(
             gameplay_talk_body(&mut game, file, npc_id),
-            0,
+            139_503,
             "NPC {npc_id}: no invented locale id"
         );
     }
@@ -996,8 +997,8 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         Gameplay::load(&fixture.0, None).expect("the fixture gameplay content loads");
     assert_eq!(
         gameplay_talk_body(&mut fixture_game, "merry_vale.json", BLANK_MERRY_VALE),
-        0,
-        "an explicit zero greeting encodes a zero 26/3 body"
+        139_503,
+        "an explicit zero greeting says the stock Hello!, not a zero 26/3 body"
     );
     assert_eq!(
         gameplay_talk_body(&mut fixture_game, "merry_vale.json", CONTROL_ROW),

@@ -1864,6 +1864,34 @@ impl QuestEngine {
             .and_then(|fields| fields.description_string_id)
     }
 
+    /// (R) What `npc_id` says on a Talk that offers nothing when it has no greeting: the open
+    /// goal line of an active quest it gives or takes back (its description when the goal has
+    /// none), else the closing line of the last quest handed in to it.
+    pub fn talk_line(&self, npc_id: u64) -> Option<u32> {
+        let mut closing = None;
+        for (&id, progress) in &self.state.quests {
+            let Some(quest) = self.definitions.get(&id) else {
+                continue;
+            };
+            match progress.status {
+                QuestStatus::Active
+                    if npc_id == quest.giver_npc_id || npc_id == quest.turnin_npc_id =>
+                {
+                    let goal = (self.current_objectives(id).first()).map(|goal| (id, goal.id));
+                    let line = goal.and_then(|goal| self.objective_text.get(&goal).copied());
+                    if let Some(line) = line.or_else(|| self.description_string_id(id)) {
+                        return Some(line);
+                    }
+                }
+                QuestStatus::Completed if npc_id == quest.turnin_npc_id => {
+                    closing = self.end_text_string_id(id).or(closing);
+                }
+                _ => {}
+            }
+        }
+        closing
+    }
+
     pub fn quest_ids_for_giver(&self, npc_id: u64) -> impl Iterator<Item = u32> + '_ {
         self.definitions
             .values()

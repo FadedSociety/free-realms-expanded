@@ -98,11 +98,12 @@ fn bat_fighter() -> ZoneQuest {
     quest(BAT_FIGHTER, &[], DERP, BLACKSMITH)
 }
 
-/// Silversnow and Milo speak no bound line (their rows have no greeting), so the 26/3 body is 0.
+/// Silversnow and Milo speak no bound line (their rows have no greeting), so the 26/3 body is
+/// the stock "Hello!" (139503, rc-0136), never 0.
 fn asking_old_folks() -> ZoneQuest {
     quest(
         ASKING_OLD_FOLKS,
-        &[(SILVERSNOW, 0), (MILO, 0)],
+        &[(SILVERSNOW, 139_503), (MILO, 139_503)],
         STEELE,
         WARRIOR,
     )

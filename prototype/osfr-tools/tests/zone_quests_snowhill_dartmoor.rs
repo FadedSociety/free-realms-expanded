@@ -101,9 +101,10 @@ fn warrior(fixture: &Fixture, guid: u64) -> Gameplay {
 }
 
 fn meeting_the_team() -> ZoneQuest {
+    // No greeting and no step line: the stock "Hello!" (139503, rc-0136), never body 0.
     quest(
         MEETING_THE_TEAM,
-        &[(BIGS, 0), (BOBO, 0), (DEEDEE, 0)],
+        &[(BIGS, 139_503), (BOBO, 139_503), (DEEDEE, 139_503)],
         EDDIE,
         SOCCER_STAR,
     )

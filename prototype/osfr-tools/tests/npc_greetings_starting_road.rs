@@ -310,11 +310,12 @@ fn missing_or_zero_greeting_still_falls_back_to_an_empty_body() {
         _ => panic!("the refused choice must leave the menu usable"),
     }
 
-    // The real router still encodes 26/3 with a zero body and the one goodbye row.
+    // rc-0136: the real router sends the stock "Hello!" (139503), never a zero body, and
+    // the one goodbye row.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     assert_eq!(
         gameplay_talk_body(&mut game, "farnum_farmstead.json", BLANK),
-        0,
+        139_503,
         "no invented locale id"
     );
 }

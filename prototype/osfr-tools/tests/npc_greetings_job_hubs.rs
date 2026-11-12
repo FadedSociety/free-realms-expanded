@@ -392,7 +392,8 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         _ => panic!("the refused choice must leave the menu usable"),
     }
 
-    // The real router still encodes 26/3 with a zero body and no invented id.
+    // rc-0136: the real router sends the stock "Hello!" (139503), never a zero body, and
+    // no invented id.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     for (file, npc_id) in [
         ("snowhill.json", BLANK_SNOWHILL),
@@ -400,7 +401,7 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
     ] {
         assert_eq!(
             gameplay_talk_body(&mut game, file, npc_id),
-            0,
+            139_503,
             "NPC {npc_id}: no invented locale id"
         );
     }
