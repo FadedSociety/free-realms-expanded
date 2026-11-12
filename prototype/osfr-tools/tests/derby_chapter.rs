@@ -254,7 +254,8 @@ fn rules_of_the_road(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) {
         "the end screen waits for the 26/6 dialogue choice"
     );
     *now += 10;
-    release_end_screen(game, &dalton, RULES_OF_THE_ROAD, DALTON, 0, *now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(game, &dalton, RULES_OF_THE_ROAD, DALTON, 416_261, *now);
     *now += 10;
     finish_quest(
         game,
@@ -656,7 +657,8 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
         "the return end screen is a 26/6 dialog choice"
     );
     now += 10;
-    release_end_screen(&mut game, &crash, LICENSE_TO_DRIVE, CRASH, 0, now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut game, &crash, LICENSE_TO_DRIVE, CRASH, 416_261, now);
     now += 10;
     finish_quest(
         &mut game,

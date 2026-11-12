@@ -73,6 +73,9 @@ const W1_TITLE: u32 = 22_526;
 const W4_TITLE: u32 = 22_580;
 const W4_DESCRIPTION: u32 = 22_581;
 const W4_INTRO: u32 = 22_579;
+// A23 (L1190): W1 says the stock turn-in line 416261 (R); W4 the wiki's completion line 2140.
+const W1_END_TEXT: u32 = 416_261;
+const W4_END_TEXT: u32 = 2_140;
 const REWARD_COINS: u32 = 5;
 const REWARD_XP: u32 = 25;
 /// L926: W4 pays the fanbyte wiki star reward (47); W1 still pays 25.
@@ -236,9 +239,10 @@ fn release_reward(
     character: &CharacterState,
     quest_id: u32,
     expected_actor: u64,
+    end_text: u32,
     now: u64,
 ) -> Vec<u8> {
-    let end = release_end_screen(game, character, quest_id, expected_actor, 0, now);
+    let end = release_end_screen(game, character, quest_id, expected_actor, end_text, now);
     assert_reward_bundle(&end, quest_id, character.guid);
     end
 }
@@ -260,7 +264,7 @@ fn finish_w1(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
     assert_eq!(counts(game, W1), vec![1]);
     assert_eq!(pending_turnin(game), Some(W1));
     *now += 10;
-    release_reward(game, character, W1, DEWEY, *now);
+    release_reward(game, character, W1, DEWEY, W1_END_TEXT, *now);
     *now += 10;
     finish_quest(game, character, W1, WARRIOR, REWARD_COINS, REWARD_XP, *now);
 }
@@ -408,7 +412,7 @@ fn dewey_offers_becoming_a_warrior_only_to_warriors() {
     now += 10;
     assert!(talk(&mut game, &dewey, DEWEY, now).changed);
     now += 10;
-    release_reward(&mut game, &dewey, W1, DEWEY, now);
+    release_reward(&mut game, &dewey, W1, DEWEY, W1_END_TEXT, now);
 }
 
 #[test]
@@ -446,7 +450,7 @@ fn the_battle_cry_talk_completes_w1_and_pays_warrior_xp() {
     assert_eq!(coins(&game), coins_before, "no reward before the turn-in");
 
     now += 10;
-    release_reward(&mut game, &character, W1, DEWEY, now);
+    release_reward(&mut game, &character, W1, DEWEY, W1_END_TEXT, now);
 
     // Switch to another unlocked job before the turn-in: the explicit reward map,
     // not the active job, decides which profile gains the XP.
@@ -575,7 +579,7 @@ fn morninglory_offers_w4_after_w1_and_steele_completes_it() {
     );
 
     now += 10;
-    release_reward(&mut game, &steele, W4, STEELE, now);
+    release_reward(&mut game, &steele, W4, STEELE, W4_END_TEXT, now);
     now += 10;
     finish_quest(
         &mut game,
@@ -991,7 +995,9 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     assert!(w1.get("description_string_id").is_none());
     // rc-0136: the quest table matched the wiki's offer line to Global.Text 24981.
     assert_eq!(w1["intro_text_string_id"].as_u64(), Some(24_981));
-    assert!(w1.get("end_text_string_id").is_none());
+    // A23 (L1190): every enabled quest has turn-in text; W1 has no closing line in the wiki or
+    // its client block, so it says the stock client line 416261 (R).
+    assert_eq!(w1["end_text_string_id"].as_u64(), Some(416_261));
 
     let w4 = records
         .iter()
@@ -1013,7 +1019,8 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         "W4 is the explicit playtest entry after W1 (W2/W3 unbuilt)"
     );
     assert_eq!(w4["objectives"][0]["npc_id"].as_u64(), Some(STEELE));
-    assert!(w4.get("end_text_string_id").is_none());
+    // A23 (L1190): the wiki's completion dialog for One With Your Weapon is client id 2140.
+    assert_eq!(w4["end_text_string_id"].as_u64(), Some(2_140));
 
     let w5 = records
         .iter()

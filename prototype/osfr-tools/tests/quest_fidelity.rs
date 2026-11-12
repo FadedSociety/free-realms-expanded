@@ -130,3 +130,18 @@ fn every_live_quest_agrees_with_the_wiki_or_names_its_reason() {
         assert!(event.get("quest_ids").is_none(), "{} lists quests; tag the rows", event["key"]);
     }
 }
+
+/// A23 (owner 2026-11-12 recheck: empty dialog boxes; DONT-DO 2 "every offer, reminder, progress
+/// and closing line must carry real text"): every enabled quest says something when it is
+/// turned in. The id comes from the wiki's completion dialog, the client's own quest block
+/// (title + 2), or the stock client line 416261 marked (R); each names its tier in `source`.
+#[test]
+fn every_enabled_quest_has_turn_in_text() {
+    let blank: Vec<u64> = quest_rows()
+        .iter()
+        .filter(|row| row["enabled"].as_bool() == Some(true))
+        .filter(|row| row["end_text_string_id"].as_u64().unwrap_or(0) == 0)
+        .map(|row| row["id"].as_u64().unwrap())
+        .collect();
+    assert!(blank.is_empty(), "{} enabled quests have no turn-in text: {blank:?}", blank.len());
+}

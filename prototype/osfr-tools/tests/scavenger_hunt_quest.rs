@@ -97,7 +97,8 @@ fn open_hunt_end_screen(game: &mut Gameplay, jacque: &CharacterState, now: &mut 
     let final_talk = talk(game, jacque, JACQUE, *now);
     *now += 2;
     assert!(has_objective(&final_talk.replies, 10, 4));
-    release_end_screen(game, jacque, QUEST, JACQUE, 0, *now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(game, jacque, QUEST, JACQUE, 416_261, *now);
     *now += 2;
     assert_eq!(pending_turnin(game), Some(QUEST));
 }
@@ -253,7 +254,8 @@ fn the_four_stops_complete_and_pay_once() {
     assert_eq!(pending_turnin(&game), Some(QUEST));
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
 
-    let screen = release_end_screen(&mut game, &jacque, QUEST, JACQUE, 0, now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    let screen = release_end_screen(&mut game, &jacque, QUEST, JACQUE, 416_261, now);
     now += 2;
     assert_eq!(screen.len(), 99);
     assert_eq!(i32::from_le_bytes(screen[27..31].try_into().unwrap()), 50);
@@ -621,7 +623,8 @@ fn refusals_and_reconnect_change_nothing() {
     let final_talk = talk(&mut game, &jacque, JACQUE, now);
     now += 2;
     assert!(has_objective(&final_talk.replies, 10, 4));
-    release_end_screen(&mut game, &jacque, QUEST, JACQUE, 0, now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut game, &jacque, QUEST, JACQUE, 416_261, now);
     now += 2;
     finish_quest(&mut game, &jacque, QUEST, ADVENTURER, 50, 25, now);
     now += 2;
@@ -722,7 +725,8 @@ fn a_second_player_does_not_share_hunt_progress() {
     let a_final = talk(&mut a, &a_jacque, JACQUE, a_now);
     a_now += 2;
     assert!(has_objective(&a_final.replies, 10, 4));
-    release_end_screen(&mut a, &a_jacque, QUEST, JACQUE, 0, a_now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut a, &a_jacque, QUEST, JACQUE, 416_261, a_now);
     a_now += 2;
     finish_quest(&mut a, &a_jacque, QUEST, ADVENTURER, 50, 25, a_now);
     a_now += 2;
@@ -752,7 +756,8 @@ fn a_second_player_does_not_share_hunt_progress() {
     let b_final = talk(&mut b, &b_jacque, JACQUE, b_now);
     b_now += 2;
     assert!(has_objective(&b_final.replies, 10, 4));
-    release_end_screen(&mut b, &b_jacque, QUEST, JACQUE, 0, b_now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut b, &b_jacque, QUEST, JACQUE, 416_261, b_now);
     b_now += 2;
     finish_quest(&mut b, &b_jacque, QUEST, ADVENTURER, 50, 25, b_now);
     b_now += 2;

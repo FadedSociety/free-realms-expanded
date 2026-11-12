@@ -153,10 +153,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T418: live_event keeps the hunt closed until an admin runs realm event open 3000200 (src/gameplay/live_events.rs); realm event close stops new offers while an accepted hunt still finishes and pays. This replaces T281's always-offered policy (World Builder realm event, Build Plan 3.3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
-      "live_event": true
+      "live_event": true,
+      "end_text_string_id": 416261
     }
   ]
 }

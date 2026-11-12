@@ -77,10 +77,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1965); the giver is the trainer Manager Landon (9000000140), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412464,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3140002,
@@ -150,9 +155,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3140003,
@@ -766,12 +776,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 52,
       "description_string_id": 402605,
-      "intro_text_string_id": 402605
+      "intro_text_string_id": 402605,
+      "end_text_string_id": 416261
     },
     {
       "id": 3140009,
@@ -869,12 +884,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 52,
       "description_string_id": 402585,
-      "intro_text_string_id": 402585
+      "intro_text_string_id": 402585,
+      "end_text_string_id": 416261
     },
     {
       "id": 3140010,

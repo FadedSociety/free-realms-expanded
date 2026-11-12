@@ -69,10 +69,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T671: the record's giver 9000000550 is an unresolved guide id (npcs_unresolved.json names no NPC for it). Fizzlesticks is the giver: the wiki lists Being a Better Wizard among his quests (his npcs/wilds.json quests_given_text) and the client sends the player to him. No job gate: the video shows the quest held by a player on another job. He offers it after his Wizard-gated line, as the last entry of his list."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 442248,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3160003,
@@ -1730,11 +1735,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T723: enabled on the round-3 spec (talk_to_npc Sandbur 9000000190, a drawn reference_data row at the FabledRealms.lua:3673 spawn). The talk target is also the hand-in (the named-objective-target rule). Prerequisite 3160017 stays."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37312,
       "intro_text_string_id": 37310,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3160020,
@@ -2358,11 +2368,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24975 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 22310,
       "enabled": true,
-      "job": 12
+      "job": 12,
+      "end_text_string_id": 416261
     },
     {
       "id": 3160027,
@@ -2902,10 +2917,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1967); the giver is the trainer Fizzlesticks (9000000324), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412482,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }

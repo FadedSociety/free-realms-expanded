@@ -466,12 +466,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 22103,
       "intro_text_string_id": 22101,
       "enabled": true,
-      "job": 35
+      "job": 35,
+      "end_text_string_id": 416261
     },
     {
       "id": 3010005,
@@ -1362,10 +1367,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 77617 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 77597 + 2 = 77599, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 77598,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 77599
     },
     {
       "id": 3010013,
@@ -2790,10 +2800,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1952); the giver is the trainer Lugabow (9000000387), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412188,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }

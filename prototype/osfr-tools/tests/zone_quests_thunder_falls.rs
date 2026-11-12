@@ -349,7 +349,7 @@ fn the_loader_binds_crash_as_giver_and_each_target_as_turn_in() {
         assert_eq!(engine.turnin_npc_id(case.quest), Some(case.target));
     }
     // Locale 402845 is the completion line the answers tie to Tucker's Troubles; it is the
-    // 49/13 end text. Betty has no attested completion line, so hers stays 0.
+    // 49/13 end text. Betty has no attested completion line: A23 (L1190), stock 416261 (R).
     assert_eq!(TUCKER.quest().end_text, 402_845);
-    assert_eq!(BETTY.quest().end_text, 0);
+    assert_eq!(BETTY.quest().end_text, 416_261);
 }

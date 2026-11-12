@@ -269,11 +269,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T202: job 45 (Chef) gate. Auguste Frydaze is the Highroad Junction Chef trainer and the client title is \"Cooking 101\"; the tutorial is offered only while Chef is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 4420051,
       "intro_text_string_id": 4420049,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3050005,
@@ -1649,12 +1654,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 116478,
       "intro_text_string_id": 116476,
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "end_text_string_id": 416261
     },
     {
       "id": 3050016,
@@ -2909,12 +2919,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 24314,
       "enabled": true,
       "job": 45,
-      "intro_text_string_id": 25003
+      "intro_text_string_id": 25003,
+      "end_text_string_id": 416261
     },
     {
       "id": 3050028,
@@ -3729,10 +3744,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1978); the giver is the trainer Simone (9000000467), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 413022,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }

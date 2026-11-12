@@ -37,11 +37,16 @@
         {
           "kind": "wiki",
           "evidence": "A Profitable Package (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_profitable_package_03a6b7)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46303,
       "intro_text_string_id": 46301,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950023,
@@ -81,11 +86,16 @@
         {
           "kind": "wiki",
           "evidence": "A Small Errand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_small_errand_25f785)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36582,
       "intro_text_string_id": 36580,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950036,
@@ -123,11 +133,16 @@
         {
           "kind": "wiki",
           "evidence": "Bad Apples (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_apples_b6f099)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 75689,
       "intro_text_string_id": 75687,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950041,
@@ -177,11 +192,16 @@
         {
           "kind": "wiki",
           "evidence": "Beach Ball Wear (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_beach_ball_wear_2cfc10)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101747,
       "intro_text_string_id": 101747,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950045,
@@ -219,11 +239,16 @@
         {
           "kind": "wiki",
           "evidence": "Better Late Than Never (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_better_late_than_never_5e51b1)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46286,
       "intro_text_string_id": 46284,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950066,
@@ -261,11 +286,16 @@
         {
           "kind": "wiki",
           "evidence": "Broken Axle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_broken_axle_52fa12)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 24841,
       "intro_text_string_id": 24841,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950068,
@@ -303,11 +333,16 @@
         {
           "kind": "wiki",
           "evidence": "Brother's Keeper (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brother_s_keeper_ff368a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 103060,
       "intro_text_string_id": 24800,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950083,
@@ -362,10 +397,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36591 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36593,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950084,
@@ -451,11 +491,16 @@
         {
           "kind": "wiki",
           "evidence": "Cargug, Cargug, Let Me In! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cargug_cargug_let_me_in_33fdce)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46955,
       "intro_text_string_id": 46953,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950114,
@@ -498,12 +543,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event twelve_days runs; event_calendar.json event twelve_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 441111,
       "intro_text_string_id": 441109,
       "enabled": true,
-      "live_event": "twelve_days"
+      "live_event": "twelve_days",
+      "end_text_string_id": 416261
     },
     {
       "id": 3950125,
@@ -579,11 +629,16 @@
         {
           "kind": "wiki",
           "evidence": "Doctor's Note (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_doctor_s_note_27c820)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92318 + 2 = 92320, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92317,
       "intro_text_string_id": 92317,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92320
     },
     {
       "id": 3950131,
@@ -633,11 +688,16 @@
         {
           "kind": "wiki",
           "evidence": "Druid Dress Code (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_druid_dress_code_de6f6b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92356 + 2 = 92358, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92357,
       "intro_text_string_id": 92355,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92358
     },
     {
       "id": 3950141,
@@ -687,11 +747,16 @@
         {
           "kind": "wiki",
           "evidence": "Excuses, Excuses! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_excuses_excuses_db900c)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92272 + 2 = 92274, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92273,
       "intro_text_string_id": 92271,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92274
     },
     {
       "id": 3950161,
@@ -729,11 +794,16 @@
         {
           "kind": "wiki",
           "evidence": "Finishing the Job (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_finishing_the_job_25652a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 71553,
       "intro_text_string_id": 71551,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950162,
@@ -788,10 +858,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 92591 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92592 + 2 = 92594, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92593,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92594
     },
     {
       "id": 3950164,
@@ -846,9 +921,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 94570 (0.97) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950173,
@@ -898,11 +978,16 @@
         {
           "kind": "wiki",
           "evidence": "Fond Memories (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fond_memories_61f382)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70936,
       "intro_text_string_id": 70936,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950175,
@@ -940,11 +1025,16 @@
         {
           "kind": "wiki",
           "evidence": "Forcing the Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forcing_the_food_e723e0)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101544,
       "intro_text_string_id": 101544,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950183,
@@ -982,11 +1072,16 @@
         {
           "kind": "wiki",
           "evidence": "Fortune Find (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fortune_find_1184ce)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 100231 + 2 = 100233, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 100230,
       "intro_text_string_id": 100230,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 100233
     },
     {
       "id": 3950199,
@@ -1168,11 +1263,16 @@
         {
           "kind": "wiki",
           "evidence": "Half a Dozen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_half_a_dozen_8a85e1)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 103043,
       "intro_text_string_id": 103043,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950216,
@@ -1246,11 +1346,16 @@
         {
           "kind": "wiki",
           "evidence": "Heading for Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_heading_for_safety_e05398)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101261,
       "intro_text_string_id": 101261,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950218,
@@ -1336,11 +1441,16 @@
         {
           "kind": "wiki",
           "evidence": "Hide 'n Seek (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hide_n_seek_c2b0be)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 115942,
       "intro_text_string_id": 24794,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950229,
@@ -1390,11 +1500,16 @@
         {
           "kind": "wiki",
           "evidence": "Hungry Hungry Troll (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_hungry_troll_75a30e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101437,
       "intro_text_string_id": 101437,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950231,
@@ -1436,11 +1551,16 @@
         {
           "kind": "wiki",
           "evidence": "I'm New at This (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_new_at_this_a2f9f5)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36617,
       "intro_text_string_id": 36615,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950233,
@@ -1490,11 +1610,16 @@
         {
           "kind": "wiki",
           "evidence": "Icky Brown Bag Lunch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_icky_brown_bag_lunch_b1c390)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92429 + 2 = 92431, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92430,
       "intro_text_string_id": 92428,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92431
     },
     {
       "id": 3950234,
@@ -1532,11 +1657,16 @@
         {
           "kind": "wiki",
           "evidence": "Idle Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_idle_hands_f69899)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 90730,
       "intro_text_string_id": 90730,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950239,
@@ -1588,11 +1718,16 @@
         {
           "kind": "wiki",
           "evidence": "Job Reference (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_job_reference_363640)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70983,
       "intro_text_string_id": 70983,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950247,
@@ -1666,11 +1801,16 @@
         {
           "kind": "wiki",
           "evidence": "Lakeshore Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lakeshore_reports_910543)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 76057 + 2 = 76059, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 76058,
       "intro_text_string_id": 76056,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 76059
     },
     {
       "id": 3950260,
@@ -1708,11 +1848,16 @@
         {
           "kind": "wiki",
           "evidence": "Lucca's New Creation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lucca_s_new_creation_4c583b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46129,
       "intro_text_string_id": 46130,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950264,
@@ -1801,12 +1946,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 429031,
       "intro_text_string_id": 429029,
       "enabled": true,
-      "live_event": "summer_camp"
+      "live_event": "summer_camp",
+      "end_text_string_id": 416261
     },
     {
       "id": 3950273,
@@ -1961,10 +2111,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36506 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36508,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950285,
@@ -2021,9 +2176,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 36829 (0.92) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950286,
@@ -2061,11 +2221,16 @@
         {
           "kind": "wiki",
           "evidence": "Noisy Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noisy_neighbors_3847ce)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36811,
       "intro_text_string_id": 36809,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950314,
@@ -2103,11 +2268,16 @@
         {
           "kind": "wiki",
           "evidence": "Pirri's Sketches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pirri_s_sketches_5fc94f)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46260,
       "intro_text_string_id": 46258,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950324,
@@ -2293,12 +2463,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 429097,
       "intro_text_string_id": 429095,
       "enabled": true,
-      "live_event": "summer_camp"
+      "live_event": "summer_camp",
+      "end_text_string_id": 416261
     },
     {
       "id": 3950348,
@@ -2383,11 +2558,16 @@
         {
           "kind": "wiki",
           "evidence": "Sad Penguin! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sad_penguin_cdde61)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389592 + 2 = 389594, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389591,
       "intro_text_string_id": 389591,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389594
     },
     {
       "id": 3950350,
@@ -2425,11 +2605,16 @@
         {
           "kind": "wiki",
           "evidence": "Sanctuary Warp Tests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sanctuary_warp_tests_6d4c57)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 385680 + 2 = 385682, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 385681,
       "intro_text_string_id": 385679,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 385682
     },
     {
       "id": 3950358,
@@ -2486,10 +2671,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_is_picky_928a8b) is Global.Text 6200011, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 15108,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950359,
@@ -2541,11 +2731,16 @@
         {
           "kind": "wiki",
           "evidence": "Seafoam's Last Idea (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_last_idea_7cd073)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 15110,
       "intro_text_string_id": 24876,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950360,
@@ -2595,11 +2790,16 @@
         {
           "kind": "wiki",
           "evidence": "Seafoam's Sweet Tooth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seafoam_s_sweet_tooth_ce53e0)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 15268,
       "intro_text_string_id": 24874,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950370,
@@ -2637,11 +2837,16 @@
         {
           "kind": "wiki",
           "evidence": "Sister Feud (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sister_feud_0d33b2)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 94551,
       "intro_text_string_id": 94551,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950378,
@@ -2684,10 +2889,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 385689 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 385690 + 2 = 385692, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 385691,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 385692
     },
     {
       "id": 3950387,
@@ -2737,11 +2947,16 @@
         {
           "kind": "wiki",
           "evidence": "Spinnerette (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spinnerette_8c6d38)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 16121,
       "intro_text_string_id": 24895,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950388,
@@ -2842,11 +3057,16 @@
         {
           "kind": "wiki",
           "evidence": "Spread the Good Cheer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_spread_the_good_cheer_19c4b8)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46728,
       "intro_text_string_id": 46728,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950395,
@@ -2908,11 +3128,16 @@
         {
           "kind": "wiki",
           "evidence": "Sweet Incentive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sweet_incentive_4731a2)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 41404,
       "intro_text_string_id": 41402,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950399,
@@ -2977,12 +3202,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 429545 + 2 = 429547, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 429546,
       "intro_text_string_id": 429544,
       "enabled": true,
-      "live_event": "summer_camp"
+      "live_event": "summer_camp",
+      "end_text_string_id": 429547
     },
     {
       "id": 3950401,
@@ -3046,11 +3276,16 @@
         {
           "kind": "wiki",
           "evidence": "The Cure for the Common Lazy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_cure_for_the_common_lazy_435c1a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38823,
       "intro_text_string_id": 38823,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950413,
@@ -3088,11 +3323,16 @@
         {
           "kind": "wiki",
           "evidence": "The Memorial Caverns (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_memorial_caverns_890bf8)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 75610,
       "intro_text_string_id": 75610,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950414,
@@ -3135,10 +3375,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_mighty_mekaletaliki_09504b) is Global.Text 6200012, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 16257,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950425,
@@ -3176,11 +3421,16 @@
         {
           "kind": "wiki",
           "evidence": "The Search for Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_search_for_snorg_4152bb)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46204,
       "intro_text_string_id": 46202,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950431,
@@ -3244,13 +3494,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 384769 + 2 = 384771, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 14,
       "description_string_id": 384770,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 384771
     },
     {
       "id": 3950436,
@@ -3336,11 +3591,16 @@
         {
           "kind": "wiki",
           "evidence": "Toad Tag - Round 1 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_1_898a88)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 115948,
       "intro_text_string_id": 24795,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950437,
@@ -3452,11 +3712,16 @@
         {
           "kind": "wiki",
           "evidence": "Toad Tag - Round 2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_2_c99a76)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 115948,
       "intro_text_string_id": 24796,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950438,
@@ -3609,10 +3874,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toad_tag_round_3_df414f) is Global.Text 6200013, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 115948,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950443,
@@ -3650,11 +3920,16 @@
         {
           "kind": "wiki",
           "evidence": "Tran's Plant (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_tran_s_plant_716f0e)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91581 + 2 = 91583, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91582,
       "intro_text_string_id": 91580,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91583
     },
     {
       "id": 3950455,
@@ -3706,11 +3981,16 @@
         {
           "kind": "wiki",
           "evidence": "Washing it Down (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_washing_it_down_fb8db4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38840,
       "intro_text_string_id": 38840,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950463,
@@ -3760,11 +4040,16 @@
         {
           "kind": "wiki",
           "evidence": "Where is Wellington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_wellington_a126b4)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37550,
       "intro_text_string_id": 37550,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950468,
@@ -3802,11 +4087,16 @@
         {
           "kind": "wiki",
           "evidence": "Working Overtime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_working_overtime_c2a8c6)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38783,
       "intro_text_string_id": 38783,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950498,
@@ -3969,11 +4259,16 @@
         {
           "kind": "wiki",
           "evidence": "Late Library Books (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_late_library_books_b1c7da)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91541 + 2 = 91543, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91542,
       "intro_text_string_id": 91540,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91543
     },
     {
       "id": 3950698,
@@ -4036,11 +4331,16 @@
         {
           "kind": "wiki",
           "evidence": "A Friend in Need (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_friend_in_need_75573c)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92596 + 2 = 92598, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92597,
       "intro_text_string_id": 92595,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92598
     },
     {
       "id": 3950706,
@@ -4147,11 +4447,16 @@
         {
           "kind": "wiki",
           "evidence": "Fishy Fish Thefts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fishy_fish_thefts_a3d94c)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92484 + 2 = 92486, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92485,
       "intro_text_string_id": 92483,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92486
     },
     {
       "id": 3950850,
@@ -4219,10 +4524,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 37069 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 103105,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3950877,
@@ -4290,11 +4600,16 @@
         {
           "kind": "wiki",
           "evidence": "Happy on the Inside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_happy_on_the_inside_068718)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 15259,
       "intro_text_string_id": 24857,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951040,
@@ -4443,13 +4758,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38787,
       "intro_text_string_id": 38787,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951126,
@@ -4505,9 +4825,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_barrels_of_fun_d26dda) is Global.Text 6200014, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951129,
@@ -4558,11 +4883,16 @@
         {
           "kind": "wiki",
           "evidence": "Bears on the Loose! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bears_on_the_loose_a75c7e)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 116258 + 2 = 116260, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 116259,
       "intro_text_string_id": 116257,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 116260
     },
     {
       "id": 3951154,
@@ -4729,11 +5059,16 @@
         {
           "kind": "wiki",
           "evidence": "Bye Bye, Butterfly (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bye_bye_butterfly_665d94)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72032 + 2 = 72034, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72033,
       "intro_text_string_id": 72031,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72034
     },
     {
       "id": 3951174,
@@ -4772,11 +5107,16 @@
         {
           "kind": "wiki",
           "evidence": "Cloudy Days (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cloudy_days_e7ba57)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 430168 + 2 = 430170, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 430169,
       "intro_text_string_id": 430167,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 430170
     },
     {
       "id": 3951175,
@@ -4828,11 +5168,16 @@
         {
           "kind": "wiki",
           "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3ACoin_Clean-Up)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 430164 + 2 = 430166, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 430166
     },
     {
       "id": 3951271,
@@ -4872,11 +5217,16 @@
         {
           "kind": "wiki",
           "evidence": "Grandpa Snarfs is Losted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grandpa_snarfs_is_losted_4ba6cb)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 72431,
       "intro_text_string_id": 72444,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951276,
@@ -4938,11 +5288,16 @@
         {
           "kind": "wiki",
           "evidence": "Grubby Hands (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_grubby_hands_242608)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38002,
       "intro_text_string_id": 38002,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951302,
@@ -4982,11 +5337,16 @@
         {
           "kind": "wiki",
           "evidence": "Keep it Down! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_down_3bc80b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38183,
       "intro_text_string_id": 38183,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951316,
@@ -5037,11 +5397,16 @@
         {
           "kind": "wiki",
           "evidence": "Lost Turtle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_turtle_405065)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 94596,
       "intro_text_string_id": 94594,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951317,
@@ -5094,11 +5459,16 @@
         {
           "kind": "wiki",
           "evidence": "Make Sure to Wash Up... (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_make_sure_to_wash_up_ae87ea)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 90819 + 2 = 90821, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 90827,
       "intro_text_string_id": 90818,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 90821
     },
     {
       "id": 3951322,
@@ -5154,10 +5524,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 91523 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91524 + 2 = 91526, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91525,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91526
     },
     {
       "id": 3951362,
@@ -5221,11 +5596,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951364,
@@ -5276,11 +5656,16 @@
         {
           "kind": "wiki",
           "evidence": "Pookie's Treats (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pookie_s_treats_9e5277)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 19821,
       "intro_text_string_id": 24938,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951407,
@@ -5336,10 +5721,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 72065 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72066 + 2 = 72068, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72067,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72068
     },
     {
       "id": 3951427,
@@ -5406,11 +5796,16 @@
         {
           "kind": "wiki",
           "evidence": "Starfish Picking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_starfish_picking_c2b1d3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101168,
       "intro_text_string_id": 101166,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951451,
@@ -5461,11 +5856,16 @@
         {
           "kind": "wiki",
           "evidence": "The Only Thing Better Than Cake (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_only_thing_better_than_cake_cddf92)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 72419,
       "intro_text_string_id": 72424,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951459,
@@ -5516,11 +5916,16 @@
         {
           "kind": "wiki",
           "evidence": "The Toadal Truth (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_toadal_truth_d4101d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37431,
       "intro_text_string_id": 37429,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951491,
@@ -5572,11 +5977,16 @@
         {
           "kind": "wiki",
           "evidence": "Words of Wooing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_words_of_wooing_a61c15)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72070 + 2 = 72072, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72071,
       "intro_text_string_id": 72069,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72072
     },
     {
       "id": 3951494,
@@ -5657,9 +6067,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 38439 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951547,
@@ -5786,11 +6201,16 @@
         {
           "kind": "wiki",
           "evidence": "Farewell Feast (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_farewell_feast_18bee1)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 428200 + 2 = 428202, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 428201,
       "intro_text_string_id": 428199,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 428202
     },
     {
       "id": 3951724,
@@ -5830,11 +6250,16 @@
         {
           "kind": "wiki",
           "evidence": "Hasty Food Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasty_food_delivery_56503a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 100297,
       "intro_text_string_id": 100297,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951759,
@@ -5951,11 +6376,16 @@
         {
           "kind": "wiki",
           "evidence": "Butterfly Fluttered By (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_butterfly_fluttered_by_dc3cad)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37089,
       "intro_text_string_id": 37089,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3951809,
@@ -6103,12 +6533,17 @@
         {
           "kind": "wiki",
           "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3APopularly_Healthy)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 428826 + 2 = 428828, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 428827,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 428828
     },
     {
       "id": 3951995,
@@ -6247,11 +6682,16 @@
         {
           "kind": "wiki",
           "evidence": "The Road to Mire's Edge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_road_to_mire_s_edge_42d5e9)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 78699,
       "intro_text_string_id": 78697,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3952082,
@@ -6332,10 +6772,15 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 432195 + 2 = 432197, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "enabled": true,
-      "live_event": "halloween"
+      "live_event": "halloween",
+      "end_text_string_id": 432197
     },
     {
       "id": 3952343,
@@ -6474,13 +6919,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 100217 + 2 = 100219, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 100216,
       "intro_text_string_id": 100216,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 100219
     },
     {
       "id": 3952407,
@@ -6536,10 +6986,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 71595 (0.98) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71596 + 2 = 71598, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 71597,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 71598
     },
     {
       "id": 3952471,
@@ -6607,12 +7062,17 @@
         {
           "kind": "wiki",
           "evidence": "Card Duelist: Gifted Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_gifted_cards_4ce1d1)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 413779 + 2 = 413781, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 120,
       "description_string_id": 413780,
       "intro_text_string_id": 413778,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 413781
     },
     {
       "id": 3952472,
@@ -6692,12 +7152,17 @@
         {
           "kind": "wiki",
           "evidence": "Card Duelist: Keeping Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_card_duelist_keeping_quiet_9a6c27)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 413783 + 2 = 413785, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 120,
       "description_string_id": 413782,
       "intro_text_string_id": 413782,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 413785
     },
     {
       "id": 3952500,
@@ -6755,13 +7220,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The page gates Deck of Buzzing behind a purchased Pumpkin Costume or Deadman's Party quest pack (fanbyte Category:Super_Spooktacular, 2013 quest series (lab/references/fanbyte-events-20261111/super_spooktacular.html)); the economy is free (owner), so the row has no gate."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 416492 + 2 = 416494, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 120,
       "description_string_id": 416493,
       "intro_text_string_id": 416491,
       "enabled": true,
-      "live_event": "halloween"
+      "live_event": "halloween",
+      "end_text_string_id": 416494
     },
     {
       "id": 3952619,
@@ -6846,12 +7316,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3AMatching_Wits) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 400813 + 2 = 400815, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 120,
       "description_string_id": 400814,
       "enabled": true,
-      "live_event": "seaside_summer_splash"
+      "live_event": "seaside_summer_splash",
+      "end_text_string_id": 400815
     },
     {
       "id": 3952640,
@@ -6918,12 +7393,17 @@
         {
           "kind": "wiki",
           "evidence": "Access Granted (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_access_granted_8182a8)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 413803 + 2 = 413805, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 120,
       "description_string_id": 413827,
       "intro_text_string_id": 413802,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 413805
     },
     {
       "id": 3952686,
@@ -7022,11 +7502,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 413798 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 413799 + 2 = 413801, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 120,
       "description_string_id": 413826,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 413801
     },
     {
       "id": 3952795,
@@ -7138,11 +7623,16 @@
         {
           "kind": "wiki",
           "evidence": "Drinks on the House (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_drinks_on_the_house_71e425)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46738,
       "intro_text_string_id": 46738,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3952922,
@@ -7193,11 +7683,16 @@
         {
           "kind": "wiki",
           "evidence": "One Man's Trash is Another Man's Treasure (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_one_man_s_trash_is_another_man_s_treasure_ac35b5)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101425,
       "intro_text_string_id": 101425,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3952926,
@@ -7357,11 +7852,16 @@
         {
           "kind": "wiki",
           "evidence": "Overboard! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_overboard_bd7224)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390263 + 2 = 390265, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 390262,
       "intro_text_string_id": 390262,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 390265
     },
     {
       "id": 3953011,
@@ -7506,9 +8006,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [title, description, intro, end] around title 29629, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953013,
@@ -7581,12 +8086,17 @@
         {
           "kind": "wiki",
           "evidence": "A Bounty of Berries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_bounty_of_berries_45a977)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37488,
       "intro_text_string_id": 37486,
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953039,
@@ -7666,11 +8176,16 @@
         {
           "kind": "wiki",
           "evidence": "Are you Sirius (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_are_you_sirius_b892f9)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 102158 + 2 = 102160, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 102140,
       "intro_text_string_id": 102157,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 102160
     },
     {
       "id": 3953055,
@@ -7738,9 +8253,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 384094 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 384095 + 2 = 384097, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 384097
     },
     {
       "id": 3953070,
@@ -7799,11 +8319,16 @@
         {
           "kind": "wiki",
           "evidence": "Bully Defense 101 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bully_defense_101_1b0260)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 40230,
       "intro_text_string_id": 40230,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953095,
@@ -7854,12 +8379,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event twelve_days runs; event_calendar.json event twelve_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 441119,
       "intro_text_string_id": 441117,
       "enabled": true,
-      "live_event": "twelve_days"
+      "live_event": "twelve_days",
+      "end_text_string_id": 416261
     },
     {
       "id": 3953106,
@@ -7952,11 +8482,16 @@
         {
           "kind": "wiki",
           "evidence": "Defending the Hive (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defending_the_hive_9afd0e)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 104039 + 2 = 104041, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 104040,
       "intro_text_string_id": 104038,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 104041
     },
     {
       "id": 3953107,
@@ -8282,11 +8817,16 @@
         {
           "kind": "wiki",
           "evidence": "Did That Just Happen (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_did_that_just_happen_00f85b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 102139 + 2 = 102141, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 102140,
       "intro_text_string_id": 102138,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 102141
     },
     {
       "id": 3953112,
@@ -8383,13 +8923,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71548 + 2 = 71550, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 70384,
       "intro_text_string_id": 71547,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 71550
     },
     {
       "id": 3953116,
@@ -8650,9 +9195,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_enough_for_dinner_849959) is Global.Text 6200016, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953151,
@@ -8715,9 +9265,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36839 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953153,
@@ -8780,11 +9335,16 @@
         {
           "kind": "wiki",
           "evidence": "Flower BAD! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flower_bad_c5fe90)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 41317,
       "intro_text_string_id": 41317,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953155,
@@ -8846,11 +9406,16 @@
         {
           "kind": "wiki",
           "evidence": "Food for Fhred (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_food_for_fhred_da4505)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 21552,
       "intro_text_string_id": 24967,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953159,
@@ -8909,11 +9474,16 @@
         {
           "kind": "wiki",
           "evidence": "Forgetful Tanning (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forgetful_tanning_e3c95c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101935,
       "intro_text_string_id": 101943,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953164,
@@ -9005,10 +9575,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 70382 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 70383 + 2 = 70385, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 70384,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 70385
     },
     {
       "id": 3953168,
@@ -9081,11 +9656,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 390120 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390121 + 2 = 390123, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 390122,
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "end_text_string_id": 390123
     },
     {
       "id": 3953171,
@@ -9182,13 +9762,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 92177 + 2 = 92179, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 92178,
       "intro_text_string_id": 92176,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 92179
     },
     {
       "id": 3953172,
@@ -9277,11 +9862,16 @@
         {
           "kind": "wiki",
           "evidence": "Gardening 101 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_gardening_101_2432d3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 384873,
       "intro_text_string_id": 384871,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953175,
@@ -9358,11 +9948,16 @@
         {
           "kind": "wiki",
           "evidence": "Getting the Girl (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_getting_the_girl_368679)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36849,
       "intro_text_string_id": 36849,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953176,
@@ -9475,10 +10070,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 72438 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 72437,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953188,
@@ -9546,10 +10146,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 102006 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 102008,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953201,
@@ -9591,11 +10196,16 @@
         {
           "kind": "wiki",
           "evidence": "I'm Okay! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_i_m_okay_c3daa7)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 16541,
       "intro_text_string_id": 24902,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953274,
@@ -9677,13 +10287,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91772 + 2 = 91774, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91773,
       "intro_text_string_id": 91771,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 91774
     },
     {
       "id": 3953277,
@@ -9746,9 +10361,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 101474 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953285,
@@ -9801,12 +10421,17 @@
         {
           "kind": "wiki",
           "evidence": "Rivaling Rucks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rivaling_rucks_ef5f21)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390113 + 2 = 390115, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 390114,
       "intro_text_string_id": 390112,
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "end_text_string_id": 390115
     },
     {
       "id": 3953286,
@@ -9881,11 +10506,16 @@
         {
           "kind": "wiki",
           "evidence": "Robgoblin Recycling Program (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_robgoblin_recycling_program_58a3e8)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 75969 + 2 = 75971, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 76063,
       "intro_text_string_id": 76061,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 75971
     },
     {
       "id": 3953294,
@@ -10100,9 +10730,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sandstorm_s_grand_opening_3186ef) is Global.Text 6200017, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 406432 + 2 = 406434, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 406434
     },
     {
       "id": 3953300,
@@ -10225,11 +10860,16 @@
         {
           "kind": "wiki",
           "evidence": "Sharing is Caring (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_sharing_is_caring_62d362)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101970,
       "intro_text_string_id": 101975,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953315,
@@ -10316,11 +10956,16 @@
         {
           "kind": "wiki",
           "evidence": "Snow Place Like Home (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snow_place_like_home_06ecaa)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389883 + 2 = 389885, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389882,
       "intro_text_string_id": 389882,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389885
     },
     {
       "id": 3953323,
@@ -10496,10 +11141,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 389648, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389648 + 2 = 389650, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "end_text_string_id": 389650
     },
     {
       "id": 3953344,
@@ -10591,11 +11241,16 @@
         {
           "kind": "wiki",
           "evidence": "The New Place (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_new_place_bae20e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101335,
       "intro_text_string_id": 101335,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953367,
@@ -10662,11 +11317,16 @@
         {
           "kind": "wiki",
           "evidence": "Turning the Tables (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_turning_the_tables_3bdfbe)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 70392 + 2 = 70394, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 70393,
       "intro_text_string_id": 70391,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 70394
     },
     {
       "id": 3953369,
@@ -10730,11 +11390,16 @@
         {
           "kind": "wiki",
           "evidence": "Two Feet No Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_two_feet_no_socks_da032d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101378,
       "intro_text_string_id": 101378,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953370,
@@ -10928,12 +11593,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390211 + 2 = 390213, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "enabled": true,
       "job": 45,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 390213
     },
     {
       "id": 3953383,
@@ -11021,11 +11691,16 @@
         {
           "kind": "wiki",
           "evidence": "Woe is Willie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_woe_is_willie_d19cda)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36872,
       "intro_text_string_id": 36872,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953396,
@@ -11254,12 +11929,17 @@
         {
           "kind": "wiki",
           "evidence": "The Concoction (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_concoction_45a51d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38329,
       "intro_text_string_id": 38327,
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "end_text_string_id": 416261
     },
     {
       "id": 3953698,
@@ -11377,12 +12057,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 410462 + 2 = 410464, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 410464
     },
     {
       "id": 3953730,
@@ -11487,12 +12172,17 @@
         {
           "kind": "wiki",
           "evidence": "Catch of the Day (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_catch_of_the_day_8860b4)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 410067 + 2 = 410069, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
       "description_string_id": 410066,
       "intro_text_string_id": 410066,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 410069
     },
     {
       "id": 3953839,
@@ -11562,6 +12252,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 409944 + 2 = 409946, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
@@ -11569,7 +12263,8 @@
       "intro_text_string_id": 409943,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 409946
     },
     {
       "id": 3953973,
@@ -11674,13 +12369,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 410288 + 2 = 410290, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
       "description_string_id": 410289,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 410290
     },
     {
       "id": 3953979,
@@ -11731,11 +12431,16 @@
         {
           "kind": "wiki",
           "evidence": "A Dirt Covered Map (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_dirt_covered_map_294afb)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72090 + 2 = 72092, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72089,
       "intro_text_string_id": 72089,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72092
     },
     {
       "id": 3953987,
@@ -11817,13 +12522,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 90665 + 2 = 90667, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 90664,
       "intro_text_string_id": 90664,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 90667
     },
     {
       "id": 3954019,
@@ -11874,11 +12584,16 @@
         {
           "kind": "wiki",
           "evidence": "Brain Freeze Mix-up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brain_freeze_mix_up_ab4177)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 47230 + 2 = 47232, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 47229,
       "intro_text_string_id": 47229,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 47232
     },
     {
       "id": 3954033,
@@ -12041,11 +12756,16 @@
         {
           "kind": "wiki",
           "evidence": "Checkers for a Chart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_checkers_for_a_chart_8076eb)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72094 + 2 = 72096, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72095,
       "intro_text_string_id": 72093,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72096
     },
     {
       "id": 3954042,
@@ -12125,11 +12845,16 @@
         {
           "kind": "wiki",
           "evidence": "Combo Challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_combo_challenge_5874dc)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389233 + 2 = 389235, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389234,
       "intro_text_string_id": 389232,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389235
     },
     {
       "id": 3954085,
@@ -12180,11 +12905,16 @@
         {
           "kind": "wiki",
           "evidence": "Feed the Ducks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feed_the_ducks_da1e4c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 74619,
       "intro_text_string_id": 74617,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954106,
@@ -12243,13 +12973,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 115533 + 2 = 115535, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 115532,
       "intro_text_string_id": 115532,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 115535
     },
     {
       "id": 3954150,
@@ -12312,11 +13047,16 @@
         {
           "kind": "wiki",
           "evidence": "Lazi's Pigs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lazi_s_pigs_fb5d44)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36676,
       "intro_text_string_id": 36675,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954167,
@@ -12394,11 +13134,16 @@
         {
           "kind": "wiki",
           "evidence": "Mudpie! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mudpie_7fdf7f)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389249 + 2 = 389251, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389250,
       "intro_text_string_id": 389248,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389251
     },
     {
       "id": 3954177,
@@ -12461,11 +13206,16 @@
         {
           "kind": "wiki",
           "evidence": "Noglash Delivery (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_noglash_delivery_39e1dc)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70595,
       "intro_text_string_id": 70593,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954178,
@@ -12516,11 +13266,16 @@
         {
           "kind": "wiki",
           "evidence": "Nooklings' Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nooklings_deliveries_58f6ea)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70432,
       "intro_text_string_id": 70430,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954201,
@@ -12600,11 +13355,16 @@
         {
           "kind": "wiki",
           "evidence": "Pool of Seashells (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pool_of_seashells_2c94fc)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389229 + 2 = 389231, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389228,
       "intro_text_string_id": 389228,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389231
     },
     {
       "id": 3954217,
@@ -12667,11 +13427,16 @@
         {
           "kind": "wiki",
           "evidence": "Rimpadun's Plan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rimpadun_s_plan_88081b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 386150 + 2 = 386152, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 386149,
       "intro_text_string_id": 386149,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 386152
     },
     {
       "id": 3954231,
@@ -12737,11 +13502,16 @@
         {
           "kind": "wiki",
           "evidence": "Shift Swap (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shift_swap_5f415d)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389253 + 2 = 389255, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389252,
       "intro_text_string_id": 389252,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389255
     },
     {
       "id": 3954262,
@@ -12913,9 +13683,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 36489 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954302,
@@ -12981,11 +13756,16 @@
         {
           "kind": "wiki",
           "evidence": "Wrapper Round-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wrapper_round_up_6e0adb)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 391763,
       "intro_text_string_id": 391763,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954303,
@@ -13036,11 +13816,16 @@
         {
           "kind": "wiki",
           "evidence": "Wumpig's Deliveries (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wumpig_s_deliveries_2da3d7)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70645,
       "intro_text_string_id": 70645,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954466,
@@ -13114,6 +13899,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 409693 + 2 = 409695, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
@@ -13121,7 +13910,8 @@
       "intro_text_string_id": 409692,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 409695
     },
     {
       "id": 3954475,
@@ -13166,9 +13956,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_helping_hand_f4bb2c) is Global.Text 6200018, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954498,
@@ -13206,11 +14001,16 @@
         {
           "kind": "wiki",
           "evidence": "Bigger Fish to Fry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bigger_fish_to_fry_555c83)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 20839,
       "intro_text_string_id": 24890,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954510,
@@ -13248,11 +14048,16 @@
         {
           "kind": "wiki",
           "evidence": "Bound for Blackspore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bound_for_blackspore_45c668)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 46148 + 2 = 46150, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 46149,
       "intro_text_string_id": 46143,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 46150
     },
     {
       "id": 3954516,
@@ -13325,13 +14130,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 101094,
       "intro_text_string_id": 101094,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954524,
@@ -13369,11 +14179,16 @@
         {
           "kind": "wiki",
           "evidence": "Change of Heart (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_change_of_heart_bc1b60)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 24907,
       "intro_text_string_id": 24907,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954534,
@@ -13447,11 +14262,16 @@
         {
           "kind": "wiki",
           "evidence": "Cool Kids (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cool_kids_a7981f)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 384412,
       "intro_text_string_id": 384410,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954573,
@@ -13657,12 +14477,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 409948 + 2 = 409950, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 409950
     },
     {
       "id": 3954584,
@@ -13775,11 +14600,16 @@
         {
           "kind": "wiki",
           "evidence": "Flag Dancin' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_flag_dancin_d59205)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 21056,
       "intro_text_string_id": 24957,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954585,
@@ -13883,10 +14713,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 41207 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 41209,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954588,
@@ -14115,11 +14950,16 @@
         {
           "kind": "wiki",
           "evidence": "Funding the Fun (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_funding_the_fun_d9f59a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 45180,
       "intro_text_string_id": 45180,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954595,
@@ -14180,6 +15020,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 410372 + 2 = 410374, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
@@ -14187,7 +15031,8 @@
       "intro_text_string_id": 410371,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 410374
     },
     {
       "id": 3954604,
@@ -14262,11 +15107,16 @@
         {
           "kind": "wiki",
           "evidence": "Greenwood Situation Report (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_greenwood_situation_report_7f5bbd)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 47853 + 2 = 47855, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 388220,
       "intro_text_string_id": 47871,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 47855
     },
     {
       "id": 3954610,
@@ -14360,11 +15210,16 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3AHidden_Treasure) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 400819,
       "enabled": true,
-      "live_event": "seaside_summer_splash"
+      "live_event": "seaside_summer_splash",
+      "end_text_string_id": 416261
     },
     {
       "id": 3954612,
@@ -14439,13 +15294,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 15136,
       "intro_text_string_id": 24856,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954617,
@@ -14503,10 +15363,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_horrible_hiccups_700a03) is Global.Text 6200019, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 389238,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954631,
@@ -14604,13 +15469,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 410104 + 2 = 410106, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 137,
       "description_string_id": 410105,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 410106
     },
     {
       "id": 3954642,
@@ -14694,9 +15564,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_little_sheep_95d89e) is Global.Text 6200020, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954649,
@@ -14772,11 +15647,16 @@
         {
           "kind": "wiki",
           "evidence": "Missing Merchandise (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_missing_merchandise_9c6f69)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 45195,
       "intro_text_string_id": 45193,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954657,
@@ -14831,9 +15711,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 72878 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72879 + 2 = 72881, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72881
     },
     {
       "id": 3954662,
@@ -15041,11 +15926,16 @@
         {
           "kind": "wiki",
           "evidence": "Perry's Problem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_perry_s_problem_7eaf3f)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 39769,
       "intro_text_string_id": 39764,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954688,
@@ -15142,10 +16032,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 91619, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91619 + 2 = 91621, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91620,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91621
     },
     {
       "id": 3954706,
@@ -15200,11 +16095,16 @@
         {
           "kind": "wiki",
           "evidence": "Scaredy Pants (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scaredy_pants_e9a30b)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389241 + 2 = 389243, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389240,
       "intro_text_string_id": 389240,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389243
     },
     {
       "id": 3954709,
@@ -15266,11 +16166,16 @@
         {
           "kind": "wiki",
           "evidence": "Shaming the Sheriff (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_shaming_the_sheriff_763aff)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 384232 + 2 = 384234, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 384231,
       "intro_text_string_id": 384231,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 384234
     },
     {
       "id": 3954720,
@@ -15521,9 +16426,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 91654 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954740,
@@ -15748,11 +16658,16 @@
         {
           "kind": "wiki",
           "evidence": "Where is Everyone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_everyone_7d0c2e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 10167,
       "intro_text_string_id": 24863,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954779,
@@ -15815,11 +16730,16 @@
         {
           "kind": "wiki",
           "evidence": "A Delivery to Aunt Daisy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_delivery_to_aunt_daisy_d0cdc6)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 41860,
       "intro_text_string_id": 41860,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954791,
@@ -15943,11 +16863,16 @@
         {
           "kind": "wiki",
           "evidence": "Advertising to the Tourists (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_advertising_to_the_tourists_00b8b9)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 95037,
       "intro_text_string_id": 95037,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954801,
@@ -16017,10 +16942,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 45907 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 45906,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954803,
@@ -16083,11 +17013,16 @@
         {
           "kind": "wiki",
           "evidence": "Berry Delicious (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_berry_delicious_57700f)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 45896,
       "intro_text_string_id": 45894,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954813,
@@ -16175,6 +17110,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 400840 + 2 = 400842, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 14,
@@ -16183,7 +17122,8 @@
       "enabled": true,
       "live_event": "seaside_summer_splash",
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 400842
     },
     {
       "id": 3954823,
@@ -16252,10 +17192,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 41792 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 41794,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954832,
@@ -16311,9 +17256,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 41744, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954854,
@@ -16358,9 +17308,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 391803 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 391804 + 2 = 391806, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 391806
     },
     {
       "id": 3954861,
@@ -16412,11 +17367,16 @@
         {
           "kind": "wiki",
           "evidence": "Electric Scouting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_electric_scouting_8ce20e)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 93923 + 2 = 93925, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 93924,
       "intro_text_string_id": 93922,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 93925
     },
     {
       "id": 3954876,
@@ -16461,10 +17421,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 385478, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 385478 + 2 = 385480, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 385479,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 385480
     },
     {
       "id": 3954882,
@@ -16550,11 +17515,16 @@
         {
           "kind": "wiki",
           "evidence": "Fixing the Flavor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fixing_the_flavor_d85644)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71867 + 2 = 71869, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 71866,
       "intro_text_string_id": 71866,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 71869
     },
     {
       "id": 3954900,
@@ -16607,11 +17577,16 @@
         {
           "kind": "wiki",
           "evidence": "Growing Green (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_growing_green_1b687a)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91904 + 2 = 91906, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91905,
       "intro_text_string_id": 91903,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91906
     },
     {
       "id": 3954907,
@@ -16758,11 +17733,16 @@
         {
           "kind": "wiki",
           "evidence": "Kitty, Get the Spider! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kitty_get_the_spider_807341)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72036 + 2 = 72038, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72035,
       "intro_text_string_id": 72035,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72038
     },
     {
       "id": 3954939,
@@ -16843,11 +17823,16 @@
         {
           "kind": "wiki",
           "evidence": "Music-a-Thon (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_music_a_thon_3f3f1b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 94545,
       "intro_text_string_id": 94543,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954950,
@@ -16906,13 +17891,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46813,
       "intro_text_string_id": 46813,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954977,
@@ -16991,11 +17981,16 @@
         {
           "kind": "wiki",
           "evidence": "Ready to Rock (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ready_to_rock_3d3363)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 71705,
       "intro_text_string_id": 71705,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3954981,
@@ -17104,11 +18099,16 @@
         {
           "kind": "wiki",
           "evidence": "Rockin' the Stage (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rockin_the_stage_3d40bc)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 391839 + 2 = 391841, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 391840,
       "intro_text_string_id": 391838,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 391841
     },
     {
       "id": 3954982,
@@ -17186,10 +18186,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 386158 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 386159 + 2 = 386161, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 45,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 386161
     },
     {
       "id": 3954991,
@@ -17241,11 +18246,16 @@
         {
           "kind": "wiki",
           "evidence": "Scouting for Flo (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_scouting_for_flo_f8bba1)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 93940 + 2 = 93942, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 93941,
       "intro_text_string_id": 93939,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 93942
     },
     {
       "id": 3955011,
@@ -17285,11 +18295,16 @@
         {
           "kind": "wiki",
           "evidence": "Such a Show Off! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_such_a_show_off_f975c4)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 391884 + 2 = 391886, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 391885,
       "intro_text_string_id": 391883,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 391886
     },
     {
       "id": 3955014,
@@ -17354,11 +18369,16 @@
         {
           "kind": "wiki",
           "evidence": "Taste Testing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_taste_testing_708738)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 71721,
       "intro_text_string_id": 71721,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955024,
@@ -17415,11 +18435,16 @@
         {
           "kind": "wiki",
           "evidence": "The Next Big Star (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_next_big_star_b23c2a)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 93244 + 2 = 93246, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 93245,
       "intro_text_string_id": 93243,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 93246
     },
     {
       "id": 3955038,
@@ -17691,11 +18716,16 @@
         {
           "kind": "wiki",
           "evidence": "A Change of Script (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_change_of_script_f6df05)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46675,
       "intro_text_string_id": 46673,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955069,
@@ -17771,11 +18801,16 @@
         {
           "kind": "wiki",
           "evidence": "A New Star is Born! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_new_star_is_born_2f8237)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46710,
       "intro_text_string_id": 46708,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955070,
@@ -17815,11 +18850,16 @@
         {
           "kind": "wiki",
           "evidence": "A Plea for Peace and Quiet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_plea_for_peace_and_quiet_f3c6af)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70829,
       "intro_text_string_id": 70827,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955105,
@@ -17980,11 +19020,16 @@
         {
           "kind": "wiki",
           "evidence": "Extending an Invite (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_extending_an_invite_cc8793)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 71214,
       "intro_text_string_id": 71212,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955186,
@@ -18038,11 +19083,16 @@
         {
           "kind": "wiki",
           "evidence": "Hungry Wolves (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hungry_wolves_8480c5)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 21016,
       "intro_text_string_id": 24958,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955191,
@@ -18109,11 +19159,16 @@
         {
           "kind": "wiki",
           "evidence": "Jump in the Well (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_jump_in_the_well_2bc347)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70812,
       "intro_text_string_id": 70803,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955200,
@@ -18261,11 +19316,16 @@
         {
           "kind": "wiki",
           "evidence": "Looking for Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_trouble_4e4e3d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "intro_text_string_id": 37716,
-      "description_string_id": 37718
+      "description_string_id": 37718,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955201,
@@ -18578,11 +19638,16 @@
         {
           "kind": "wiki",
           "evidence": "Looking for Volunteers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_looking_for_volunteers_5f7af1)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 21605,
       "intro_text_string_id": 24969,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955202,
@@ -18740,11 +19805,16 @@
         {
           "kind": "wiki",
           "evidence": "Lost and Found (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_lost_and_found_7a2a5a)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72897 + 2 = 72899, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72898,
       "intro_text_string_id": 72896,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72899
     },
     {
       "id": 3955224,
@@ -18802,11 +19872,16 @@
         {
           "kind": "wiki",
           "evidence": "Pearls for Ashby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pearls_for_ashby_e4e50d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "intro_text_string_id": 101729,
-      "description_string_id": 101714
+      "description_string_id": 101714,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955248,
@@ -18864,11 +19939,16 @@
         {
           "kind": "wiki",
           "evidence": "Resort Refreshments (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46308,
       "intro_text_string_id": 46306,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955250,
@@ -18934,11 +20014,16 @@
         {
           "kind": "wiki",
           "evidence": "Royal RSVP (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_rsvp_7534e3)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390676 + 2 = 390678, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 390677,
       "enabled": true,
-      "intro_text_string_id": 390675
+      "intro_text_string_id": 390675,
+      "end_text_string_id": 390678
     },
     {
       "id": 3955313,
@@ -19026,11 +20111,16 @@
         {
           "kind": "wiki",
           "evidence": "Well Wishes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_well_wishes_6918c3)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70833,
       "intro_text_string_id": 70831,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955364,
@@ -19252,11 +20342,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 47885,
       "intro_text_string_id": 47886,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955502,
@@ -19588,11 +20683,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 391059,
       "intro_text_string_id": 391057,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955567,
@@ -20670,10 +21770,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 36485 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36484,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955752,
@@ -20822,12 +21927,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 432210 + 2 = 432212, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 432211,
       "enabled": true,
       "intro_text_string_id": 432260,
-      "live_event": "halloween"
+      "live_event": "halloween",
+      "end_text_string_id": 432212
     },
     {
       "id": 3955781,
@@ -20912,9 +22022,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 72027 (1.00) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72028 + 2 = 72030, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72030
     },
     {
       "id": 3955802,
@@ -21144,10 +22259,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 91753 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91754 + 2 = 91756, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 115028,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91756
     },
     {
       "id": 3955818,
@@ -21229,10 +22349,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_feeding_the_kittens_3e875a) is Global.Text 6200021, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 70534,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955819,
@@ -21311,10 +22436,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 72023 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72024 + 2 = 72026, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72025,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72026
     },
     {
       "id": 3955821,
@@ -21424,11 +22554,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36473,
       "intro_text_string_id": 36479,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955824,
@@ -21536,10 +22671,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 91043 (0.93) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 91044 + 2 = 91046, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 91045,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91046
     },
     {
       "id": 3955832,
@@ -21636,11 +22776,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389261 + 2 = 389263, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389260,
       "intro_text_string_id": 389260,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389263
     },
     {
       "id": 3955834,
@@ -21732,9 +22877,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_coco_nuts_997b2d) is Global.Text 6200022, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955836,
@@ -21876,11 +23026,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71564 + 2 = 71566, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 71565,
       "intro_text_string_id": 71563,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 71566
     },
     {
       "id": 3955846,
@@ -22194,10 +23349,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_lost_kitten_684024) is Global.Text 6200023, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 47083,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955866,
@@ -22334,11 +23494,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 21780,
       "intro_text_string_id": 24971,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955888,
@@ -22607,11 +23772,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 74544 + 2 = 74546, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 74545,
       "intro_text_string_id": 74543,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 74546
     },
     {
       "id": 3955895,
@@ -22886,11 +24056,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 36723,
       "intro_text_string_id": 36721,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955910,
@@ -23000,9 +24175,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 40519 (0.96) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955914,
@@ -23059,11 +24239,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72058 + 2 = 72060, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 116145,
       "intro_text_string_id": 72057,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72060
     },
     {
       "id": 3955917,
@@ -23129,11 +24314,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72054 + 2 = 72056, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72055,
       "intro_text_string_id": 72053,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72056
     },
     {
       "id": 3955919,
@@ -23256,9 +24446,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 36926 (0.99) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3955927,
@@ -23496,11 +24691,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72078 + 2 = 72080, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72077,
       "intro_text_string_id": 72077,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72080
     },
     {
       "id": 3955939,
@@ -23680,11 +24880,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 102201 + 2 = 102203, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 102202,
       "intro_text_string_id": 102200,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 102203
     },
     {
       "id": 3955941,
@@ -23848,10 +25053,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 72097 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72098 + 2 = 72100, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72099,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72100
     },
     {
       "id": 3955947,
@@ -23961,11 +25171,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72019 + 2 = 72021, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72112,
       "intro_text_string_id": 72018,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72021
     },
     {
       "id": 3955967,
@@ -24075,11 +25290,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 39923,
       "intro_text_string_id": 39923,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3956011,
@@ -24252,11 +25472,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71392 + 2 = 71394, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 71389,
       "intro_text_string_id": 71387,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 71394
     },
     {
       "id": 3956023,
@@ -24836,11 +26061,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the server has no 'while another quest is open' gate, so the prerequisite is Stranded!'s own, Overboard! 3952928: Sera Bella offers this quest as soon as Stranded! can be taken."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 390364,
       "intro_text_string_id": 390364,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3956071,
@@ -24932,10 +26162,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 38581 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38583,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3956073,
@@ -25131,12 +26366,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "job": 14,
       "description_string_id": 35696,
       "intro_text_string_id": 35774,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3956082,
@@ -25300,11 +26540,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 15285,
       "intro_text_string_id": 24873,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3956090,
@@ -25587,11 +26832,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390619 + 2 = 390621, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 390618,
       "intro_text_string_id": 390618,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 390621
     },
     {
       "id": 3956123,
@@ -25930,11 +27180,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 390920,
       "intro_text_string_id": 390920,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3956134,
@@ -26049,11 +27304,16 @@
         {
           "kind": "wiki",
           "evidence": "Sera Bella is the Shrouded Glade student, record 9500000712 (legacy_data, 'Speak to Sera Bella in Shrouded Glade' on the wiki page; her jars and ducks stand in the Glade); the Briarwood row 9500000207 'Sera / Bella' is mentioned-only and 1.5 km away."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 390326 + 2 = 390328, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 390325,
       "intro_text_string_id": 390325,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 390328
     },
     {
       "id": 3956145,
@@ -26431,10 +27691,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 71395 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71396 + 2 = 71398, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 71397,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 71398
     },
     {
       "id": 3957003,
@@ -27349,11 +28614,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38579,
       "intro_text_string_id": 38577,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957089,
@@ -28471,11 +29741,16 @@
         {
           "kind": "client",
           "evidence": "Global.Text description_string_id 37113: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37113,
       "intro_text_string_id": 37111,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957176,
@@ -28698,11 +29973,16 @@
         {
           "kind": "client",
           "evidence": "Global.Text intro_text_string_id 37041: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37043,
       "enabled": true,
-      "intro_text_string_id": 37041
+      "intro_text_string_id": 37041,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957203,
@@ -29895,6 +31175,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 73018 + 2 = 73020, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 43,
@@ -29902,7 +31186,8 @@
       "intro_text_string_id": 73017,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 73020
     },
     {
       "id": 3957300,
@@ -29978,12 +31263,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 73006 + 2 = 73008, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "job": 43,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 73008
     },
     {
       "id": 3957319,
@@ -30050,13 +31340,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 74510 + 2 = 74512, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 74509,
       "intro_text_string_id": 74509,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 74512
     },
     {
       "id": 3957335,
@@ -30115,11 +31410,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 16243,
       "intro_text_string_id": 24898,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957337,
@@ -30186,13 +31486,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 24946,
       "intro_text_string_id": 24946,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957357,
@@ -30251,11 +31556,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 45616,
       "intro_text_string_id": 45614,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957391,
@@ -30329,11 +31639,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 38047,
       "intro_text_string_id": 38045,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957410,
@@ -30405,11 +31720,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 389427 + 2 = 389429, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 389426,
       "intro_text_string_id": 389426,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 389429
     },
     {
       "id": 3957416,
@@ -30453,11 +31773,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 74526,
       "intro_text_string_id": 74526,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957432,
@@ -30531,9 +31856,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [title, description, intro, end] around title 29637, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957433,
@@ -30599,9 +31929,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [title, description, intro, end] around title 29633, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957451,
@@ -30660,11 +31995,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46601,
       "intro_text_string_id": 46601,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957502,
@@ -30731,13 +32071,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 46226,
       "intro_text_string_id": 46224,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957507,
@@ -30897,13 +32242,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 384830,
       "intro_text_string_id": 384830,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957514,
@@ -30981,11 +32331,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 47260 + 2 = 47262, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 47259,
       "intro_text_string_id": 47259,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 47262
     },
     {
       "id": 3957541,
@@ -31073,12 +32428,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest:Spectral_Spectacles) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 415324,
       "intro_text_string_id": 415322,
       "enabled": true,
-      "live_event": "halloween"
+      "live_event": "halloween",
+      "end_text_string_id": 416261
     },
     {
       "id": 3957562,
@@ -31142,10 +32502,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 383025, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 383025 + 2 = 383027, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 383026,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 383027
     },
     {
       "id": 3957565,
@@ -31219,11 +32584,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 140224 + 2 = 140226, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 140225,
       "intro_text_string_id": 140223,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 140226
     },
     {
       "id": 3957586,
@@ -31293,11 +32663,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 93358 + 2 = 93360, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 93359,
       "intro_text_string_id": 392134,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 93360
     },
     {
       "id": 3957607,
@@ -31454,13 +32829,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 71406 + 2 = 71408, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 71407,
       "intro_text_string_id": 71405,
       "enabled": true,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 71408
     },
     {
       "id": 3957622,
@@ -31585,12 +32965,17 @@
         {
           "kind": "wiki",
           "evidence": "Event quest: offered only while event twelve_days runs; the wiki files it under 'Snow Days' (https://fr.fanbyte.com/wiki/fr_quest:Day_7:_Snowhill_Racing) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 441102 + 2 = 441104, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 441103,
       "intro_text_string_id": 441101,
       "enabled": true,
-      "live_event": "twelve_days"
+      "live_event": "twelve_days",
+      "end_text_string_id": 441104
     },
     {
       "id": 3957750,
@@ -31651,11 +33036,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 72062 + 2 = 72064, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "description_string_id": 72063,
       "intro_text_string_id": 72061,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 72064
     },
     {
       "id": 3957765,
@@ -31714,11 +33104,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 24787,
       "intro_text_string_id": 24787,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957854,
@@ -31882,9 +33277,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_purr_fect_secret_b5a0b4) is Global.Text 6200025, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }

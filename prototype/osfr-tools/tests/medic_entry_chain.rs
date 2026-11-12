@@ -241,7 +241,8 @@ fn complete_vitamins(game: &mut Gameplay, now: &mut u64) {
     // No completion line is recovered for 3090005; the guide supplies none and
     // the locale block only has Greyli's in-dialogue thank-you. Keep 0 and mark
     // the gap rather than invent an end-screen id.
-    release_end_screen(game, &greyli, VITAMINS, GREYLI, 0, *now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(game, &greyli, VITAMINS, GREYLI, 416_261, *now);
     *now += 10;
     finish_quest(
         game,
@@ -470,7 +471,8 @@ fn take_your_vitamins_requires_house_call() {
         "no reward before the turn-in"
     );
     now += 10;
-    release_end_screen(&mut game, &greyli, VITAMINS, GREYLI, 0, now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut game, &greyli, VITAMINS, GREYLI, 416_261, now);
     now += 10;
     finish_quest(
         &mut game,
@@ -541,7 +543,8 @@ fn medic_xp_goes_to_medic_not_the_active_job() {
     let talked = talk(&mut game, &greyli, GREYLI, now);
     assert!(talked.changed);
     now += 10;
-    release_end_screen(&mut game, &greyli, VITAMINS, GREYLI, 0, now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut game, &greyli, VITAMINS, GREYLI, 416_261, now);
     now += 10;
     finish_quest(
         &mut game,

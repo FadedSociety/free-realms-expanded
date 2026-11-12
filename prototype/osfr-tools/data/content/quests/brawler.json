@@ -2755,13 +2755,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 388507 + 2 = 388509, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "enabled": true,
       "description_string_id": 388504,
       "intro_text_string_id": 388506,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "end_text_string_id": 388509
     },
     {
       "id": 3030032,
@@ -3123,12 +3128,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 39712,
       "intro_text_string_id": 39710,
       "enabled": true,
-      "job": 43
+      "job": 43,
+      "end_text_string_id": 416261
     },
     {
       "id": 3030035,

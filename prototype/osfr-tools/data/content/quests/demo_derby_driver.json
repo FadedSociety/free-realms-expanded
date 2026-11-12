@@ -79,10 +79,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 117356 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
-      "description_string_id": 117356
+      "description_string_id": 117356,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060002,
@@ -277,9 +282,14 @@
         {
           "kind": "client",
           "evidence": "Giver 9000000495 (Tucker Thunderjolt), hand-in 9000000295 (Dalton Narrowbrow): the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in; the wiki starts it at Tucker Thunderjolt (https://fr.fanbyte.com/wiki/FR_Quest%3ADemo_Derby%3A_Rules_of_the_Road) (scripts/quest_fidelity.py GIVER_MOVES)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060005,
@@ -415,9 +425,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_license_to_drive_ce11d0) is Global.Text 6200001, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060006,
@@ -514,11 +529,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393372 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
-      "description_string_id": 393372
+      "description_string_id": 393372,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060007,
@@ -640,12 +660,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393377,
-      "intro_text_string_id": 393377
+      "intro_text_string_id": 393377,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060008,
@@ -731,12 +756,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 394017,
-      "intro_text_string_id": 393374
+      "intro_text_string_id": 393374,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060009,
@@ -826,12 +856,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 394024,
-      "intro_text_string_id": 393381
+      "intro_text_string_id": 393381,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060010,
@@ -957,12 +992,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 394023,
-      "intro_text_string_id": 393380
+      "intro_text_string_id": 393380,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060011,
@@ -1062,9 +1102,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T727: prerequisite 3060005 (License to Drive) is the nearest enabled earlier step of the guide's Series 1 order (Demolition Derby Driver.md row 8 follows rows 2-7, 'after Spare Parts or Dealing Damage (inferred)'), and keeps Crash from offering this before the license test. The skipped steps 3060006-3060010 are disabled stubs, so they cannot be prerequisites. Derby Driver (49) offer gate follows the enabled siblings."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060012,
@@ -1418,12 +1463,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393382,
-      "intro_text_string_id": 393382
+      "intro_text_string_id": 393382,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060015,
@@ -1525,12 +1575,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393383,
-      "intro_text_string_id": 393383
+      "intro_text_string_id": 393383,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060016,
@@ -1639,9 +1694,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T674: prerequisite 3060013 (Tucker's Troubles) is the nearest enabled earlier row of the guide's Series 2 order (row 13 follows rows 10-12; rows 11 and 12, Curious Crash and Arena Revenge, are disabled stubs, so they cannot be prerequisites). Derby Driver (49) offer gate follows the enabled siblings."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060017,
@@ -1705,12 +1765,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393385,
-      "intro_text_string_id": 393385
+      "intro_text_string_id": 393385,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060018,
@@ -1800,12 +1865,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393386,
-      "intro_text_string_id": 393386
+      "intro_text_string_id": 393386,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060019,
@@ -2041,12 +2111,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text 393378 is Duncan Slickshoes' offer for this quest (the wiki row's dialog) and 394021 'Collect health power-ups while competing in a demolition derby at Thunder Falls.' its description."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "intro_text_string_id": 393378,
-      "description_string_id": 394021
+      "description_string_id": 394021,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060022,
@@ -2234,9 +2309,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T661: enabled with no predecessor, as the record already had none. The guide's order puts 3060023 (Taking on the Tank, giver unplaced, not live-wireable) before it, so this is a playtest entry like 3000009 (T241). The Demo Derby Driver (49) offer gate follows the enabled siblings 3060004 and 3060005. No progress or completion line is bound: locale 394301 (progress) has no quest slot and no completion line is tagged to this quest."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060025,
@@ -2318,12 +2398,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 394036,
-      "intro_text_string_id": 393393
+      "intro_text_string_id": 393393,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060026,
@@ -2483,12 +2568,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text 393354 'A mysterious derby fan admires your talent...' is the text the wiki row carries for this quest; no separate first-person offer line was found, so it serves as both offer and description."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "intro_text_string_id": 393354,
-      "description_string_id": 393354
+      "description_string_id": 393354,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060029,
@@ -2582,12 +2672,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393366,
-      "intro_text_string_id": 393406
+      "intro_text_string_id": 393406,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060030,
@@ -2816,11 +2911,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_an_incomplete_set_ca2bf5) is Global.Text 6200003, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
-      "description_string_id": 393357
+      "description_string_id": 393357,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060032,
@@ -2914,12 +3014,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393358,
-      "intro_text_string_id": 393398
+      "intro_text_string_id": 393398,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060033,
@@ -3373,12 +3478,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393402,
-      "intro_text_string_id": 393402
+      "intro_text_string_id": 393402,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060037,
@@ -3480,12 +3590,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393355,
-      "intro_text_string_id": 393395
+      "intro_text_string_id": 393395,
+      "end_text_string_id": 416261
     },
     {
       "id": 3060038,
@@ -4353,10 +4468,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1960); the giver is the trainer Mad Jack (9000000391), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412343,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }

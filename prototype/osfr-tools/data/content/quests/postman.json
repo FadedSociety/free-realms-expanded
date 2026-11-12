@@ -81,10 +81,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the client description 412446 names Felipe (9000000086), a poi_anchor row the 35/2 draw set omits; the job_trainers.json profile 4 trainer is Flitter (9000000091), T407's reachable Sanctuary postmaster, so giver, target and turn-in are Flitter."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412446,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3130002,
@@ -220,12 +225,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 93382,
       "enabled": true,
       "job": 4,
-      "intro_text_string_id": 103827
+      "intro_text_string_id": 103827,
+      "end_text_string_id": 416261
     },
     {
       "id": 3130004,

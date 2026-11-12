@@ -283,7 +283,8 @@ pub fn assert_enabled_medic_chapter_records() {
         house["end_text_string_id"].as_u64(),
         Some(u64::from(HOUSE_END_TEXT))
     );
-    assert!(vitamins.get("end_text_string_id").is_none());
+    // A23 (L1190): Vitamins now says the stock turn-in line 416261 (R).
+    assert_eq!(vitamins["end_text_string_id"].as_u64(), Some(416_261));
     assert!(exam.get("intro_text_string_id").is_none());
     assert_eq!(house["intro_text_string_id"].as_u64(), Some(24_853));
     assert_eq!(vitamins["intro_text_string_id"].as_u64(), Some(24_855));

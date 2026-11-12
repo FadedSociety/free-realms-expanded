@@ -272,7 +272,8 @@ fn close_refuses_a_shown_offer_while_an_accepted_hunt_pays_once() {
     let final_talk = talk(&mut hunter, &hunter_at, JACQUE, now);
     now += 2;
     assert!(has_objective(&final_talk.replies, 10, 4));
-    release_end_screen(&mut hunter, &hunter_at, QUEST, JACQUE, 0, now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(&mut hunter, &hunter_at, QUEST, JACQUE, 416_261, now);
     now += 2;
     finish_quest(&mut hunter, &hunter_at, QUEST, ADVENTURER, 50, 25, now);
     refused(

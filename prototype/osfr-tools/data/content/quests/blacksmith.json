@@ -2205,12 +2205,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 16,
       "description_string_id": 95104,
-      "intro_text_string_id": 95135
+      "intro_text_string_id": 95135,
+      "end_text_string_id": 416261
     },
     {
       "id": 3020021,
@@ -2569,11 +2574,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "description_string_id": 95108,
-      "intro_text_string_id": 95143
+      "intro_text_string_id": 95143,
+      "end_text_string_id": 416261
     },
     {
       "id": 3020026,
@@ -2689,12 +2699,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 16,
       "description_string_id": 95109,
-      "intro_text_string_id": 95145
+      "intro_text_string_id": 95145,
+      "end_text_string_id": 416261
     },
     {
       "id": 3020027,
@@ -2785,12 +2800,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 16,
       "description_string_id": 95110,
-      "intro_text_string_id": 95147
+      "intro_text_string_id": 95147,
+      "end_text_string_id": 416261
     },
     {
       "id": 3020028,

@@ -1575,11 +1575,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110: DISABLED: No Peep's Dog Bowl definition in catalogue or runtime world pickup. Reward shard 30923 exists; do not substitute a different bowl."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 37703,
       "intro_text_string_id": 37701,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3000019,
@@ -3287,11 +3292,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the client's own quest block: title 90787 + 2 = 90789, a quest_dialog line that reads as the turn-in reply (lead read, A23)."
         }
       ],
       "enabled": true,
       "description_string_id": 90794,
-      "intro_text_string_id": 90786
+      "intro_text_string_id": 90786,
+      "end_text_string_id": 90789
     },
     {
       "id": 3000036,

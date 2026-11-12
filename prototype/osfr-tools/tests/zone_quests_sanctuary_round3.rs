@@ -365,9 +365,10 @@ fn the_jobs_window_postman_start_is_refused_and_unlocks_no_job() {
         postman.intro_text_string_id, 0,
         "3130001's 49/1 intro is unbound"
     );
+    // A23 (L1190): every enabled quest has turn-in text; 3130001 says the stock line 416261 (R).
     assert_eq!(
-        postman.end_text_string_id, 0,
-        "3130001's 49/13 end text is unbound"
+        postman.end_text_string_id, 416_261,
+        "3130001's 49/13 end text is the stock turn-in line"
     );
 
     let fixture = Fixture::new();

@@ -86,7 +86,8 @@ fn return_talk(game: &mut Gameplay, at: &CharacterState, now: &mut u64) {
 }
 
 fn release_end(game: &mut Gameplay, at: &CharacterState, now: &mut u64) -> Vec<u8> {
-    let screen = release_end_screen(game, at, QUEST, JACQUE, 0, *now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    let screen = release_end_screen(game, at, QUEST, JACQUE, 416_261, *now);
     *now += 2;
     screen
 }

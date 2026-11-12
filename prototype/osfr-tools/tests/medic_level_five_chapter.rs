@@ -249,7 +249,8 @@ fn complete_vitamins(
     );
     *now += 10;
     // No completion line is recovered for 3090005; keep the documented 0 gap.
-    release_end_screen(game, greyli, VITAMINS, GREYLI, 0, *now);
+    // A23 (L1190): this quest now says the stock turn-in line 416261 (R).
+    release_end_screen(game, greyli, VITAMINS, GREYLI, 416_261, *now);
     *now += 10;
     finish_quest(
         game,

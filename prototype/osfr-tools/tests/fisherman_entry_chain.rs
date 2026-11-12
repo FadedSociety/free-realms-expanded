@@ -64,6 +64,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
+// A23 (L1190): Learn to Fish has no closing line in the wiki or its client block, so it says
+// the stock turn-in line 416261 (R).
+const LEARN_TO_FISH_END: u32 = 416_261;
 const REED: u64 = 9_000_000_181;
 /// An ordinary spawned Stillwater Crossing vendor near Reed: a real in-range
 /// NPC that must not advance Reed's quest.
@@ -518,7 +521,7 @@ fn finish_learn_to_fish(rig: &mut Rig) {
         LEARN_TO_FISH
     );
     rig.accept_offer(LEARN_TO_FISH);
-    rig.take_end(LEARN_TO_FISH, 0);
+    rig.take_end(LEARN_TO_FISH, LEARN_TO_FISH_END);
     rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Completed);
 }
@@ -794,7 +797,7 @@ fn a_normal_character_learns_fisherman_and_reaches_the_chapter() {
     );
     rig.accept_offer(LEARN_TO_FISH);
     assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Active);
-    rig.take_end(LEARN_TO_FISH, 0);
+    rig.take_end(LEARN_TO_FISH, LEARN_TO_FISH_END);
     rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.coins(), coins + 10);
     assert_eq!(rig.fisherman_xp(), xp + 25);
@@ -826,7 +829,7 @@ fn the_chapter_is_gated_on_the_active_fisherman() {
 
     // Back on Brawler, the reward pays the explicit 137 profile, never the active Brawler.
     rig.switch_to_brawler();
-    rig.take_end(LEARN_TO_FISH, 0);
+    rig.take_end(LEARN_TO_FISH, LEARN_TO_FISH_END);
     rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.fisherman_xp(), xp + 25);
     assert_eq!(
@@ -872,7 +875,7 @@ fn reed_offers_the_two_fisherman_quests_in_order() {
     );
 
     // 3070003 has no end-text id, so its 49/13 end text is 0.
-    rig.take_end(LEARN_TO_FISH, 0);
+    rig.take_end(LEARN_TO_FISH, LEARN_TO_FISH_END);
     rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Completed);
 

@@ -404,11 +404,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 101158 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 394242,
       "enabled": true,
-      "job": 48
+      "job": 48,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080004,
@@ -529,12 +534,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
       "description_string_id": 101174,
-      "intro_text_string_id": 101174
+      "intro_text_string_id": 101174,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080005,
@@ -765,11 +775,16 @@
         {
           "kind": "client",
           "evidence": "Global.Text 3495 is the title 'Kart Driver: You Want To Go Fast?', not this quest's description, so no description id is stored; the offer is 394380."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "intro_text_string_id": 394380
+      "intro_text_string_id": 394380,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080007,
@@ -836,9 +851,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T732: objective kind/id from objective-specs-fixed q3080007; job 48 (Kart Driver) gate and the 5 coins + 15 XP reward follow T202/W110. No prerequisite: the guide's predecessor 3080006 is still a disabled stub."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080008,
@@ -1383,11 +1403,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_wildwood_744691) is Global.Text 6200005, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 394503
+      "description_string_id": 394503,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080013,
@@ -1637,12 +1662,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
       "description_string_id": 394718,
-      "intro_text_string_id": 394642
+      "intro_text_string_id": 394642,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080015,
@@ -1896,12 +1926,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
       "description_string_id": 394650,
-      "intro_text_string_id": 394650
+      "intro_text_string_id": 394650,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080017,
@@ -2156,11 +2191,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_icy_perfection_a75713) is Global.Text 6200006, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 394831
+      "description_string_id": 394831,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080019,
@@ -2577,12 +2617,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
       "description_string_id": 394674,
-      "intro_text_string_id": 394674
+      "intro_text_string_id": 394674,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080023,
@@ -2839,12 +2884,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
       "description_string_id": 394685,
-      "intro_text_string_id": 394685
+      "intro_text_string_id": 394685,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080025,
@@ -3111,10 +3161,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_settling_the_score_eb0250) is Global.Text 6200007, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
-      "job": 48
+      "job": 48,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080027,
@@ -3766,12 +3821,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
       "description_string_id": 395272,
-      "intro_text_string_id": 395262
+      "intro_text_string_id": 395262,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080033,
@@ -4062,11 +4122,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_burning_up_the_track_e4291b) is Global.Text 6200009, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 395633
+      "description_string_id": 395633,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080036,
@@ -4336,10 +4401,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
-      "job": 48
+      "job": 48,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080038,
@@ -5172,10 +5242,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the client description 412379 names Johnny Thunder at Wildwood Speedway; the job_trainers.json profile 48 trainer is Cale Yardbird at Tangletrack (both are client-named Kart Driver trainers), so giver and target use the trainer row."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412379,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }

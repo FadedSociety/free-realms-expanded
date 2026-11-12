@@ -89,9 +89,14 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 24981 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3150002,
@@ -348,11 +353,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T257: enabled as the second playable Warrior chapter step. The title 22580, description 22581 and intro 22579 are unchanged; the client title block has no end-text id, so the end screen stays 0 and the missing debrief is a documented lead text gap."
+        },
+        {
+          "kind": "client",
+          "evidence": "Closing line from the wiki's completion dialog (wiki:fr_quest_warrior_one_with_your_weapon_e49a3e), client id 2140 (lab/references/quest-table-20261102/quests.merged.json)."
         }
       ],
       "description_string_id": 22581,
       "intro_text_string_id": 22579,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 2140
     },
     {
       "id": 3150005,
@@ -2154,10 +2164,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1966); the giver is the trainer Drill Sergeant Dewey (9000000076), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 412472,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     }
   ]
 }
