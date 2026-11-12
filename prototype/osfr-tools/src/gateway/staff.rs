@@ -32,6 +32,14 @@ impl Gateway {
             outcome.replies.extend(reply.packets.iter().map(|p| wrapped(p)));
             return true;
         }
+        // gifts-codes: the Claim window's gift rows and `realm redeem <code>`.
+        let account = self.role_account.as_ref().map(|(path, id)| (path.as_path(), *id));
+        if let Some(reply) = crate::gifts::claim::intercept(account, game, inner, state, now_ms) {
+            outcome.state_changed |= reply.changed;
+            outcome.gameplay_changed |= reply.changed;
+            outcome.replies.extend(reply.packets.iter().map(|p| wrapped(p)));
+            return true;
+        }
         crate::chat::request(inner, state.guid)
             .ok()
             .flatten()

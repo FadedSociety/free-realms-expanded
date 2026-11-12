@@ -9,7 +9,7 @@ export const me = { name: '', role: '', permissions: null };
 // The server enforces roles; the panel only greys out what /me's permission list leaves out. A list that uses none
 // of these names (the gateway named its actions differently) greys out nothing rather than everything.
 const PERMS = new Set(['view', 'mute', 'unmute', 'kick', 'ban', 'unban', 'warn', 'jail', 'release', 'note', 'mail', 'announce',
-  'inventory', 'coins', 'quests', 'jobs', 'move', 'powers']);
+  'inventory', 'coins', 'quests', 'jobs', 'move', 'powers', 'gifts', 'gift_codes']);
 export const can = (perm) => {
   const list = me.permissions;
   return !Array.isArray(list) || list.includes('*') || list.includes(perm) || !list.some((x) => PERMS.has(x));

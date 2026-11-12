@@ -469,6 +469,13 @@ impl EventCalendar {
         (self.running(areas, unix_ms).map(|event| event.key.as_str())).collect()
     }
 
+    /// The one "is this event running now" gate (event-repeat contract): event `key`'s dates
+    /// and rotations under the hand toggles `areas` carries. An unknown key never runs. Gifts
+    /// (`crate::gifts`) ask it; any row kind with a `live_event` key can.
+    pub fn is_running(&self, key: &str, areas: &ClientAreas, unix_ms: u64) -> bool {
+        self.running(areas, unix_ms).any(|event| event.key == key)
+    }
+
     /// The quests of the events running at `unix_ms`.
     pub fn open_quests(&self, areas: &ClientAreas, unix_ms: u64) -> BTreeSet<u32> {
         (self.running(areas, unix_ms))

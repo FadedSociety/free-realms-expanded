@@ -42,6 +42,8 @@ use subtle::ConstantTimeEq;
 
 #[path = "admin_wire.rs"]
 mod wire;
+#[path = "admin_gifts.rs"]
+mod gift_routes;
 
 /// (R) Local bounds: request head and body, connections at once, staff sessions, a panel file.
 const MAX_HEAD: usize = 8 * 1024;
@@ -732,6 +734,12 @@ fn api(shared: &Shared, request: &Request, rest: &str, peer: IpAddr) -> Answer {
         ("GET", ["powers"]) => wire::powers_now(shared, &caller),
         ("POST", ["powers"]) => wire::power(shared, &caller, request),
         ("GET", ["map", zone]) => wire::map(shared, &caller, zone),
+        ("GET", ["gifts"]) => gift_routes::browse(shared, &caller, request),
+        ("POST", ["gifts", "send"]) => gift_routes::send(shared, &caller, request),
+        ("GET", ["gifts", "codes"]) => gift_routes::codes(shared, &caller),
+        ("POST", ["gifts", "codes"]) => gift_routes::make_code(shared, &caller, request),
+        ("POST", ["gifts", "codes", "revoke"]) => gift_routes::revoke(shared, &caller, request),
+        ("POST", ["gifts", "offers"]) => gift_routes::offer(shared, &caller, request),
         ("GET", ["events"]) => stub(&caller, "view", "the event stream (poll every 2 s instead)"),
         _ => Err(error(404, "no such admin route")),
     }

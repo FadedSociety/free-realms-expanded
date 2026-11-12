@@ -19,6 +19,10 @@ pub const ACTIONS: &[(&str, AccountRole)] = &[
     ("release", AccountRole::Moderator),
     ("note", AccountRole::Moderator),
     ("mail", AccountRole::Moderator),
+    // gifts-codes: browse the catalog, send a gift, list codes; making codes and turning
+    // standing offers on or off is admin only.
+    ("gifts", AccountRole::Moderator),
+    ("gift_codes", AccountRole::Admin),
     ("announce", AccountRole::Admin),
     ("inventory", AccountRole::Admin),
     ("coins", AccountRole::Admin),

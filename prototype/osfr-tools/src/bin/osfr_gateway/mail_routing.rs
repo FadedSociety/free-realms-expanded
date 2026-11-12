@@ -19,7 +19,12 @@ pub(super) fn tick(sessions: &mut SessionMap, options: &Options) {
     };
     start_staged(sessions, store);
     notify(sessions, store);
+    gift_routing::tick(sessions, store, osfr_tools::client_areas::unix_now_ms());
 }
+
+// gifts-codes: the Claim window's gifts, the realm's other post (nested: no hub line).
+#[path = "gift_routing.rs"]
+mod gift_routing;
 
 /// Every selected session, as `mail::admin::send` filters `online` and `zone` sends.
 fn roster(sessions: &SessionMap) -> Vec<OnlineCharacter> {

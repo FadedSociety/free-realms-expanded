@@ -1,0 +1,3470 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Gifts the Claim window hands out (gifts-codes piece, owner 2026-11-11). Rebuilt by the lab's gifts-codes builder from the wiki pages it cites in each row's evidence; every item id was resolved by name (or by its client locale row) through the item definitions in data/release (item-table.json, item-table-supplement.json and the captured inventory.json rows) and the client locale, and name_id pins that binding.",
+    "source: profile = the website profile page's ad offers; promotional = a promotion, tie-in or login gift with no known code; member = a monthly member pack (the membership gate is gone). All three are standing offers: while enabled (and their event runs) every account finds them in its Claim window. code = a published code (realm redeem <code> puts the gift in the Claim window). Staff can send any row or make a code for it.",
+    "Defaults (R): per account; the original codes work again; event rows only while their event runs (live_event, the event_calendar.json key); the rows the wiki says kept reappearing repeat every 24 hours; everything else once. tradeable is the wiki's word for profile rows and the client item's own no-trade flag for the rest.",
+    "Dropped source facts: the profile offers were for US accounts only (no country gate here); watching the ad (no ad here); the member packs were for paying members (free here).",
+    "Limited rows: stock_per_event (claims the realm may make per event run, all time without an event), per_player (claims one player may make per run) and stock_group (rows of one group share both counters), B2's shop fields; null is unlimited.",
+    "unresolved lists the items that cannot be given yet and why: missing work (an item row to build, a source to find), never not-applicable."
+  ],
+  "sources": {
+    "profile": "https://eq2.fanbyte.com/wiki/Free_Items_(FR)",
+    "code": [
+      "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR)",
+      "https://freerealms.fandom.com/wiki/Free_Item_Codes"
+    ],
+    "promotional": [
+      "https://freerealms.fandom.com/wiki/Category:Promotional",
+      "https://freerealms.fandom.com/wiki/Category:Code_Flair",
+      "https://freerealms.fandom.com/wiki/Category:Code_Weapons"
+    ],
+    "member": [
+      "https://eq2.fanbyte.com/wiki/Category:Super_Spooktacular",
+      "https://eq2.fanbyte.com/wiki/Category:Snow_Days",
+      "https://eq2.fanbyte.com/wiki/Category:Birthday_Bash",
+      "https://freerealms.fandom.com/wiki/Teddy_Bear_Costume"
+    ]
+  },
+  "gifts": [
+    {
+      "key": "profile-charged-fries",
+      "name": "Charged Fries",
+      "items": [
+        {
+          "item_id": 2966,
+          "count": 1,
+          "name_id": 261
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "one of the original offers",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Original Offers: Charged Fries"
+    },
+    {
+      "key": "profile-doggy-fairy-outfit",
+      "name": "Doggy Fairy Outfit",
+      "items": [
+        {
+          "item_id": 5333,
+          "count": 1,
+          "name_id": 11899
+        },
+        {
+          "item_id": 5613,
+          "count": 1,
+          "name_id": 12179
+        },
+        {
+          "item_id": 5753,
+          "count": 1,
+          "name_id": 12319
+        },
+        {
+          "item_id": 6138,
+          "count": 1,
+          "name_id": 12704
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "one of the original offers; (R) the outfit as its 4 client pieces; Doggy Fairy Wings: (R) 35 client rows read this name; 5333 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Doggy Fairy Shoes: (R) 35 client rows read this name; 5613 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Doggy Fairy Antennae: (R) 35 client rows read this name; 5753 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Doggy Fairy Collar: (R) 35 client rows read this name; 6138 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Original Offers: Doggy Fairy Outfit"
+    },
+    {
+      "key": "profile-iron-golem-goggleguard",
+      "name": "Iron Golem Goggleguard",
+      "items": [
+        {
+          "item_id": 10916,
+          "count": 1,
+          "name_id": 42292
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "one of the original offers; (R) 3 client rows read this name; 10916 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Original Offers: Iron Golem Goggleguard"
+    },
+    {
+      "key": "profile-panda-mask",
+      "name": "Panda Mask",
+      "items": [
+        {
+          "item_id": 50953,
+          "count": 1,
+          "name_id": 142829
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "one of the original offers; (R) 36 client rows read this name; 50953 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Original Offers: Panda Mask"
+    },
+    {
+      "key": "profile-turkey-leg",
+      "name": "Turkey Leg",
+      "items": [
+        {
+          "item_id": 49398,
+          "count": 1,
+          "name_id": 384460
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "one of the original offers; (R) 36 client rows read this name; 49398 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Original Offers: Turkey Leg"
+    },
+    {
+      "key": "profile-fuzzy-squirrel",
+      "name": "Fuzzy Squirrel",
+      "items": [
+        {
+          "item_id": 70426,
+          "count": 1,
+          "name_id": 134360
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered December, 2009",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in December, 2009: Fuzzy Squirrel"
+    },
+    {
+      "key": "profile-gumball-machine",
+      "name": "Gumball Machine",
+      "items": [
+        {
+          "item_id": 36149,
+          "count": 1,
+          "name_id": 132562
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered December, 2009; kept reappearing while its ads ran; (R) 2 client rows read this name; 36149 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in December, 2009: Gumball Machine"
+    },
+    {
+      "key": "profile-knitted-fish-hat",
+      "name": "Knitted Fish Hat",
+      "items": [
+        {
+          "item_id": 2145,
+          "count": 1,
+          "name_id": 6167
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered December, 2009",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in December, 2009: Knitted Fish Hat"
+    },
+    {
+      "key": "profile-standard-hanging-plant",
+      "name": "Standard Hanging Plant",
+      "items": [
+        {
+          "item_id": 36150,
+          "count": 1,
+          "name_id": 132563
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered December, 2009; kept reappearing while its ads ran",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in December, 2009: Standard Hanging Plant"
+    },
+    {
+      "key": "profile-tiki-torch",
+      "name": "Tiki Torch",
+      "items": [
+        {
+          "item_id": 36200,
+          "count": 1,
+          "name_id": 67072
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered December, 2009; kept reappearing while its ads ran; (R) 3 client rows read this name; 36200 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in December, 2009: Tiki Torch"
+    },
+    {
+      "key": "profile-turtle",
+      "name": "Turtle",
+      "items": [
+        {
+          "item_id": 70430,
+          "count": 1,
+          "name_id": 189
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered December, 2009",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in December, 2009: Turtle"
+    },
+    {
+      "key": "profile-doggy-superhero-outfit-black",
+      "name": "Doggy Superhero Outfit (black)",
+      "items": [
+        {
+          "item_id": 77411,
+          "count": 1,
+          "name_id": 11759
+        },
+        {
+          "item_id": 77412,
+          "count": 1,
+          "name_id": 12074
+        },
+        {
+          "item_id": 77413,
+          "count": 1,
+          "name_id": 12494
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; (R) the black cape, boots and mask of block 77411-77413",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Doggy Superhero Outfit (black)"
+    },
+    {
+      "key": "profile-firefrog-legs",
+      "name": "Firefrog Legs",
+      "items": [
+        {
+          "item_id": 77418,
+          "count": 5,
+          "name_id": 267
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; kept reappearing while its ads ran; (R) 2 client rows read this name; 77418 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Firefrog Legs x5"
+    },
+    {
+      "key": "profile-graveyard-flambe",
+      "name": "Graveyard Flambe",
+      "items": [
+        {
+          "item_id": 77419,
+          "count": 5,
+          "name_id": 269
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; kept reappearing while its ads ran; (R) 2 client rows read this name; 77419 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Graveyard Flambe x5"
+    },
+    {
+      "key": "profile-large-health-potion",
+      "name": "Large Health Potion",
+      "items": [
+        {
+          "item_id": 77417,
+          "count": 5,
+          "name_id": 422911
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; kept reappearing while its ads ran; (R) 2 client rows read this name; 77417 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Large Health Potion x5"
+    },
+    {
+      "key": "profile-natural-wood-flooring-tan",
+      "name": "Natural Wood Flooring (tan)",
+      "items": [
+        {
+          "item_id": 77424,
+          "count": 1,
+          "name_id": 19582
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; the wiki names the tan one (R); (R) 2 client rows read this name; 77424 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Natural Wood Flooring (tan)"
+    },
+    {
+      "key": "profile-polkadot-sunglasses-white",
+      "name": "Polkadot Sunglasses (white)",
+      "items": [
+        {
+          "item_id": 77414,
+          "count": 1,
+          "name_id": 6978
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; the wiki names the white one (R); (R) 3 client rows read this name; 77414 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Polkadot Sunglasses (white)"
+    },
+    {
+      "key": "profile-prospector-s-scroll",
+      "name": "Prospector's Scroll",
+      "items": [
+        {
+          "item_id": 77420,
+          "count": 1,
+          "name_id": 426573
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; kept reappearing while its ads ran; (R) 2 client rows read this name; 77420 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Prospector's Scroll"
+    },
+    {
+      "key": "profile-skeletal-hoodie-pink",
+      "name": "Skeletal Hoodie (pink)",
+      "items": [
+        {
+          "item_id": 77415,
+          "count": 1,
+          "name_id": 106670
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; (R) tint 258 of the two hoodies in block 77415-77416",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Skeletal Hoodie (pink)"
+    },
+    {
+      "key": "profile-skeletal-hoodie-black",
+      "name": "Skeletal Hoodie (black)",
+      "items": [
+        {
+          "item_id": 77416,
+          "count": 1,
+          "name_id": 106670
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; (R) tint 264, the black of block 77411-77416",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Skeletal Hoodie (black)"
+    },
+    {
+      "key": "profile-starry-night-wallpaper-green",
+      "name": "Starry Night Wallpaper (green)",
+      "items": [
+        {
+          "item_id": 77425,
+          "count": 1,
+          "name_id": 19596
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; the wiki names the green one (R); (R) 2 client rows read this name; 77425 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Starry Night Wallpaper (green)"
+    },
+    {
+      "key": "profile-stereo-green",
+      "name": "Stereo (green)",
+      "items": [
+        {
+          "item_id": 77423,
+          "count": 1,
+          "name_id": 132604
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; the wiki names the green one (R); (R) 3 client rows read this name; 77423 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Stereo (green)"
+    },
+    {
+      "key": "profile-tuxedo-jacket-white",
+      "name": "Tuxedo Jacket (white)",
+      "items": [
+        {
+          "item_id": 77421,
+          "count": 1,
+          "name_id": 142583
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered March, 2010; the wiki names the white one (R); (R) 37 client rows read this name; 77421 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in March, 2010: Tuxedo Jacket (white)"
+    },
+    {
+      "key": "profile-blast-sphere",
+      "name": "Blast Sphere",
+      "items": [
+        {
+          "item_id": 3074,
+          "count": 3,
+          "name_id": 37409
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010; (R) 2 client rows read this name; 3074 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Blast Sphere x3"
+    },
+    {
+      "key": "profile-fairy-wand",
+      "name": "Fairy Wand",
+      "items": [
+        {
+          "item_id": 17248,
+          "count": 1,
+          "name_id": 30971
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Fairy Wand; https://freerealms.fandom.com/wiki/Category:Promotional: Fairy Wand"
+    },
+    {
+      "key": "profile-flabbergast-sphere",
+      "name": "Flabbergast Sphere",
+      "items": [
+        {
+          "item_id": 3015,
+          "count": 3,
+          "name_id": 36523
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010; (R) 2 client rows read this name; 3015 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Flabbergast Sphere x3"
+    },
+    {
+      "key": "profile-frag-sphere",
+      "name": "Frag Sphere",
+      "items": [
+        {
+          "item_id": 3025,
+          "count": 3,
+          "name_id": 36540
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010; (R) 2 client rows read this name; 3025 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Frag Sphere x3"
+    },
+    {
+      "key": "profile-gossamer-wings",
+      "name": "Gossamer Wings",
+      "items": [
+        {
+          "item_id": 17246,
+          "count": 1,
+          "name_id": 30969
+        },
+        {
+          "item_id": 17247,
+          "count": 1,
+          "name_id": 30969
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010; (R) both gender models of the Tinker Bell set's wings",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Gossamer Wings; https://freerealms.fandom.com/wiki/Category:Promotional: Gossamer Wings"
+    },
+    {
+      "key": "profile-legend-of-the-guardians-mask",
+      "name": "Legend of the Guardians Mask",
+      "items": [
+        {
+          "item_id": 36816,
+          "count": 1,
+          "name_id": 148207
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Legend of the Guardians is © Warner Bros); first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Legend of the Guardians Mask (Legend of the Guardians is © Warner Bros); https://freerealms.fandom.com/wiki/Category:Promotional: Legend of the Guardians Mask"
+    },
+    {
+      "key": "profile-legend-of-the-guardians-stuffed-soren",
+      "name": "Legend of the Guardians Stuffed Soren",
+      "items": [
+        {
+          "item_id": 17249,
+          "count": 1,
+          "name_id": 30972
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Legend of the Guardians is © Warner Bros); first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Legend of the Guardians Stuffed Soren (Legend of the Guardians is © Warner Bros); https://freerealms.fandom.com/wiki/Category:Promotional: Legend of the Guardians Stuffed Soren"
+    },
+    {
+      "key": "profile-legend-of-the-guardians-t-shirt",
+      "name": "Legend of the Guardians T-Shirt",
+      "items": [
+        {
+          "item_id": 36780,
+          "count": 1,
+          "name_id": 148171
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Legend of the Guardians is © Warner Bros); first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Legend of the Guardians T-Shirt (Legend of the Guardians is © Warner Bros); https://freerealms.fandom.com/wiki/Category:Promotional: Legend of the Guardians T-Shirt"
+    },
+    {
+      "key": "profile-pixie-dust-flair-shard",
+      "name": "Pixie Dust Flair Shard",
+      "items": [
+        {
+          "item_id": 17254,
+          "count": 1,
+          "name_id": 30977
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Pixie Dust Flair Shard"
+    },
+    {
+      "key": "profile-sleep-sphere",
+      "name": "Sleep Sphere",
+      "items": [
+        {
+          "item_id": 3011,
+          "count": 3,
+          "name_id": 36525
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010; (R) 2 client rows read this name; 3011 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Sleep Sphere x3"
+    },
+    {
+      "key": "profile-sparrow-man-outfit",
+      "name": "Sparrow Man Outfit",
+      "items": [
+        {
+          "item_id": 17244,
+          "count": 1,
+          "name_id": 30967
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Sparrow Man Outfit; https://freerealms.fandom.com/wiki/Category:Promotional: Sparrow Man Outfit"
+    },
+    {
+      "key": "profile-tinker-bell-outfit",
+      "name": "Tinker Bell Outfit",
+      "items": [
+        {
+          "item_id": 17245,
+          "count": 1,
+          "name_id": 30968
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Tinker Bell is © Disney); first offered September, 2010",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Tinker Bell Outfit (Tinker Bell is © Disney); https://freerealms.fandom.com/wiki/Category:Promotional: Tinker Bell Outfit"
+    },
+    {
+      "key": "profile-unmoving-sphere",
+      "name": "Unmoving Sphere",
+      "items": [
+        {
+          "item_id": 3013,
+          "count": 3,
+          "name_id": 36527
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "first offered September, 2010; (R) 2 client rows read this name; 3013 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in September, 2010: Unmoving Sphere x3"
+    },
+    {
+      "key": "profile-bambi-pet-pal",
+      "name": "Bambi",
+      "items": [
+        {
+          "item_id": 911288,
+          "count": 1,
+          "name_id": 10466
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Bambi © Disney); first offered February, 2011",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in February, 2011: Bambi pet pal (Bambi © Disney); https://freerealms.fandom.com/wiki/Category:Promotional: Bambi"
+    },
+    {
+      "key": "profile-flower-pet-pal",
+      "name": "Flower",
+      "items": [
+        {
+          "item_id": 911289,
+          "count": 1,
+          "name_id": 10468
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Flower © Disney); first offered February, 2011",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in February, 2011: Flower pet pal (Flower © Disney); https://freerealms.fandom.com/wiki/Category:Promotional: Flower"
+    },
+    {
+      "key": "profile-thumper-pet-pal",
+      "name": "Thumper",
+      "items": [
+        {
+          "item_id": 14184,
+          "count": 1,
+          "name_id": 10467
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Thumper © Disney); first offered February, 2011",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in February, 2011: Thumper pet pal (Thumper © Disney); https://freerealms.fandom.com/wiki/Category:Promotional: Thumper"
+    },
+    {
+      "key": "profile-hoodwinked-poster-pack",
+      "name": "Hoodwinked Poster Pack",
+      "items": [
+        {
+          "item_id": 911294,
+          "count": 1,
+          "name_id": 435295
+        },
+        {
+          "item_id": 911295,
+          "count": 1,
+          "name_id": 435296
+        },
+        {
+          "item_id": 911296,
+          "count": 1,
+          "name_id": 435297
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Hoodwinked Too © The Weinstein Co.); first offered April, 2011; (R) the outfit as its 3 client pieces; (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in April, 2011: Hoodwinked Poster Pack (Hoodwinked Too © The Weinstein Co.)"
+    },
+    {
+      "key": "profile-red-s-cloak",
+      "name": "Red's Cloak",
+      "items": [
+        {
+          "item_id": 77986,
+          "count": 1,
+          "name_id": 435298
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Red © The Weinstein Co.); first offered April, 2011",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in April, 2011: Red's Cloak (Red © The Weinstein Co.); https://freerealms.fandom.com/wiki/Category:Promotional: Red's Cloak"
+    },
+    {
+      "key": "profile-sword-of-omens",
+      "name": "Sword of Omens",
+      "items": [
+        {
+          "item_id": 911297,
+          "count": 1,
+          "name_id": 435939
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Sword of Omens © Warner Brothers); first offered July, 2011",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in July, 2011: Sword of Omens (Sword of Omens © Warner Brothers); https://freerealms.fandom.com/wiki/Category:Promotional: Sword of Omens"
+    },
+    {
+      "key": "profile-thundercats-poster",
+      "name": "ThunderCats Poster",
+      "items": [
+        {
+          "item_id": 911298,
+          "count": 1,
+          "name_id": 435935
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (ThunderCats © Warner Brothers); first offered July, 2011; (R) the client's item is tradeable; the trade window follows the client",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in July, 2011: ThunderCats Poster (ThunderCats © Warner Brothers); https://freerealms.fandom.com/wiki/Category:Promotional: Thundercats Poster"
+    },
+    {
+      "key": "profile-thundercat-s-t-shirt",
+      "name": "ThunderCat's T-Shirt",
+      "items": [
+        {
+          "item_id": 911300,
+          "count": 1,
+          "name_id": 435945
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (ThunderCats © Warner Brothers); first offered July, 2011",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Started Appearing in July, 2011: ThunderCat's T-Shirt (ThunderCats © Warner Brothers); https://freerealms.fandom.com/wiki/Category:Promotional: Thundercat's T-Shirt"
+    },
+    {
+      "key": "profile-black-spooky-spray",
+      "name": "Black Spooky Spray",
+      "items": [
+        {
+          "item_id": 69822,
+          "count": 5,
+          "name_id": 16640
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Super Spooktacular Only: Black Spooky Spray x5"
+    },
+    {
+      "key": "profile-jack-o-lantern-pail",
+      "name": "Jack-O-Lantern Pail",
+      "items": [
+        {
+          "item_id": 69637,
+          "count": 1,
+          "name_id": 119245
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "(R) 35 client rows read this name; 69637 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Super Spooktacular Only: Jack-O-Lantern Pail"
+    },
+    {
+      "key": "profile-paper-bag-candy-carrier",
+      "name": "Paper Bag Candy Carrier",
+      "items": [
+        {
+          "item_id": 69748,
+          "count": 1,
+          "name_id": 119247
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "(R) 36 client rows read this name; 69748 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Super Spooktacular Only: Paper Bag Candy Carrier"
+    },
+    {
+      "key": "profile-t-bone-steak-outfit",
+      "name": "T-Bone Steak Outfit",
+      "items": [
+        {
+          "item_id": 69836,
+          "count": 1,
+          "name_id": 119206
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Super Spooktacular Only: T-Bone Steak Outfit"
+    },
+    {
+      "key": "profile-witch-pail",
+      "name": "Witch Pail",
+      "items": [
+        {
+          "item_id": 69702,
+          "count": 1,
+          "name_id": 119246
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "(R) 35 client rows read this name; 69702 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Super Spooktacular Only: Witch Pail"
+    },
+    {
+      "key": "profile-garland",
+      "name": "Garland",
+      "items": [
+        {
+          "item_id": 2707,
+          "count": 1,
+          "name_id": 6554
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Snow Days Only: Garland"
+    },
+    {
+      "key": "profile-holiday-lights-flair-shard",
+      "name": "Holiday Lights Flair Shard",
+      "items": [
+        {
+          "item_id": 76575,
+          "count": 1,
+          "name_id": 134444
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Snow Days Only: Holiday Lights Flair Shard"
+    },
+    {
+      "key": "profile-tacky-holiday-tree-sweater",
+      "name": "Tacky Holiday Tree Sweater",
+      "items": [
+        {
+          "item_id": 76541,
+          "count": 1,
+          "name_id": 134464
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Snow Days Only: Tacky Holiday Tree Sweater"
+    },
+    {
+      "key": "profile-oversized-candy-cane",
+      "name": "Oversized Candy Cane",
+      "items": [
+        {
+          "item_id": 76556,
+          "count": 1,
+          "name_id": 134473
+        }
+      ],
+      "source": "profile",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) 'All Known Free Items', Snow Days Only: Oversized Candy Cane"
+    },
+    {
+      "key": "code-kn78ch2",
+      "name": "Striped Shoes",
+      "items": [
+        {
+          "item_id": 14062,
+          "count": 1,
+          "name_id": 8536
+        }
+      ],
+      "source": "code",
+      "code": "KN78CH2",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 78 client rows read this name; 14062 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: KN78CH2 | Striped Shoes | Clothing | Freestyle"
+    },
+    {
+      "key": "code-jfre87j",
+      "name": "Doggy Bowling T-Shirt",
+      "items": [
+        {
+          "item_id": 26910,
+          "count": 1,
+          "name_id": 81658
+        }
+      ],
+      "source": "code",
+      "code": "JFRE87J",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Pet Clothing: Dogs; (R) 35 client rows read this name; 26910 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: JFRE87J | Doggy Bowling T-Shirt | Pet Clothing | Dogs"
+    },
+    {
+      "key": "code-cmnjgge",
+      "name": "Spidey Snack",
+      "items": [
+        {
+          "item_id": 4059,
+          "count": 1,
+          "name_id": 1218
+        }
+      ],
+      "source": "code",
+      "code": "CMNJGGE",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Shaggy Spider Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: CMNJGGE | Spidey Snack | Consumable | 30m Shaggy Spider Illusion"
+    },
+    {
+      "key": "code-n4pf9r3",
+      "name": "Crystal Hammer (level 1)",
+      "items": [
+        {
+          "item_id": 8032,
+          "count": 1,
+          "name_id": 11190
+        }
+      ],
+      "source": "code",
+      "code": "N4PF9R3",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Weapon: Brawler; (R) 67 client rows read this name; 8032 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: N4PF9R3 | Crystal Hammer (level 1) | Weapon | Brawler; https://freerealms.fandom.com/wiki/Category:Code_Weapons: Crystal Hammer"
+    },
+    {
+      "key": "code-6tnbtgh",
+      "name": "Bermuda Shorts",
+      "items": [
+        {
+          "item_id": 17988,
+          "count": 1,
+          "name_id": 8620
+        }
+      ],
+      "source": "code",
+      "code": "6TNBTGH",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 68 client rows read this name; 17988 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: 6TNBTGH | Bermuda Shorts | Clothing | Freestyle"
+    },
+    {
+      "key": "code-facebookfans01",
+      "name": "Veggie Surprise",
+      "items": [
+        {
+          "item_id": 4067,
+          "count": 1,
+          "name_id": 1226
+        }
+      ],
+      "source": "code",
+      "code": "FACEBOOKFANS01",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Man-Eating Plant Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FACEBOOKFANS01 | Veggie Surprise | Consumable | 30m Man-Eating Plant Illusion"
+    },
+    {
+      "key": "code-facebookfans02",
+      "name": "Froggy Fries",
+      "items": [
+        {
+          "item_id": 2959,
+          "count": 1,
+          "name_id": 254
+        }
+      ],
+      "source": "code",
+      "code": "FACEBOOKFANS02",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Frog Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FACEBOOKFANS02 | Froggy Fries | Consumable | 30m Frog Illusion"
+    },
+    {
+      "key": "code-facebookfans03",
+      "name": "Goat Cheese",
+      "items": [
+        {
+          "item_id": 2958,
+          "count": 1,
+          "name_id": 253
+        }
+      ],
+      "source": "code",
+      "code": "FACEBOOKFANS03",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Goat Illusion; (R) 2 client rows read this name; 2958 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FACEBOOKFANS03 | Goat Cheese | Consumable | 30m Goat Illusion"
+    },
+    {
+      "key": "code-facebookfans04",
+      "name": "Shadowblade",
+      "items": [
+        {
+          "item_id": 4824,
+          "count": 1,
+          "name_id": 3635
+        }
+      ],
+      "source": "code",
+      "code": "FACEBOOKFANS04",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Weapon: Ninja; (R) 70 client rows read this name; 4824 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FACEBOOKFANS04 | Shadowblade | Weapon | Ninja (fandom https://freerealms.fandom.com/wiki/Free_Item_Codes: Shadowblade (code version)); https://freerealms.fandom.com/wiki/Category:Code_Weapons: Shadowblade (code version)"
+    },
+    {
+      "key": "code-facebookfans05",
+      "name": "Dynamite",
+      "items": [
+        {
+          "item_id": 6394,
+          "count": 1,
+          "name_id": 3254
+        }
+      ],
+      "source": "code",
+      "code": "FACEBOOKFANS05",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Tool: Miner; (R) 50 client rows read this name; 6394 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FACEBOOKFANS05 | Dynamite | Tool | Miner; https://freerealms.fandom.com/wiki/Category:Code_Weapons: Dynamite"
+    },
+    {
+      "key": "code-facebookfans06",
+      "name": "Checker Charged Helmet",
+      "items": [
+        {
+          "item_id": 33381,
+          "count": 1,
+          "name_id": 106459
+        }
+      ],
+      "source": "code",
+      "code": "FACEBOOKFANS06",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Kart Driver; (R) 35 client rows read this name; 33381 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FACEBOOKFANS06 | Checker Charged Helmet | Armor | Kart Driver"
+    },
+    {
+      "key": "code-rosesformom",
+      "name": "Mother's Day Bouquet",
+      "items": [
+        {
+          "item_id": 494,
+          "count": 1,
+          "name_id": 3074
+        }
+      ],
+      "source": "code",
+      "code": "ROSESFORMOM",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Weapon: Adventurer; expired May 17, 2009; works again (R); (R) 6 client rows read this name; 494 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: ROSESFORMOM | Mother's Day Bouquet (Expired May 17, 2009) | Weapon | Adventurer"
+    },
+    {
+      "key": "code-robgoblinbooty",
+      "name": "Robgoblin T-Shirt",
+      "items": [
+        {
+          "item_id": 340,
+          "count": 1,
+          "name_id": 2503
+        }
+      ],
+      "source": "code",
+      "code": "ROBGOBLINBOOTY",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 35 client rows read this name; 340 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: ROBGOBLINBOOTY | Robgoblin T-Shirt | Clothing | Freestyle"
+    },
+    {
+      "key": "code-mpt38b3",
+      "name": "Layered Skirt",
+      "items": [
+        {
+          "item_id": 16786,
+          "count": 1,
+          "name_id": 2487
+        }
+      ],
+      "source": "code",
+      "code": "MPT38B3",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 72 client rows read this name; 16786 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: MPT38B3 | Layered Skirt | Clothing | Freestyle"
+    },
+    {
+      "key": "code-sandwich",
+      "name": "Small Sandwich",
+      "items": [
+        {
+          "item_id": 79,
+          "count": 1,
+          "name_id": 2429
+        }
+      ],
+      "source": "code",
+      "code": "SANDWICH",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: Decreases Player's Size",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: SANDWICH | Small Sandwich | Consumable | Decreases Player's Size"
+    },
+    {
+      "key": "code-froggy",
+      "name": "Froggy Fries",
+      "items": [
+        {
+          "item_id": 2959,
+          "count": 1,
+          "name_id": 254
+        }
+      ],
+      "source": "code",
+      "code": "FROGGY",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Frog Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FROGGY | Froggy Fries | Consumable | 30m Frog Illusion"
+    },
+    {
+      "key": "code-pxnh6hb",
+      "name": "Spook Sphere",
+      "items": [
+        {
+          "item_id": 896,
+          "count": 1,
+          "name_id": 2822
+        }
+      ],
+      "source": "code",
+      "code": "PXNH6HB",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Wolf Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: PXNH6HB | Spook Sphere | Consumable | 30m Wolf Illusion"
+    },
+    {
+      "key": "code-xczg923",
+      "name": "Baseball Cap",
+      "items": [
+        {
+          "item_id": 223,
+          "count": 1,
+          "name_id": 2466
+        }
+      ],
+      "source": "code",
+      "code": "XCZG923",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 36 client rows read this name; 223 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: XCZG923 | Baseball Cap | Clothing | Freestyle"
+    },
+    {
+      "key": "code-t86766r",
+      "name": "Chatty Baseball Cap",
+      "items": [
+        {
+          "item_id": 399,
+          "count": 1,
+          "name_id": 2804
+        }
+      ],
+      "source": "code",
+      "code": "T86766R",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: T86766R | Chatty Baseball Cap | Clothing | Freestyle"
+    },
+    {
+      "key": "code-cp24c5n",
+      "name": "Race Away Jacket",
+      "items": [
+        {
+          "item_id": 13496,
+          "count": 1,
+          "name_id": 1650
+        }
+      ],
+      "source": "code",
+      "code": "CP24C5N",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Kart Driver; (R) 19 client rows read this name; 13496 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: CP24C5N | Race Away Jacket | Armor | Kart Driver"
+    },
+    {
+      "key": "promo-hot-to-trot-tots",
+      "name": "Hot-To-Trot Tots",
+      "items": [
+        {
+          "item_id": 2979,
+          "count": 1,
+          "name_id": 274
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: Fire Around Player's Feet; no published code ('Email Code'): a standing offer instead (R)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: Email Code | Hot-To-Trot Tots | Consumable | Fire Around Player's Feet"
+    },
+    {
+      "key": "code-3g9mkt2",
+      "name": "Striped T-Shirt",
+      "items": [
+        {
+          "item_id": 248,
+          "count": 1,
+          "name_id": 2497
+        }
+      ],
+      "source": "code",
+      "code": "3G9MKT2",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 36 client rows read this name; 248 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: 3G9MKT2 | Striped T-Shirt | Clothing | Freestyle"
+    },
+    {
+      "key": "code-fbredsparkler",
+      "name": "Red Summer Sparkler",
+      "items": [
+        {
+          "item_id": 15920,
+          "count": 1,
+          "name_id": 394985
+        }
+      ],
+      "source": "code",
+      "code": "FBREDSPARKLER",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Weapon: Freestyle; expired July 12, 2009; works again (R); (R) 2 client rows read this name; 15920 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FBREDSPARKLER | Red Summer Sparkler (Expired July 12, 2009) | Weapon | Freestyle"
+    },
+    {
+      "key": "code-summersparkler",
+      "name": "Purple Summer Sparkler",
+      "items": [
+        {
+          "item_id": 57018,
+          "count": 1,
+          "name_id": 394984
+        }
+      ],
+      "source": "code",
+      "code": "SUMMERSPARKLER",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Weapon: Freestyle; expired July 12, 2009; works again (R); (R) 2 client rows read this name; 57018 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: SUMMERSPARKLER | Purple Summer Sparkler (Expired July 12, 2009) | Weapon | Freestyle"
+    },
+    {
+      "key": "code-skeletal",
+      "name": "Skeletal Speed Helmet",
+      "items": [
+        {
+          "item_id": 33324,
+          "count": 1,
+          "name_id": 106389
+        }
+      ],
+      "source": "code",
+      "code": "SKELETAL",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Kart Driver; (R) 38 client rows read this name; 33324 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: SKELETAL | Skeletal Speed Helmet | Armor | Kart Driver"
+    },
+    {
+      "key": "code-f7kpg5a",
+      "name": "Chatty T-Shirt",
+      "items": [
+        {
+          "item_id": 398,
+          "count": 1,
+          "name_id": 2802
+        }
+      ],
+      "source": "code",
+      "code": "F7KPG5A",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: F7KPG5A | Chatty T-Shirt | Clothing | Freestyle"
+    },
+    {
+      "key": "code-strawberries",
+      "name": "Strawberry Surge Helmet",
+      "items": [
+        {
+          "item_id": 33140,
+          "count": 1,
+          "name_id": 106214
+        }
+      ],
+      "source": "code",
+      "code": "STRAWBERRIES",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Kart Driver; (R) 35 client rows read this name; 33140 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: STRAWBERRIES | Strawberry Surge Helmet | Armor | Kart Driver"
+    },
+    {
+      "key": "code-dxnmjh9",
+      "name": "Kitty Jeweled Collar",
+      "items": [
+        {
+          "item_id": 29801,
+          "count": 1,
+          "name_id": 89128
+        }
+      ],
+      "source": "code",
+      "code": "DXNMJH9",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Pet Clothing: Cats; (R) 38 client rows read this name; 29801 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: DXNMJH9 | Kitty Jeweled Collar | Pet Clothing | Cats"
+    },
+    {
+      "key": "code-drinkmilk",
+      "name": "Bullhorn Ninja Cowl",
+      "items": [
+        {
+          "item_id": 67887,
+          "count": 1,
+          "name_id": 156719
+        }
+      ],
+      "source": "code",
+      "code": "DRINKMILK",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Ninja",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: DRINKMILK | Bullhorn Ninja Cowl | Armor | Ninja"
+    },
+    {
+      "key": "code-milkrocks",
+      "name": "Cow Hat",
+      "items": [
+        {
+          "item_id": 65807,
+          "count": 1,
+          "name_id": 154639
+        }
+      ],
+      "source": "code",
+      "code": "MILKROCKS",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: MILKROCKS | Cow Hat | Clothing | Freestyle; https://freerealms.fandom.com/wiki/Category:Promotional: Cow Hat"
+    },
+    {
+      "key": "code-milkrules",
+      "name": "Pet Trainer Cow Spot Apron",
+      "items": [
+        {
+          "item_id": 63903,
+          "count": 1,
+          "name_id": 152735
+        }
+      ],
+      "source": "code",
+      "code": "MILKRULES",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Pet Trainer",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: MILKRULES | Pet Trainer Cow Spot Apron | Clothing | Pet Trainer"
+    },
+    {
+      "key": "code-6fg8zt7",
+      "name": "Crash Crunch Helmet",
+      "items": [
+        {
+          "item_id": 14659,
+          "count": 1,
+          "name_id": 1149
+        }
+      ],
+      "source": "code",
+      "code": "6FG8ZT7",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Demo Derby Driver; (R) 18 client rows read this name; 14659 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: 6FG8ZT7 | Crash Crunch Helmet | Armor | Demo Derby Driver"
+    },
+    {
+      "key": "code-emd73dk",
+      "name": "Jagged Scythe",
+      "items": [
+        {
+          "item_id": 4176,
+          "count": 1,
+          "name_id": 10285
+        }
+      ],
+      "source": "code",
+      "code": "EMD73DK",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Ninja; (R) 68 client rows read this name; 4176 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: EMD73DK | Jagged Scythe | Armor | Ninja (fandom https://freerealms.fandom.com/wiki/Free_Item_Codes: Jagged Scythe (code version)); https://freerealms.fandom.com/wiki/Category:Code_Weapons: Jagged Scythe (code version)"
+    },
+    {
+      "key": "code-mmmdonut",
+      "name": "Heavenly Donut",
+      "items": [
+        {
+          "item_id": 60269,
+          "count": 1,
+          "name_id": 401519
+        }
+      ],
+      "source": "code",
+      "code": "MMMDONUT",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Matcher's Advantage Increase",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: MMMDONUT | Heavenly Donut | Consumable | 30m Matcher's Advantage Increase"
+    },
+    {
+      "key": "code-berrycupcake",
+      "name": "Berry Cupcake",
+      "items": [
+        {
+          "item_id": 60267,
+          "count": 1,
+          "name_id": 401517
+        }
+      ],
+      "source": "code",
+      "code": "BERRYCUPCAKE",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Matcher's Skill Increase",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: BERRYCUPCAKE | Berry Cupcake | Consumable | 30m Matcher's Skill Increase"
+    },
+    {
+      "key": "code-g3tacpch",
+      "name": "Wild Winger Shin Guards",
+      "items": [
+        {
+          "item_id": 62480,
+          "count": 1,
+          "name_id": 404910
+        }
+      ],
+      "source": "code",
+      "code": "G3TACPCH",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Soccer Star; (R) 34 client rows read this name; 62480 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: G3TACPCH | Wild Winger Shin Guards | Clothing | Soccer Star"
+    },
+    {
+      "key": "code-k9kcecxm3ek",
+      "name": "Treeble Cut-Out Mask",
+      "items": [
+        {
+          "item_id": 69229,
+          "count": 1,
+          "name_id": 119224
+        }
+      ],
+      "source": "code",
+      "code": "K9KCECXM3EK",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: K9KCECXM3EK | Treeble Cut-Out Mask | Clothing | Freestyle"
+    },
+    {
+      "key": "code-getspooky",
+      "name": "Robgoblin Costume",
+      "items": [
+        {
+          "item_id": 69115,
+          "count": 1,
+          "name_id": 119216
+        }
+      ],
+      "source": "code",
+      "code": "GETSPOOKY",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: GETSPOOKY | Robgoblin Costume | Clothing | Freestyle"
+    },
+    {
+      "key": "code-snowdays",
+      "name": "Snowman",
+      "items": [
+        {
+          "item_id": 225,
+          "count": 1,
+          "name_id": 3956
+        }
+      ],
+      "source": "code",
+      "code": "SNOWDAYS",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Housing: Interactive House Item; the house item (type 1, cost 0), not pet 17521",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: SNOWDAYS | Snowman | Housing | Interactive House Item (fandom https://freerealms.fandom.com/wiki/Free_Item_Codes: Snowman (furniture))"
+    },
+    {
+      "key": "code-barkbark",
+      "name": "Bark Chocolate",
+      "items": [
+        {
+          "item_id": 60277,
+          "count": 1,
+          "name_id": 401527
+        }
+      ],
+      "source": "code",
+      "code": "BARKBARK",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Dog Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: BARKBARK | Bark Chocolate | Consumable | 30m Dog Illusion"
+    },
+    {
+      "key": "code-flyingdragon",
+      "name": "Flying Dragon Cowl",
+      "items": [
+        {
+          "item_id": 482,
+          "count": 1,
+          "name_id": 518
+        }
+      ],
+      "source": "code",
+      "code": "FLYINGDRAGON",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Armor: Ninja; (R) 35 client rows read this name; 482 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: FLYINGDRAGON | Flying Dragon Cowl | Armor | Ninja"
+    },
+    {
+      "key": "promo-triceratops",
+      "name": "Triceratops",
+      "items": [
+        {
+          "item_id": 911292,
+          "count": 1,
+          "name_id": 21620
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Pets: Triceratops Pet; no published code ('Link Removed site no longer valid'): a standing offer instead (R)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: Link Removed site no longer valid | Triceratops | Pets | Triceratops Pet"
+    },
+    {
+      "key": "code-popsicle",
+      "name": "Triple Layer Popsicle",
+      "items": [
+        {
+          "item_id": 60272,
+          "count": 1,
+          "name_id": 401522
+        }
+      ],
+      "source": "code",
+      "code": "POPSICLE",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Pixie Dust Effect",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: POPSICLE | Triple Layer Popsicle | Consumable | 30m Pixie Dust Effect"
+    },
+    {
+      "key": "code-camocamo",
+      "name": "Camouflage Sunglasses",
+      "items": [
+        {
+          "item_id": 58297,
+          "count": 1,
+          "name_id": 398750
+        }
+      ],
+      "source": "code",
+      "code": "CAMOCAMO",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Clothing: Freestyle; (R) 36 client rows read this name; 58297 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: CAMOCAMO | Camouflage Sunglasses | Clothing | Freestyle"
+    },
+    {
+      "key": "code-plantpower",
+      "name": "Animated Snacks",
+      "items": [
+        {
+          "item_id": 2957,
+          "count": 1,
+          "name_id": 252
+        }
+      ],
+      "source": "code",
+      "code": "PLANTPOWER",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 1m Forest Giant Illusion",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: PLANTPOWER | Animated Snacks | Consumable | 1m Forest Giant Illusion"
+    },
+    {
+      "key": "code-icecreamsurprise",
+      "name": "Ice Cream Surprise",
+      "items": [
+        {
+          "item_id": 60273,
+          "count": 1,
+          "name_id": 401523
+        }
+      ],
+      "source": "code",
+      "code": "ICECREAMSURPRISE",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Snowflake Effect",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: ICECREAMSURPRISE | Ice Cream Surprise | Consumable | 30m Snowflake Effect"
+    },
+    {
+      "key": "code-replenish",
+      "name": "Medium Replenishment Potion",
+      "items": [
+        {
+          "item_id": 3084,
+          "count": 1,
+          "name_id": 422913
+        }
+      ],
+      "source": "code",
+      "code": "REPLENISH",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: Restore Health/Energy in Battle; (R) 2 client rows read this name; 3084 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: REPLENISH | Medium Replenishment Potion | Consumable | Restore Health/Energy in Battle"
+    },
+    {
+      "key": "code-croissant",
+      "name": "Crispy Crossiant",
+      "items": [
+        {
+          "item_id": 60271,
+          "count": 1,
+          "name_id": 401521
+        }
+      ],
+      "source": "code",
+      "code": "CROISSANT",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Consumable: 30m Shadow Flames Effect",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: CROISSANT | Crispy Crossiant (in-game item spelled incorrectly) | Consumable | 30m Shadow Flames Effect"
+    },
+    {
+      "key": "code-smackdown",
+      "name": "Crystal Hammer (level 19)",
+      "items": [
+        {
+          "item_id": 8045,
+          "count": 1,
+          "name_id": 11190
+        }
+      ],
+      "source": "code",
+      "code": "SMACKDOWN",
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Weapon: Brawler; (R) 67 client rows read this name; 8045 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: SMACKDOWN | Crystal Hammer (level 19) | Weapon | Brawler; https://freerealms.fandom.com/wiki/Category:Code_Weapons: Crystal Hammer"
+    },
+    {
+      "key": "promo-alienware-t-shirt",
+      "name": "Alienware T-Shirt",
+      "items": [
+        {
+          "item_id": 911301,
+          "count": 1,
+          "name_id": 6772
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Alienware T-Shirt"
+    },
+    {
+      "key": "promo-domo",
+      "name": "Domo",
+      "items": [
+        {
+          "item_id": 10399,
+          "count": 1,
+          "name_id": 6249
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Domo"
+    },
+    {
+      "key": "promo-domo-backpack",
+      "name": "Domo Backpack",
+      "items": [
+        {
+          "item_id": 10402,
+          "count": 1,
+          "name_id": 8429
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Domo Backpack"
+    },
+    {
+      "key": "promo-domo-hat",
+      "name": "Domo Hat",
+      "items": [
+        {
+          "item_id": 10401,
+          "count": 1,
+          "name_id": 8428
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Domo Hat"
+    },
+    {
+      "key": "promo-dukey-the-dog",
+      "name": "Dukey the Dog",
+      "items": [
+        {
+          "item_id": 911290,
+          "count": 1,
+          "name_id": 435710
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Dukey the Dog"
+    },
+    {
+      "key": "promo-grizzlies-zach-randolph-jersey",
+      "name": "Grizzlies Zach Randolph Jersey",
+      "items": [
+        {
+          "item_id": 911303,
+          "count": 1,
+          "name_id": 435338
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Grizzlies Zach Randolph Jersey"
+    },
+    {
+      "key": "promo-heat-lebron-james-jersey",
+      "name": "Heat Lebron James Jersey",
+      "items": [
+        {
+          "item_id": 911304,
+          "count": 1,
+          "name_id": 435339
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Heat Lebron James Jersey"
+    },
+    {
+      "key": "promo-lakers-kobe-bryant-jersey",
+      "name": "Lakers Kobe Bryant Jersey",
+      "items": [
+        {
+          "item_id": 911302,
+          "count": 1,
+          "name_id": 435337
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Lakers Kobe Bryant Jersey"
+    },
+    {
+      "key": "promo-raptors-andrea-bargnani-jersey",
+      "name": "Raptors Andrea Bargnani Jersey",
+      "items": [
+        {
+          "item_id": 911306,
+          "count": 1,
+          "name_id": 435352
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Raptors Andrea Bargnani Jersey"
+    },
+    {
+      "key": "promo-slobbersaurus-rex",
+      "name": "Slobbersaurus-Rex",
+      "items": [
+        {
+          "item_id": 2731,
+          "count": 1,
+          "name_id": 4888
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Slobbersaurus-Rex"
+    },
+    {
+      "key": "promo-spurs-manu-ginobli-jersey",
+      "name": "Spurs Manu Ginobli Jersey",
+      "items": [
+        {
+          "item_id": 911305,
+          "count": 1,
+          "name_id": 435351
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Spurs Manu Ginobli Jersey"
+    },
+    {
+      "key": "promo-wally",
+      "name": "Wally",
+      "items": [
+        {
+          "item_id": 911291,
+          "count": 1,
+          "name_id": 609
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Wally"
+    },
+    {
+      "key": "promo-walmart-t-shirt",
+      "name": "Walmart T-Shirt",
+      "items": [
+        {
+          "item_id": 911307,
+          "count": 1,
+          "name_id": 9132
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Promotional: Walmart T-Shirt"
+    },
+    {
+      "key": "promo-floral-flair-shard",
+      "name": "Floral Flair Shard",
+      "items": [
+        {
+          "item_id": 77042,
+          "count": 1,
+          "name_id": 6959
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Code_Flair: Floral Flair Shard"
+    },
+    {
+      "key": "promo-spider-bite",
+      "name": "Spider Bite",
+      "items": [
+        {
+          "item_id": 60258,
+          "count": 1,
+          "name_id": 400989
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "a promotion with no published code: a standing offer (owner 2026-11-11: everything available); (R) 2 client rows read this name; 60258 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://freerealms.fandom.com/wiki/Category:Code_Weapons: Spider Bite"
+    },
+    {
+      "key": "member-super-spooktacular-2009",
+      "name": "Super Spooktacular 2009 Member Pack",
+      "items": [
+        {
+          "item_id": 69109,
+          "count": 1,
+          "name_id": 119190
+        },
+        {
+          "item_id": 69244,
+          "count": 1,
+          "name_id": 119227
+        },
+        {
+          "item_id": 69773,
+          "count": 1,
+          "name_id": 119248
+        },
+        {
+          "item_id": 69557,
+          "count": 1,
+          "name_id": 119237
+        },
+        {
+          "item_id": 69556,
+          "count": 1,
+          "name_id": 119236
+        },
+        {
+          "item_id": 69553,
+          "count": 1,
+          "name_id": 119233
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "2009 member pack; (R) the Skull Lantern variant (the wiki names the green one); Pumpkin Paper Bag Mask: (R) 35 client rows read this name; 69244 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Skull Lantern: (R) 36 client rows read this name; 69773 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Troll Face Paint Card: (R) 2 client rows read this name; 69557 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Phantom Face Paint Card: (R) 2 client rows read this name; 69556 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Super_Spooktacular (2009: active members Oct 1-21 2009 got Chatty Costume, Pumpkin Paper Bag Mask, Skull Lantern (green), Troll, Phantom and Starry Moons Face Paint Cards); locale 156839"
+    },
+    {
+      "key": "member-december-2009",
+      "name": "December Members Pack 2009",
+      "items": [
+        {
+          "item_id": 76608,
+          "count": 1,
+          "name_id": 134469
+        },
+        {
+          "item_id": 76645,
+          "count": 1,
+          "name_id": 134467
+        },
+        {
+          "item_id": 76555,
+          "count": 1,
+          "name_id": 134472
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "December 2009 member pack",
+      "evidence": "https://eq2.fanbyte.com/wiki/FR_Item pages for Reindeer Antlers, 2010 Party Hat and Candy Cane Sparkler (Dec 2009 Members Pack); locale 156900"
+    },
+    {
+      "key": "member-december-2011",
+      "name": "December 2011 Member's Pack",
+      "items": [
+        {
+          "item_id": 79440,
+          "count": 1,
+          "name_id": 7504
+        },
+        {
+          "item_id": 27959,
+          "count": 1,
+          "name_id": 26383
+        },
+        {
+          "item_id": 27972,
+          "count": 1,
+          "name_id": 26409
+        },
+        {
+          "item_id": 78137,
+          "count": 1,
+          "name_id": 436409
+        },
+        {
+          "item_id": 27943,
+          "count": 2,
+          "name_id": 26349
+        },
+        {
+          "item_id": 17179,
+          "count": 1,
+          "name_id": 22959
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "coins": 10000,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "December 2011 member pack; (R) the client has one Houndstooth Flooring and one Houndstooth Wallpaper row, so those are the blue flooring and the green wallpaper",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Snow_Days (Dec 2011 Member's Pack: 10,000 coins, Houndstooth Flooring (blue), Houndstooth Wallpaper (green), Mystery Key, 2 Snowhill Lodge Chairs, Snowball ride, Snow Globe)"
+    },
+    {
+      "key": "member-april-rewards",
+      "name": "April Member Rewards Pack",
+      "items": [
+        {
+          "item_id": 4831,
+          "count": 1,
+          "name_id": 5689
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "birthday_bash",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "the anniversary member pack",
+      "evidence": "https://eq2.fanbyte.com/wiki/FR_Item:Balloon_Hat (the April Member Rewards Pack's reward version); client locale 156944/156945 'It's the Free Realms Anniversary! Celebrate with April's Member Rewards Pack'"
+    },
+    {
+      "key": "member-february-2011",
+      "name": "February 2011 Monthly Membership Pack",
+      "items": [
+        {
+          "item_id": 76619,
+          "count": 1,
+          "name_id": 4833
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "festival_of_hearts",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "February 2011 member pack",
+      "evidence": "https://freerealms.fandom.com/wiki/Teddy_Bear_Costume (in the February 2011 Monthly Membership Pack)"
+    },
+    {
+      "key": "member-summer-sparkler-bundle",
+      "name": "Summer Sparkler Bundle",
+      "items": [
+        {
+          "item_id": 15917,
+          "count": 1,
+          "name_id": 394982
+        },
+        {
+          "item_id": 57017,
+          "count": 1,
+          "name_id": 394983
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "July 2009 members' bundle; (R) offered all year: its event, Seaside Summer Splash, has no calendar row yet; Blue Summer Sparkler: (R) 2 client rows read this name; 15917 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id); Green Summer Sparkler: (R) 2 client rows read this name; 57017 picked (section block, the gift variant's no-trade rarity-2 row, rank, lowest id)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Seaside_Summer_Splash (members' Summer Sparkler Bundle, blue and green sparklers, July 2009)"
+    },
+    {
+      "key": "promo-meatball-hat",
+      "name": "Meatball Hat",
+      "items": [
+        {
+          "item_id": 60969,
+          "count": 1,
+          "name_id": 403308
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Cloudy With a Chance of Meatballs); (R) offered all year: the tie-in has no calendar row",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Cloudy_With_a_Chance_of_Meatballs (Meatballs Movie Premiere, Aug-Sep 2009); locale 403308-403405"
+    },
+    {
+      "key": "promo-meatball-costume",
+      "name": "Meatball Costume",
+      "items": [
+        {
+          "item_id": 60986,
+          "count": 1,
+          "name_id": 403405
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Cloudy With a Chance of Meatballs)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Cloudy_With_a_Chance_of_Meatballs"
+    },
+    {
+      "key": "promo-meatballs-t-shirts",
+      "name": "Meatballs T-Shirts",
+      "items": [
+        {
+          "item_id": 68165,
+          "count": 1,
+          "name_id": 409490
+        },
+        {
+          "item_id": 68166,
+          "count": 1,
+          "name_id": 409490
+        },
+        {
+          "item_id": 68167,
+          "count": 1,
+          "name_id": 409490
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it; (R) all three colours in one gift (which id is which colour is not recorded)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Cloudy_With_a_Chance_of_Meatballs (Meatballs T-Shirts, blue, green and white)"
+    },
+    {
+      "key": "member-october-2013",
+      "name": "October 2013 Member Pack",
+      "items": [
+        {
+          "item_id": 911019,
+          "count": 1,
+          "name_id": 5102474
+        },
+        {
+          "item_id": 911020,
+          "count": 1,
+          "name_id": 5102475
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "halloween",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "October 2013 member pack: Pinkeye (pet) and Toeny (pet pal)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Super_Spooktacular (2013: 'The October 2013 Member's Pack included a pet, Pinkeye' and a pet pal, Toeny); locale 5102474-5102475"
+    },
+    {
+      "key": "member-december-2013",
+      "name": "December 2013 Member Pack",
+      "items": [
+        {
+          "item_id": 911287,
+          "count": 1,
+          "name_id": 5102793
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "December 2013 member pack",
+      "evidence": "https://freerealms.fandom.com/wiki/SBS-1000 ('December's Monthly Member Pack'); locale 5102793"
+    },
+    {
+      "key": "member-new-year-2014",
+      "name": "New Year 2014 Member Pack",
+      "items": [
+        {
+          "item_id": 911309,
+          "count": 1,
+          "name_id": 5103033
+        },
+        {
+          "item_id": 911310,
+          "count": 1,
+          "name_id": 5103009
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "snow_days",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "New Year 2014 member pack; (R) tied to Snow Days, whose dates cover the Dec 31-Jan 1 login",
+      "evidence": "https://freerealms.fandom.com/wiki/New_Year's_Eve (2014 Party Glasses and 2014 Party Hat); locale 5103009, 5103033"
+    },
+    {
+      "key": "member-spring-chicken-pack",
+      "name": "Spring Chicken Pack",
+      "items": [
+        {
+          "item_id": 911275,
+          "count": 1,
+          "name_id": 435322
+        },
+        {
+          "item_id": 911276,
+          "count": 1,
+          "name_id": 435320
+        },
+        {
+          "item_id": 911308,
+          "count": 1,
+          "name_id": 435323
+        }
+      ],
+      "source": "member",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "birthday_bash",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Birthday Bash 2011 member pack; (R) its three pieces, not the pack box (row 911274 has no contents table)",
+      "evidence": "https://eq2.fanbyte.com/wiki/FR_Item:Spring_Chicken_Pack (Birthday Bash 2011: costume, pet pal and ride); locale 435357"
+    },
+    {
+      "key": "promo-birthday-cake-hat-2012",
+      "name": "Birthday Cake Hat",
+      "items": [
+        {
+          "item_id": 15976,
+          "count": 1,
+          "name_id": 694
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": "birthday_bash",
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "2012 Birthday Bash login gift",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Birthday_Bash (given to every character on first login during the 2012 Birthday Bash)"
+    },
+    {
+      "key": "promo-letterman-jacket",
+      "name": "Free Realms Letterman Jacket",
+      "items": [
+        {
+          "item_id": 22952,
+          "count": 1,
+          "name_id": 8878
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "20 Million Dance Party login gift; (R) offered all year: the party has no calendar row",
+      "evidence": "https://freerealms.fandom.com/wiki/Free_Realms_Letterman_Jacket (20 Million Dance Party login gift, Oct 21-31 2011)"
+    },
+    {
+      "key": "promo-wheres-waldo",
+      "name": "Where's Waldo 25th Anniversary",
+      "items": [
+        {
+          "item_id": 17925,
+          "count": 1,
+          "name_id": 9146
+        },
+        {
+          "item_id": 911311,
+          "count": 1,
+          "name_id": 9150
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "Where's Waldo tie-in: the sweater and the wallpaper",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Items_(FR) (Waldo Sweater); client locale 9144-9150 (the Waldo clothing and wallpaper)"
+    },
+    {
+      "key": "promo-thundercats-seal",
+      "name": "Thundercats Seal",
+      "items": [
+        {
+          "item_id": 911299,
+          "count": 1,
+          "name_id": 435936
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": true,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (ThunderCats)",
+      "evidence": "client locale 435935-435947 (ThunderCats tie-in, Jul-Aug 2011)"
+    },
+    {
+      "key": "promo-meatball-illusions",
+      "name": "Meatball Illusions",
+      "items": [
+        {
+          "item_id": 911312,
+          "count": 1,
+          "name_id": 147628
+        },
+        {
+          "item_id": 911313,
+          "count": 1,
+          "name_id": 147629
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "movie or TV tie-in: the original never repeated it (Cloudy With a Chance of Meatballs): the 15-minute and 30-minute illusions",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Cloudy_With_a_Chance_of_Meatballs; client locale 147628-147629"
+    },
+    {
+      "key": "promo-zando",
+      "name": "Zando",
+      "items": [
+        {
+          "item_id": 2274,
+          "count": 1,
+          "name_id": 4760
+        }
+      ],
+      "source": "promotional",
+      "code": null,
+      "per": "account",
+      "repeatable": false,
+      "repeat_hours": null,
+      "live_event": null,
+      "tradeable": false,
+      "enabled": true,
+      "stock_per_event": null,
+      "per_player": null,
+      "stock_group": null,
+      "note": "charity promotion pet",
+      "evidence": "https://freerealms.fandom.com/wiki/Zando (the T-Rex pet of the Haiti relief drive, Jan 15-18 2010); https://eq2.fanbyte.com/wiki/Special_Pets_(FR)"
+    }
+  ],
+  "unresolved": [
+    {
+      "name": "Sample Booster Pack for use in the Trading Card Game (10 virtual cards, no loot card)",
+      "source": "code",
+      "code": "GMBZZ24B",
+      "name_id": null,
+      "live_event": null,
+      "reason": "the card game's: a booster of virtual cards, not an inventory item (TCG rewards belong to the card game)",
+      "evidence": "https://eq2.fanbyte.com/wiki/Free_Item_Codes_(FR) table: GMBZZ24B | Sample Booster Pack for use in the Trading Card Game (10 virtual cards, no loot card) |  | TCG"
+    },
+    {
+      "name": "Snow Days Membership Gift 2010",
+      "source": "member",
+      "code": null,
+      "name_id": null,
+      "live_event": "snow_days",
+      "reason": "missing: no source names its contents (they varied by membership level); needs another source",
+      "evidence": "https://eq2.fanbyte.com/wiki/Category:Snow_Days (Dec 2010, by membership level)"
+    },
+    {
+      "name": "Black Friday to Cyber Monday login gifts (four outfit pieces)",
+      "source": "promotional",
+      "code": null,
+      "name_id": null,
+      "live_event": "turkey_dance",
+      "reason": "missing: no source names the four pieces; needs another source",
+      "evidence": "client locale 1616 (Thanksgiving 2012 splash)"
+    }
+  ]
+}

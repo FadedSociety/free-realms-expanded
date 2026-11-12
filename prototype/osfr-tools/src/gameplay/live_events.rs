@@ -153,6 +153,34 @@ impl Gameplay {
         }
     }
 
+    /// gifts-codes: whether calendar event `key` runs now for this session, through the shared
+    /// gate (`EventCalendar::is_running`) and the hand toggles this session follows.
+    pub(crate) fn gift_event_running(&self, key: &str) -> bool {
+        let unix_ms = self.event_watch.clock.unwrap_or_else(unix_now_ms);
+        (self.event_watch.seasons.as_ref())
+            .is_some_and(|areas| areas.calendar().is_running(key, areas, unix_ms))
+    }
+
+    /// Every calendar event running now, by the same gate, with its run: the local date the run
+    /// ends, or `held` while a hand toggle holds it (what a limited gift's stock counts per).
+    pub(crate) fn gift_running_events(&self) -> crate::gifts::Events {
+        let Some(areas) = self.event_watch.seasons.as_ref() else {
+            return crate::gifts::Events::new();
+        };
+        let unix_ms = self.event_watch.clock.unwrap_or_else(unix_now_ms);
+        let calendar = areas.calendar();
+        (calendar.keys())
+            .filter(|key| self.gift_event_running(key))
+            .map(|key| {
+                let run = calendar.running_until(key, areas, unix_ms).map_or_else(
+                    || "held".to_owned(),
+                    |end| event_calendar::local_date(areas.local_minute(end)),
+                );
+                (key.to_owned(), run)
+            })
+            .collect()
+    }
+
     fn events_path(&self) -> PathBuf {
         self.live_dir().join(EVENTS_FILE)
     }

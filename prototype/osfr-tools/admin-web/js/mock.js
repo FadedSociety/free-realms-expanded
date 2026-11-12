@@ -47,6 +47,9 @@ export function createMock(source) {
   const { me, players, inventory, items, quests, zones, audit } = data;
   const jobs = data.mail.jobs;
   const boxes = data.mail.mailboxes;
+  const gifts = data.gifts;
+  const offersOff = new Set(gifts.offers_off);
+  const giftOf = (key) => gifts.gifts.find((g) => g.key === key) || (() => { throw new MockError(404, 'no such gift'); })();
   const powers = { spectating: null, following: null, invisible: false, flying: false, frozen: [], jailed: [] };
   const undos = new Map();
   const sessionBase = new Map(players.map((p) => [p.character_id, p.session_s]));
@@ -398,6 +401,53 @@ export function createMock(source) {
         && (!q.action || r.action === q.action) && (!q.since || !Number.isFinite(since) || r.time >= since));
       const page = Math.max(1, parseInt(q.page, 10) || 1);
       return { total: rows.length, page, page_size: PAGE, rows: rows.slice((page - 1) * PAGE, page * PAGE) };
+    },
+    // gifts-codes: the catalog with each row's toggle, sends into a Claim window, codes and standing offers.
+    giftCatalog(_, q) {
+      const text = String(q.q || '').trim().toLowerCase();
+      const rows = gifts.gifts.filter((g) => !text || [g.name, g.key, g.code].some((t) => t && t.toLowerCase().includes(text)))
+        .map((g) => ({ ...g, enabled_now: !offersOff.has(g.key) && g.enabled }));
+      const page = Math.max(1, parseInt(q.page, 10) || 1);
+      return { total: rows.length, page, page_size: PAGE, rows: rows.slice((page - 1) * PAGE, page * PAGE), unresolved: gifts.unresolved };
+    },
+    giftSend(_, __, b) {
+      const p = player(b.character_id);
+      const g = giftOf(b.key);
+      if (String(b.note || '').length > 200) bad('a note is at most 200 characters');
+      const gift_id = ++seq;
+      log('gift_send', p, {}, { key: g.key, name: g.name, gift_id, note: b.note || '' });
+      return { account: p.account, gift_id, key: g.key };
+    },
+    giftCodes: () => gifts.codes,
+    giftMakeCode(_, __, b) {
+      if (!Array.isArray(b.keys) || !b.keys.length || b.keys.length > 8) bad('keys names 1 to 8 catalog gifts');
+      const picked = b.keys.map(giftOf);
+      const uses = intIn(b.uses ?? 1, 1, 10000, 'Uses');
+      const days = b.expires_days == null ? null : intIn(b.expires_days, 1, 3650, 'Days');
+      const bound = b.character_id == null ? null : player(b.character_id).account;
+      const code = `FR-${hex(4).toUpperCase()}-${hex(4).toUpperCase()}`;
+      const row = { code, enabled: true, uses: 0, max_uses: uses, per_character: 1,
+        expires: days ? new Date(Date.now() + days * 86400000).toISOString().slice(0, 10) : null, bound_account: bound,
+        note: b.note || picked.map((g) => g.name).join(', '), coins: 0, items: picked.flatMap((g) => g.items.map((i) => ({ item_id: i.item_id, count: i.count }))), redeemed_by: 0 };
+      gifts.codes.push(row);
+      log('gift_code', null, {}, { keys: b.keys, row });
+      return { code, row };
+    },
+    giftRevoke(_, __, b) {
+      const row = gifts.codes.find((c) => c.code === String(b.code || '').toUpperCase()) || (() => { throw new MockError(404, 'no such code'); })();
+      if (!row.enabled) throw new MockError(422, 'that code is already revoked');
+      const before = { ...row };
+      row.enabled = false;
+      log('gift_code_revoke', null, before, row);
+      return { row };
+    },
+    giftOffer(_, __, b) {
+      const g = giftOf(b.key);
+      if (typeof b.enabled !== 'boolean') bad('enabled is true or false');
+      const was = !offersOff.has(g.key) && g.enabled;
+      if (b.enabled) offersOff.delete(g.key); else offersOff.add(g.key);
+      log('gift_offer', null, { key: g.key, enabled: was }, { key: g.key, enabled: b.enabled });
+      return { key: g.key, enabled: b.enabled, was };
     },
     map({ zone }) {
       step();

@@ -8,6 +8,7 @@ import { openCommandBar } from './cmd.js';
 import * as dashboard from './views/dashboard.js';
 import * as players from './views/players.js';
 import * as mail from './views/mail.js';
+import * as gifts from './views/gifts.js';
 import * as moderation from './views/moderation.js';
 import * as world from './views/world.js';
 import * as audit from './views/audit.js';
@@ -15,7 +16,7 @@ import * as server from './views/server.js';
 
 const VIEWS = {
   dashboard: ['Dashboard', 'dashboard', dashboard], players: ['Players', 'players', players], mail: ['Mail', 'mail', mail],
-  moderation: ['Moderation', 'shield', moderation], world: ['World', 'globe', world], audit: ['Audit', 'audit', audit], server: ['Server', 'server', server],
+  gifts: ['Gifts & Codes', 'gift', gifts], moderation: ['Moderation', 'shield', moderation], world: ['World', 'globe', world], audit: ['Audit', 'audit', audit], server: ['Server', 'server', server],
 };
 const $ = (id) => document.getElementById(id);
 let cleanup = null;

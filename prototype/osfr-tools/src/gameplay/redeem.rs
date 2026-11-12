@@ -6,23 +6,51 @@ use crate::{
     redeem_codes::{self, Codes},
 };
 
-fn today() -> i64 {
-    (current_unix_seconds() / 86_400) as i64
-}
-
-/// `FR-XXXX-XXXX` from the OS random source (letters and digits without 0/O/1/I).
-fn random_code() -> String {
-    const ALPHABET: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let mut bytes = [0u8; 8];
-    let _ = getrandom::getrandom(&mut bytes);
-    let pick: String = bytes
-        .iter()
-        .map(|b| ALPHABET[usize::from(*b) % ALPHABET.len()] as char)
-        .collect();
-    format!("FR-{}-{}", &pick[..4], &pick[4..])
-}
+use redeem_codes::{random_code, today};
 
 impl Gameplay {
+    // gifts-codes: what the Claim window's gift rows need from the session (`crate::gifts::claim`).
+
+    /// This character's own claim rows (achievement rewards), encoded for the 108/2 list.
+    pub(crate) fn gift_claim_rows(&self) -> Vec<Vec<u8>> {
+        self.progression_extras.claim_rows()
+    }
+
+    /// The folder `gift_catalog.json` is read from: the one the season table comes from.
+    pub(crate) fn gift_content_dir(&self) -> PathBuf {
+        crate::content::npc_content(&self.content_dir)
+    }
+
+    pub(crate) fn gift_presentation(&self, item: i32) -> Option<crate::inventory::ItemPresentation> {
+        self.inventory.presentation(item).ok()
+    }
+
+    /// The serialized `ClientItemDefinition` a 108/6 carries.
+    pub(crate) fn gift_definition(&self, item: i32) -> Option<Vec<u8>> {
+        self.inventory.definition_record(item).map(<[u8]>::to_vec)
+    }
+
+    pub(crate) fn gift_member(&self) -> bool {
+        self.game_rules.membership.is_active_at(current_unix_seconds())
+    }
+
+    /// A gift's grant through mail's reward path (stacking, the item tables, pets settled), held
+    /// to the bag: no new shown stack past `BAG_STACKS` (or a legacy bag's own count). Run it on
+    /// a copy; an error leaves that copy to be dropped.
+    pub(crate) fn gift_grant(
+        &mut self,
+        coins: u32,
+        items: &[(i32, u32)],
+        now_ms: u64,
+    ) -> io::Result<Vec<Vec<u8>>> {
+        let room = (self.inventory.state().bag_stacks()).max(crate::inventory::BAG_STACKS);
+        let granted = self.mail_grant(coins, items, now_ms)?;
+        if self.inventory.state().bag_stacks() > room {
+            return Err(io::Error::other("your bag is full, make room first"));
+        }
+        Ok(granted.replies)
+    }
+
     pub(super) fn realm_redeem(
         &mut self,
         words: &[&str],

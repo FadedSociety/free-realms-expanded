@@ -34,9 +34,16 @@ export const ROUTES = {
   audit: ['GET', '/admin/api/audit'],
   map: ['GET', '/admin/api/map/{zone}'],
   events: ['GET', '/admin/api/events'], // optional stream; the panel polls every 2 s instead
+  // gifts-codes (admin_gifts.rs): the catalog, a gift into a player's Claim window, codes, standing offers.
+  giftCatalog: ['GET', '/admin/api/gifts'],
+  giftSend: ['POST', '/admin/api/gifts/send'],
+  giftCodes: ['GET', '/admin/api/gifts/codes'],
+  giftMakeCode: ['POST', '/admin/api/gifts/codes'],
+  giftRevoke: ['POST', '/admin/api/gifts/codes/revoke'],
+  giftOffer: ['POST', '/admin/api/gifts/offers'],
 };
 
-export const MOCK_FILES = ['meta', 'me', 'status', 'zones', 'players', 'inventory', 'items', 'quests', 'mail', 'audit'];
+export const MOCK_FILES = ['meta', 'me', 'status', 'zones', 'players', 'inventory', 'items', 'quests', 'mail', 'audit', 'gifts'];
 const NO_CSRF = new Set(['loginChallenge', 'login']);
 let mock = null;
 let csrf = null; // the session itself is the gateway's HttpOnly cookie; only the CSRF token lives here
@@ -145,6 +152,12 @@ export const api = {
   announce: (to, text, style) => req('announce', {}, null, { to, text, style }),
   audit: (query) => req('audit', {}, query),
   map: (zone) => req('map', { zone }),
+  giftCatalog: (query) => req('giftCatalog', {}, query),
+  giftSend: (character_id, key, note) => req('giftSend', {}, null, note ? { character_id, key, note } : { character_id, key }),
+  giftCodes: () => req('giftCodes'),
+  giftMakeCode: (body) => req('giftMakeCode', {}, null, body),
+  giftRevoke: (code) => req('giftRevoke', {}, null, { code }),
+  giftOffer: (key, enabled) => req('giftOffer', {}, null, { key, enabled }),
 };
 
 // An item's icon: the API's icon URL when it gives one, else the gateway's icon route; none in mock mode.

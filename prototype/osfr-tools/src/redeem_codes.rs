@@ -34,6 +34,9 @@ pub struct Code {
     pub note: String,
     /// Character guid -> times redeemed.
     pub redeemed: BTreeMap<u64, u32>,
+    /// gifts-codes: the one account that may redeem it (a code made for an event's winner).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bound: Option<u64>,
 }
 
 #[derive(Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -79,6 +82,23 @@ impl Codes {
     pub fn save(&self, path: &Path) -> io::Result<()> {
         let bytes = serde_json::to_vec_pretty(self).map_err(io::Error::other)?;
         crate::character_store::replace_bytes(path, &bytes)
+    }
+
+    /// [`Self::redeem`] for `account`'s character: a code bound to another account is refused
+    /// before any limit is read or any use recorded.
+    pub fn redeem_for(
+        &mut self,
+        code: &str,
+        character: u64,
+        account: u64,
+        member: bool,
+        today: i64,
+    ) -> Result<(u32, Vec<(i32, u32)>), &'static str> {
+        let bound = self.codes.get(&normalize(code)).and_then(|c| c.bound);
+        if bound.is_some_and(|owner| owner != account) {
+            return Err("That code belongs to someone else.");
+        }
+        self.redeem(code, character, member, today)
     }
 
     /// Check a player's code and record the use; the grant is the caller's.
@@ -258,8 +278,25 @@ pub fn normalize(code: &str) -> String {
     code.trim().to_ascii_uppercase()
 }
 
-fn valid_code(code: &str) -> bool {
+pub fn valid_code(code: &str) -> bool {
     (4..=24).contains(&code.len()) && code.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
+}
+
+/// Days since 1970-01-01 (UTC), the unit `starts` and `expires` count in.
+pub fn today() -> i64 {
+    i64::try_from(crate::gifts::unix_now() / 86_400).unwrap_or(i64::MAX)
+}
+
+/// `FR-XXXX-XXXX` from the OS random source (letters and digits without 0/O/1/I).
+pub fn random_code() -> String {
+    const ALPHABET: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let mut bytes = [0u8; 8];
+    let _ = getrandom::getrandom(&mut bytes);
+    let pick: String = bytes
+        .iter()
+        .map(|b| ALPHABET[usize::from(*b) % ALPHABET.len()] as char)
+        .collect();
+    format!("FR-{}-{}", &pick[..4], &pick[4..])
 }
 
 fn flag(on: bool) -> &'static str {

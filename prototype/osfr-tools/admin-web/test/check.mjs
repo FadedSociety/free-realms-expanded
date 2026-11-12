@@ -52,7 +52,13 @@ GET /admin/api/players/{id}/mail
 POST /admin/api/announce
 GET /admin/api/audit
 GET /admin/api/map/{zone}
-GET /admin/api/events`.trim().split('\n').map((l) => l.replace('{character_id}', '{id}'));
+GET /admin/api/events
+GET /admin/api/gifts
+POST /admin/api/gifts/send
+GET /admin/api/gifts/codes
+POST /admin/api/gifts/codes
+POST /admin/api/gifts/codes/revoke
+POST /admin/api/gifts/offers`.trim().split('\n').map((l) => l.replace('{character_id}', '{id}'));
 const { ROUTES, MOCK_FILES, api, signChallenge } = await load('js/api.js');
 assert.deepEqual(Object.values(ROUTES).map(([m, p]) => `${m} ${p}`).sort(), [...CONTRACT].sort(), 'api.js routes differ from the contract');
 ok(Object.keys(ROUTES).length === CONTRACT.length, 'one name per route');
@@ -153,6 +159,26 @@ ok((await call('audit', {}, { since: Math.floor(Date.now() / 1000) - 60 })).rows
 const map = await call('map', { zone: pip.zone });
 has(map, ['image', 'bounds', 'players'], 'map');
 has(map.players[0], ['character_id', 'name', 'position'], 'map player');
+// gifts-codes: the Gifts & Codes routes in the shapes admin_gifts.rs serves.
+const catalogPage = await call('giftCatalog', {}, { q: 'witch' });
+has(catalogPage, ['total', 'page', 'page_size', 'rows', 'unresolved'], 'gift catalog');
+has(catalogPage.rows[0], ['key', 'name', 'items', 'source', 'code', 'per', 'repeatable', 'repeat_hours', 'live_event', 'tradeable', 'enabled', 'stock_per_event', 'per_player', 'stock_group', 'enabled_now'], 'gift row');
+ok(catalogPage.rows.length === 1 && catalogPage.rows[0].live_event === 'halloween', 'search finds the Halloween offer');
+has(await call('giftSend', {}, {}, { character_id: pip.character_id, key: 'promo-domo-hat', note: 'winner' }), ['account', 'gift_id', 'key'], 'gift send');
+await assert.rejects(call('giftSend', {}, {}, { character_id: pip.character_id, key: 'no-such' }), (e) => e.status === 404);
+const madeCode = await call('giftMakeCode', {}, {}, { keys: ['promo-domo-hat', 'code-getspooky'], uses: 1, expires_days: 7, character_id: pip.character_id });
+has(madeCode, ['code', 'row'], 'gift code');
+has(madeCode.row, ['code', 'enabled', 'uses', 'max_uses', 'expires', 'bound_account', 'note', 'items'], 'code row');
+ok(/^FR-[0-9A-F]{4}-[0-9A-F]{4}$/.test(madeCode.code) && madeCode.row.items.length === 2, 'a bundle code');
+ok((await call('giftCodes')).some((c) => c.code === madeCode.code), 'the codes list has it');
+ok((await call('giftRevoke', {}, {}, { code: madeCode.code })).row.enabled === false, 'revoke turns it off');
+await assert.rejects(call('giftRevoke', {}, {}, { code: madeCode.code }), (e) => e.status === 422);
+const offer = await call('giftOffer', {}, {}, { key: 'profile-turtle', enabled: false });
+ok(offer.was === true && offer.enabled === false, 'an offer turns off');
+ok((await call('giftCatalog', {}, { q: 'turtle' })).rows[0].enabled_now === false, 'and the catalog shows it off');
+for (const action of ['gift_send', 'gift_code', 'gift_code_revoke', 'gift_offer']) {
+  ok((await call('audit', {}, { action })).total === 1, `${action} leaves one audit row`);
+}
 await call('logout', {}, {}, {});
 await assert.rejects(call('me'), (e) => e.status === 401);
 
@@ -187,6 +213,8 @@ ok(parse('give Pip', true).error, 'a missing item is an error');
 const act = await load('js/actions.js');
 act.me.permissions = ['view', 'mute', 'unmute', 'kick', 'ban', 'unban', 'warn', 'jail', 'release', 'note', 'mail'];
 ok(act.can('mute') && act.can('mail') && !act.can('inventory') && !act.can('announce'), 'a moderator list greys out item edits and announcements');
+act.me.permissions = ['view', 'mail', 'gifts'];
+ok(act.can('gifts') && !act.can('gift_codes'), 'a moderator sends gifts; codes and offers are greyed out');
 act.me.permissions = ['players.write'];
 ok(act.can('inventory'), 'unknown permission names grey out nothing');
 

@@ -501,7 +501,10 @@ fn claim_pays_once_replay_and_forged_ids_are_inert_and_history_survives_relog() 
         .iter()
         .find(|packet| packet.starts_with(&[108, 0, 4, 0, 0xef, 0xbe, 0, 0]))
         .unwrap();
-    assert_eq!(decode_claim_rows(claimed_row, 9).len(), 1);
+    // gifts-codes: the 108/4 rows replace the client's whole list (ctor 00a00490 points the
+    // packet at the manager's own array, which 00a04640 resizes and fills), so they are what is
+    // still waiting: nothing, once the only row is claimed.
+    assert_eq!(decode_claim_rows(claimed_row, 9).len(), 0);
     let paid = gateway.snapshot();
     assert_eq!(item_count(&paid, 8), 1);
     assert!(

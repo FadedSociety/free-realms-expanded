@@ -1297,9 +1297,12 @@ impl ClaimWindow {
             Ok(result) => result,
             Err(_) => return Ok(reject()),
         };
-        let records = ids
-            .iter()
-            .map(|id| self.pending[id].record.encode())
+        // gifts-codes: the 108/4 rows replace the client's whole list (ctor 00a00490 points the
+        // packet at the manager's own array, which 00a04640 resizes), so they are the rows still
+        // waiting, not the ones just claimed.
+        let records = (self.pending.iter())
+            .filter(|(id, _)| !ids.contains(id))
+            .map(|(_, item)| item.record.encode())
             .collect::<io::Result<Vec<_>>>()?;
         let mut response = packet_u16_u16(108, 4);
         put_u32(&mut response, tracker_id);
@@ -1516,6 +1519,14 @@ impl ProgressionExtras {
 
     pub fn pending_count(&self) -> usize {
         self.claims.pending_count()
+    }
+
+    /// gifts-codes: the queued claim rows as the 108/2 list carries them, for the gift window
+    /// that lists them beside the account's gifts. A row that cannot encode is left out.
+    pub fn claim_rows(&self) -> Vec<Vec<u8>> {
+        (self.claims.pending.values())
+            .filter_map(|item| item.record.encode().ok())
+            .collect()
     }
 
     pub fn achievement_state(&self) -> AchievementState {

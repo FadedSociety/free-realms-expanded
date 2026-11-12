@@ -597,6 +597,71 @@ fn admin_icons_come_from_the_client_install() {
     assert_eq!(get(&mut rig, "/admin/icon/abc", Some(&mo)).status, 400);
 }
 
+/// gifts-codes: the Gifts & Codes routes. Staff browse and send; only admins make and revoke
+/// codes and turn offers on or off; every applied write is one audit row, refusals none.
+#[test]
+fn admin_gift_routes_send_make_revoke_and_toggle_by_role() {
+    use osfr_tools::gifts::{self, Toggles};
+    let Some((files, mut rig)) = panel("gifts", SESSION_TTL, None) else {
+        return;
+    };
+    let (ada, mo) = (sign_in(&mut rig, ADA_HANDLE), sign_in(&mut rig, MO_HANDLE));
+    let found = get(&mut rig, "/admin/api/gifts?q=witch", Some(&mo));
+    assert_eq!(found.status, 200, "{}", String::from_utf8_lossy(&found.body));
+    let found = found.json();
+    let rows = found["rows"].as_array().unwrap();
+    assert!(rows.iter().any(|row| row["key"] == "profile-witch-pail" && row["live_event"] == "halloween"));
+    assert!(rows.iter().all(|row| row["enabled_now"].is_boolean()));
+    assert!(!found["unresolved"].as_array().unwrap().is_empty(), "the unresolved list rides along");
+    assert_eq!(get(&mut rig, "/admin/api/gifts", None).status, 401);
+
+    // A moderator sends a catalog gift straight into a player's Claim window.
+    let body = json!({"character_id": guid(PIP), "key": "promo-domo-hat", "note": "Costume contest winner"});
+    let sent = post(&mut rig, "/admin/api/gifts/send", body, &mo);
+    assert_eq!(sent.status, 200, "{}", String::from_utf8_lossy(&sent.body));
+    assert_eq!(sent.json()["account"], account(PIP));
+    let waiting = gifts::load(&gifts::box_path(&files.store(), account(PIP))).unwrap().pending;
+    assert!(waiting.iter().any(|p| p.key.as_deref() == Some("promo-domo-hat") && p.note == "Costume contest winner"));
+    let nobody = json!({"character_id": 99_999, "key": "promo-domo-hat"});
+    assert_eq!(post(&mut rig, "/admin/api/gifts/send", nobody, &mo).status, 404);
+    let unknown = json!({"character_id": guid(PIP), "key": "no-such-gift"});
+    assert_eq!(post(&mut rig, "/admin/api/gifts/send", unknown, &mo).status, 404);
+
+    // Codes and offers are admin only.
+    let new = json!({"keys": ["promo-domo-hat"], "uses": 1, "expires_days": 7, "character_id": guid(PIP)});
+    assert_eq!(post(&mut rig, "/admin/api/gifts/codes", new.clone(), &mo).status, 403);
+    let off = json!({"key": "profile-turtle", "enabled": false});
+    assert_eq!(post(&mut rig, "/admin/api/gifts/offers", off.clone(), &mo).status, 403);
+    let made = post(&mut rig, "/admin/api/gifts/codes", new, &ada);
+    assert_eq!(made.status, 200, "{}", String::from_utf8_lossy(&made.body));
+    let code = made.json()["code"].as_str().unwrap().to_owned();
+    assert_eq!(made.json()["row"]["bound_account"], account(PIP));
+    let listed = get(&mut rig, "/admin/api/gifts/codes", Some(&mo)).json();
+    assert!(listed.as_array().unwrap().iter().any(|row| row["code"] == code.as_str() && row["max_uses"] == 1));
+    let revoke = json!({"code": code});
+    assert_eq!(post(&mut rig, "/admin/api/gifts/codes/revoke", revoke.clone(), &mo).status, 403);
+    assert_eq!(post(&mut rig, "/admin/api/gifts/codes/revoke", revoke.clone(), &ada).status, 200);
+    assert_eq!(post(&mut rig, "/admin/api/gifts/codes/revoke", revoke, &ada).status, 422, "revoked once");
+    let toggled = post(&mut rig, "/admin/api/gifts/offers", off, &ada);
+    assert_eq!((toggled.status, toggled.json()["was"].as_bool()), (200, Some(true)));
+    let catalog = gifts::Catalog::load(&rig.server.options.content.clone().map_or_else(
+        osfr_tools::content::bundled_content,
+        |dir| osfr_tools::content::npc_content(&dir),
+    ))
+    .unwrap();
+    assert!(!Toggles::load(&files.store()).enabled(catalog.get("profile-turtle").unwrap()));
+
+    // One audit row per applied write, with the staff member and the target.
+    let actions: Vec<String> = audit_rows(&files)
+        .into_iter()
+        .map(|row| row.action)
+        .filter(|action| action.starts_with("gift"))
+        .collect();
+    assert_eq!(actions, ["gift_offer", "gift_code_revoke", "gift_code", "gift_send"], "newest first");
+    let send_row = audit_rows(&files).into_iter().find(|row| row.action == "gift_send").unwrap();
+    assert_eq!((send_row.staff.name.as_str(), send_row.target.character_id), (MO_HANDLE, Some(guid(PIP))));
+}
+
 #[cfg(test)]
 #[path = "admin_wire_tests.rs"]
 mod wire;
