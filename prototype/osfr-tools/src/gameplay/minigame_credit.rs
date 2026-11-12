@@ -6,8 +6,8 @@
 use super::*;
 
 impl crate::quest_engine::MinigameResult {
-    /// (R) T787: a single-player time trial finished with the server-measured race
-    /// time. A kart race has no score, placement or knock-out fact.
+    /// (R) T787: a race finished with the server-measured time. It has no score or knock-out
+    /// fact; the kart race adds its place (C6, `KartRewardClaim::result`).
     pub(crate) fn finished_at(elapsed_seconds: Option<u32>) -> Self {
         Self {
             won: true,

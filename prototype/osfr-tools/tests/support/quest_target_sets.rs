@@ -43,8 +43,8 @@
 //!   Derby" or an extra `derby_rows.json` row, never its type id 11, which is
 //!   MiniGameData row 11 (the Trading Card Game). Mining,
 //!   harvesting, forging, chess and soccer read their elapsed seconds and score
-//!   from the server-built 39/18; kart reports its own elapsed time and no
-//!   placement (a single-player time trial); the derby reports score, placement
+//!   from the server-built 39/18; kart reports its own elapsed time and,
+//!   with an AI field (C6), its place; the derby reports score, placement
 //!   and knock-outs; a paid fishing catch reports no result fact.
 //! * `items`: `Inventory::load`'s merged `inventory.json` +
 //!   `item-catalogue.json` definitions. A `collect_item`, `equip_item` or
@@ -227,10 +227,15 @@ impl Targets {
         }
         // `KartGateway::load` owns `kart_gates.json` and `kart_rows.json`; a kart claim credits the
         // MiniGameData row the race ran as (L930), one of `minigame_ids`. A time trial has no
-        // rival, so no placement is reported.
+        // rival, so no placement is reported; C6: a row whose track has an AI field (`kart_ai.json`)
+        // also reports the place it finished in.
         if let Some(kart) = KartGateway::load(root, None)? {
             for row in kart.minigame_ids() {
-                targets.producer(row, [MinigameFact::Elapsed]);
+                if kart.reports_placement(row) {
+                    targets.producer(row, [MinigameFact::Elapsed, MinigameFact::Placement]);
+                } else {
+                    targets.producer(row, [MinigameFact::Elapsed]);
+                }
             }
         }
         // L932: every `soccer.json` game is a producer, the Games window rows 42-44 and the

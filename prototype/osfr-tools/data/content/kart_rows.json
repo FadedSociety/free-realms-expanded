@@ -824,6 +824,492 @@
           "evidence": "(R) track: as row 579, a Sandstorm circuit; it runs the Sandstorm package until a driven lap separates the circuits."
         }
       ]
+    },
+    {
+      "game_id": 283,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 9870,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 283 '283^10^0^0^9870^2^...' is TYPE 10 with no name or description text, ICON_ID 9870, DIFFICULTY 2."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy and one hard row per speedway, so they are placed on sg_kt_track. (R) texts: the row carries none, so the offer borrows the Wildwood free race's name 17958 and description 37935; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 284,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 9870,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 284 '284^10^0^0^9870^3^...' is TYPE 10 with no name or description text, ICON_ID 9870, DIFFICULTY 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy and one hard row per speedway, so they are placed on sg_kt_track. (R) texts: the row carries none, so the offer borrows the Wildwood free race's name 17958 and description 37935; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 285,
+      "track": "sh_kt_track",
+      "name_id": 37933,
+      "description_id": 37936,
+      "icon_id": 9872,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 285 '285^10^0^0^9872^2^...' is TYPE 10 with no name or description text, ICON_ID 9872, DIFFICULTY 2."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9872 is the Frost Ridge speedway's picture in the client table, so the row races on sh_kt_track. (R) texts: the row carries none, so the offer borrows the Frost Ridge free race's name 37933 and description 37936; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 286,
+      "track": "sh_kt_track",
+      "name_id": 37933,
+      "description_id": 37936,
+      "icon_id": 9872,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 286 '286^10^0^0^9872^3^...' is TYPE 10 with no name or description text, ICON_ID 9872, DIFFICULTY 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9872 is the Frost Ridge speedway's picture in the client table, so the row races on sh_kt_track. (R) texts: the row carries none, so the offer borrows the Frost Ridge free race's name 37933 and description 37936; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 287,
+      "track": "bw_kt_track",
+      "name_id": 37934,
+      "description_id": 37937,
+      "icon_id": 9868,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 287 '287^10^0^0^9868^2^...' is TYPE 10 with no name or description text, ICON_ID 9868, DIFFICULTY 2."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9868 is the Tangletrack speedway's picture in the client table, so the row races on bw_kt_track. (R) texts: the row carries none, so the offer borrows the Tangletrack free race's name 37934 and description 37937; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 288,
+      "track": "bw_kt_track",
+      "name_id": 37934,
+      "description_id": 37937,
+      "icon_id": 9868,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 288 '288^10^0^0^9868^3^...' is TYPE 10 with no name or description text, ICON_ID 9868, DIFFICULTY 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9868 is the Tangletrack speedway's picture in the client table, so the row races on bw_kt_track. (R) texts: the row carries none, so the offer borrows the Tangletrack free race's name 37934 and description 37937; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 310,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 310 '310^10^17958^37935^9870^1^...' is TYPE 10, NAME_ID 17958, DESCRIPTION_ID 37935, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958, so this row is placed on sg_kt_track."
+        }
+      ]
+    },
+    {
+      "game_id": 561,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 14,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 561 '561^10^17958^37935^14^1^...' is TYPE 10, NAME_ID 17958, DESCRIPTION_ID 37935, ICON_ID 14, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 14 is a generic picture and the row's name is the Wildwood Kart Racing text 17958 (rows 28, 310, 565, 569 share it), so it races on sg_kt_track."
+        }
+      ]
+    },
+    {
+      "game_id": 562,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 14,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 562 '562^10^17958^37935^14^1^...' is TYPE 10, NAME_ID 17958, DESCRIPTION_ID 37935, ICON_ID 14, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 14 is a generic picture and the row's name is the Wildwood Kart Racing text 17958 (rows 28, 310, 565, 569 share it), so it races on sg_kt_track."
+        }
+      ]
+    },
+    {
+      "game_id": 565,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 565 '565^10^17958^37935^9870^1^...' is TYPE 10, NAME_ID 17958, DESCRIPTION_ID 37935, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958, so this row is placed on sg_kt_track."
+        }
+      ]
+    },
+    {
+      "game_id": 569,
+      "track": "sg_kt_track",
+      "name_id": 17958,
+      "description_id": 37935,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 569 '569^10^17958^37935^9870^1^...' is TYPE 10, NAME_ID 17958, DESCRIPTION_ID 37935, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958, so this row is placed on sg_kt_track."
+        }
+      ]
+    },
+    {
+      "game_id": 1076,
+      "track": "sg_kt_track",
+      "name_id": 440701,
+      "description_id": 3436,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1076 '1076^10^440701^3436^9870^1^...' is TYPE 10, NAME_ID 440701, DESCRIPTION_ID 3436, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958 but this row has its own name id, which names no speedway, so it is placed on sg_kt_track as the first speedway of the table (R)."
+        }
+      ]
+    },
+    {
+      "game_id": 1077,
+      "track": "sg_kt_track",
+      "name_id": 440702,
+      "description_id": 3436,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1077 '1077^10^440702^3436^9870^1^...' is TYPE 10, NAME_ID 440702, DESCRIPTION_ID 3436, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958 but this row has its own name id, which names no speedway, so it is placed on sg_kt_track as the first speedway of the table (R)."
+        }
+      ]
+    },
+    {
+      "game_id": 1078,
+      "track": "sg_kt_track",
+      "name_id": 440703,
+      "description_id": 3436,
+      "icon_id": 9870,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1078 '1078^10^440703^3436^9870^1^...' is TYPE 10, NAME_ID 440703, DESCRIPTION_ID 3436, ICON_ID 9870, DIFFICULTY 1."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958 but this row has its own name id, which names no speedway, so it is placed on sg_kt_track as the first speedway of the table (R)."
+        }
+      ]
+    },
+    {
+      "game_id": 1079,
+      "track": "sg_kt_track",
+      "name_id": 440646,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1079 '1079^10^440646^3438^9870^2^...' is TYPE 10, NAME_ID 440646, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 2."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958 but this row has its own name id, which names no speedway, so it is placed on sg_kt_track as the first speedway of the table (R)."
+        }
+      ]
+    },
+    {
+      "game_id": 1080,
+      "track": "sg_kt_track",
+      "name_id": 440650,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1080 '1080^10^440650^3438^9870^3^...' is TYPE 10, NAME_ID 440650, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958 but this row has its own name id, which names no speedway, so it is placed on sg_kt_track as the first speedway of the table (R)."
+        }
+      ]
+    },
+    {
+      "game_id": 1081,
+      "track": "sg_kt_track",
+      "name_id": 440654,
+      "description_id": 3438,
+      "icon_id": 9870,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1081 '1081^10^440654^3438^9870^4^...' is TYPE 10, NAME_ID 440654, DESCRIPTION_ID 3438, ICON_ID 9870, DIFFICULTY 4."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9870 is the generic kart picture (the client also gives it to Thunder Falls 567, the Sandstorm circuits 579/580 and Tangletrack 649-655), so it names no speedway; the unnamed 283/284 sit beside the 285-288 pattern of one easy row per speedway and the named rows 310, 565 and 569 carry the Wildwood Kart Racing text 17958 but this row has its own name id, which names no speedway, so it is placed on sg_kt_track as the first speedway of the table (R)."
+        }
+      ]
+    },
+    {
+      "game_id": 1105,
+      "track": "ss_kt_track",
+      "name_id": 401623,
+      "description_id": 407515,
+      "icon_id": 20991,
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1105 '1105^10^0^0^20991^2^...' is TYPE 10 with no name or description text, ICON_ID 20991, DIFFICULTY 2."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 20991 is the Sandstorm speedway's picture in the client table, so the row races on ss_kt_track. (R) texts: the row carries none, so the offer borrows the Sandstorm free race's name 401623 and description 407515; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 1106,
+      "track": "ss_kt_track",
+      "name_id": 401623,
+      "description_id": 407515,
+      "icon_id": 20991,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1106 '1106^10^0^0^20991^4^...' is TYPE 10 with no name or description text, ICON_ID 20991, DIFFICULTY 4."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 20991 is the Sandstorm speedway's picture in the client table, so the row races on ss_kt_track. (R) texts: the row carries none, so the offer borrows the Sandstorm free race's name 401623 and description 407515; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 1107,
+      "track": "ss_kt_track",
+      "name_id": 401623,
+      "description_id": 407515,
+      "icon_id": 20991,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1107 '1107^10^0^0^20991^4^...' is TYPE 10 with no name or description text, ICON_ID 20991, DIFFICULTY 4."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 20991 is the Sandstorm speedway's picture in the client table, so the row races on ss_kt_track. (R) texts: the row carries none, so the offer borrows the Sandstorm free race's name 401623 and description 407515; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 1108,
+      "track": "sh_kt_track",
+      "name_id": 37933,
+      "description_id": 37936,
+      "icon_id": 9872,
+      "difficulty": 3,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1108 '1108^10^0^0^9872^3^...' is TYPE 10 with no name or description text, ICON_ID 9872, DIFFICULTY 3."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9872 is the Frost Ridge speedway's picture in the client table, so the row races on sh_kt_track. (R) texts: the row carries none, so the offer borrows the Frost Ridge free race's name 37933 and description 37936; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 1110,
+      "track": "sg_kt_track2",
+      "name_id": 3606,
+      "description_id": 3244,
+      "icon_id": 20990,
+      "difficulty": 4,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1110 '1110^10^0^0^20990^4^...' is TYPE 10 with no name or description text, ICON_ID 20990, DIFFICULTY 4."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 20990 is the Thunder Falls speedway's picture in the client table, so the row races on sg_kt_track2. (R) texts: the row carries none, so the offer borrows the Thunder Falls free race's name 3606 and description 3244; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 1112,
+      "track": "bw_kt_track",
+      "name_id": 37934,
+      "description_id": 37937,
+      "icon_id": 9868,
+      "difficulty": 5,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 1112 '1112^10^0^0^9868^5^...' is TYPE 10 with no name or description text, ICON_ID 9868, DIFFICULTY 5."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: icon 9868 is the Tangletrack speedway's picture in the client table, so the row races on bw_kt_track. (R) texts: the row carries none, so the offer borrows the Tangletrack free race's name 37934 and description 37937; the difficulty dots are the row's own."
+        }
+      ]
+    },
+    {
+      "game_id": 279,
+      "track": null,
+      "name_id": 117323,
+      "description_id": 139383,
+      "icon_id": 18420,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 279 '279^10^117323^139383^18420^1^...' is TYPE 10, a second client copy of the Racing Tutorial rows 277/278 (name 117323, description 139383, tutorial icon 18420)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: closed with the tutorials 277/278. The tutorial lesson is the RacingTutorial popup flow (client Lua RacingTutorial: StartRacingBasics, StartRacingAdvanced) that no server frame opens yet, and the client names no track for it, so the row stays listed and closed rather than racing without its lesson."
+        }
+      ]
+    },
+    {
+      "game_id": 280,
+      "track": null,
+      "name_id": 117324,
+      "description_id": 139419,
+      "icon_id": 18420,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 280 '280^10^117324^139419^18420^1^...' is TYPE 10, a second client copy of the Racing Tutorial rows 277/278 (name 117324, description 139419, tutorial icon 18420)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: closed with the tutorials 277/278. The tutorial lesson is the RacingTutorial popup flow (client Lua RacingTutorial: StartRacingBasics, StartRacingAdvanced) that no server frame opens yet, and the client names no track for it, so the row stays listed and closed rather than racing without its lesson."
+        }
+      ]
+    },
+    {
+      "game_id": 281,
+      "track": null,
+      "name_id": 117323,
+      "description_id": 139383,
+      "icon_id": 18420,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 281 '281^10^117323^139383^18420^1^...' is TYPE 10, a second client copy of the Racing Tutorial rows 277/278 (name 117323, description 139383, tutorial icon 18420)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: closed with the tutorials 277/278. The tutorial lesson is the RacingTutorial popup flow (client Lua RacingTutorial: StartRacingBasics, StartRacingAdvanced) that no server frame opens yet, and the client names no track for it, so the row stays listed and closed rather than racing without its lesson."
+        }
+      ]
+    },
+    {
+      "game_id": 282,
+      "track": null,
+      "name_id": 117324,
+      "description_id": 139419,
+      "icon_id": 18420,
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 282 '282^10^117324^139419^18420^1^...' is TYPE 10, a second client copy of the Racing Tutorial rows 277/278 (name 117324, description 139419, tutorial icon 18420)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) track: closed with the tutorials 277/278. The tutorial lesson is the RacingTutorial popup flow (client Lua RacingTutorial: StartRacingBasics, StartRacingAdvanced) that no server frame opens yet, and the client names no track for it, so the row stays listed and closed rather than racing without its lesson."
+        }
+      ]
     }
   ]
 }

@@ -138,7 +138,9 @@ const CHESS_DETAIL: &str = "chess_detail.dds";
 const CHESS_THUMBNAIL: &str = "chess_thumb.dds";
 /// L099: the service rows include one per runnable recipe (31 today). L962: raised from 128 when
 /// Tower Defense's 36 games pushed a full content set past it; the live catalogue has 211 rows.
-const MAX_ACTIVITIES: usize = 256;
+/// C2: the open dungeon doors' fights are battle rows too, and a full content set passed 256; a
+/// service row joins at most one live row, so the live lists' own bound holds them.
+const MAX_ACTIVITIES: usize = MAX_LIVE_ROWS;
 const MAX_FILE: u64 = 1 << 20;
 const PLAY_LEN: usize = 12;
 
@@ -435,8 +437,12 @@ impl Catalogue {
         if !live.is_empty() {
             // A game whose MiniGameData row is already a service id stays unlisted (the tests
             // prove every live row that should run is joined).
+            // L1178 (lead): a game row repeated among the games (a kart row that is also a derby
+            // or service id) is listed once too, as one already in the catalogue is.
+            let mut listed: std::collections::BTreeSet<u32> =
+                self.rows.iter().map(|row| row.id).collect();
             let games = (games.into_iter())
-                .filter(|game| !self.rows.iter().any(|row| row.id == game.id))
+                .filter(|game| listed.insert(game.id))
                 .collect::<Vec<_>>();
             self = self.append(games)?;
         }

@@ -113,6 +113,7 @@
 //!
 //! ponytail: one flat service, one schedule cursor, one gate cursor derived from the racing session.
 
+use crate::kart_ai::AiField;
 use crate::kart_entry::{self, EntryGate};
 use crate::kart_pickups::{
     PendingRespawn, PickupError, PickupRefusal, PickupRespawn, PickupSet, PickupSnapshot,
@@ -1002,6 +1003,9 @@ pub struct KartService {
     reward_taken: bool,
     /// When state 11 goes out. Not saved: a reconnect keeps the race, not this hold.
     close_at_ms: Option<u64>,
+    /// C6: the AI racers of this race. Session-local and not saved: every pose is a function of the
+    /// race clock, and a login abandons the saved race.
+    ai: Option<AiField>,
     /// Gates crossed since the last lap close ([`GateRule::Coverage`]); unused by the ordered rule.
     covered: BTreeSet<u32>,
 }
@@ -1497,8 +1501,31 @@ impl KartService {
             weapon_pose: None,
             reward_taken: false,
             close_at_ms: None,
+            ai: None,
             covered: BTreeSet::new(),
         })
+    }
+
+    /// C6: gives the race its AI field (built by `KartAi::field` for the race's row and track).
+    pub fn set_ai(&mut self, ai: AiField) {
+        self.ai = Some(ai);
+    }
+
+    /// C6: the AI racers' introduction frames (driver, vehicle, grid pose and first progress each),
+    /// sent right after the local racer's entry frames. Empty without a field.
+    pub fn ai_intro_frames(&self) -> Vec<Vec<u8>> {
+        self.ai.as_ref().map_or_else(Vec::new, AiField::intro_frames)
+    }
+
+    /// C6: the finished race's place among the field (1 = first); `None` without a field or before
+    /// the finish.
+    pub fn placement(&self) -> Option<u8> {
+        self.ai.as_ref()?.placement()
+    }
+
+    /// C6: whether the finished racer beat the row's named rival; `None` on a row with no rival.
+    pub fn beat_rival(&self) -> Option<bool> {
+        self.ai.as_ref()?.beat_rival()
     }
 
     pub fn set_gate(&mut self, gate: EntryGate) {
@@ -1658,6 +1685,9 @@ impl KartService {
         session.start(now_ms).map_err(ServiceError::Track)?;
         self.phase = RacePhase::Racing;
         self.race_started_ms = now_ms;
+        if let Some(ai) = &mut self.ai {
+            ai.start(now_ms);
+        }
         self.last_claim_ms = now_ms;
         self.last_position = self.content.start_position;
         // The native countdown reaches zero before its state9 racing/toolbar transition.
@@ -1774,6 +1804,30 @@ impl KartService {
         if self.close_at_ms.is_some_and(|at| now_ms >= at) {
             self.close_at_ms = None;
             replies.push(kart_entry::encode_inner(GAME_STATE_SUBTYPE, &11_i32.to_le_bytes()));
+        }
+        // C6: the AI racers' poses and the board, while the race runs and through the results hold.
+        if let Some(guid) = self.context.map(|context| context.player_guid) {
+            let racing = self.phase == RacePhase::Racing;
+            if racing || (self.phase == RacePhase::Finished && self.close_at_ms.is_some()) {
+                let position = self
+                    .weapon_pose
+                    .map_or(self.last_position, |observed| observed.pose.position);
+                let laps = self.session.as_ref().map_or(0, RaceSession::laps_completed);
+                let best = self.session.as_ref().and_then(RaceSession::best_lap_ms);
+                let mut board_due = false;
+                if let Some(ai) = &mut self.ai {
+                    if racing {
+                        ai.observe_local(position, laps, now_ms);
+                    }
+                    let (frames, due) = ai.tick(now_ms, guid, racing);
+                    replies.extend(frames);
+                    board_due = due;
+                }
+                // The local racer's own row rides every board update, so its place moves between gates.
+                if board_due {
+                    replies.push(self.progress_frame(guid, laps, best, now_ms));
+                }
+            }
         }
         // Timed pickup returns fire only inside a live racing window: after Go, before the race
         // window closes, never on a clock that predates the last accepted claim (a stale tick must
@@ -2442,6 +2496,7 @@ impl KartService {
             weapon_pose: snapshot.weapon_pose,
             reward_taken: snapshot.reward_taken,
             close_at_ms: None,
+            ai: None,
             covered: snapshot.covered.iter().copied().collect(),
         })
     }
@@ -2674,6 +2729,9 @@ impl KartService {
             };
             let (laps_completed, best_lap_ms) = (session.laps_completed(), session.best_lap_ms());
             self.accept_movement(position, now_ms, &charge);
+            if let Some(ai) = &mut self.ai {
+                ai.observe_local(position, laps_completed, now_ms);
+            }
             let reply =
                 self.progress_frame(context.player_guid, laps_completed, best_lap_ms, now_ms);
             return Ok(ServiceOutcome::Handled {
@@ -2729,8 +2787,17 @@ impl KartService {
             // A finished race keeps its last progress frame; no effect expires after it.
             self.shield_expiry = None;
         }
+        // C6: the field reads the claimed position, and a finish fixes the place before the local
+        // racer's final `33/14` is written; every AI's final row goes out first.
+        let mut replies = Vec::new();
+        if let Some(ai) = &mut self.ai {
+            ai.observe_local(position, laps_completed, now_ms);
+            if finished {
+                replies = ai.finish(now_ms, context.player_guid).0;
+            }
+        }
         let reply = self.progress_frame(context.player_guid, laps_completed, best_lap_ms, now_ms);
-        let mut replies = vec![reply];
+        replies.push(reply);
         if finished {
             replies.extend(self.weapons.clear());
             self.weapon_pose = None;
@@ -2824,6 +2891,9 @@ impl KartService {
         payload.best_lap_bits = (best_lap_ms.unwrap_or(0) as f32 / 1_000.0).to_bits();
         let elapsed = now_ms.saturating_sub(self.race_started_ms) as f32 / 1_000.0;
         payload.total_time_bits = elapsed.to_bits();
+        if let Some(ai) = &self.ai {
+            ai.apply_local(&mut payload, now_ms);
+        }
         kart_entry::encode_inner(
             PROGRESS_SUBTYPE,
             &kart_progress_native::encode_progress(&payload),

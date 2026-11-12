@@ -434,10 +434,17 @@
             {
               "kind": "wiki",
               "evidence": "the step's client id was empty in the wiki table; this row supplies it. The quest is not blocked by this step today, only by its giver chain (Challenge Verve McNichols)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Verve McNichols': kart_ai.json names Verve McNichols as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 628,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -667,10 +674,17 @@
             {
               "kind": "wiki",
               "evidence": "the step's client id was empty in the wiki table; this row supplies it. The quest waits only on its chain (Challenge Verve McNichols)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Linx Redline': kart_ai.json names Linx Redline as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 629,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -842,10 +856,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the You Want to Go Fast race. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_you_want_to_go_fast_8b63f9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than T.R. Walker Jr.': kart_ai.json names T.R. Walker Jr. as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 630,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -1244,10 +1265,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the Dominating at Wildwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_wildwood_744691)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Win the race' is first place among the seven AI racers of kart_ai.json; the race reports the racer's place, so only a first place credits (`require.max_placement` 1)."
             }
           ],
           "minigame_id": 633,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 1
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -1477,10 +1505,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the Treacherous Track race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_a_treacherous_track_fd5be8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Sparks Blitzwing': kart_ai.json names Sparks Blitzwing as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 635,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -1703,10 +1738,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the Redline Returns race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_redline_returns_c0de0b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Linx Redline': kart_ai.json names Linx Redline as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 636,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -1930,10 +1972,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the Icy Perfection race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_icy_perfection_a75713)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Amber Violet': kart_ai.json names Amber Violet as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 637,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -2315,10 +2364,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the Dominating at Frost Ridge race three times - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_frost_ridge_4de2c3)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Win the race' is first place among the seven AI racers of kart_ai.json; the race reports the racer's place, so only a first place credits (`require.max_placement` 1)."
             }
           ],
           "minigame_id": 640,
-          "count": 3
+          "count": 3,
+          "require": {
+            "max_placement": 1
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -2544,10 +2600,17 @@
             {
               "kind": "wiki",
               "evidence": "Beat the Age Before Beauty minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_age_before_beauty_914262)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Ace O'Mally': kart_ai.json names Ace O'Mally as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 642,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -2767,10 +2830,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the Settling the Score minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_settling_the_score_eb0250)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Linx Redline': kart_ai.json names Linx Redline as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 643,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -3000,10 +3070,17 @@
             {
               "kind": "wiki",
               "evidence": "Beat the High Speed Chase race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_high_speed_chase_899393)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Chase Wheeler': kart_ai.json names Chase Wheeler as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 644,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -3368,10 +3445,17 @@
             {
               "kind": "wiki",
               "evidence": "Beat the Dominating at Thunder Falls Challenge race three times - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_thunder_falls_1d6cd4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Win the race' is first place among the seven AI racers of kart_ai.json; the race reports the racer's place, so only a first place credits (`require.max_placement` 1)."
             }
           ],
           "minigame_id": 647,
-          "count": 3
+          "count": 3,
+          "require": {
+            "max_placement": 1
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -3642,10 +3726,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the 'Burning Up the Track' race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_burning_up_the_track_e4291b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Antonio Taurino': kart_ai.json names Antonio Taurino as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 649,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -3891,10 +3982,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the \"The Showdown\" minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_the_showdown_535129)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Linx Redline': kart_ai.json names Linx Redline as one of the racers on this row, and the race reports `won` only when the racer finished ahead of that rival. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event."
             }
           ],
           "minigame_id": 650,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",

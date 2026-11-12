@@ -2077,6 +2077,7 @@ impl Gameplay {
             } else {
                 crate::kart_gateway::KartRewardClaim::default()
             };
+            let result = claim.result();
             replies.extend(claim.replies);
             // The save decision is the type's: a clock-only racing tick writes nothing.
             let changed = before.changed_for_save(kart.state());
@@ -2088,7 +2089,7 @@ impl Gameplay {
             if let Some(minigame_id) = claim.minigame_id {
                 staged.credit_minigame(
                     minigame_id,
-                    crate::quest_engine::MinigameResult::finished_at(claim.elapsed_seconds),
+                    result,
                     &mut out,
                 )?;
                 staged.npc_quest_profiles_changed(&mut out)?;
@@ -2651,16 +2652,12 @@ impl Gameplay {
                     profiles,
                     self.consumable_effects.boost(),
                 )?;
-                minigame = claim.minigame_id.map(|id| (id, claim.elapsed_seconds));
+                minigame = claim.minigame_id.map(|id| (id, claim.result()));
                 out.replies.extend(claim.replies);
             }
             out.changed = before.changed_for_save(kart.state());
-            if let Some((minigame_id, elapsed_seconds)) = minigame {
-                self.credit_minigame(
-                    minigame_id,
-                    crate::quest_engine::MinigameResult::finished_at(elapsed_seconds),
-                    &mut out,
-                )?;
+            if let Some((minigame_id, result)) = minigame {
+                self.credit_minigame(minigame_id, result, &mut out)?;
                 self.npc_quest_profiles_changed(&mut out)?;
                 // T229: the paid finish is the one-shot completion record.
                 self.pay_earned_station_cash(EarnSource::KartRace, &mut out)?;

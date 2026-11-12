@@ -70,6 +70,7 @@ pub mod item_bar;
 pub mod item_categories;
 pub mod job_browser;
 pub mod jump_relay;
+pub mod kart_ai;
 pub mod kart_entry;
 pub mod kart_gateway;
 pub mod kart_lobby_native;

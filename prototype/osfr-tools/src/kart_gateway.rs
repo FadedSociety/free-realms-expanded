@@ -183,9 +183,24 @@ pub struct KartRewardClaim {
     /// L930: the MiniGameData row the race ran as (`kart_rows.json`), not the speedway id the
     /// reward registry is keyed by.
     pub minigame_id: Option<u32>,
-    /// (R) T787: the finished race's own elapsed time. The course has no rivals, so
-    /// a placement is never reported.
+    /// (R) T787: the finished race's own elapsed time.
     pub elapsed_seconds: Option<u32>,
+    /// C6: the place among the AI field (1 = first); `None` when the race ran without a field.
+    pub placement: Option<u8>,
+    /// C6: whether the racer beat the row's named rival; `None` on a row with no rival.
+    pub beat_rival: Option<bool>,
+}
+
+impl KartRewardClaim {
+    /// The settled facts the quest engine matches a `require` against: the elapsed time, the place
+    /// and, on a rival row, whether the rival was beaten (`won`).
+    pub fn result(&self) -> crate::quest_engine::MinigameResult {
+        crate::quest_engine::MinigameResult {
+            won: self.beat_rival.unwrap_or(true),
+            placement: self.placement,
+            ..crate::quest_engine::MinigameResult::finished_at(self.elapsed_seconds)
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -212,6 +227,8 @@ pub struct KartGateway {
     looks: Option<Arc<Looks>>,
     /// The garage's own values; `None` without `kart_garage.json` (no doors, no first cars).
     garage_content: Option<Arc<GarageContent>>,
+    /// C6: the AI racers' tunables; `None` without `kart_ai.json` (a solo time trial as before).
+    ai: Option<Arc<crate::kart_ai::KartAi>>,
 }
 
 /// The grid pose (3 x 3 basis then translation) opens the captured 33/5 body (`client_data`,
@@ -645,6 +662,7 @@ impl KartGateway {
             vehicles: Vehicles::load(directory)?,
             looks: Looks::load(directory)?,
             garage_content: GarageContent::load(directory)?,
+            ai: crate::kart_ai::KartAi::load(directory)?.map(Arc::new),
         };
         if result.state.active.is_some() {
             result.rebuild_entry()?;
@@ -695,6 +713,10 @@ impl KartGateway {
             .filter(|id| entered_track.is_none_or(|scene| track(*id) == Some(scene)))
             .find(runs)
             .or_else(|| entered.filter(runs));
+    }
+    /// C6: whether a finish of row `id` reports a place (the row's track has an AI field).
+    pub fn reports_placement(&self, id: u32) -> bool {
+        self.ai_field(Some(id)).is_some()
     }
     /// The row a race with no choice runs as: the gates' `minigame_id`.
     fn default_row(&self) -> Option<u32> {
@@ -836,6 +858,21 @@ impl KartGateway {
             character.guid == a.return_location.guid && character.zone_id == a.context.instance_id
         })
     }
+    /// C6: the AI field row `row` races against on its track, when `kart_ai.json` names the track.
+    fn ai_field(&self, row: Option<u32>) -> Option<crate::kart_ai::AiField> {
+        let ai = self.ai.as_ref()?;
+        let base = self.content.race.as_ref()?;
+        let race = race_for(self.rows.as_deref(), &self.tracks, base, row).ok()?;
+        match track_for(self.rows.as_deref(), &self.tracks, row) {
+            Some(track) => ai.field(row, &track.scene.scene, &race, track.start_basis()),
+            None => ai.field(
+                row,
+                &self.content.context.scene.scene,
+                &race,
+                [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+            ),
+        }
+    }
     fn rebuild_entry(&mut self) -> io::Result<()> {
         let active = self
             .state
@@ -885,6 +922,12 @@ impl KartGateway {
                 basis,
                 track.race.start_position,
             );
+        }
+        // C6: the client waits for as many NPC racers as `33/4` names; the field's introduction
+        // frames follow the kart's registration (`handle`).
+        let row = active.row.or_else(|| self.default_row());
+        if let Some(field) = self.ai_field(row) {
+            content.npc_count = field.count();
         }
         let mut entry = KartEntryHandler::new(content).map_err(invalid)?;
         entry.set_gate(EntryGate::Enabled);
@@ -965,8 +1008,15 @@ impl KartGateway {
         staged.state.next_instance = next;
         staged.rebuild_entry()?;
         if let Some(base) = &staged.content.race {
-            let config = race_for(staged.rows.as_deref(), &staged.tracks, base, row)?;
+            let mut config = race_for(staged.rows.as_deref(), &staged.tracks, base, row)?;
+            let field = staged.ai_field(row);
+            if let Some(field) = &field {
+                crate::kart_ai::set_npc_count(&mut config, field.count());
+            }
             let mut race = crate::kart_service::KartService::new(config).map_err(invalid)?;
+            if let Some(field) = field {
+                race.set_ai(field);
+            }
             race.set_gate(EntryGate::Enabled);
             staged.race = Some(race);
             staged.sync_race();
@@ -1074,7 +1124,7 @@ impl KartGateway {
         }
         let (subtype, _) = crate::kart_entry::decode_inner(inner).map_err(invalid)?;
         let replies = if matches!(subtype, 9 | 2) {
-            let replies = self.handle_entry(inner)?;
+            let mut replies = self.handle_entry(inner)?;
             if subtype == 9 && !replies.is_empty() {
                 if let (Some(race), Some(active)) = (&mut self.race, &self.state.active) {
                     let context = &active.context;
@@ -1088,6 +1138,8 @@ impl KartGateway {
                         now_ms,
                     )
                     .map_err(invalid)?;
+                    // C6: the AI racers join the grid right after the kart, as the capture's did.
+                    replies.extend(race.ai_intro_frames());
                 }
             }
             replies
@@ -1150,6 +1202,7 @@ impl KartGateway {
             .session()
             .and_then(crate::kart_racing::RaceSession::finish_elapsed_seconds)
             .filter(|seconds| *seconds <= crate::content::MAX_MINIGAME_ELAPSED_SECONDS);
+        let (placement, beat_rival) = (race.placement(), race.beat_rival());
         let Some(finished) = race.take_finished_session() else {
             return Ok(KartRewardClaim::default());
         };
@@ -1177,6 +1230,8 @@ impl KartGateway {
             replies: payout.replies,
             minigame_id,
             elapsed_seconds,
+            placement,
+            beat_rival,
         })
     }
     pub fn race_ready(&mut self) -> io::Result<Vec<Vec<u8>>> {

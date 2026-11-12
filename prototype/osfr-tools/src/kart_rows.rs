@@ -23,8 +23,8 @@ use std::{
     path::Path,
 };
 
-const MAX_FILE: usize = 64 * 1024;
-const MAX_ROWS: usize = 64;
+const MAX_FILE: usize = 128 * 1024;
+const MAX_ROWS: usize = 128;
 
 /// The client's own text ids for a row (`Resources/MiniGameData.txt`): the offer window's title,
 /// picture, description and difficulty dots when the race runs as this row.
@@ -125,7 +125,7 @@ impl KartRows {
             .take((MAX_FILE + 1) as u64)
             .read_to_end(&mut bytes)?;
         if bytes.len() > MAX_FILE {
-            return Err(invalid("kart rows exceed 64 KiB"));
+            return Err(invalid("kart rows exceed 128 KiB"));
         }
         let file: KartRowsFile = serde_json::from_slice(&bytes).map_err(invalid)?;
         let mut seen = BTreeSet::new();

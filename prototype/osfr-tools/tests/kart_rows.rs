@@ -19,11 +19,18 @@ use std::{collections::BTreeSet, fs, path::PathBuf};
 
 const PLAYER: u64 = 1;
 /// Every Wildwood row that runs on the shipped package's track.
-const WILDWOOD: [u32; 9] = [28, 628, 629, 630, 631, 632, 633, 634, 1103];
-/// The other speedways' free rows and the Sandstorm circuits (their quest rows are 635-655).
-const OTHER_TRACKS: [u32; 6] = [37, 38, 567, 578, 579, 580];
-/// The tutorials: listed, no track recovered, closed.
-const CLOSED: [u32; 2] = [277, 278];
+const WILDWOOD: [u32; 22] = [
+    28, 628, 629, 630, 631, 632, 633, 634, 1103, // the free race and the Wildwood quest rows
+    283, 284, 310, 561, 562, 565, 569, // C6: difficulty variants and copies (icon 9870 or the Wildwood text)
+    1076, 1077, 1078, 1079, 1080, 1081, // C6: the Wildwood races of difficulty 1-4
+];
+/// The other speedways' free rows and the Sandstorm circuits (their quest rows are 635-655), and the
+/// C6 difficulty variants the client's icons put on them.
+const OTHER_TRACKS: [u32; 16] = [
+    37, 38, 567, 578, 579, 580, 285, 286, 287, 288, 1105, 1106, 1107, 1108, 1110, 1112,
+];
+/// The tutorials and their copies: listed, no track recovered, closed.
+const CLOSED: [u32; 6] = [277, 278, 279, 280, 281, 282];
 
 fn content() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")

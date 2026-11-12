@@ -106,7 +106,7 @@ ACTIVITY_MAX_BYTES = {
     "kart_entry.json": 512 * 1024,
     "kart_lobby.json": 256 * 1024,
     "kart_gates.json": 16 * 1024,
-    "kart_rows.json": 64 * 1024,
+    "kart_rows.json": 128 * 1024,
     "derby_entry.json": 512 * 1024,
     "derby_gates.json": 16 * 1024,
     "derby_rows.json": 256 * 1024,  # derby_gateway.rs MAX_ROWS_BYTES: arena rows carry slots and pickups
