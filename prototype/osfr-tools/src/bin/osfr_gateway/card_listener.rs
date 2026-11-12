@@ -656,10 +656,12 @@ impl Server {
 
     /// Saves a deck the card window built or removed, staged like a single-player record.
     fn change_card_deck(&mut self, character: u64, change: osfr_tools::card_game::DeckChange) {
+        // L1177: never an unbound handshake that only carries the template's guid.
+        let local = self.options.account_store.is_none();
         let Some(session) = self
             .sessions
             .values_mut()
-            .find(|session| session.character_guid == character)
+            .find(|session| session.plays(character, local))
         else {
             return;
         };
@@ -702,10 +704,11 @@ impl Server {
         record: &card_service::SinglePlayerRecord,
         now_ms: u64,
     ) {
+        let local = self.options.account_store.is_none();
         let Some(session) = self
             .sessions
             .values_mut()
-            .find(|session| session.character_guid == character)
+            .find(|session| session.plays(character, local))
         else {
             return;
         };

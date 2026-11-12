@@ -541,6 +541,9 @@ struct Session {
     bundle_budget: BundleBudget,
     /// L042: a moderator's kick or ban; `Server::step` ends the session through `end_session`.
     kicked: bool,
+    /// L1177 (security): the CRC-32 this session's client announced in its 115 just before a
+    /// portrait upload (`00b4fd60`). `portrait_http` takes an upload only when it matches.
+    portrait_crc: Option<u32>,
 }
 
 #[derive(Clone, Debug)]
@@ -1064,6 +1067,13 @@ fn load_gateway_template(options: &Options) -> Result<Gateway, Box<dyn std::erro
 }
 
 impl Session {
+    /// L1177 (security): whether this session plays `guid`. With an account store (`local`
+    /// false) an unbound handshake still carries the startup template's guid (1), so only a
+    /// session that selected its character counts.
+    fn plays(&self, guid: u64, local: bool) -> bool {
+        self.character_guid == guid && (self.selected_character || local)
+    }
+
     fn new(
         id: SessionId,
         peer: SocketAddr,
@@ -1170,6 +1180,7 @@ impl Session {
             trace,
             bundle_budget: BundleBudget::outside(),
             kicked: false,
+            portrait_crc: None,
         })
     }
 
@@ -1195,7 +1206,11 @@ impl Session {
             .ok_or("character account is missing")?;
         // L023: with an account store only the HMAC binding ticket enters, for 1/1 too (the fixed
         // ticket is public). The refusal is logged without ticket bytes.
-        if !login::verify_gateway_binding_ticket(&options.handoff_key, account, guid, &ticket) {
+        // L1177: a ticket expires (`GATEWAY_TICKET_TTL_SECS`) and admits one session only, so a
+        // captured one cannot be replayed once its client has used it or logged out.
+        if !login::verify_gateway_binding_ticket(&options.handoff_key, account, guid, &ticket)
+            || !login::claim_gateway_ticket(guid, &ticket)
+        {
             let mut security = security.lock().unwrap_or_else(|e| e.into_inner());
             security.record(EventKind::AuthFailure, Some(account.id), Some(self.id.0));
             return Err("gateway character binding ticket is invalid".into());
@@ -2155,6 +2170,12 @@ impl Session {
         }
         // T519: 156/2 is answered from the target's live presentation; 115 is checked and
         // dropped. A refusal sends nothing and stores nothing.
+        // L1177 (security): the 115's CRC arms this session's next portrait upload.
+        if let &[_, _, a, b, c, d] = inner
+            && fotomat::is_upload(inner)
+        {
+            self.portrait_crc = Some(u32::from_le_bytes([a, b, c, d]));
+        }
         if fotomat::handles(inner) {
             return delivery::fotomat_reply(self, inner, world).unwrap_or_default();
         }
@@ -2521,10 +2542,11 @@ fn trade_party<'a>(
     if me.character_guid == guid {
         return Some(me);
     }
+    // L1177: an unbound handshake carries guid 1 too; trade needs the selected session.
     taken
         .iter_mut()
         .map(|(_, session)| session)
-        .find(|session| session.character_guid == guid)
+        .find(|session| session.plays(guid, false))
 }
 
 /// Lead (security): the all-or-nothing commit of a settled trade (W163 settlement).

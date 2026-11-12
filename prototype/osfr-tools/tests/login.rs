@@ -12,6 +12,67 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+/// L1177: the gateway ticket in a successful character login reply (8; the payload's first
+/// string is the gateway address, the second the ticket).
+fn reply_ticket(reply: &[u8]) -> String {
+    let address = u32::from_le_bytes(reply[21..25].try_into().unwrap()) as usize;
+    let at = 25 + address + 4;
+    String::from_utf8(reply[at..at + 32].to_vec()).unwrap()
+}
+
+fn ticket_account() -> account::Account {
+    account::Account {
+        id: 7,
+        login_name_hash: [3; 32],
+        flags: AccountFlags::default(),
+        slots: SlotPolicy { max_characters: 1 },
+        character_guids: vec![70],
+    }
+}
+
+/// L1177 (security review 2026-11-12, finding 1): a captured ticket was valid forever and
+/// could be replayed whenever its character was offline. It now expires and admits once.
+#[test]
+fn a_gateway_ticket_expires_and_admits_its_character_once() {
+    let key = b"synthetic-handoff-key";
+    let account = ticket_account();
+    let first = login::gateway_binding_ticket(key, &account, 70);
+    let second = login::gateway_binding_ticket(key, &account, 70);
+    assert_eq!(first.len(), 32, "the length the client already carries");
+    assert_ne!(first, second, "every ticket is unique");
+    let issued = u64::from_str_radix(&first[..8], 16).unwrap();
+
+    assert!(login::verify_gateway_binding_ticket_at(key, &account, 70, &first, issued));
+    let ttl = login::GATEWAY_TICKET_TTL_SECS;
+    assert!(login::verify_gateway_binding_ticket_at(key, &account, 70, &first, issued + ttl));
+    assert!(
+        !login::verify_gateway_binding_ticket_at(key, &account, 70, &first, issued + ttl + 1),
+        "expired"
+    );
+    assert!(
+        !login::verify_gateway_binding_ticket_at(key, &account, 70, &first, issued - 31),
+        "issued too far in the future"
+    );
+    assert!(!login::verify_gateway_binding_ticket_at(key, &account, 71, &first, issued));
+    let mut forged = first.clone();
+    forged.replace_range(..8, &format!("{:08x}", issued + 60));
+    assert!(
+        !login::verify_gateway_binding_ticket_at(key, &account, 70, &forged, issued + 60),
+        "the issue time is covered by the MAC"
+    );
+    assert!(!login::verify_gateway_binding_ticket_at(
+        key,
+        &account,
+        70,
+        &first.to_uppercase(),
+        issued
+    ));
+
+    assert!(login::claim_gateway_ticket_at(70, &first, issued));
+    assert!(!login::claim_gateway_ticket_at(70, &first, issued + 5), "replayed");
+    assert!(login::claim_gateway_ticket_at(70, &second, issued + 5));
+}
+
 fn hex(value: &str) -> Vec<u8> {
     value
         .as_bytes()
@@ -298,8 +359,14 @@ fn native_creation_selection_reconnect_and_name_check_preserve_identity() {
     assert!(selected.selected);
     // L023: 1/1 gets its HMAC binding ticket, never the public fixed ticket.
     let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
-    let ticket =
-        login::gateway_binding_ticket(b"synthetic-handoff-key", store.account(1).unwrap(), 1);
+    // L1177: each ticket is unique (issue time and sequence), so it is checked, not rebuilt.
+    let ticket = reply_ticket(&selected.replies[0]);
+    assert!(login::verify_gateway_binding_ticket(
+        b"synthetic-handoff-key",
+        store.account(1).unwrap(),
+        1,
+        &ticket
+    ));
     assert_eq!(
         selected.replies[0],
         login::character_login_reply(1, 1, 1, "127.0.0.1:20260", &ticket)
@@ -353,7 +420,13 @@ fn account_login_creates_lists_selects_and_deletes_two_characters() {
             })
         );
         let account = store.account(1).unwrap();
-        let ticket = login::gateway_binding_ticket(b"synthetic-handoff-key", account, guid);
+        let ticket = reply_ticket(&selected.replies[0]);
+        assert!(login::verify_gateway_binding_ticket(
+            b"synthetic-handoff-key",
+            account,
+            guid,
+            &ticket
+        ));
         assert_eq!(
             selected.replies[0],
             login::character_login_reply(guid, 1, 1, "127.0.0.1:20260", &ticket,)

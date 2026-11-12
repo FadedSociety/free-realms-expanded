@@ -613,19 +613,68 @@ fn migrate_legacy_account_store(
     }
 }
 
+/// L1177 (security): how long a gateway ticket admits its character. The client presents it
+/// within seconds of character select; a captured ticket is worthless after this.
+pub const GATEWAY_TICKET_TTL_SECS: u64 = 120;
+/// Clock difference allowed between the login server and the gateway.
+const GATEWAY_TICKET_SKEW_SECS: u64 = 30;
+/// Makes each ticket unique, so `claim_gateway_ticket` can admit it exactly once.
+static GATEWAY_TICKET_SEQUENCE: std::sync::atomic::AtomicU32 =
+    std::sync::atomic::AtomicU32::new(0);
+/// Tickets the gateway has already admitted (issue time, character, ticket), kept until they
+/// would have expired anyway.
+type ClaimedTickets = std::collections::BTreeSet<(u64, u64, String)>;
+static CLAIMED_GATEWAY_TICKETS: std::sync::Mutex<ClaimedTickets> =
+    std::sync::Mutex::new(std::collections::BTreeSet::new());
+
+fn unix_now_secs() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_secs())
+}
+
 /// Ticket binds the login-authenticated account and selected character without
-/// sending an account id as authority in the client login packet.
+/// sending an account id as authority in the client login packet. L1177: 32 hex characters
+/// (the length the client already carries) = issue time (u32 seconds), a sequence number, and
+/// 8 bytes of HMAC-SHA256 over both plus the account and character.
 pub fn gateway_binding_ticket(
     key: &[u8],
     account: &crate::account::Account,
     character_guid: u64,
 ) -> String {
-    let mut message = b"osfr-login-binding-v1\0".to_vec();
+    let issued = u32::try_from(unix_now_secs()).unwrap_or(u32::MAX);
+    let sequence = GATEWAY_TICKET_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+    ticket_text(key, account, character_guid, issued, sequence)
+}
+
+fn ticket_text(
+    key: &[u8],
+    account: &crate::account::Account,
+    character_guid: u64,
+    issued: u32,
+    sequence: u32,
+) -> String {
+    let mut message = b"osfr-login-binding-v2\0".to_vec();
     message.extend(account.id.to_le_bytes());
     message.extend(character_guid.to_le_bytes());
     message.extend(account.login_name_hash);
+    message.extend(issued.to_le_bytes());
+    message.extend(sequence.to_le_bytes());
     let mac = hmac_sha256(key, &message);
-    mac[..16].iter().map(|byte| format!("{byte:02x}")).collect()
+    let mut text = format!("{issued:08x}{sequence:08x}");
+    text.extend(mac[..8].iter().map(|byte| format!("{byte:02x}")));
+    text
+}
+
+/// The ticket's issue time and sequence, when it has the shape `ticket_text` writes.
+fn ticket_parts(ticket: &str) -> Option<(u32, u32)> {
+    let lower_hex = |b: u8| b.is_ascii_digit() || (b'a'..=b'f').contains(&b);
+    if ticket.len() != 32 || !ticket.bytes().all(lower_hex) {
+        return None;
+    }
+    let issued = u32::from_str_radix(&ticket[..8], 16).ok()?;
+    let sequence = u32::from_str_radix(&ticket[8..16], 16).ok()?;
+    Some((issued, sequence))
 }
 
 pub fn verify_gateway_binding_ticket(
@@ -634,16 +683,50 @@ pub fn verify_gateway_binding_ticket(
     character_guid: u64,
     ticket: &str,
 ) -> bool {
-    if key.len() < 16 || ticket.len() != 32 {
+    verify_gateway_binding_ticket_at(key, account, character_guid, ticket, unix_now_secs())
+}
+
+/// `verify_gateway_binding_ticket` at `now` (unix seconds): the MAC must match and the ticket
+/// must be younger than `GATEWAY_TICKET_TTL_SECS`.
+pub fn verify_gateway_binding_ticket_at(
+    key: &[u8],
+    account: &crate::account::Account,
+    character_guid: u64,
+    ticket: &str,
+    now: u64,
+) -> bool {
+    let Some((issued, sequence)) = ticket_parts(ticket) else {
+        return false;
+    };
+    let age_ok = u64::from(issued) <= now.saturating_add(GATEWAY_TICKET_SKEW_SECS)
+        && now.saturating_sub(u64::from(issued)) <= GATEWAY_TICKET_TTL_SECS;
+    if key.len() < 16 || !age_ok {
         return false;
     }
-    let expected = gateway_binding_ticket(key, account, character_guid);
+    let expected = ticket_text(key, account, character_guid, issued, sequence);
     expected
         .as_bytes()
         .iter()
         .zip(ticket.as_bytes())
         .fold(0u8, |difference, (left, right)| difference | (left ^ right))
         == 0
+}
+
+/// L1177: admit a verified ticket once. `false` when this character already entered with it.
+pub fn claim_gateway_ticket(character_guid: u64, ticket: &str) -> bool {
+    claim_gateway_ticket_at(character_guid, ticket, unix_now_secs())
+}
+
+pub fn claim_gateway_ticket_at(character_guid: u64, ticket: &str, now: u64) -> bool {
+    let Some((issued, _)) = ticket_parts(ticket) else {
+        return false;
+    };
+    let keep = GATEWAY_TICKET_TTL_SECS + GATEWAY_TICKET_SKEW_SECS;
+    let mut claimed = CLAIMED_GATEWAY_TICKETS
+        .lock()
+        .unwrap_or_else(|e| e.into_inner());
+    claimed.retain(|(at, _, _)| now.saturating_sub(*at) <= keep);
+    claimed.insert((u64::from(issued), character_guid, ticket.to_owned()))
 }
 
 fn hmac_sha256(key: &[u8], message: &[u8]) -> [u8; 32] {

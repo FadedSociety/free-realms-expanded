@@ -43,8 +43,10 @@ pub(super) fn lend(
         let Ok(guid) = <[u8; 8]>::try_from(guid).map(u64::from_le_bytes) else {
             continue;
         };
+        // L1177: prefer the session that selected `guid`; an unbound handshake carries guid 1.
         let target = (sessions.values())
-            .find(|session| session.character_guid == guid)
+            .filter(|session| session.character_guid == guid)
+            .max_by_key(|session| session.selected_character)
             .map(|session| {
                 let presence = (session.gateway.gameplay()).map(|g| g.travel_presence());
                 (session.gateway.state().clone(), presence)

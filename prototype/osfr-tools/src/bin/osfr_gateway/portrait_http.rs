@@ -104,7 +104,11 @@ impl PortraitHttp {
         while index < self.connections.len() {
             let connection = &mut self.connections[index];
             let mut buffer = [0; 16 * 1024];
+            // L1177 (security): the deadline holds while bytes keep trickling in too; it was
+            // checked only when a read would block, so a slow sender kept its slot.
+            let expired = now_ms.saturating_sub(connection.opened_ms) > DEADLINE_MS;
             let finished = match connection.stream.read(&mut buffer) {
+                _ if expired => Some(None),
                 Ok(0) => Some(None),
                 Ok(n) => {
                     connection.input.extend_from_slice(&buffer[..n]);
@@ -117,9 +121,7 @@ impl PortraitHttp {
                         Err(reason) => Some(Some(Err(reason))),
                     }
                 }
-                Err(error) if error.kind() == ErrorKind::WouldBlock => {
-                    (now_ms.saturating_sub(connection.opened_ms) > DEADLINE_MS).then_some(None)
-                }
+                Err(error) if error.kind() == ErrorKind::WouldBlock => None,
                 Err(_) => Some(None),
             };
             match finished {
@@ -184,10 +186,19 @@ impl Server {
                 }
             };
             let guid = upload.character_guid;
-            let owner = self.sessions.values().find(|session| {
-                session.character_guid == guid && session.peer.ip() == connection.peer.ip()
+            // L1177 (security review 2026-11-12, findings 2 and 3): the owner is the session
+            // that selected this character (an unbound handshake carries the startup template's
+            // guid), at this address, whose client announced this portrait's CRC in its 115
+            // (`00b4fd60` sends it just before the POST). A player behind the same NAT cannot.
+            let local = self.options.account_store.is_none();
+            let crc = upload.portrait.as_ref().map(|(_, crc)| *crc);
+            let owner = self.sessions.iter().find(|(_, session)| {
+                session.plays(guid, local)
+                    && session.peer.ip() == connection.peer.ip()
+                    && crc.is_some()
+                    && session.portrait_crc == crc
             });
-            let Some(owner) = owner.map(|session| session.id) else {
+            let Some((owner_key, owner)) = owner.map(|(key, session)| (*key, session.id)) else {
                 answer(connection, 403, "not this address's character");
                 continue;
             };
@@ -205,6 +216,9 @@ impl Server {
                 continue;
             }
             http.last_upload.insert(guid, now_ms);
+            if let Some(session) = self.sessions.get_mut(&owner_key) {
+                session.portrait_crc = None; // one 115 admits one upload
+            }
             answer(connection, 200, "stored");
             self.show_portrait(owner, guid, &http.root);
         }
@@ -256,11 +270,20 @@ mod tests {
 
     /// A 70x70 RGB headshot, the smallest upload the client makes.
     fn headshot() -> Vec<u8> {
-        let stride = 1 + 70 * 3;
-        let rows = vec![0; stride * 70];
+        png(70, 70)
+    }
+
+    /// The 180x330 portrait the client always sends beside the headshot (`00b4fd60`).
+    fn portrait() -> Vec<u8> {
+        png(180, 330)
+    }
+
+    fn png(width: u32, height: u32) -> Vec<u8> {
+        let stride = 1 + width as usize * 3;
+        let rows = vec![0; stride * height as usize];
         let mut out = vec![137, 80, 78, 71, 13, 10, 26, 10];
-        let mut ihdr = 70u32.to_be_bytes().to_vec();
-        ihdr.extend(70u32.to_be_bytes());
+        let mut ihdr = width.to_be_bytes().to_vec();
+        ihdr.extend(height.to_be_bytes());
         ihdr.extend([8, 2, 0, 0, 0]);
         for (kind, data) in [
             (b"IHDR", ihdr),
@@ -288,7 +311,12 @@ mod tests {
         )
         .into_bytes();
         body.extend(headshot());
-        body.extend(b"\r\n--AaBb432101234bBaA--\r\n");
+        body.extend(
+            b"\r\n--AaBb432101234bBaA\r\nContent-Disposition: form-data; name=\"imageFile\"; \
+              filename=\"portrait.png\"\r\nContent-Type: image/png\r\n\r\n",
+        );
+        body.extend(portrait());
+        body.extend(b"\r\n--AaBb432101234bBaA--\r\n\r\n");
         let mut raw = format!(
             "POST /image HTTP/1.1\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
             portrait_upload::CONTENT_TYPE,
@@ -362,6 +390,15 @@ mod tests {
         server.world.session_keys.insert(session_id, key);
         server.sessions.insert(key, scene.session);
 
+        // The client's 115 (u16 115, u32 CRC-32 of portrait.png) through the session's real
+        // route, as `00b4fd60` sends it just before the POST.
+        let arm = |server: &mut Server| {
+            let mut notice = fotomat::CRC_OPCODE.to_le_bytes().to_vec();
+            notice.extend(portrait_upload::crc32(&portrait()).to_le_bytes());
+            let session = server.sessions.get_mut(&key).unwrap();
+            assert!(session.route_application(&notice, &mut server.world, 1_000).is_empty());
+        };
+
         assert_eq!(
             post(&mut server, &upload(guid + 1), 1_000),
             403,
@@ -376,6 +413,10 @@ mod tests {
             ),
             400
         );
+        // L1177: no 115 from this session, no upload (another player behind the same address).
+        assert_eq!(post(&mut server, &upload(guid), 1_000), 403, "no announced CRC");
+        assert!(portrait_upload::image(&root, guid, "Headshot").is_empty());
+        arm(&mut server);
         assert_eq!(post(&mut server, &upload(guid), 1_000), 200);
         let stored = portrait_upload::image(&root, guid, "Headshot");
         assert_eq!(
@@ -390,10 +431,60 @@ mod tests {
             "the player sees their new headshot in a 156/3"
         );
         assert_eq!(
+            post(&mut server, &upload(guid), 61_001),
+            403,
+            "one 115 admits one upload"
+        );
+        arm(&mut server);
+        assert_eq!(
             post(&mut server, &upload(guid), 30_000),
             429,
             "one upload a minute"
         );
         assert_eq!(post(&mut server, &upload(guid), 61_001), 200);
+
+        // L1177 (finding 2): on a realm with an account store, only a session that selected
+        // its character owns it; an unbound handshake carries the startup template's guid.
+        server.options.account_store = Some(scratch.state().with_file_name("accounts.json"));
+        server.sessions.get_mut(&key).unwrap().selected_character = false;
+        arm(&mut server);
+        assert_eq!(post(&mut server, &upload(guid), 130_000), 403, "not selected");
+        server.sessions.get_mut(&key).unwrap().selected_character = true;
+        assert_eq!(post(&mut server, &upload(guid), 130_000), 200);
+    }
+
+    /// L1177 (security review 2026-11-12, finding 4): a request still arriving byte by byte is
+    /// closed at the deadline; the deadline was checked only when a read would block.
+    #[test]
+    fn a_trickling_request_is_closed_at_its_deadline() {
+        if !test_support::bin_test_target("portrait") {
+            return;
+        }
+        let scratch = Scratch::new("l1177-portrait-deadline");
+        let options = test_support::options(scratch.state());
+        if !test_support::fixtures_present(&options) {
+            return;
+        }
+        let mut server = Server::new(options).unwrap();
+        let address = server.local_addr().unwrap();
+        let mut client = TcpStream::connect(address).unwrap();
+        client.write_all(b"POST /image HTTP/1.1\r\n").unwrap();
+        let mut accepted = false;
+        for _ in 0..400 {
+            server.poll_portraits(1_000);
+            if server.portraits.as_ref().unwrap().connections.len() == 1 {
+                accepted = true;
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert!(accepted, "the connection is open");
+        client.write_all(b"X").unwrap();
+        std::thread::sleep(Duration::from_millis(100));
+        server.poll_portraits(1_000 + DEADLINE_MS + 1);
+        assert!(
+            server.portraits.as_ref().unwrap().connections.is_empty(),
+            "closed although a byte was readable"
+        );
     }
 }
