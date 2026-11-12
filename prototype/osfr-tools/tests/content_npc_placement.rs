@@ -372,6 +372,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
     // P-banking: Yoink (reference_data, bound to his body) in npcs/bankers.json (1,314).
     // QF: the listed-only Burgl row folds into the placed Burglz row, one quarry troll (1,313).
-    assert_eq!(npc_count, 1313);
+    // L1188: the duplicate Ceard Bauchlog (9500000012) folds into his Legacy spawn (1,312).
+    assert_eq!(npc_count, 1312);
     println!("NPC placement sources: {counts:?}");
 }

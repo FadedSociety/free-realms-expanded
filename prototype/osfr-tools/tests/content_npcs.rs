@@ -534,7 +534,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
     // P-banking: Yoink, bound to his body in npc_spawns_extra.json (1,314).
     // QF: the listed-only Burgl row folds into the placed Burglz row, one quarry troll (1,313).
-    assert_eq!(content_npcs.len(), 1313);
+    // L1188: the duplicate Ceard Bauchlog (9500000012) folds into his Legacy spawn (1,312).
+    assert_eq!(content_npcs.len(), 1312);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),

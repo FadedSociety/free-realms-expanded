@@ -5754,8 +5754,27 @@
       "location_evidence": [
         "\"To the right of the Druid Academy in Shrouded Glade.\" (195933183). Not in video."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3955824,
+          "title": "Foreign Lumber",
+          "title_string_id": 91044,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Foreign Lumber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_foreign_lumber_06c060)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3955824
+      ],
       "quests_given_text": [
         "The potion and flower chain (see #Quest index): Potions for the Arch Druid (\"Ceard wants you to get a potion from Perci in Shrouded Glade.\" 1497227789; \"Acquire a potion from Perci in Shrouded Glade for Ceard Bauchlog.\" 1704034030; \"Deliver the potion to Ceard Bauchlog\" 866291283); receives Edvard's rare flower (\"Deliver the rare flower to Elder Ceard Bauchlog in Shrouded Glade.\" 1367967653); Power stones from Mugwort's Hollow (\"Retrieve power stones from Mugwort's Hollow for Ceard Bauchlog.\" 1454045340; \"The power stones can be found within Mugwort's Hollow to the west of Shrouded Glade.\" 4097395734; dungeon Mugwort's Hollow); Lumber scouting (2239618292; scouts the area west of the Blackspore warpstone and near Farmer Brambleback's farm in Briarwood); Clear the Misty Mountain path (\"Some nasty critters are blocking the path through Misty Mountain that the druids of Shrouded Glade use to perform their rites.\" 3536529370; dungeon Misty Mountain). A recommendation line: \"Ceard Bauchlog recognizes your potential, and recommends that you offer your services to Queen Valerian.\" (4208462784)."
       ],
