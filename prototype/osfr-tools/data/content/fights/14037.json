@@ -344,194 +344,28 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75421,
-        "name_id": 131165,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75377,
-        "name_id": 131121,
-        "icon_id": 549,
-        "job": 2
-      },
-      {
-        "item_id": 75099,
-        "name_id": 131983,
-        "icon_id": 3217,
-        "job": 2
-      },
-      {
-        "item_id": 76236,
-        "name_id": 133244,
-        "icon_id": 5393,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75069,
-        "name_id": 131953,
-        "icon_id": 3145,
-        "job": 11
-      },
-      {
-        "item_id": 75356,
-        "name_id": 131100,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75312,
-        "name_id": 131056,
-        "icon_id": 549,
-        "job": 11
-      },
-      {
-        "item_id": 76106,
-        "name_id": 133114,
-        "icon_id": 3563,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 75159,
-        "name_id": 132043,
-        "icon_id": 3253,
-        "job": 12
-      },
-      {
-        "item_id": 75551,
-        "name_id": 131295,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75507,
-        "name_id": 131251,
-        "icon_id": 549,
-        "job": 12
-      },
-      {
-        "item_id": 76423,
-        "name_id": 133431,
-        "icon_id": 5092,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76346,
-        "name_id": 133354,
-        "icon_id": 5452,
-        "job": 32
-      },
-      {
-        "item_id": 75129,
-        "name_id": 132013,
-        "icon_id": 3129,
-        "job": 32
-      },
-      {
-        "item_id": 75486,
-        "name_id": 131230,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75442,
-        "name_id": 131186,
-        "icon_id": 549,
-        "job": 32
-      },
-      {
-        "item_id": 75009,
-        "name_id": 131893,
-        "icon_id": 3111,
-        "job": 35
-      },
-      {
-        "item_id": 75226,
-        "name_id": 130970,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75182,
-        "name_id": 130926,
-        "icon_id": 549,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75760,
-        "name_id": 132768,
-        "icon_id": 2397,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75039,
-        "name_id": 131923,
-        "icon_id": 3123,
-        "job": 43
-      },
-      {
-        "item_id": 75291,
-        "name_id": 131035,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75247,
-        "name_id": 130991,
-        "icon_id": 549,
-        "job": 43
-      },
-      {
-        "item_id": 75881,
-        "name_id": 132889,
-        "icon_id": 5001,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75099, "name_id": 131983, "icon_id": 3217, "job": 2},
+      {"item_id": 75421, "name_id": 131165, "icon_id": 3721, "job": 2},
+      {"item_id": 75377, "name_id": 131121, "icon_id": 549, "job": 2},
+      {"item_id": 75069, "name_id": 131953, "icon_id": 3145, "job": 11},
+      {"item_id": 75356, "name_id": 131100, "icon_id": 3721, "job": 11},
+      {"item_id": 75312, "name_id": 131056, "icon_id": 549, "job": 11},
+      {"item_id": 75159, "name_id": 132043, "icon_id": 3253, "job": 12},
+      {"item_id": 75551, "name_id": 131295, "icon_id": 3721, "job": 12},
+      {"item_id": 75507, "name_id": 131251, "icon_id": 549, "job": 12},
+      {"item_id": 75129, "name_id": 132013, "icon_id": 3129, "job": 32},
+      {"item_id": 75486, "name_id": 131230, "icon_id": 3721, "job": 32},
+      {"item_id": 75442, "name_id": 131186, "icon_id": 549, "job": 32},
+      {"item_id": 75009, "name_id": 131893, "icon_id": 3111, "job": 35},
+      {"item_id": 75226, "name_id": 130970, "icon_id": 3721, "job": 35},
+      {"item_id": 75182, "name_id": 130926, "icon_id": 549, "job": 35},
+      {"item_id": 75039, "name_id": 131923, "icon_id": 3123, "job": 43},
+      {"item_id": 75291, "name_id": 131035, "icon_id": 3721, "job": 43},
+      {"item_id": 75247, "name_id": 130991, "icon_id": 549, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
-    "wheel_coins": 54
+    "wheel_coins": 1
   },
   "source": [
     {
@@ -558,9 +392,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/floren_forest.json, its notes page and the fork battle; under the id (14037) quests name."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Floren Forest' (revision 49136) lists one prize wheel per combat job and a 54-coin slot; any other job spins the items every job's wheel holds."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Floren Forest' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Floren_Forest.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

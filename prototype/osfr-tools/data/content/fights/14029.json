@@ -480,194 +480,32 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75093,
-        "name_id": 131977,
-        "icon_id": 3153,
-        "job": 2
-      },
-      {
-        "item_id": 75381,
-        "name_id": 131125,
-        "icon_id": 1194,
-        "job": 2
-      },
-      {
-        "item_id": 75420,
-        "name_id": 131164,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 76221,
-        "name_id": 133229,
-        "icon_id": 5370,
-        "job": 2
-      },
-      {
-        "item_id": 76091,
-        "name_id": 133099,
-        "icon_id": 5328,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75316,
-        "name_id": 131060,
-        "icon_id": 1194,
-        "job": 11
-      },
-      {
-        "item_id": 75355,
-        "name_id": 131099,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75063,
-        "name_id": 131947,
-        "icon_id": 3221,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76403,
-        "name_id": 133411,
-        "icon_id": 5082,
-        "job": 12
-      },
-      {
-        "item_id": 75511,
-        "name_id": 131255,
-        "icon_id": 1194,
-        "job": 12
-      },
-      {
-        "item_id": 75550,
-        "name_id": 131294,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75153,
-        "name_id": 132037,
-        "icon_id": 3157,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76331,
-        "name_id": 133339,
-        "icon_id": 5428,
-        "job": 32
-      },
-      {
-        "item_id": 75123,
-        "name_id": 132007,
-        "icon_id": 3099,
-        "job": 32
-      },
-      {
-        "item_id": 75446,
-        "name_id": 131190,
-        "icon_id": 1194,
-        "job": 32
-      },
-      {
-        "item_id": 75485,
-        "name_id": 131229,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75003,
-        "name_id": 131887,
-        "icon_id": 3110,
-        "job": 35
-      },
-      {
-        "item_id": 75186,
-        "name_id": 130930,
-        "icon_id": 1194,
-        "job": 35
-      },
-      {
-        "item_id": 75225,
-        "name_id": 130969,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75745,
-        "name_id": 132753,
-        "icon_id": 2384,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75033,
-        "name_id": 131917,
-        "icon_id": 3130,
-        "job": 43
-      },
-      {
-        "item_id": 75251,
-        "name_id": 130995,
-        "icon_id": 1194,
-        "job": 43
-      },
-      {
-        "item_id": 75290,
-        "name_id": 131034,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75866,
-        "name_id": 132874,
-        "icon_id": 4971,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75381, "name_id": 131125, "icon_id": 1194, "job": 2},
+      {"item_id": 75420, "name_id": 131164, "icon_id": 3721, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 2},
+      {"item_id": 76091, "name_id": 133099, "icon_id": 5328, "job": 11},
+      {"item_id": 75063, "name_id": 131947, "icon_id": 3221, "job": 11},
+      {"item_id": 75316, "name_id": 131060, "icon_id": 1194, "job": 11},
+      {"item_id": 75355, "name_id": 131099, "icon_id": 3721, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 11},
+      {"item_id": 75511, "name_id": 131255, "icon_id": 1194, "job": 12},
+      {"item_id": 75550, "name_id": 131294, "icon_id": 3721, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 12},
+      {"item_id": 75446, "name_id": 131190, "icon_id": 1194, "job": 32},
+      {"item_id": 75485, "name_id": 131229, "icon_id": 3721, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 32},
+      {"item_id": 75745, "name_id": 132753, "icon_id": 2384, "job": 35},
+      {"item_id": 75003, "name_id": 131887, "icon_id": 3110, "job": 35},
+      {"item_id": 75186, "name_id": 130930, "icon_id": 1194, "job": 35},
+      {"item_id": 75225, "name_id": 130969, "icon_id": 3721, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 35},
+      {"item_id": 75251, "name_id": 130995, "icon_id": 1194, "job": 43},
+      {"item_id": 75290, "name_id": 131034, "icon_id": 3721, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3}
     ],
     "drops": [],
-    "wheel_coins": 80
+    "wheel_coins": 1
   },
   "source": [
     {
@@ -694,9 +532,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/sweetwater_climb.json, its notes page and the fork battle; under the id (14029) quests name."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Sweetwater Climb' (revision 49131) lists one prize wheel per combat job and a 80-coin slot; any other job spins the items every job's wheel holds."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Sweetwater Climb' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Sweetwater_Climb.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

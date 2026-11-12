@@ -878,7 +878,8 @@ fn assert_payout(before: &Economy, after: &Economy, row: &Value, prize_ids: &BTr
         .collect();
     assert_eq!(gains.len(), 1, "exactly one prize was granted");
     assert!(prize_ids.contains(&gains[0].0));
-    assert_eq!(gains[0].1, 1);
+    // L1194: a wheel row grants its own quantity (the wiki's "3 Small Health Potion").
+    assert!(gains[0].1 >= 1, "the prize grants at least one");
 }
 
 fn full_route_pays_once(id: u32, reconnect_mid_activity: bool) {

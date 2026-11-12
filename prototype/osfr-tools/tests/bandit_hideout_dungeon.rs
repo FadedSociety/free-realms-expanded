@@ -394,7 +394,7 @@ fn the_start_screen_carries_the_instance_and_roster_count() {
         "the screen carries the roster count"
     );
     let wheel: Vec<(i32, i32, i32)> = (job_prizes(row, BRAWLER).iter())
-        .map(|p| (i32_field(p, "item_id"), i32_field(p, "name_id"), 1))
+        .map(|p| (i32_field(p, "item_id"), i32_field(p, "name_id"), p["quantity"].as_i64().unwrap_or(1) as i32))
         .collect();
     assert_eq!(card.preview.items, wheel, "the prize preview is the Brawler's wheel");
     // The client start screen has no level field: the level floor is enforced

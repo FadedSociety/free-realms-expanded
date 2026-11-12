@@ -192,194 +192,32 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75106,
-        "name_id": 131990,
-        "icon_id": 3100,
-        "job": 2
-      },
-      {
-        "item_id": 75383,
-        "name_id": 131127,
-        "icon_id": 1196,
-        "job": 2
-      },
-      {
-        "item_id": 75422,
-        "name_id": 131166,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 76246,
-        "name_id": 133254,
-        "icon_id": 5381,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75076,
-        "name_id": 131960,
-        "icon_id": 3149,
-        "job": 11
-      },
-      {
-        "item_id": 75318,
-        "name_id": 131062,
-        "icon_id": 1196,
-        "job": 11
-      },
-      {
-        "item_id": 75357,
-        "name_id": 131101,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 76116,
-        "name_id": 133124,
-        "icon_id": 5335,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76437,
-        "name_id": 133445,
-        "icon_id": 5665,
-        "job": 12
-      },
-      {
-        "item_id": 75166,
-        "name_id": 132050,
-        "icon_id": 3162,
-        "job": 12
-      },
-      {
-        "item_id": 75513,
-        "name_id": 131257,
-        "icon_id": 1196,
-        "job": 12
-      },
-      {
-        "item_id": 75552,
-        "name_id": 131296,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76356,
-        "name_id": 133364,
-        "icon_id": 5441,
-        "job": 32
-      },
-      {
-        "item_id": 75136,
-        "name_id": 132020,
-        "icon_id": 3127,
-        "job": 32
-      },
-      {
-        "item_id": 75448,
-        "name_id": 131192,
-        "icon_id": 1196,
-        "job": 32
-      },
-      {
-        "item_id": 75487,
-        "name_id": 131231,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75188,
-        "name_id": 130932,
-        "icon_id": 1196,
-        "job": 35
-      },
-      {
-        "item_id": 75227,
-        "name_id": 130971,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75016,
-        "name_id": 131900,
-        "icon_id": 3105,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75770,
-        "name_id": 132778,
-        "icon_id": 4943,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75046,
-        "name_id": 131930,
-        "icon_id": 3128,
-        "job": 43
-      },
-      {
-        "item_id": 75253,
-        "name_id": 130997,
-        "icon_id": 1196,
-        "job": 43
-      },
-      {
-        "item_id": 75292,
-        "name_id": 131036,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75891,
-        "name_id": 132899,
-        "icon_id": 4990,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75422, "name_id": 131166, "icon_id": 3721, "job": 2},
+      {"item_id": 75393, "name_id": 131137, "icon_id": 555, "job": 2},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 2},
+      {"item_id": 75076, "name_id": 131960, "icon_id": 3149, "job": 11},
+      {"item_id": 75357, "name_id": 131101, "icon_id": 3721, "job": 11},
+      {"item_id": 75328, "name_id": 131072, "icon_id": 555, "job": 11},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 11},
+      {"item_id": 75552, "name_id": 131296, "icon_id": 3721, "job": 12},
+      {"item_id": 75523, "name_id": 131267, "icon_id": 555, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 12},
+      {"item_id": 75136, "name_id": 132020, "icon_id": 3127, "job": 32},
+      {"item_id": 75487, "name_id": 131231, "icon_id": 3721, "job": 32},
+      {"item_id": 75458, "name_id": 131202, "icon_id": 555, "job": 32},
+      {"item_id": 76358, "name_id": 133366, "icon_id": 5457, "job": 32},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 32},
+      {"item_id": 75227, "name_id": 130971, "icon_id": 3721, "job": 35},
+      {"item_id": 75198, "name_id": 130942, "icon_id": 555, "job": 35},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 35},
+      {"item_id": 75046, "name_id": 131930, "icon_id": 3128, "job": 43},
+      {"item_id": 75292, "name_id": 131036, "icon_id": 3721, "job": 43},
+      {"item_id": 75263, "name_id": 131007, "icon_id": 555, "job": 43},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 43},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3}
     ],
     "drops": [],
-    "wheel_coins": 176
+    "wheel_coins": 1
   },
   "source": [
     {
@@ -406,9 +244,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
     },
-    {
-      "kind": "reconstructed",
-      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Vulture Watch!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Briar Patch' (Ninja's Jagged Scythe of Shadow Armies; Wizard's Jewel Wand of Vortex; Warrior’s Double Axe of Whirlwind; Medic's Megasaw of Vitamins), so it spins that wheel, from fandom 'Briar Patch' (revision 49336), one per combat job, and 176 coins. The same pages also name briar_patch."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Vulture Watch! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Vulture_Watch_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

@@ -429,194 +429,33 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75410,
-        "name_id": 131154,
-        "icon_id": 3717,
-        "job": 2
-      },
-      {
-        "item_id": 75377,
-        "name_id": 131121,
-        "icon_id": 549,
-        "job": 2
-      },
-      {
-        "item_id": 75097,
-        "name_id": 131981,
-        "icon_id": 3217,
-        "job": 2
-      },
-      {
-        "item_id": 76226,
-        "name_id": 133234,
-        "icon_id": 2480,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 76096,
-        "name_id": 133104,
-        "icon_id": 2346,
-        "job": 11
-      },
-      {
-        "item_id": 75067,
-        "name_id": 131951,
-        "icon_id": 3145,
-        "job": 11
-      },
-      {
-        "item_id": 75345,
-        "name_id": 131089,
-        "icon_id": 3717,
-        "job": 11
-      },
-      {
-        "item_id": 75312,
-        "name_id": 131056,
-        "icon_id": 549,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76410,
-        "name_id": 133418,
-        "icon_id": 2428,
-        "job": 12
-      },
-      {
-        "item_id": 75157,
-        "name_id": 132041,
-        "icon_id": 3253,
-        "job": 12
-      },
-      {
-        "item_id": 75540,
-        "name_id": 131284,
-        "icon_id": 3717,
-        "job": 12
-      },
-      {
-        "item_id": 75507,
-        "name_id": 131251,
-        "icon_id": 549,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76336,
-        "name_id": 133344,
-        "icon_id": 2508,
-        "job": 32
-      },
-      {
-        "item_id": 75127,
-        "name_id": 132011,
-        "icon_id": 3129,
-        "job": 32
-      },
-      {
-        "item_id": 75475,
-        "name_id": 131219,
-        "icon_id": 3717,
-        "job": 32
-      },
-      {
-        "item_id": 75442,
-        "name_id": 131186,
-        "icon_id": 549,
-        "job": 32
-      },
-      {
-        "item_id": 75007,
-        "name_id": 131891,
-        "icon_id": 3111,
-        "job": 35
-      },
-      {
-        "item_id": 75215,
-        "name_id": 130959,
-        "icon_id": 3717,
-        "job": 35
-      },
-      {
-        "item_id": 75182,
-        "name_id": 130926,
-        "icon_id": 549,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75750,
-        "name_id": 132758,
-        "icon_id": 2379,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75037,
-        "name_id": 131921,
-        "icon_id": 3123,
-        "job": 43
-      },
-      {
-        "item_id": 75280,
-        "name_id": 131024,
-        "icon_id": 3717,
-        "job": 43
-      },
-      {
-        "item_id": 75247,
-        "name_id": 130991,
-        "icon_id": 549,
-        "job": 43
-      },
-      {
-        "item_id": 75871,
-        "name_id": 132879,
-        "icon_id": 4961,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75097, "name_id": 131981, "icon_id": 3217, "job": 2},
+      {"item_id": 75410, "name_id": 131154, "icon_id": 3717, "job": 2},
+      {"item_id": 75377, "name_id": 131121, "icon_id": 549, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 2},
+      {"item_id": 75067, "name_id": 131951, "icon_id": 3145, "job": 11},
+      {"item_id": 75345, "name_id": 131089, "icon_id": 3717, "job": 11},
+      {"item_id": 75312, "name_id": 131056, "icon_id": 549, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 11},
+      {"item_id": 75540, "name_id": 131284, "icon_id": 3717, "job": 12},
+      {"item_id": 75507, "name_id": 131251, "icon_id": 549, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 12},
+      {"item_id": 76336, "name_id": 133344, "icon_id": 2508, "job": 32},
+      {"item_id": 75127, "name_id": 132011, "icon_id": 3129, "job": 32},
+      {"item_id": 75475, "name_id": 131219, "icon_id": 3717, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 32},
+      {"item_id": 75007, "name_id": 131891, "icon_id": 3111, "job": 35},
+      {"item_id": 75215, "name_id": 130959, "icon_id": 3717, "job": 35},
+      {"item_id": 75182, "name_id": 130926, "icon_id": 549, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 35},
+      {"item_id": 75037, "name_id": 131921, "icon_id": 3123, "job": 43},
+      {"item_id": 75280, "name_id": 131024, "icon_id": 3717, "job": 43},
+      {"item_id": 75247, "name_id": 130991, "icon_id": 549, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3}
     ],
     "drops": [],
-    "wheel_coins": 162
+    "wheel_coins": 1
   },
   "source": [
     {
@@ -643,9 +482,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier. Door actor 100000046188: reference Npcs.json Id 46188, model 267, name 21188, at [-901.38, -49.96, 1835.92]."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'The Snarling Hedges' (revision 49140) lists one prize wheel per combat job and a 162-coin slot; any other job spins the items every job's wheel holds."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:The Snarling Hedges' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_The_Snarling_Hedges.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) Not in the client's item table, so left out: 's Ring of Regeneration III. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

@@ -470,223 +470,29 @@
     "coins": 15,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 76255,
-        "name_id": 133263,
-        "icon_id": 2503,
-        "job": 2
-      },
-      {
-        "item_id": 75416,
-        "name_id": 131160,
-        "icon_id": 3719,
-        "job": 2
-      },
-      {
-        "item_id": 75412,
-        "name_id": 131156,
-        "icon_id": 3717,
-        "job": 2
-      },
-      {
-        "item_id": 75379,
-        "name_id": 131123,
-        "icon_id": 551,
-        "job": 2
-      },
-      {
-        "item_id": 75118,
-        "name_id": 132002,
-        "icon_id": 3152,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 76125,
-        "name_id": 133133,
-        "icon_id": 2370,
-        "job": 11
-      },
-      {
-        "item_id": 75351,
-        "name_id": 131095,
-        "icon_id": 3719,
-        "job": 11
-      },
-      {
-        "item_id": 75347,
-        "name_id": 131091,
-        "icon_id": 3717,
-        "job": 11
-      },
-      {
-        "item_id": 75314,
-        "name_id": 131058,
-        "icon_id": 551,
-        "job": 11
-      },
-      {
-        "item_id": 75088,
-        "name_id": 131972,
-        "icon_id": 3122,
-        "job": 11
-      },
-      {
-        "item_id": 76449,
-        "name_id": 133457,
-        "icon_id": 5064,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 75178,
-        "name_id": 132062,
-        "icon_id": 3160,
-        "job": 12
-      },
-      {
-        "item_id": 75546,
-        "name_id": 131290,
-        "icon_id": 3719,
-        "job": 12
-      },
-      {
-        "item_id": 75542,
-        "name_id": 131286,
-        "icon_id": 3717,
-        "job": 12
-      },
-      {
-        "item_id": 75509,
-        "name_id": 131253,
-        "icon_id": 551,
-        "job": 12
-      },
-      {
-        "item_id": 76365,
-        "name_id": 133373,
-        "icon_id": 2533,
-        "job": 32
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 75481,
-        "name_id": 131225,
-        "icon_id": 3719,
-        "job": 32
-      },
-      {
-        "item_id": 75477,
-        "name_id": 131221,
-        "icon_id": 3717,
-        "job": 32
-      },
-      {
-        "item_id": 75444,
-        "name_id": 131188,
-        "icon_id": 551,
-        "job": 32
-      },
-      {
-        "item_id": 75148,
-        "name_id": 132032,
-        "icon_id": 3219,
-        "job": 32
-      },
-      {
-        "item_id": 75221,
-        "name_id": 130965,
-        "icon_id": 3719,
-        "job": 35
-      },
-      {
-        "item_id": 75217,
-        "name_id": 130961,
-        "icon_id": 3717,
-        "job": 35
-      },
-      {
-        "item_id": 75028,
-        "name_id": 131912,
-        "icon_id": 3106,
-        "job": 35
-      },
-      {
-        "item_id": 75184,
-        "name_id": 130928,
-        "icon_id": 551,
-        "job": 35
-      },
-      {
-        "item_id": 75779,
-        "name_id": 132787,
-        "icon_id": 2406,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75900,
-        "name_id": 132908,
-        "icon_id": 5662,
-        "job": 43
-      },
-      {
-        "item_id": 75058,
-        "name_id": 131942,
-        "icon_id": 3126,
-        "job": 43
-      },
-      {
-        "item_id": 75286,
-        "name_id": 131030,
-        "icon_id": 3719,
-        "job": 43
-      },
-      {
-        "item_id": 75282,
-        "name_id": 131026,
-        "icon_id": 3717,
-        "job": 43
-      },
-      {
-        "item_id": 75249,
-        "name_id": 130993,
-        "icon_id": 551,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75380, "name_id": 131124, "icon_id": 1209, "job": 2},
+      {"item_id": 75408, "name_id": 131152, "icon_id": 3717, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 75315, "name_id": 131059, "icon_id": 1209, "job": 11},
+      {"item_id": 75343, "name_id": 131087, "icon_id": 3717, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 75510, "name_id": 131254, "icon_id": 1209, "job": 12},
+      {"item_id": 75538, "name_id": 131282, "icon_id": 3717, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 75445, "name_id": 131189, "icon_id": 1209, "job": 32},
+      {"item_id": 75473, "name_id": 131217, "icon_id": 3717, "job": 32},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 75185, "name_id": 130929, "icon_id": 1209, "job": 35},
+      {"item_id": 75213, "name_id": 130957, "icon_id": 3717, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75031, "name_id": 131915, "icon_id": 3131, "job": 43},
+      {"item_id": 75250, "name_id": 130994, "icon_id": 1209, "job": 43},
+      {"item_id": 75278, "name_id": 131022, "icon_id": 3717, "job": 43},
+      {"item_id": 75856, "name_id": 132864, "icon_id": 4991, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
-    "wheel_coins": 10,
+    "wheel_coins": 2,
     "drops": []
   },
   "source": [
@@ -709,6 +515,7 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) L1192: Npc 4154 is definition 4154 (hooligan_delinquent), and Npc 4160 (same name, female body) shares it, so every Delinquent defeated here counts for 3030007. Npc 46002 is the Tavern Cellar's hooligan_brawler (1404301) and 46079 the Hooligan Scrapper (950040), the boss woken when wave 3 starts, as in 14021. Rules, the L1189 hooligan barks and the prize wheel copy Hooligan Bullies! (14021), the same family and scene: the wiki gives this battle no wheel of its own. Not proven in the client yet: this scene needs one native load."
-    }
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Hooligan Brawling Club! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Hooligan_Brawling_Club_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

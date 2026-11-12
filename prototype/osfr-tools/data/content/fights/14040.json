@@ -271,191 +271,37 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75421,
-        "name_id": 131165,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75392,
-        "name_id": 131136,
-        "icon_id": 554,
-        "job": 2
-      },
-      {
-        "item_id": 75096,
-        "name_id": 131980,
-        "icon_id": 3217,
-        "job": 2
-      },
-      {
-        "item_id": 76229,
-        "name_id": 133237,
-        "icon_id": 2496,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 76099,
-        "name_id": 133107,
-        "icon_id": 2359,
-        "job": 11
-      },
-      {
-        "item_id": 75066,
-        "name_id": 131950,
-        "icon_id": 3145,
-        "job": 11
-      },
-      {
-        "item_id": 75356,
-        "name_id": 131100,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75327,
-        "name_id": 131071,
-        "icon_id": 554,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76414,
-        "name_id": 133422,
-        "icon_id": 2437,
-        "job": 12
-      },
-      {
-        "item_id": 75156,
-        "name_id": 132040,
-        "icon_id": 3253,
-        "job": 12
-      },
-      {
-        "item_id": 75551,
-        "name_id": 131295,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75522,
-        "name_id": 131266,
-        "icon_id": 554,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76339,
-        "name_id": 133347,
-        "icon_id": 2523,
-        "job": 32
-      },
-      {
-        "item_id": 75126,
-        "name_id": 132010,
-        "icon_id": 3129,
-        "job": 32
-      },
-      {
-        "item_id": 75486,
-        "name_id": 131230,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75457,
-        "name_id": 131201,
-        "icon_id": 554,
-        "job": 32
-      },
-      {
-        "item_id": 75006,
-        "name_id": 131890,
-        "icon_id": 3111,
-        "job": 35
-      },
-      {
-        "item_id": 75226,
-        "name_id": 130970,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75197,
-        "name_id": 130941,
-        "icon_id": 554,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75753,
-        "name_id": 132761,
-        "icon_id": 2393,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75036,
-        "name_id": 131920,
-        "icon_id": 3123,
-        "job": 43
-      },
-      {
-        "item_id": 75291,
-        "name_id": 131035,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75262,
-        "name_id": 131006,
-        "icon_id": 554,
-        "job": 43
-      },
-      {
-        "item_id": 75874,
-        "name_id": 132882,
-        "icon_id": 4997,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 75421, "name_id": 131165, "icon_id": 3721, "job": 2},
+      {"item_id": 75392, "name_id": 131136, "icon_id": 554, "job": 2},
+      {"item_id": 75096, "name_id": 131980, "icon_id": 3217, "job": 2},
+      {"item_id": 76229, "name_id": 133237, "icon_id": 2496, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 76099, "name_id": 133107, "icon_id": 2359, "job": 11},
+      {"item_id": 75066, "name_id": 131950, "icon_id": 3145, "job": 11},
+      {"item_id": 75356, "name_id": 131100, "icon_id": 3721, "job": 11},
+      {"item_id": 75327, "name_id": 131071, "icon_id": 554, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 76414, "name_id": 133422, "icon_id": 2437, "job": 12},
+      {"item_id": 75156, "name_id": 132040, "icon_id": 3253, "job": 12},
+      {"item_id": 75551, "name_id": 131295, "icon_id": 3721, "job": 12},
+      {"item_id": 75522, "name_id": 131266, "icon_id": 554, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 76339, "name_id": 133347, "icon_id": 2523, "job": 32},
+      {"item_id": 75126, "name_id": 132010, "icon_id": 3129, "job": 32},
+      {"item_id": 75486, "name_id": 131230, "icon_id": 3721, "job": 32},
+      {"item_id": 75457, "name_id": 131201, "icon_id": 554, "job": 32},
+      {"item_id": 75006, "name_id": 131890, "icon_id": 3111, "job": 35},
+      {"item_id": 75226, "name_id": 130970, "icon_id": 3721, "job": 35},
+      {"item_id": 75197, "name_id": 130941, "icon_id": 554, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75753, "name_id": 132761, "icon_id": 2393, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 75036, "name_id": 131920, "icon_id": 3123, "job": 43},
+      {"item_id": 75291, "name_id": 131035, "icon_id": 3721, "job": 43},
+      {"item_id": 75262, "name_id": 131006, "icon_id": 554, "job": 43},
+      {"item_id": 75874, "name_id": 132882, "icon_id": 4997, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
     "wheel_coins": 8
@@ -485,9 +331,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Return to Sender!' (revision 49843) lists one prize wheel per combat job and a 8-coin slot; any other job spins the items every job's wheel holds."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this dungeon's own, from our guide record data/content/dungeons/return_to_sender.json (dungeon_data.rewards.prize_wheels, one list per class from its wiki page, and the wheel's coin slot). Each class spins its own list. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

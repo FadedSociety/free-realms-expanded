@@ -272,7 +272,9 @@ impl EncounterEngine {
     /// must not collide with any other encounter actor.
     pub fn load_field_battles(&mut self, path: &Path) -> io::Result<()> {
         let bytes = fs::read(path)?;
-        if bytes.len() > 128 * 1024 {
+        // 1 MiB, as `field_kill_rewards.json`: per-class wheels (L1194: up to 8 rows for each of
+        // seven jobs) put the 64-battle ceiling well past the old 128 KiB.
+        if bytes.len() > 1024 * 1024 {
             return Err(invalid("field battle content too large"));
         }
         let file: FieldBattleFile =

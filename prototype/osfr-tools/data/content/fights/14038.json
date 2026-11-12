@@ -195,191 +195,32 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 76212,
-        "name_id": 133220,
-        "icon_id": 2501,
-        "job": 2
-      },
-      {
-        "item_id": 75091,
-        "name_id": 131975,
-        "icon_id": 3229,
-        "job": 2
-      },
-      {
-        "item_id": 75419,
-        "name_id": 131163,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75390,
-        "name_id": 131134,
-        "icon_id": 552,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75354,
-        "name_id": 131098,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75061,
-        "name_id": 131945,
-        "icon_id": 3133,
-        "job": 11
-      },
-      {
-        "item_id": 75325,
-        "name_id": 131069,
-        "icon_id": 552,
-        "job": 11
-      },
-      {
-        "item_id": 76082,
-        "name_id": 133090,
-        "icon_id": 5793,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76391,
-        "name_id": 133399,
-        "icon_id": 5088,
-        "job": 12
-      },
-      {
-        "item_id": 75549,
-        "name_id": 131293,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75520,
-        "name_id": 131264,
-        "icon_id": 552,
-        "job": 12
-      },
-      {
-        "item_id": 75151,
-        "name_id": 132035,
-        "icon_id": 3158,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76322,
-        "name_id": 133330,
-        "icon_id": 5455,
-        "job": 32
-      },
-      {
-        "item_id": 75121,
-        "name_id": 132005,
-        "icon_id": 3120,
-        "job": 32
-      },
-      {
-        "item_id": 75484,
-        "name_id": 131228,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75455,
-        "name_id": 131199,
-        "icon_id": 552,
-        "job": 32
-      },
-      {
-        "item_id": 75001,
-        "name_id": 131885,
-        "icon_id": 3104,
-        "job": 35
-      },
-      {
-        "item_id": 75224,
-        "name_id": 130968,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75195,
-        "name_id": 130939,
-        "icon_id": 552,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75736,
-        "name_id": 132744,
-        "icon_id": 4952,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75031,
-        "name_id": 131915,
-        "icon_id": 3131,
-        "job": 43
-      },
-      {
-        "item_id": 75289,
-        "name_id": 131033,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75260,
-        "name_id": 131004,
-        "icon_id": 552,
-        "job": 43
-      },
-      {
-        "item_id": 75857,
-        "name_id": 132865,
-        "icon_id": 5008,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75091, "name_id": 131975, "icon_id": 3229, "job": 2},
+      {"item_id": 75419, "name_id": 131163, "icon_id": 3721, "job": 2},
+      {"item_id": 75390, "name_id": 131134, "icon_id": 552, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 75061, "name_id": 131945, "icon_id": 3133, "job": 11},
+      {"item_id": 75354, "name_id": 131098, "icon_id": 3721, "job": 11},
+      {"item_id": 75325, "name_id": 131069, "icon_id": 552, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 75151, "name_id": 132035, "icon_id": 3158, "job": 12},
+      {"item_id": 75549, "name_id": 131293, "icon_id": 3721, "job": 12},
+      {"item_id": 75520, "name_id": 131264, "icon_id": 552, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 75121, "name_id": 132005, "icon_id": 3120, "job": 32},
+      {"item_id": 75484, "name_id": 131228, "icon_id": 3721, "job": 32},
+      {"item_id": 75455, "name_id": 131199, "icon_id": 552, "job": 32},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 75001, "name_id": 131885, "icon_id": 3104, "job": 35},
+      {"item_id": 75224, "name_id": 130968, "icon_id": 3721, "job": 35},
+      {"item_id": 75195, "name_id": 130939, "icon_id": 552, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75857, "name_id": 132865, "icon_id": 5008, "job": 43},
+      {"item_id": 75031, "name_id": 131915, "icon_id": 3131, "job": 43},
+      {"item_id": 75289, "name_id": 131033, "icon_id": 3721, "job": 43},
+      {"item_id": 75260, "name_id": 131004, "icon_id": 552, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
     "wheel_coins": 2
@@ -417,9 +258,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/snakes_in_a_maze.json."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Snakes in a Maze!' (revision 10383) lists one prize wheel per combat job and a 2-coin slot; any other job spins the items every job's wheel holds. Archer: the wiki's 'Hen Feather Archer Pants' is 'Hen Feather Archer Leggings' in our record dungeons/snakes_in_a_maze.json; Medic: the wiki's 'Stable Condition Medic Fatigues' is 'Stable Condition Medic Pants' in our record dungeons/snakes_in_a_maze.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Snakes in a Maze! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Snakes_in_a_Maze_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

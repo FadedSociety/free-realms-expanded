@@ -461,188 +461,46 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 76254,
-        "name_id": 133262,
-        "icon_id": 2499,
-        "job": 2
-      },
-      {
-        "item_id": 75384,
-        "name_id": 131128,
-        "icon_id": 1197,
-        "job": 2
-      },
-      {
-        "item_id": 75398,
-        "name_id": 131142,
-        "icon_id": 1204,
-        "job": 2
-      },
-      {
-        "item_id": 75423,
-        "name_id": 131167,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75119,
-        "name_id": 132003,
-        "icon_id": 3152,
-        "job": 2
-      },
-      {
-        "item_id": 75319,
-        "name_id": 131063,
-        "icon_id": 1197,
-        "job": 11
-      },
-      {
-        "item_id": 75333,
-        "name_id": 131077,
-        "icon_id": 1204,
-        "job": 11
-      },
-      {
-        "item_id": 75358,
-        "name_id": 131102,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75089,
-        "name_id": 131973,
-        "icon_id": 3122,
-        "job": 11
-      },
-      {
-        "item_id": 76447,
-        "name_id": 133455,
-        "icon_id": 2453,
-        "job": 12
-      },
-      {
-        "item_id": 75514,
-        "name_id": 131258,
-        "icon_id": 1197,
-        "job": 12
-      },
-      {
-        "item_id": 75528,
-        "name_id": 131272,
-        "icon_id": 1204,
-        "job": 12
-      },
-      {
-        "item_id": 75179,
-        "name_id": 132063,
-        "icon_id": 3160,
-        "job": 12
-      },
-      {
-        "item_id": 75553,
-        "name_id": 131297,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 76364,
-        "name_id": 133372,
-        "icon_id": 2530,
-        "job": 32
-      },
-      {
-        "item_id": 75449,
-        "name_id": 131193,
-        "icon_id": 1197,
-        "job": 32
-      },
-      {
-        "item_id": 75463,
-        "name_id": 131207,
-        "icon_id": 1204,
-        "job": 32
-      },
-      {
-        "item_id": 75488,
-        "name_id": 131232,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75149,
-        "name_id": 132033,
-        "icon_id": 3219,
-        "job": 32
-      },
-      {
-        "item_id": 75189,
-        "name_id": 130933,
-        "icon_id": 1197,
-        "job": 35
-      },
-      {
-        "item_id": 75203,
-        "name_id": 130947,
-        "icon_id": 1204,
-        "job": 35
-      },
-      {
-        "item_id": 75228,
-        "name_id": 130972,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75029,
-        "name_id": 131913,
-        "icon_id": 3106,
-        "job": 35
-      },
-      {
-        "item_id": 75778,
-        "name_id": 132786,
-        "icon_id": 2399,
-        "job": 35
-      },
-      {
-        "item_id": 75899,
-        "name_id": 132907,
-        "icon_id": 5005,
-        "job": 43
-      },
-      {
-        "item_id": 75059,
-        "name_id": 131943,
-        "icon_id": 3126,
-        "job": 43
-      },
-      {
-        "item_id": 75254,
-        "name_id": 130998,
-        "icon_id": 1197,
-        "job": 43
-      },
-      {
-        "item_id": 75268,
-        "name_id": 131012,
-        "icon_id": 1204,
-        "job": 43
-      },
-      {
-        "item_id": 75293,
-        "name_id": 131037,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75399, "name_id": 131143, "icon_id": 559, "job": 2},
+      {"item_id": 75119, "name_id": 132003, "icon_id": 3152, "job": 2},
+      {"item_id": 76254, "name_id": 133262, "icon_id": 2499, "job": 2},
+      {"item_id": 75423, "name_id": 131167, "icon_id": 3721, "job": 2},
+      {"item_id": 75384, "name_id": 131128, "icon_id": 1197, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 2},
+      {"item_id": 75334, "name_id": 131078, "icon_id": 559, "job": 11},
+      {"item_id": 75089, "name_id": 131973, "icon_id": 3122, "job": 11},
+      {"item_id": 76124, "name_id": 133132, "icon_id": 2367, "job": 11},
+      {"item_id": 75358, "name_id": 131102, "icon_id": 3721, "job": 11},
+      {"item_id": 75319, "name_id": 131063, "icon_id": 1197, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 11},
+      {"item_id": 75529, "name_id": 131273, "icon_id": 559, "job": 12},
+      {"item_id": 75179, "name_id": 132063, "icon_id": 3160, "job": 12},
+      {"item_id": 76447, "name_id": 133455, "icon_id": 2453, "job": 12},
+      {"item_id": 75553, "name_id": 131297, "icon_id": 3721, "job": 12},
+      {"item_id": 75514, "name_id": 131258, "icon_id": 1197, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 12},
+      {"item_id": 75464, "name_id": 131208, "icon_id": 559, "job": 32},
+      {"item_id": 75149, "name_id": 132033, "icon_id": 3219, "job": 32},
+      {"item_id": 76364, "name_id": 133372, "icon_id": 2530, "job": 32},
+      {"item_id": 75488, "name_id": 131232, "icon_id": 3721, "job": 32},
+      {"item_id": 75449, "name_id": 131193, "icon_id": 1197, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 32},
+      {"item_id": 75204, "name_id": 130948, "icon_id": 559, "job": 35},
+      {"item_id": 75029, "name_id": 131913, "icon_id": 3106, "job": 35},
+      {"item_id": 75778, "name_id": 132786, "icon_id": 2399, "job": 35},
+      {"item_id": 75228, "name_id": 130972, "icon_id": 3721, "job": 35},
+      {"item_id": 75189, "name_id": 130933, "icon_id": 1197, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 35},
+      {"item_id": 75269, "name_id": 131013, "icon_id": 559, "job": 43},
+      {"item_id": 75059, "name_id": 131943, "icon_id": 3126, "job": 43},
+      {"item_id": 75899, "name_id": 132907, "icon_id": 5005, "job": 43},
+      {"item_id": 75293, "name_id": 131037, "icon_id": 3721, "job": 43},
+      {"item_id": 75254, "name_id": 130998, "icon_id": 1197, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3}
     ],
     "drops": [],
-    "wheel_coins": 26
+    "wheel_coins": 235
   },
   "source": [
     {
@@ -669,9 +527,6 @@
       "kind": "capture",
       "evidence": "rc-0136 (2026-11-11): model 1682 robgoblin_m_master.adr, the model live sent for every Robgoblin Kaboomer (10 AddNpc rows in packets_3.pcapng, 2014-03); 4202 robgoblin_m_junkmaster.adr was the reference row's."
     },
-    {
-      "kind": "reconstructed",
-      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Explosive Robgoblins!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Bergram Stumpfinger' (Ninja's Shadow Blade of Deception; Wizard's Ornate Wand of Transmutation; Warrior’s Warlord Axe of Thunder; Medic's Shockrod of Lasers), so it spins that wheel, from our record dungeons/bergram_stumpfinger_s_ghost.json, one per combat job, and 26 coins. The same pages also name Bergram Stumpfinger's Ghost. Archer from our record dungeons/bergram_stumpfinger_s_ghost.json; Brawler from our record dungeons/bergram_stumpfinger_s_ghost.json; Medic from our record dungeons/bergram_stumpfinger_s_ghost.json; Medic: 'Energy Transfer Medic Pants' is in no catalogue or record, left off; Ninja from our record dungeons/bergram_stumpfinger_s_ghost.json; Warrior from our record dungeons/bergram_stumpfinger_s_ghost.json; Wizard from our record dungeons/bergram_stumpfinger_s_ghost.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Explosive Robgoblins! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Explosive_Robgoblins_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

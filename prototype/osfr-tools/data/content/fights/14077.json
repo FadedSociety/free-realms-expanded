@@ -261,71 +261,17 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 75093,
-        "name_id": 131977,
-        "icon_id": 3153,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75355,
-        "name_id": 131099,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75326,
-        "name_id": 131070,
-        "icon_id": 553,
-        "job": 11
-      },
-      {
-        "item_id": 75063,
-        "name_id": 131947,
-        "icon_id": 3221,
-        "job": 11
-      },
-      {
-        "item_id": 76088,
-        "name_id": 133096,
-        "icon_id": 2365,
-        "job": 11
-      },
-      {
-        "item_id": 75153,
-        "name_id": 132037,
-        "icon_id": 3157,
-        "job": 12
-      },
-      {
-        "item_id": 75123,
-        "name_id": 132007,
-        "icon_id": 3099,
-        "job": 32
-      },
-      {
-        "item_id": 75003,
-        "name_id": 131887,
-        "icon_id": 3110,
-        "job": 35
-      },
-      {
-        "item_id": 75033,
-        "name_id": 131917,
-        "icon_id": 3130,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75093, "name_id": 131977, "icon_id": 3153, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 75355, "name_id": 131099, "icon_id": 3721, "job": 11},
+      {"item_id": 75326, "name_id": 131070, "icon_id": 553, "job": 11},
+      {"item_id": 75063, "name_id": 131947, "icon_id": 3221, "job": 11},
+      {"item_id": 76088, "name_id": 133096, "icon_id": 2365, "job": 11},
+      {"item_id": 75153, "name_id": 132037, "icon_id": 3157, "job": 12},
+      {"item_id": 75123, "name_id": 132007, "icon_id": 3099, "job": 32},
+      {"item_id": 75003, "name_id": 131887, "icon_id": 3110, "job": 35},
+      {"item_id": 75033, "name_id": 131917, "icon_id": 3130, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
     "wheel_coins": 0
@@ -355,9 +301,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Thugawug Sneak!' (revision 48739) lists one prize wheel per combat job and a 0-coin slot; any other job spins the items every job's wheel holds. Archer from our record dungeons/thugawug_sneak.json; Brawler from our record dungeons/thugawug_sneak.json; Ninja from our record dungeons/thugawug_sneak.json; Warrior from our record dungeons/thugawug_sneak.json; Wizard from our record dungeons/thugawug_sneak.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this dungeon's own, from our guide record data/content/dungeons/thugawug_sneak.json (dungeon_data.rewards.prize_wheels, one list per class from its wiki page, and the wheel's coin slot). Each class spins its own list. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

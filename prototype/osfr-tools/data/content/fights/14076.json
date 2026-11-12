@@ -337,191 +337,21 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 76210,
-        "name_id": 133218,
-        "icon_id": 2489,
-        "job": 2
-      },
-      {
-        "item_id": 75091,
-        "name_id": 131975,
-        "icon_id": 3229,
-        "job": 2
-      },
-      {
-        "item_id": 75419,
-        "name_id": 131163,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75390,
-        "name_id": 131134,
-        "icon_id": 552,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75354,
-        "name_id": 131098,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75061,
-        "name_id": 131945,
-        "icon_id": 3133,
-        "job": 11
-      },
-      {
-        "item_id": 75325,
-        "name_id": 131069,
-        "icon_id": 552,
-        "job": 11
-      },
-      {
-        "item_id": 76080,
-        "name_id": 133088,
-        "icon_id": 5337,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76389,
-        "name_id": 133397,
-        "icon_id": 5047,
-        "job": 12
-      },
-      {
-        "item_id": 75549,
-        "name_id": 131293,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75520,
-        "name_id": 131264,
-        "icon_id": 552,
-        "job": 12
-      },
-      {
-        "item_id": 75151,
-        "name_id": 132035,
-        "icon_id": 3158,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76320,
-        "name_id": 133328,
-        "icon_id": 5439,
-        "job": 32
-      },
-      {
-        "item_id": 75121,
-        "name_id": 132005,
-        "icon_id": 3120,
-        "job": 32
-      },
-      {
-        "item_id": 75484,
-        "name_id": 131228,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75455,
-        "name_id": 131199,
-        "icon_id": 552,
-        "job": 32
-      },
-      {
-        "item_id": 75001,
-        "name_id": 131885,
-        "icon_id": 3104,
-        "job": 35
-      },
-      {
-        "item_id": 75224,
-        "name_id": 130968,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75195,
-        "name_id": 130939,
-        "icon_id": 552,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75734,
-        "name_id": 132742,
-        "icon_id": 4946,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75031,
-        "name_id": 131915,
-        "icon_id": 3131,
-        "job": 43
-      },
-      {
-        "item_id": 75289,
-        "name_id": 131033,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75260,
-        "name_id": 131004,
-        "icon_id": 552,
-        "job": 43
-      },
-      {
-        "item_id": 75855,
-        "name_id": 132863,
-        "icon_id": 4988,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75419, "name_id": 131163, "icon_id": 3721, "job": 2},
+      {"item_id": 75375, "name_id": 131119, "icon_id": 547, "job": 2},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 2},
+      {"item_id": 75354, "name_id": 131098, "icon_id": 3721, "job": 11},
+      {"item_id": 75310, "name_id": 131054, "icon_id": 547, "job": 11},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 11},
+      {"item_id": 75549, "name_id": 131293, "icon_id": 3721, "job": 12},
+      {"item_id": 75505, "name_id": 131249, "icon_id": 547, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 12},
+      {"item_id": 75732, "name_id": 132740, "icon_id": 2371, "job": 35},
+      {"item_id": 75001, "name_id": 131885, "icon_id": 3104, "job": 35},
+      {"item_id": 75224, "name_id": 130968, "icon_id": 3721, "job": 35},
+      {"item_id": 75180, "name_id": 130924, "icon_id": 547, "job": 35},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 35},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3}
     ],
     "drops": [],
     "wheel_coins": 2
@@ -547,9 +377,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
     },
-    {
-      "kind": "reconstructed",
-      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Thugawug Bumbler!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Frostfang Snarlers!' (Warrior’s Cudgel of Cleaving; Wizard's Sparkle Twig of Glaciers; Medic's Reflex Hammer of Vitals; Brawler's Mallet of Rumbling), so it spins that wheel, from fandom 'Frostfang Snarlers!' (revision 48736), one per combat job, and 2 coins. The same pages also name Bixie Hive, Cracked Claw Caverns, Hot Springs Haven, Sheep Watch. Brawler: the wiki's 'Bell Brawler Gloves' is 'Saved by the Bell Brawler Gloves' in our record dungeons/frostfang_snarlers.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Thugawug Bumbler! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Thugawug_Bumbler_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

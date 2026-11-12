@@ -397,230 +397,46 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 76264,
-        "name_id": 133272,
-        "icon_id": 5380,
-        "job": 2
-      },
-      {
-        "item_id": 75412,
-        "name_id": 131156,
-        "icon_id": 3717,
-        "job": 2
-      },
-      {
-        "item_id": 75394,
-        "name_id": 131138,
-        "icon_id": 556,
-        "job": 2
-      },
-      {
-        "item_id": 75115,
-        "name_id": 131999,
-        "icon_id": 3152,
-        "job": 2
-      },
-      {
-        "item_id": 76257,
-        "name_id": 133265,
-        "icon_id": 5374,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75347,
-        "name_id": 131091,
-        "icon_id": 3717,
-        "job": 11
-      },
-      {
-        "item_id": 75329,
-        "name_id": 131073,
-        "icon_id": 556,
-        "job": 11
-      },
-      {
-        "item_id": 75085,
-        "name_id": 131969,
-        "icon_id": 3122,
-        "job": 11
-      },
-      {
-        "item_id": 76134,
-        "name_id": 133142,
-        "icon_id": 5733,
-        "job": 11
-      },
-      {
-        "item_id": 76127,
-        "name_id": 133135,
-        "icon_id": 5334,
-        "job": 11
-      },
-      {
-        "item_id": 76460,
-        "name_id": 133468,
-        "icon_id": 5741,
-        "job": 12
-      },
-      {
-        "item_id": 76451,
-        "name_id": 133459,
-        "icon_id": 5075,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 75175,
-        "name_id": 132059,
-        "icon_id": 3160,
-        "job": 12
-      },
-      {
-        "item_id": 75542,
-        "name_id": 131286,
-        "icon_id": 3717,
-        "job": 12
-      },
-      {
-        "item_id": 75524,
-        "name_id": 131268,
-        "icon_id": 556,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76367,
-        "name_id": 133375,
-        "icon_id": 5423,
-        "job": 32
-      },
-      {
-        "item_id": 76374,
-        "name_id": 133382,
-        "icon_id": 5796,
-        "job": 32
-      },
-      {
-        "item_id": 75477,
-        "name_id": 131221,
-        "icon_id": 3717,
-        "job": 32
-      },
-      {
-        "item_id": 75459,
-        "name_id": 131203,
-        "icon_id": 556,
-        "job": 32
-      },
-      {
-        "item_id": 75145,
-        "name_id": 132029,
-        "icon_id": 3219,
-        "job": 32
-      },
-      {
-        "item_id": 75217,
-        "name_id": 130961,
-        "icon_id": 3717,
-        "job": 35
-      },
-      {
-        "item_id": 75025,
-        "name_id": 131909,
-        "icon_id": 3106,
-        "job": 35
-      },
-      {
-        "item_id": 75199,
-        "name_id": 130943,
-        "icon_id": 556,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75788,
-        "name_id": 132796,
-        "icon_id": 4941,
-        "job": 35
-      },
-      {
-        "item_id": 75781,
-        "name_id": 132789,
-        "icon_id": 4936,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75055,
-        "name_id": 131939,
-        "icon_id": 3126,
-        "job": 43
-      },
-      {
-        "item_id": 75282,
-        "name_id": 131026,
-        "icon_id": 3717,
-        "job": 43
-      },
-      {
-        "item_id": 75264,
-        "name_id": 131008,
-        "icon_id": 556,
-        "job": 43
-      },
-      {
-        "item_id": 75909,
-        "name_id": 132917,
-        "icon_id": 5631,
-        "job": 43
-      },
-      {
-        "item_id": 75902,
-        "name_id": 132910,
-        "icon_id": 4976,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 76264, "name_id": 133272, "icon_id": 5380, "job": 2},
+      {"item_id": 76257, "name_id": 133265, "icon_id": 5374, "job": 2},
+      {"item_id": 75412, "name_id": 131156, "icon_id": 3717, "job": 2},
+      {"item_id": 75394, "name_id": 131138, "icon_id": 556, "job": 2},
+      {"item_id": 75115, "name_id": 131999, "icon_id": 3152, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 76134, "name_id": 133142, "icon_id": 5733, "job": 11},
+      {"item_id": 76127, "name_id": 133135, "icon_id": 5334, "job": 11},
+      {"item_id": 75347, "name_id": 131091, "icon_id": 3717, "job": 11},
+      {"item_id": 75329, "name_id": 131073, "icon_id": 556, "job": 11},
+      {"item_id": 75085, "name_id": 131969, "icon_id": 3122, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 76460, "name_id": 133468, "icon_id": 5741, "job": 12},
+      {"item_id": 76451, "name_id": 133459, "icon_id": 5075, "job": 12},
+      {"item_id": 75542, "name_id": 131286, "icon_id": 3717, "job": 12},
+      {"item_id": 75524, "name_id": 131268, "icon_id": 556, "job": 12},
+      {"item_id": 75175, "name_id": 132059, "icon_id": 3160, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 76374, "name_id": 133382, "icon_id": 5796, "job": 32},
+      {"item_id": 76367, "name_id": 133375, "icon_id": 5423, "job": 32},
+      {"item_id": 75477, "name_id": 131221, "icon_id": 3717, "job": 32},
+      {"item_id": 75459, "name_id": 131203, "icon_id": 556, "job": 32},
+      {"item_id": 75145, "name_id": 132029, "icon_id": 3219, "job": 32},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 75788, "name_id": 132796, "icon_id": 4941, "job": 35},
+      {"item_id": 75781, "name_id": 132789, "icon_id": 4936, "job": 35},
+      {"item_id": 75217, "name_id": 130961, "icon_id": 3717, "job": 35},
+      {"item_id": 75199, "name_id": 130943, "icon_id": 556, "job": 35},
+      {"item_id": 75025, "name_id": 131909, "icon_id": 3106, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75909, "name_id": 132917, "icon_id": 5631, "job": 43},
+      {"item_id": 75902, "name_id": 132910, "icon_id": 4976, "job": 43},
+      {"item_id": 75282, "name_id": 131026, "icon_id": 3717, "job": 43},
+      {"item_id": 75264, "name_id": 131008, "icon_id": 556, "job": 43},
+      {"item_id": 75055, "name_id": 131939, "icon_id": 3126, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
-    "wheel_coins": 117
+    "wheel_coins": 1115
   },
   "source": [
     {
@@ -655,9 +471,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/briarheart_caverns.json."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Briarheart Caverns' (revision 49146) lists one prize wheel per combat job and a 117-coin slot; any other job spins the items every job's wheel holds. Archer: the wiki's 'Pinhole Archer Boots' is 'Pin Hole Archer Boots' in our record dungeons/briarheart_caverns.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Briarheart Caverns' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Briarheart_Caverns.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Critical Hit Warrior Guantlets' as 'Critical Hit Warrior Gauntlets'. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

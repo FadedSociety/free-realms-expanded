@@ -351,6 +351,61 @@ fn reference() -> PathBuf {
         .join("../../../lab/references/rust-opening-cooking-original-assets")
 }
 
+/// Battle 96's wheel as the loaded data authors it: `job`'s own rows `(item, quantity, name id)`,
+/// else the any-job rows (`card::wheel_rows`), and its coin slot. Read from the data so a wheel
+/// edit needs no test edit (owner 2026-11-12: no content pins in tests).
+fn battle_96_wheel(game: &Gameplay, job: i32) -> (Vec<(i32, u32, i32)>, u32) {
+    let path = game.content_dir().join("field_battles.json");
+    let file: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(path).expect("field_battles.json")).unwrap();
+    let battle = file["battles"]
+        .as_array()
+        .and_then(|rows| rows.iter().find(|row| row["id"] == 96))
+        .expect("battle 96 in field_battles.json");
+    let number = |value: &serde_json::Value| u32::try_from(value.as_u64().unwrap()).unwrap();
+    let rows_for = |job: i64| -> Vec<(i32, u32, i32)> {
+        battle["prizes"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|prize| prize["job"].as_i64().unwrap_or(0) == job)
+            .map(|prize| {
+                let id = |field: &str| i32::try_from(prize[field].as_i64().unwrap()).unwrap();
+                let quantity = prize.get("quantity").map_or(1, number);
+                (id("item_id"), quantity, id("name_id"))
+            })
+            .collect()
+    };
+    let own = rows_for(i64::from(job));
+    let rows = if own.is_empty() { rows_for(0) } else { own };
+    (rows, battle.get("wheel_coins").map_or(0, number))
+}
+
+/// Swap in the round70 runtime item catalogue (the one `tests/battle_catalogue_audit.rs` proves
+/// every battle prize against) under this save's bag: the opening reference's own catalogue
+/// predates the per-class wheels (L1194) and grants no job's battle-96 wheel.
+fn with_runtime_catalogue(game: &mut Gameplay) {
+    let runtime = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/reports/round70-native-20261016T061000Z/content");
+    game.inventory =
+        crate::inventory::Inventory::load(&runtime, Some(game.inventory.state().clone()))
+            .expect("the round70 runtime catalogue loads under this bag");
+}
+
+/// The first combat job whose battle-96 wheel this save's item catalogue grants in full, the
+/// Medic these tests were written for first.
+fn grantable_battle_96_job(game: &Gameplay) -> i32 {
+    [11, 2, 12, 32, 35, 43]
+        .into_iter()
+        .find(|&job| {
+            battle_96_wheel(game, job)
+                .0
+                .iter()
+                .all(|&(item, quantity, _)| game.inventory.accepts_reward(item, quantity))
+        })
+        .expect("a combat job whose battle-96 wheel this reference's catalogue grants")
+}
+
 fn bundled_content() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
 }
@@ -1546,12 +1601,16 @@ fn battle_go_requires_a_combat_job_and_zones_into_the_arena() {
         .iter()
         .find(|p| p.starts_with(&[41, 0, 114, 0]))
         .expect("start screen");
-    // The preview bundle lists the wheel a job with none of its own spins (rc-0137: one wheel
-    // per combat job, and the Battle Item Mystery Pack every job's wheel holds).
-    assert!(
-        details.windows(4).any(|w| w == 10_482_i32.to_le_bytes()),
-        "the Battle Item Mystery Pack on the start screen"
-    );
+    // The preview bundle lists the wheel a job with none of its own spins: battle 96's any-job
+    // rows, read from the loaded data (L1194: each battle's own page decides its wheel).
+    let (any_job, _) = battle_96_wheel(&game, 0);
+    assert!(!any_job.is_empty(), "battle 96 has an any-job wheel");
+    for (item, _, _) in &any_job {
+        assert!(
+            details.windows(4).any(|w| w == item.to_le_bytes()),
+            "any-job prize {item} on the start screen"
+        );
+    }
     assert!(
         screen
             .replies
@@ -1568,16 +1627,20 @@ fn battle_go_requires_a_combat_job_and_zones_into_the_arena() {
         "the start screen stays up so Switch Jobs is reachable"
     );
 
+    // A combat job whose battle-96 wheel this reference's catalogue grants: a prize it cannot
+    // grant refuses Go, which is not what this test is about.
+    with_runtime_catalogue(&mut game);
+    let job = grantable_battle_96_job(&game);
     let inventory = game.inventory.clone();
-    // A Medic: this reference's catalogue holds every prize of the Medic's wheel for battle 96
-    // (one of the Brawler's is missing from it, so its Go would be refused for the prize). The
-    // reference unlocks only the Brawler, so the Medic is learned first.
     let profiles = game.profiles.as_mut().unwrap();
-    profiles.unlock(11).unwrap();
-    profiles.select(11, &inventory).unwrap();
+    profiles.unlock(job).unwrap();
+    profiles.select(job, &inventory).unwrap();
     game.handle_in_world(&click, &character, 3_000).unwrap();
     let entered = game.handle_in_world(&go, &character, 4_000).unwrap();
-    let zone = entered.zoning.expect("Go zones into the battle arena");
+    let said = String::from_utf8_lossy(&entered.replies.concat()).to_string();
+    let zone = entered
+        .zoning
+        .unwrap_or_else(|| panic!("Go zones into the battle arena as job {job}: {said}"));
     assert_eq!(zone.name, "sg_random_encounter_clearing");
     // Go without a fresh start screen does nothing.
     assert!(
@@ -1597,6 +1660,12 @@ fn troll_summoner_battle_summons_waves_and_is_won_on_the_summoner() {
     const SUMMONER: u64 = 100_000_096_001;
     let reference = reference();
     let mut game = Gameplay::load(&reference, None).unwrap();
+    // Every slot of battle 96's wheels, read from the loaded data: (item, quantity, name id).
+    let prizes: Vec<(i32, u32, i32)> = [0, 2, 11, 12, 32, 35, 43]
+        .into_iter()
+        .flat_map(|job| battle_96_wheel(&game, job).0)
+        .collect();
+    let (_, wheel_coins) = battle_96_wheel(&game, 0);
     let encounter = game.encounter.as_mut().unwrap();
     let world = CharacterState {
         guid: 1,
@@ -1624,31 +1693,27 @@ fn troll_summoner_battle_summons_waves_and_is_won_on_the_summoner() {
         won |= out.replies.iter().any(|p| p.starts_with(&[39, 0, 18]));
         if !out.defeated.is_empty() {
             let reward = out.rewards.first().expect("battle reward");
-            assert_eq!(reward.coins, 25);
             assert_eq!(reward.job_xp, 50, "battles level the combat job");
-            assert!(
-                reward.items.len() == 1
-                    && [10_482, 3_023, 75_354, 11_002].contains(&reward.items[0].0),
-                "one prize from the wheel: {:?}",
-                reward.items
-            );
-            // The loot wheel lands on the same prize (39/45, by name id).
-            let name = [
-                (10_482, 6_666),
-                (3_023, 422_907),
-                (75_354, 131_098),
-                (11_002, 422_909),
-            ]
-            .iter()
-            .find(|(item, _)| *item == reward.items[0].0)
-            .unwrap()
-            .1;
             let wheel = out
                 .replies
                 .iter()
                 .find(|p| p.starts_with(&[39, 0, 45]))
                 .expect("loot wheel landing");
-            assert!(wheel.windows(4).any(|w| w == (name as i32).to_le_bytes()));
+            // One slot of the job's wheel: one of battle 96's prizes, or its coin slot.
+            match reward.items.as_slice() {
+                [(item, quantity)] => {
+                    let &(_, authored, name) = prizes
+                        .iter()
+                        .find(|prize| prize.0 == *item)
+                        .unwrap_or_else(|| panic!("prize {item} is not on battle 96's wheel"));
+                    assert_eq!(*quantity, authored, "the prize's own quantity");
+                    assert_eq!(reward.coins, 25);
+                    // The loot wheel lands on the same prize (39/45, by name id).
+                    assert!(wheel.windows(4).any(|w| w == name.to_le_bytes()));
+                }
+                [] => assert_eq!(reward.coins, 25 + wheel_coins, "the coin slot pays its coins"),
+                items => panic!("one prize from the wheel: {items:?}"),
+            }
             break;
         }
         let called = spawned_actors(&out.replies);
@@ -2677,13 +2742,14 @@ fn developer_cheat_console_drives_a_battle() {
     let mut game = Gameplay::load(&reference, None).unwrap();
     game.set_dev_tools(true);
     game.set_role(crate::account_store::AccountRole::Admin);
+    // A combat job whose battle-96 wheel this reference's catalogue grants (see
+    // `grantable_battle_96_job`).
+    with_runtime_catalogue(&mut game);
+    let job = grantable_battle_96_job(&game);
     let inventory = game.inventory.clone();
-    // A Medic: this reference's catalogue holds every prize of the Medic's wheel for battle 96
-    // (one of the Brawler's is missing from it, so its Go would be refused for the prize). The
-    // reference unlocks only the Brawler, so the Medic is learned first.
     let profiles = game.profiles.as_mut().unwrap();
-    profiles.unlock(11).unwrap();
-    profiles.select(11, &inventory).unwrap();
+    profiles.unlock(job).unwrap();
+    profiles.select(job, &inventory).unwrap();
     let character = CharacterState {
         guid: 1,
         zone_id: 0,

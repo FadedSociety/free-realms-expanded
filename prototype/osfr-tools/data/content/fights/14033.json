@@ -214,188 +214,35 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75093,
-        "name_id": 131977,
-        "icon_id": 3153,
-        "job": 2
-      },
-      {
-        "item_id": 75420,
-        "name_id": 131164,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75391,
-        "name_id": 131135,
-        "icon_id": 553,
-        "job": 2
-      },
-      {
-        "item_id": 76218,
-        "name_id": 133226,
-        "icon_id": 5398,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75355,
-        "name_id": 131099,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75326,
-        "name_id": 131070,
-        "icon_id": 553,
-        "job": 11
-      },
-      {
-        "item_id": 75063,
-        "name_id": 131947,
-        "icon_id": 3221,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76399,
-        "name_id": 133407,
-        "icon_id": 2454,
-        "job": 12
-      },
-      {
-        "item_id": 75550,
-        "name_id": 131294,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75521,
-        "name_id": 131265,
-        "icon_id": 553,
-        "job": 12
-      },
-      {
-        "item_id": 75153,
-        "name_id": 132037,
-        "icon_id": 3157,
-        "job": 12
-      },
-      {
-        "item_id": 76328,
-        "name_id": 133336,
-        "icon_id": 2528,
-        "job": 32
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 75123,
-        "name_id": 132007,
-        "icon_id": 3099,
-        "job": 32
-      },
-      {
-        "item_id": 75485,
-        "name_id": 131229,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75456,
-        "name_id": 131200,
-        "icon_id": 553,
-        "job": 32
-      },
-      {
-        "item_id": 75003,
-        "name_id": 131887,
-        "icon_id": 3110,
-        "job": 35
-      },
-      {
-        "item_id": 75225,
-        "name_id": 130969,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75196,
-        "name_id": 130940,
-        "icon_id": 553,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75742,
-        "name_id": 132750,
-        "icon_id": 5626,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75033,
-        "name_id": 131917,
-        "icon_id": 3130,
-        "job": 43
-      },
-      {
-        "item_id": 75290,
-        "name_id": 131034,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75261,
-        "name_id": 131005,
-        "icon_id": 553,
-        "job": 43
-      },
-      {
-        "item_id": 75863,
-        "name_id": 132871,
-        "icon_id": 5009,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75093, "name_id": 131977, "icon_id": 3153, "job": 2},
+      {"item_id": 75420, "name_id": 131164, "icon_id": 3721, "job": 2},
+      {"item_id": 75391, "name_id": 131135, "icon_id": 553, "job": 2},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 2},
+      {"item_id": 75063, "name_id": 131947, "icon_id": 3221, "job": 11},
+      {"item_id": 75355, "name_id": 131099, "icon_id": 3721, "job": 11},
+      {"item_id": 75326, "name_id": 131070, "icon_id": 553, "job": 11},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 11},
+      {"item_id": 75153, "name_id": 132037, "icon_id": 3157, "job": 12},
+      {"item_id": 75550, "name_id": 131294, "icon_id": 3721, "job": 12},
+      {"item_id": 75521, "name_id": 131265, "icon_id": 553, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 12},
+      {"item_id": 75123, "name_id": 132007, "icon_id": 3099, "job": 32},
+      {"item_id": 75485, "name_id": 131229, "icon_id": 3721, "job": 32},
+      {"item_id": 75456, "name_id": 131200, "icon_id": 553, "job": 32},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 32},
+      {"item_id": 75003, "name_id": 131887, "icon_id": 3110, "job": 35},
+      {"item_id": 75225, "name_id": 130969, "icon_id": 3721, "job": 35},
+      {"item_id": 75196, "name_id": 130940, "icon_id": 553, "job": 35},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 35},
+      {"item_id": 75863, "name_id": 132871, "icon_id": 5009, "job": 43},
+      {"item_id": 75033, "name_id": 131917, "icon_id": 3130, "job": 43},
+      {"item_id": 75290, "name_id": 131034, "icon_id": 3721, "job": 43},
+      {"item_id": 75261, "name_id": 131005, "icon_id": 553, "job": 43},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3, "job": 43},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "quantity": 3}
     ],
     "drops": [],
-    "wheel_coins": 4
+    "wheel_coins": 2
   },
   "source": [
     {
@@ -439,12 +286,9 @@
       "evidence": "(R) rc-0136 (2026-11-11): the Ice Troll Scout that fights wears model 100 troll_ice.adr, the body of the fork battle's Ice Trolls (BJX Battles.json Id 83; its Npcs.json 46053 'Ice Troll'); 4546 sg_troll_hut_02_snow.adr is the scout's hut with no skeleton, the starter's look (entrance ice_troll_scout)."
     },
     {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Ice Troll Scout!' (revision 30399) lists one prize wheel per combat job and a 4-coin slot; any other job spins the items every job's wheel holds. Medic: 'Urgent Care Medic Fatigues' is in no catalogue or record, left off."
-    },
-    {
       "kind": "reconstructed",
       "evidence": "(R) rc-0136 pacing: the waves' Ice Trolls are normal enemies (the fork battle's Npcs.json 46053 'Ice Troll' is a wave enemy, not a boss) and the Ice Troll Scout who leads them is tough; every wave at boss rank made the fight a group fight, out of reach of the solo player its level gate asks for."
-    }
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Ice Troll Scout! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Ice_Troll_Scout_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

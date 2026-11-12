@@ -241,224 +241,46 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 76255,
-        "name_id": 133263,
-        "icon_id": 2503,
-        "job": 2
-      },
-      {
-        "item_id": 75416,
-        "name_id": 131160,
-        "icon_id": 3719,
-        "job": 2
-      },
-      {
-        "item_id": 75412,
-        "name_id": 131156,
-        "icon_id": 3717,
-        "job": 2
-      },
-      {
-        "item_id": 75379,
-        "name_id": 131123,
-        "icon_id": 551,
-        "job": 2
-      },
-      {
-        "item_id": 75118,
-        "name_id": 132002,
-        "icon_id": 3152,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 76125,
-        "name_id": 133133,
-        "icon_id": 2370,
-        "job": 11
-      },
-      {
-        "item_id": 75351,
-        "name_id": 131095,
-        "icon_id": 3719,
-        "job": 11
-      },
-      {
-        "item_id": 75347,
-        "name_id": 131091,
-        "icon_id": 3717,
-        "job": 11
-      },
-      {
-        "item_id": 75314,
-        "name_id": 131058,
-        "icon_id": 551,
-        "job": 11
-      },
-      {
-        "item_id": 75088,
-        "name_id": 131972,
-        "icon_id": 3122,
-        "job": 11
-      },
-      {
-        "item_id": 76449,
-        "name_id": 133457,
-        "icon_id": 5064,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 75178,
-        "name_id": 132062,
-        "icon_id": 3160,
-        "job": 12
-      },
-      {
-        "item_id": 75546,
-        "name_id": 131290,
-        "icon_id": 3719,
-        "job": 12
-      },
-      {
-        "item_id": 75542,
-        "name_id": 131286,
-        "icon_id": 3717,
-        "job": 12
-      },
-      {
-        "item_id": 75509,
-        "name_id": 131253,
-        "icon_id": 551,
-        "job": 12
-      },
-      {
-        "item_id": 76365,
-        "name_id": 133373,
-        "icon_id": 2533,
-        "job": 32
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 75481,
-        "name_id": 131225,
-        "icon_id": 3719,
-        "job": 32
-      },
-      {
-        "item_id": 75477,
-        "name_id": 131221,
-        "icon_id": 3717,
-        "job": 32
-      },
-      {
-        "item_id": 75444,
-        "name_id": 131188,
-        "icon_id": 551,
-        "job": 32
-      },
-      {
-        "item_id": 75148,
-        "name_id": 132032,
-        "icon_id": 3219,
-        "job": 32
-      },
-      {
-        "item_id": 75221,
-        "name_id": 130965,
-        "icon_id": 3719,
-        "job": 35
-      },
-      {
-        "item_id": 75217,
-        "name_id": 130961,
-        "icon_id": 3717,
-        "job": 35
-      },
-      {
-        "item_id": 75028,
-        "name_id": 131912,
-        "icon_id": 3106,
-        "job": 35
-      },
-      {
-        "item_id": 75184,
-        "name_id": 130928,
-        "icon_id": 551,
-        "job": 35
-      },
-      {
-        "item_id": 75779,
-        "name_id": 132787,
-        "icon_id": 2406,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75900,
-        "name_id": 132908,
-        "icon_id": 5662,
-        "job": 43
-      },
-      {
-        "item_id": 75058,
-        "name_id": 131942,
-        "icon_id": 3126,
-        "job": 43
-      },
-      {
-        "item_id": 75286,
-        "name_id": 131030,
-        "icon_id": 3719,
-        "job": 43
-      },
-      {
-        "item_id": 75282,
-        "name_id": 131026,
-        "icon_id": 3717,
-        "job": 43
-      },
-      {
-        "item_id": 75249,
-        "name_id": 130993,
-        "icon_id": 551,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75415, "name_id": 131159, "icon_id": 3719, "job": 2},
+      {"item_id": 75118, "name_id": 132002, "icon_id": 3152, "job": 2},
+      {"item_id": 76255, "name_id": 133263, "icon_id": 2503, "job": 2},
+      {"item_id": 75412, "name_id": 131156, "icon_id": 3717, "job": 2},
+      {"item_id": 75379, "name_id": 131123, "icon_id": 551, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 2},
+      {"item_id": 75350, "name_id": 131094, "icon_id": 3719, "job": 11},
+      {"item_id": 75088, "name_id": 131972, "icon_id": 3122, "job": 11},
+      {"item_id": 76125, "name_id": 133133, "icon_id": 2370, "job": 11},
+      {"item_id": 75347, "name_id": 131091, "icon_id": 3717, "job": 11},
+      {"item_id": 75314, "name_id": 131058, "icon_id": 551, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 11},
+      {"item_id": 75545, "name_id": 131289, "icon_id": 3719, "job": 12},
+      {"item_id": 75178, "name_id": 132062, "icon_id": 3160, "job": 12},
+      {"item_id": 76449, "name_id": 133457, "icon_id": 5064, "job": 12},
+      {"item_id": 75542, "name_id": 131286, "icon_id": 3717, "job": 12},
+      {"item_id": 75509, "name_id": 131253, "icon_id": 551, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 12},
+      {"item_id": 75480, "name_id": 131224, "icon_id": 3719, "job": 32},
+      {"item_id": 75148, "name_id": 132032, "icon_id": 3219, "job": 32},
+      {"item_id": 76365, "name_id": 133373, "icon_id": 2533, "job": 32},
+      {"item_id": 75477, "name_id": 131221, "icon_id": 3717, "job": 32},
+      {"item_id": 75444, "name_id": 131188, "icon_id": 551, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 32},
+      {"item_id": 75220, "name_id": 130964, "icon_id": 3719, "job": 35},
+      {"item_id": 75028, "name_id": 131912, "icon_id": 3106, "job": 35},
+      {"item_id": 75779, "name_id": 132787, "icon_id": 2406, "job": 35},
+      {"item_id": 75217, "name_id": 130961, "icon_id": 3717, "job": 35},
+      {"item_id": 75184, "name_id": 130928, "icon_id": 551, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 35},
+      {"item_id": 75285, "name_id": 131029, "icon_id": 3719, "job": 43},
+      {"item_id": 75058, "name_id": 131942, "icon_id": 3126, "job": 43},
+      {"item_id": 75900, "name_id": 132908, "icon_id": 5662, "job": 43},
+      {"item_id": 75282, "name_id": 131026, "icon_id": 3717, "job": 43},
+      {"item_id": 75249, "name_id": 130993, "icon_id": 551, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731}
     ],
     "drops": [],
-    "wheel_coins": 10
+    "wheel_coins": 235
   },
   "source": [
     {
@@ -495,11 +317,8 @@
     },
     {
       "kind": "reconstructed",
-      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Hooligan Bullies!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Mudshell' (Ninja's Shadow Blade of Soul Power; Wizard's Ornate Wand of Chaos; Warrior’s Warlord Axe of Command; Medic's Shockrod of Antibodies), so it spins that wheel, from fandom 'Mudshell' (revision 30403), one per combat job, and 10 coins. Conflict: its own row says difficulty 1 (the fork's), while 'Mudshell' is difficulty 5; the fight keeps its difficulty. The same pages also name Chugawump, Chugawump!. Brawler: the wiki's 'Bare-Knuckle Brawler Shoulder Pads' is 'Bare-Knuckle Brawler Shoulderpads' in our record dungeons/mudshell.json; Brawler: the wiki's 'Brawer's Atlas Hammer of Rage' is 'Brawler's Atlas Hammer of Rage' in our record dungeons/mudshell.json."
-    },
-    {
-      "kind": "reconstructed",
       "evidence": "(R) rc-0137 (owner: the hooligans 'say no lines' and 'don't all come at the player'): each bully, archer and the Scrapper says one of its own lines when it engages and now and then while it fights (L1189, owner 2026-11-12: 'the hooligans saying they could bench you'): Global.Text 37156-37170, the brawler-initiation block of the client locale; bullies 37156-37160/37164, the Scrapper 37162/37163/37165/37166 ('I can bench ten of you!'), archers 37167-37170. The chase is the engine's battle rule (no notice radius in a paced fight, as the captured Frostfang wave wolves); the melee default's 40 m had left the far wave points idle (w1 spawns 35 to 41 m from the arrival)."
-    }
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Hooligan Bullies! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Hooligan_Bullies_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

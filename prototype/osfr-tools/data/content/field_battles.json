@@ -210,10 +210,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) prize list: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354, Small Health Potion 11002 (ids, names and icons from the client item catalogue). Modelled on the wiki's per-job dungeon 'Medic Prize Wheel' (Robgoblin Treasure Trove: Battle Item Mystery Pack, Medic's Power Shard of Vitality II, ...); the original Troll Summoner Madness prizes and their job-specific wheels are unknown; one is awarded at random per win"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) rc-0136 (2026-11-11) tuning, the owner's 'felt way too easy': the 2014 numbers of design 5.2/5.3 at the battle's tier 1 instead of the old rows' 900/140 health and 4/3 damage (x3.72 and x0.5 at load: 3348 and 521 health, 2 a hit, read off the owner's run). Summoner rank tough, 1726 health (video: 1,650-2,100 at difficulty 1; about four 444 hits at level 4); it still fights beside its helpers as the owner's 2026-10-15 design has it, though no video shows it strike. Scoutlings rank minion (260), Ragelings normal (760), every one 25 raw a hit every 2.3 s (S12; Bixie anchor 25). Summon pace after the 2009 ladder (ENEM 4.1: helpers at about 70 % and 40 %): pairs at 70, 50 and 30 % (was 75 / 50 / 25), the Ragelings last. Values are rows here and the rank tables in combat_scale.json."
         },
         {
@@ -221,8 +217,8 @@
           "evidence": "(R) rc-0137: the marker stands at the captured Troll Summoner starter, AddNpc guid 0x4e9000000012 at [-793.26, -1.97, 1016.19] in p12.pcap t=546031.2 (it was a reconstructed spot at [-440.0, 0.8, 1290.0]); the entrance that stood there as a second Troll Summoner is held in entrances.json."
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Troll Summoner Madness!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Frostfang Snarlers!' (Warrior’s Cudgel of Cleaving; Wizard's Sparkle Twig of Glaciers; Medic's Reflex Hammer of Vitals; Brawler's Mallet of Rumbling), so it spins that wheel, from fandom 'Frostfang Snarlers!' (revision 48736), one per combat job, and 2 coins. The same pages also name Bixie Hive, Cracked Claw Caverns, Hot Springs Haven, Sheep Watch. Brawler: the wiki's 'Bell Brawler Gloves' is 'Saved by the Bell Brawler Gloves' in our record dungeons/frostfang_snarlers.json."
+          "kind": "wiki",
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Troll Summoner Madness! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Troll_Summoner_Madness_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -246,45 +242,34 @@
       "icon_id": 4543,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 2
-        },
-        {
-          "item_id": 76210,
-          "name_id": 133218,
-          "icon_id": 2489,
-          "job": 2
-        },
-        {
           "item_id": 75091,
           "name_id": 131975,
           "icon_id": 3229,
           "job": 2
         },
         {
-          "item_id": 75419,
-          "name_id": 131163,
-          "icon_id": 3721,
+          "item_id": 75385,
+          "name_id": 131129,
+          "icon_id": 1198,
           "job": 2
         },
         {
-          "item_id": 75390,
-          "name_id": 131134,
-          "icon_id": 552,
+          "item_id": 75408,
+          "name_id": 131152,
+          "icon_id": 3717,
           "job": 2
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 11
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 2
         },
         {
-          "item_id": 75354,
-          "name_id": 131098,
-          "icon_id": 3721,
+          "item_id": 76079,
+          "name_id": 133087,
+          "icon_id": 5330,
           "job": 11
         },
         {
@@ -294,39 +279,28 @@
           "job": 11
         },
         {
-          "item_id": 75325,
-          "name_id": 131069,
-          "icon_id": 552,
+          "item_id": 75320,
+          "name_id": 131064,
+          "icon_id": 1198,
           "job": 11
         },
         {
-          "item_id": 76080,
-          "name_id": 133088,
-          "icon_id": 5337,
+          "item_id": 75343,
+          "name_id": 131087,
+          "icon_id": 3717,
           "job": 11
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 12
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 11
         },
         {
-          "item_id": 76389,
-          "name_id": 133397,
-          "icon_id": 5047,
-          "job": 12
-        },
-        {
-          "item_id": 75549,
-          "name_id": 131293,
-          "icon_id": 3721,
-          "job": 12
-        },
-        {
-          "item_id": 75520,
-          "name_id": 131264,
-          "icon_id": 552,
+          "item_id": 76387,
+          "name_id": 133395,
+          "icon_id": 5080,
           "job": 12
         },
         {
@@ -336,16 +310,23 @@
           "job": 12
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 32
+          "item_id": 75515,
+          "name_id": 131259,
+          "icon_id": 1198,
+          "job": 12
         },
         {
-          "item_id": 76320,
-          "name_id": 133328,
-          "icon_id": 5439,
-          "job": 32
+          "item_id": 75538,
+          "name_id": 131282,
+          "icon_id": 3717,
+          "job": 12
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 12
         },
         {
           "item_id": 75121,
@@ -354,15 +335,22 @@
           "job": 32
         },
         {
-          "item_id": 75484,
-          "name_id": 131228,
-          "icon_id": 3721,
+          "item_id": 75450,
+          "name_id": 131194,
+          "icon_id": 1198,
           "job": 32
         },
         {
-          "item_id": 75455,
-          "name_id": 131199,
-          "icon_id": 552,
+          "item_id": 75473,
+          "name_id": 131217,
+          "icon_id": 3717,
+          "job": 32
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 32
         },
         {
@@ -372,34 +360,23 @@
           "job": 35
         },
         {
-          "item_id": 75224,
-          "name_id": 130968,
-          "icon_id": 3721,
+          "item_id": 75190,
+          "name_id": 130934,
+          "icon_id": 1198,
           "job": 35
         },
         {
-          "item_id": 75195,
-          "name_id": 130939,
-          "icon_id": 552,
+          "item_id": 75213,
+          "name_id": 130957,
+          "icon_id": 3717,
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 35
-        },
-        {
-          "item_id": 75734,
-          "name_id": 132742,
-          "icon_id": 4946,
-          "job": 35
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 43
         },
         {
           "item_id": 75031,
@@ -408,27 +385,29 @@
           "job": 43
         },
         {
-          "item_id": 75289,
-          "name_id": 131033,
-          "icon_id": 3721,
+          "item_id": 75255,
+          "name_id": 130999,
+          "icon_id": 1198,
           "job": 43
         },
         {
-          "item_id": 75260,
-          "name_id": 131004,
-          "icon_id": 552,
+          "item_id": 75278,
+          "name_id": 131022,
+          "icon_id": 3717,
           "job": 43
         },
         {
-          "item_id": 75855,
-          "name_id": 132863,
-          "icon_id": 4988,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3
         }
       ],
       "wheel_coins": 2
@@ -562,15 +541,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Prize substitution: the four rows are copied from battle 12350 (Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354 and Small Health Potion 11002, with their catalogue name/icon ids) because the guide's per-job wheel rows have not been resolved to runtime item ids. The existing checked payout grants 68 coins plus one random prize once per win; no original Bixie Hive wheel, star payout or member bonus is recovered."
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) Arena reuse: the zone block is battle 12350's shared sg_random_encounter_clearing (zone 9600, arrival [136,-0.5,155], geometry 214, sky_wilds24.xml, zero rotation, tutorial false) because no original Bixie Hive scene or door transform was recovered; the guide's door is a Queensfields prop with no recovered transform."
         },
         {
           "kind": "wiki",
-          "evidence": "rc-0137 prize wheel: fandom 'Bixie Hive' (revision 49119) lists one prize wheel per combat job and a 68-coin slot; any other job spins the items every job's wheel holds. Brawler: the wiki's 'Saved by the Bell Brawler Cap' is 'Saved by the Bell Brawler Bandana' in our record dungeons/bixie_hive.json; Medic: the wiki's 'Stable Condition Medic Cap' is 'Stable Condition Medic Beanie' in our record dungeons/bixie_hive.json; Wizard: the wiki's 'Novice Wizard Fez' is 'Novice Wizard Cap' in our record dungeons/bixie_hive.json."
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Bixie Hive' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/fr_place_Bixie_Hive.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Blue Defense Warrior Gauntlets' as 'Base Defense Warrior Gauntlets'. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -594,21 +569,15 @@
       "icon_id": 662,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75091,
+          "name_id": 131975,
+          "icon_id": 3229,
           "job": 2
         },
         {
           "item_id": 76211,
           "name_id": 133219,
           "icon_id": 2497,
-          "job": 2
-        },
-        {
-          "item_id": 75091,
-          "name_id": 131975,
-          "icon_id": 3229,
           "job": 2
         },
         {
@@ -624,27 +593,16 @@
           "job": 2
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 11
-        },
-        {
-          "item_id": 75315,
-          "name_id": 131059,
-          "icon_id": 1209,
-          "job": 11
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 2
         },
         {
           "item_id": 75061,
           "name_id": 131945,
           "icon_id": 3133,
-          "job": 11
-        },
-        {
-          "item_id": 75343,
-          "name_id": 131087,
-          "icon_id": 3717,
           "job": 11
         },
         {
@@ -654,15 +612,34 @@
           "job": 11
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75315,
+          "name_id": 131059,
+          "icon_id": 1209,
+          "job": 11
+        },
+        {
+          "item_id": 75343,
+          "name_id": 131087,
+          "icon_id": 3717,
+          "job": 11
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 11
+        },
+        {
+          "item_id": 75151,
+          "name_id": 132035,
+          "icon_id": 3158,
           "job": 12
         },
         {
-          "item_id": 76390,
-          "name_id": 133398,
-          "icon_id": 5056,
+          "item_id": 76381,
+          "name_id": 133389,
+          "icon_id": 5044,
           "job": 12
         },
         {
@@ -678,27 +655,22 @@
           "job": 12
         },
         {
-          "item_id": 75151,
-          "name_id": 132035,
-          "icon_id": 3158,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 12
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 32
-        },
-        {
-          "item_id": 76321,
-          "name_id": 133329,
-          "icon_id": 5449,
-          "job": 32
         },
         {
           "item_id": 75121,
           "name_id": 132005,
           "icon_id": 3120,
+          "job": 32
+        },
+        {
+          "item_id": 76314,
+          "name_id": 133322,
+          "icon_id": 2517,
           "job": 32
         },
         {
@@ -714,9 +686,22 @@
           "job": 32
         },
         {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 32
+        },
+        {
           "item_id": 75001,
           "name_id": 131885,
           "icon_id": 3104,
+          "job": 35
+        },
+        {
+          "item_id": 75735,
+          "name_id": 132743,
+          "icon_id": 4948,
           "job": 35
         },
         {
@@ -732,27 +717,22 @@
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 35
-        },
-        {
-          "item_id": 75735,
-          "name_id": 132743,
-          "icon_id": 4948,
-          "job": 35
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 43
         },
         {
           "item_id": 75031,
           "name_id": 131915,
           "icon_id": 3131,
+          "job": 43
+        },
+        {
+          "item_id": 75849,
+          "name_id": 132857,
+          "icon_id": 4989,
           "job": 43
         },
         {
@@ -768,15 +748,17 @@
           "job": 43
         },
         {
-          "item_id": 75856,
-          "name_id": 132864,
-          "icon_id": 4991,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3
         }
       ],
       "wheel_coins": 68
@@ -1549,8 +1531,8 @@
           "evidence": "(R) Marker uses visible enemy model rather than non-rendering tent spawner; overhead image 11970 reuses native battle 96. Terrain/safety gate checks the full 5 m marker wander disc; collision, water and native road access remain unverified."
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Band of Robgoblins' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Den of Secrets' (Ninja's Blade of Flame Wave; Warrior’s Axe of Warcry; Wizard's Wand of Tsunami; Medic's Scalpel of Immunization), so it spins that wheel, from fandom 'Den of Secrets' (revision 49127), one per combat job, and 26 coins. The same pages also name Fleetfoot Ninja!, den_of_secrets, fleetfoot_ninja."
+          "kind": "wiki",
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Band of Robgoblins! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Band_of_Robgoblins_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -1574,58 +1556,29 @@
       "icon_id": 4540,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 2
-        },
-        {
           "item_id": 75095,
           "name_id": 131979,
           "icon_id": 3153,
           "job": 2
         },
         {
-          "item_id": 75420,
-          "name_id": 131164,
-          "icon_id": 3721,
+          "item_id": 75409,
+          "name_id": 131153,
+          "icon_id": 3717,
           "job": 2
         },
         {
-          "item_id": 75391,
-          "name_id": 131135,
-          "icon_id": 553,
+          "item_id": 75376,
+          "name_id": 131120,
+          "icon_id": 548,
           "job": 2
         },
         {
-          "item_id": 76224,
-          "name_id": 133232,
-          "icon_id": 5397,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 2
-        },
-        {
-          "item_id": 76094,
-          "name_id": 133102,
-          "icon_id": 5789,
-          "job": 11
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 11
-        },
-        {
-          "item_id": 75355,
-          "name_id": 131099,
-          "icon_id": 3721,
-          "job": 11
-        },
-        {
-          "item_id": 75326,
-          "name_id": 131070,
-          "icon_id": 553,
-          "job": 11
         },
         {
           "item_id": 75065,
@@ -1634,28 +1587,23 @@
           "job": 11
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 12
+          "item_id": 75344,
+          "name_id": 131088,
+          "icon_id": 3717,
+          "job": 11
         },
         {
-          "item_id": 76407,
-          "name_id": 133415,
-          "icon_id": 5091,
-          "job": 12
+          "item_id": 75311,
+          "name_id": 131055,
+          "icon_id": 548,
+          "job": 11
         },
         {
-          "item_id": 75550,
-          "name_id": 131294,
-          "icon_id": 3721,
-          "job": 12
-        },
-        {
-          "item_id": 75521,
-          "name_id": 131265,
-          "icon_id": 553,
-          "job": 12
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 11
         },
         {
           "item_id": 75155,
@@ -1664,16 +1612,29 @@
           "job": 12
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 32
+          "item_id": 75539,
+          "name_id": 131283,
+          "icon_id": 3717,
+          "job": 12
         },
         {
-          "item_id": 76334,
-          "name_id": 133342,
-          "icon_id": 5454,
-          "job": 32
+          "item_id": 75506,
+          "name_id": 131250,
+          "icon_id": 548,
+          "job": 12
+        },
+        {
+          "item_id": 76398,
+          "name_id": 133406,
+          "icon_id": 2446,
+          "job": 12
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 12
         },
         {
           "item_id": 75125,
@@ -1682,15 +1643,28 @@
           "job": 32
         },
         {
-          "item_id": 75485,
-          "name_id": 131229,
-          "icon_id": 3721,
+          "item_id": 75474,
+          "name_id": 131218,
+          "icon_id": 3717,
           "job": 32
         },
         {
-          "item_id": 75456,
-          "name_id": 131200,
-          "icon_id": 553,
+          "item_id": 75441,
+          "name_id": 131185,
+          "icon_id": 548,
+          "job": 32
+        },
+        {
+          "item_id": 76327,
+          "name_id": 133335,
+          "icon_id": 2525,
+          "job": 32
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 32
         },
         {
@@ -1700,34 +1674,23 @@
           "job": 35
         },
         {
-          "item_id": 75225,
-          "name_id": 130969,
-          "icon_id": 3721,
+          "item_id": 75214,
+          "name_id": 130958,
+          "icon_id": 3717,
           "job": 35
         },
         {
-          "item_id": 75196,
-          "name_id": 130940,
-          "icon_id": 553,
+          "item_id": 75181,
+          "name_id": 130925,
+          "icon_id": 548,
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 35
-        },
-        {
-          "item_id": 75748,
-          "name_id": 132756,
-          "icon_id": 2395,
-          "job": 35
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 43
         },
         {
           "item_id": 75035,
@@ -1736,30 +1699,32 @@
           "job": 43
         },
         {
-          "item_id": 75290,
-          "name_id": 131034,
-          "icon_id": 3721,
+          "item_id": 75279,
+          "name_id": 131023,
+          "icon_id": 3717,
           "job": 43
         },
         {
-          "item_id": 75261,
-          "name_id": 131005,
-          "icon_id": 553,
+          "item_id": 75246,
+          "name_id": 130990,
+          "icon_id": 548,
           "job": 43
         },
         {
-          "item_id": 75869,
-          "name_id": 132877,
-          "icon_id": 5007,
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3
         }
       ],
-      "wheel_coins": 26
+      "wheel_coins": 1
     },
     {
       "id": 12303,
@@ -2103,12 +2068,8 @@
           "evidence": "(R) Placement: marker [-2165.513,-32.96,328.1112], 19.00 m east of Pappy Farnum [-2184.513,-31.53728,328.1112] (the video marker is quoted as 19 m). The full 105-sample 5 m wander disc is terrain-covered; max sampled slope 19.96 degrees; all 24 ring samples are finite; y is the bilinear zone-0 height -32.9577 rounded to -32.96 (delta 0.0023 m). Nearest spawned NPC Riley 9500000276 is 17.38 m away, the nearest field enemy is 207.2 m away and the nearest other battle marker (12400) is 269.6 m away. Water, object collision and a native walkable route remain unverified."
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) Prize rows copied from battle 12311: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354 and Small Health Potion 11002; T243's battle_prizes_available accepts all four against the shipped item catalogue. No original Sheep Watch wheel, star payout, coin-wheel slot or bonus-goal reward is recovered."
-        },
-        {
           "kind": "wiki",
-          "evidence": "rc-0137 prize wheel: fandom 'Sheep Watch' (revision 49122) lists one prize wheel per combat job and a 8-coin slot; any other job spins the items every job's wheel holds."
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Sheep Watch' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Sheep_Watch.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Ninja Training Sword of 1000 Storms' as 'Ninja's Training Sword of 1000 Storms'. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -2132,21 +2093,15 @@
       "icon_id": -1,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75091,
+          "name_id": 131975,
+          "icon_id": 3229,
           "job": 2
         },
         {
           "item_id": 76213,
           "name_id": 133221,
           "icon_id": 5406,
-          "job": 2
-        },
-        {
-          "item_id": 75091,
-          "name_id": 131975,
-          "icon_id": 3229,
           "job": 2
         },
         {
@@ -2162,9 +2117,22 @@
           "job": 2
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 2
+        },
+        {
+          "item_id": 75061,
+          "name_id": 131945,
+          "icon_id": 3133,
+          "job": 11
+        },
+        {
+          "item_id": 76083,
+          "name_id": 133091,
+          "icon_id": 5356,
           "job": 11
         },
         {
@@ -2180,21 +2148,16 @@
           "job": 11
         },
         {
-          "item_id": 75061,
-          "name_id": 131945,
-          "icon_id": 3133,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 11
         },
         {
-          "item_id": 76083,
-          "name_id": 133091,
-          "icon_id": 5356,
-          "job": 11
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75151,
+          "name_id": 132035,
+          "icon_id": 3158,
           "job": 12
         },
         {
@@ -2216,27 +2179,22 @@
           "job": 12
         },
         {
-          "item_id": 75151,
-          "name_id": 132035,
-          "icon_id": 3158,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 12
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75121,
+          "name_id": 132005,
+          "icon_id": 3120,
           "job": 32
         },
         {
           "item_id": 76323,
           "name_id": 133331,
           "icon_id": 5466,
-          "job": 32
-        },
-        {
-          "item_id": 75121,
-          "name_id": 132005,
-          "icon_id": 3120,
           "job": 32
         },
         {
@@ -2252,9 +2210,22 @@
           "job": 32
         },
         {
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 32
+        },
+        {
           "item_id": 75001,
           "name_id": 131885,
           "icon_id": 3104,
+          "job": 35
+        },
+        {
+          "item_id": 75737,
+          "name_id": 132745,
+          "icon_id": 4959,
           "job": 35
         },
         {
@@ -2270,27 +2241,22 @@
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 35
-        },
-        {
-          "item_id": 75737,
-          "name_id": 132745,
-          "icon_id": 4959,
-          "job": 35
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 43
         },
         {
           "item_id": 75031,
           "name_id": 131915,
           "icon_id": 3131,
+          "job": 43
+        },
+        {
+          "item_id": 75858,
+          "name_id": 132866,
+          "icon_id": 5655,
           "job": 43
         },
         {
@@ -2306,18 +2272,20 @@
           "job": 43
         },
         {
-          "item_id": 75858,
-          "name_id": 132866,
-          "icon_id": 5655,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3
         }
       ],
-      "wheel_coins": 8
+      "wheel_coins": 1
     },
     {
       "id": 12310,
@@ -2624,7 +2592,7 @@
         },
         {
           "kind": "wiki",
-          "evidence": "rc-0137 prize wheel: fandom 'Petty Yetis!' (revision 49161) lists one prize wheel per combat job and a 8-coin slot; any other job spins the items every job's wheel holds."
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Petty Yetis! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Petty_Yetis_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -2648,21 +2616,9 @@
       "icon_id": -1,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 2
-        },
-        {
           "item_id": 75094,
           "name_id": 131978,
           "icon_id": 3153,
-          "job": 2
-        },
-        {
-          "item_id": 75381,
-          "name_id": 131125,
-          "icon_id": 1194,
           "job": 2
         },
         {
@@ -2672,21 +2628,22 @@
           "job": 2
         },
         {
-          "item_id": 76219,
-          "name_id": 133227,
-          "icon_id": 5411,
+          "item_id": 75381,
+          "name_id": 131125,
+          "icon_id": 1194,
           "job": 2
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 11
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 2
         },
         {
-          "item_id": 75316,
-          "name_id": 131060,
-          "icon_id": 1194,
+          "item_id": 75064,
+          "name_id": 131948,
+          "icon_id": 3221,
           "job": 11
         },
         {
@@ -2696,33 +2653,22 @@
           "job": 11
         },
         {
-          "item_id": 75064,
-          "name_id": 131948,
-          "icon_id": 3221,
-          "job": 11
-        },
-        {
-          "item_id": 76089,
-          "name_id": 133097,
-          "icon_id": 5351,
-          "job": 11
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 12
-        },
-        {
-          "item_id": 76401,
-          "name_id": 133409,
-          "icon_id": 5070,
-          "job": 12
-        },
-        {
-          "item_id": 75511,
-          "name_id": 131255,
+          "item_id": 75316,
+          "name_id": 131060,
           "icon_id": 1194,
+          "job": 11
+        },
+        {
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 11
+        },
+        {
+          "item_id": 75154,
+          "name_id": 132038,
+          "icon_id": 3157,
           "job": 12
         },
         {
@@ -2732,33 +2678,22 @@
           "job": 12
         },
         {
-          "item_id": 75154,
-          "name_id": 132038,
-          "icon_id": 3157,
+          "item_id": 75511,
+          "name_id": 131255,
+          "icon_id": 1194,
           "job": 12
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 32
-        },
-        {
-          "item_id": 76329,
-          "name_id": 133337,
-          "icon_id": 2534,
-          "job": 32
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 12
         },
         {
           "item_id": 75124,
           "name_id": 132008,
           "icon_id": 3099,
-          "job": 32
-        },
-        {
-          "item_id": 75446,
-          "name_id": 131190,
-          "icon_id": 1194,
           "job": 32
         },
         {
@@ -2768,15 +2703,22 @@
           "job": 32
         },
         {
+          "item_id": 75446,
+          "name_id": 131190,
+          "icon_id": 1194,
+          "job": 32
+        },
+        {
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 32
+        },
+        {
           "item_id": 75004,
           "name_id": 131888,
           "icon_id": 3110,
-          "job": 35
-        },
-        {
-          "item_id": 75186,
-          "name_id": 130930,
-          "icon_id": 1194,
           "job": 35
         },
         {
@@ -2786,21 +2728,22 @@
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75186,
+          "name_id": 130930,
+          "icon_id": 1194,
           "job": 35
         },
         {
-          "item_id": 75743,
-          "name_id": 132751,
-          "icon_id": 2401,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75864,
+          "name_id": 132872,
+          "icon_id": 5660,
           "job": 43
         },
         {
@@ -2810,27 +2753,29 @@
           "job": 43
         },
         {
-          "item_id": 75251,
-          "name_id": 130995,
-          "icon_id": 1194,
-          "job": 43
-        },
-        {
           "item_id": 75279,
           "name_id": 131023,
           "icon_id": 3717,
           "job": 43
         },
         {
-          "item_id": 75864,
-          "name_id": 132872,
-          "icon_id": 5660,
+          "item_id": 75251,
+          "name_id": 130995,
+          "icon_id": 1194,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 43
+        },
+        {
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3
         }
       ],
       "drops": [
@@ -2850,7 +2795,7 @@
           ]
         }
       ],
-      "wheel_coins": 8
+      "wheel_coins": 1
     },
     {
       "id": 12311,
@@ -3001,7 +2946,7 @@
         },
         {
           "kind": "wiki",
-          "evidence": "rc-0137 prize wheel: fandom 'Pixie Hunters!' (revision 49841) lists one prize wheel per combat job and a 0-coin slot; any other job spins the items every job's wheel holds. Brawler from our record dungeons/pixie_hunters.json; Medic from our record dungeons/pixie_hunters.json; Ninja from our record dungeons/pixie_hunters.json; Warrior from our record dungeons/pixie_hunters.json; Wizard from our record dungeons/pixie_hunters.json."
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Pixie Hunters! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Pixie_Hunters_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -3025,10 +2970,47 @@
       "icon_id": -1,
       "prizes": [
         {
+          "item_id": 75420,
+          "name_id": 131164,
+          "icon_id": 3721,
+          "job": 2
+        },
+        {
+          "item_id": 75381,
+          "name_id": 131125,
+          "icon_id": 1194,
+          "job": 2
+        },
+        {
           "item_id": 75093,
           "name_id": 131977,
           "icon_id": 3153,
           "job": 2
+        },
+        {
+          "item_id": 76221,
+          "name_id": 133229,
+          "icon_id": 5370,
+          "job": 2
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 2
+        },
+        {
+          "item_id": 75355,
+          "name_id": 131099,
+          "icon_id": 3721,
+          "job": 11
+        },
+        {
+          "item_id": 75316,
+          "name_id": 131060,
+          "icon_id": 1194,
+          "job": 11
         },
         {
           "item_id": 75063,
@@ -3037,10 +3019,60 @@
           "job": 11
         },
         {
+          "item_id": 76091,
+          "name_id": 133099,
+          "icon_id": 5328,
+          "job": 11
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 11
+        },
+        {
+          "item_id": 75550,
+          "name_id": 131294,
+          "icon_id": 3721,
+          "job": 12
+        },
+        {
+          "item_id": 75511,
+          "name_id": 131255,
+          "icon_id": 1194,
+          "job": 12
+        },
+        {
           "item_id": 75153,
           "name_id": 132037,
           "icon_id": 3157,
           "job": 12
+        },
+        {
+          "item_id": 76403,
+          "name_id": 133411,
+          "icon_id": 5082,
+          "job": 12
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 12
+        },
+        {
+          "item_id": 75485,
+          "name_id": 131229,
+          "icon_id": 3721,
+          "job": 32
+        },
+        {
+          "item_id": 75446,
+          "name_id": 131190,
+          "icon_id": 1194,
+          "job": 32
         },
         {
           "item_id": 75123,
@@ -3049,9 +3081,22 @@
           "job": 32
         },
         {
-          "item_id": 75003,
-          "name_id": 131887,
-          "icon_id": 3110,
+          "item_id": 76331,
+          "name_id": 133339,
+          "icon_id": 5428,
+          "job": 32
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 32
+        },
+        {
+          "item_id": 75225,
+          "name_id": 130969,
+          "icon_id": 3721,
           "job": 35
         },
         {
@@ -3061,15 +3106,9 @@
           "job": 35
         },
         {
-          "item_id": 75225,
-          "name_id": 130969,
-          "icon_id": 3721,
-          "job": 35
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 75003,
+          "name_id": 131887,
+          "icon_id": 3110,
           "job": 35
         },
         {
@@ -3079,18 +3118,51 @@
           "job": 35
         },
         {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 35
+        },
+        {
+          "item_id": 75290,
+          "name_id": 131034,
+          "icon_id": 3721,
+          "job": 43
+        },
+        {
+          "item_id": 75251,
+          "name_id": 130995,
+          "icon_id": 1194,
+          "job": 43
+        },
+        {
           "item_id": 75033,
           "name_id": 131917,
           "icon_id": 3130,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 75866,
+          "name_id": 132874,
+          "icon_id": 4971,
+          "job": 43
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3,
+          "job": 43
+        },
+        {
+          "item_id": 2173,
+          "name_id": 422909,
+          "icon_id": 730,
+          "quantity": 3
         }
       ],
-      "wheel_coins": 0
+      "wheel_coins": 8
     },
     {
       "id": 12400,
@@ -3165,7 +3237,7 @@
         },
         {
           "kind": "wiki",
-          "evidence": "rc-0137 prize wheel: fandom 'King of the Ring!' (revision 49121) lists one prize wheel per combat job and a 19-coin slot; any other job spins the items every job's wheel holds. Brawler: the wiki's 'Bell Brawler Gloves' is 'Saved by the Bell Brawler Gloves' in our record dungeons/king_of_the_ring.json."
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:King of the Ring!' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_King_of_the_Ring.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -3189,12 +3261,6 @@
       "icon_id": -1,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 2
-        },
-        {
           "item_id": 76210,
           "name_id": 133218,
           "icon_id": 2489,
@@ -3204,7 +3270,7 @@
           "item_id": 10482,
           "name_id": 6666,
           "icon_id": 973,
-          "job": 11
+          "job": 2
         },
         {
           "item_id": 76080,
@@ -3216,7 +3282,7 @@
           "item_id": 10482,
           "name_id": 6666,
           "icon_id": 973,
-          "job": 12
+          "job": 11
         },
         {
           "item_id": 76389,
@@ -3225,10 +3291,10 @@
           "job": 12
         },
         {
-          "item_id": 76324,
-          "name_id": 133332,
-          "icon_id": 2510,
-          "job": 32
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973,
+          "job": 12
         },
         {
           "item_id": 76320,
@@ -3240,7 +3306,7 @@
           "item_id": 10482,
           "name_id": 6666,
           "icon_id": 973,
-          "job": 35
+          "job": 32
         },
         {
           "item_id": 75734,
@@ -3252,12 +3318,18 @@
           "item_id": 10482,
           "name_id": 6666,
           "icon_id": 973,
-          "job": 43
+          "job": 35
         },
         {
           "item_id": 75855,
           "name_id": 132863,
           "icon_id": 4988,
+          "job": 43
+        },
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973,
           "job": 43
         },
         {
@@ -3396,12 +3468,8 @@
           "evidence": "(R) Placement: no barrier transform is recovered. The marker [-1903.0,-34.75,-660.0] is on the Greenwood Camp approach south-east of Lugabow [-1915.146,-36.9307,-636.1354], the nearest regional legacy_data NPC, 26.78 m away; the nearest visible npc_spawns_extra.json actor is Bandit Patrolman 100000004341 [-1877.934,-29.25417,-654.0696], 25.76 m away (Glugmort [-1943.932,-39.94606,-600.8123] is 71.96 m away and the Thugamug marker 339.18 m). y is the bilinear zone-0 height -34.75 (delta 0.0000 m). All 105 samples of the 5 m wander disc (81 grid + 24 ring) are terrain-covered with a finite y; the 24-sample ring and full disc reach at most 14.04 degrees of slope. The nearest field-enemy home is 946.62 m away and the nearest other battle marker 339.18 m. Water, object collision and a native walkable route remain unverified."
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) Prize rows copied from battle 12350: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354 and Small Health Potion 11002, with their name and icon ids. The guide's Bandit Hideout wheel rows (for example Archer's Necklace of Bark Skin IV) are not resolved to runtime item ids, so this four-item substitution is reconstructed; one is awarded at random per win."
-        },
-        {
           "kind": "wiki",
-          "evidence": "rc-0137 prize wheel: fandom 'Bandit Hideout!' (revision 49141) lists one prize wheel per combat job and a 60-coin slot; any other job spins the items every job's wheel holds."
+          "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Bandit Hideout!' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Bandit_Hideout.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."
         }
       ],
       "nameplate_image_id": 11970,
@@ -3425,15 +3493,9 @@
       "icon_id": 660,
       "prizes": [
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 2
-        },
-        {
-          "item_id": 75102,
-          "name_id": 131986,
-          "icon_id": 3100,
+          "item_id": 75411,
+          "name_id": 131155,
+          "icon_id": 3717,
           "job": 2
         },
         {
@@ -3443,33 +3505,16 @@
           "job": 2
         },
         {
-          "item_id": 75411,
-          "name_id": 131155,
-          "icon_id": 3717,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 2
-        },
-        {
-          "item_id": 76244,
-          "name_id": 133252,
-          "icon_id": 5358,
-          "job": 2
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 11
         },
         {
           "item_id": 75072,
           "name_id": 131956,
           "icon_id": 3149,
-          "job": 11
-        },
-        {
-          "item_id": 75318,
-          "name_id": 131062,
-          "icon_id": 1196,
           "job": 11
         },
         {
@@ -3479,27 +3524,22 @@
           "job": 11
         },
         {
-          "item_id": 76114,
-          "name_id": 133122,
-          "icon_id": 3555,
+          "item_id": 75318,
+          "name_id": 131062,
+          "icon_id": 1196,
           "job": 11
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 12
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 11
         },
         {
-          "item_id": 76434,
-          "name_id": 133442,
-          "icon_id": 5031,
-          "job": 12
-        },
-        {
-          "item_id": 75162,
-          "name_id": 132046,
-          "icon_id": 3162,
+          "item_id": 75541,
+          "name_id": 131285,
+          "icon_id": 3717,
           "job": 12
         },
         {
@@ -3509,33 +3549,16 @@
           "job": 12
         },
         {
-          "item_id": 75541,
-          "name_id": 131285,
-          "icon_id": 3717,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 12
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 32
-        },
-        {
-          "item_id": 76354,
-          "name_id": 133362,
-          "icon_id": 5415,
-          "job": 32
         },
         {
           "item_id": 75132,
           "name_id": 132016,
           "icon_id": 3127,
-          "job": 32
-        },
-        {
-          "item_id": 75448,
-          "name_id": 131192,
-          "icon_id": 1196,
           "job": 32
         },
         {
@@ -3545,10 +3568,23 @@
           "job": 32
         },
         {
-          "item_id": 75188,
-          "name_id": 130932,
+          "item_id": 75448,
+          "name_id": 131192,
           "icon_id": 1196,
-          "job": 35
+          "job": 32
+        },
+        {
+          "item_id": 76354,
+          "name_id": 133362,
+          "icon_id": 5415,
+          "job": 32
+        },
+        {
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 32
         },
         {
           "item_id": 75216,
@@ -3557,39 +3593,22 @@
           "job": 35
         },
         {
-          "item_id": 75012,
-          "name_id": 131896,
-          "icon_id": 3105,
+          "item_id": 75188,
+          "name_id": 130932,
+          "icon_id": 1196,
           "job": 35
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
           "job": 35
-        },
-        {
-          "item_id": 75768,
-          "name_id": 132776,
-          "icon_id": 2376,
-          "job": 35
-        },
-        {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973,
-          "job": 43
         },
         {
           "item_id": 75042,
           "name_id": 131926,
           "icon_id": 3128,
-          "job": 43
-        },
-        {
-          "item_id": 75253,
-          "name_id": 130997,
-          "icon_id": 1196,
           "job": 43
         },
         {
@@ -3599,18 +3618,26 @@
           "job": 43
         },
         {
-          "item_id": 75889,
-          "name_id": 132897,
-          "icon_id": 4965,
+          "item_id": 75253,
+          "name_id": 130997,
+          "icon_id": 1196,
           "job": 43
         },
         {
-          "item_id": 10482,
-          "name_id": 6666,
-          "icon_id": 973
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3,
+          "job": 43
+        },
+        {
+          "item_id": 3082,
+          "name_id": 422912,
+          "icon_id": 731,
+          "quantity": 3
         }
       ],
-      "wheel_coins": 60
+      "wheel_coins": 176
     }
   ]
 }

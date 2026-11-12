@@ -543,191 +543,37 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75103,
-        "name_id": 131987,
-        "icon_id": 3100,
-        "job": 2
-      },
-      {
-        "item_id": 75388,
-        "name_id": 131132,
-        "icon_id": 1201,
-        "job": 2
-      },
-      {
-        "item_id": 75422,
-        "name_id": 131166,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 76247,
-        "name_id": 133255,
-        "icon_id": 5387,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75073,
-        "name_id": 131957,
-        "icon_id": 3149,
-        "job": 11
-      },
-      {
-        "item_id": 75323,
-        "name_id": 131067,
-        "icon_id": 1201,
-        "job": 11
-      },
-      {
-        "item_id": 75357,
-        "name_id": 131101,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 76117,
-        "name_id": 133125,
-        "icon_id": 3562,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76438,
-        "name_id": 133446,
-        "icon_id": 5050,
-        "job": 12
-      },
-      {
-        "item_id": 75163,
-        "name_id": 132047,
-        "icon_id": 3162,
-        "job": 12
-      },
-      {
-        "item_id": 75518,
-        "name_id": 131262,
-        "icon_id": 1201,
-        "job": 12
-      },
-      {
-        "item_id": 75552,
-        "name_id": 131296,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76357,
-        "name_id": 133365,
-        "icon_id": 5444,
-        "job": 32
-      },
-      {
-        "item_id": 75133,
-        "name_id": 132017,
-        "icon_id": 3127,
-        "job": 32
-      },
-      {
-        "item_id": 75453,
-        "name_id": 131197,
-        "icon_id": 1201,
-        "job": 32
-      },
-      {
-        "item_id": 75487,
-        "name_id": 131231,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75193,
-        "name_id": 130937,
-        "icon_id": 1201,
-        "job": 35
-      },
-      {
-        "item_id": 75227,
-        "name_id": 130971,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75013,
-        "name_id": 131897,
-        "icon_id": 3105,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75771,
-        "name_id": 132779,
-        "icon_id": 3413,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75043,
-        "name_id": 131927,
-        "icon_id": 3128,
-        "job": 43
-      },
-      {
-        "item_id": 75258,
-        "name_id": 131002,
-        "icon_id": 1201,
-        "job": 43
-      },
-      {
-        "item_id": 75292,
-        "name_id": 131036,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75892,
-        "name_id": 132900,
-        "icon_id": 5000,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 75103, "name_id": 131987, "icon_id": 3100, "job": 2},
+      {"item_id": 75388, "name_id": 131132, "icon_id": 1201, "job": 2},
+      {"item_id": 75422, "name_id": 131166, "icon_id": 3721, "job": 2},
+      {"item_id": 76247, "name_id": 133255, "icon_id": 5387, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 75073, "name_id": 131957, "icon_id": 3149, "job": 11},
+      {"item_id": 75323, "name_id": 131067, "icon_id": 1201, "job": 11},
+      {"item_id": 75357, "name_id": 131101, "icon_id": 3721, "job": 11},
+      {"item_id": 76117, "name_id": 133125, "icon_id": 3562, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 76438, "name_id": 133446, "icon_id": 5050, "job": 12},
+      {"item_id": 75163, "name_id": 132047, "icon_id": 3162, "job": 12},
+      {"item_id": 75518, "name_id": 131262, "icon_id": 1201, "job": 12},
+      {"item_id": 75552, "name_id": 131296, "icon_id": 3721, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 76357, "name_id": 133365, "icon_id": 5444, "job": 32},
+      {"item_id": 75133, "name_id": 132017, "icon_id": 3127, "job": 32},
+      {"item_id": 75453, "name_id": 131197, "icon_id": 1201, "job": 32},
+      {"item_id": 75487, "name_id": 131231, "icon_id": 3721, "job": 32},
+      {"item_id": 75193, "name_id": 130937, "icon_id": 1201, "job": 35},
+      {"item_id": 75227, "name_id": 130971, "icon_id": 3721, "job": 35},
+      {"item_id": 75013, "name_id": 131897, "icon_id": 3105, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75771, "name_id": 132779, "icon_id": 3413, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 75043, "name_id": 131927, "icon_id": 3128, "job": 43},
+      {"item_id": 75258, "name_id": 131002, "icon_id": 1201, "job": 43},
+      {"item_id": 75292, "name_id": 131036, "icon_id": 3721, "job": 43},
+      {"item_id": 75892, "name_id": 132900, "icon_id": 5000, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
     "wheel_coins": 132
@@ -765,9 +611,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/darvon_s_descent.json."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Darvon's Descent' (revision 49144) lists one prize wheel per combat job and a 132-coin slot; any other job spins the items every job's wheel holds. Ninja: the wiki's 'Ninja's Neckace of Vitality IV' is 'Ninja's Necklace of Vitality IV' in our record dungeons/darvon_s_descent.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this dungeon's own, from our guide record data/content/dungeons/darvon_s_descent.json (dungeon_data.rewards.prize_wheels, one list per class from its wiki page, and the wheel's coin slot). Each class spins its own list. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

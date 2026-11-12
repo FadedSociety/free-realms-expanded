@@ -201,194 +201,35 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75095,
-        "name_id": 131979,
-        "icon_id": 3153,
-        "job": 2
-      },
-      {
-        "item_id": 75420,
-        "name_id": 131164,
-        "icon_id": 3721,
-        "job": 2
-      },
-      {
-        "item_id": 75391,
-        "name_id": 131135,
-        "icon_id": 553,
-        "job": 2
-      },
-      {
-        "item_id": 76224,
-        "name_id": 133232,
-        "icon_id": 5397,
-        "job": 2
-      },
-      {
-        "item_id": 76094,
-        "name_id": 133102,
-        "icon_id": 5789,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75355,
-        "name_id": 131099,
-        "icon_id": 3721,
-        "job": 11
-      },
-      {
-        "item_id": 75326,
-        "name_id": 131070,
-        "icon_id": 553,
-        "job": 11
-      },
-      {
-        "item_id": 75065,
-        "name_id": 131949,
-        "icon_id": 3221,
-        "job": 11
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 76407,
-        "name_id": 133415,
-        "icon_id": 5091,
-        "job": 12
-      },
-      {
-        "item_id": 75550,
-        "name_id": 131294,
-        "icon_id": 3721,
-        "job": 12
-      },
-      {
-        "item_id": 75521,
-        "name_id": 131265,
-        "icon_id": 553,
-        "job": 12
-      },
-      {
-        "item_id": 75155,
-        "name_id": 132039,
-        "icon_id": 3157,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76334,
-        "name_id": 133342,
-        "icon_id": 5454,
-        "job": 32
-      },
-      {
-        "item_id": 75125,
-        "name_id": 132009,
-        "icon_id": 3099,
-        "job": 32
-      },
-      {
-        "item_id": 75485,
-        "name_id": 131229,
-        "icon_id": 3721,
-        "job": 32
-      },
-      {
-        "item_id": 75456,
-        "name_id": 131200,
-        "icon_id": 553,
-        "job": 32
-      },
-      {
-        "item_id": 75005,
-        "name_id": 131889,
-        "icon_id": 3110,
-        "job": 35
-      },
-      {
-        "item_id": 75225,
-        "name_id": 130969,
-        "icon_id": 3721,
-        "job": 35
-      },
-      {
-        "item_id": 75196,
-        "name_id": 130940,
-        "icon_id": 553,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75748,
-        "name_id": 132756,
-        "icon_id": 2395,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75035,
-        "name_id": 131919,
-        "icon_id": 3130,
-        "job": 43
-      },
-      {
-        "item_id": 75290,
-        "name_id": 131034,
-        "icon_id": 3721,
-        "job": 43
-      },
-      {
-        "item_id": 75261,
-        "name_id": 131005,
-        "icon_id": 553,
-        "job": 43
-      },
-      {
-        "item_id": 75869,
-        "name_id": 132877,
-        "icon_id": 5007,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75095, "name_id": 131979, "icon_id": 3153, "job": 2},
+      {"item_id": 75420, "name_id": 131164, "icon_id": 3721, "job": 2},
+      {"item_id": 75376, "name_id": 131120, "icon_id": 548, "job": 2},
+      {"item_id": 76215, "name_id": 133223, "icon_id": 5379, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 2},
+      {"item_id": 75065, "name_id": 131949, "icon_id": 3221, "job": 11},
+      {"item_id": 75355, "name_id": 131099, "icon_id": 3721, "job": 11},
+      {"item_id": 75311, "name_id": 131055, "icon_id": 548, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 11},
+      {"item_id": 75155, "name_id": 132039, "icon_id": 3157, "job": 12},
+      {"item_id": 75550, "name_id": 131294, "icon_id": 3721, "job": 12},
+      {"item_id": 75506, "name_id": 131250, "icon_id": 548, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 12},
+      {"item_id": 75125, "name_id": 132009, "icon_id": 3099, "job": 32},
+      {"item_id": 75485, "name_id": 131229, "icon_id": 3721, "job": 32},
+      {"item_id": 75441, "name_id": 131185, "icon_id": 548, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 32},
+      {"item_id": 75005, "name_id": 131889, "icon_id": 3110, "job": 35},
+      {"item_id": 75225, "name_id": 130969, "icon_id": 3721, "job": 35},
+      {"item_id": 75181, "name_id": 130925, "icon_id": 548, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 35},
+      {"item_id": 75035, "name_id": 131919, "icon_id": 3130, "job": 43},
+      {"item_id": 75290, "name_id": 131034, "icon_id": 3721, "job": 43},
+      {"item_id": 75246, "name_id": 130990, "icon_id": 548, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3}
     ],
     "drops": [],
-    "wheel_coins": 26
+    "wheel_coins": 1
   },
   "source": [
     {
@@ -411,9 +252,6 @@
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
     },
-    {
-      "kind": "reconstructed",
-      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Tormented Spirits!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Den of Secrets' (Ninja's Blade of Flame Wave; Warrior’s Axe of Warcry; Wizard's Wand of Tsunami; Medic's Scalpel of Immunization), so it spins that wheel, from fandom 'Den of Secrets' (revision 49127), one per combat job, and 26 coins. The same pages also name Fleetfoot Ninja!, den_of_secrets, fleetfoot_ninja."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'Tormented Spirits! (FR Battle)' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/Tormented_Spirits_FR_Battle.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }

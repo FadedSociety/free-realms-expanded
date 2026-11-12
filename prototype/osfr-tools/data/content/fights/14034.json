@@ -495,230 +495,28 @@
     "coins": 25,
     "job_xp": 50,
     "wheel": [
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 2
-      },
-      {
-        "item_id": 75389,
-        "name_id": 131133,
-        "icon_id": 1202,
-        "job": 2
-      },
-      {
-        "item_id": 75412,
-        "name_id": 131156,
-        "icon_id": 3717,
-        "job": 2
-      },
-      {
-        "item_id": 75397,
-        "name_id": 131141,
-        "icon_id": 558,
-        "job": 2
-      },
-      {
-        "item_id": 75111,
-        "name_id": 131995,
-        "icon_id": 3152,
-        "job": 2
-      },
-      {
-        "item_id": 76259,
-        "name_id": 133267,
-        "icon_id": 5388,
-        "job": 2
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 11
-      },
-      {
-        "item_id": 75324,
-        "name_id": 131068,
-        "icon_id": 1202,
-        "job": 11
-      },
-      {
-        "item_id": 75347,
-        "name_id": 131091,
-        "icon_id": 3717,
-        "job": 11
-      },
-      {
-        "item_id": 75332,
-        "name_id": 131076,
-        "icon_id": 558,
-        "job": 11
-      },
-      {
-        "item_id": 75081,
-        "name_id": 131965,
-        "icon_id": 3122,
-        "job": 11
-      },
-      {
-        "item_id": 76129,
-        "name_id": 133137,
-        "icon_id": 5348,
-        "job": 11
-      },
-      {
-        "item_id": 76454,
-        "name_id": 133462,
-        "icon_id": 5051,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 12
-      },
-      {
-        "item_id": 75519,
-        "name_id": 131263,
-        "icon_id": 1202,
-        "job": 12
-      },
-      {
-        "item_id": 75171,
-        "name_id": 132055,
-        "icon_id": 3160,
-        "job": 12
-      },
-      {
-        "item_id": 75542,
-        "name_id": 131286,
-        "icon_id": 3717,
-        "job": 12
-      },
-      {
-        "item_id": 75527,
-        "name_id": 131271,
-        "icon_id": 558,
-        "job": 12
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 32
-      },
-      {
-        "item_id": 76369,
-        "name_id": 133377,
-        "icon_id": 5442,
-        "job": 32
-      },
-      {
-        "item_id": 75454,
-        "name_id": 131198,
-        "icon_id": 1202,
-        "job": 32
-      },
-      {
-        "item_id": 75477,
-        "name_id": 131221,
-        "icon_id": 3717,
-        "job": 32
-      },
-      {
-        "item_id": 75462,
-        "name_id": 131206,
-        "icon_id": 558,
-        "job": 32
-      },
-      {
-        "item_id": 75141,
-        "name_id": 132025,
-        "icon_id": 3219,
-        "job": 32
-      },
-      {
-        "item_id": 75194,
-        "name_id": 130938,
-        "icon_id": 1202,
-        "job": 35
-      },
-      {
-        "item_id": 75217,
-        "name_id": 130961,
-        "icon_id": 3717,
-        "job": 35
-      },
-      {
-        "item_id": 75021,
-        "name_id": 131905,
-        "icon_id": 3106,
-        "job": 35
-      },
-      {
-        "item_id": 75202,
-        "name_id": 130946,
-        "icon_id": 558,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 35
-      },
-      {
-        "item_id": 75783,
-        "name_id": 132791,
-        "icon_id": 4134,
-        "job": 35
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973,
-        "job": 43
-      },
-      {
-        "item_id": 75051,
-        "name_id": 131935,
-        "icon_id": 3126,
-        "job": 43
-      },
-      {
-        "item_id": 75259,
-        "name_id": 131003,
-        "icon_id": 1202,
-        "job": 43
-      },
-      {
-        "item_id": 75282,
-        "name_id": 131026,
-        "icon_id": 3717,
-        "job": 43
-      },
-      {
-        "item_id": 75267,
-        "name_id": 131011,
-        "icon_id": 558,
-        "job": 43
-      },
-      {
-        "item_id": 75904,
-        "name_id": 132912,
-        "icon_id": 4996,
-        "job": 43
-      },
-      {
-        "item_id": 10482,
-        "name_id": 6666,
-        "icon_id": 973
-      }
+      {"item_id": 75397, "name_id": 131141, "icon_id": 558, "job": 2},
+      {"item_id": 76259, "name_id": 133267, "icon_id": 5388, "job": 2},
+      {"item_id": 75412, "name_id": 131156, "icon_id": 3717, "job": 2},
+      {"item_id": 75389, "name_id": 131133, "icon_id": 1202, "job": 2},
+      {"item_id": 75111, "name_id": 131995, "icon_id": 3152, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 75527, "name_id": 131271, "icon_id": 558, "job": 12},
+      {"item_id": 76454, "name_id": 133462, "icon_id": 5051, "job": 12},
+      {"item_id": 75542, "name_id": 131286, "icon_id": 3717, "job": 12},
+      {"item_id": 75519, "name_id": 131263, "icon_id": 1202, "job": 12},
+      {"item_id": 75171, "name_id": 132055, "icon_id": 3160, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 75202, "name_id": 130946, "icon_id": 558, "job": 35},
+      {"item_id": 75783, "name_id": 132791, "icon_id": 4134, "job": 35},
+      {"item_id": 75217, "name_id": 130961, "icon_id": 3717, "job": 35},
+      {"item_id": 75194, "name_id": 130938, "icon_id": 1202, "job": 35},
+      {"item_id": 75021, "name_id": 131905, "icon_id": 3106, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
     ],
     "drops": [],
-    "wheel_coins": 117
+    "wheel_coins": 1
   },
   "source": [
     {
@@ -757,9 +555,6 @@
       "kind": "reconstructed",
       "evidence": "(R) rc-0136 (2026-11-11): the Yetis that fight wear model 51 sasquatch_01.adr, the yeti body the fork's wave Yeti 46010 wears; 4547 sh_standard_yeti_01.adr is a banner with no skeleton, the Frosty Yeti starter's look."
     },
-    {
-      "kind": "wiki",
-      "evidence": "rc-0137 prize wheel: fandom 'Snowy Canyon' (revision 49151) lists one prize wheel per combat job and a 117-coin slot; any other job spins the items every job's wheel holds. Archer: the wiki's 'Pinhole Archer Shades' is 'Pin Hole Archer Shades' in our record dungeons/snowy_canyon.json."
-    }
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Snowy Canyon' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Snowy_Canyon.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Archers's Power Shard of Regeneration V' as 'Archer's Power Shard of Regeneration V'; 'Ninja Shadow Blade of 1000 Storms' as 'Ninja's Shadow Blade of 1000 Storms'. It replaces every earlier note in this record about the prize wheel or its prizes."}
   ]
 }
