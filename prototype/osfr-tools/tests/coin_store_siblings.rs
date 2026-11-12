@@ -1286,15 +1286,35 @@ fn disabled_station_cash_policy_answers_every_marketplace_row_without_changes() 
 
 /// F387: the real store screen asks for its wallet (66/10, native sender `00b43bc0`, Lua
 /// `RequestWalletInfo`) and never for the catalogue (66/12), so the wallet reply carries the
-/// 66/24 handshake and the ride catalogue. World entry itself pushes nothing; the lead owns
-/// that stream. `00b48700` is the 66/5 reader.
+/// 66/24 handshake and the ride catalogue. D5 (lead sign-off 2026-11-12, superseding 2026-10-21):
+/// the first login's Ready stream also carries the catalogue, once and in this order, ahead of
+/// the 93 welcome, whose `SelectStoreBundleGroup(6)` reads group 6 at once (`0099efd0` ->
+/// `009a3a50`). `00b48700` is the 66/5 reader.
 #[test]
 fn wallet_reply_carries_the_marketplace_handshake_and_the_ride_catalogue() {
     let fixture = Fixture::new().with_sc();
     let (mut gateway, ready) = fixture.enter(fixture.state());
+    let startup_heads: Vec<&[u8]> = (ready.iter())
+        .filter(|packet| packet.starts_with(&[66, 0]))
+        .map(|packet| &packet[..4])
+        .collect();
+    assert_eq!(
+        startup_heads,
+        vec![
+            &[66, 0, 24, 0][..],
+            &[66, 0, 33, 0],
+            &[66, 0, 7, 0],
+            &[66, 0, 6, 0],
+            &[66, 0, 9, 0],
+            &[66, 0, 5, 0],
+        ],
+        "the first login's Ready stream carries the Marketplace catalogue once, in order"
+    );
+    let welcome = ready.iter().position(|packet| packet.starts_with(&[93, 0]));
+    let last_catalogue = ready.iter().rposition(|packet| packet.starts_with(&[66, 0]));
     assert!(
-        ready.iter().all(|packet| !packet.starts_with(&[66, 0])),
-        "world entry must not push the Marketplace"
+        welcome.is_some() && last_catalogue < welcome,
+        "the catalogue goes out ahead of the 93 welcome"
     );
     let before = gateway.snapshot();
     let outcome = deliver(&mut gateway, &marketplace(10));

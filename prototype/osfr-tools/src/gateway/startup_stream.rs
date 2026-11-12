@@ -23,35 +23,41 @@ impl Gateway {
             Kind::Login => 0..8,
             Kind::Ready => 8..46,
         };
-        range
-            .filter(|index| {
-                !(gameplay.is_some_and(Gameplay::is_opening) && (10..=32).contains(index))
-                    && !(welcomed && *index == 41)
-                    && !self.world_draws(*index, gameplay)
-            })
-            .map(|index| {
-                let message = match index {
-                    3 => {
-                        let zone = gameplay.and_then(Gameplay::current_zone);
-                        snapshot.build_zone(state.zone_id, zone.as_ref())
+        let mut messages = Vec::new();
+        for index in range.filter(|index| {
+            !(gameplay.is_some_and(Gameplay::is_opening) && (10..=32).contains(index))
+                && !(welcomed && *index == 41)
+                && !self.world_draws(*index, gameplay)
+        }) {
+            // D5: the welcome window selects Popular Items (store group 6) as it opens, and the
+            // client reads that group's rows at that moment (`0099efd0` -> `009a3a50`). The
+            // Marketplace catalogue (66/24, 66/33, 66/7, 66/6, 66/9, 66/5) goes out first.
+            if index == 41
+                && let Some(game) = gameplay
+            {
+                messages.extend(game.marketplace_startup_packets().iter().map(|p| wrapped(p)));
+            }
+            messages.push(match index {
+                3 => {
+                    let zone = gameplay.and_then(Gameplay::current_zone);
+                    snapshot.build_zone(state.zone_id, zone.as_ref())
+                }
+                5 => match gameplay.and_then(Gameplay::definitions_packet) {
+                    Some(inner) => wrapped(&inner),
+                    None => snapshot.build_packet(index, state.guid)?,
+                },
+                7 => self.build_self_message(state, gameplay)?,
+                // T437: 38/1 carries the live health once known, not the captured pair.
+                33 => match gameplay.and_then(Gameplay::startup_health) {
+                    Some((current, max)) => {
+                        crate::startup_messages::build_hit_points(current as i32, max as i32)
                     }
-                    5 => match gameplay.and_then(Gameplay::definitions_packet) {
-                        Some(inner) => wrapped(&inner),
-                        None => snapshot.build_packet(index, state.guid)?,
-                    },
-                    7 => self.build_self_message(state, gameplay)?,
-                    // T437: 38/1 carries the live health once known, not the captured pair.
-                    33 => match gameplay.and_then(Gameplay::startup_health) {
-                        Some((current, max)) => {
-                            crate::startup_messages::build_hit_points(current as i32, max as i32)
-                        }
-                        None => snapshot.build_packet(index, state.guid)?,
-                    },
-                    _ => snapshot.build_packet(index, state.guid)?,
-                };
-                Ok(message)
-            })
-            .collect()
+                    None => snapshot.build_packet(index, state.guid)?,
+                },
+                _ => snapshot.build_packet(index, state.guid)?,
+            });
+        }
+        Ok(messages)
     }
 
     /// Whether startup message `index` is an NPC row (10 to 32) the world table draws itself.

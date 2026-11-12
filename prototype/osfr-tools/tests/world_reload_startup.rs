@@ -189,11 +189,29 @@ fn the_welcome_splash_goes_out_once_per_login() {
     assert_eq!(count(&inside, WELCOME), 0, "not on the house load");
     let (outside, _) = reload(&mut gateway, &LEAVE, 14_000);
     assert_eq!(count(&outside, WELCOME), 0, "not on the way back out");
+    // D5: the first login also carries the Marketplace catalogue (family 66) ahead of the
+    // splash; a reload drops it along with the splash.
+    let without_market = |replies: &[Vec<u8>]| {
+        opcodes(replies).into_iter().filter(|opcode| *opcode != 66).count()
+    };
     assert_eq!(
-        opcodes(&first.ready).len(),
-        opcodes(&outside).len() + 1,
+        without_market(&first.ready),
+        without_market(&outside) + 1,
         "only the splash is dropped from the reload stream"
     );
+    let has = |replies: &[Vec<u8>], head: [u8; 4]| {
+        replies.iter().any(|r| r.get(7..11) == Some(&head[..]))
+    };
+    let at = |replies: &[Vec<u8>], head: [u8; 4]| {
+        replies.iter().position(|r| r.get(7..11) == Some(&head[..]))
+    };
+    for head in [[66, 0, 9, 0], [66, 0, 5, 0]] {
+        assert!(!has(&inside, head), "a reload carries no catalogue {head:?}");
+        assert!(!has(&outside, head), "the way out carries no catalogue {head:?}");
+        let first_at = at(&first.ready, head).expect("the first login carries the catalogue");
+        let welcome = first.ready.iter().position(|r| r.get(7..9) == Some(&[93, 0][..]));
+        assert!(Some(first_at) < welcome, "the catalogue {head:?} precedes the first 93");
+    }
     gateway.reset_session();
     gateway.handle_at(&login(1), 16_000).unwrap();
     let relog = gateway.handle_at(&wrap(&[13, 0]), 16_000).unwrap();
@@ -202,6 +220,11 @@ fn the_welcome_splash_goes_out_once_per_login() {
         1,
         "a new login shows it again"
     );
+    let welcome = relog.replies.iter().position(|r| r.get(7..9) == Some(&[93, 0][..]));
+    for head in [[66, 0, 9, 0], [66, 0, 5, 0]] {
+        let at = relog.replies.iter().position(|r| r.get(7..11) == Some(&head[..]));
+        assert!(at.is_some() && at < welcome, "a new login carries {head:?} ahead of its 93");
+    }
 }
 
 #[test]

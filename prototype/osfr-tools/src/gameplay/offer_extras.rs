@@ -48,6 +48,12 @@ impl Gameplay {
         Some(table.loading_screen_xml(self.offer_extras.boosts.events()))
     }
 
+    /// The Marketplace catalogue for the login stream, ahead of the welcome window (D5); empty
+    /// without the Station Cash package or the Marketplace handshake.
+    pub fn marketplace_startup_packets(&self) -> Vec<Vec<u8>> {
+        self.npc_coin_shop.as_ref().map(|shop| shop.marketplace_packets()).unwrap_or_default()
+    }
+
     /// One commit's outgoing packets, each an inner packet after `head` wrapper bytes: every
     /// minigame offer gains its Marketplace panel (see [`Watch::dress`]).
     pub fn dress_offers(
