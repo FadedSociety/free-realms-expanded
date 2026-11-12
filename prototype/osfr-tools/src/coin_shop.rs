@@ -691,14 +691,20 @@ impl CoinShop {
     /// merchant stocks made buyable, then the merchant's other items the static list lacks, with
     /// the third flag set so the gamedock store keeps them unlisted (`00cf1ac0`), as the 18 such
     /// static rows are (R). A static id is never repeated: the next update unlinks by id.
-    fn dynamic_list_update(&self) -> Vec<u8> {
+    /// rc-0137: `own` are rows another service keeps in the same list (the bank's upgrades, with
+    /// their own lock); they go first and replace a login row of the same id, since this one
+    /// update is the client's whole dynamic list.
+    pub fn dynamic_list_update(&self, own: &[(i32, [u32; 3], [u8; 3])]) -> Vec<u8> {
         let lists = &self.store_lists;
         let stocks = |id: i32| self.open_stock.contains(&id);
-        let mut records: Vec<(i32, [u32; 3], [u8; 3])> = (lists.dynamic.iter())
-            .map(|&(id, words, [first, second, third])| {
+        let owned = |id: i32| own.iter().any(|record| record.0 == id);
+        let mut records: Vec<(i32, [u32; 3], [u8; 3])> = own.to_vec();
+        records.extend((lists.dynamic.iter()).filter(|record| !owned(record.0)).map(
+            |&(id, words, [first, second, third])| {
                 (id, words, [u8::from(first != 0 && !stocks(id)), second, third])
-            })
-            .collect();
+            },
+        ));
+        records.extend(self.window_event_rows().filter(|record| !owned(record.0)));
         let known: BTreeSet<i32> = records.iter().map(|record| record.0).collect();
         let fresh = |id: &&i32| !lists.static_ids.contains(id) && !known.contains(id);
         let extra: BTreeSet<i32> = self.open_stock.iter().filter(fresh).copied().collect();
@@ -711,6 +717,46 @@ impl CoinShop {
             reply.extend(flags);
         }
         reply
+    }
+
+    /// C1: in-season event stock (`live_event`) with a coin price that the login lists lack, as
+    /// window rows: words (item, category, 0) like the shipped 165/1 rows, every flag clear. The
+    /// gamedock Coin Shop asks for the dynamic list when it opens (`CoinStoreHandler:Init` ->
+    /// `CoinStoreScreen.OnCoinStoreOpened` `00c003c0` -> 165/8 `00c76d20`), and every 165/9
+    /// rebuilds the window's rows (`00c76100` -> `RefreshCoinStoreFilteredRows` `00cf2120`) from
+    /// the store nodes whose third flag (`+0xe`) is clear (`RebuildFilteredNodeList` `00cf1ac0`).
+    /// So these rows are listed only while their event runs; the 21 L1172 priced in coins were
+    /// in no list and at no vendor. (R) A shop no calendar drives (a bare fixture) lists none:
+    /// only the session's calendar can say an event runs.
+    fn window_event_rows(&self) -> impl Iterator<Item = (i32, [u32; 3], [u8; 3])> + '_ {
+        let lists = &self.store_lists;
+        let listed = |id: i32| {
+            lists.static_ids.contains(&id) || lists.dynamic.iter().any(|record| record.0 == id)
+        };
+        let driven = self.open_events.is_some();
+        (self.catalogue.items.iter())
+            .filter(move |item| {
+                driven
+                    && self.catalogue.seasonal.contains_key(&item.item_id)
+                    && item.purchase_price_coins.is_some()
+                    && self.in_season(item.item_id)
+                    && !listed(item.item_id)
+            })
+            .map(|item| {
+                let id = item.item_id;
+                (id, [id.cast_unsigned(), item.category_id.unwrap_or(0), 0], [0, 0, 0])
+            })
+    }
+
+    /// C1: whether the gamedock Coin Shop window lists `item_id`, so its buy (165/4 with the null
+    /// merchant and no record) may be sold without a vendor: a static row, a login dynamic row
+    /// with the third flag clear (`00cf1ac0`), or in-season event stock it is sent
+    /// (`window_event_rows`). A vendor-only row (third flag set) or a row in no list is not.
+    pub fn window_lists(&self, item_id: i32) -> bool {
+        let lists = &self.store_lists;
+        lists.static_ids.contains(&item_id)
+            || (lists.dynamic.iter()).any(|(id, _, flags)| *id == item_id && flags[2] == 0)
+            || self.window_event_rows().any(|record| record.0 == item_id)
     }
 
     /// Build the session's shop when the NPC package provides one. A saved Station Cash wallet
@@ -884,7 +930,7 @@ impl CoinShop {
             // F3: the client clears and refills its dynamic list from 165/9; the open merchant's
             // stock goes in, or its Buy stays grey (`dynamic_list_update`).
             8 if inner.len() == 4 => Ok(CoinShopOutcome {
-                replies: vec![self.dynamic_list_update()],
+                replies: vec![self.dynamic_list_update(&[])],
                 result_code: RESULT_SUCCESS,
                 ..CoinShopOutcome::default()
             }),

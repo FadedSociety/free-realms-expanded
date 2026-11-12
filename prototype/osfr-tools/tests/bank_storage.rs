@@ -383,7 +383,9 @@ fn upgrades_are_refused_out_of_order_and_take_their_coins_once() {
         .iter()
         .find(|r| r.starts_with(&[0xa5, 0, 9, 0]))
         .unwrap();
-    assert_eq!(word(rows, 4), 11);
+    // rc-0137: the bank's 11 rows lead the Coin Shop's one 165/9, the login rows follow (the
+    // client replaces its whole dynamic list with each 165/9, so the bank cannot send its own).
+    assert!(word(rows, 4) > 11, "the upgrade rows plus the Coin Shop's own");
     let flag = |row: usize| rows[8 + row * 19 + 16];
     assert_eq!((word(rows, 8), flag(0), flag(1)), (UPGRADE_1, 0, 1));
     assert_eq!((word(rows, 8 + 10 * 19), flag(10)), (UPGRADE_50, 0));

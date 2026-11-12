@@ -234,17 +234,29 @@ impl Bank {
     /// its category, 0), locked by the first flag unless it may be bought now.
     pub fn coin_store_rows(&self, state: &InventoryState) -> Vec<u8> {
         let mut packet = header(0xa5, 9);
-        let count = i32::try_from(self.upgrades.len()).unwrap_or(i32::MAX);
+        let records = self.coin_store_records(state);
+        let count = i32::try_from(records.len()).unwrap_or(i32::MAX);
         packet.extend(count.to_le_bytes());
-        for upgrade in &self.upgrades {
-            let locked = self.purchase_refusal(state, upgrade.item_id).is_some();
-            packet.extend(upgrade.item_id.to_le_bytes());
-            packet.extend(upgrade.item_id.to_le_bytes());
-            packet.extend(UPGRADE_CATEGORY.to_le_bytes());
-            packet.extend(0u32.to_le_bytes());
-            packet.extend([u8::from(locked), 0, 0]);
+        for (id, words, flags) in records {
+            packet.extend(id.to_le_bytes());
+            words.iter().for_each(|word| packet.extend(word.to_le_bytes()));
+            packet.extend(flags);
         }
         packet
+    }
+
+    /// The upgrades as 165/9 records (id, three dwords, three flags). rc-0137: the client replaces
+    /// its whole dynamic list with each 165/9, so a Coin Shop session merges these into its one
+    /// list (`CoinShop::dynamic_list_update`); sent alone they wiped the login rows and the open
+    /// vendor's stock, and no vendor row could be bought.
+    pub fn coin_store_records(&self, state: &InventoryState) -> Vec<(i32, [u32; 3], [u8; 3])> {
+        (self.upgrades.iter())
+            .map(|upgrade| {
+                let locked = self.purchase_refusal(state, upgrade.item_id).is_some();
+                let id = upgrade.item_id;
+                (id, [id.cast_unsigned(), UPGRADE_CATEGORY, 0], [u8::from(locked), 0, 0])
+            })
+            .collect()
     }
 
     /// The bag after moving `quantity` units of record `id`: a positive count into the bank, a

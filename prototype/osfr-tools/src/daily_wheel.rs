@@ -81,7 +81,7 @@
 
 use crate::{
     minigame::{
-        MinigameRuns, RunMode, RunOutcome, RunSpec, movie_text, payload_packet, state_remove_packet,
+        MinigameRuns, RunMode, RunOutcome, RunSpec, movie_text, payload_packet,
     },
     power_ups::{Rng, pick_weighted},
     rewards::{ItemGrant, RewardDisplay, RewardGrant},
@@ -806,17 +806,16 @@ impl DailyWheel {
     }
 
     /// End the run from the server's side (the movie's close, or a refused payout): anything not
-    /// shown yet, then 39/19.
+    /// shown yet, then the end-screen set ending in 39/19 (`MinigameRuns::close_with_end_screen`).
+    /// rc-0137: 39/19 alone "broke the UI after finishing" the wheel (run 20261112T020333Z: the
+    /// client logged `ShowMiniGameEndDialog` with no result and the HUD stayed down). (R) No source
+    /// shows what retail showed after the wheel; this is the client's own end-screen path.
     pub fn close(&mut self) -> io::Result<Vec<Vec<u8>>> {
-        let (Some(instance), Some(content)) =
-            (self.runs.current_instance_id(), self.content.as_ref())
-        else {
+        if self.runs.current_instance_id().is_none() || self.content.is_none() {
             return Ok(Vec::new());
-        };
-        let removal = state_remove_packet(instance, content.minigame_id);
+        }
         let mut out = self.take_unseen();
-        out.push(removal);
-        self.runs.disconnect();
+        out.extend(self.runs.close_with_end_screen()?.replies);
         self.connected = false;
         Ok(out)
     }

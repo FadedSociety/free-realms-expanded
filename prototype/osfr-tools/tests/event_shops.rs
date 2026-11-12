@@ -528,3 +528,31 @@ fn an_unknown_family_is_refused_and_a_stray_one_keeps_its_ride_type() {
     let listing = shop.sc_catalogue().listing(76_856).expect("still listed");
     assert_eq!(listing.group, mechanical.category_id);
 }
+
+/// C1 (rc-0137): Halloween stock that no login list carries (69819, one of the 21 rows L1172 priced
+/// in coins that no list or vendor had) joins the gamedock window's dynamic list (165/9, every
+/// flag clear) and its buys only while Halloween runs.
+#[test]
+fn unlisted_event_stock_is_a_window_row_only_in_season() {
+    let item = 69_819;
+    let mut shop = shop_from(&stores(), 10_000, 0);
+    shop.set_store_lists(coin_shop::StoreLists {
+        static_ids: BTreeSet::from([BANNER]),
+        dynamic: Vec::new(),
+    });
+    let listed = |shop: &mut CoinShop| {
+        let update = shop.handle(&[165, 0, 8, 0]).unwrap().replies.remove(0);
+        assert_eq!(&update[..4], &[165, 0, 9, 0]);
+        let count = u32::from_le_bytes(update[4..8].try_into().unwrap()) as usize;
+        (0..count).any(|index| {
+            let at = 8 + index * 19;
+            i32::from_le_bytes(update[at..at + 4].try_into().unwrap()) == item
+                && update[at + 16..at + 19] == [0, 0, 0]
+        })
+    };
+    halloween(&mut shop, Some(OCTOBER));
+    assert!(shop.window_lists(item) && listed(&mut shop), "listed while Halloween runs");
+    halloween(&mut shop, None);
+    assert!(!shop.window_lists(item) && !listed(&mut shop), "gone once it ends");
+    assert!(shop.window_lists(BANNER), "a static row stays a window row");
+}

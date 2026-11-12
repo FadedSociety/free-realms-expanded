@@ -12,6 +12,7 @@
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
+    inventory::InventoryItem,
     npc_interaction::{MerchantBuyRequestV2, decode_merchant_list_66_42, encode_merchant_buy_66_43},
     station_cash::{EarnTable, Wallet},
 };
@@ -139,4 +140,111 @@ fn a_station_cash_display_opens_its_shop_and_sells_its_ride_for_station_cash() {
     assert!(spent > 0, "paid in Station Cash");
     assert_eq!(balance(&bought.replies), 1_000 - spent, "the window's balance follows");
     assert!(bought.changed);
+}
+
+/// The Camp Chatty Banner (release item table): an ordinary item won since login.
+const BANNER: i32 = 14_299;
+
+/// A scratch content folder with the released item tables, so every item below is defined.
+fn release_scratch(tag: &str) -> Scratch {
+    let scratch = Scratch::new(tag);
+    let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    for file in ["inventory.json", "item-table.json", "item-table-supplement.json"] {
+        std::fs::copy(release.join(file), scratch.path().join(file)).unwrap();
+    }
+    scratch
+}
+
+/// A character that logged in with 100 coins and `wallet`.
+fn logged_in(scratch: &Scratch, wallet: Option<Wallet>) -> Gameplay {
+    let mut saved = game(scratch, None).state();
+    saved.inventory.coins = 100;
+    saved.sc_wallet = wallet;
+    game(scratch, Some(saved))
+}
+
+/// Since login, a settled trade (no shop involved): 75 coins spent and the banner gained.
+fn trade_since_login(game: &mut Gameplay) {
+    let mut after = game.inventory_state().clone();
+    let last = after.items.iter().map(|row| i64::from(row.id)).max().unwrap_or(0);
+    let id = last.max(after.next_instance_id.unwrap_or(1) - 1) + 1;
+    after.coins = 25;
+    after.items.push(InventoryItem {
+        definition_id: BANNER,
+        tint: 0,
+        id: i32::try_from(id).unwrap(),
+        count: 1,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    });
+    after.next_instance_id = Some(id + 1);
+    game.adopt_trade_inventory(after).unwrap();
+}
+
+fn owns(game: &Gameplay, item: i32) -> bool {
+    game.inventory_state().items.iter().any(|row| row.definition_id == item)
+}
+
+/// rc-0137 review: the first wallet read (66/10) pays the welcome grant, and its changed outcome
+/// adopted the shop's login-time bag, so 100 -> 25 coins came back as 100 and the banner was
+/// gone. Every Marketplace message now starts the shop from the live bag.
+#[test]
+fn the_first_wallet_read_keeps_the_coins_and_items_changed_since_login() {
+    let grant = shipped_grant();
+    let scratch = release_scratch("f3-welcome-live");
+    let mut game = logged_in(&scratch, None);
+    trade_since_login(&mut game);
+    let at = character([0.0; 3]);
+    let first = game.handle_in_world(&[66, 0, 10, 0], &at, 1_000).unwrap();
+    assert_eq!(balance(&first.replies), grant, "the first wallet read pays the grant");
+    assert!(first.changed);
+    assert_eq!(game.inventory_state().coins, 25, "the coins spent since login stay spent");
+    assert!(owns(&game, BANNER), "the item won since login stays");
+    let again = game.handle_in_world(&[66, 0, 10, 0], &at, 2_000).unwrap();
+    assert_eq!(balance(&again.replies), grant, "the grant is paid once");
+    assert!(!again.changed);
+    let saved = game.state();
+    assert_eq!(saved.inventory.coins, 25, "the save keeps the live coins");
+    assert!(saved.inventory.items.iter().any(|row| row.definition_id == BANNER));
+}
+
+/// The sibling: a display's Station Cash buy (66/43) adopted the shop's login-time bag the same way.
+#[test]
+fn a_display_buy_keeps_the_coins_and_items_changed_since_login() {
+    let scratch = release_scratch("f3-display-live");
+    let wallet = Wallet { balance: 1_000, welcomed: true, ..Wallet::default() };
+    let mut game = logged_in(&scratch, Some(wallet));
+    let near = character([DRAGON_AT[0] + 2.0, DRAGON_AT[1], DRAGON_AT[2]]);
+    game.initialize_world(&near, 500).unwrap();
+    let mut click = vec![26, 0, 8, 0];
+    click.extend(DRAGON_DISPLAY.to_le_bytes());
+    click.push(0);
+    let opened = game.handle_in_world(&click, &near, 1_000).unwrap();
+    let window = (opened.replies.iter())
+        .find(|reply| reply.starts_with(&[66, 0, 42, 0]))
+        .expect("the display opens the Station Cash window");
+    let list = decode_merchant_list_66_42(window).unwrap();
+    let row = (list.group.entries.iter())
+        .find(|row| row.first_item_id as i32 == DRAGON_RIDE)
+        .expect("the ride's row");
+    trade_since_login(&mut game);
+    let buy = encode_merchant_buy_66_43(&MerchantBuyRequestV2 {
+        initial_dwords: [row.item_id, 0],
+        context_dwords: [0; 3],
+        context_bytes: Vec::new(),
+        trailing_dwords: [1, 0, 78],
+    })
+    .unwrap();
+    let bought = game.handle_in_world(&buy, &near, 1_200).unwrap();
+    let result = (bought.replies.iter())
+        .find(|reply| reply.starts_with(&[66, 0, 44, 0]))
+        .expect("the window's own result");
+    assert_eq!(u32::from_le_bytes(result[48..52].try_into().unwrap()), 1, "success");
+    assert!(owns(&game, DRAGON_RIDE), "the ride is bought");
+    assert_eq!(game.inventory_state().coins, 25, "the coins spent since login stay spent");
+    assert!(owns(&game, BANNER), "the item won since login stays");
 }

@@ -449,8 +449,10 @@ fn finish_match(
             .expect("the car has a pose");
         send(game, &character, &pose_for(key, beside), at - 1);
         let out = send(game, &character, &hit_for(key, *npc, 10_000.0), at);
+        // rc-0137: a contact saves nothing (the match is connection-local); its 34/11 says it
+        // was resolved.
         assert!(
-            out.changed,
+            out.replies.iter().any(|reply| reply.starts_with(&[34, 0, 11, 0])),
             "the server resolves contact {index}: {}",
             replies_text(&out)
         );

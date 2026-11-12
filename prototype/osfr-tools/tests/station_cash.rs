@@ -157,7 +157,8 @@ fn wallet_packet_matches_the_client_reader() {
     assert_eq!(u32::from_le_bytes(packet[13..17].try_into().unwrap()), 0);
     assert_eq!(i32::from_le_bytes(packet[17..21].try_into().unwrap()), 0);
     assert_eq!(i32::from_le_bytes(packet[21..25].try_into().unwrap()), 0);
-    assert_eq!(packet[25], 0);
+    // rc-0137: state and zip on file, so the client asks for no billing address.
+    assert_eq!(packet[25], 1);
     assert_eq!(packet.len(), 26);
 }
 

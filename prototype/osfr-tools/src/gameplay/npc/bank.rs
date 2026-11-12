@@ -43,8 +43,19 @@ impl Gameplay {
             (26, 44) => Some(reply(bank.usage_packet(self.inventory.state()))),
             (42, 17) => Some(self.bank_move(&bank, inner)),
             (0xa5, 4) => self.bank_upgrade_buy(&bank, inner),
-            _ => Some(reply(bank.coin_store_rows(self.inventory.state()))),
+            _ => Some(reply(self.coin_store_list(&bank))),
         })
+    }
+
+    /// rc-0137: the one 165/9 the client keeps (it replaces its whole dynamic list): the bank's
+    /// upgrades merged into the Coin Shop's login rows and the open vendor's stock. The bank's rows
+    /// alone (run 20261112T020333Z: 11 rows) left 271 of Andrea Motorspark's 280 rows unbuyable.
+    fn coin_store_list(&self, bank: &Bank) -> Vec<u8> {
+        let state = self.inventory.state();
+        match self.npc_coin_shop.as_ref() {
+            Some(shop) => shop.dynamic_list_update(&bank.coin_store_records(state)),
+            None => bank.coin_store_rows(state),
+        }
     }
 
     fn bank_rules(&self) -> Option<Bank> {
@@ -225,7 +236,7 @@ impl Gameplay {
         let state = self.inventory.state();
         replies.push(complete(RESULT_SUCCESS, price));
         replies.push(bank.usage_packet(state));
-        replies.push(bank.coin_store_rows(state));
+        replies.push(self.coin_store_list(bank));
         let line = format!("Your bank now holds {} slots.", bank.capacity(state));
         replies.push(chat::system(&line));
         npc_event(serde_json::json!({"event": "bank_upgrade", "item": item, "price": price}));

@@ -94,8 +94,11 @@ impl Gameplay {
         let ended = derby.phase().is_some() && !derby.active();
         let previous_job = if derby.active() { None } else { derby.exit() };
         // L931: the driven NPCs' 34/5 poses are ephemeral; they must not force a save every tick.
+        // rc-0137: nor may anything else in the match. It is connection-local (the save keeps only
+        // the paid-match ledger and the job it replaced), and a save per hit and countdown step
+        // wrote the character and gameplay files 61 times in a 35 s match (run 20261112T020333Z).
+        // The payout, the arena exit and the job restore below still save.
         let mut out = Outcome {
-            changed: replies.iter().any(|reply| !reply.starts_with(&[34, 0, 5])),
             replies,
             ..Default::default()
         };
@@ -236,8 +239,9 @@ impl Gameplay {
             return Ok(out);
         }
         if inner.starts_with(&[34, 0]) {
+            // rc-0137: a match packet saves nothing (see `tick_derby`); 48 of the 61 saves in run
+            // 20261112T020333Z followed a pose. Only the payout below marks a change.
             out.replies = derby.handle(inner, now_ms)?;
-            out.changed = !out.replies.is_empty();
             self.pay_derby_completion(character, &mut out)?;
         }
         // T528: a saddle or chest check/use mid-match is refused with a line, not dropped (the

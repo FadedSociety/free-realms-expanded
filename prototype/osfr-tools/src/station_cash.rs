@@ -1592,6 +1592,13 @@ fn refusal(order: &OrderRequest, result: u32) -> OrderOutcome {
 }
 
 /// 66/11. The client reader `00b3a6e0`/`00b2b450` consumes exactly this record.
+///
+/// rc-0137: the last byte is "state and zip on file". `HandleWalletInfoResponse` (`00b3e120`)
+/// stores it at the purchase manager's `+0x3b3d4` (the setter `00d5c7a0`, sub-object `+0x230`),
+/// and a Station Cash purchase asks for a billing state and zip unless it is set
+/// (`PreviewSubscriptionPurchaseWithStationCash` `00b33a50` reads the same byte; the Marketplace
+/// movie's `_executeOrder` goes to `STATE_ENTER_ZIP` when Lua `GetStateAndZipOnFile` says no). Our
+/// Station Cash is free and never billed, so the wallet always has them on file.
 pub fn wallet_packet(balance: u32) -> Vec<u8> {
     let mut bytes = header(OP_WALLET_RESPONSE);
     put_u32(&mut bytes, 1);
@@ -1600,7 +1607,7 @@ pub fn wallet_packet(balance: u32) -> Vec<u8> {
     put_u32(&mut bytes, 0);
     put_string(&mut bytes, "");
     put_string(&mut bytes, "");
-    bytes.push(0);
+    bytes.push(1);
     bytes
 }
 

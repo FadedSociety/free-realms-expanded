@@ -796,6 +796,17 @@ impl Table {
         reference: &Path,
         players: &[(CharacterState, osfr_tools::gameplay::GameplayState)],
     ) -> Option<Self> {
+        Self::with_ticket(scratch, content, reference, players, "t889")
+    }
+
+    /// As `new`, every player logging in with `ticket` (the secure channel's key, rc-0137).
+    pub fn with_ticket(
+        scratch: Scratch,
+        content: &Path,
+        reference: &Path,
+        players: &[(CharacterState, osfr_tools::gameplay::GameplayState)],
+        ticket: &str,
+    ) -> Option<Self> {
         if !reference.join("manifest.json").is_file() {
             eprintln!("skip: the private lab fixtures are absent");
             return None;
@@ -839,7 +850,7 @@ impl Table {
         };
         for (index, (character, _)) in players.iter().enumerate() {
             for (step, message) in [
-                f160_field_views::f213_login(character.guid, &version, "t889"),
+                f160_field_views::f213_login(character.guid, &version, ticket),
                 wrap(&[13, 0]),
                 wrap(&[10, 0]),
             ]

@@ -57,6 +57,48 @@ impl Session {
         Ok(())
     }
 
+    /// L965: the newest held report (ship or derby pose) since the last tick, handed on once.
+    pub(super) fn dispatch_held(
+        &mut self,
+        options: &Options,
+        now_ms: u64,
+        world: &mut SharedWorld,
+        membership: &mut World,
+        sessions: &mut SessionMap,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(report) = self.ship_report.take() {
+            let transport = Some((5, None, "direct", false));
+            self.dispatch_message(
+                &report, options, now_ms, world, membership, sessions, transport,
+            )?;
+        }
+        Ok(())
+    }
+
+    /// rc-0137 derby: a hit (34/16) or pickup (34/14) report is judged against the car's pose, so
+    /// the newest held pose goes first. It arrived before the report, so this is also the order
+    /// the client sent them in. Waiting for the tick left the judged pose up to 1.2 s old in run
+    /// 20261112T020333Z (the server loop ran late): a ram the client made 3.7 m from the car it hit
+    /// was judged 9.7 m away and refused.
+    pub(super) fn flush_before_hit(
+        &mut self,
+        messages: &[Vec<u8>],
+        options: &Options,
+        now_ms: u64,
+        world: &mut SharedWorld,
+        membership: &mut World,
+        sessions: &mut SessionMap,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let hit = |message: &Vec<u8>| {
+            matches!(message.get(7..11), Some([34, 0, 14 | 16, 0]))
+                && matches!(message.get(..2), Some([5 | 6, 0]))
+        };
+        if messages.iter().any(hit) {
+            self.dispatch_held(options, now_ms, world, membership, sessions)?;
+        }
+        Ok(())
+    }
+
     /// The client also batches direct packets into a Multi frame: 05, then the tunnel, whose first
     /// byte reads as the opcode's low byte. About one ship report in nine and every FireAtLocation
     /// came this way (native 194302Z). Each draws on the direct budget, as a lone packet does.

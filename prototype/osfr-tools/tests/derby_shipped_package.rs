@@ -466,8 +466,10 @@ fn drive_to_results(
         let out = gateway
             .handle_at(&wrap(&hit_for(key, *npc, 10_000.0)), at)
             .unwrap();
+        // rc-0137: a contact saves nothing (the match is connection-local); its 34/11 says it
+        // was resolved.
         assert!(
-            out.gameplay_changed,
+            out.replies.iter().any(|reply| reply.get(7..11) == Some(&[34, 0, 11, 0][..])),
             "the contact is resolved by the server"
         );
         assert_eq!(

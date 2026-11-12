@@ -1304,13 +1304,11 @@ impl Gameplay {
             let Some(shop) = &mut self.npc_coin_shop else {
                 return Ok(None);
             };
-            // The shop was built with the login-time inventory; a reward earned since must not be
-            // lost by the order's staged grant (the coin buy path does the same), and the
-            // ownership check of a preview or an order and the 66/38 owned flags (T484) read it.
-            // A wallet read never touches the inventory.
-            if matches!(inner.get(2..4), Some([1 | 3 | 38, 0])) {
-                shop.sync_inventory(self.inventory.clone());
-            }
+            // The shop was built with the login-time inventory and a changed outcome adopts its
+            // copy, so every message starts from the live bag: an order's staged grant, the first
+            // wallet read's welcome grant (66/10, which once undid every coin and item since
+            // login), a preview's ownership check and the 66/38 owned flags (T484).
+            shop.sync_inventory(self.inventory.clone());
             // L046: a paid deed grants this character's lot in the housing session; the order
             // debits only after that grant commits, and both land in the one gameplay save.
             let housing = &mut self.housing;
@@ -1355,6 +1353,10 @@ impl Gameplay {
             let transaction_id = request.trailing_dwords[2];
             // F3: the Station Cash window a display opened buys its bundle with Station Cash.
             let busy = self.activity_busy();
+            // Both buys below adopt the shop's inventory, so it starts from the live bag.
+            if let Some(shop) = self.npc_coin_shop.as_mut() {
+                shop.sync_inventory(self.inventory.clone());
+            }
             let housing = &mut self.housing;
             if let Some(shop) = self.npc_coin_shop.as_mut()
                 && let Some(paid) = shop.buy_open_bundle(
@@ -1399,7 +1401,6 @@ impl Gameplay {
                     ..Outcome::default()
                 }));
             };
-            shop.sync_inventory(self.inventory.clone());
             shop.sync_pet_room(self.pets.room());
             let outcome = if let Some(result_code) = refusal_code {
                 shop.refuse_vendor_buy(transaction_id, result_code)

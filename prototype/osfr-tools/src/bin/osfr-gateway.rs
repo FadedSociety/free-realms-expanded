@@ -535,6 +535,7 @@ struct Session {
     /// L965: the newest ship report (94/16, by its stamp) since the last tick. The tick hands it
     /// on once, so the client's frame rate never sets the server's work.
     ship_report: Option<Vec<u8>>,
+    secure: Box<osfr_tools::secure_channel::SecureChannel>, // sealed client messages, opened
     sent: u64,
     received: u64,
     trace: Option<trace::Trace>,
@@ -1175,6 +1176,7 @@ impl Session {
             direct: Bucket::full(DIRECT_BUDGET.1, Instant::now()),
             bytes: Bucket::full(BYTE_BUDGET.1, Instant::now()),
             ship_report: None,
+            secure: Box::default(),
             sent: 0,
             received: 0,
             trace,
@@ -1408,6 +1410,9 @@ impl Session {
                         .then(|| packet.payload.get(..2))
                         .flatten()
                         .map(|bytes| u16::from_be_bytes([bytes[0], bytes[1]]));
+                    self.flush_before_hit(
+                        &outcome.messages, options, now_ms, world, membership, sessions,
+                    )?;
                     for message in outcome.messages {
                         self.dispatch_message(
                             &message,
@@ -1595,6 +1600,7 @@ impl Session {
         // One reply budget for the whole client message: `commit_outcome` charges the replies it
         // is about to queue, which covers both the combat split and the shared-field/ride/pet
         // replies `handle_at` did not count (F179).
+        let message: &[u8] = &self.secure.take(message); // rc-0137: sealed Marketplace requests
         self.bundle_budget = BundleBudget::message(message);
         let result = self.dispatch_message_inner(
             message, options, now_ms, world, membership, sessions, transport, false,
@@ -2477,13 +2483,7 @@ impl Session {
         if isolation::PANIC_IN_TICK.get() == Some(self.id) {
             panic!("isolation probe");
         }
-        // L965: the newest ship report since the last tick, handed on once.
-        if let Some(report) = self.ship_report.take() {
-            let transport = Some((5, None, "direct", false));
-            self.dispatch_message(
-                &report, options, now_ms, world, membership, sessions, transport,
-            )?;
-        }
+        self.dispatch_held(options, now_ms, world, membership, sessions)?;
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
         let mut held =

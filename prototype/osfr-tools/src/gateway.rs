@@ -417,6 +417,7 @@ enum Event {
     Camera,
     Time,
     Application(Vec<u8>),
+    Unknown, // a top-level message that is not 1, 5 or 6: logged and ignored, never fatal
 }
 // (R) Account writes cannot participate in a staged character transaction.
 fn reject_bundled_role_changes(events: &[Event], guid: u64) -> io::Result<()> {
@@ -464,6 +465,7 @@ fn trace_message(message: &[u8], event: &Event, combined: bool) -> GatewayTraceE
         Event::Camera => "gateway.camera",
         Event::Time => "gateway.time_sync",
         Event::Application(_) => application_handler(body),
+        Event::Unknown => "gateway.unknown_top_level",
     };
     GatewayTraceEvent {
         event: if matches!(event, Event::Position(..)) {
@@ -684,7 +686,7 @@ fn parse_message(message: &[u8], state: &CharacterState, version: &str) -> io::R
             reader.end()?;
             Ok(event)
         }
-        _ => Err(invalid("unsupported top-level gateway message")),
+        _ => Ok(Event::Unknown),
     }
 }
 
@@ -730,9 +732,7 @@ impl Gateway {
     /// (R) The server splits a fully parsed bundle into ordered commits before
     /// resolving shared actions; later movement can never move an earlier hit.
     pub fn is_combat_request(&self, message: &[u8]) -> io::Result<bool> {
-        Ok(
-            matches!(parse_message(message,&self.state,&self.version)?, Event::Application(inner) if inner.starts_with(&[36,0,10,0]) || inner.starts_with(&[26,0,10,0])),
-        )
+        Ok(matches!(parse_message(message,&self.state,&self.version)?, Event::Application(inner) if inner.starts_with(&[36,0,10,0]) || inner.starts_with(&[26,0,10,0])))
     }
     pub fn ordered_messages(&self, message: &[u8]) -> io::Result<Vec<Vec<u8>>> {
         let messages = application_messages(message)?;
@@ -754,8 +754,7 @@ impl Gateway {
             .map(|message| parse_message(message, &self.state, &self.version))
             .filter_map(|event| match event {
                 Ok(Event::Application(inner)) => Some(Ok(inner)),
-                Ok(_) => None,
-                Err(error) => Some(Err(error)),
+                other => other.err().map(Err),
             })
             .collect()
     }
@@ -1614,6 +1613,7 @@ impl Gateway {
                         );
                     }
                 }
+                Event::Unknown => application_preload::ignore_unknown(&mut trace, event_index),
                 Event::Camera => {
                     if !ready {
                         if gameplay.as_deref().is_some_and(Gameplay::is_opening) {

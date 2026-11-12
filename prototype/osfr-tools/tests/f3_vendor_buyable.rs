@@ -97,6 +97,96 @@ fn a_vendor_row_the_login_list_lacks_becomes_buyable_and_the_buy_pays_and_delive
     );
 }
 
+/// rc-0137 recheck (run 20261112T020333Z): with the shipped `bank.json` the bank answered every
+/// 165/8 with its 11 upgrade rows alone, and the client swaps its whole dynamic list for each
+/// 165/9 (`00c76100`), so Andrea's rows were never buyable and no 165/4 came. The client's order
+/// from that run: 26/8 on Andrea, 26/10 Shop, two 26/20, then the window's 165/8.
+#[test]
+fn with_the_bank_installed_the_windows_list_keeps_the_vendor_rows_and_the_bank_rows() {
+    let fixture = VendorFixture::for_vendor(&fixture_root(), "f3-bank", ANDREA, "briarwood.json");
+    fixture.stock_price_coins(&[(PART, PRICE), (STATIC_ITEM, PRICE)]);
+    let data = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    std::fs::copy(data.join("bank.json"), fixture.content().join("bank.json")).unwrap();
+    let mut gateway = connect_with(
+        fixture.reference(),
+        fixture.character(),
+        fixture.content(),
+        fixture.state(100, false),
+    );
+    let idle = dynamic_records(&send(&mut gateway, &[165, 0, 8, 0])[0]);
+    let bank: Vec<i32> = idle.iter().take_while(|row| row.1[1] == 62).map(|row| row.0).collect();
+    assert!(!bank.is_empty(), "the bank's upgrade rows (category 62) lead the list");
+
+    send(&mut gateway, &interact(ANDREA));
+    let opened = send(&mut gateway, &select(ANDREA, fixture.option()));
+    let window = opened.iter().find(|packet| packet.starts_with(&[165, 0, 10, 0])).unwrap();
+    let list = decode_coin_merchant_list_165_10(window).unwrap();
+    send(&mut gateway, &[26, 0, 20, 0]);
+    send(&mut gateway, &[26, 0, 20, 0]);
+    let update = send(&mut gateway, &[165, 0, 8, 0]);
+    assert_eq!(update.len(), 1, "one 165/9: the client keeps only the last");
+    let records = dynamic_records(&update[0]);
+    let ids: Vec<i32> = records.iter().map(|row| row.0).collect();
+    assert!(bank.iter().all(|id| ids.contains(id)), "the bank rows stay");
+    let part = records.iter().find(|(id, _, _)| *id == PART).expect("Andrea's row is in");
+    assert_eq!(part.2[0], 0, "buyable");
+    assert_eq!(records.len(), idle.len() + 1, "the login rows stay too");
+
+    let before = inventory_of(&gateway);
+    send(&mut gateway, &coin_buy_packet(ANDREA, list.fields[0], PART, 1));
+    let after = inventory_of(&gateway);
+    assert_eq!(after.coins, before.coins - PRICE, "the buy the live button sends is paid");
+    assert_eq!(count_definition(&after, PART), count_definition(&before, PART) + 1);
+}
+
+/// C1 (rc-0137 known bugs): the gamedock Coin Shop window buys with no NPC open. Lua
+/// `CoinStoreScreen.BuyItem(itemId, quantity, tintId)` (`00bffe30`) -> `BuyItemByItemId`
+/// (`00c77a30`) sends 165/4 with the session merchant GUID (never stored: 0) and record -1. The
+/// vendor checks refused it as "no open shop" and the client got no answer at all. Only rows the
+/// window lists sell this way: a crafted packet for a vendor-only row or a row in no list is
+/// refused and costs nothing.
+#[test]
+fn the_coin_shop_window_buys_a_priced_row_with_no_vendor_open() {
+    let fixture = VendorFixture::for_vendor(&fixture_root(), "f3-window", ANDREA, "briarwood.json");
+    fixture.stock_price_coins(&[(PART, PRICE)]);
+    let mut gateway = connect_with(
+        fixture.reference(),
+        fixture.character(),
+        fixture.content(),
+        fixture.state(1_000, false),
+    );
+    let before = inventory_of(&gateway);
+    // One of the rows L1172 moved from the Marketplace to coins for this window, a static row
+    // no NPC stocks: the Camp Chatty Banner, 50 coins in the shipped `stores.json`.
+    let banner = 14_299;
+    let replies = send(&mut gateway, &coin_buy_packet(0, u32::MAX, banner, 1));
+    assert!(replies.iter().any(|reply| reply.starts_with(&[165, 0, 6, 0])), "answered");
+    let after = inventory_of(&gateway);
+    assert_eq!(after.coins, before.coins - 50, "the banner is paid");
+    assert_eq!(
+        count_definition(&after, banner),
+        count_definition(&before, banner) + 1,
+        "and in the bag"
+    );
+
+    // (Event stock the login lists lack is a window row only while the session's calendar runs
+    // its event, so it depends on today's date here; `event_shops.rs` checks it on a fixed
+    // calendar.)
+
+    // Crafted window buys for rows the window does not list are refused and cost nothing:
+    // Andrea's part (vendor-only), a coin row in no list and at no vendor (49), and the Super Coin
+    // booster (Station Cash only).
+    for item in [PART, 49, 81] {
+        send(&mut gateway, &coin_buy_packet(0, u32::MAX, item, 1));
+        let now = inventory_of(&gateway);
+        assert_eq!(now.coins, after.coins, "{item} costs nothing");
+        assert_eq!(count_definition(&now, item), count_definition(&after, item), "{item}");
+    }
+    // A vendor's own buy (its GUID and window record) still needs the vendor open.
+    send(&mut gateway, &coin_buy_packet(ANDREA, 7, PART, 1));
+    assert_eq!(inventory_of(&gateway).coins, after.coins, "no Andrea window is open");
+}
+
 /// P-banking (L1161) stores banked units on the item record, so a record whose every unit is in
 /// the vault stays in the save but is not in the bag (`InventoryState::bag_stacks`). A player with
 /// 100 such records has an empty bag and must still be able to buy; with 100 shown stacks the bag

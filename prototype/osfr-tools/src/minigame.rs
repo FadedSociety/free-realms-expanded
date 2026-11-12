@@ -709,6 +709,26 @@ impl MinigameRuns {
         })
     }
 
+    /// rc-0137: end a run that has no result of its own (the daily wheel, whose movie closes
+    /// itself) through the end-screen path the client takes on 39/19 (flag `+616`): 39/18 won,
+    /// 39/47 and 39/19, as a match end sends. 39/19 alone left that screen with nothing to show
+    /// and the HUD hidden after the wheel (the L957 soccer quit, again). Nothing waits for the
+    /// screen's Close: the run is closed at once and pays nothing here.
+    pub fn close_with_end_screen(&mut self) -> io::Result<RunOutcome> {
+        let Some(run) = self.current.as_ref() else {
+            return Ok(RunOutcome::default());
+        };
+        let replies = result_packets(run.instance_id, run.spec.game_id, true, 0, 0, 0)?;
+        self.retire(RunState::Closed);
+        Ok(RunOutcome {
+            accepted: true,
+            changed: true,
+            state: Some(RunState::Closed),
+            replies,
+            ..Default::default()
+        })
+    }
+
     /// Settle one activity result. Win grants use a stable run-derived key and
     /// losses cannot carry one. A win must carry its grant: an activity whose
     /// win legitimately pays nothing (a content zero award or a reached daily

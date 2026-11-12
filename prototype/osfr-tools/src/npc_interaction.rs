@@ -919,7 +919,19 @@ impl NpcInteraction {
         let (is_sell, is_buy_back) = (is(COIN_STORE_SELL), is_coin_store_buy_back(packet));
         // 2 definitions, 8 list update and 14 gift need no session; anything else (including an
         // unknown subtype) must pass the checks, which refuse what they do not know.
-        let session_free = [2, 8, 14].into_iter().any(is);
+        // C1 (rc-0137): the gamedock Coin Shop window buys too. Lua `CoinStoreScreen.BuyItem`
+        // (`00bffe30`) -> `BuyItemByItemId` (`00c77a30`) sends 165/4 with the session merchant
+        // GUID (`01beea08`, never stored, so 0) and no window record (-1). No NPC shop is open for
+        // it, so it skips the vendor checks for a row the window lists (`window_lists`; the client
+        // sends this only for a row in its own coin store table, `00c77230`). The shop's own buy
+        // still refuses a row that is not on sale, out of season or out of stock. Anything else
+        // shaped like it takes the vendor checks and is refused there.
+        let window_buy = is(COIN_STORE_BUY)
+            && packet.len() == 28
+            && le::u64(packet, 4) == Some(0)
+            && le::u32(packet, 12) == Some(u32::MAX)
+            && le::i32(packet, 16).is_some_and(|item| shop.window_lists(item));
+        let session_free = window_buy || [2, 8, 14].into_iter().any(is);
         let result = (if session_free {
             Ok(())
         } else {

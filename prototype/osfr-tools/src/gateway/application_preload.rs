@@ -18,6 +18,13 @@ pub(super) fn quiet_application(body: &[u8]) -> bool {
     )
 }
 
+/// rc-0137 recheck: an unknown top-level message (not login 1 or tunnel 5/6) is traced and dropped.
+/// It used to end the session; the client's sealed Marketplace request was one (`secure_channel`).
+pub(super) fn ignore_unknown(trace: &mut Option<Vec<GatewayTraceEvent>>, index: usize) {
+    let reason = Some("unknown top-level message".into());
+    set_trace(trace, index, "ignored", None, reason, None);
+}
+
 /// The pre-Loaded Fotomat answer. `presentation` is called only for the session's own,
 /// well-formed 156/2, so a foreign guid or a 115 refuses before the presentation clone. The
 /// caller has already checked [`crate::fotomat::handles`] and `!loaded`.

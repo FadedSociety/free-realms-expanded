@@ -587,7 +587,7 @@ fn status_text_and_empty_list(opcode: u8) -> Vec<u8> {
 fn marketplace_table(enabled: bool) -> Vec<(&'static str, Vec<u8>, Vec<u8>)> {
     let mut wallet = vec![66, 0, 11, 0, 1, 0, 0, 0, 0];
     wallet.extend([0; 16]); // two dwords, two empty texts (`00b2b450`)
-    wallet.push(0);
+    wallet.push(1); // rc-0137: state and zip on file (`00b3e120`), so no billing prompt
     let mut account = vec![66, 0, 26, 0, 1, 0, 0, 0];
     account.extend([2, 0, 0, 0, b'U', b'S', 3, 0, 0, 0, b'U', b'S', b'D', 0]);
     vec![

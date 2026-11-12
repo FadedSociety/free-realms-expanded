@@ -204,6 +204,12 @@ pub enum DerbyError {
     InvalidIdentity,
 }
 
+/// (R) rc-0137: a human's hit report is judged against the server's pose of the car it hit, but the
+/// client drew that car where its relayed pose put it, 99-174 ms behind (1.3-2.3 m at the NPCs'
+/// 13 m/s, run 20261112T020333Z). Real rams the client measured at 5.3 m and 6.1 m were refused at
+/// the 5 m contact radius, so a report gets this much more; an NPC's own bump keeps the radius.
+const HUMAN_REPORT_SLACK: f32 = 1.5;
+
 /// A driver key the session checked a moment earlier is missing: refuse rather than panic.
 const UNKNOWN_DRIVER: DerbyError = DerbyError::InvalidField("unknown driver");
 
@@ -1772,9 +1778,8 @@ impl DerbyService {
         let distance_squared = (attacker_position[0] - victim_position[0]).powi(2)
             + (attacker_position[1] - victim_position[1]).powi(2)
             + (attacker_position[2] - victim_position[2]).powi(2);
-        if !distance_squared.is_finite()
-            || distance_squared > self.rules.contact_radius_m * self.rules.contact_radius_m
-        {
+        let reach = self.rules.contact_radius_m * HUMAN_REPORT_SLACK;
+        if !distance_squared.is_finite() || distance_squared > reach * reach {
             return Ok(Vec::new());
         }
         self.apply_hit(sender, report.other, impact, now_ms)
@@ -2158,6 +2163,9 @@ impl DerbyService {
             }
             return Ok(Vec::new());
         }
+        if matches!(self.phase, DerbyPhase::WaitingForState(_) | DerbyPhase::Countdown) {
+            return self.drive_npcs(now_ms); // rc-0137: the NPC cars hold still until Go
+        }
         if self.phase != DerbyPhase::Running {
             return Ok(Vec::new());
         }
@@ -2265,8 +2273,13 @@ impl DerbyService {
             .map(|(key, _)| *key)
             .collect();
         let mut actions = Vec::new();
+        // (R) rc-0137 "the karts roll before the start": before Go the NPC cars were never posed,
+        // so the client's physics moved them from their 34/10 spots until the first chase step.
+        // Now they take their ring spot as soon as the player's car is posed and hold it, posed
+        // every step with no speed, until Go.
+        let holding = matches!(self.phase, DerbyPhase::WaitingForState(_) | DerbyPhase::Countdown);
         for (slot, key) in npcs.iter().copied().enumerate() {
-            if self.phase != DerbyPhase::Running {
+            if self.phase != DerbyPhase::Running && !holding {
                 break;
             }
             let placed = self.drivers[&key].pose.as_ref().and_then(pose_position);
@@ -2275,6 +2288,20 @@ impl DerbyService {
             }) else {
                 continue;
             };
+            if holding {
+                let mut pose = self.drivers[&key].pose.unwrap_or_else(|| {
+                    let heading = anchor.map_or(0.0, |anchor| chase(from, anchor, 0.0, 0.0).1);
+                    npc_pose(key, from, heading, [0.0; 3], now_ms)
+                });
+                pose.sequence = now_ms;
+                pose.vector_a_bits = [0.0, 0.0, 0.0, 1.0_f32].map(f32::to_bits);
+                pose.controls_bits = [0; 3];
+                let driver = self.drivers.get_mut(&key).ok_or(UNKNOWN_DRIVER)?;
+                driver.pose = Some(pose);
+                driver.pose_at_ms = Some(now_ms);
+                self.push_broadcast(&mut actions, DerbyMessage::VehiclePose(pose))?;
+                continue;
+            }
             let alive = self.drivers[&key].state.health > 0;
             // (R) The first `human_chasers` slots hunt the player; the rest fight whoever is
             // nearest, so an idle human still cannot stay first.
