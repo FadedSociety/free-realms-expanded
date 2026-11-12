@@ -67,6 +67,8 @@ const SHEEP_WATCH: u32 = 12350;
 /// The Brawler job profile every session switches to so it can start a battle.
 const BRAWLER: i32 = 43;
 /// The shipped `Brawler: Delinquent Dilemma` defeat goal (kind `930050`).
+/// L1192: Delinquent Dilemma counts Hooligan Delinquents (4154), not the Alpha Wolves (930050) of this
+/// battle, so every check below now holds that a win here credits it nothing, for either player (A25).
 const DELINQUENT_QUEST: u32 = 3030007;
 /// (R) `encounter.rs::BATTLE_JOB_XP` (half a rank on the local curve): the
 /// field-battle engine policy, not a content row field. The same value the
@@ -416,7 +418,7 @@ fn a_win_or_loss_in_one_encounter_does_not_affect_the_other() {
     assert_eq!(won_flag(&a_replies), Some(1));
     let a_paid = economy(&a, &prizes);
     assert_payout(&a_before_win, &a_paid, row, &prizes, BATTLE_JOB_XP);
-    assert_eq!(quest_count(&a, DELINQUENT_QUEST), 2);
+    assert_eq!(quest_count(&a, DELINQUENT_QUEST), 0);
 
     // Nothing of A's win reached B: state, save, wallet, quest and fight.
     assert_eq!(
@@ -499,14 +501,14 @@ fn both_get_their_own_payout_and_return_to_their_own_pose() {
     assert_eq!(results_lifecycle(&a_replies), vec![18, 47, 19]);
     let a_paid = economy(&a, &prizes);
     assert_payout(&a_before, &a_paid, row, &prizes, BATTLE_JOB_XP);
-    assert_eq!(quest_count(&a, DELINQUENT_QUEST), 3);
+    assert_eq!(quest_count(&a, DELINQUENT_QUEST), 1);
 
     let mut b_now = 1_000;
     let b_replies = fight_to_win(&mut b, &mut b_now, row);
     assert_eq!(results_lifecycle(&b_replies), vec![18, 47, 19]);
     let b_paid = economy(&b, &prizes);
     assert_payout(&b_before, &b_paid, row, &prizes, BATTLE_JOB_XP);
-    assert_eq!(quest_count(&b, DELINQUENT_QUEST), 2);
+    assert_eq!(quest_count(&b, DELINQUENT_QUEST), 0);
 
     // A live delta during A's results screen: no old snapshot is restored over
     // it on Close. B's wallet does not move.
@@ -525,14 +527,14 @@ fn both_get_their_own_payout_and_return_to_their_own_pose() {
     assert!(a_closed.began_zoning, "Close returns to the open world");
     assert_returned(&a, marker);
     assert_eq!(economy(&a, &prizes), a_with_delta, "Close pays nothing");
-    assert_eq!(quest_count(&a, DELINQUENT_QUEST), 3);
+    assert_eq!(quest_count(&a, DELINQUENT_QUEST), 1);
 
     // B is still in its own won arena, untouched by A's Close.
     assert_eq!(b.state().zone_id, arena_zone);
     assert_eq!(b.state().position, arena_arrival);
     assert_eq!(phase(&b), Some(EncounterPhase::Won));
     assert_eq!(economy(&b, &prizes), b_paid);
-    assert_eq!(quest_count(&b, DELINQUENT_QUEST), 2);
+    assert_eq!(quest_count(&b, DELINQUENT_QUEST), 0);
 
     // Replaying A's Close and Go pays nothing and does not start B.
     let a_after_close = (a.snapshot(), saved_bytes(&a));
@@ -565,10 +567,10 @@ fn both_get_their_own_payout_and_return_to_their_own_pose() {
     let reopened_a = reopen(&fixture, &a, "a-after-close.json", a_now + 500);
     let reopened_b = reopen(&fixture, &b, "b-after-close.json", b_now + 500);
     assert_eq!(economy(&reopened_a, &prizes), a_with_delta);
-    assert_eq!(quest_count(&reopened_a, DELINQUENT_QUEST), 3);
+    assert_eq!(quest_count(&reopened_a, DELINQUENT_QUEST), 1);
     assert_returned(&reopened_a, marker);
     assert_eq!(economy(&reopened_b, &prizes), b_paid);
-    assert_eq!(quest_count(&reopened_b, DELINQUENT_QUEST), 2);
+    assert_eq!(quest_count(&reopened_b, DELINQUENT_QUEST), 0);
     assert_returned(&reopened_b, b_start);
     assert_eq!((a.snapshot(), saved_bytes(&a)), a_state);
     assert_eq!((b.snapshot(), saved_bytes(&b)), b_state);

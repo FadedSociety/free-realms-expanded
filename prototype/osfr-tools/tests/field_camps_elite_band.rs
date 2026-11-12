@@ -233,8 +233,9 @@ const EXISTING_GROUPS: [&str; 10] = [
 /// (`scripts/npc_floor.py`), which moved this value. L1189 gave the two Bixie Soldiers their
 /// bark rules (`behaviour`), which moved it again.
 /// L1191 gave every row `attacks_in_overworld: false` and one (R) source line, which moved it again.
+/// L1192 made the four quest-gated Delinquents definition 4154 with a Brawling Club link, which moved it again.
 const EXISTING_PREFIX_SHA256: &str =
-    "ce234de33eecf662cedf04765c3853f40713bc64c2d082de67e648a86a3b6b8c";
+    "8855e96594d1acafa9963fa0e4d81662adba1786f5acc36dff587b8d0d80ad00";
 
 /// The existing level-10 and level-14 controls used to prove the actor level,
 /// not the player level, selects the reward band.

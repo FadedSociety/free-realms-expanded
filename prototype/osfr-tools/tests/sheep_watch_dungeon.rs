@@ -1379,12 +1379,13 @@ fn an_arena_defeat_credits_a_goal_keyed_to_the_enemy_kind() {
     let replies = fight_to_win(&mut gateway, &mut now, row);
     assert_eq!(results_lifecycle(&replies), vec![18, 47, 19]);
 
-    // Two Alpha Wolf defeats match the goal; the three Wolves are another
-    // kind, so the goal stops at 2/4.
-    assert_eq!(saved_quest_count(&gateway, DELINQUENT_QUEST), 2);
+    // L1192 (KNOWN-BUGS A25): the goal counts Hooligan Delinquents (4154). The Alpha Wolves here are
+    // 930050 and the Wolves 930071, so this win credits it nothing and sends no ObjectiveUpdate; a
+    // Delinquent defeated in Hooligan Brawling Club! does count (brawler_job_chain, C4).
+    assert_eq!(saved_quest_count(&gateway, DELINQUENT_QUEST), 0);
     assert_eq!(
         objective_updates(&replies, DELINQUENT_QUEST),
-        vec![1, 2],
-        "49/9 ObjectiveUpdate reports 1/4 then 2/4 (reader 0x00c7af60)"
+        Vec::<u32>::new(),
+        "no 49/9 ObjectiveUpdate for kinds the goal does not count"
     );
 }

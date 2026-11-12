@@ -411,7 +411,7 @@
   "enemies": [
     {
       "guid": 100000004154,
-      "definition_id": 930050,
+      "definition_id": 4154,
       "model_id": 203,
       "name_id": 5100401,
       "name": "Hooligan",
@@ -453,14 +453,20 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1192: a Hooligan Delinquent (definition 4154, was the Alpha Wolf's 930050); a Battle Starter on the wiki whose battle is Hooligan Brawling Club! (fight 14017, the hut 100000004156, about 147 m away)."
         }
       ],
-      "attacks_in_overworld": false
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100000004156
     },
     {
       "guid": 100000004155,
-      "definition_id": 930050,
+      "definition_id": 4154,
       "model_id": 489,
       "name_id": 5100401,
       "name": "Hooligan",
@@ -502,14 +508,20 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1192: a Hooligan Delinquent (definition 4154, was the Alpha Wolf's 930050); a Battle Starter on the wiki whose battle is Hooligan Brawling Club! (fight 14017, the hut 100000004156, about 147 m away)."
         }
       ],
-      "attacks_in_overworld": false
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100000004156
     },
     {
       "guid": 5064655448674664449,
-      "definition_id": 930050,
+      "definition_id": 4154,
       "model_id": 489,
       "name_id": 5100401,
       "name": "Hooligan",
@@ -551,14 +563,20 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1192: a Hooligan Delinquent (definition 4154, was the Alpha Wolf's 930050); a Battle Starter on the wiki whose battle is Hooligan Brawling Club! (fight 14017, the hut 100000004156, about 147 m away)."
         }
       ],
-      "attacks_in_overworld": false
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100000004156
     },
     {
       "guid": 5064655448674664450,
-      "definition_id": 930050,
+      "definition_id": 4154,
       "model_id": 203,
       "name_id": 5100401,
       "name": "Hooligan",
@@ -600,10 +618,16 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1192: a Hooligan Delinquent (definition 4154, was the Alpha Wolf's 930050); a Battle Starter on the wiki whose battle is Hooligan Brawling Club! (fight 14017, the hut 100000004156, about 147 m away)."
         }
       ],
-      "attacks_in_overworld": false
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100000004156
     },
     {
       "guid": 131000102001,

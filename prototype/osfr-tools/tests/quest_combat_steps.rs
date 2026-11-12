@@ -545,7 +545,7 @@ const SHIPPED_DEFEATS: [(u32, usize, u32); 7] = [
     (3_000_024, 0, 930_050),
     (3_000_029, 1, 3_156),
     (3_010_011, 0, 1_294),
-    (3_030_007, 0, 930_050),
+    (3_030_007, 0, 4_154), // L1192: the Hooligan Delinquent (930050 is the Alpha Wolf)
     (3_110_002, 0, 930_096),
 ];
 const SHIPPED_DUNGEONS: [(u32, usize, u32); 4] = [

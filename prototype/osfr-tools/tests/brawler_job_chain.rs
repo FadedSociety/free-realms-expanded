@@ -1,6 +1,7 @@
 use gateway_reference::Reference;
 use osfr_tools::{
     character_store::CharacterState,
+    encounter::EncounterPhase,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
     npc_interaction::NpcInteraction,
@@ -36,7 +37,7 @@ const REFERRAL_TO_JONES: u32 = 3_030_006;
 const HOOLIGAN_FIGHT: u32 = 3_030_007;
 const SEARCH_BLACKSPORE: u32 = 3_030_008;
 const GIVEN_TO_GUARD: u32 = 3_030_009;
-const HOOLIGAN_DEFINITION: u32 = 930_050;
+const HOOLIGAN_DEFINITION: u32 = 4_154; // L1192: the Hooligan Delinquent (930050 is the Alpha Wolf)
 const CHAPTER_COINS: u32 = 6 + 15 + 15; // C3, C4 and C5
 const QUEST_REWARD_JOB_XP: u32 = 32; // L926: wiki stars (quest 3030009)
 const BRAWLER: i32 = 43;
@@ -61,8 +62,22 @@ fn reward_coins(quest_id: u32) -> u32 {
     }
 }
 
+/// The reference content plus the reward item table, and (L1192) the shipped fight files with
+/// the catalogue and pacing table they load against: C4 is fought in Hooligan Brawling Club!
+/// (fight 14017), and the opening package carries no fights, so its entrance would stand closed.
 fn gameplay_dir() -> PathBuf {
-    npc_quest_chain::reference_with_reward_items().to_path_buf()
+    static DIRECTORY: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    DIRECTORY
+        .get_or_init(|| {
+            let path = Path::new(env!("CARGO_TARGET_TMPDIR")).join("brawler-chain-content");
+            npc_quest_chain::copy_tree(npc_quest_chain::reference_with_reward_items(), &path);
+            npc_quest_chain::copy_tree(&content_dir().join("fights"), &path.join("fights"));
+            for file in ["enemies.json", "instance_pacing.json"] {
+                fs::copy(content_dir().join(file), path.join(file)).unwrap();
+            }
+            path
+        })
+        .clone()
 }
 
 fn character_at(position: [f32; 3]) -> CharacterState {
@@ -617,104 +632,103 @@ fn assert_pending_screen_recovery(
     *game = reconnected;
 }
 
-fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
-    // A far-away location lets the production tick publish quest-gated spawns
-    // without advancing any actor before the test reaches it.
+/// L1192: a Hooligan Delinquent is a battle starter (wiki FR_Mob Hooligan Delinquent, "Battles:
+/// Hooligan Brawling Club!"). Its click opens fight 14017's card; every Delinquent defeated inside
+/// counts for C4. One win holds eight (3 + 2 + 3; the Brawlers and the Scrapper are other kinds),
+/// so two wins reach the wiki's 15 and the ninth of the second run must not raise it. Returns the
+/// coins the two wins paid, so the chapter's own quest rewards stay countable.
+fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64) -> u32 {
+    const ARRIVE: [f32; 3] = [239.42, 3.31, 186.49];
+    let wallet = game.state().inventory.coins;
     let mut character = character.clone();
-    character.position = [10_000.0, 0.0, 10_000.0];
-    *now += 100;
-    game.tick(&character, *now)
-        .expect("field quests synchronize");
-
-    let hooligans = field_hooligans();
-    for (guid, position) in hooligans.iter().copied() {
+    let home = character.position;
+    for (run, expected) in [(0, 8), (1, 15)] {
+        // A far-away location lets the production tick publish quest-gated spawns.
+        character.zone_id = 0;
+        character.position = [10_000.0, 0.0, 10_000.0];
+        *now += 100;
+        game.tick(&character, *now).expect("field quests synchronize");
+        let (guid, position) = field_hooligans()[0];
         character.position = position;
         *now += 100;
-        let menu = game
+        let card = game
             .handle_in_world(&npc_interact(guid), &character, *now)
-            .expect("field enemy interaction is valid");
-        assert!(
-            menu.replies
-                .iter()
-                .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
-            "field enemy {guid} did not expose its Attack menu"
-        );
-        let before = quest_count(game, HOOLIGAN_FIGHT);
-        // Twice the swings since the owner doubled enemy health (rc-0137).
-        for _ in 0..10 {
-            *now += 700;
-            game.handle_in_world(&npc_select(guid, ATTACK_CHOICE), &character, *now)
-                .expect("field basic attack is valid");
-            if quest_count(game, HOOLIGAN_FIGHT) > before {
+            .expect("the Delinquent's click is valid");
+        let details = card
+            .replies
+            .iter()
+            .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
+            .cloned()
+            .unwrap_or_else(|| panic!("Delinquent {guid} did not open the Brawling Club card"));
+        let mut go = vec![41, 0, 108, 0];
+        go.extend(&details[4..12]);
+        go.extend(0_u64.to_le_bytes());
+        *now += 100;
+        let went = game.handle_in_world(&go, &character, *now).expect("Go is valid");
+        let heads: Vec<_> = went.replies.iter().map(|p| p[..p.len().min(4)].to_vec()).collect();
+        let zone = went.zoning.clone().unwrap_or_else(|| {
+            let text: Vec<_> = went.replies.iter().map(|p| String::from_utf8_lossy(p).into_owned()).collect();
+            panic!("Go zones into the Brawling Club: replies {heads:?} {text:?}")
+        });
+        character.zone_id = zone.zone_id;
+        character.position = ARRIVE;
+        *now += 100;
+        game.initialize_world(&character, *now).expect("the arena loads");
+
+        // A fight file does not end by itself: after the last wave and the Scrapper its exit
+        // opens, and the win waits for the player's leave (41/109), as in the Snarlers' den.
+        let (mut target, mut quiet, mut killed) = (None, 0, None);
+        for _ in 0..3_000 {
+            let Some(active) = game.state().encounter.and_then(|state| state.active) else {
                 break;
+            };
+            assert_eq!(active.phase, EncounterPhase::Fighting, "run {run}: the Brawling Club is lost");
+            *now += 700;
+            let living = active.enemies.iter().find(|enemy| enemy.health > 0 && !enemy.dormant);
+            if let Some(enemy) = living {
+                quiet = 0;
+                character.position = enemy.position;
+                if target != Some(enemy.guid) {
+                    target = Some(enemy.guid);
+                    let _ = game.handle_in_world(&npc_interact(enemy.guid), &character, *now);
+                }
+                let _ = game.handle_in_world(&npc_select(enemy.guid, ATTACK_CHOICE), &character, *now);
+                killed = Some(enemy.guid);
+            } else {
+                quiet += 1;
+                if quiet >= 12 {
+                    break;
+                }
             }
+            game.tick(&character, *now).expect("the arena ticks");
         }
         assert_eq!(
             quest_count(game, HOOLIGAN_FIGHT),
-            before + 1,
-            "actual combat did not advance the kill objective for {guid}"
+            expected,
+            "run {run}: each Delinquent defeated inside counts once, up to the wiki's 15"
         );
-        // Replay the lethal request after the cooldown: the enemy is now dead, so the
-        // production request path must not double-credit or touch the saved state.
-        let after_kill = saved(game);
-        *now += 700;
-        let replayed = game
-            .handle_in_world(&npc_select(guid, ATTACK_CHOICE), &character, *now)
-            .expect("a replayed lethal attack is a clean refusal");
-        assert!(
-            !replayed.changed,
-            "a replayed lethal attack changed gameplay"
-        );
-        assert_eq!(
-            saved(game),
-            after_kill,
-            "a replayed lethal attack changed the saved state"
-        );
-        assert_eq!(quest_count(game, HOOLIGAN_FIGHT), before + 1);
-    }
-    assert_eq!(quest_count(game, HOOLIGAN_FIGHT), 4);
-
-    // The authored 30 s respawn makes a fifth live 930050 kill possible. With C4's
-    // objective already full, that live kill must not raise the count or change the
-    // saved state; a double-credit or missing cap would fail here.
-    let mut observer = character.clone();
-    observer.position = [10_000.0, 0.0, 10_000.0];
-    *now += 30_100;
-    game.tick(&observer, *now)
-        .expect("the field respawn tick is valid");
-    let (respawned, position) = field_hooligans()
-        .into_iter()
-        .next()
-        .expect("the chapter owns four field spawns");
-    observer.position = position;
-    *now += 100;
-    interact_npc(game, &observer, respawned, *now);
-    let before_live_kill = saved(game);
-    let mut killed = false;
-    // Twice the swings since the owner doubled enemy health (rc-0137).
-    for _ in 0..10 {
-        *now += 700;
-        let out = game
-            .handle_in_world(&npc_select(respawned, ATTACK_CHOICE), &observer, *now)
-            .expect("the respawned Hooligan attack is valid");
-        if out.replies.iter().any(|packet| {
-            packet.starts_with(&[35, 0, 3, 0]) && packet[6..14] == respawned.to_le_bytes()
-        }) {
-            killed = true;
-            break;
+        // A replayed attack on a defeated enemy must not credit again or touch the save.
+        if let Some(dead) = killed {
+            let before = saved(game);
+            *now += 700;
+            let replayed = game
+                .handle_in_world(&npc_select(dead, ATTACK_CHOICE), &character, *now)
+                .expect("a replayed attack is a clean refusal");
+            assert!(!replayed.changed, "a replayed attack changed gameplay");
+            assert_eq!(saved(game), before, "a replayed attack changed the saved state");
         }
+        let mut leave = vec![41, 0, 109, 0];
+        leave.extend(0_i32.to_le_bytes());
+        leave.extend(&details[8..12]);
+        *now += 100;
+        let left = game.handle_in_world(&leave, &character, *now).expect("the leave is valid");
+        assert!(left.zoning.is_some(), "run {run}: the leave returns to the world");
+        character.zone_id = 0;
+        character.position = home;
+        *now += 100;
+        game.initialize_world(&character, *now).expect("world return");
     }
-    assert!(killed, "the respawned Hooligan did not die");
-    assert_eq!(
-        quest_count(game, HOOLIGAN_FIGHT),
-        4,
-        "a live respawned kill exceeded C4's required count"
-    );
-    assert_eq!(
-        saved(game),
-        before_live_kill,
-        "a live respawned kill changed the completed objective"
-    );
+    game.state().inventory.coins - wallet
 }
 
 fn quest_count(game: &Gameplay, quest_id: u32) -> u32 {
@@ -788,7 +802,7 @@ fn complete_chapter(game: &mut Gameplay, character: &CharacterState, now: &mut u
     finish_turnin(game, &at, REFERRAL_TO_JONES, now);
 
     accept_quest(game, &at, JONES, jones, HOOLIGAN_FIGHT, now);
-    kill_hooligans(game, &at, now);
+    let battle_coins = kill_hooligans(game, &at, now);
     at.position = jones;
     let _ = open_end_screen(game, &at, JONES, HOOLIGAN_FIGHT, now);
     finish_turnin(game, &at, HOOLIGAN_FIGHT, now);
@@ -797,7 +811,8 @@ fn complete_chapter(game: &mut Gameplay, character: &CharacterState, now: &mut u
     at.position = sabastian;
     let _ = open_end_screen(game, &at, SABASTIAN, SEARCH_BLACKSPORE, now);
     finish_turnin(game, &at, SEARCH_BLACKSPORE, now);
-    initial
+    // The two Brawling Club wins pay their own coins: count them with the starting wallet.
+    initial + battle_coins
 }
 
 #[test]
@@ -900,7 +915,8 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
         HOOLIGAN_FIGHT,
         &mut now,
     );
-    kill_hooligans(&mut game, &character, &mut now);
+    // The two Brawling Club wins pay their own coins; the chapter checks below count only quests.
+    let battle_coins = kill_hooligans(&mut game, &character, &mut now);
 
     character.position = jones;
     let end = open_end_screen(&mut game, &character, JONES, HOOLIGAN_FIGHT, &mut now);
@@ -1048,7 +1064,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
 
     assert_eq!(
         game.state().inventory.coins,
-        initial_coins + CHAPTER_COINS
+        initial_coins + battle_coins + CHAPTER_COINS
     );
     let quests = game.state().npc_quests.unwrap();
     for quest_id in [REFERRAL_TO_JONES, HOOLIGAN_FIGHT, SEARCH_BLACKSPORE] {
@@ -1064,7 +1080,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
     let reloaded = reloaded.state();
     assert_eq!(
         reloaded.inventory.coins,
-        initial_coins + CHAPTER_COINS
+        initial_coins + battle_coins + CHAPTER_COINS
     );
     let quests = reloaded.npc_quests.unwrap();
     assert_eq!(quests.pending_turnin, None);

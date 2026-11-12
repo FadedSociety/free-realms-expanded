@@ -660,8 +660,8 @@ fn every_drawn_spawner_hut_starts_its_battle_or_says_why() {
     assert!(bad.is_empty(), "spawner huts that start no battle:\n{}", bad.join("\n"));
     // The Snarlers' den, Hooligan Bullies!, Robgoblin Troublemakers!, Explosive Robgoblins!,
     // Robgoblin Adept Trouble!, Robgoblin Geomancer!, the Ice Troll Scout's hut and the Frostfang
-    // Caverns door open; Band of Robgoblins!, Robgoblin Camp!, Hooligan Brawling Club! (no fight
-    // file), Robgoblin Pondblasters! (its scene's .gzne is in no pack) and the second Ice Troll
+    // Caverns door open, and (L1192) Hooligan Brawling Club!; Band of Robgoblins!, Robgoblin Camp!,
+    // Robgoblin Pondblasters! (its scene's .gzne is in no pack) and the second Ice Troll
     // Scout hut wait.
     open.sort_unstable();
     waiting.sort_unstable();
@@ -672,6 +672,7 @@ fn every_drawn_spawner_hut_starts_its_battle_or_says_why() {
             100_000_003_592,
             100_000_004_099,
             100_000_004_110,
+            100_000_004_156,
             100_000_004_162,
             100_000_004_303,
             100_000_033_822,
@@ -684,7 +685,6 @@ fn every_drawn_spawner_hut_starts_its_battle_or_says_why() {
             100_000_003_564,
             100_000_003_593,
             100_000_004_102,
-            100_000_004_156,
             100_000_004_499
         ]
     );

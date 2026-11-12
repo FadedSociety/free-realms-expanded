@@ -76,8 +76,8 @@
     "existing_model_id_gaps": 0,
     "known_ability_evidence_strings": 28,
     "w58b_definitions_added": 24,
-    "client_model_table_pairs_checked": 186,
-    "catalog_pairs_present": 184,
+    "client_model_table_pairs_checked": 187,
+    "catalog_pairs_present": 185,
     "catalog_pairs_missing": 2,
     "world_rows_resolved": 36,
     "world_rows_partial": 3,
@@ -23173,6 +23173,41 @@
       "match_method": "reference_npc_row_plus_client_locale",
       "matched_tokens": [],
       "binding_evidence": "The reference server's NPC row gives this name id and model id together (the row's own source cites it); client locale 4448 reads 'Yeti Sentry', Models.txt line 52 maps 51 to sasquatch_01.adr, and the extracted client catalogue holds that file. No capture shows this actor (R).",
+      "capture": null
+    },
+    {
+      "definition_id": 4154,
+      "enemy_id": "hooligan_delinquent",
+      "kind": "Hooligan",
+      "model_id": 203,
+      "adr": "human_m_hooligan_brawler_01.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 204,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 203,
+        "filename": "human_m_hooligan_brawler_01.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51345,
+        "extracted_path": "pack_13/000559.agr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9",
+        "asset_sha256": "c82f5359693616d2ac838312744c4baa2fe7066e36f20b690e0e5085dfcc03ee"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "reference_npc_row_plus_client_locale",
+      "matched_tokens": [],
+      "binding_evidence": "Legacy Npcs.json Id 4154 gives NameId 5100401 'Hooligan' and ModelId 203 together; Models.txt maps 203 to human_m_hooligan_brawler_01.agr; the catalog contains the asset (the same pair as 930060).",
+      "adr_closure": {
+        "reader": "not_applicable",
+        "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
+      },
+      "runtime_scale": null,
+      "texture_alias": "",
       "capture": null
     }
   ],

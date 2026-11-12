@@ -5510,6 +5510,32 @@
         "home": 10.0
       },
       "tags": []
+    },
+    {
+      "id": "hooligan_delinquent",
+      "kind": "Hooligan",
+      "actor_kind_id": 4154,
+      "definition_id": 4154,
+      "model_id": 203,
+      "name_string_id": 5100401,
+      "texture_alias": "",
+      "level": null,
+      "max_health": 180,
+      "damage": 15,
+      "move_speed": 3.0,
+      "aggro_radius": 40.0,
+      "leash_radius": 40.0,
+      "attack_range": 2.5,
+      "attack_cooldown_ms": 1000,
+      "respawn_ms": 30000,
+      "boss": false,
+      "reward": {
+        "coins": 0,
+        "xp": 0,
+        "items": [],
+        "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
+      },
+      "source": "[reference] lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id 4154: Name 'Hooligan', NameId 5100401, ModelId 203 (human_m_hooligan_brawler_01.agr), spawned beside the Hooligan Brawling Club! hut (FabledRealms.lua:2818-2822). [wiki] FR_Mob Hooligan Delinquent: Battle Starter, Monster, Quest; Battles: Hooligan Brawling Club!; Related Quests: Brawler: Delinquent Dilemma (lab/references/fanbyte-wiki-20261102/enemies.json). [client] Global.Text 5100401 'Hooligan'. [reconstructed] (R) L1192: stats, speeds and rank copy the generic Hooligan (930060); its own id keeps Delinquent kill credit apart from the Alpha Wolf (930050) the field rows borrowed."
     }
   ],
   "spawn_groups": [

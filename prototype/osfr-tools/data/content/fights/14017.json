@@ -1,0 +1,714 @@
+{
+  "schema_version": 1,
+  "id": 14017,
+  "kind": "battle",
+  "title_id": 74374,
+  "description_id": 75440,
+  "icon_id": 310,
+  "difficulty": 1,
+  "entry": {
+    "starter": {
+      "definition": "hooligan_delinquent",
+      "at": [
+        -1822.981,
+        -33.30164,
+        567.1284
+      ],
+      "roam": 0
+    }
+  },
+  "place": {
+    "zone": 1239,
+    "arena": "sg_random_encounter_01",
+    "arrive": [
+      239.42,
+      3.31,
+      186.49
+    ],
+    "exit_door": [
+      242.37,
+      1.09,
+      195.02
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "hooligan_delinquent": {
+      "definition_id": 4154,
+      "name": "Hooligan",
+      "name_id": 5100401,
+      "model_id": 203,
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    },
+    "hooligan_delinquent_f": {
+      "definition_id": 4154,
+      "name": "Hooligan",
+      "name_id": 5100401,
+      "model_id": 518,
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    },
+    "hooligan_brawler": {
+      "definition_id": 1404301,
+      "name": "Hooligan Brawler",
+      "name_id": 6686,
+      "model_id": 203,
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    },
+    "hooligan_scrapper": {
+      "definition_id": 950040,
+      "name": "Hooligan Scrapper",
+      "name_id": 37614,
+      "model_id": 489,
+      "rank": "boss",
+      "boss": true,
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37162,
+                    37163,
+                    37165,
+                    37166
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37162,
+                    37163,
+                    37165,
+                    37166
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    }
+  },
+  "actors": {
+    "boss": {
+      "definition": "hooligan_scrapper",
+      "at": [
+        230.79,
+        1.21,
+        230.72
+      ],
+      "heading": 2.949,
+      "boss": true,
+      "scale": 1,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1_hooligan": [
+      [
+        207.54,
+        2.92,
+        160.0
+      ],
+      [
+        226.54,
+        4.28,
+        153.76
+      ],
+      [
+        201.23,
+        1.49,
+        177.44
+      ]
+    ],
+    "w2_hooligan": [
+      [
+        224.89,
+        1.11,
+        221.9
+      ],
+      [
+        205.99,
+        1.96,
+        200.68
+      ]
+    ],
+    "w2_brawler": [
+      [
+        229.46,
+        1.63,
+        217.72
+      ],
+      [
+        209.78,
+        0.22,
+        191.97
+      ]
+    ],
+    "w3_hooligan": [
+      [
+        206.23,
+        1.93,
+        215.5
+      ],
+      [
+        222.69,
+        0.73,
+        224.27
+      ],
+      [
+        257.78,
+        0.16,
+        212.41
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_delinquent",
+          "count": 3,
+          "at": "w1_hooligan"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_delinquent_f",
+          "count": 2,
+          "at": "w2_hooligan"
+        },
+        {
+          "definition": "hooligan_brawler",
+          "count": 2,
+          "at": "w2_brawler"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "hooligan_delinquent",
+          "count": 3,
+          "at": "w3_hooligan"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 75441,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    },
+    {
+      "id": "boss",
+      "kind": "defeat",
+      "text_id": 0,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "wake_boss",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ],
+      "once": true
+    }
+  ],
+  "rewards": {
+    "coins": 15,
+    "job_xp": 50,
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76255,
+        "name_id": 133263,
+        "icon_id": 2503,
+        "job": 2
+      },
+      {
+        "item_id": 75416,
+        "name_id": 131160,
+        "icon_id": 3719,
+        "job": 2
+      },
+      {
+        "item_id": 75412,
+        "name_id": 131156,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 75379,
+        "name_id": 131123,
+        "icon_id": 551,
+        "job": 2
+      },
+      {
+        "item_id": 75118,
+        "name_id": 132002,
+        "icon_id": 3152,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 76125,
+        "name_id": 133133,
+        "icon_id": 2370,
+        "job": 11
+      },
+      {
+        "item_id": 75351,
+        "name_id": 131095,
+        "icon_id": 3719,
+        "job": 11
+      },
+      {
+        "item_id": 75347,
+        "name_id": 131091,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 75314,
+        "name_id": 131058,
+        "icon_id": 551,
+        "job": 11
+      },
+      {
+        "item_id": 75088,
+        "name_id": 131972,
+        "icon_id": 3122,
+        "job": 11
+      },
+      {
+        "item_id": 76449,
+        "name_id": 133457,
+        "icon_id": 5064,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 75178,
+        "name_id": 132062,
+        "icon_id": 3160,
+        "job": 12
+      },
+      {
+        "item_id": 75546,
+        "name_id": 131290,
+        "icon_id": 3719,
+        "job": 12
+      },
+      {
+        "item_id": 75542,
+        "name_id": 131286,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 75509,
+        "name_id": 131253,
+        "icon_id": 551,
+        "job": 12
+      },
+      {
+        "item_id": 76365,
+        "name_id": 133373,
+        "icon_id": 2533,
+        "job": 32
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 75481,
+        "name_id": 131225,
+        "icon_id": 3719,
+        "job": 32
+      },
+      {
+        "item_id": 75477,
+        "name_id": 131221,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75444,
+        "name_id": 131188,
+        "icon_id": 551,
+        "job": 32
+      },
+      {
+        "item_id": 75148,
+        "name_id": 132032,
+        "icon_id": 3219,
+        "job": 32
+      },
+      {
+        "item_id": 75221,
+        "name_id": 130965,
+        "icon_id": 3719,
+        "job": 35
+      },
+      {
+        "item_id": 75217,
+        "name_id": 130961,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75028,
+        "name_id": 131912,
+        "icon_id": 3106,
+        "job": 35
+      },
+      {
+        "item_id": 75184,
+        "name_id": 130928,
+        "icon_id": 551,
+        "job": 35
+      },
+      {
+        "item_id": 75779,
+        "name_id": 132787,
+        "icon_id": 2406,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75900,
+        "name_id": 132908,
+        "icon_id": 5662,
+        "job": 43
+      },
+      {
+        "item_id": 75058,
+        "name_id": 131942,
+        "icon_id": 3126,
+        "job": 43
+      },
+      {
+        "item_id": 75286,
+        "name_id": 131030,
+        "icon_id": 3719,
+        "job": 43
+      },
+      {
+        "item_id": 75282,
+        "name_id": 131026,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75249,
+        "name_id": 130993,
+        "icon_id": 551,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "wheel_coins": 10,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 74374 'Hooligan Brawling Club!' (title), 75440 'Hooligans are running a brawling club and kidnapping travelers! Head in and shut this club down!' (card), 75441 'Defeat all the hooligans.' (goal); icon 310; 5100401 'Hooligan'."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 49 ('Hooligan Brawling Club! (the live random encounter: the hooligans' brawling club)'): starter Npc 4156, scene sg_random_encounter_01 (zone 1239), the same entry and exit as Id 58 (our 14021), difficulty 1, 15 coins. Waves: 3x Npc 4154 Hooligan; 2x 4160 Hooligan (female body, model 518) and 2x 46002 Hooligan Brawler; the 46079 Hooligan Scrapper boss and 3x 4154. Every spot here is the fork's."
+    },
+    {
+      "kind": "legacy-data",
+      "evidence": "FreeRealms-Legacy FabledRealms.lua:2818-2822 spawns 4152 Billie JoBob, 4153 Billie's Trunk, 4154 and 4155 Hooligans, and 4156 'Hooligan Brawling Club!' (Npcs.json, sg_spawner_human_01.adr) together near Jones's camp."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "FR_Mob Hooligan Delinquent: 'Battle Starter, Monster, Quest'; Battles: 'Hooligan Brawling Club!'; Related Quests: 'Brawler: Delinquent Dilemma', 'Contract: All Around Win'; found in the wilds surrounding Crossroads."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) L1192: Npc 4154 is definition 4154 (hooligan_delinquent), and Npc 4160 (same name, female body) shares it, so every Delinquent defeated here counts for 3030007. Npc 46002 is the Tavern Cellar's hooligan_brawler (1404301) and 46079 the Hooligan Scrapper (950040), the boss woken when wave 3 starts, as in 14021. Rules, the L1189 hooligan barks and the prize wheel copy Hooligan Bullies! (14021), the same family and scene: the wiki gives this battle no wheel of its own. Not proven in the client yet: this scene needs one native load."
+    }
+  ]
+}

@@ -100,6 +100,13 @@ fn reward_item_table() -> &'static str {
         for prize in rows.flat_map(|row| row["prizes"].as_array().into_iter().flatten()) {
             wanted.extend(prize["item_id"].as_i64());
         }
+        // L1192: and every fight file's wheel (Brawler C4 is fought in fight 14017).
+        for entry in fs::read_dir(content_dir().join("fights")).into_iter().flatten().flatten() {
+            let fight = read_json(&entry.path());
+            for prize in fight["rewards"]["wheel"].as_array().into_iter().flatten() {
+                wanted.extend(prize["item_id"].as_i64());
+            }
+        }
         // QF: what a reward's Mystery Gift opens into (`release/mystery_chests.json` gifts).
         let chests = read_json(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/mystery_chests.json"));
         for gift in chests["gifts"].as_array().into_iter().flatten() {

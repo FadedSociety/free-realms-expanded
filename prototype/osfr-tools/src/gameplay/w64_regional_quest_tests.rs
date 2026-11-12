@@ -1069,7 +1069,7 @@ fn take_me_there_pin_follows_the_selected_quest() {
 fn kill_objective_pins_its_field_enemy() {
     let (mut game, character) = offer_test_game(false);
     let engine = game.npc_quests.as_mut().unwrap();
-    // "Defeat the Hooligan Delinquents" (kind 930050), a real enabled quest.
+    // "Defeat the Hooligan Delinquents" (kind 4154 since L1192; 930050 is the Alpha Wolf), a real enabled quest.
     assert!(engine.dev_mark_offered(3_030_007));
     assert!(engine.accept(3_030_007).changed);
     let content = bundled_content();
@@ -1080,7 +1080,7 @@ fn kill_objective_pins_its_field_enemy() {
         .as_array()
         .unwrap()
         .iter()
-        .filter(|enemy| enemy["definition_id"] == 930_050)
+        .filter(|enemy| enemy["definition_id"] == 4_154)
         .min_by_key(|enemy| enemy["guid"].as_u64().unwrap())
         .unwrap();
     let out = game
@@ -3003,7 +3003,7 @@ fn quest_gated_field_enemies_spawn_fight_and_respawn() {
     }
     assert_eq!(
         defeated,
-        vec![930_050],
+        vec![4_154],
         "a defeat reports the quest kill id"
     );
     assert!(

@@ -65,11 +65,13 @@ const HIGH: [(u64, u32, &str, u64); 4] = [
 const EXISTING_ACTORS: [(u64, &str); 24] = [
     // L1191 (owner 2026-11-12, overworld enemies): every row gained `attacks_in_overworld: false`
     // and one (R) source line, which moved all 24 digests.
-    (100000004154, "47c6367baa3698cff55b3d78d9d1094df1cfd48484b646da6deb861cf1db3554"),
-    (100000004155, "8322a8b2638311448cfd7444cbe1c7ced92841325d4bbad02822757bbc6f271b"),
+    // L1192: the four quest-gated Delinquents (the first four rows) became definition 4154 with an
+    // instance link to the Hooligan Brawling Club, which moved their digests again.
+    (100000004154, "a35f8212580a55d7dea0e9fcd9e69f01e5206eb460e41d2d1f3ed6654ad341dd"),
+    (100000004155, "698378e0ada6536e43f24433cf70bb6548625eaa333c2fba3480625dbdd6c063"),
     // F6 (op-P-npc-life): these two homes were set onto the floor (scripts/npc_floor.py).
-    (5064655448674664449, "4f284be854f4c4cccccd44bdeec1165b2f3e8b29800b44f59c23f06e2da4238b"),
-    (5064655448674664450, "509ca5aa1029e49a2fcedc5ed741a015aef3cccb0187e794096567f86c2eec02"),
+    (5064655448674664449, "48f0699762e58d1aadaf82b8f070e8df11e73bc635f157d229be25944c2e12d2"),
+    (5064655448674664450, "9e5c0f602332439b17d5d6052afecbbec27e437318d8416b0608cc8a6f4671cb"),
     (131000102001, "ec88bfff038c0d1d32f5ea1ee368b7ec7ee5ffb1c11a1bfb533706115027e1bd"),
     (131000102002, "e00d03ca786aea207c6632564811538a5069e4f7c740de32337965ac55c1a297"),
     (131000102003, "4febf2d0c08062e2f6282a9ebbb564c5d058860394329ed5f6c2ad6f5cd110d6"),

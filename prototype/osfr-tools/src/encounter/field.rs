@@ -279,11 +279,27 @@ impl EncounterEngine {
     /// walking away. `None` covers no open screen and a dropped one.
     pub fn take_pending_battle(&mut self, position: [f32; 3]) -> Option<u32> {
         let (id, _) = self.pending_battle.take()?;
-        let near =
-            self.battles.iter().find(|b| b.id == id).is_some_and(|b| {
-                distance(position, self.marker_position(b)) <= BATTLE_SCREEN_RADIUS
-            });
+        let near = self.battles.iter().find(|b| b.id == id).is_some_and(|b| {
+            let marker = self.marker_position(b);
+            distance(position, marker) <= BATTLE_SCREEN_RADIUS
+                || self.linked_actor_near(b.spawner.guid, marker, position)
+        });
         near.then_some(id)
+    }
+
+    /// L1191: whether `position` is within reach of an actor whose click opens `starter`'s card
+    /// (a present `instance_enemy` homed in its area, or a linked object), so Go from that
+    /// card starts the battle as Go beside the starter does.
+    fn linked_actor_near(&self, starter: u64, marker: [f32; 3], position: [f32; 3]) -> bool {
+        let enemy = self.field_sim.enemies.iter().any(|f| {
+            f.present
+                && f.instance == Some(starter)
+                && distance(f.actor.position, marker) <= LINKED_AREA
+                && distance(position, f.state.position) <= LINKED_CLICK_REACH
+        });
+        enemy
+            || (self.content.object_links.values())
+                .any(|&(at, s)| s == starter && distance(position, at) <= LINKED_CLICK_REACH)
     }
 
     /// The marker's current spot: where its walk has taken it, else home.

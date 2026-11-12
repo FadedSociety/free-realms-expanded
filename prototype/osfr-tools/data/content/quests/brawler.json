@@ -499,8 +499,8 @@
         {
           "kind": "defeat",
           "id": 1,
-          "model_id": 930050,
-          "count": 4,
+          "model_id": 4154,
+          "count": 15,
           "text_string_id": 94304,
           "source": [
             {
@@ -514,6 +514,10 @@
             {
               "kind": "client",
               "evidence": "T403 goal text Global.Text 94304 'Defeat the Hooligan Delinquents south of Jones to recover the artifacts they stole from him.': client hash 3825361510 = Global.Text 94304, cited here."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1192: the wiki's goal line is 'Recover Pilfered Artifacts from Hooligan Delinquents - 0/15' (fr_quest_brawler_delinquent_dilemma), so 15 Delinquent defeats (R: one artifact each). The target is definition 4154, the Hooligan Delinquent of fight 14017 (Hooligan Brawling Club!), no longer the Alpha Wolf's 930050."
             }
           ]
         }

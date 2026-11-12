@@ -94,8 +94,8 @@ const STARTER_STATS: [(u64, i64, i64, &str, u64, u64); 12] = [
 ];
 
 /// The four quest-gated Hooligans, in file order: GUID, position, model, name
-/// id, name, max health, damage. All four use definition 930050 and gate on
-/// quest 3030007.
+/// id, name, max health, damage. All four use definition 4154 (the Hooligan Delinquent, L1192;
+/// 930050, the Alpha Wolf's, before) and gate on quest 3030007.
 const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64); 4] = [
     (
         100000004154,
@@ -168,19 +168,13 @@ const QUEST_SOURCE: [&[&str]; 4] = [
         "legacy-data",
         "reconstructed",
         "reconstructed",
-    ],
-    &[
-        "legacy-data",
-        "client",
-        "reconstructed",
-        "legacy-data",
-        "reconstructed",
         "reconstructed",
     ],
     &[
         "legacy-data",
         "client",
         "reconstructed",
+        "legacy-data",
         "reconstructed",
         "reconstructed",
         "reconstructed",
@@ -188,6 +182,16 @@ const QUEST_SOURCE: [&[&str]; 4] = [
     &[
         "legacy-data",
         "client",
+        "reconstructed",
+        "reconstructed",
+        "reconstructed",
+        "reconstructed",
+        "reconstructed",
+    ],
+    &[
+        "legacy-data",
+        "client",
+        "reconstructed",
         "reconstructed",
         "reconstructed",
         "reconstructed",
@@ -482,7 +486,7 @@ fn the_existing_starter_and_quest_populations_are_unchanged() {
         QUEST_HOOLIGANS.into_iter().enumerate()
     {
         let row = actor(&field, guid);
-        assert_eq!(row["definition_id"], 930050);
+        assert_eq!(row["definition_id"], 4154);
         assert_eq!(row["quest_ids"], json!([QUEST_ID]));
         assert_eq!(row["model_id"], model);
         assert_eq!(row["name_id"], name_id);

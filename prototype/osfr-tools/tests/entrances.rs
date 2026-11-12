@@ -92,10 +92,11 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
         .count();
     assert_eq!(
         (table.entrances.len(), doors, table.scenes.len()),
-        (55, 35, 46),
-        "35 dungeon doors and 20 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
+        (56, 35, 46),
+        "35 dungeon doors and 21 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
          Legacy spawner huts, two of them in scenes of their own; rc-0137 holds the Troll \
-         Summoner starter, where battle 96's own marker now stands)"
+         Summoner starter, where battle 96's own marker now stands; L1192 places the Hooligan \
+         Brawling Club hut for fight 14017)"
     );
     for row in &table.entrances {
         let actor = spawners.iter().find(|actor| actor.0 == row.guid);
@@ -294,6 +295,7 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             "frostfang_growler",
             "frostfang_snarlers",
             "grexan_s_camp",
+            "hooligan_brawling_club",
             "hooligan_bullies",
             "hot_springs_haven",
             "howling_hills",
@@ -1277,6 +1279,14 @@ fn an_instance_enemy_opens_its_entrance_card() {
             continue;
         }
         assert_eq!(subs(&out), subs(&at_door), "Cray Marauder {guid} opens the Cray Marauders card");
+        // Go (41/108) from that card starts the battle where the player stands, beside the
+        // marauder, and not after walking away.
+        let mut go = base.clone();
+        go.handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
+        assert!(go.take_pending_battle(at).is_some(), "Go beside Cray Marauder {guid} starts it");
+        go.handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
+        let walked = [at[0] + 40.0, at[1], at[2]];
+        assert_eq!(go.take_pending_battle(walked), None, "Go after walking away starts nothing");
         let far = [at[0] + 40.0, at[1], at[2]];
         let missed = base.clone().handle(&click(guid), 77, far, BRAWLER, 1_000).unwrap();
         assert_ne!(subs(&missed), subs(&at_door), "out of reach, {guid} opens nothing");
