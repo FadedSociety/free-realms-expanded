@@ -55,7 +55,8 @@ pub(super) fn browse(shared: &Shared, caller: &Caller, request: &Request) -> Ans
     let catalog = catalog(shared)?;
     let page = page_param(request)?;
     let query = request.param("q").unwrap_or_default();
-    let toggles = Toggles::load(&shared.store);
+    let toggles = Toggles::load(&shared.store)
+        .map_err(|_| error(503, "the gift offer settings are unreadable"))?;
     Ok(json_reply(200, gift_admin::catalog_page(&catalog, &toggles, &query, page)))
 }
 

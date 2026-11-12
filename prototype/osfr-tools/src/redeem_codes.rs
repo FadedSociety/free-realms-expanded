@@ -59,29 +59,16 @@ pub fn store() -> Option<&'static Path> {
 
 impl Codes {
     pub fn load(path: &Path) -> io::Result<Self> {
-        match std::fs::metadata(path) {
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                return Ok(Self {
-                    schema_version: 1,
-                    ..Self::default()
-                });
-            }
-            Err(e) => return Err(e),
-            Ok(meta) if meta.len() > MAX_FILE_BYTES => {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "redeem codes file too large",
-                ));
-            }
-            Ok(_) => {}
-        }
-        serde_json::from_slice(&std::fs::read(path)?).map_err(io::Error::other)
+        let Some(bytes) = crate::reward_transaction::read(path, MAX_FILE_BYTES)? else {
+            return Ok(Self { schema_version: 1, ..Self::default() });
+        };
+        serde_json::from_slice(&bytes).map_err(io::Error::other)
     }
 
     /// Whole-file replace (`character_store::replace_bytes`), so a crash leaves the old file or the new one.
     pub fn save(&self, path: &Path) -> io::Result<()> {
         let bytes = serde_json::to_vec_pretty(self).map_err(io::Error::other)?;
-        crate::character_store::replace_bytes(path, &bytes)
+        crate::reward_transaction::write(path, &bytes)
     }
 
     /// [`Self::redeem`] for `account`'s character: a code bound to another account is refused

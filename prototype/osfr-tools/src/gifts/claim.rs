@@ -73,7 +73,7 @@ impl Realm {
     pub fn load(store: &Path, game: &Gameplay) -> io::Result<Self> {
         Ok(Self {
             catalog: Catalog::load(&game.gift_content_dir())?,
-            toggles: Toggles::load(store),
+            toggles: Toggles::load(store)?,
             stock: Stock::read(store)?,
             events: game.gift_running_events(),
         })
@@ -393,6 +393,7 @@ fn admin_code(
     now_ms: u64,
 ) -> Option<Reply> {
     use crate::account_store::{AccountStoreLock, STAFF_LOCK_WAIT};
+    let savepoint = crate::reward_transaction::Scope::savepoint();
     let path = super::codes_path(store);
     let Ok(_lock) = AccountStoreLock::acquire_within(&path, STAFF_LOCK_WAIT) else {
         return Some(Reply::line("Codes are busy; try again in a moment."));
@@ -416,6 +417,7 @@ fn admin_code(
         if codes.save(&path).is_err() {
             return Some(Reply::line("Codes cannot be saved right now; try again."));
         }
+        savepoint.keep();
         *game = trial;
         let mut packets = granted;
         packets.push(crate::chat::system(&format!("Redeemed code {name}.")));
@@ -434,14 +436,15 @@ fn admin_code(
         via: super::Via::Code,
         character: None,
     };
-    // The gift lands before the use is saved: a failed save gives the gift without spending
-    // the use (it can be redeemed again), never a spent use without the gift.
+    // Both writes join the gateway reward batch. A refusal rolls back this savepoint;
+    // the host journals the parcel and the consumed use together before publishing success.
     if let Err(error) = super::deliver(store, account, parcel) {
         return Some(Reply::line(&format!("Cannot redeem that code: {error}.")));
     }
     if codes.save(&path).is_err() {
-        log("gift_code_save_failed", account, name);
+        return Some(Reply::line("Codes cannot be saved right now; try again."));
     }
+    savepoint.keep();
     Some(redeemed(store, account, game, character, name))
 }
 
@@ -462,8 +465,8 @@ fn classic(store: &Path, account: u64, game: &Gameplay, character: u64, name: &s
 /// The new list (the gift's row is in it) and the line.
 fn redeemed(store: &Path, account: u64, game: &Gameplay, character: u64, name: &str) -> Reply {
     let mut reply = list(store, account, game, character);
-    // This session shows it now; the tick need not tell it again.
-    let _ = super::take_delivered(store);
+    // Leave delivery markers for the tick: other accounts and other characters on this
+    // account may also need their Claim windows refreshed.
     reply.packets.push(crate::chat::system(&format!(
         "Redeemed code {name}: your gift is waiting in the Claim window (Marketplace)."
     )));

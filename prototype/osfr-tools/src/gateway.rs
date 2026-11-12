@@ -135,6 +135,7 @@ pub struct Gateway {
 
 #[derive(Debug, Default)]
 pub struct GatewayOutcome {
+    pub reward_writes: crate::reward_transaction::Batch,
     pub dev_command_denials: usize,
     pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
@@ -1411,6 +1412,7 @@ impl Gateway {
     }
 
     pub fn handle_at(&mut self, message: &[u8], now_ms: u64) -> io::Result<GatewayOutcome> {
+        let rewards = crate::reward_transaction::Scope::begin();
         self.refresh_role();
         // Decode every child first. Malformed later children cannot partially
         // update a saved character or release half an initialization stream.
@@ -1826,6 +1828,7 @@ impl Gateway {
         self.loaded = loaded;
         self.welcomed = welcomed;
         outcome.trace = trace.unwrap_or_default();
+        outcome.reward_writes = rewards.finish();
         Ok(outcome)
     }
 

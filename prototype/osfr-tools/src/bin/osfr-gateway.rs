@@ -2012,7 +2012,7 @@ impl Session {
                 && self
                     .position_saved_ms
                     .is_some_and(|saved| now_ms < saved.saturating_add(POSITION_SAVE_MS));
-            if outcome.state_changed && !deferred {
+            if outcome.state_changed && !deferred && outcome.reward_writes.is_empty() {
                 // S17: the snapshot carries the pet roster, so an adoption's spent item and its
                 // new pet land in this ONE atomic write or not at all.
                 save(&self.state_path, &staged_gateway.snapshot())?;
@@ -2022,6 +2022,8 @@ impl Session {
                 .chat_settings
                 .save_changed(&world.chat_settings)?;
             staged_world.guilds.save_changed()?;
+            std::mem::take(&mut outcome.reward_writes)
+                .commit(&self.state_path, &staged_gateway.snapshot())?;
             let deliveries = staged_world.with_rides(deliveries);
             let deliveries = staged_world.with_pets(deliveries);
             Ok((staged_world, deliveries, change, deferred))
@@ -3249,6 +3251,15 @@ impl Server {
             .filter(|path| !path.as_os_str().is_empty())
         {
             fs::create_dir_all(parent)?;
+        }
+        // Reward recovery must precede every save load and HTTP/background writer.
+        if let Some(directory) = options.state.parent().filter(|p| !p.as_os_str().is_empty()) {
+            osfr_tools::reward_transaction::recover(directory)?;
+        } else {
+            osfr_tools::reward_transaction::recover(Path::new("."))?;
+        }
+        if let Some(directory) = character_state_path(&options.state, 0).parent() {
+            osfr_tools::reward_transaction::recover(directory)?;
         }
         if let Some(account_store) = &options.account_store {
             // On first use the login server creates the store by migrating the

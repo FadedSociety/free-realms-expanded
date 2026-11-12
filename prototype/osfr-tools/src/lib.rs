@@ -52,6 +52,7 @@ pub mod gm_panel;
 pub mod gm_powers;
 pub mod player_gm_menu;
 pub mod redeem_codes;
+pub mod reward_transaction;
 pub mod loot_tables;
 pub mod guilds;
 pub mod group_play;

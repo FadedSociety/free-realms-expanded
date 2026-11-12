@@ -104,6 +104,12 @@ pub fn save(path: &Path, state: &CharacterState) -> io::Result<()> {
 
 /// Shared same-directory replacement used by the expanded gameplay snapshot.
 pub fn replace_bytes(path: &Path, bytes: &[u8]) -> io::Result<()> {
+    crate::reward_transaction::ensure_writable(path)?;
+    replace_bytes_unchecked(path, bytes)
+}
+
+// Only journal application/recovery may bypass the pending-transaction write barrier.
+pub(crate) fn replace_bytes_unchecked(path: &Path, bytes: &[u8]) -> io::Result<()> {
     replace_bytes_with(path, bytes, |from, to| fs::rename(from, to))
 }
 

@@ -234,20 +234,12 @@ pub fn mailbox_path(account_store: &Path, guid: u64) -> PathBuf {
 
 // ponytail: one process-wide lock, because only the gateway process writes mail; a file lock
 // like `AccountStoreLock` if a second process ever does.
-static LOCK: Mutex<()> = Mutex::new(());
+pub(crate) static LOCK: Mutex<()> = Mutex::new(());
 
 /// A mailbox as stored; a missing file is an empty mailbox.
 pub fn load(path: &Path) -> io::Result<Mailbox> {
-    let bytes = match fs::metadata(path) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Mailbox::default()),
-        Err(error) => return Err(error),
-        Ok(meta) if !meta.is_file() || meta.len() > MAX_FILE_BYTES => {
-            return Err(io::Error::new(
-                io::ErrorKind::InvalidData,
-                "mailbox is not a bounded regular file",
-            ));
-        }
-        Ok(_) => fs::read(path)?,
+    let Some(bytes) = crate::reward_transaction::read(path, MAX_FILE_BYTES)? else {
+        return Ok(Mailbox::default());
     };
     let mailbox: Mailbox = serde_json::from_slice(&bytes)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
@@ -278,7 +270,7 @@ pub fn update<T>(
         fs::create_dir_all(dir)?;
     }
     let text = serde_json::to_string_pretty(&mailbox).map_err(io::Error::other)? + "\n";
-    crate::character_store::replace_bytes(path, text.as_bytes())?;
+    crate::reward_transaction::write(path, text.as_bytes())?;
     Ok(result)
 }
 

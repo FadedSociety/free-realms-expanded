@@ -196,15 +196,7 @@ fn invalid(text: impl Into<String>) -> io::Error {
 }
 
 fn read_bounded(path: &Path, max: u64) -> io::Result<Option<Vec<u8>>> {
-    match fs::metadata(path) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(None),
-        Err(error) => Err(error),
-        Ok(meta) if !meta.is_file() || meta.len() > max => Err(invalid(format!(
-            "{} is not a regular file of at most {max} bytes",
-            path.display()
-        ))),
-        Ok(_) => fs::read(path).map(Some),
-    }
+    crate::reward_transaction::read(path, max)
 }
 
 impl Catalog {
@@ -446,7 +438,7 @@ pub fn codes_path(account_store: &Path) -> PathBuf {
 // ponytail: one process lock, as mail's: only the gateway writes gift files.
 static LOCK: Mutex<()> = Mutex::new(());
 
-fn guard() -> MutexGuard<'static, ()> {
+pub(crate) fn guard() -> MutexGuard<'static, ()> {
     LOCK.lock().unwrap_or_else(PoisonError::into_inner)
 }
 
@@ -467,7 +459,7 @@ fn write_json<T: Serialize>(path: &Path, value: &T) -> io::Result<()> {
         fs::create_dir_all(dir)?;
     }
     let text = serde_json::to_string_pretty(value).map_err(io::Error::other)? + "\n";
-    crate::character_store::replace_bytes(path, text.as_bytes())
+    crate::reward_transaction::write(path, text.as_bytes())
 }
 
 /// Read, change and atomically replace one gift box under the gift lock. A refusal or a failed
@@ -544,7 +536,7 @@ pub fn deliver(store: &Path, account: u64, parcel: Parcel) -> Result<u32, GiftEr
         return Err(refused(format!("a gift carries 1 to {MAX_GIFT_ITEMS} items")));
     }
     let id = update(&box_path(store, account), |gifts| push(gifts, parcel, unix_now()))?;
-    mark(&DELIVERED, store, account);
+    publish_notice(store, account, false);
     Ok(id)
 }
 
@@ -561,13 +553,17 @@ impl Toggles {
         gifts_dir(store).join("offers.json")
     }
 
-    /// The toggles as stored; a missing or unreadable file is none (the catalog decides).
-    pub fn load(store: &Path) -> Self {
-        read_bounded(&Self::path(store), MAX_BOX_BYTES)
-            .ok()
-            .flatten()
-            .and_then(|bytes| serde_json::from_slice(&bytes).ok())
-            .unwrap_or_default()
+    /// A missing file has no overrides. Unreadable, malformed and unsupported files are
+    /// errors: catalog defaults must not silently re-enable offers staff disabled.
+    pub fn load(store: &Path) -> io::Result<Self> {
+        let Some(bytes) = read_bounded(&Self::path(store), MAX_BOX_BYTES)? else {
+            return Ok(Self { schema_version: SCHEMA_VERSION, ..Self::default() });
+        };
+        let toggles: Self = serde_json::from_slice(&bytes).map_err(|e| invalid(e.to_string()))?;
+        if toggles.schema_version != SCHEMA_VERSION {
+            return Err(invalid("unsupported gift toggle schema"));
+        }
+        Ok(toggles)
     }
 
     pub fn enabled(&self, gift: &Gift) -> bool {
@@ -577,7 +573,7 @@ impl Toggles {
     /// Set one row's toggle; returns the effective value before.
     pub fn set(store: &Path, gift: &Gift, enabled: bool) -> io::Result<bool> {
         let _guard = guard();
-        let mut toggles = Self::load(store);
+        let mut toggles = Self::load(store)?;
         let before = toggles.enabled(gift);
         toggles.schema_version = SCHEMA_VERSION;
         toggles.enabled.insert(gift.key.clone(), enabled);
@@ -704,7 +700,7 @@ pub fn redeem_classic(
         }
         push(gifts, Parcel::of(gift, "Free Realms", Via::Code, character), now)
     })?;
-    mark(&DELIVERED, store, account);
+    publish_notice(store, account, false);
     Ok(id)
 }
 
@@ -721,6 +717,7 @@ pub fn take(
     rules: &Rules,
     now: u64,
 ) -> Result<Vec<Pending>, GiftError> {
+    let savepoint = crate::reward_transaction::Scope::savepoint();
     let path = box_path(store, account);
     let _guard = guard();
     let mut gifts = load(&path)?;
@@ -756,6 +753,7 @@ pub fn take(
         write_json(&Stock::path(store), &stock)?;
     }
     write_json(&path, &gifts)?;
+    savepoint.keep();
     Ok(taken)
 }
 
@@ -764,6 +762,11 @@ pub fn take(
 // gateways with their own stores never see each other's.
 static DELIVERED: Mutex<BTreeSet<(PathBuf, u64)>> = Mutex::new(BTreeSet::new());
 static RESEND: Mutex<BTreeSet<(PathBuf, u64)>> = Mutex::new(BTreeSet::new());
+
+pub(crate) fn publish_notice(store: &Path, account: u64, resend: bool) {
+    if crate::reward_transaction::notice(store, account, resend) { return }
+    mark(if resend { &RESEND } else { &DELIVERED }, store, account);
+}
 
 fn mark(set: &Mutex<BTreeSet<(PathBuf, u64)>>, store: &Path, account: u64) {
     set.lock()
@@ -790,7 +793,7 @@ pub fn take_resend(store: &Path) -> BTreeSet<u64> {
 }
 
 pub(crate) fn mark_resend(store: &Path, account: u64) {
-    mark(&RESEND, store, account);
+    publish_notice(store, account, true);
 }
 
 #[cfg(test)]
@@ -835,6 +838,29 @@ mod tests {
             gifts,
             ..Catalog::default()
         }
+    }
+
+    #[test]
+    fn corrupt_unreadable_and_unsupported_toggles_are_never_replaced() {
+        let store = scratch("invalid-toggles");
+        let path = Toggles::path(&store);
+        assert!(Toggles::load(&store).unwrap().enabled(&gift("offer")));
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        for bytes in [b"{not json".as_slice(), br#"{"schema_version":99,"enabled":{"offer":false}}"#] {
+            crate::character_store::replace_bytes(&path, bytes).unwrap();
+            assert!(Toggles::load(&store).is_err());
+            assert!(Toggles::set(&store, &gift("another"), true).is_err());
+            assert_eq!(fs::read(&path).unwrap(), bytes);
+        }
+        fs::remove_file(&path).unwrap();
+        fs::create_dir(&path).unwrap();
+        assert!(Toggles::load(&store).is_err());
+        assert!(Toggles::set(&store, &gift("another"), true).is_err());
+        fs::remove_dir(&path).unwrap();
+        Toggles::set(&store, &gift("offer"), false).unwrap();
+        Toggles::set(&store, &gift("another"), true).unwrap();
+        assert!(!Toggles::load(&store).unwrap().enabled(&gift("offer")));
+        let _ = fs::remove_dir_all(gifts_dir(&store));
     }
 
     #[test]
@@ -898,7 +924,7 @@ mod tests {
         assert!(redeem_classic(&store, 3, 31, &code, &rules).is_err(), "per account");
         assert_eq!(take_delivered(&store), BTreeSet::from([3]));
         Toggles::set(&store, &code, false).unwrap();
-        let toggles = Toggles::load(&store);
+        let toggles = Toggles::load(&store).unwrap();
         let rules = Rules { catalog: &catalog, toggles: &toggles, events: &off, stock: &stock };
         assert!(redeem_classic(&store, 4, 40, &code, &rules).is_err(), "a disabled row's code");
         let _ = fs::remove_dir_all(gifts_dir(&store));

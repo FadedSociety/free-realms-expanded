@@ -649,7 +649,7 @@ fn admin_gift_routes_send_make_revoke_and_toggle_by_role() {
         |dir| osfr_tools::content::npc_content(&dir),
     ))
     .unwrap();
-    assert!(!Toggles::load(&files.store()).enabled(catalog.get("profile-turtle").unwrap()));
+    assert!(!Toggles::load(&files.store()).unwrap().enabled(catalog.get("profile-turtle").unwrap()));
 
     // One audit row per applied write, with the staff member and the target.
     let actions: Vec<String> = audit_rows(&files)

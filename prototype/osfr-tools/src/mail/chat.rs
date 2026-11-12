@@ -453,8 +453,8 @@ fn read_rows(mailbox: &Mailbox, message: &Message, n: usize) -> Vec<[u32; 5]> {
 /// Claim message `id`: the grant runs on a copy of the player's gameplay first (bag space,
 /// stacking, catalogue: the reward path), then the mailbox marks it claimed under the mail
 /// lock, and only then does the copy become the player's. A full bag or a second claim
-/// changes nothing. (A character save that then fails loses the claimed letter's contents,
-/// as a redeemed code's would; it can never pay twice.)
+/// changes nothing. The gateway journals the staged mailbox write with the character save,
+/// so a failed packet cannot consume attachments without granting them.
 fn claim(path: &Path, id: u32, game: &mut Gameplay, now_ms: u64) -> Reply {
     if game.mail_busy() {
         return Reply::line("Finish what you are doing before you claim mail.");

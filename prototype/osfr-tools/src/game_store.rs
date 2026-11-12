@@ -76,6 +76,10 @@ pub fn load_or_create(path: &Path, initial: CharacterState) -> io::Result<Snapsh
 /// Write the whole character document in one atomic replace. Housing is read back from disk
 /// (it still saves read-modify-write), and so is the roster when `snapshot.pets` is `None`.
 pub fn save(path: &Path, snapshot: &Snapshot) -> io::Result<()> {
+    replace_bytes(path, &snapshot_bytes(path, snapshot)?)
+}
+
+pub(crate) fn snapshot_bytes(path: &Path, snapshot: &Snapshot) -> io::Result<Vec<u8>> {
     snapshot.character.validate()?;
     let (housing, pets) = match read_document(path) {
         Ok(document) => (document.housing, snapshot.pets.clone().or(document.pets)),
@@ -97,7 +101,7 @@ pub fn save(path: &Path, snapshot: &Snapshot) -> io::Result<()> {
         housing,
         pets,
     };
-    write_document(path, &document)
+    document_bytes(&document)
 }
 
 /// L043: rewrite only the saved character's position and rotation (`rotation` `None` keeps it),
@@ -184,9 +188,13 @@ fn read_document(path: &Path) -> io::Result<Document> {
 }
 
 fn write_document(path: &Path, document: &Document) -> io::Result<()> {
+    replace_bytes(path, &document_bytes(document)?)
+}
+
+fn document_bytes(document: &Document) -> io::Result<Vec<u8>> {
     let bytes = serde_json::to_vec_pretty(&document).map_err(invalid)?;
     if bytes.len() > MAX_SNAPSHOT_BYTES {
         return Err(invalid("gameplay snapshot exceeds 1 MiB"));
     }
-    replace_bytes(path, &bytes)
+    Ok(bytes)
 }
