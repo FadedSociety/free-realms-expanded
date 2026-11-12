@@ -425,6 +425,7 @@
     },
     {
       "npc_id": 9500000436,
+      "live_event": "spring_eggstravaganza",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Alyssa Eggelyn",
@@ -947,6 +948,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event spring_eggstravaganza: fr.fanbyte.com/wiki/fr_mob:Alyssa_Eggelyn (Event mob type): the Spring Eggstravaganza host; her one quest is the egg hunt"
           }
         ]
       },
@@ -7254,9 +7261,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1488.439604,
-        -35.049,
-        411.554558
+        -1483.453405,
+        -35.157,
+        411.183314
       ],
       "position_w": null,
       "rotation": [
@@ -7281,7 +7288,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1488.439604, -35.049, 411.554558]: it stood 2.0 m from Jeni Shortfuse; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -9791,6 +9798,7 @@
     },
     {
       "npc_id": 9500000456,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Brunhilda",
@@ -10218,6 +10226,12 @@
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Brunhilda (the wiki files it under Super Spooktacular); a costume model; her one quest is the event's"
+          }
         ]
       },
       "model_id": 1709,
@@ -10270,9 +10284,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1409.709226,
-        -27.7364,
-        356.99805
+        -1259.368616,
+        -14.2663,
+        275.473257
       ],
       "position_w": null,
       "rotation": [
@@ -10292,7 +10306,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1409.709226, -27.7364, 356.99805]: it stood at the reconstructed Sanctuary zone centre, 0.8 m from the placed wreck of the quest-merchant-caravan; the client says Buzz keeps his honey cart on Sunset St. (369540315), so he now stands on Sunset Street by the reference sign 1 Sunset St. (-1262.7, -14.2, 274.4); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -11009,6 +11023,7 @@
     },
     {
       "npc_id": 9500000459,
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakeling",
@@ -11330,11 +11345,18 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fr.fanbyte.com/wiki/FR_Mob:Cakeling (Birthday Bash)"
+          }
         ]
       }
     },
     {
       "npc_id": 9500000460,
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakenstein",
@@ -11832,11 +11854,18 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fr.fanbyte.com/wiki/FR_Mob:Cakenstein (Birthday Bash)"
+          }
         ]
       }
     },
     {
       "npc_id": 9500000461,
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Camellia",
@@ -12391,6 +12420,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fr.fanbyte.com/wiki/FR_Mob:Camellia (Birthday Bash); video jCgyPxVDJD8 shows her during Birthday Bash 2013; every quest she gives is the event's"
           }
         ]
       },
@@ -22004,6 +22039,7 @@
     },
     {
       "npc_id": 9500000478,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Finklestein",
@@ -22405,6 +22441,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Finklestein (the wiki files it under Super Spooktacular)"
           }
         ]
       },
@@ -26371,9 +26413,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1414.895083,
-        -27.631,
-        357.169912
+        -1056.98817,
+        4.6666,
+        306.647951
       ],
       "position_w": null,
       "rotation": [
@@ -26393,7 +26435,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1414.895083, -27.631, 357.169912]: it stood at the reconstructed Sanctuary zone centre among the wrecked caravan pieces; its location text says Royal Palace, so it now stands in the throne room beside the legacy row of Queen Valerian (-1054.1, 4.6, 305.7); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -27170,6 +27212,7 @@
     },
     {
       "npc_id": 9500000485,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Ghost Hunter",
@@ -27645,6 +27688,12 @@
           {
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3568 spawnNpcWithGuid(33338); src/Resources/Npcs.json Id=33338"
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Ghost_Hunter (the wiki files it under Super Spooktacular)"
           }
         ]
       },
@@ -29828,9 +29877,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1488.383874,
-        -35.1886,
-        405.191649
+        -1492.883524,
+        -35.1,
+        405.135551
       ],
       "position_w": null,
       "rotation": [
@@ -29855,7 +29904,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1488.383874, -35.1886, 405.191649]: it stood 2.4 m from Bruce; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -30624,6 +30673,7 @@
     },
     {
       "npc_id": 9500000493,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Halloween Harry",
@@ -31228,6 +31278,12 @@
             "kind": "reconstructed",
             "evidence": "(R) T280: the quest-offer link is inferred, not recovered from a client greeting binding. Client locale block: title_string_id 415303 (Bag Snatchers), description_string_id 415304 names Halloween Harry, and this offer intro is locale row 415302 = title-1. Guide notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 134."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Halloween_Harry (the wiki files it under Super Spooktacular); the Super Spooktacular event page (fanbyte, read 2026-11-11): Harry stands for the event and has his own Atlas icon during it"
+          }
         ]
       },
       "heading": 0.031577,
@@ -31237,6 +31293,7 @@
     },
     {
       "npc_id": 9500000494,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Hector",
@@ -31297,9 +31354,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1280.0,
-        -14.395,
-        296.0
+        -1271.283,
+        -14.2857,
+        289.209
       ],
       "position_w": null,
       "rotation": [
@@ -31319,7 +31376,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1280.0, -14.395, 296.0]: it stood 3.0 m from Chair; the new spot is on walkable ground clear of props and other bodies. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1280.486234, -14.9, 291.023698]: it stood 9 m away on a guessed point (zone centre); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the place its own location text names: ../lab/content/startup-snapshot/startup.json world.points_of_interest id=36 (Bixie Tower Defense, name per ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -31673,6 +31730,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Hector (the wiki files it under Super Spooktacular); his one quest, Ghostly Games, is the event's"
           }
         ]
       },
@@ -33701,9 +33764,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1488.887283,
-        -35.049,
-        413.54531
+        -1487.675259,
+        -35.0275,
+        415.731859
       ],
       "position_w": null,
       "rotation": [
@@ -33728,7 +33791,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1488.887283, -35.049, 413.54531]: it stood 2.6 m from Honeytwig Plant; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "reconstructed",
@@ -36966,9 +37029,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1415.593061,
-        -29.1711,
-        361.37273
+        -1055.307193,
+        4.734,
+        302.959385
       ],
       "position_w": null,
       "rotation": [
@@ -36988,7 +37051,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1415.593061, -29.1711, 361.37273]: it stood at the reconstructed Sanctuary zone centre among the wrecked caravan pieces; its location text says Royal Palace, so it now stands in the throne room beside the legacy row of Queen Valerian (-1054.1, 4.6, 305.7); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -45435,6 +45498,7 @@
     },
     {
       "npc_id": 9500000516,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Pumpkin Prince",
@@ -45919,6 +45983,12 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Pumpkin_Prince (the wiki files it under Super Spooktacular)"
+          }
         ]
       }
     },
@@ -45965,9 +46035,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1408.499852,
-        -29.629,
-        343.017483
+        -1406.47731,
+        -29.8352,
+        341.54802
       ],
       "position_w": null,
       "rotation": [
@@ -45987,7 +46057,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1408.499852, -29.629, 343.017483]: it stood 2.4 m from Sampson Idlefist; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -50506,9 +50576,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1417.15415,
-        -29.77,
-        362.271597
+        -1054.650182,
+        4.8688,
+        309.687585
       ],
       "position_w": null,
       "rotation": [
@@ -50528,7 +50598,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1417.15415, -29.77, 362.271597]: it stood at the reconstructed Sanctuary zone centre among the wrecked caravan pieces; its location text says Royal Palace, so it now stands in the throne room beside the legacy row of Queen Valerian (-1054.1, 4.6, 305.7); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -56511,6 +56581,7 @@
     },
     {
       "npc_id": 9500000534,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Skelly",
@@ -56927,6 +56998,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/fr_mob:Skelly (the wiki files it under Super Spooktacular); a skeleton costume model; his one quest, Dem Bones, is the event's"
           }
         ]
       },
@@ -58779,6 +58856,7 @@
     },
     {
       "npc_id": 9500000538,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Tabitha",
@@ -59178,6 +59256,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Tabitha (the wiki files it under Super Spooktacular): Spooky Hide 'n Seek"
           }
         ]
       }
@@ -60658,6 +60742,7 @@
     },
     {
       "npc_id": 9500000542,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Vladimir",
@@ -60714,9 +60799,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1414.806378,
-        -29.6431,
-        363.208058
+        -1273.0,
+        -15.0,
+        232.0
       ],
       "position_w": null,
       "rotation": [
@@ -60736,7 +60821,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1414.806378, -29.6431, 363.208058]: it stood among the wrecked caravan pieces (bw_cart_ransacked_01, quest-merchant-caravan) at the reconstructed Sanctuary zone centre; the wiki puts him in Pixiewood Hills on the south side of Sunset Street. The project compass is +x north and +z east, so south is the -x side, where the even-numbered signs 2 and 4 Sunset St. stand; he now stands there beside Ruby, another Pixiewood Halloween NPC, inside client area Halloween_Pixiewood_4; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -61076,14 +61161,22 @@
         ],
         "model_id": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AVladimir"
+            "kind": "client",
+            "evidence": "Resources/Models.txt 1714 = human_m_costume_vladimir.agr, the body named after this NPC; the community client's Assets_manifest.txt carries it."
+          },
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte Going Batty: 'Vladimir is dressed up as a vampire'; the fr_mob:Vladimir portrait (eq2.fanbyte.com/Im/145311) shows the cape collar, fangs and widow's peak."
           }
         ],
         "model_file_name": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob%3AVladimir"
+            "kind": "client",
+            "evidence": "Resources/Models.txt 1714 = human_m_costume_vladimir.agr, the body named after this NPC; the community client's Assets_manifest.txt carries it."
+          },
+          {
+            "kind": "wiki",
+            "evidence": "fanbyte Going Batty: 'Vladimir is dressed up as a vampire'; the fr_mob:Vladimir portrait (eq2.fanbyte.com/Im/145311) shows the cape collar, fangs and widow's peak."
           }
         ],
         "greeting_reason": [
@@ -61091,10 +61184,16 @@
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/fr_mob:Vladimir (the wiki files it under Super Spooktacular); his one quest, Going Batty, is the event's"
+          }
         ]
       },
-      "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr",
+      "model_id": 1714,
+      "model_file_name": "human_m_costume_vladimir.agr",
       "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
@@ -63712,7 +63811,7 @@
       "services_reason": null,
       "position": [
         -1121.956,
-        -9.551,
+        4.5939,
         311.17
       ],
       "position_w": 1.0,
@@ -63733,7 +63832,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) PL-A npc-placement-a, 2026-11-12: moved from [-1121.956, -9.551, 311.17]: its zone-centre default height was 14 m under the terrain here (road west of Sanctuary, near the tunnel); it now stands on the floor under its spot; the new spot is on walkable ground clear of props and other bodies.",
       "heading": 0.0,
       "model_id": 456,
       "model_file_name": "fairy_druid_f.adr",
@@ -64053,9 +64152,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        -1121.146,
-        4.408,
-        312.432
+        -1232.501,
+        7.7463,
+        384.151
       ],
       "position_w": 1.0,
       "rotation": [
@@ -64075,7 +64174,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) PL-A npc-placement-a, 2026-11-12: moved from [-1121.146, 4.408, 312.432]: it stood 132 m away on a guessed point (POI spiral); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the video placement index: ../lab/reports/placement/solved-checked.json key vereni; the new spot is on walkable ground clear of props and other bodies.",
       "heading": 0.0,
       "model_id": 468,
       "model_file_name": "fairy_druid_m.adr",
@@ -64395,9 +64494,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        -1358.0,
-        -29.31,
-        159.8
+        -1355.194,
+        -29.1842,
+        164.09
       ],
       "position_w": 1.0,
       "rotation": [
@@ -64422,7 +64521,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) PL-A npc-placement-a, 2026-11-12: moved from [-1358.0, -29.31, 159.8]: it stood 5 m away on a guessed point (POI spiral); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at a Sanctuary-main Lua spawn: ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3633 spawnNpcWithGuid(33409, 100000033409); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33409; the new spot is on walkable ground clear of props and other bodies.",
       "heading": 0.0,
       "model_id": 456,
       "model_file_name": "fairy_druid_f.adr",

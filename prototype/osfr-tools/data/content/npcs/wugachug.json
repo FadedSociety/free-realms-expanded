@@ -1304,9 +1304,9 @@
       ],
       "services_reason": null,
       "position": [
-        -67.477612,
-        38.789,
-        -447.03607
+        -68.0,
+        38.05,
+        -447.0
       ],
       "position_w": null,
       "rotation": [
@@ -1326,7 +1326,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood 0.84 m above bare terrain. Moved onto open terrain; moved 0.5 m south from [-67.477612, 38.789, -447.03607] to [-68.0, 38.05, -447.0], world editor /api/probe: stand.y 38.05 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -4064,9 +4064,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -66.588047,
-        38.789,
-        -443.765942
+        -66.09,
+        36.991,
+        -437.77
       ],
       "position_w": null,
       "rotation": [
@@ -4086,7 +4086,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.0 m east from [-66.588047, 38.789, -443.765942] to [-66.09, 36.991, -437.77], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -6551,9 +6551,9 @@
       ],
       "services_reason": null,
       "position": [
-        -65.676701,
-        38.789,
-        -446.207581
+        -60.68,
+        37.06,
+        -446.71
       ],
       "position_w": null,
       "rotation": [
@@ -6573,7 +6573,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.0 m north from [-65.676701, 38.789, -446.207581] to [-60.68, 37.06, -446.71], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -8680,9 +8680,9 @@
       ],
       "services_reason": null,
       "position": [
-        -75.787517,
-        38.789,
-        -444.942995
+        -79.29,
+        37.648,
+        -440.94
       ],
       "position_w": null,
       "rotation": [
@@ -8702,7 +8702,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.3 m south-east from [-75.787517, 38.789, -444.942995] to [-79.29, 37.648, -440.94], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -10128,9 +10128,9 @@
       ],
       "services_reason": null,
       "position": [
-        -64.638513,
-        37.0796,
-        -444.387244
+        -61.14,
+        36.825,
+        -442.89
       ],
       "position_w": null,
       "rotation": [
@@ -10150,7 +10150,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 3.8 m north-east from [-64.638513, 37.0796, -444.387244] to [-61.14, 36.825, -442.89], world editor /api/probe: stand.y 36.825 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -10573,9 +10573,9 @@
       ],
       "services_reason": null,
       "position": [
-        -75.29524,
-        38.789,
-        -441.772239
+        -75.3,
+        38.223,
+        -442.27
       ],
       "position_w": null,
       "rotation": [
@@ -10595,7 +10595,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.5 m west from [-75.29524, 38.789, -441.772239] to [-75.3, 38.223, -442.27], world editor /api/probe: stand.y 38.223 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -10993,9 +10993,9 @@
       ],
       "services_reason": null,
       "position": [
-        -69.092053,
-        39.2969,
-        -451.063414
+        -63.09,
+        38.987,
+        -455.56
       ],
       "position_w": null,
       "rotation": [
@@ -11015,7 +11015,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 7.5 m north-west from [-69.092053, 39.2969, -451.063414] to [-63.09, 38.987, -455.56], world editor /api/probe: stand.y 38.987 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -12985,9 +12985,9 @@
       ],
       "services_reason": null,
       "position": [
-        147.15443,
-        37.941364,
-        -469.97418
+        145.7,
+        37.014,
+        -466.5
       ],
       "position_w": null,
       "rotation": [
@@ -13012,7 +13012,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 82 by longest normalized whole-name score 16; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 82 by longest normalized whole-name score 16; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood about 1.4 m under the terrain. Moved onto open terrain; moved 3.8 m south-east from [147.15443, 37.941364, -469.97418] to [145.7, 37.014, -466.5], world editor /api/probe: stand.y 37.014 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -13497,9 +13497,9 @@
       ],
       "services_reason": null,
       "position": [
-        -64.655416,
-        38.789,
-        -447.827922
+        -64.66,
+        37.143,
+        -444.83
       ],
       "position_w": null,
       "rotation": [
@@ -13519,7 +13519,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 3.0 m east from [-64.655416, 38.789, -447.827922] to [-64.66, 37.143, -444.83], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -14261,9 +14261,9 @@
       ],
       "services_reason": null,
       "position": [
-        -72.907609,
-        38.789,
-        -439.218597
+        -72.91,
+        37.607,
+        -438.72
       ],
       "position_w": null,
       "rotation": [
@@ -14283,7 +14283,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.5 m east from [-72.907609, 38.789, -439.218597] to [-72.91, 37.607, -438.72], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -16499,9 +16499,9 @@
       ],
       "services_reason": null,
       "position": [
-        -64.545622,
-        38.789,
-        -442.078117
+        -62.55,
+        36.867,
+        -439.58
       ],
       "position_w": null,
       "rotation": [
@@ -16521,7 +16521,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 12. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 3.2 m north-east from [-64.545622, 38.789, -442.078117] to [-62.55, 36.867, -439.58], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",

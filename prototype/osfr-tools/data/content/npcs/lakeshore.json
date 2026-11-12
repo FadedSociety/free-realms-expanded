@@ -3538,9 +3538,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1324.767979,
-        -65.8164,
-        901.701782
+        -1303.4,
+        -62.293,
+        900.6
       ],
       "position_w": null,
       "rotation": [
@@ -3565,7 +3565,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1324.767979, -65.8164, 901.701782]: it stood 2.2 m from Guppie; the new spot is on walkable ground clear of props and other bodies. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1327.243649, -65.8164, 901.353849]: it stood on the pond water at the Sacred Grove Shallows (a flat 53-triangle lid 2.3 m over the bed); his location text says he later joins the Shallows tournament, so he now stands on the bank with the Shallows group; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -4719,9 +4719,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -732.585283,
-        9.3916,
-        950.33031
+        -733.983265,
+        9.3241,
+        948.257716
       ],
       "position_w": null,
       "rotation": [
@@ -4741,7 +4741,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-732.585283, 9.3916, 950.33031]: it stood 2.7 m from quest-treats; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -9801,9 +9801,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -739.320517,
-        9.5566,
-        946.195005
+        -481.245,
+        9.6365,
+        766.464
       ],
       "position_w": null,
       "rotation": [
@@ -9823,7 +9823,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 9. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 9. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-739.320517, 9.5566, 946.195005]: it stood 314 m away on a guessed point (zone centre); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the place its own location text names: data/content/npcs/wilds.json npc_id 9500000871 (legacy_data_spawn); data/content/npcs/wilds.json npc_id 9500000879 (legacy_data_spawn); data/content/npcs/wilds.json npc_id 9500000897 (legacy_data_spawn); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -10144,9 +10144,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -730.058655,
-        8.4128,
-        942.098601
+        -731.492596,
+        8.6893,
+        944.146481
       ],
       "position_w": null,
       "rotation": [
@@ -10166,7 +10166,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-730.058655, 8.4128, 942.098601]: it stood 2.2 m from Sharon; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -13981,9 +13981,9 @@
       ],
       "services_reason": null,
       "position": [
-        -737.152319,
-        9.3028,
-        945.406909
+        -734.72658,
+        8.9784,
+        944.802104
       ],
       "position_w": null,
       "rotation": [
@@ -14003,7 +14003,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-737.152319, 9.3028, 945.406909]: it stood 2.0 m from Lacy Trembletoes; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -14694,9 +14694,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -736.440609,
-        10.0337,
-        951.919403
+        -859.3,
+        3.146,
+        788.4
       ],
       "position_w": null,
       "rotation": [
@@ -14716,7 +14716,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 9 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-736.440609, 10.0337, 951.919403]: it stood 205 m away on a guessed point (POI spiral); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the video placement index: ../lab/reports/placement/solved-checked.json key sunni; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",

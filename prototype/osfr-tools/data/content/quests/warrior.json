@@ -512,12 +512,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Ready_Your_Weapon%21)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388358,
       "intro_text_string_id": 388356,
       "end_text_string_id": 388359,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3150007,
@@ -1004,12 +1014,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Thinning_Their_Numbers)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388362,
       "intro_text_string_id": 388360,
       "end_text_string_id": 388363,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3150012,
@@ -1098,7 +1118,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75126,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Warrior's Battle Hammer of Spinning (lab/references/quest-table-20261102/quests.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 76346,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Charge Attack Warrior Breeches (lab/references/quest-table-20261102/quests.json wiki:fr_quest_warrior_knocking_some_sense_in_51377e)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 163
           },
@@ -1186,7 +1227,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 46031,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Warrior Tunic (lab/references/quest-table-20261102/quests.json wiki:fr_quest_warrior_take_care_of_that_ankle_0a4a63)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 282
           },
@@ -1985,12 +2037,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Contract:_Defending_Snowhill)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388370,
       "intro_text_string_id": 388368,
       "end_text_string_id": 388371,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3150024,

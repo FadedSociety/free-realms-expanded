@@ -32,7 +32,7 @@ use osfr_tools::{
     character_store::CharacterState,
     chat,
     encounter::{EncounterEngine, EncounterPhase},
-    gameplay::{Gameplay, GameplayState},
+    gameplay::{Gameplay, GameplayState, Outcome},
     inventory::Inventory,
     quest_engine::QuestStatus,
     startup_world::parse_add_npc,
@@ -48,6 +48,7 @@ use std::{
 const CHARACTER: u64 = 252_001;
 const OTHER: u64 = 252_002;
 const CARLOS: u64 = 9_000_000_042;
+const SAMANTHA: u64 = 9_000_000_189;
 const GATE: u64 = 100_000_124_000;
 const MONGO: u64 = 100_000_124_001;
 /// Mongo's authored (old-scale) health; the loader scales it by `enemy_health_scale`.
@@ -156,14 +157,50 @@ fn brawler_at(position: [f32; 3]) -> (Gameplay, CharacterState, u64) {
     (game, character, at + 200)
 }
 
-/// Carlos's Talk offers C1 as the quest dialogue row, and 49/2 accepts it; the follow-up Talk
-/// completes step 1. Both calls go through the ordinary 26/8 -> 26/10 -> 26/6 packets.
-fn accept_first(game: &mut Gameplay, character: &CharacterState, at: &mut u64) {
+fn samantha_position() -> [f32; 3] {
+    chain::content_position("cobblestone_village.json", SAMANTHA)
+}
+
+/// QF: C1's offer is Samantha's, the wiki's giver (her offer line 140530 sends the player to
+/// Carlos). Beside her, the 26/8 -> 26/10 Talk -> 26/6 quest row: the dialogue, the offer, and
+/// the character standing there (49/2 is answered from beside the offering NPC).
+fn samantha_offer(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    at: &mut u64,
+) -> (Outcome, Outcome, CharacterState) {
+    let mut beside = character.clone();
+    beside.position = samantha_position();
     *at += 100;
-    let menu = interact(game, character, CARLOS, *at);
+    let menu = interact(game, &beside, SAMANTHA, *at);
     let choice = menu_option(&menu, TALK_LABEL);
     *at += 100;
-    let dialogue = send(game, character, &npc_select(CARLOS, choice), *at);
+    let dialogue = send(game, &beside, &npc_select(SAMANTHA, choice), *at);
+    assert!(
+        dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "Samantha must open the 26/3 dialogue"
+    );
+    *at += 100;
+    let offered = send(game, &beside, &dialogue_choice(QUEST_CHOICE), *at);
+    (dialogue, offered, beside)
+}
+
+fn offered_ids(offered: &Outcome) -> Vec<u32> {
+    offered
+        .replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
+        .map(|packet| u32::from_le_bytes(packet[6..10].try_into().unwrap()))
+        .collect()
+}
+
+/// Samantha's Talk offers C1 as the quest dialogue row, and 49/2 accepts it; the Talk at
+/// Carlos completes step 1. Both go through the ordinary 26/8 -> 26/10 -> 26/6 packets.
+fn accept_first(game: &mut Gameplay, character: &CharacterState, at: &mut u64) {
+    let (dialogue, offered, beside) = samantha_offer(game, character, at);
     assert!(
         dialogue.replies.iter().any(|packet| {
             packet.starts_with(&[26, 0, 3, 0])
@@ -171,19 +208,17 @@ fn accept_first(game: &mut Gameplay, character: &CharacterState, at: &mut u64) {
                     .windows(4)
                     .any(|field| field == 140_531_u32.to_le_bytes())
         }),
-        "Carlos's dialogue must carry the C1 quest row"
+        "Samantha's dialogue must carry the C1 quest row"
     );
-    *at += 100;
-    let offered = send(game, character, &dialogue_choice(QUEST_CHOICE), *at);
     assert!(
         offered
             .replies
             .iter()
             .any(|packet| has_family(packet, 49, 1, Some(FIRST))),
-        "Carlos must offer C1 to a Brawler"
+        "Samantha must offer C1 to a Brawler"
     );
     *at += 100;
-    accept(game, character, FIRST, *at);
+    accept(game, &beside, FIRST, *at);
     *at += 100;
     talk(game, character, CARLOS, *at);
     assert_eq!(counts(game, FIRST), vec![1, 0], "step 1 completes");
@@ -407,36 +442,19 @@ fn pay_first(game: &mut Gameplay, character: &CharacterState, at: &mut u64) {
     finish_quest(game, character, FIRST, BRAWLER, QUEST_COINS, QUEST_XP, *at);
 }
 
+/// QF: the offer is Samantha's (the wiki's giver); Carlos keeps the Talk step and the hand-in.
 #[test]
 fn carlos_offers_bringing_back_brazenfist_only_to_brawlers() {
     let (mut game, mut character, mut at) = brawler_at(carlos_position());
 
-    // 26/8 -> 26/9, then the 26/10 Talk option, then the 26/6 quest row.
-    let menu = interact(&mut game, &character, CARLOS, at);
-    let choice = menu_option(&menu, TALK_LABEL);
-    at += 100;
-    let dialogue = send(&mut game, &character, &npc_select(CARLOS, choice), at);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "Carlos must open the 26/3 dialogue"
-    );
-    at += 100;
-    let offered = send(&mut game, &character, &dialogue_choice(QUEST_CHOICE), at);
-    let offers: Vec<u32> = offered
-        .replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
-        .map(|packet| u32::from_le_bytes(packet[6..10].try_into().unwrap()))
-        .collect();
-    assert_eq!(offers, [FIRST], "a Brawler is offered C1, exactly once");
+    // 26/8 -> 26/9, then the 26/10 Talk option, then the 26/6 quest row, beside Samantha.
+    let (_, offered, beside) = samantha_offer(&mut game, &character, &mut at);
+    assert_eq!(offered_ids(&offered), [FIRST], "a Brawler is offered C1, exactly once");
     assert_eq!(quest_status(&game, FIRST), QuestStatus::Offered);
 
     // 49/2 accepts; a split quest runs its steps in order, so only step 1 activates.
     at += 100;
-    let accepted = accept(&mut game, &character, FIRST, at);
+    let accepted = accept(&mut game, &beside, FIRST, at);
     let activated: Vec<(u32, u32, u32)> = accepted
         .replies
         .iter()
@@ -487,11 +505,31 @@ fn carlos_offers_bringing_back_brazenfist_only_to_brawlers() {
         initial.brawler_xp + BATTLE_XP + QUEST_XP
     );
 
-    // A non-Brawler is never offered C1: Carlos's dialogue row names C3's title instead and a
-    // forged C1 accept changes nothing.
-    let mut other = load_game(None);
+    // A non-Brawler is never offered C1, by Samantha (a session of its own, so her own offer
+    // does not stand in front of Carlos's below) or by Carlos: Carlos's dialogue row names C3's
+    // title instead and a forged C1 accept changes nothing.
+    let mut greeted = load_game(None);
     let outsider = character_at_for(OTHER, 0, carlos_position());
     let mut at = now();
+    greeted
+        .initialize_world(&outsider, at)
+        .expect("world entry initializes");
+    let (dialogue, choice, _) = samantha_offer(&mut greeted, &outsider, &mut at);
+    assert!(
+        !dialogue.replies.iter().any(|packet| packet
+            .windows(4)
+            .any(|field| field == 140_531_u32.to_le_bytes())),
+        "C1's title row must not appear at Samantha for a non-Brawler"
+    );
+    assert!(
+        !choice
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(FIRST))),
+        "Samantha never offers C1 to a non-Brawler"
+    );
+    let mut other = load_game(None);
+    at += 100;
     other
         .initialize_world(&outsider, at)
         .expect("world entry initializes");
@@ -764,7 +802,8 @@ fn the_mongo_win_completes_bringing_back_brazenfist_once() {
 fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
     let (mut game, mut character, mut at) = brawler_at(carlos_position());
 
-    // C2 is not offered while C1 is unfinished; Carlos offers C3 instead.
+    // C2 is not offered while C1 is unfinished; Carlos offers C3 instead (QF: C1 is Samantha's,
+    // and she offers only C1).
     let menu = interact(&mut game, &character, CARLOS, at);
     let choice = menu_option(&menu, TALK_LABEL);
     at += 100;
@@ -777,21 +816,13 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
     );
     at += 100;
     let offered = send(&mut game, &character, &dialogue_choice(QUEST_CHOICE), at);
-    let offers: Vec<u32> = offered
-        .replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
-        .map(|packet| u32::from_le_bytes(packet[6..10].try_into().unwrap()))
-        .collect();
-    assert_eq!(offers, [FIRST], "only C1 is on offer before it is done");
-    assert!(
-        !offered
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1, Some(SECOND)))
-    );
+    assert_eq!(offered_ids(&offered), [CLAIM], "Carlos offers C3, not C2, before C1 is done");
     at += 100;
-    accept(&mut game, &character, FIRST, at);
+    send(&mut game, &character, &quest_reply(CLAIM, false), at);
+    let (_, offered, beside) = samantha_offer(&mut game, &character, &mut at);
+    assert_eq!(offered_ids(&offered), [FIRST], "only C1 is on offer before it is done");
+    at += 100;
+    accept(&mut game, &beside, FIRST, at);
     at += 100;
     talk(&mut game, &character, CARLOS, at);
     finish_battle(&mut game, &mut character, &mut at);
@@ -1234,15 +1265,32 @@ fn the_battle_and_quest_content_load_with_real_targets() {
             .any(|npc| npc["npc_id"].as_u64() == Some(CARLOS)),
         "the C1/C2 giver is a real NPC record"
     );
-    for (id, objective_kinds, encounter_step, end_text) in [
+    // QF: C1 starts at Samantha, the wiki's giver; Carlos takes its Talk and its hand-in.
+    let carlos = npcs["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|npc| npc["npc_id"].as_u64() == Some(CARLOS))
+        .unwrap();
+    assert!(
+        carlos["quests_accepted"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|quest| quest["quest_id"].as_u64() == Some(u64::from(FIRST))),
+        "Carlos takes C1's hand-in"
+    );
+    for (id, giver, objective_kinds, encounter_step, end_text) in [
         (
             FIRST,
+            SAMANTHA,
             ["talk_to_npc", "complete_dungeon"],
             1usize,
             FIRST_END_TEXT,
         ),
         (
             SECOND,
+            CARLOS,
             ["complete_dungeon", "talk_to_npc"],
             0usize,
             SECOND_END_TEXT,
@@ -1254,7 +1302,7 @@ fn the_battle_and_quest_content_load_with_real_targets() {
             .expect("the quest record exists");
         assert_eq!(record["enabled"], true);
         assert_eq!(record["job"], BRAWLER);
-        assert_eq!(record["giver_npc_id"].as_u64(), Some(CARLOS));
+        assert_eq!(record["giver_npc_id"].as_u64(), Some(giver));
         assert_eq!(
             record["end_text_string_id"].as_u64(),
             Some(u64::from(end_text))
@@ -1552,19 +1600,7 @@ fn a_failed_quest_event_for_one_player_does_not_stop_the_other() {
     finish_battle(&mut a, &mut character, &mut at);
     let opened = open_end_screen(&mut a, &character, FIRST, FIRST_END_TEXT, &mut at);
     assert!(!opened.is_empty());
-    other_at += 100;
-    let menu = interact(&mut b, &other, CARLOS, other_at);
-    let choice = menu_option(&menu, TALK_LABEL);
-    other_at += 100;
-    let dialogue = send(&mut b, &other, &npc_select(CARLOS, choice), other_at);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0]))
-    );
-    other_at += 100;
-    let offered = send(&mut b, &other, &dialogue_choice(QUEST_CHOICE), other_at);
+    let (_, offered, beside_samantha) = samantha_offer(&mut b, &other, &mut other_at);
     assert!(
         offered
             .replies
@@ -1581,7 +1617,7 @@ fn a_failed_quest_event_for_one_player_does_not_stop_the_other() {
         "A's truncated 49/14 is refused"
     );
     other_at += 100;
-    let accepted = accept(&mut b, &other, FIRST, other_at);
+    let accepted = accept(&mut b, &beside_samantha, FIRST, other_at);
     assert!(accepted.changed);
     assert_eq!(quest_status(&b, FIRST), QuestStatus::Active);
     other_at += 100;

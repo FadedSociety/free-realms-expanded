@@ -425,7 +425,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76387,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Novice Wizard Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_lightning_bolt_00680e)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 76388,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Novice Wizard Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_lightning_bolt_00680e)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 75
           },
@@ -526,7 +555,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76392,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Novice Wizard Skirt (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_the_first_rule_of_being_a_wizard_4d8fa7)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            },
+            {
+              "definition_id": 76391,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Novice Wizard Slacks (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_the_first_rule_of_being_a_wizard_4d8fa7)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 100
           },
@@ -703,7 +761,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76390,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Novice Wizard Cap (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+                }
+              ]
+            },
+            {
+              "definition_id": 75520,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Wizard's Ring of Energy I (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_market_wizards_25dd24)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 47
           },
@@ -811,7 +890,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10844,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Wizard Square Shard (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_student_profits_aa8359)."
+                }
+              ]
+            },
+            {
+              "definition_id": 12031,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Wizard Short Cloak (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_student_profits_aa8359)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 47
           },
@@ -1532,12 +1632,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Contract:_Robgoblin_Magic)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388289,
       "intro_text_string_id": 388287,
       "end_text_string_id": 388290,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3160019,
@@ -2055,12 +2165,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Secret_Magic)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388293,
       "intro_text_string_id": 388291,
       "end_text_string_id": 388294,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3160026,
@@ -2561,12 +2681,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Life_and_Death_Magic)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388297,
       "intro_text_string_id": 388295,
       "end_text_string_id": 388298,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3160032,

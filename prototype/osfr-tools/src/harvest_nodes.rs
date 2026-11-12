@@ -49,6 +49,8 @@ const MAX_FILE_BYTES: u64 = 1 << 20;
 const MAX_TEXTURE_ALIAS: usize = 120;
 /// The largest model scale a node type may ask for.
 const MAX_NODE_SCALE: f32 = 100.0;
+/// EV: the regrow deadline of a node whose event is not running: it never comes back by time.
+const OUT_OF_EVENT: u64 = u64::MAX;
 /// Node actor guids: "NOD", the node file's tag byte, then the content spawn id. The tag is
 /// OR-ed into a zero byte, so every tag needs its own value; see `NODE_FILES`. Clear of NPC,
 /// placement and pickup ids.
@@ -220,6 +222,9 @@ pub struct HarvestNodeSpawn {
     /// sent as the AddNpc `terrain_object_id` (see `NodePresentation::terrain_object_id`).
     #[serde(default)]
     pub terrain_object_id: Option<i32>,
+    /// EV: an `event_calendar.json` key; the node stands only while that event runs.
+    #[serde(default)]
+    pub live_event: Option<String>,
     #[serde(default)]
     pub source_tag: Option<String>,
     #[serde(default)]
@@ -408,6 +413,8 @@ struct Site {
     /// row, so the two are not interchangeable.
     range: f64,
     respawn_ms: u64,
+    /// EV: the spawn row's event; see [`GatheringNodes::set_running_events`].
+    live_event: Option<String>,
 }
 
 impl Site {
@@ -500,7 +507,7 @@ impl GatheringNodes {
         if sites.is_empty() {
             return Ok(None);
         }
-        Ok(Some(Self {
+        let mut nodes = Self {
             sites: Arc::new(sites),
             shown: BTreeSet::new(),
             current: None,
@@ -509,7 +516,27 @@ impl GatheringNodes {
             // The stream is the only roll source; a missing OS seed fails the load closed
             // rather than falling back to a predictable seed a client could learn.
             rolls: Rng::from_entropy()?,
-        }))
+        };
+        // EV: closed until the session's calendar names the running events.
+        nodes.set_running_events(&BTreeSet::new());
+        Ok(Some(nodes))
+    }
+
+    /// EV: follow the events running now (`EventCalendar::active_at`, the one gate). A node whose
+    /// `live_event` is not among them waits like a regrowing node with no deadline, so the next
+    /// [`Self::sync`] hides it and every click on it is refused as gone; once its event runs the
+    /// wait is lifted and the next sync shows it. Untagged nodes are untouched.
+    pub fn set_running_events(&mut self, running: &BTreeSet<String>) {
+        for (guid, site) in self.sites.iter() {
+            let Some(key) = &site.live_event else {
+                continue;
+            };
+            if !running.contains(key) {
+                self.regrow.insert(*guid, OUT_OF_EVENT);
+            } else if self.regrow.get(guid) == Some(&OUT_OF_EVENT) {
+                self.regrow.remove(guid);
+            }
+        }
     }
 
     /// (R) Replace the collection roll stream. Tests and offline fixtures only: [`Self::load`]
@@ -704,7 +731,9 @@ impl GatheringNodes {
             self.current = None; // quit, lost or dropped run: the node stays
             for guid in self.paid.drain(..) {
                 if let Some(site) = self.sites.get(&guid) {
-                    self.regrow.insert(guid, now_ms + site.respawn_ms);
+                    // An event that ended meanwhile keeps its node waiting (EV).
+                    let back = now_ms + site.respawn_ms;
+                    (self.regrow.entry(guid)).and_modify(|at| *at = back.max(*at)).or_insert(back);
                 }
             }
         }
@@ -917,6 +946,7 @@ fn add_sites(
                 game_id: pool.game_id,
                 range: f64::from(node_type.interact_range),
                 respawn_ms: u64::from(pool.respawn_seconds) * 1000,
+                live_event: spawn.live_event.clone(),
             };
             if sites.insert(guid, site).is_some() {
                 return Err(bad("duplicate node spawn id"));

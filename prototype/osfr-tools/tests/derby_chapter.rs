@@ -233,12 +233,15 @@ fn learn_and_activate(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) {
 }
 
 /// Quest 3060004: offer, accept, the one Talk, its held 49/13 end screen and the 49/14 turn-in.
+/// QF: Tucker Thunderjolt offers it (the wiki's giver; his offer line sends the player to the
+/// commissioner), and Dalton Narrowbrow, the commissioner, takes the Talk and the hand-in.
 fn rules_of_the_road(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) {
+    let tucker = fixture.character(TUCKER);
+    *now += 10;
+    offer(game, &tucker, TUCKER, RULES_OF_THE_ROAD, *now);
+    *now += 10;
+    accept(game, &tucker, RULES_OF_THE_ROAD, *now);
     let dalton = fixture.character(DALTON);
-    *now += 10;
-    offer(game, &dalton, DALTON, RULES_OF_THE_ROAD, *now);
-    *now += 10;
-    accept(game, &dalton, RULES_OF_THE_ROAD, *now);
     *now += 10;
     let talked = talk(game, &dalton, DALTON, *now);
     assert_eq!(counts(game, RULES_OF_THE_ROAD), vec![1]);
@@ -1646,10 +1649,12 @@ fn seeking_a_sponsor_is_offered_only_after_tuckers_troubles_to_a_derby_driver() 
         "a forged 49/2 without the derby job",
     );
 
-    // The derby job without Tucker's Troubles.
+    // The derby job without Tucker's Troubles: Tucker offers the job's first quest (QF: Rules
+    // of the Road is his), not Seeking a Sponsor.
     let mut game = fixture.game();
     learn_and_activate(&fixture, &mut game, &mut now);
-    assert_no_offer(&mut game, &tucker, TUCKER, &mut now, "Tucker, before Betty");
+    now += 10;
+    offer(&mut game, &tucker, TUCKER, RULES_OF_THE_ROAD, now);
     now += 10;
     assert_packet_changes_nothing(
         &mut game,

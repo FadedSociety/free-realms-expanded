@@ -69,6 +69,7 @@ fn state(id: u32, counts: Vec<u32>, status: QuestStatus) -> QuestState {
         pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
+        repeats: Default::default(),
     }
 }
 

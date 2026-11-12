@@ -311,8 +311,9 @@ const NEW_GREETINGS: [Greeting; 23] = [
         quest: None,
         proof: "self-identifying first-person line",
     },
-    // T726/F745: Petal's first-person Seaside Board of Tourism pitch is the 49/1
-    // offer intro of her quest, so the guide's giver row proves the speaker.
+    // T726/F745: Petal's first-person Seaside Board of Tourism pitch, the guide's row
+    // proving the speaker. QF moved the quest's offer to Amber Violet (the wiki's giver):
+    // the pitch is now its closing line, at Petal, who takes the hand-in.
     Greeting {
         npc_id: 9500000613,
         file: SEASIDE,
@@ -574,7 +575,8 @@ fn every_edited_row_has_resolved_client_provenance() {
         );
         if let Some((file, quest_id)) = row.quest {
             // A quest intro is reconstructed T-1 text, so the test also pins the
-            // giver and intro binding and the job guide that quotes the same line.
+            // giver and intro binding and the job guide that quotes the same line, or
+            // (QF) the hand-in and closing binding of a line that closes the quest.
             assert!(
                 evidence.contains(&format!("data/content/quests/{file}"))
                     && evidence.contains(&format!("quest {quest_id}")),
@@ -582,16 +584,18 @@ fn every_edited_row_has_resolved_client_provenance() {
                 row.npc_id
             );
             let quest = quest_record(file, quest_id);
-            assert_eq!(
-                quest["giver_npc_id"].as_u64(),
-                Some(row.npc_id),
-                "NPC {}: quest {quest_id} in {file} must be giver-owned",
-                row.npc_id
-            );
-            assert_eq!(
-                quest["intro_text_string_id"].as_u64(),
-                Some(u64::from(row.greeting)),
-                "NPC {}: quest {quest_id} in {file} must use the greeting as its intro",
+            let greeting = Some(u64::from(row.greeting));
+            let opens = quest["giver_npc_id"].as_u64() == Some(row.npc_id)
+                && quest["intro_text_string_id"].as_u64() == greeting;
+            let closes = quest["end_text_string_id"].as_u64() == greeting
+                && npc_record(row.file, row.npc_id)["quests_accepted"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .any(|accepted| accepted["quest_id"].as_u64() == Some(u64::from(quest_id)));
+            assert!(
+                opens || closes,
+                "NPC {}: quest {quest_id} in {file} must open with the greeting from its giver                  or close with it at its hand-in",
                 row.npc_id
             );
         }

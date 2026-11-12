@@ -42,6 +42,9 @@ struct Camp {
     #[serde(default)]
     power_up_table: Option<String>,
     members: Vec<u64>,
+    /// EV: an `event_calendar.json` key for the whole camp; absent follows each member's body.
+    #[serde(default)]
+    live_event: Option<String>,
     source: Vec<serde_json::Value>,
 }
 
@@ -86,6 +89,9 @@ struct Body {
     position: [f32; 3],
     #[serde(default)]
     capture_match: Option<serde_json::Value>,
+    /// EV: the body's event: an event camp's enemies stand only while it runs.
+    #[serde(default)]
+    live_event: Option<String>,
 }
 
 /// The shared combat marker row of `field_enemies.json`.
@@ -178,6 +184,7 @@ impl EncounterEngine {
                         scale: None,
                         behaviour: Some(camp.behaviour.clone().into()),
                         power_up_table: camp.power_up_table.clone(),
+                        live_event: camp.live_event.clone().or_else(|| body.live_event.clone()),
                         ..Default::default()
                     },
                     respawn_seconds: Some(camp.respawn_seconds),

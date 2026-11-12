@@ -648,8 +648,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T503: minted id 3000361 = 3000300 + (fork QuestId 3061 - 3000); XP rung 25 (collect row); the fork's RewardExperience 90 is not used and its item row is deferred to T412."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3AA_Booming_Problem) (scripts/quest_fidelity.py)."
         }
-      ]
+      ],
+      "live_event": "seaside_summer_splash"
     }
   ]
 }

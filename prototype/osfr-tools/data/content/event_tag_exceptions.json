@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "source": "EV (op-P-event-assets), written by scripts/event_tags.py. 'signals' is the one rule for what looks like event dressing: a model file name that starts with a prefix, or a model file or row name holding one of the words as a whole token (lower case, split on non-alphanumerics). Every placed row it flags carries live_event, or is listed in 'rows' with the reason it stands all year. tests/event_assets.rs and the Studio's problem:untagged-event read this file; ids are the Studio's row ids.",
+  "signals": {
+    "prefixes": {
+      "halloween": [
+        "evnt_halloween_",
+        "halloween_"
+      ],
+      "snow_days": [
+        "evnt_winter_holiday_",
+        "evnt_presents_",
+        "xmas_",
+        "hol_"
+      ],
+      "festival_of_hearts": [
+        "evnt_valentines_",
+        "event_valentines_"
+      ],
+      "saint_patricks": [
+        "evnt_stpatricks_",
+        "event_stpatricks_"
+      ],
+      "birthday_bash": [
+        "evnt_anniversary_"
+      ]
+    },
+    "words": {
+      "halloween": [
+        "halloween",
+        "pumpkin",
+        "pumpkins",
+        "jackolantern",
+        "jackolanterns",
+        "ghost",
+        "ghosts",
+        "witch",
+        "cauldron",
+        "skeleton",
+        "candy",
+        "candybag",
+        "candycorn",
+        "vampire",
+        "werewolf",
+        "spooky",
+        "trickortreat"
+      ],
+      "snow_days": [
+        "snowman",
+        "snowmen",
+        "snowball",
+        "present",
+        "presents",
+        "gift",
+        "gifts",
+        "xmas",
+        "christmas",
+        "ornament",
+        "stocking",
+        "wreath",
+        "candycane",
+        "santa",
+        "holiday",
+        "snowmans",
+        "wintertree",
+        "gingerbread"
+      ],
+      "festival_of_hearts": [
+        "heart",
+        "hearts",
+        "valentine",
+        "valentines",
+        "cupid",
+        "heartbreaker"
+      ],
+      "saint_patricks": [
+        "shamrock",
+        "shamrocks",
+        "leprechaun",
+        "potofgold",
+        "stpatricks"
+      ],
+      "spring_eggstravaganza": [
+        "egg",
+        "eggs",
+        "eggbasket",
+        "bunny",
+        "easter",
+        "eggstravaganza"
+      ],
+      "birthday_bash": [
+        "cake",
+        "cakes",
+        "cakeling",
+        "cakenstein",
+        "balloon",
+        "balloons",
+        "birthday",
+        "birthdaycake"
+      ],
+      "turkey_dance": [
+        "turkey"
+      ]
+    }
+  },
+  "rows": [
+    {
+      "id": "node:385",
+      "looks_like": "snow_days",
+      "reason": "picked up for the year-round Getting the Girl (3953175)"
+    },
+    {
+      "id": "node:386",
+      "looks_like": "snow_days",
+      "reason": "picked up for the year-round Getting the Girl (3953175)"
+    },
+    {
+      "id": "node:387",
+      "looks_like": "snow_days",
+      "reason": "picked up for the year-round Getting the Girl (3953175)"
+    },
+    {
+      "id": "npc:9500000028",
+      "looks_like": "halloween",
+      "reason": "the ghosts of the old dwarven miners, a year-round Blackspore enemy kind"
+    },
+    {
+      "id": "npc:9500000069",
+      "looks_like": "snow_days",
+      "reason": "the themed-party merchant all year (A Luau, Party for Pets, Winter Party); the holiday outfit is his look"
+    },
+    {
+      "id": "npc:9500000926",
+      "looks_like": "saint_patricks",
+      "reason": "a lab worker and cook; Shamrock is his family name"
+    },
+    {
+      "id": "spawn:100000001524",
+      "looks_like": "halloween",
+      "reason": "Sal Monella's cooking cauldron in Blackspore Swamp, used all year"
+    },
+    {
+      "id": "spawn:100000002018",
+      "looks_like": "halloween",
+      "reason": "the starter of the year-round Stealthy Despoilers battle"
+    },
+    {
+      "id": "spawn:100000002019",
+      "looks_like": "halloween",
+      "reason": "the starter of the year-round Stealthy Despoilers battle"
+    },
+    {
+      "id": "spawn:100000002210",
+      "looks_like": "birthday_bash",
+      "reason": "the starter of Merry Vale's year-round Free the Balloons minigame (wiki quest fr_quest_free_the_balloons)"
+    },
+    {
+      "id": "spawn:100000003916",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "a pet egg (ranching), not an Easter egg"
+    },
+    {
+      "id": "spawn:100000004134",
+      "looks_like": "halloween",
+      "reason": "a spooky dog in Blackspore Swamp, whose swamp is spooky all year"
+    },
+    {
+      "id": "spawn:100000004218",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004219",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004220",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004221",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004225",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004227",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004228",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004229",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004230",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004231",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004232",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004233",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004234",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004235",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004236",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004237",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004238",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004239",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004240",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004241",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000004242",
+      "looks_like": "halloween",
+      "reason": "a Changeling ninja enemy of the year-round ninja content (Stealthy Despoilers); 'ghost' is its ninja look"
+    },
+    {
+      "id": "spawn:100000006278",
+      "looks_like": "halloween",
+      "reason": "a spooky log of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006279",
+      "looks_like": "halloween",
+      "reason": "a spooky log of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006299",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006300",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006302",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006303",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006304",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006316",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006317",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006345",
+      "looks_like": "halloween",
+      "reason": "a spooky tree of Blackspore Swamp's year-round scenery (no source ties it to the event)"
+    },
+    {
+      "id": "spawn:100000006446",
+      "looks_like": "halloween",
+      "reason": "a gathering cauldron prop, used all year"
+    },
+    {
+      "id": "spawn:9500000069",
+      "looks_like": "snow_days",
+      "reason": "the themed-party merchant all year (A Luau, Party for Pets, Winter Party); the holiday outfit is his look"
+    },
+    {
+      "id": "spawn:9500000774",
+      "looks_like": "snow_days",
+      "reason": "the themed-party merchant all year (A Luau, Party for Pets, Winter Party); the holiday outfit is his look"
+    }
+  ]
+}

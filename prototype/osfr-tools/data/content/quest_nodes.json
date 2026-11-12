@@ -9204,6 +9204,7 @@
     },
     {
       "id": 127,
+      "live_event": "snow_days",
       "pool_key": "quest-present",
       "zone_definition_id": 1,
       "position": [
@@ -9215,11 +9216,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3951040)"
       }
     },
     {
       "id": 128,
+      "live_event": "snow_days",
       "pool_key": "quest-present",
       "zone_definition_id": 1,
       "position": [
@@ -9231,11 +9234,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3951040)"
       }
     },
     {
       "id": 129,
+      "live_event": "snow_days",
       "pool_key": "quest-present",
       "zone_definition_id": 1,
       "position": [
@@ -9247,7 +9252,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3951040)"
       }
     },
     {
@@ -9940,6 +9946,7 @@
     },
     {
       "id": 173,
+      "live_event": "birthday_bash",
       "pool_key": "quest-blue-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -9951,11 +9958,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
       "id": 174,
+      "live_event": "birthday_bash",
       "pool_key": "quest-blue-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -9967,11 +9976,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
       "id": 175,
+      "live_event": "birthday_bash",
       "pool_key": "quest-blue-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -9983,7 +9994,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 3.0 m from [-977.7, 5.17, 420.89]: the old spot was on or inside something solid: its top is 19.5 m above the ground; the editor probes find open ground here: terrain y 5.28, 0.13 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
@@ -10420,6 +10432,7 @@
     },
     {
       "id": 200,
+      "live_event": "birthday_bash",
       "pool_key": "quest-green-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -10431,11 +10444,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
       "id": 201,
+      "live_event": "birthday_bash",
       "pool_key": "quest-green-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -10447,11 +10462,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
       "id": 202,
+      "live_event": "birthday_bash",
       "pool_key": "quest-green-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -10463,7 +10480,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
@@ -10836,6 +10854,7 @@
     },
     {
       "id": 226,
+      "live_event": "birthday_bash",
       "pool_key": "quest-orange-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -10847,11 +10866,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
       "id": 227,
+      "live_event": "birthday_bash",
       "pool_key": "quest-orange-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -10863,11 +10884,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
       "id": 228,
+      "live_event": "birthday_bash",
       "pool_key": "quest-orange-balloon",
       "zone_definition_id": 1,
       "position": [
@@ -10879,7 +10902,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 4.0 m from [-979.05, 6.29, 416.92]: the old spot was on or inside something solid: its top is 4.9 m above the ground; the editor probes find open ground here: terrain y 5.41, 0.07 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3951154)"
       }
     },
     {
@@ -11492,6 +11516,7 @@
     },
     {
       "id": 267,
+      "live_event": "halloween",
       "pool_key": "quest-gassy-water",
       "zone_definition_id": 1,
       "position": [
@@ -11503,11 +11528,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952082)"
       }
     },
     {
       "id": 268,
+      "live_event": "halloween",
       "pool_key": "quest-gassy-water",
       "zone_definition_id": 1,
       "position": [
@@ -11519,11 +11546,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952082)"
       }
     },
     {
       "id": 269,
+      "live_event": "halloween",
       "pool_key": "quest-gassy-water",
       "zone_definition_id": 1,
       "position": [
@@ -11535,11 +11564,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952082)"
       }
     },
     {
       "id": 270,
+      "live_event": "halloween",
       "pool_key": "quest-gassy-water",
       "zone_definition_id": 1,
       "position": [
@@ -11551,11 +11582,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952082)"
       }
     },
     {
       "id": 271,
+      "live_event": "halloween",
       "pool_key": "quest-gassy-water",
       "zone_definition_id": 1,
       "position": [
@@ -11567,11 +11600,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952082)"
       }
     },
     {
       "id": 272,
+      "live_event": "halloween",
       "pool_key": "quest-gassy-water",
       "zone_definition_id": 1,
       "position": [
@@ -11583,7 +11618,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952082)"
       }
     },
     {
@@ -11636,6 +11672,7 @@
     },
     {
       "id": 276,
+      "live_event": "snow_days",
       "pool_key": "quest-pretty-presents",
       "zone_definition_id": 1,
       "position": [
@@ -11647,11 +11684,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3952343)"
       }
     },
     {
       "id": 277,
+      "live_event": "snow_days",
       "pool_key": "quest-pretty-presents",
       "zone_definition_id": 1,
       "position": [
@@ -11663,11 +11702,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3952343)"
       }
     },
     {
       "id": 278,
+      "live_event": "snow_days",
       "pool_key": "quest-pretty-presents",
       "zone_definition_id": 1,
       "position": [
@@ -11679,11 +11720,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3952343)"
       }
     },
     {
       "id": 279,
+      "live_event": "snow_days",
       "pool_key": "quest-pretty-presents",
       "zone_definition_id": 1,
       "position": [
@@ -11695,11 +11738,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3952343)"
       }
     },
     {
       "id": 280,
+      "live_event": "snow_days",
       "pool_key": "quest-pretty-presents",
       "zone_definition_id": 1,
       "position": [
@@ -11711,11 +11756,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3952343)"
       }
     },
     {
       "id": 281,
+      "live_event": "snow_days",
       "pool_key": "quest-pretty-presents",
       "zone_definition_id": 1,
       "position": [
@@ -11727,7 +11774,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3952343)"
       }
     },
     {
@@ -12404,6 +12452,7 @@
     },
     {
       "id": 324,
+      "live_event": "halloween",
       "pool_key": "quest-candy-bags-2",
       "zone_definition_id": 1,
       "position": [
@@ -12415,11 +12464,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952926)"
       }
     },
     {
       "id": 325,
+      "live_event": "halloween",
       "pool_key": "quest-candy-bags-2",
       "zone_definition_id": 1,
       "position": [
@@ -12431,11 +12482,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952926)"
       }
     },
     {
       "id": 326,
+      "live_event": "halloween",
       "pool_key": "quest-candy-bags-2",
       "zone_definition_id": 1,
       "position": [
@@ -12447,11 +12500,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952926)"
       }
     },
     {
       "id": 327,
+      "live_event": "halloween",
       "pool_key": "quest-candy-bags-2",
       "zone_definition_id": 1,
       "position": [
@@ -12463,11 +12518,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952926)"
       }
     },
     {
       "id": 328,
+      "live_event": "halloween",
       "pool_key": "quest-candy-bags-2",
       "zone_definition_id": 1,
       "position": [
@@ -12479,7 +12536,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3952926)"
       }
     },
     {
@@ -12900,6 +12958,7 @@
     },
     {
       "id": 355,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -12911,11 +12970,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
       "id": 356,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -12927,11 +12988,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
       "id": 357,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -12943,11 +13006,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
       "id": 358,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -12959,11 +13024,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
       "id": 359,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -12975,11 +13042,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
       "id": 360,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -12991,11 +13060,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
       "id": 361,
+      "live_event": "halloween",
       "pool_key": "quest-bone",
       "zone_definition_id": 1,
       "position": [
@@ -13007,7 +13078,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
-        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI."
+        "heading": "(R) quest pick-up: the step before it is 'Go to the Blackspore graveyard', so the bones lie around that POI.",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3953110)"
       }
     },
     {
@@ -14036,6 +14108,7 @@
     },
     {
       "id": 426,
+      "live_event": "summer_camp",
       "pool_key": "quest-buck-2",
       "zone_definition_id": 1,
       "position": [
@@ -14047,11 +14120,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 427,
+      "live_event": "summer_camp",
       "pool_key": "quest-buck-2",
       "zone_definition_id": 1,
       "position": [
@@ -14063,11 +14138,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 428,
+      "live_event": "summer_camp",
       "pool_key": "quest-buck-2",
       "zone_definition_id": 1,
       "position": [
@@ -14079,7 +14156,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
@@ -14180,6 +14258,7 @@
     },
     {
       "id": 435,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14191,11 +14270,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 436,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14207,11 +14288,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 5.0 m from [-1298.56, -15.0, 270.35]: the old spot was on or inside something solid: its top is 14.3 m above the ground; the editor probes find open ground here: terrain y -15.0, 0.0 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 437,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14223,11 +14306,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 438,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14239,11 +14324,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 439,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14255,11 +14342,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 440,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14271,11 +14360,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 441,
+      "live_event": "birthday_bash",
       "pool_key": "quest-bumbleberry",
       "zone_definition_id": 1,
       "position": [
@@ -14287,7 +14378,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
@@ -14420,6 +14512,7 @@
     },
     {
       "id": 450,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14431,11 +14524,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 451,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14447,11 +14542,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 452,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14463,11 +14560,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 453,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14479,11 +14578,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 454,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14495,11 +14596,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 455,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14511,11 +14614,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 456,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14527,11 +14632,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 457,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14543,11 +14650,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 458,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14559,11 +14668,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 459,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14575,11 +14686,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 460,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14591,11 +14704,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 461,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14607,11 +14722,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 462,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14623,11 +14740,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 463,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14639,11 +14758,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 464,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14655,11 +14776,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
       "id": 465,
+      "live_event": "snow_days",
       "pool_key": "quest-coal",
       "zone_definition_id": 1,
       "position": [
@@ -14671,7 +14794,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3954720)"
       }
     },
     {
@@ -14724,6 +14848,7 @@
     },
     {
       "id": 469,
+      "live_event": "summer_camp",
       "pool_key": "quest-doe",
       "zone_definition_id": 1,
       "position": [
@@ -14735,11 +14860,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 5.8 m from [-1566.78, -40.13, -612.49]: the old spot was on or inside something solid: its top is 6.3 m above the ground; the editor probes find open ground here: terrain y -39.95, 0.67 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 470,
+      "live_event": "summer_camp",
       "pool_key": "quest-doe",
       "zone_definition_id": 1,
       "position": [
@@ -14751,11 +14878,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 471,
+      "live_event": "summer_camp",
       "pool_key": "quest-doe",
       "zone_definition_id": 1,
       "position": [
@@ -14767,7 +14896,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
@@ -15188,6 +15318,7 @@
     },
     {
       "id": 498,
+      "live_event": "birthday_bash",
       "pool_key": "quest-honeytwig",
       "zone_definition_id": 1,
       "position": [
@@ -15199,11 +15330,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 6.4 m from [-988.36, 2.89, 196.06]: the old spot was on or inside something solid: its top is 12.4 m above the ground; the editor probes find open ground here: terrain y 4.78, 0.42 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 43 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 499,
+      "live_event": "birthday_bash",
       "pool_key": "quest-honeytwig",
       "zone_definition_id": 1,
       "position": [
@@ -15215,11 +15348,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 3.6 m from [-988.36, 2.89, 202.06]: the old spot was on or inside something solid: its top is 10.2 m above the ground; the editor probes find open ground here: terrain y 6.16, 0.3 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 500,
+      "live_event": "birthday_bash",
       "pool_key": "quest-honeytwig",
       "zone_definition_id": 1,
       "position": [
@@ -15231,11 +15366,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 501,
+      "live_event": "birthday_bash",
       "pool_key": "quest-honeytwig",
       "zone_definition_id": 1,
       "position": [
@@ -15247,11 +15384,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
       "id": 502,
+      "live_event": "birthday_bash",
       "pool_key": "quest-honeytwig",
       "zone_definition_id": 1,
       "position": [
@@ -15263,7 +15402,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3954573)"
       }
     },
     {
@@ -15396,6 +15536,7 @@
     },
     {
       "id": 511,
+      "live_event": "summer_camp",
       "pool_key": "quest-squirrel-4",
       "zone_definition_id": 1,
       "position": [
@@ -15407,11 +15548,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 512,
+      "live_event": "summer_camp",
       "pool_key": "quest-squirrel-4",
       "zone_definition_id": 1,
       "position": [
@@ -15423,11 +15566,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 513,
+      "live_event": "summer_camp",
       "pool_key": "quest-squirrel-4",
       "zone_definition_id": 1,
       "position": [
@@ -15439,11 +15584,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 514,
+      "live_event": "summer_camp",
       "pool_key": "quest-toad-3",
       "zone_definition_id": 1,
       "position": [
@@ -15455,11 +15602,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 515,
+      "live_event": "summer_camp",
       "pool_key": "quest-toad-3",
       "zone_definition_id": 1,
       "position": [
@@ -15471,11 +15620,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
       "id": 516,
+      "live_event": "summer_camp",
       "pool_key": "quest-toad-3",
       "zone_definition_id": 1,
       "position": [
@@ -15487,7 +15638,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event summer_camp: picked up only for summer_camp quests (3954588)"
       }
     },
     {
@@ -16772,6 +16924,7 @@
     },
     {
       "id": 597,
+      "live_event": "halloween",
       "pool_key": "quest-toad-1",
       "zone_definition_id": 1,
       "position": [
@@ -16783,11 +16936,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3955038)"
       }
     },
     {
       "id": 598,
+      "live_event": "halloween",
       "pool_key": "quest-toad-1",
       "zone_definition_id": 1,
       "position": [
@@ -16799,11 +16954,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3955038)"
       }
     },
     {
       "id": 599,
+      "live_event": "halloween",
       "pool_key": "quest-toad-1",
       "zone_definition_id": 1,
       "position": [
@@ -16815,11 +16972,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 2.8 m from [-1258.58, -14.27, 221.76]: the old spot was on or inside something solid: its top is 0.7 m above the ground; the editor probes find open ground here: terrain y -15.0, 0.0 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3955038)"
       }
     },
     {
       "id": 600,
+      "live_event": "halloween",
       "pool_key": "quest-toad-1",
       "zone_definition_id": 1,
       "position": [
@@ -16831,7 +16990,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3955038)"
       }
     },
     {
@@ -18388,6 +18548,7 @@
     },
     {
       "id": 696,
+      "live_event": "halloween",
       "pool_key": "quest-chicken",
       "zone_definition_id": 1,
       "position": [
@@ -18399,11 +18560,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3955756)"
       }
     },
     {
       "id": 697,
+      "live_event": "halloween",
       "pool_key": "quest-chicken",
       "zone_definition_id": 1,
       "position": [
@@ -18415,7 +18578,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3955756)"
       }
     },
     {
@@ -18692,6 +18856,7 @@
     },
     {
       "id": 714,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower",
       "zone_definition_id": 1,
       "position": [
@@ -18703,11 +18868,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 1.0 m from [-1116.0, -40.0, -413.2]: the old spot was blocked N, NE and NW; the editor probe finds terrain here, open and clear of other things (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 715,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower",
       "zone_definition_id": 1,
       "position": [
@@ -18719,11 +18886,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 716,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower",
       "zone_definition_id": 1,
       "position": [
@@ -18735,11 +18904,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 717,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower-2-2",
       "zone_definition_id": 1,
       "position": [
@@ -18751,11 +18922,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 2.0 m from [224.63, 23.33, 399.15]: the old spot was 1.1 m from a quest-present node; the editor probe finds terrain here, open and clear of other things (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 718,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower-2-2",
       "zone_definition_id": 1,
       "position": [
@@ -18767,11 +18940,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 2.0 m from [226.63, 23.29, 393.15]: the old spot was 0.8 m from a quest-present node; the editor probe finds terrain here, open and clear of other things (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 719,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower-2-2",
       "zone_definition_id": 1,
       "position": [
@@ -18783,11 +18958,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 720,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower-3",
       "zone_definition_id": 1,
       "position": [
@@ -18799,11 +18976,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 2.0 m from [-399.35, -15.78, -1200.83]: the old spot was a 44.5 degree slope; the editor probe finds terrain here, open and clear of other things (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 721,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower-3",
       "zone_definition_id": 1,
       "position": [
@@ -18815,11 +18994,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) moved 4.1 m from [-388.67, -11.365, -1189.33]: the old spot was on steep ground: it changes 1.4 m within 1.5 m; the editor probes find open ground here: terrain y -10.22, 0.32 m of rise within 1.5 m, no water, nothing solid over it or 1 m to any side, 41 walkable cells joined to it (2026-11-09)",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
       "id": 722,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-flower-3",
       "zone_definition_id": 1,
       "position": [
@@ -18831,7 +19012,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955737)"
       }
     },
     {
@@ -18900,6 +19082,7 @@
     },
     {
       "id": 727,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-heart-flower",
       "zone_definition_id": 1,
       "position": [
@@ -18911,7 +19094,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955888)"
       }
     },
     {
@@ -19604,6 +19788,7 @@
     },
     {
       "id": 768,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test",
       "zone_definition_id": 1,
       "position": [
@@ -19615,11 +19800,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 769,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test",
       "zone_definition_id": 1,
       "position": [
@@ -19631,11 +19818,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 770,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test",
       "zone_definition_id": 1,
       "position": [
@@ -19647,11 +19836,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 771,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test-2",
       "zone_definition_id": 1,
       "position": [
@@ -19663,11 +19854,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 772,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test-2",
       "zone_definition_id": 1,
       "position": [
@@ -19679,11 +19872,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 773,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test-2",
       "zone_definition_id": 1,
       "position": [
@@ -19695,11 +19890,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 774,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test-3",
       "zone_definition_id": 1,
       "position": [
@@ -19711,11 +19908,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 775,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test-3",
       "zone_definition_id": 1,
       "position": [
@@ -19727,11 +19926,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
       "id": 776,
+      "live_event": "festival_of_hearts",
       "pool_key": "quest-test-3",
       "zone_definition_id": 1,
       "position": [
@@ -19743,7 +19944,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event festival_of_hearts: picked up only for festival_of_hearts quests (3955895)"
       }
     },
     {
@@ -19924,6 +20126,7 @@
     },
     {
       "id": 901,
+      "live_event": "birthday_bash",
       "pool_key": "quest-camellia-cupcake",
       "zone_definition_id": 1,
       "position": [
@@ -19935,11 +20138,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3957007)"
       }
     },
     {
       "id": 902,
+      "live_event": "birthday_bash",
       "pool_key": "quest-camellia-cupcake",
       "zone_definition_id": 1,
       "position": [
@@ -19951,11 +20156,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3957007)"
       }
     },
     {
       "id": 903,
+      "live_event": "birthday_bash",
       "pool_key": "quest-camellia-cupcake",
       "zone_definition_id": 1,
       "position": [
@@ -19967,11 +20174,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event birthday_bash: picked up only for birthday_bash quests (3957007)"
       }
     },
     {
       "id": 904,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -19983,11 +20192,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
       "id": 905,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -19999,11 +20210,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
       "id": 906,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -20015,11 +20228,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
       "id": 907,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -20031,11 +20246,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
       "id": 908,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -20047,11 +20264,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
       "id": 909,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -20063,11 +20282,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
       "id": 910,
+      "live_event": "halloween",
       "pool_key": "quest-candy",
       "zone_definition_id": 1,
       "position": [
@@ -20079,7 +20300,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957017)"
       }
     },
     {
@@ -20180,6 +20402,7 @@
     },
     {
       "id": 917,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20191,11 +20414,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 918,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20207,11 +20432,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 919,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20223,11 +20450,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 920,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20239,11 +20468,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 921,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20255,11 +20486,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 922,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20271,11 +20504,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 923,
+      "live_event": "halloween",
       "pool_key": "quest-drake-bogwart",
       "zone_definition_id": 1,
       "position": [
@@ -20287,11 +20522,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 924,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20303,11 +20540,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 925,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20319,11 +20558,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 926,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20335,11 +20576,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 927,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20351,11 +20594,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 928,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20367,11 +20612,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 929,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20383,11 +20630,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 930,
+      "live_event": "halloween",
       "pool_key": "quest-drake-pink-azalea",
       "zone_definition_id": 1,
       "position": [
@@ -20399,11 +20648,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957089)"
       }
     },
     {
       "id": 931,
+      "live_event": "halloween",
       "pool_key": "quest-greyli-spectacles",
       "zone_definition_id": 1,
       "position": [
@@ -20415,11 +20666,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957009)"
       }
     },
     {
       "id": 932,
+      "live_event": "halloween",
       "pool_key": "quest-greyli-spectacles",
       "zone_definition_id": 1,
       "position": [
@@ -20431,11 +20684,13 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957009)"
       }
     },
     {
       "id": 933,
+      "live_event": "halloween",
       "pool_key": "quest-greyli-spectacles",
       "zone_definition_id": 1,
       "position": [
@@ -20447,7 +20702,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event halloween: picked up only for halloween quests (3957009)"
       }
     },
     {
@@ -20916,6 +21172,7 @@
     },
     {
       "id": 787,
+      "live_event": "snow_days",
       "pool_key": "quest-booth-2",
       "zone_definition_id": 1,
       "position": [
@@ -20927,7 +21184,8 @@
       "source_tag": "reconstructed",
       "source_tags": {
         "position": "(R) beside the client's own sh_telephone_booth_01 prop at (283.4, 26.0, 385.2) (tile FabledRealms_4_4.gcnk), 2.5 m from it and by Phone Guy Phil 9500004864; ground probe: terrain, dry, open",
-        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "live_event": "EV live_event snow_days: picked up only for snow_days quests (3956145)"
       }
     },
     {

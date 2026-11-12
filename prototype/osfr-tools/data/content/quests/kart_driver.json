@@ -955,9 +955,9 @@
       "id": 3080009,
       "job": 48,
       "title_string_id": 394484,
-      "intro_text_string_id": 394486,
+      "intro_text_string_id": 394483,
       "description_string_id": 394485,
-      "giver_npc_id": 9500000872,
+      "giver_npc_id": 9500000950,
       "prerequisite_quest_ids": [],
       "objectives": [
         {
@@ -1016,9 +1016,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T732: objective kind/id from objective-specs-fixed q3080009; job 48 (Kart Driver) gate and the 5 coins + 15 XP reward follow T202/W110. No prerequisite: the guide's predecessor 3080008 is still a disabled stub."
+        },
+        {
+          "kind": "client",
+          "evidence": "Giver 9500000950 (T.R. Walker Jr.), hand-in 9500000872 (Blammo): the description 394485 reads 'T.R. suggested talking to Blammo'; the lines run offer 394483 (T.R.'s 'you're going to need to get a sponsor'), title 394484, description 394485, then Blammo's pitch 394486, as 3080008's run 394433-394436 with its closing last, so the pitch is the closing (R) and Blammo takes the hand-in; the wiki starts it at T.R. Walker Jr. (https://fr.fanbyte.com/wiki/FR_Quest%3AKart_Driver%3A_Exploder%27s_League_Sponsorship) (scripts/quest_fidelity.py GIVER_MOVES)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 394486
     },
     {
       "id": 3080010,
@@ -1072,7 +1077,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59633,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Grip Tires (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_wildwood_sprint_challenge_f5033c)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 300
           },
@@ -1192,7 +1208,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59630,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Normal Turning (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_wildwood_endurance_challenge_5d3395)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 300
           },
@@ -1293,7 +1320,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14604,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Kart Driver Helmet (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_dominating_at_wildwood_744691)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 338
           },
@@ -1433,7 +1471,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59634,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Extra Grip Tires (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_guest_of_honor_b89e7b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 338
           },
@@ -1533,7 +1582,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14154,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rookie Kart Driver Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_a_treacherous_track_fd5be8)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 375
           },
@@ -1666,7 +1726,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59637,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Racing Basic Jumping Springs (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_stopping_the_sabotage_68591c)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 375
           },
@@ -1766,7 +1837,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 15049,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rookie Kart Driver Pants (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_redline_returns_c0de0b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 275
           },
@@ -1895,7 +1977,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59631,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Loose Turning (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_self_promotion_132feb)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 275
           },
@@ -2000,7 +2093,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13400,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rookie Kart Driver Jacket (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_icy_perfection_a75713)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 275
           },
@@ -2062,7 +2166,7 @@
       "id": 3080019,
       "job": 48,
       "title_string_id": 394663,
-      "giver_npc_id": 9500000613,
+      "giver_npc_id": 9500000868,
       "prerequisite_quest_ids": [],
       "objectives": [
         {
@@ -2141,11 +2245,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T726/F745: intro is the offer line 394665; end text is 394666, the line Petal speaks when the player returns to her, since the quest ends on the Talk at her and the client has no completion line for it. No prerequisite is authored (intentional orphan): the predecessor (Icy Perfection, 3080018, or Self Promotion) is disabled and its giver row is unresolved, so requiring it would make this quest unreachable; the job gate 48 is the only gate. Enabling the predecessor and gating this quest on it is a later content task that needs the lead's acceptance of the current orphan order."
+        },
+        {
+          "kind": "client",
+          "evidence": "Giver 9500000868 (Amber Violet), hand-in 9500000613 (Petal Oceanmist): the description 394664 sends the player to Petal Oceanmist; the lines run offer 394662 (Amber's 'I've heard that Petal Oceanmist is looking to sponsor a racer'), title 394663, description 394664, then Petal's pitch 394665, so the pitch is the closing (R) and Petal keeps the hand-in; 394666 is 3080020's offer; the wiki starts it at Amber Violet (https://fr.fanbyte.com/wiki/FR_Quest%3AKart_Driver%3A_Seaside_Board_of_Tourism_Sponsorship) (scripts/quest_fidelity.py GIVER_MOVES)."
         }
       ],
       "description_string_id": 394664,
-      "intro_text_string_id": 394665,
-      "end_text_string_id": 394666,
+      "intro_text_string_id": 394662,
+      "end_text_string_id": 394665,
       "enabled": true
     },
     {
@@ -2192,7 +2300,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59635,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Normal Tires (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_frost_ridge_sprint_challenge_a2922d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 488
           },
@@ -2292,7 +2411,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59607,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Racing Basic Engine (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_frost_ridge_endurance_challenge_9a219a)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 488
           },
@@ -2392,7 +2522,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14572,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Rookie Kart Driver Helmet (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_dominating_at_frost_ridge_4de2c3)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 350
           },
@@ -2528,7 +2669,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59632,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Tight Turning (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_the_price_of_fame_b0be31)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 350
           },
@@ -2628,7 +2780,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14073,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Kart Driver Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_age_before_beauty_914262)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 350
           },
@@ -2757,7 +2924,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59636,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Slick Tires (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_a_helping_hand_461d8b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 375
           },
@@ -2870,7 +3048,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14984,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Kart Driver Pants (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_settling_the_score_eb0250)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 375
           },
@@ -2989,7 +3182,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59619,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Basic Turbo Booster (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_making_amends_746504)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 375
           },
@@ -3098,7 +3302,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13475,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Kart Racing Jacket (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_high_speed_chase_899393)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) no row is named 'Pro Kart Racing Jacket'; item-table row 13475 'Pro Kart Driver Jacket' is the Pro kart set's jacket, the set this chain's other cells pay."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 1200
           },
@@ -3280,7 +3499,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59638,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Basic Full-Body Armor (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_thunder_falls_sprint_challenge_37bbfb)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 638
           },
@@ -3473,7 +3707,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 14752,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Kart Driver Helmet (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_dominating_at_thunder_falls_1d6cd4)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 500
           },
@@ -3754,7 +4003,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76297,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Switchback Kart Driver Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_burning_up_the_track_e4291b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 167
           },
@@ -3910,7 +4170,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59643,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Racing Basic Anti-Mine Armor A (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_burnt_rubber_768faa)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 175
           },
@@ -4010,7 +4281,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76303,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Crankshaft Kart Driver Pants (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_the_showdown_535129)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 175
           },
@@ -4121,7 +4403,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59642,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Racing Basic Anti-Missile Armor (lab/references/quest-table-20261102/quests.json wiki:fr_quest_kart_driver_the_keys_to_victory_24837c)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 167
           },

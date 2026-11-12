@@ -42,6 +42,13 @@ pub const CELL_M: f32 = 8.0;
 /// (R) A surface steeper than this is a wall, never walking ground. One definition for
 /// the bake, the collision analysis (`restoration/piece_064.rs`) and the walk query.
 pub const MAX_SLOPE_DEGREES: f32 = 50.0;
+/// (R) A baked surface with an edge longer than this is water (`water_*.adr`: the Stillwater river
+/// and the sea are single flat triangles 200 m across; no deck, floor or ledge comes near it).
+/// Bodies that do not swim never stand on it ([`ZoneObstacles::dry_surface_below`]). Small ponds
+/// and river pieces (edges under 100 m: 146 of the 1,656 2014 water placements, such as the
+/// Sacred Grove Shallows pond) are not caught, so a guessed row's height is also checked
+/// against the terrain (`tests/npc_life.rs`).
+pub const WATER_EDGE_M: f32 = 100.0;
 const HEADER: usize = 8 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4;
 const MAX_FILE_BYTES: usize = 256 << 20;
 /// With `MAX_ITEMS` and `MAX_BUCKETS`, the largest `to_bytes` is under
@@ -81,6 +88,14 @@ pub fn placed(position: [f32; 3], rotation: [f32; 3], scale: f32, local: [f32; 3
     let (y, z) = (y * cos_pitch - z * sin_pitch, y * sin_pitch + z * cos_pitch);
     let (x, z) = (x * cos_yaw + z * sin_yaw, -x * sin_yaw + z * cos_yaw);
     [position[0] + x, position[1] + y, position[2] + z]
+}
+
+/// Whether a baked triangle is water: an edge longer than [`WATER_EDGE_M`].
+fn is_water(tri: &[[f32; 3]; 3]) -> bool {
+    let edge = |a: [f32; 3], b: [f32; 3]| ((a[0] - b[0]).powi(2) + (a[2] - b[2]).powi(2)).sqrt();
+    [(0, 1), (1, 2), (0, 2)]
+        .iter()
+        .any(|&(a, b)| edge(tri[a], tri[b]) > WATER_EDGE_M)
 }
 
 /// The `y` at which `triangle` crosses the vertical line through `(x, z)`, when the
@@ -260,6 +275,23 @@ impl ZoneObstacles {
     /// `step_down` below it, so a bridge deck answers as ground. `step_down` is the
     /// follow block's `step_down_m`.
     pub fn surface_below(&self, x: f32, z: f32, from_y: f32, step_down: f32) -> Option<f32> {
+        self.surface_below_where(x, z, from_y, step_down, |_| true)
+    }
+
+    /// [`Self::surface_below`] without the water: a body that does not swim stands on the bed
+    /// under the river, not on its surface.
+    pub fn dry_surface_below(&self, x: f32, z: f32, from_y: f32, step_down: f32) -> Option<f32> {
+        self.surface_below_where(x, z, from_y, step_down, |tri| !is_water(tri))
+    }
+
+    fn surface_below_where(
+        &self,
+        x: f32,
+        z: f32,
+        from_y: f32,
+        step_down: f32,
+        accept: impl Fn(&[[f32; 3]; 3]) -> bool,
+    ) -> Option<f32> {
         if !x.is_finite()
             || !z.is_finite()
             || !from_y.is_finite()
@@ -273,6 +305,9 @@ impl ZoneObstacles {
         let end = self.bucket_start[bucket + 1] as usize;
         let mut best: Option<f32> = None;
         for &id in &self.bucket_items[start..end] {
+            if !accept(&self.triangles[id as usize]) {
+                continue;
+            }
             let Some(y) = triangle_surface(self.triangles[id as usize], x, z, MAX_SLOPE_DEGREES)
             else {
                 continue;
@@ -724,6 +759,20 @@ impl Obstacles {
         self.zones
             .get(&zone)
             .and_then(|mesh| mesh.surface_below(x, z, from_y, step_down))
+    }
+
+    /// [`Self::surface_below`] without the water ([`WATER_EDGE_M`]).
+    pub fn dry_surface_below(
+        &self,
+        zone: u32,
+        x: f32,
+        z: f32,
+        from_y: f32,
+        step_down: f32,
+    ) -> Option<f32> {
+        self.zones
+            .get(&zone)
+            .and_then(|mesh| mesh.dry_surface_below(x, z, from_y, step_down))
     }
 
     #[cfg(test)]

@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source": "Live quests that knowingly differ from the wiki quest table on one check of tests/quest_fidelity.rs (repeatable, event, rewards, giver), each with its reason. scripts/quest_fidelity.py leaves a listed quest's check alone; the test fails on a row that no longer differs, so this list only shrinks by fixing. Hand-kept; review 2026-11-11 (QF).",
+  "exceptions": [
+    {
+      "quest_id": 3020009,
+      "check": "rewards",
+      "reason": "Pays the wiki's Pro Blacksmith Goggles and also the Rowdy Rumbler Recipe (2511): (R) 2026-11-09, the wiki says this quest teaches the Rowdy Rumbler Hammer, and our recipes are taught by holding the pattern item."
+    },
+    {
+      "quest_id": 3020015,
+      "check": "rewards",
+      "reason": "Pays the wiki's Pro Blacksmith Shirt and also the Chivalrous Guardian Hammer Recipe (2518): (R) 2026-11-09, nothing sells this pattern and the next quest forges from it."
+    },
+    {
+      "quest_id": 3020016,
+      "check": "rewards",
+      "reason": "Pays the wiki's Pro Blacksmith Triangle Shard and also the Anguish Aid Bonesaw Recipe (2516): (R) 2026-11-09, nothing sells this pattern and the next quest forges from it."
+    },
+    {
+      "quest_id": 3040013,
+      "check": "rewards",
+      "reason": "Every 'Hoodie' row is a boys' row (199 the lowest), so girls get its counterpart Rolled-Sleeve Hoodie 190, the same freestyle chest piece; (R), as quest_rewards.py CLOSE pays Chapter 1: The Missing Sisters."
+    },
+    {
+      "quest_id": 3130004,
+      "check": "rewards",
+      "reason": "Flat Rate Postman Short Shorts (75968) is a girls' row; boys get its counterpart Flat Rate Postman Shorts (75967), the same set's legs piece (R). The wiki's other cell, Amateur Postman Short Shorts, is marked obsolete."
+    },
+    {
+      "quest_id": 3957541,
+      "check": "rewards",
+      "reason": "The wiki's reward cell reads 'See below'; the page's text below it names the Spectral Spectacles, item 69831, which the row pays."
+    },
+    {
+      "quest_id": 3955710,
+      "check": "event",
+      "reason": "Fanbyte files the egg hunt under Birthday Bash, but its own offer line says 'The Spring Eggstravaganza is here' and the page dates it to the March 28 update: the calendar's spring_eggstravaganza window (March 28 to April 7), which tests/event_calendar.rs drives."
+    }
+  ]
+}

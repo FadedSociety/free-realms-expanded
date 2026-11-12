@@ -2622,7 +2622,36 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 1767,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Pants (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_beware_of_dogs_20f5c0)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            },
+            {
+              "definition_id": 2788,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Postman Skirt (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_beware_of_dogs_20f5c0)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 950
           },

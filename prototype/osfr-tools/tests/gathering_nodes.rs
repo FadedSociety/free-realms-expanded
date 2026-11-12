@@ -1524,8 +1524,25 @@ fn every_placed_plant_and_node_is_clickable_and_answers() {
     let data = Path::new(env!("CARGO_MANIFEST_DIR")).join("data");
     let (dir, base) = shipped_world();
     let nodes = GatheringNodes::load(&data.join("content")).unwrap().unwrap();
+    // L1182 (lead): EV's event pick-ups (`quest_nodes.json` spawns with a `live_event`: Presents,
+    // Balloons) stand only while their event runs, and `tests/event_assets.rs` covers them. This
+    // walk is every always-placed node; each event spawn is matched by its spot and left out.
+    let events = json::read(&data.join("content/quest_nodes.json"));
+    let seasonal: Vec<[f32; 2]> = (events["spawns"].as_array().unwrap().iter())
+        .filter(|spawn| spawn["live_event"].is_string())
+        .map(|spawn| {
+            let at = |i: usize| spawn["position"][i].as_f64().unwrap() as f32;
+            [at(0), at(2)]
+        })
+        .collect();
+    let is_seasonal = |at: [f32; 3]| {
+        (seasonal.iter()).any(|p| (p[0] - at[0]).abs() < 1e-3 && (p[1] - at[2]).abs() < 1e-3)
+    };
+    let left_out = nodes.actors().filter(|actor| is_seasonal(actor.position)).count();
+    assert_eq!(left_out, seasonal.len(), "every event spawn is a placed node");
     let mut rows: Vec<(u64, [f32; 3], String, bool)> = nodes
         .actors()
+        .filter(|actor| !is_seasonal(actor.position))
         .map(|actor| (actor.guid, actor.position, actor.name.clone(), false))
         .collect();
     let extras = json::read(&data.join("content/npc_spawns_extra.json"));

@@ -30,10 +30,14 @@ const SCALE: f32 = 10.0;
 /// moved MovementType-2 actor the same way: `010ba6e0` casts from Y+2 down to Y-2000 and takes
 /// the first collision hit, so a body up to 2 m into the ground still finds its own floor.
 pub const FLOOR_CAST_LIFT_M: f32 = 2.0;
-/// (R) How far above a body a placed object's top still counts as its floor (a body sunk into a
-/// deck). Higher tops are not lifted onto: the baked collision includes surfaces such as the sea
-/// at Seaside, where the original enemies wade 1.1 m under them (`field_enemies` homes).
-pub const FLOOR_STEP_UP_M: f32 = 0.5;
+/// (R) How far above a body a placed object's top still counts as its floor: only the settling
+/// tolerance, so a body already standing on a deck keeps it. A body is never *raised* onto a top
+/// further up. The baked collision holds the tops of carts, wagons, stalls, tables, crates and
+/// boulders beside the surfaces bodies really stand on, and none of it says which is which; a
+/// guessed spot inside a wreck (Vladimir and Ladyslipper in the Sanctuary caravan) must stay on
+/// the ground inside it, not climb onto a rim 0.1 to 0.5 m up (PL-A npc-placement-a; the sea at
+/// Seaside, where the original enemies wade 1.1 m under it, is another such surface).
+pub const FLOOR_STEP_UP_M: f32 = SETTLED_M;
 const FLOOR_CAST_DEPTH_M: f32 = 2_000.0;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -268,7 +272,9 @@ impl Terrain {
 
     /// F6: the floor a body placed at `p` stands on: the higher of the height grid, when it is
     /// at most `FLOOR_CAST_LIFT_M` above the feet, and the highest baked collision top (a deck,
-    /// a floor, a ledge) at most `FLOOR_STEP_UP_M` above them. Ground further up is a roof (a
+    /// a floor, a ledge) at most `FLOOR_STEP_UP_M` above them (a body never climbs onto a top),
+    /// never the water surface (a body that does not swim stands on the bed, not the river).
+    /// Ground further up is a roof (a
     /// cave under the hills). `None` when nothing lies below: off the grid, or a cave with no
     /// baked floor.
     pub fn floor_at(&self, zone: u32, p: [f32; 3]) -> Option<f32> {
@@ -277,7 +283,7 @@ impl Terrain {
         let from = p[1] + FLOOR_STEP_UP_M;
         let top = self
             .obstacles
-            .surface_below(zone, p[0], p[2], from, FLOOR_CAST_DEPTH_M);
+            .dry_surface_below(zone, p[0], p[2], from, FLOOR_CAST_DEPTH_M);
         ground.into_iter().chain(top).reduce(f32::max)
     }
 
@@ -391,6 +397,69 @@ mod tests {
             None
         );
         fs::remove_dir_all(&dir).unwrap();
+    }
+
+    /// PL-A npc-placement-a: a body inside a wrecked cart stands on the ground inside it. The
+    /// cart's rim is a baked top 0.3 m up; the floor never climbs onto it, but a body already
+    /// level with a top (a deck) keeps that top.
+    #[test]
+    fn a_body_is_never_raised_onto_a_prop_top() {
+        let dir = std::env::temp_dir().join(format!("osfr-terrain-rim-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let mut grid = HeightGrid::new([0.0, 0.0], [10.0, 10.0], 2.0).unwrap();
+        grid.add_triangle([[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [10.0, 0.0, 10.0]]);
+        grid.add_triangle([[0.0, 0.0, 0.0], [10.0, 0.0, 10.0], [0.0, 0.0, 10.0]]);
+        fs::write(dir.join("zone_7.hgt"), grid.to_bytes()).unwrap();
+        let rim = crate::obstacles::ZoneObstacles::from_world_triangles(
+            vec![[[0.0, 0.3, 0.0], [4.0, 0.3, 0.0], [0.0, 0.3, 4.0]]],
+            8.0,
+        )
+        .unwrap();
+        fs::write(dir.join("zone_7.obs"), rim.to_bytes()).unwrap();
+        let terrain = Terrain::load(&dir).unwrap();
+        fs::remove_dir_all(&dir).unwrap();
+        assert_eq!(
+            terrain.floor_at(7, [1.0, 0.0, 1.0]),
+            Some(0.0),
+            "a body on the ground inside the cart stays on the ground"
+        );
+        assert_eq!(
+            terrain.floor_at(7, [1.0, 0.1, 1.0]),
+            Some(0.0),
+            "a rim 0.2 m over its feet is not its floor"
+        );
+        assert_eq!(
+            terrain.floor_at(7, [1.0, 0.25, 1.0]),
+            Some(0.3),
+            "a body level with a top keeps it"
+        );
+    }
+
+    /// PL-A npc-placement-a: the baked water surface (a flat triangle 150 m across) is no body's
+    /// floor: a body on the river bed stays on the bed, but the obstacle itself still answers.
+    #[test]
+    fn a_body_never_stands_on_the_water_surface() {
+        let dir = std::env::temp_dir().join(format!("osfr-terrain-water-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let mut grid = HeightGrid::new([0.0, 0.0], [10.0, 10.0], 2.0).unwrap();
+        grid.add_triangle([[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [10.0, 0.0, 10.0]]);
+        grid.add_triangle([[0.0, 0.0, 0.0], [10.0, 0.0, 10.0], [0.0, 0.0, 10.0]]);
+        fs::write(dir.join("zone_7.hgt"), grid.to_bytes()).unwrap();
+        let water = crate::obstacles::ZoneObstacles::from_world_triangles(
+            vec![[[-5.0, 0.05, -5.0], [145.0, 0.05, -5.0], [-5.0, 0.05, 145.0]]],
+            8.0,
+        )
+        .unwrap();
+        fs::write(dir.join("zone_7.obs"), water.to_bytes()).unwrap();
+        let terrain = Terrain::load(&dir).unwrap();
+        fs::remove_dir_all(&dir).unwrap();
+        assert_eq!(terrain.floor_at(7, [1.0, 0.0, 1.0]), Some(0.0));
+        assert_eq!(
+            terrain.obstacles().surface_below(7, 1.0, 1.0, 0.5, 3.0),
+            Some(0.05),
+            "the water is still collision"
+        );
+        assert_eq!(terrain.obstacles().dry_surface_below(7, 1.0, 1.0, 0.5, 3.0), None);
     }
 
     /// T534 review: a caller that only needs heights (the shared placement suites) skips every

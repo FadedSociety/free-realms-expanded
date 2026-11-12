@@ -6,8 +6,9 @@
 //! host's local clock). A slot starts at every minute of the local day where
 //! `(minute - offset_minutes)` is divisible by `slot_minutes` (the count restarts at midnight).
 //!
-//! A slot is skipped, never queued, when it is out of its `season` (judged at the slot's start,
-//! so one that opens just after the season ends neither starts nor announces) or when its start
+//! A slot is skipped, never queued, when its `live_event` is not running (an `event_calendar.json`
+//! key, asked of the one gate `EventCalendar::is_running` at the slot's start, so one that opens
+//! just after the event ends neither starts nor announces) or when its start
 //! is also a slot start of an event in `skip_if_slot_matches` (R: plain slot arithmetic, as
 //! Sanctuary's dance-off against Bruce's 2-hour boundary; the other event's season and run state
 //! do not count). Nothing is saved: a restart computes the next slot from the clock, and a slot
@@ -34,7 +35,8 @@ pub(super) struct ScheduleRow {
     slot_minutes: u32,
     #[serde(default)]
     offset_minutes: u32,
-    season: Option<String>,
+    /// EV: the event key the show belongs to (was a `season` display name).
+    live_event: Option<String>,
     announce_lead_ms: Option<u64>,
     announce: Option<AnnounceRow>,
     #[serde(default)]
@@ -60,7 +62,7 @@ pub(super) struct Slot {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Schedule {
     slot: Slot,
-    season: Option<String>,
+    live_event: Option<String>,
     /// Milliseconds before a slot's start, and the broadcast line.
     announce: Option<(u64, String)>,
     skip_keys: Vec<String>,
@@ -87,23 +89,23 @@ impl Schedule {
             && paired
             && announce.is_some() == row.announce_lead_ms.is_some()
             && row
-                .season
+                .live_event
                 .as_deref()
-                .is_none_or(|name| (1..=MAX_NAME_BYTES).contains(&name.len()))
+                .is_none_or(|key| (1..=MAX_NAME_BYTES).contains(&key.len()))
             && row.skip_if_slot_matches.len() <= MAX_SKIPS
             && row
                 .skip_if_slot_matches
                 .iter()
                 .all(|other| valid_key(other) && other != key);
         if !sane {
-            return Err("schedule needs slot_minutes of 5-1440, offset_minutes below it, a season name of at most 64 bytes, announce_lead_ms (below the slot) and announce {text, locale_id} together, and at most 8 other events to skip".into());
+            return Err("schedule needs slot_minutes of 5-1440, offset_minutes below it, a live_event key of at most 64 bytes, announce_lead_ms (below the slot) and announce {text, locale_id} together, and at most 8 other events to skip".into());
         }
         Ok(Self {
             slot: Slot {
                 minutes: i64::from(row.slot_minutes),
                 offset: i64::from(row.offset_minutes),
             },
-            season: row.season,
+            live_event: row.live_event,
             announce,
             skip_keys: row.skip_if_slot_matches,
         })
@@ -221,15 +223,21 @@ pub(super) enum Due {
 }
 
 impl Entry {
-    /// Whether the slot starting at `start_ms` runs: in season, and not on a skipped event's start.
+    /// Whether the slot starting at `start_ms` runs: its event running, and not on a skipped event's
+    /// start.
     fn runs_at(&self, start_ms: u64, areas: &ClientAreas) -> bool {
         let offset = areas.utc_offset_minutes();
-        let season = self.schedule.season.as_deref();
-        season.is_none_or(|name| areas.is_season_active(name, start_ms))
+        self.in_event(start_ms, areas)
             && !self
                 .skips
                 .iter()
                 .any(|slot| slot.starts_at(Slot::local_minute(start_ms, offset)))
+    }
+
+    /// EV: an untagged show always runs; a tagged one only while its event does (the one gate).
+    fn in_event(&self, at_ms: u64, areas: &ClientAreas) -> bool {
+        (self.schedule.live_event.as_deref())
+            .is_none_or(|key| areas.calendar().is_running(key, areas, at_ms))
     }
 
     /// The first slot after `after_ms` that runs.
@@ -241,13 +249,8 @@ impl Entry {
             if self.runs_at(start, areas) {
                 return Some(start);
             }
-            // Out of season, the rest of the local day is too (seasons are whole dates).
-            let out = self
-                .schedule
-                .season
-                .as_deref()
-                .is_some_and(|name| !areas.is_season_active(name, start));
-            after_ms = match out {
+            // Out of its event by date, the rest of the local day is too (seasons are whole dates).
+            after_ms = match !self.in_event(start, areas) {
                 true => {
                     let next_day = (Slot::local_minute(start, offset).div_euclid(DAY_MINUTES) + 1)
                         * DAY_MINUTES;
@@ -362,6 +365,10 @@ mod tests {
             "seasons": [{"name": "Halloween", "start_month": 9, "start_day": 20,
                 "end_month": 11, "end_day": 11, "area_ids": [3992], "source": "T462 test"}]});
         std::fs::write(dir.join("client_areas.json"), file.to_string()).unwrap();
+        // EV: the show names the event, which names the season.
+        let calendar = json!({"schema_version": 1, "source": "T462 test", "events": [{"key": "halloween",
+            "name": "Halloween", "season": "Halloween", "source": "T462 test"}]});
+        std::fs::write(dir.join("event_calendar.json"), calendar.to_string()).unwrap();
         let areas = ClientAreas::load(&dir).unwrap();
         let _ = std::fs::remove_dir_all(&dir);
         areas
@@ -398,7 +405,7 @@ mod tests {
     fn dance() -> Value {
         row(
             "dance",
-            json!({"slot_minutes": 30, "season": "Halloween", "announce_lead_ms": 2 * MINUTE,
+            json!({"slot_minutes": 30, "live_event": "halloween", "announce_lead_ms": 2 * MINUTE,
                 "announce": {"text": DANCE_LINE, "locale_id": 432_430},
                 "skip_if_slot_matches": ["bruce"]}),
         )
@@ -547,7 +554,7 @@ mod tests {
         let seasonal = || {
             vec![row(
                 "dance",
-                json!({"slot_minutes": 30, "season": "Halloween"}),
+                json!({"slot_minutes": 30, "live_event": "halloween"}),
             )]
         };
         let day = utc(2026, 10, 21, 0, 0);
@@ -771,7 +778,7 @@ mod tests {
                 "nine skips",
                 json!({"slot_minutes": 30, "skip_if_slot_matches": nine}),
             ),
-            ("empty season", json!({"slot_minutes": 30, "season": ""})),
+            ("empty season", json!({"slot_minutes": 30, "live_event": ""})),
             ("no slot", json!({"offset_minutes": 3})),
             ("unknown field", json!({"slot_minutes": 30, "every": 3})),
         ];

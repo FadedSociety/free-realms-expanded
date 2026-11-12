@@ -416,20 +416,17 @@ fn samantha_still_offers_introduce_yourself_and_the_hunt_does_not_cross() {
     assert!(referral_talk.changed);
     assert_eq!(counts(&a, REFERRAL), [1]);
     assert_eq!(pending_turnin(&a), Some(REFERRAL));
-    release_end_screen(&mut a, &a_ricky, REFERRAL, RICKY, 0, now);
+    release_end_screen(&mut a, &a_ricky, REFERRAL, RICKY, 116_463, now); // QF: Ricky's closing line
     now += 2;
     finish_quest(&mut a, &a_ricky, REFERRAL, ADVENTURER, 5, 20, now);
     now += 2;
     assert_eq!(quest_status(&a, REFERRAL), QuestStatus::Completed);
     assert_eq!(quest_status(&a, QUEST), QuestStatus::Active);
     assert_eq!(counts(&a, QUEST), [0, 0, 0, 0]);
-    assert_no_offer(
-        &mut a,
-        &a_samantha,
-        SAMANTHA,
-        &mut now,
-        "Samantha after the referral is completed",
-    );
+    // QF: Samantha also gives the Brawler's Bringing Back Brazenfist (the wiki's giver), and the
+    // fixture character knows Brawler: that is her one offer now, neither the referral nor the hunt.
+    now += 2;
+    offer(&mut a, &a_samantha, SAMANTHA, 3_030_004, now);
 
     // An active hunt does not suppress the still-unaccepted referral at
     // Samantha for a second character.

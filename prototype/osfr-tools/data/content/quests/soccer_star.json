@@ -913,7 +913,22 @@
       "rewards": [
         {
           "coins": 30,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 62520,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Amateur Star Square Shard (lab/references/quest-table-20261102/quests.json wiki:fr_quest_soccer_star_power_game_990f25)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) no row is named 'Amateur Star Square Shard'; item-table row 62520 'Amateur Soccer Star Square Shard' is the Soccer Star job's amateur square shard."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "52": 184
           },

@@ -35,6 +35,21 @@ impl Gameplay {
         self.npc_inventory_events(&before, &mut out)?;
         Ok(Some(out))
     }
+
+    /// QF: open each gift that reached the bag (`mystery_chests.json` `gifts`): a quest's Mystery
+    /// Gift turns into its prize at once. Never fails the turn-in it follows.
+    pub(super) fn open_gifts(&mut self, player_guid: u64, out: &mut Outcome) {
+        let Some(table) = self.mystery_chests.clone() else {
+            return;
+        };
+        let member = self.game_rules.membership.is_active_at(current_unix_seconds());
+        let nanos = SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |at| at.as_nanos());
+        let draw = |instance, index| crate::mystery_chest_loot::gift_draw(player_guid, instance, index, nanos);
+        let (replies, lines) = table.open_gifts(&mut self.inventory, player_guid, member, self.gender, &draw);
+        out.changed |= !replies.is_empty();
+        out.replies.extend(replies);
+        out.replies.extend(lines.iter().map(|line| chat::system(line)));
+    }
 }
 
 /// (R) 35/6 EquipItemChange a neighbour needs after an active-job equip or

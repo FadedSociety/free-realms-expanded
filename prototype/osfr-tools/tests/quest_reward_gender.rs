@@ -26,7 +26,8 @@ use serde_json::{Value, json};
 
 const CHARACTER: u64 = 235_012;
 const CHEF: i32 = 45;
-const AUGUSTE: u64 = 9_000_000_019;
+/// QF: Ranger Requisition's giver is Merigold, the wiki's (Ricardo takes the hand-in).
+const MERIGOLD: u64 = 9_000_000_402;
 const RICARDO: u64 = 9_000_000_178;
 const RANGER_REQUISITION: u32 = 3_050_011;
 const RANGER_END_TEXT: u32 = 104_136;
@@ -108,9 +109,9 @@ fn turn_in(game: &mut Gameplay) -> [u32; 3] {
         let (zone, position) = npc_location(npc);
         character_at_for(CHARACTER, zone, position)
     };
-    let (auguste, ricardo) = (at(AUGUSTE), at(RICARDO));
-    offer(game, &auguste, AUGUSTE, RANGER_REQUISITION, 7_000);
-    accept(game, &auguste, RANGER_REQUISITION, 7_010);
+    let (merigold, ricardo) = (at(MERIGOLD), at(RICARDO));
+    offer(game, &merigold, MERIGOLD, RANGER_REQUISITION, 7_000);
+    accept(game, &merigold, RANGER_REQUISITION, 7_010);
     talk_step(game, &ricardo, RICARDO, 7_020, "Chef: Ranger Requisition");
     release_end_screen(
         game,

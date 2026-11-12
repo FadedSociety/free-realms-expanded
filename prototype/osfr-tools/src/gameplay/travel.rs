@@ -106,6 +106,9 @@ struct Point {
     teleport_location_id: i32,
     atlas: String,
     unknown_15: i32,
+    /// EV: an `event_calendar.json` key; the marker is listed only while that event runs.
+    #[serde(default)]
+    live_event: Option<String>,
 }
 
 /// The travel registry for a content directory: the whole table from `travel.json`, or the
@@ -137,6 +140,7 @@ fn from_content(file: ContentFile) -> io::Result<WarpRegistry> {
         |s: &str, max: usize| s.len() <= max && s.bytes().all(|b| (0x20..0x7f).contains(&b));
     let mut ids = BTreeSet::new();
     let mut requires = BTreeMap::new();
+    let mut events = BTreeMap::new();
     let (mut destinations, mut definitions) = (Vec::new(), Vec::new());
     for point in file.points {
         let spawn = point.spawn.unwrap_or(point.position);
@@ -153,6 +157,9 @@ fn from_content(file: ContentFile) -> io::Result<WarpRegistry> {
         }
         if let Some(stone) = point.requires_stone {
             requires.insert(point.id, stone);
+        }
+        if let Some(key) = point.live_event {
+            events.insert(point.id, key);
         }
         destinations.push(WarpDestination {
             id: point.id,
@@ -191,6 +198,7 @@ fn from_content(file: ContentFile) -> io::Result<WarpRegistry> {
     }
     let mut registry =
         WarpRegistry::atlas(destinations, definitions, file.rules.undiscovered, requires);
+    registry.set_event_rows(events);
     registry
         .set_rules(WarpRules {
             attune_radius_m: file.rules.attune_radius_m,
@@ -475,6 +483,8 @@ mod tests {
     #[test]
     fn the_shipped_table_lists_every_row_and_greys_unfound_stones() {
         let mut registry = shipped();
+        // EV: every row, Halloween Harry's event marker included, while Halloween runs.
+        registry.set_running_events(&BTreeSet::from(["halloween".to_owned()]));
         let listed = rows(&registry);
         assert_eq!(listed.len(), 137, "136 reference rows and the comic alias");
         let kind = |rows: &[PointOfInterestDefinition], t: i32| {
@@ -502,6 +512,27 @@ mod tests {
                 .notification_type,
             7
         );
+    }
+
+    #[test]
+    /// EV: Halloween Harry's own Atlas marker (row 140) is listed and travelled to only while
+    /// Halloween runs; a moved event asks for a fresh 57.
+    #[test]
+    fn an_event_marker_is_listed_and_travelled_to_only_while_its_event_runs() {
+        let mut registry = shipped();
+        let here = context([0.0, 0.0, 0.0]);
+        let harry = |r: &WarpRegistry| rows(r).iter().any(|row| row.id == 140);
+        assert!(!harry(&registry), "closed until the calendar names Halloween");
+        let refused = registry.handle(&travel(140), &here, 0, &no_world()).unwrap();
+        assert_eq!(refused.rejection, Some(WarpRejection::UnknownDestination(140)));
+        let halloween = BTreeSet::from(["halloween".to_owned()]);
+        assert!(registry.set_running_events(&halloween), "the marker comes: send 57");
+        assert!(!registry.set_running_events(&halloween), "no change, no 57");
+        assert!(harry(&registry));
+        let to = registry.handle(&travel(140), &here, 0, &no_world()).unwrap();
+        assert!(to.relocation.is_some(), "{to:?}");
+        assert!(registry.set_running_events(&BTreeSet::new()), "the marker goes: send 57");
+        assert!(!harry(&registry));
     }
 
     #[test]

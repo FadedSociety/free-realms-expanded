@@ -581,27 +581,18 @@ fn t552_conversation_turns_and_idle_rows_reach_every_viewer() {
         );
     }
 
-    let (idle_at, idle_update) = find_due(
+    // L1182 (lead): PL-A's rule (`NpcAmbient::clear_idles`): an actor with a pose row keeps its
+    // pose, so its idle loop is cleared while its conversation turns still play (above). These
+    // Sanctuary children stand posed, so no idle row fires for them.
+    let idle = find_due(
         &table,
         &known,
         &models,
         |update| matches!(update, AmbientUpdate::Idle { .. }),
         second_at + 1,
         60_000,
-    )
-    .expect("a child idle row fires");
-    let idle_packets = idle_update.packets(0);
-    assert_eq!(idle_packets.len(), 2, "35/26 and the base 35/8");
-    tick_with_known(&mut server, [keys[0], keys[1]], &known, idle_at);
-    for key in [keys[0], keys[1]] {
-        assert_packets(
-            &mut server,
-            key,
-            idle_at,
-            &idle_packets,
-            "the idle loop reaches both viewers",
-        );
-    }
+    );
+    assert!(idle.is_none(), "a posed child keeps its pose: no idle loop");
 
     let _ = fs::remove_dir_all(scratch);
 }

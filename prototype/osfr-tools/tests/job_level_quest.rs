@@ -122,6 +122,7 @@ fn warrior_state(fixture: &Fixture, character: u64, warrior_xp: u32) -> Gameplay
         pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
+        repeats: Default::default(),
     });
     state
 }
@@ -461,6 +462,7 @@ fn a_job_level_event_is_profile_exact_and_uses_at_least() {
         pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
+        repeats: Default::default(),
     };
     let mut engine = QuestEngine::from_split_content(
         &content_dir(),

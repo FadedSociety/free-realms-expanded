@@ -144,6 +144,7 @@ fn saved_state(quests: &[(u32, QuestStatus, u32)]) -> QuestState {
         pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
+        repeats: Default::default(),
     }
 }
 

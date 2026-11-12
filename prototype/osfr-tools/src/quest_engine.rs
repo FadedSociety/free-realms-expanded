@@ -27,6 +27,9 @@ mod admin_set;
 #[path = "quest_offer_block.rs"]
 mod offer_block;
 pub use offer_block::OfferBlock;
+#[path = "quest_repeat.rs"]
+mod repeat;
+pub use repeat::{QuestRepeat, Repeats};
 
 const MAX_OBJECTIVES: usize = 64;
 // A sanity bound on catalogue and save size, not a game rule: the wiki lists about 1,420 quests (1,337 live),
@@ -595,6 +598,10 @@ pub struct QuestState {
     pub pending_turnin_actor: Option<u64>,
     pub selected_quest_id: Option<u32>,
     pub auto_switch_selected: bool,
+    /// Each repeatable quest's last completion and count (`quest_repeat.rs`). Absent on
+    /// older saves.
+    #[serde(default, skip_serializing_if = "Repeats::is_empty")]
+    pub repeats: Repeats,
 }
 
 impl QuestState {
@@ -1097,6 +1104,8 @@ pub struct QuestEngine {
     revision: u64,
     /// T499: every NPC that gives, takes in or is a talk target of any quest. Built once.
     quest_npcs: BTreeSet<u64>,
+    /// Repeats, calendar event keys and completion counts (`quest_repeat.rs`).
+    rules: Box<repeat::Rules>,
 }
 
 /// 49/13 fields before the reward bundle: the turn-in actor as an 8-byte value, then three
@@ -1382,11 +1391,13 @@ impl QuestEngine {
         let mut engine =
             Self::new_with_disabled(character_id, definitions, eligibility, state, disabled)?;
         engine.poi_locations = poi_locations;
+        // An admin event (T418) and a calendar event start closed; the session opens them.
         engine.live_events = quests
             .iter()
-            .filter(|quest| quest.live_event)
+            .filter(|quest| !quest.live_event.is_off())
             .map(|quest| (quest.id, false))
             .collect();
+        engine.set_rules(&quests)?;
         engine.exclusions = exclusions;
         engine.any_prerequisites = quests
             .iter()
@@ -1433,6 +1444,7 @@ impl QuestEngine {
         let conversations = conversation_steps(&content.quests);
         let mut engine = Self::new(character_id, definitions, eligibility, state)?;
         engine.conversations = conversations;
+        engine.set_rules(&content.quests)?;
         Ok(engine)
     }
 
@@ -1565,10 +1577,12 @@ impl QuestEngine {
             pending_turnin_actor: None,
             selected_quest_id: None,
             auto_switch_selected: false,
+            repeats: Repeats::default(),
         });
         if state.version != 1
             || state.character_id != character_id
             || state.quests.len() > MAX_QUESTS
+            || state.repeats.len() > MAX_QUESTS
         {
             return Err(invalid("saved quest identity, version or count is invalid"));
         }
@@ -1606,6 +1620,7 @@ impl QuestEngine {
             options: EngineOptions {
                 opening_order: None,
             },
+            rules: Box::default(),
         };
         engine.index_location_quests();
         Ok(engine)
@@ -2202,9 +2217,13 @@ impl QuestEngine {
                 .is_some_and(|d| !d.objectives.is_empty())
     }
 
-    /// T418: every `live_event` quest and whether it is open.
-    pub fn live_events(&self) -> &BTreeMap<u32, bool> {
-        &self.live_events
+    /// T418: every admin-opened `live_event` quest and whether it is open. A quest whose
+    /// `live_event` is a calendar key follows its event (`event_quests`), not this list.
+    pub fn live_events(&self) -> BTreeMap<u32, bool> {
+        (self.live_events.iter())
+            .filter(|(id, _)| self.event_quests().all(|(keyed, _)| keyed != **id))
+            .map(|(id, open)| (*id, *open))
+            .collect()
     }
 
     /// T418: open exactly the live events in `open` (the live world's
@@ -2639,7 +2658,14 @@ impl QuestEngine {
             .definitions
             .get(&quest_id)
             .ok_or_else(|| invalid("pending quest definition disappeared"))?;
-        let grant_key = format!("quest:{}:{}", self.character_id, quest_id);
+        // A repeatable quest pays on every run: each run's key carries its ordinal.
+        let grant_key = match self.repeat_hours(quest_id) {
+            Some(_) => {
+                let run = self.state.completions(quest_id).saturating_add(1);
+                format!("quest:{}:{}:{run}", self.character_id, quest_id)
+            }
+            None => format!("quest:{}:{}", self.character_id, quest_id),
+        };
         let (next_reward_state, reward_packets) =
             match rewards::apply_grant(reward_state, &definition.reward, &grant_key) {
                 Ok(granted) => granted,
@@ -2657,12 +2683,7 @@ impl QuestEngine {
             self.state.selected_quest_id = None;
         }
         self.revision = self.revision.wrapping_add(1); // `definition` still borrows self
-        let completed_count = self
-            .state
-            .quests
-            .values()
-            .filter(|progress| progress.status == QuestStatus::Completed)
-            .count() as u32;
+        let completed_count = u32::try_from(self.state.completed_count()).unwrap_or(u32::MAX);
         let mut outcome = QuestOutcome {
             changed: true,
             outbound: reward_packets
@@ -2698,6 +2719,7 @@ impl QuestEngine {
                 );
             }
         }
+        self.record_completion(quest_id);
         Ok((outcome, next_reward_state))
     }
 

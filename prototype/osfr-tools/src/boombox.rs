@@ -744,6 +744,8 @@ struct Placed {
     dance: Option<Dance>,
     /// `None` for rows that do not transform.
     transform: Option<Transform>,
+    /// EV: a permanent box's prop event; it dances only while that event runs.
+    live_event: Option<String>,
 }
 
 impl Placed {
@@ -877,11 +879,34 @@ impl Boomboxes {
                 range_m: row.range_m,
                 transform: (row.kind == Kind::Transform).then(|| Transform::new(row)),
                 dance: Dance::new(Arc::clone(row)),
+                live_event: prop.live_event.clone(),
             });
         }
         boxes.live = boxes.fixed.clone();
         boxes.pet_dance = catalogue.pet_dance().cloned();
         Ok(boxes)
+    }
+
+    /// EV: a permanent box whose prop names an event runs only while `running` (the one gate,
+    /// `EventCalendar::is_running`) says it does: at its end the box stops and its dancers are
+    /// released (the next tick sends them idle), and at its start the box comes back as built.
+    pub fn follow_events(&mut self, running: &dyn Fn(&str) -> bool) {
+        // ponytail: walks the live boxes each tick only while some permanent box has an event.
+        if self.fixed.iter().all(|b| b.live_event.is_none()) {
+            return;
+        }
+        let on = |b: &Placed| b.live_event.as_deref().is_none_or(running);
+        let (off, live): (Vec<_>, Vec<_>) = (std::mem::take(&mut self.live).into_iter())
+            .partition(|b| b.permanent() && !on(b));
+        self.live = live;
+        for mut placed in off {
+            self.released.extend(placed.release());
+        }
+        for fixed in self.fixed.iter().filter(|f| on(f)) {
+            if !self.live.iter().any(|b| b.guid == fixed.guid) {
+                self.live.push(fixed.clone());
+            }
+        }
     }
 
     /// Only the permanent boxes, each as freshly built: what the world runs on after a fault drops
@@ -951,6 +976,7 @@ impl Boomboxes {
             range_m: row.range_m,
             transform: (row.kind == Kind::Transform).then(|| Transform::new(&row)),
             dance: Dance::new(row),
+            live_event: None,
         };
         for session in players.nearby_sessions(zone, position) {
             placed.show(session, true, &mut sends);
@@ -2897,6 +2923,7 @@ mod tests {
                     spawn_guid: *spawn_guid,
                     item_id: XVD,
                     position: *position,
+                    live_event: None,
                 })
                 .collect();
             let mut live =
@@ -2942,6 +2969,22 @@ mod tests {
             }
             assert_eq!(live.live.len(), 1);
             assert!(live.live[0].permanent());
+        }
+
+        /// EV: a permanent box whose prop names an event runs only while the event does; at its
+        /// end the box leaves the live set (its dancers are released), and it comes back as built.
+        #[test]
+        fn a_permanent_box_with_an_event_runs_only_while_the_event_does() {
+            let mut live = radios(&[(RADIO, [5.0, 1.0, 0.0])]);
+            live.follow_events(&|_| false);
+            assert_eq!(live.live.len(), 1, "an untagged box ignores the gate");
+            live.fixed[0].live_event = Some("halloween".into());
+            live.live[0].live_event = Some("halloween".into());
+            live.follow_events(&|key| key == "snow_days");
+            assert!(live.live.is_empty(), "gone while halloween is not running");
+            live.follow_events(&|key| key == "halloween");
+            assert_eq!(live.live.len(), 1);
+            assert!(live.live[0].permanent() && live.live[0].guid == RADIO);
         }
 
         #[test]
@@ -3051,6 +3094,7 @@ mod tests {
                 spawn_guid,
                 item_id,
                 position: [0.0; 3],
+                live_event: None,
             };
             let error = Boomboxes::permanent(&catalogue, &[prop(RADIO, XVD), prop(77, 1)])
                 .unwrap_err()

@@ -950,6 +950,16 @@
                   "evidence": "(R) 2026-11-09: the wiki says Impressing the Axemaker teaches the Rowdy Rumbler Hammer."
                 }
               ]
+            },
+            {
+              "definition_id": 21511,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Goggles (lab/references/quest-table-20261102/quests.json wiki:fr_quest_blacksmith_impressing_the_axemaker_10e96c)."
+                }
+              ]
             }
           ],
           "job_xp": {
@@ -1591,6 +1601,16 @@
                   "evidence": "(R) 2026-11-09: nothing sells this pattern; the quest before the one that forges it hands it over."
                 }
               ]
+            },
+            {
+              "definition_id": 1371,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Shirt (lab/references/quest-table-20261102/quests.json wiki:fr_quest_blacksmith_bolstering_the_bows_d59967)."
+                }
+              ]
             }
           ],
           "job_xp": {
@@ -1709,6 +1729,16 @@
                 {
                   "kind": "reconstructed",
                   "evidence": "(R) 2026-11-09: nothing sells this pattern; the quest before the one that forges it hands it over."
+                }
+              ]
+            },
+            {
+              "definition_id": 10848,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Blacksmith Triangle Shard (lab/references/quest-table-20261102/quests.json wiki:fr_quest_blacksmith_chivalrous_carlos_ab99fb)."
                 }
               ]
             }

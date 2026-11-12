@@ -283,9 +283,16 @@
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Going Batty's bat: its quest is Super Spooktacular's (fanbyte Category:Super_Spooktacular) and its giver Vladimir stands only during it, so the bat stands only while event halloween (season Halloween) runs."
+          }
         ]
       },
-      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk.",
+      "live_event": "halloween"
     },
     {
       "npc_id": 9500001314,
@@ -17157,6 +17164,7 @@
     },
     {
       "npc_id": 9500004100,
+      "live_event": "spring_eggstravaganza",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Hidden Egg",
@@ -17434,6 +17442,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "client",
+            "evidence": "EV live_event spring_eggstravaganza: client prop 4203 sg_eggbasket_01.adr 'Easter Egg basket'; the egg the Spring Eggstravaganza hunt finds (quest 3955710)"
           }
         ]
       },

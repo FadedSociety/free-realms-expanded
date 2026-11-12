@@ -5,7 +5,7 @@
   "records": [
     {
       "npc_id": 9500000724,
-      "season": "Snow Days",
+      "live_event": "snow_days",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Abominable Snowman",
@@ -83,7 +83,16 @@
         }
       ],
       "field_sources": {
-        "season": [{"kind": "wiki", "evidence": "rc-0136 F4: title 'Snow Days open-world boss' (this row's title_or_role, wiki); Legacy Npcs.json Id 31336 sits with the Snow Days extras 31425-31445, which carry season Snow Days."}],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "rc-0136 F4: title 'Snow Days open-world boss' (this row's title_or_role, wiki); Legacy Npcs.json Id 31336 sits with the Snow Days extras 31425-31445, which carry season Snow Days."
+          },
+          {
+            "kind": "client",
+            "evidence": "EV live_event snow_days: client Models.txt 1944: 'Abominable Snowman for winter holiday world event'; fanbyte FR_Mob:Abominable_Snowman (Snow Days)"
+          }
+        ],
         "npc_id": [
           {
             "kind": "client",
@@ -6578,6 +6587,7 @@
     },
     {
       "npc_id": 9500000733,
+      "live_event": "snow_days",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Candi Ivy",
@@ -7169,6 +7179,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event snow_days: fr.fanbyte.com/wiki/FR_Mob:Candi_Ivy (Snow Days): under The Gifting Tree; a Santa model; every quest she gives is the event's"
           }
         ]
       },
@@ -14426,9 +14442,9 @@
       ],
       "services_reason": null,
       "position": [
-        92.76789,
-        66.33743,
-        552.8647
+        88.843029,
+        65.8499,
+        550.663457
       ],
       "position_w": null,
       "rotation": [
@@ -14448,7 +14464,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 59 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 59 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [92.76789, 66.33743, 552.8647]: it stood 2.0 m from Frostfang Caverns; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -24492,9 +24508,9 @@
       ],
       "services_reason": null,
       "position": [
-        -70.714,
-        11.04,
-        226.4
+        -68.350204,
+        11.0,
+        227.21392
       ],
       "position_w": null,
       "rotation": [
@@ -24519,7 +24535,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 20 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 20 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-70.714, 11.04, 226.4]: it stood 1.7 m from Spiralmint Plant; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -42234,9 +42250,9 @@
       ],
       "services_reason": null,
       "position": [
-        405.39592,
-        47.112,
-        347.076853
+        402.896301,
+        47.288,
+        347.120484
       ],
       "position_w": null,
       "rotation": [
@@ -42261,7 +42277,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 30 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 30 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [405.39592, 47.112, 347.076853]: it stood 2.2 m from Cronyn; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -44109,6 +44125,7 @@
     },
     {
       "npc_id": 9000000492,
+      "live_event": "twelve_days",
       "id_kind": "reconstructed_from_job_reference",
       "reference_ids": [
         9000000492
@@ -44631,6 +44648,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event twelve_days: fr.fanbyte.com/wiki/fr_mob:Trina_Turtledove (Event mob type): the 12 Days of Presents host; every quest she gives is a Day quest"
           }
         ]
       },
@@ -49237,9 +49260,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        304.323,
-        27.237,
-        411.556
+        316.718,
+        26.4082,
+        416.441
       ],
       "position_w": 1.0,
       "rotation": [
@@ -49259,7 +49282,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) PL-A npc-placement-a, 2026-11-12: moved from [304.323, 27.237, 411.556]: it stood 1.5 m from Tevin; the new spot is on walkable ground clear of props and other bodies. (R) PL-A npc-placement-a, 2026-11-12: moved from [306.406975, 26.7849, 409.397981]: it stood 12 m away on a guessed point (POI spiral); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at a Sanctuary-main Lua spawn: ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3967 spawnNpcWithGuid(33772, 100000033772); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33772; the new spot is on walkable ground clear of props and other bodies.",
       "heading": 0.0,
       "model_id": 456,
       "model_file_name": "fairy_druid_f.adr",
@@ -49575,9 +49598,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        259.155,
-        23.6739,
-        355.478
+        192.945,
+        28.591,
+        417.45
       ],
       "position_w": 1.0,
       "rotation": [
@@ -49597,7 +49620,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) PL-A npc-placement-a, 2026-11-12: moved from [259.155, 23.6739, 355.478]: it stood 91 m away on a guessed point (POI spiral); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at a Sanctuary-main Lua spawn: ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3882 spawnNpcWithGuid(33664, 100000033664); Sanctuary-main-20261019 src/Resources/Npcs.json Id=33664; the new spot is on walkable ground clear of props and other bodies.",
       "heading": 0.0,
       "model_id": 468,
       "model_file_name": "fairy_druid_m.adr",

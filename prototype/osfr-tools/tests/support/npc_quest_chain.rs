@@ -93,6 +93,13 @@ fn reward_item_table() -> &'static str {
                 }
             }
         }
+        // QF: what a reward's Mystery Gift opens into (`release/mystery_chests.json` gifts).
+        let chests = read_json(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/mystery_chests.json"));
+        for gift in chests["gifts"].as_array().into_iter().flatten() {
+            for prize in gift["rewards"].as_array().into_iter().flatten() {
+                wanted.extend(prize.as_i64().or_else(|| prize["item"].as_i64()));
+            }
+        }
         let mut table =
             read_json(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table.json"));
         table["rows"]
@@ -238,6 +245,8 @@ impl Fixture {
             "zones.json",
             "npc_spawns_extra.json",
             "client_areas.json",
+            // EV: the season table's calendar, which the rows' `live_event` keys name.
+            "event_calendar.json",
             "stores.json",
             "vendors.json",
             "field_kill_rewards.json",

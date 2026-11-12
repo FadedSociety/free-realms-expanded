@@ -230,8 +230,10 @@ fn every_quest_npc_says_a_stock_line_when_it_offers_nothing() {
                     failures.push(format!("{status:?}: {npc} said {body}, not {want}"));
                 }
             }
-            // The owner's Vladimir after Going Batty: no greeting and no closing line yet.
-            assert_eq!(pass.quiet.get(&VLADIMIR), Some(&HELLO));
+            // The owner's Vladimir after Going Batty: QF's wiki pass made it repeatable in its
+            // event (Halloween, closing line 415297), so he offers it again, not a quiet Hello.
+            assert!(!pass.skipped.contains(&VLADIMIR), "Vladimir can be clicked");
+            assert!(!pass.quiet.contains_key(&VLADIMIR), "Vladimir offers Going Batty again");
         } else {
             // The owner's Rizzle with A Beautiful Friendship active: its open goal.
             assert_eq!(pass.quiet.get(&RIZZLE), Some(&FIND_THE_SASPARILLA));

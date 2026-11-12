@@ -3128,9 +3128,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1926.984,
-        -38.42006,
-        -633.9166
+        -1927.461022,
+        -38.3539,
+        -636.370668
       ],
       "position_w": null,
       "rotation": [
@@ -3144,7 +3144,7 @@
       "placement_confidence": "low",
       "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) T194: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 3468 (FabledRealms.lua:2211), one of the three unnamed Greenwood archer actors standing in front of Lugabow, so NPC range checks use the actor the client actually sees.",
+      "position_reason": "(R) T194: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 3468 (FabledRealms.lua:2211), one of the three unnamed Greenwood archer actors standing in front of Lugabow, so NPC range checks use the actor the client actually sees. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1926.984, -38.42006, -633.9166]: it stood 2.5 m from Hrugagu; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -18990,9 +18990,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1590.522274,
-        -45.37643,
-        -548.515634
+        -1591.211367,
+        -45.3056,
+        -546.11248
       ],
       "position_w": null,
       "rotation": [
@@ -19012,7 +19012,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1590.522274, -45.37643, -548.515634]: it stood 2.9 m from Greenwood Forest Warpstone; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -23368,9 +23368,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1580.39915,
-        -44.9809,
-        -555.223024
+        -1831.369,
+        -54.3212,
+        -45.576
       ],
       "position_w": null,
       "rotation": [
@@ -23390,7 +23390,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 6 by longest normalized whole-name score 16; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 6 by longest normalized whole-name score 16; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1580.39915, -44.9809, -555.223024]: it stood 568 m away on a guessed point (POI spiral); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at a Sanctuary-main Lua spawn: ../lab/references/Sanctuary-BubbaJoeX-20261031/src/Scripts/Zone/Battles.lua:78 spawnNpc(46251); Sanctuary-BubbaJoeX-20261031 src/Resources/Npcs.json Id=46251; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",

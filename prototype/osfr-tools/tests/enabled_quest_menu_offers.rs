@@ -190,11 +190,10 @@ impl Shipped {
     ) -> (GameplayState, BTreeMap<u32, Vec<u32>>) {
         let mut state = base.clone();
         let mut historical = BTreeMap::new();
-        let progress = &mut state
+        let saved = state
             .npc_quests
             .as_mut()
-            .expect("the fixture binds the quest catalogue")
-            .quests;
+            .expect("the fixture binds the quest catalogue");
         for &quest in quests {
             let chain = self.chain(quest);
             let disabled: Vec<u32> = chain
@@ -208,13 +207,18 @@ impl Shipped {
             for id in chain {
                 // Empty counters: `repair_counters` fills an enabled quest's to
                 // its required counts and keeps a disabled one as historical.
-                progress.insert(
+                saved.quests.insert(
                     id,
                     QuestProgress {
                         status: QuestStatus::Completed,
                         counts: Vec::new(),
                     },
                 );
+            }
+            // QF: a quest that needs another finished N times (Halloween Fanatic) gets the count.
+            for (other, times) in self.engine.completions_needed(quest) {
+                let repeat = osfr_tools::quest_engine::QuestRepeat { last: 0, times };
+                saved.repeats.insert(other, repeat);
             }
         }
         if let Some(job) = self.records[&quests[0]].job {

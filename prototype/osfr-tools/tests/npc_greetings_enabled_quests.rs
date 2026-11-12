@@ -67,11 +67,17 @@ const SUNSTONE_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Sunstone Va
 /// the record's own `source` note must name the locale id. A `SelfReference` row
 /// names the NPC and the quest, and the line must claim that quest's object in the
 /// first person ("my spectral spectacles"); this is only used where the client has
-/// no quest record for the event quest.
+/// no quest record for the event quest. A `QuestClosing` row names the NPC and the
+/// quest whose hand-in the NPC takes: the record's closing line is the greeting, the
+/// NPC row's `quests_accepted` binds the quest, and the record's `source` note names
+/// the locale id (QF: Petal's pitch closes the sponsorship Amber Violet offers).
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Proof {
     GuideQuote,
     QuestOffer {
+        title: &'static str,
+    },
+    QuestClosing {
         title: &'static str,
     },
     SelfReference {
@@ -257,7 +263,7 @@ const BINDINGS: &[Binding] = &[
         guide: KART_GUIDE,
         guide_line: 77,
         guide_row: "| 17 | **Kart Driver: Seaside Board of Tourism Sponsorship**",
-        proof: Proof::QuestOffer {
+        proof: Proof::QuestClosing {
             title: "Kart Driver: Seaside Board of Tourism Sponsorship",
         },
         quest: Some(("kart_driver.json", 3080019)),
@@ -532,7 +538,7 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     ),
     (
         9500000872,
-        "Blammo (T732 giver and talk target of 3080009): NPCs - Wilds.md:148 and Kart Driver.md row 7 quote only the third-person Exploder's League role; his line 394486 is the quest offer, not a greeting.",
+        "Blammo (T732 talk target of 3080009, its hand-in since QF moved the offer to T.R. Walker Jr.): NPCs - Wilds.md:148 and Kart Driver.md row 7 quote only the third-person Exploder's League role; his line 394486 is the quest's closing, not a greeting.",
     ),
     (
         9500000870,
@@ -869,6 +875,47 @@ fn speaker_proof(binding: &Binding, text: &str) -> Result<(), String> {
                     "{file} quest {quest_id} does not use {} as its intro",
                     binding.greeting
                 ));
+            }
+            let evidence = quest["source"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|source| source["evidence"].as_str())
+                .collect::<Vec<_>>()
+                .join(" ");
+            if !evidence.contains(binding.guide)
+                || !evidence.contains(&binding.greeting.to_string())
+            {
+                return Err(format!(
+                    "{file} quest {quest_id} source note does not cite {} and {}",
+                    binding.guide, binding.greeting
+                ));
+            }
+        }
+        Proof::QuestClosing { title } => {
+            if !row.contains(title) {
+                return Err(format!(
+                    "{} row {:?} does not name quest {title:?}",
+                    binding.guide, binding.guide_row
+                ));
+            }
+            let (file, quest_id) = binding
+                .quest
+                .ok_or_else(|| "a quest-closing binding must name its quest record".to_owned())?;
+            let quest = quest_record(file, quest_id);
+            if quest["end_text_string_id"].as_u64() != Some(u64::from(binding.greeting)) {
+                return Err(format!(
+                    "{file} quest {quest_id} does not close with {}",
+                    binding.greeting
+                ));
+            }
+            let takes = npc_record(binding.file, binding.npc_id)["quests_accepted"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .any(|accepted| accepted["quest_id"].as_u64() == Some(u64::from(quest_id)));
+            if !takes {
+                return Err(format!("{file} quest {quest_id} is not handed in to {}", binding.npc_id));
             }
             let evidence = quest["source"]
                 .as_array()

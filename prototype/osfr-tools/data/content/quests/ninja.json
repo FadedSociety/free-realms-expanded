@@ -776,12 +776,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Trouble_in_Snowhill)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388401,
       "intro_text_string_id": 388399,
       "end_text_string_id": 388402,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3110009,
@@ -1211,12 +1221,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AContract%3A_Sharp_Claws_and_Sharper_Swords)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388405,
       "intro_text_string_id": 388403,
       "end_text_string_id": 388406,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3110015,
@@ -1529,12 +1549,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Fending_off_the_Floren)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388409,
       "intro_text_string_id": 388407,
       "end_text_string_id": 388410,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3110020,
@@ -2088,12 +2118,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AContract%3A_Spirits_and_Spider_Trainers)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388413,
       "intro_text_string_id": 388411,
       "end_text_string_id": 388414,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3110026,

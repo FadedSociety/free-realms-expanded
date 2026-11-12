@@ -210,7 +210,9 @@ struct Event {
     /// False: the season's yearly dates do not start it; only a rotation or a hand does.
     #[serde(default = "yes")]
     by_date: bool,
-    /// Quests offered only while the event runs.
+    /// Quests offered only while the event runs. Shipped content tags the quest row instead
+    /// (`live_event`: this event's key, asked through [`EventCalendar::is_running`]); this list
+    /// is the older way to say the same and still gates.
     #[serde(default)]
     quest_ids: Vec<u32>,
     source: String,
@@ -471,7 +473,8 @@ impl EventCalendar {
 
     /// The one "is this event running now" gate (event-repeat contract): event `key`'s dates
     /// and rotations under the hand toggles `areas` carries. An unknown key never runs. Gifts
-    /// (`crate::gifts`) ask it; any row kind with a `live_event` key can.
+    /// (`crate::gifts`) and quest rows (`live_event`, `gameplay/live_events.rs`) ask it; any
+    /// row kind with a `live_event` key can.
     pub fn is_running(&self, key: &str, areas: &ClientAreas, unix_ms: u64) -> bool {
         self.running(areas, unix_ms).any(|event| event.key == key)
     }

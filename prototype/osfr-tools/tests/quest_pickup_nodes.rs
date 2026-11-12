@@ -75,8 +75,16 @@ fn at(player: u64, npc: u64) -> osfr_tools::character_store::CharacterState {
     character_at_for(player, 0, content_position("seaside.json", npc))
 }
 
-/// Offer and accept A Booming Problem at Heddy.
+/// QF: the wiki files A Booming Problem under Seaside Summer Splash (July 3-15), so its offer
+/// waits for the event: the event clock is held inside it (2014-07-05 12:00 UTC).
+const SUMMER_SPLASH_MS: u64 = 1_404_561_600_000;
+
+/// Hold the event clock in Seaside Summer Splash and let one poll open it, then offer and
+/// accept A Booming Problem at Heddy.
 fn accept_booming(game: &mut Gameplay, player: u64, now: &mut u64) {
+    *now += 1_100;
+    game.set_event_clock(Some(SUMMER_SPLASH_MS + *now));
+    tick(game, *now);
     let heddy = at(player, HEDDY);
     offer(game, &heddy, HEDDY, QUEST, *now);
     accept(game, &heddy, QUEST, *now + 2);

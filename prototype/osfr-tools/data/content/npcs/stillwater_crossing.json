@@ -97,16 +97,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1321.7224,
-        -65.9446,
-        905.15906
+        -1310.0,
+        -63.525,
+        905.5
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.88277980818522,
         0.0,
-        0.9991522236145548
+        0.46978698391980406
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -119,7 +119,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 11.7 m north from [-1321.7224, -65.9446, 905.15906] to [-1310.0, -63.525, 905.5], world editor /api/probe: stand.y -63.525 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -1127,16 +1127,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1324.63148,
-        -65.9446,
-        906.678913
+        -1312.0,
+        -64.3,
+        896.0
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.5707502844882589,
         0.0,
-        0.9991522236145548
+        0.8211236890728287
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -1149,7 +1149,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 16.5 m north-west from [-1324.63148, -65.9446, 906.678913] to [-1312.0, -64.3, 896.0], world editor /api/probe: stand.y -64.3 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -1466,18 +1466,18 @@
         "model_id": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ACallie_Kelpcake"
+            "evidence": "(R) Review 2026-11-12 (npc-placement-b): the stand-in body was model 7 (humanchild_f_skirtandtunic.adr, the most common model of drawn human female NPCs), a child body whose only idle is the sit loop with no seat anywhere near. The wiki page shows an adult, so the stand-in is the client model whose outfit matches the portrait: fanbyte images/08bb969596071483d00587688e2c481b.jpg (Callie Kelpcake: a chef in a chef's hat, red neckerchief, jacket and apron). Model 359 human_f_chef_01.agr is in no npc_ambient idle row and no npc_poses model row, so it stands on loc_stand. Still a stand-in (the client names no body for her)."
           }
         ],
         "model_file_name": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ACallie_Kelpcake"
+            "evidence": "(R) Review 2026-11-12 (npc-placement-b): the stand-in body was model 7 (humanchild_f_skirtandtunic.adr, the most common model of drawn human female NPCs), a child body whose only idle is the sit loop with no seat anywhere near. The wiki page shows an adult, so the stand-in is the client model whose outfit matches the portrait: fanbyte images/08bb969596071483d00587688e2c481b.jpg (Callie Kelpcake: a chef in a chef's hat, red neckerchief, jacket and apron). Model 359 human_f_chef_01.agr is in no npc_ambient idle row and no npc_poses model row, so it stands on loc_stand. Still a stand-in (the client names no body for her)."
           }
         ]
       },
-      "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr"
+      "model_id": 359,
+      "model_file_name": "human_f_chef_01.agr"
     },
     {
       "npc_id": 9500000783,
@@ -1549,16 +1549,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1319.141447,
-        -65.9446,
-        906.558118
+        -1308.5,
+        -63.438,
+        899.5
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.7256110024017997,
         0.0,
-        0.9991522236145548
+        0.6881051323696514
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -1576,7 +1576,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 12.8 m north-west from [-1319.141447, -65.9446, 906.558118] to [-1308.5, -63.438, 899.5], world editor /api/probe: stand.y -63.438 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -1951,16 +1951,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1326.900869,
-        -65.8164,
-        906.780675
+        -1305.5,
+        -62.325,
+        906.0
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.8499136581337349,
         0.0,
-        0.9991522236145548
+        0.5269219806743053
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -1973,7 +1973,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 21.4 m north from [-1326.900869, -65.8164, 906.780675] to [-1305.5, -62.325, 906.0], world editor /api/probe: stand.y -62.325 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -4353,9 +4353,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1262.703874,
-        -49.042,
-        780.909649
+        -1261.7,
+        -49.277,
+        779.41
       ],
       "position_w": null,
       "rotation": [
@@ -4375,7 +4375,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 18. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 18. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.8 m north-west from [-1262.703874, -49.042, 780.909649] to [-1261.7, -49.277, 779.41], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "wiki",
@@ -4686,9 +4686,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1263.207283,
-        -49.042,
-        789.26331
+        -1263.71,
+        -49.15,
+        789.26
       ],
       "position_w": null,
       "rotation": [
@@ -4708,7 +4708,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 18. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 18. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 0.5 m south from [-1263.207283, -49.042, 789.26331] to [-1263.71, -49.15, 789.26], world editor /api/probe: stand.y -49.15 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -5188,16 +5188,16 @@
       ],
       "services_reason": null,
       "position": [
-        -1322.739479,
-        -64.82256,
-        902.505048
+        -1313.0,
+        -63.987,
+        903.5
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.8832636547781797,
         0.0,
-        0.9991522236145548
+        0.46887665344724994
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -5210,7 +5210,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 9.8 m north from [-1322.739479, -64.82256, 902.505048] to [-1313.0, -63.987, 903.5], world editor /api/probe: stand.y -63.987 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -6944,16 +6944,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1321.158004,
-        -65.9446,
-        907.525618
+        -1307.5,
+        -62.75,
+        903.0
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.8112421851755617,
         0.0,
-        0.9991522236145548
+        0.5847102846637638
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -6971,7 +6971,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 14.4 m north from [-1321.158004, -65.9446, 907.525618] to [-1307.5, -62.75, 903.0], world editor /api/probe: stand.y -62.75 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -8553,16 +8553,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1321.102274,
-        -64.82256,
-        901.162709
+        -1312.5,
+        -63.919,
+        899.5
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.7354983197565639,
         0.0,
-        0.9991522236145548
+        0.6775265468122053
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -8575,7 +8575,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 8.8 m north from [-1321.102274, -64.82256, 901.162709] to [-1312.5, -63.919, 899.5], world editor /api/probe: stand.y -63.919 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -9030,16 +9030,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1326.172719,
-        -65.82,
-        904.592969
+        -1312.5,
+        -64.75,
+        908.0
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.9434065504023218,
         0.0,
-        0.9991522236145548
+        0.33163847885610537
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -9057,7 +9057,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 14.1 m north from [-1326.172719, -65.82, 904.592969] to [-1312.5, -64.75, 908.0], world editor /api/probe: stand.y -64.75 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -9817,6 +9817,7 @@
     },
     {
       "npc_id": 9500000794,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Pumpkin Prince",
@@ -10328,6 +10329,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Pumpkin_Prince (the wiki files it under Super Spooktacular)"
           }
         ]
       }
@@ -11767,9 +11774,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1260.559593,
-        -49.042,
-        788.289347
+        -1260.06,
+        -49.254,
+        788.29
       ],
       "position_w": null,
       "rotation": [
@@ -11804,7 +11811,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 18 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 18 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 0.5 m north from [-1260.559593, -49.042, 788.289347] to [-1260.06, -49.254, 788.29], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -12850,16 +12857,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1323.932803,
-        -65.94,
-        908.731713
+        -1309.0,
+        -64.463,
+        909.5
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.04116836219830328,
+        -0.9220812644453843,
         0.0,
-        0.9991522236145548
+        0.38699630716429495
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -12872,7 +12879,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 120 by longest normalized whole-name score 21; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 15.0 m north from [-1323.932803, -65.94, 908.731713] to [-1309.0, -64.463, 909.5], world editor /api/probe: stand.y -64.463 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -13779,9 +13786,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1261.632612,
-        -49.2551,
-        783.03493
+        -1261.63,
+        -49.253,
+        784.03
       ],
       "position_w": null,
       "rotation": [
@@ -13801,7 +13808,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 18 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 18 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.0 m east from [-1261.632612, -49.2551, 783.03493] to [-1261.63, -49.253, 784.03], world editor /api/probe: stand.y -49.253 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",

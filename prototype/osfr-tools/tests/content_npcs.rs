@@ -533,7 +533,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     // P-quest-npcs: seven quest people bound to spawns the world already drew (1,306).
     // Combat quests wave 2: Roxy's Barrel, bound to its drawn spawn (1,313).
     // P-banking: Yoink, bound to his body in npc_spawns_extra.json (1,314).
-    assert_eq!(content_npcs.len(), 1314);
+    // QF: the listed-only Burgl row folds into the placed Burglz row, one quarry troll (1,313).
+    assert_eq!(content_npcs.len(), 1313);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),

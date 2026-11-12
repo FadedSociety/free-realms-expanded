@@ -232,7 +232,7 @@ impl Gameplay {
         if let Some(out) = self.npc_quest_reply_49_2(inner, character.guid)? {
             return Ok(Some(out));
         }
-        if let Some(out) = self.npc_quest_end_49_14(inner)? {
+        if let Some(out) = self.npc_quest_end_49_14(inner, character.guid)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_quest_abandon_26_23(inner)? {
@@ -624,7 +624,7 @@ impl Gameplay {
         Ok(None)
     }
 
-    fn npc_quest_end_49_14(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
+    fn npc_quest_end_49_14(&mut self, inner: &[u8], player_guid: u64) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[49, 0, 14, 0]) {
             let quest_id = npc_interaction::decode_quest_end_reply_49_14(inner)
                 .map_err(|_| invalid("invalid quest end reply"))?;
@@ -690,6 +690,8 @@ impl Gameplay {
                     crate::station_cash::EarnSource::Quest { id: quest_id },
                     &mut out,
                 )?;
+                // A Mystery Gift the reward paid opens at once (`mystery_chests.json` gifts).
+                self.open_gifts(player_guid, &mut out);
             }
             out.replies.push(END_DIALOG_26_4.to_vec());
             // The line goes straight on (`-zp-94_-ImE` 223-224); with nothing more to offer,

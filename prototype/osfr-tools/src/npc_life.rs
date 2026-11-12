@@ -205,6 +205,11 @@ impl Life {
         ((floor - p[1]).abs() > SETTLED_M).then_some(floor)
     }
 
+    /// Whether this spawn has its own pose row (`animation_id`), which beats its model's idle table.
+    pub fn has_pose_row(&self, guid: u64) -> bool {
+        self.by_spawn.contains_key(&guid)
+    }
+
     /// Whether the floor is known; [`Self::set_floor`] takes only the first terrain.
     pub fn has_floor(&self) -> bool {
         self.floor.is_some()

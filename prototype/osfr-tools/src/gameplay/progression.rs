@@ -34,17 +34,10 @@ impl Gameplay {
             }
         }
         if let Some(quests) = &self.npc_quests {
+            // A repeatable quest taken again keeps counting (`QuestState::completed_count`).
             counters.insert(
                 "quest_completed_count".into(),
-                u32::try_from(
-                    quests
-                        .state()
-                        .quests
-                        .values()
-                        .filter(|quest| quest.status == crate::quest_engine::QuestStatus::Completed)
-                        .count(),
-                )
-                .unwrap_or(1_000_000),
+                u32::try_from(quests.state().completed_count()).unwrap_or(1_000_000),
             );
         }
         counters

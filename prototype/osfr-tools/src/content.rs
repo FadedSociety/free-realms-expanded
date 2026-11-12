@@ -682,10 +682,20 @@ pub struct Quest {
     /// W104 publication flag: hollow quests are `false` and never offered.
     #[serde(default = "enabled_by_default")]
     pub enabled: bool,
-    /// T418: offered only while an admin has the event open (`realm event open`,
-    /// `gameplay/live_events.rs`). A closed event stays enabled.
+    /// Offered only while its event runs (`gameplay/live_events.rs`); a closed event stays
+    /// enabled. See [`LiveEvent`].
+    #[serde(default, skip_serializing_if = "LiveEvent::is_off")]
+    pub live_event: LiveEvent,
+    /// Owner 2026-11-11: the quest can be taken again `repeat_hours` after each completion
+    /// (`quest_engine/quest_repeat.rs`); 24 is daily. `repeat_hours` is required with it.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub live_event: bool,
+    pub repeatable: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub repeat_hours: Option<u32>,
+    /// Quest id to how many times it must have been completed first, as Halloween Fanatic
+    /// needs Trick-or-Treat three times (fanbyte Category:Super_Spooktacular).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub prerequisite_completions: BTreeMap<u32, u32>,
     /// T465: quests this one is mutually exclusive with. While any of them is
     /// offered, active or completed, this one is neither offered nor accepted
     /// (`QuestEngine::requirement_denial`); an abandon reopens it (R). The split
@@ -703,6 +713,48 @@ pub struct Quest {
 
 fn enabled_by_default() -> bool {
     true
+}
+
+/// A quest's event gate (owner 2026-11-11: an "Event quest" toggle and an event drop-down).
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq, Serialize)]
+#[serde(untagged)]
+pub enum LiveEvent {
+    /// `false`: no gate. `true`: T418's admin event, open while `realm event open` lists it.
+    Admin(bool),
+    /// An `event_calendar.json` event key: open while the calendar runs that event.
+    Calendar(String),
+}
+
+impl Default for LiveEvent {
+    fn default() -> Self {
+        Self::Admin(false)
+    }
+}
+
+impl Quest {
+    /// The hours between completions of a repeatable quest; `repeat_hours` (at least 1) goes
+    /// with `repeatable` and only with it.
+    pub fn repeat_rule(&self) -> Result<Option<u32>, &'static str> {
+        match (self.repeatable, self.repeat_hours) {
+            (false, None) => Ok(None),
+            (true, Some(hours)) if hours >= 1 => Ok(Some(hours)),
+            _ => Err("a repeatable quest needs repeat_hours of at least 1, and only it has them"),
+        }
+    }
+}
+
+impl LiveEvent {
+    pub fn is_off(&self) -> bool {
+        *self == Self::Admin(false)
+    }
+
+    /// The calendar event key, when the gate is one.
+    pub fn key(&self) -> Option<&str> {
+        match self {
+            Self::Calendar(key) => Some(key),
+            Self::Admin(_) => None,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -1054,6 +1106,12 @@ impl ContentDb {
                     record: owner,
                     detail: "quest requirements need min_level 1..=20 and a positive job profile"
                         .into(),
+                });
+            }
+            if let Err(detail) = row.repeat_rule() {
+                return Err(ContentError::InvalidRecord {
+                    record: owner,
+                    detail: detail.into(),
                 });
             }
             for goal in &row.objectives {

@@ -14,9 +14,10 @@
 //! offer is the existing 49/1 (client reader 0x00c7bb60) and each command answers
 //! with one `chat::system` line.
 //!
-//! The event calendar (`crate::event_calendar`) shares the gate: a quest an event lists is
-//! open while that event's season is active (by date or by hand), beside whatever the admin
-//! has opened. Once a second the session re-reads the hand toggles, and when the running
+//! The event calendar (`crate::event_calendar`) shares the gate: a quest whose `live_event` is
+//! an event key (or that an event's old `quest_ids` list holds) is open while
+//! `EventCalendar::is_running` says that event runs (by date or by hand), beside whatever the
+//! admin has opened. Once a second the session re-reads the hand toggles, and when the running
 //! events moved it holds the seasons in its NPC view and closes the ended events' quests:
 //! a started one is abandoned (26/23's own `QuestAbandoned` answer) and a finished one is
 //! forgotten, as the calendar's `on_end` says. `realm event season` shows and sets the toggles;
@@ -88,26 +89,54 @@ impl Gameplay {
         if let Some(visibility) = self.npc_visibility.as_mut() {
             visibility.set_season_clock(unix_ms);
         }
+        // Repeatable quests come due on the same clock (`quest_repeat.rs`).
+        if let Some(engine) = self.npc_quests.as_mut() {
+            engine.set_clock(unix_ms.map(|ms| ms / 1_000));
+        }
     }
 
     /// Open the admin's events and the running calendar events, hold the seasons in the NPC
     /// view, and (on a tick, when `out` can carry the answer) clear what ended events left in
     /// the journal. Idempotent: it reads state, not transitions, so a character that was
     /// offline when an event ended is cleaned on its first tick.
-    fn apply_events(&mut self, unix_ms: u64, out: Option<&mut Outcome>) {
+    fn apply_events(&mut self, unix_ms: u64, mut out: Option<&mut Outcome>) {
         self.follow_shop_events(unix_ms);
         let watch = &self.event_watch;
         let mut open = watch.admin_open.clone();
         let mut ended = BTreeSet::new();
         let mut on_end = event_calendar::OnEnd::default();
         if let Some(areas) = &watch.seasons {
-            let running = areas.calendar().open_quests(areas, unix_ms);
-            ended = &areas.calendar().gated_quests() - &running;
+            let calendar = areas.calendar();
+            let mut gated = calendar.gated_quests();
+            let mut running = calendar.open_quests(areas, unix_ms);
+            // A quest row tagged with an event key asks the calendar's one gate (QF).
+            for (id, key) in self.npc_quests.iter().flat_map(|engine| engine.event_quests()) {
+                gated.insert(id);
+                if calendar.is_running(key, areas, unix_ms) {
+                    running.insert(id);
+                }
+            }
+            ended = &gated - &running;
             ended.retain(|id| !open.contains(id));
             on_end = areas.calendar().on_end();
             open.extend(running);
             if let Some(visibility) = self.npc_visibility.as_mut() {
                 visibility.set_event_modes(areas.hand_modes().clone());
+            }
+            // EV: this player's gathering and quest nodes and event Atlas markers follow the same
+            // gate. Event rows coming and going are world state, never a save: the nodes settle
+            // in the NPC view here (busy, so no run's bookkeeping moves; at the clock's origin, so
+            // no regrow timer is spent) and its next pass sends them, as the event's people; a
+            // moved marker sends its new 57.
+            let events: BTreeSet<String> = (areas.calendar().active_at(areas, unix_ms).into_iter())
+                .map(str::to_owned)
+                .collect();
+            if let (Some(nodes), Some(view)) = (self.gathering_nodes.as_mut(), self.npc_visibility.as_mut()) {
+                nodes.set_running_events(&events);
+                crate::harvest_nodes::apply_node_changes(view, nodes.sync(0, true));
+            }
+            if let (true, Some(out)) = (self.warp.set_running_events(&events), out.as_deref_mut()) {
+                out.replies.push(self.warp.definitions_message());
             }
         }
         let Some(engine) = self.npc_quests.as_mut() else {
@@ -217,8 +246,20 @@ impl Gameplay {
                 None
             }
         };
-        if let (Some(engine), Some(areas)) = (self.npc_quests.as_mut(), &seasons) {
-            engine.gate_events(areas.calendar().gated_quests());
+        if let Some(engine) = self.npc_quests.as_mut() {
+            engine.set_clock(clock.map(|ms| ms / 1_000));
+            if let Some(areas) = &seasons {
+                engine.gate_events(areas.calendar().gated_quests());
+                // A key the calendar lacks never runs: its quest stays closed, said once here.
+                let calendar = areas.calendar();
+                let unknown: Vec<u32> = (engine.event_quests())
+                    .filter(|(_, key)| !calendar.has_event(key))
+                    .map(|(id, _)| id)
+                    .collect();
+                if !unknown.is_empty() {
+                    npc_event(serde_json::json!({"event": "event_quest_unknown_key", "ids": unknown}));
+                }
+            }
         }
         self.event_watch = EventWatch {
             seasons,
@@ -237,6 +278,10 @@ impl Gameplay {
     pub(super) fn tick_live_events(&mut self, now_ms: u64, out: Option<&mut Outcome>) {
         if !self.event_watch.file.due(now_ms) {
             return;
+        }
+        // The same second's check of repeatable quests coming due (`quest_repeat.rs`).
+        if let Some(engine) = self.npc_quests.as_mut() {
+            engine.tick_repeats();
         }
         let path = self.events_path();
         let mut moved = match self.event_watch.file.poll_with(&path, now_ms, read_events) {
@@ -283,9 +328,10 @@ impl Gameplay {
         if let ["season", rest @ ..] = args {
             return Ok(self.event_season_command(rest));
         }
-        let Some(mut live) = self.npc_quests.as_ref().map(|q| q.live_events().clone()) else {
+        let Some(engine) = self.npc_quests.as_ref() else {
             return Ok("Live events need the quest catalogue.".into());
         };
+        let mut live = engine.live_events();
         // A calendar event's quests follow their season; `realm event season` switches those.
         if let Some(areas) = &self.event_watch.seasons {
             let seasonal = areas.calendar().gated_quests();

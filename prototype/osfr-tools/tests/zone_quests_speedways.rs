@@ -4,7 +4,9 @@
 //! The record is content only (`data/content/quests/kart_driver.json`): Petal
 //! Oceanmist (9500000613, a `legacy_data` row T698 drew for the Frost Ridge
 //! Speedway) offers it, one `talk_to_npc` objective names her again, and the final
-//! Talk is the 49/13 turn-in. No packet, handler or selector is new; the wire
+//! Talk is the 49/13 turn-in. QF: the offer is Amber Violet's (9500000868, the wiki's
+//! giver: her line 394662 sends the player to Petal), and Petal's own pitch 394665 is
+//! the closing line at her hand-in. No packet, handler or selector is new; the wire
 //! readers are the ones `tests/support/npc_quest_chain.rs` cites: 49/1
 //! `0x00c7bb60`, 49/2 `0x00a86400`, 49/13 `QuestEndPacket::ReadFields`
 //! `0x00c7b990`, 49/14 `0x00a864c0`, AddNpc `0x00921a10`. The 49/3 goal row's name
@@ -34,22 +36,25 @@ use osfr_tools::{quest_engine::QuestStatus, startup_world::parse_add_npc, world:
 use quest_records::read_quests;
 
 const PETAL: u64 = 9_500_000_613;
+/// QF: the giver, the Frost Ridge rival whose offer line sends the player to Petal.
+const AMBER: u64 = 9_500_000_868;
 /// The POI-anchored Wilds row for the same Petal at the Frost Ridge Speedway POI
 /// (`placement_candidates`: poi_id 33); the seaside row is the legacy Snowhill spawn.
 const SPEEDWAY_POI: u64 = 9_500_000_930;
 const QUEST: u32 = 3_080_019;
 const KART_DRIVER: i32 = 48;
-/// Title, intro (the offer line) and description (the objective hint) the 49/1 card carries.
-const CARD: [u32; 3] = [394_663, 394_665, 394_664];
-/// Petal's reply on the turn-in Talk (client locale, quest_dialog tagged to this title).
-const END_TEXT: u32 = 394_666;
+/// Title, intro (Amber's offer line) and description (the objective hint) the 49/1 card carries.
+const CARD: [u32; 3] = [394_663, 394_662, 394_664];
+/// Petal's pitch on the turn-in Talk (QF: the closing line of the client's block for this
+/// quest, offer 394662, title 394663, description 394664, then 394665; 394666 opens 3080020).
+const END_TEXT: u32 = 394_665;
 /// The client's direct objective line ("Talk to Petal Oceanmist at Frost Ridge
 /// Speedway to see if she will offer you a sponsorship."); 394911 is its short form.
 const OBJECTIVE_TEXT: u32 = 394_910;
 
 const MAP: ZoneQuests = ZoneQuests {
     default_file: "seaside.json",
-    files: &[],
+    files: &[(AMBER, "wilds.json")],
     runtime: &[],
 };
 
@@ -80,7 +85,7 @@ fn sponsorship() -> ZoneQuest {
     );
     ZoneQuest {
         id: QUEST,
-        giver: PETAL,
+        giver: AMBER,
         card: CARD,
         steps: &[],
         turnin: PETAL,
@@ -138,6 +143,14 @@ fn a_player_without_the_kart_job_is_not_offered_the_sponsorship() {
         &mut now,
         "Petal for an Adventurer",
     );
+    let amber = MAP.at(CHARACTER, AMBER);
+    assert_no_offer(
+        &mut game,
+        &amber,
+        AMBER,
+        &mut now,
+        "Amber for an Adventurer",
+    );
     let before = saved(&game);
     assert_packet_changes_nothing(
         &mut game,
@@ -162,13 +175,27 @@ fn petal_row_binds_the_sponsorship_as_given_and_accepted() {
         .find(|row| row["npc_id"].as_u64() == Some(PETAL))
         .expect("Petal's row ships");
     // Lead 2026-11-10: P-kart-racing gives the three Frost Ridge challenges from Petal too
-    // (3080020 Sprint, 3080021 Endurance, 3080022 Dominating); the sponsorship stays first.
+    // (3080020 Sprint, 3080021 Endurance, 3080022 Dominating).
     // Combat quests wave 2 (quest_wire.py): The Price of Fame (3080023) after Dominating.
+    // QF: the sponsorship itself is given by Amber Violet, the wiki's giver; Petal takes it.
     assert_eq!(
         row["quest_ids_given"],
-        serde_json::json!([QUEST, 3_080_020, 3_080_021, 3_080_022, 3_080_023])
+        serde_json::json!([3_080_020, 3_080_021, 3_080_022, 3_080_023])
     );
-    for list in ["quests_given", "quests_accepted"] {
+    let wilds = read_json(&content_dir().join("npcs/wilds.json"));
+    let amber = wilds["records"]
+        .as_array()
+        .expect("records")
+        .iter()
+        .find(|row| row["npc_id"].as_u64() == Some(AMBER))
+        .expect("Amber's row ships");
+    assert!(
+        amber["quest_ids_given"]
+            .as_array()
+            .is_some_and(|ids| ids.contains(&serde_json::json!(QUEST))),
+        "Amber gives the sponsorship"
+    );
+    for (row, list) in [(amber, "quests_given"), (row, "quests_accepted")] {
         let entries = row[list].as_array().expect(list);
         let entry = entries
             .iter()

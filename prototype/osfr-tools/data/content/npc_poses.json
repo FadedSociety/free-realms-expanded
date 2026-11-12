@@ -445,12 +445,6 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
-      "guid": 9500000203,
-      "name": "Randall",
-      "keep_height": "stands level with the 2014 placement bw_boulder_02.adr (3.2 m away, -0.12 m), 0.6 m below the baked floor: that is its floor, which the bake has no collision for",
-      "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
-    },
-    {
       "guid": 9500000207,
       "name": "Sera / Bella",
       "keep_height": "stands level with the 2014 placement sh_gates_01.adr (1.6 m away, +0.24 m), 0.9 m below the baked floor: that is its floor, which the bake has no collision for",
@@ -661,16 +655,34 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 9500000874,
+      "name": "Blazing Star",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 455.4 m away (hum_sofa_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 9500000880,
       "name": "Broogle",
       "animation_id": 1,
       "source": "(R) a vendor or trainer stands at its stall (loc_stand, so the client fidget runs): at the Snowhill forge market video 2fhn8kePbKQ frame 00612 shows Vaal <Miner Gear> and Bruno Battlerock <Crafting Supplies> standing"
     },
     {
+      "guid": 9500000893,
+      "name": "Desi",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 732.8 m away (sg_tree_stump_medium_01.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 9500000900,
       "name": "Funnel Bindweed",
       "keep_height": "Legacy spawn height (npcs/*.json placement legacy_data), 1.5 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 9500000907,
+      "name": "Hans",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 327.6 m away (sg_tree_stump_medium_01.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 9500000909,
@@ -727,6 +739,18 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 100000001276,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 245.0 m away (sg_chugawug_logs_01.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000001277,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 7.8 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 100000001289,
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:75), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
@@ -749,6 +773,12 @@
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:78), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001293,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 30.9 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 100000001301,
@@ -857,6 +887,12 @@
       "name": "Meika Dozen",
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:560), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001802,
+      "name": "Swatch Dozen",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 249.7 m away (hum_dining_chair_06.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 100000001808,
@@ -989,6 +1025,24 @@
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:782), 5.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002066,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 73.1 m away (sh_table_battlechair01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000002084,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 791.2 m away (bs_tree_stump_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000002085,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 566.9 m away (sg_tree_stump_medium_01.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 100000002210,
@@ -1279,6 +1333,12 @@
       "source": "(R) camp by the 2014 campfire placement bw_campfire_01.adr 3.14 m away (lab references fr-spatial prop_placements_2014.tsv): the model's own chugawug_soldier_amb_sitbyfire_loop"
     },
     {
+      "guid": 100000002812,
+      "name": "Redrose",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 13.5 m away (sh_primitive_bedroll_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 100000002841,
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1584), 0.1 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
@@ -1357,10 +1417,46 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 100000002897,
+      "name": null,
+      "animation_id": 2150,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 300.7 m away (sg_tree_stump_medium_02.adr), and the model's only loop for this pick is the sit loop 2140, so it would sit on the ground. It plays its own stand-and-drink loop 2150 (chugawug_amb_standdrink_loop) instead."
+    },
+    {
+      "guid": 100000002939,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 248.5 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 100000002955,
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:1698), 0.7 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000002958,
+      "name": null,
+      "animation_id": 2150,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 234.0 m away (sg_tree_stump_medium_02.adr), and the model's only loop for this pick is the sit loop 2140, so it would sit on the ground. It plays its own stand-and-drink loop 2150 (chugawug_amb_standdrink_loop) instead."
+    },
+    {
+      "guid": 100000002976,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 17.3 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000003020,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 30.6 m away (sg_garage_workbench_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000003052,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 73.3 m away (sg_garage_stool_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 100000003055,
@@ -1735,6 +1831,12 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 100000004069,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 22.0 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 100000004076,
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2742), 3.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
@@ -1747,10 +1849,58 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 100000004086,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 27.0 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000004087,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 25.6 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000004091,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 21.1 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000004093,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 22.4 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
       "guid": 100000004098,
       "name": null,
       "keep_height": "Legacy spawn height (Scripts/Zone/FabledRealms.lua:2764), 12.3 m above the baked floor: the original-derived height is kept; the bake lacks what it stands on (R)",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000004173,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 64.0 m away (sg_cot_01.adr), and the model's only loop for this pick is the sit loop 2100, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000004174,
+      "name": "Joe",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 67.1 m away (sg_cot_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000004175,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 66.3 m away (sg_cot_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
+    },
+    {
+      "guid": 100000004176,
+      "name": null,
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 63.8 m away (sg_cot_01.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 100000004183,
@@ -2161,6 +2311,12 @@
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
     },
     {
+      "guid": 100000034019,
+      "name": "Lazy Chugawug",
+      "animation_id": 2150,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 58.4 m away (sg_garage_workbench_01.adr), and the model's only loop for this pick is the sit loop 2140, so it would sit on the ground. It plays its own stand-and-drink loop 2150 (chugawug_amb_standdrink_loop) instead."
+    },
+    {
       "guid": 100000036129,
       "name": "Vulture",
       "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 0.5 m above the baked floor",
@@ -2195,6 +2351,12 @@
       "name": "Vulture",
       "keep_height": "(R) vulture_sunstone.adr swims, floats or perches: 0.1 m above the baked floor",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000090007,
+      "name": "Kapri",
+      "animation_id": 1,
+      "source": "(R) no seat for the sit loop (npc-placement-b 2026-11-12, owner: \"sitting NPCs sit on nothing\"): the nearest 2014 seat placement (bench, chair, stool, stump, sofa, cot, bedroll or log in lab references fr-spatial prop_placements_2014.tsv) is 23.8 m away (sh_bench_02.adr), and the model's only loop for this pick is the sit loop 2110, so it would sit on the ground. It stands (loc_stand), so the client fidget runs."
     },
     {
       "guid": 5642803637794111666,
@@ -2237,6 +2399,1038 @@
       "name": null,
       "keep_height": "(R) birds_raven.adr swims, floats or perches: 0.8 m below the baked floor",
       "source": "F6 floor audit (tests/npc_life.rs, lab terrain bake 2026-10-28)"
+    },
+    {
+      "guid": 100000001242,
+      "name": "fish.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000001243,
+      "name": "fish.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000001316,
+      "name": "toad.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000001408,
+      "name": "fish.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000001950,
+      "name": "human_m_freestyle_05.agr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000002039,
+      "name": "crab_m_basic.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000002350,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000002356,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000002357,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003086,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003087,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003088,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003566,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003839,
+      "name": "nekark_m.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003843,
+      "name": "nekark_tentacle_cutlass.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003844,
+      "name": "nekark_tentacle_default.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003852,
+      "name": "nekark_tentacle_katana.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003856,
+      "name": "nekark_tentacle_hook.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000003862,
+      "name": "nekark_tentacle_squid.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004194,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004195,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004196,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004198,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004199,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004202,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004204,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004205,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004207,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004208,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004209,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004210,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004211,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004212,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004213,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004258,
+      "name": "human_m_delvin.agr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004374,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004378,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004379,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004380,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004381,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004382,
+      "name": "Cray Bubbler",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004649,
+      "name": "Lazy Swooper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004650,
+      "name": "Lazy Swooper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004651,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004652,
+      "name": "Cray Snapper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004658,
+      "name": "Scavenger Swooper",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000004829,
+      "name": "duck_f_01.adr",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 9500000049,
+      "name": "Mudshell",
+      "keep_height": "(R) stands on the baked water surface (an edge over 100 m, `water_*.adr`): it swims, floats, perches or rides a boat, so its authored height is the water, not the bed (PL-A npc-placement-a)",
+      "source": "PL-A npc-placement-a: the floor rule no longer lets a body that does not swim stand on water"
+    },
+    {
+      "guid": 100000001251,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001275,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001288,
+      "name": "humanchild_m_swirltrimbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001304,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001309,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001616,
+      "name": "chugawug_m_02_ltgreen_drinking.agr",
+      "animation_id": 2150,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001776,
+      "name": "Mazel",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001805,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001807,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001811,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001822,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001823,
+      "name": "humanchild_m_swirltrimbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001824,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001854,
+      "name": "Nathaniel",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001855,
+      "name": "Ryanna",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001856,
+      "name": "Blake",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001857,
+      "name": "Lelime",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000001891,
+      "name": "Tigee Dozen",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002003,
+      "name": "Dougie Dozen",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002009,
+      "name": "humanchild_m_tshirtwithbaggypants.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002010,
+      "name": "fairychild_f_sleevesandshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002011,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002012,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002016,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002030,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002031,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002032,
+      "name": "fairychild_m_mohawkshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002033,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002036,
+      "name": "fairychild_m_mohawkshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002037,
+      "name": "fairychild_f_sleevesandshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002038,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002065,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002267,
+      "name": "Amalia",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002272,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002345,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002398,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002399,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002413,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002452,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002453,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002454,
+      "name": "humanchild_m_tshirtwithbaggypants.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002455,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002456,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002457,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002461,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002469,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002470,
+      "name": "humanchild_m_tshirtwithbaggypants.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002505,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002507,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002693,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002898,
+      "name": "chugawug_m_02_ltgreen_drinking.agr",
+      "animation_id": 2150,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002937,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002938,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002977,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000002998,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003016,
+      "name": "Hasti",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003017,
+      "name": "Lola",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003048,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003062,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003070,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003071,
+      "name": "humanchild_m_swirltrimbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003545,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000003546,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004085,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004092,
+      "name": "humanchild_m_afro.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004216,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004270,
+      "name": "humanchild_f_skirtandtunic.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004271,
+      "name": "fairychild_f_pigtailsdress.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004272,
+      "name": "fairychild_m_mohawkshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004273,
+      "name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004274,
+      "name": "humanchild_m_tshirtwithbaggypants.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004275,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004321,
+      "name": "Declan",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004498,
+      "name": "fairychild_m_mohawkshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004768,
+      "name": "fairychild_f_sleevesandshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004769,
+      "name": "fairychild_m_pointyhair.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004816,
+      "name": "Kaylie Brianne",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000004821,
+      "name": "fairychild_m_mohawkshorts.adr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000513,
+      "name": "Posey",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000754,
+      "name": "Kiel",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000782,
+      "name": "Wintara",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033318,
+      "name": "Pixie Child",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033401,
+      "name": "May",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033412,
+      "name": "June",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033619,
+      "name": "Smart Kid",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033659,
+      "name": "Human Child",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033660,
+      "name": "Human Child",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033661,
+      "name": "Human Child",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033733,
+      "name": "Joel",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033734,
+      "name": "Brian",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033766,
+      "name": "Pleading Son",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000034020,
+      "name": "Lazy Chugawug",
+      "animation_id": 2150,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000090003,
+      "name": "Melvin",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000124,
+      "name": "Drixi",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000152,
+      "name": "Jonathan",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000190,
+      "name": "Parr",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9600000006,
+      "name": "Emily Mistmire",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9000000139,
+      "name": "Majorie",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000268,
+      "name": "Bo",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000276,
+      "name": "Riley",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000365,
+      "name": "Sharon",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000397,
+      "name": "Kendra",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000402,
+      "name": "Lynzi Humblehoop",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000420,
+      "name": "Ronnie Britesmile",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000438,
+      "name": "Anura",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000526,
+      "name": "Roxana",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000570,
+      "name": "Cutes Dozen",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000603,
+      "name": "Miguel",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9000000153,
+      "name": "Moanna",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000617,
+      "name": "Rainchaser",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000624,
+      "name": "Shelly Sandishoes",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000626,
+      "name": "Slinky",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000631,
+      "name": "Sundancer",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000635,
+      "name": "Tikia",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9000000492,
+      "name": "Trina Turtledove",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 9500000905,
+      "name": "Greta",
+      "animation_id": 1,
+      "source": "(R) no 2014 seat placement (bench, chair, stool, stump, sofa, bedroll, log, throne) within 2 m, so the body stands (PL-A npc-placement-a; the model's sit loop needs a seat)"
+    },
+    {
+      "guid": 100000033687,
+      "name": "Human",
+      "keep_height": "Legacy spawn-script height: Sanctuary-main FabledRealms.lua:3901 puts it at y 28.914505, 0.27 m over the terrain grid, standing on the low mound the bake has as collision",
+      "source": "PL-A npc-placement-a: F6 had lifted it 0.45 m onto the mound's top; the script height is the original standing height"
+    },
+    {
+      "guid": 9500000437,
+      "name": "Amoranth",
+      "keep_height": "(R) inside the hill: the placement research (opus/pieces/npc-placement, 2026-11-11) marks this spot underground; the bake keeps only the terrain's top layer, so its cave floor is unknown and the authored height stands",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9500000468,
+      "name": "Darvon",
+      "keep_height": "(R) inside the hill: the placement research (opus/pieces/npc-placement, 2026-11-11) marks this spot underground; the bake keeps only the terrain's top layer, so its cave floor is unknown and the authored height stands",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9500000423,
+      "name": "Sammy",
+      "keep_height": "(R) inside the hill: the placement research (opus/pieces/npc-placement, 2026-11-11) marks this spot underground; the bake keeps only the terrain's top layer, so its cave floor is unknown and the authored height stands",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9500000434,
+      "name": "Yuriah",
+      "keep_height": "(R) inside the hill: the placement research (opus/pieces/npc-placement, 2026-11-11) marks this spot underground; the bake keeps only the terrain's top layer, so its cave floor is unknown and the authored height stands",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9000000339,
+      "name": "Gunther",
+      "keep_height": "(R) stands on the Brambleback's Bayou pier, which the bake has as collision 0.8 m over the water bed (Studio view of the pier and boat at his spot)",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9500000347,
+      "name": "Kim McScuttle",
+      "keep_height": "(R) stands on the end of the Rainbow Lake dock beside the boat, 3 m over the lake bed (Studio view of the dock at her spot)",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9500000494,
+      "name": "Hector",
+      "keep_height": "(R) stands on the Pixiewood Hills plaza paving, 0.6 m over the terrain grid: the same paving the reference rows of Cadie, Edwin and Skelly stand on (y -14.2 to -14.4)",
+      "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
     }
   ],
   "props": [

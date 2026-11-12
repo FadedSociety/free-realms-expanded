@@ -179,9 +179,19 @@
         {
           "kind": "wiki",
           "evidence": "lab/references/quest-table-20261102/quests.json wiki:fr_quest_table_turner_6bba10"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Table_Turner)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3180004,

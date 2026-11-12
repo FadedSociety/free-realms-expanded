@@ -35,9 +35,11 @@ const HIGHROAD: u32 = 3_000_020;
 const AVAILABLE: i32 = 2;
 const TURN_IN: i32 = 6;
 const OTHER: u64 = archer_entry::CHARACTER + 1;
-/// Rules of the Road: one Talk to its own giver (9000000295), then License to Drive is given
-/// by a different NPC (9000000289). Both stand within 25 m of each other.
-const ROAD_GIVER: u64 = 9_000_000_295;
+/// Rules of the Road: Tucker Thunderjolt offers it (QF: the wiki's giver, 9000000495), one Talk
+/// to the commissioner Dalton Narrowbrow (9000000295) completes it and he takes the hand-in, then
+/// License to Drive is given by a different NPC (9000000289). All three stand within 50 m.
+const ROAD_GIVER: u64 = 9_000_000_495;
+const ROAD_HAND_IN: u64 = 9_000_000_295;
 const ROAD_NEXT_GIVER: u64 = 9_000_000_289;
 const RULES_OF_THE_ROAD: u32 = 3_060_004;
 const DERBY_PROFILE: i32 = 49;
@@ -166,8 +168,9 @@ fn turn_in_clears_and_unlocks() {
     assert!(!shown(&first).iter().any(|(id, _)| *id == ROAD_NEXT_GIVER));
 
     offer_and_accept(&mut game, &character, ROAD_GIVER, RULES_OF_THE_ROAD);
-    let talked = archer_entry::talk(&mut game, &character, ROAD_GIVER, 2_200);
-    assert!(talked.changed, "the self-talk completes the only goal");
+    let character = at(ROAD_HAND_IN, "wilds.json");
+    let talked = archer_entry::talk(&mut game, &character, ROAD_HAND_IN, 2_200);
+    assert!(talked.changed, "the Talk at the commissioner completes the only goal");
     assert!(
         !shown(&talked.replies)
             .iter()
@@ -187,7 +190,7 @@ fn turn_in_clears_and_unlocks() {
         2_400,
     );
     assert!(
-        cleared(&done.replies).contains(&ROAD_GIVER),
+        cleared(&done.replies).contains(&ROAD_HAND_IN),
         "the hand-in marker goes"
     );
     assert!(shown(&done.replies).contains(&(ROAD_NEXT_GIVER, AVAILABLE)));
@@ -380,7 +383,7 @@ fn gateway_position_sends_the_marker_after_the_add_npc() {
 }
 
 /// A session in `wilds.json` with the kart and derby packages bound, the shape the shipped
-/// content has: the derby gate is the NPC the Rules of the Road quest already stands beside.
+/// content has: the derby gate stands beside the Rules of the Road hand-in, 24 m from its giver.
 fn race_fixture(active: i32, stands_at: u64) -> (Fixture, Gameplay, CharacterState) {
     let fixture = Fixture::new();
     for file in [

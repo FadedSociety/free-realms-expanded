@@ -16,6 +16,16 @@ pub(super) fn load(options: &Options) -> io::Result<ClientAreas> {
     Ok(ClientAreas::load(content)?.watching(options.world.as_deref().unwrap_or(content)))
 }
 
+/// EV: the calendar events running now, by the one gate (`EventCalendar::is_running` through
+/// `active_at`) on the world's season table, hand toggles included. The shared rows that are not
+/// NPC-view rows (field enemies, battle starters, permanent boomboxes) follow this set each tick.
+pub(super) fn running_events(world: &SharedWorld) -> BTreeSet<String> {
+    let areas = &world.client_areas;
+    (areas.calendar().active_at(areas, unix_now_ms()).into_iter())
+        .map(str::to_owned)
+        .collect()
+}
+
 fn in_open_world(gateway: &Gateway) -> bool {
     gateway.is_world_loaded() && gateway.state().zone_id == OPEN_WORLD_ZONE
 }

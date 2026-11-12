@@ -28,6 +28,7 @@ const CHARACTER: u64 = 101;
 const SECOND_CHARACTER: u64 = 102;
 const CLIENT_VERSION: &str = "1.910.1.530630";
 const CARLOS: u64 = 9_000_000_042;
+const SAMANTHA: u64 = 9_000_000_189;
 const JONES: u64 = 9_000_000_121;
 const SABASTIAN: u64 = 9_000_000_446;
 const PETRA: u64 = 9_000_000_428;
@@ -396,16 +397,17 @@ fn choose_quest_row(
         .expect("quest dialogue choice is valid")
 }
 
-/// T252 enabled C1 (`3030004`, Brawler-gated) ahead of C3 in Carlos's quest list. This T101
-/// chapter keeps its own C3-C5 flow by accepting C1 and completing only its Talk step: Carlos
-/// then offers C3 exactly as before, and C1 stays on its Mongo step without touching any reward
-/// or combat assertion below.
+/// T252 enabled C1 (`3030004`, Brawler-gated); QF moved its offer to Samantha, the wiki's giver
+/// (her offer line sends the player to Carlos). This T101 chapter keeps its own C3-C5 flow by
+/// accepting C1 from Samantha and completing only its Talk step at Carlos: Carlos then offers C3
+/// exactly as before, and C1 stays on its Mongo step without touching any reward or combat
+/// assertion below.
 fn open_carlos_line(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
     const FIRST: u32 = 3_030_004;
     let mut at = character.clone();
-    at.position = npc_position("cobblestone_village.json", CARLOS);
+    at.position = npc_position("cobblestone_village.json", SAMANTHA);
     *now += 100;
-    talk(game, &at, CARLOS, *now);
+    talk(game, &at, SAMANTHA, *now);
     *now += 100;
     let offered = choose_quest_row(game, &at, *now);
     assert!(
@@ -413,12 +415,13 @@ fn open_carlos_line(game: &mut Gameplay, character: &CharacterState, now: &mut u
             .replies
             .iter()
             .any(|packet| has_family(packet, 49, 1, Some(FIRST))),
-        "T252's C1 must be Carlos's first offer to a Brawler"
+        "T252's C1 must be Samantha's first offer to a Brawler"
     );
     *now += 100;
     let accepted = game
         .handle_in_world(&quest_reply(FIRST, true), &at, *now)
         .expect("C1 accept is valid");
+    at.position = npc_position("cobblestone_village.json", CARLOS);
     assert!(
         accepted
             .replies
@@ -1190,7 +1193,11 @@ fn disabled_starting_quests_refuse_without_changing_state() {
     assert!(!gated.changed);
     assert!(gated.outbound.is_empty());
     assert_eq!(engine.state(), &before);
-    let offered = engine.offer(3_030_004, CARLOS);
+    // QF: C1's giver is Samantha, the wiki's; Carlos keeps its Talk and its hand-in.
+    let carlos = engine.offer(3_030_004, CARLOS);
+    assert_eq!(carlos.denial, Some(QuestDenial::WrongGiver));
+    assert_eq!(engine.state(), &before);
+    let offered = engine.offer(3_030_004, SAMANTHA);
     assert_eq!(
         offered.denial, None,
         "T252's C1 is a real, offerable record"

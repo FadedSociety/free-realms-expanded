@@ -64,23 +64,40 @@ const HEARTS_AT: [f32; 3] = [-1122.0, -39.93, -407.5];
 const WAGON: [u64; 1] = [100_000_004_059];
 const WAGON_AT: [f32; 3] = [-490.266, 9.608_817, 775.985];
 
-/// Every shipped seasonal row and its season; the content gate below pins this table.
-const SEASONAL: [(u64, &str); 14] = [
-    (100_000_004_059, "Birthday Bash"),
-    (100_000_031_334, "Halloween"),
-    (100_000_031_425, "Snow Days"),
-    (100_000_031_427, "Snow Days"),
-    (100_000_031_428, "Snow Days"),
-    (100_000_031_443, "Snow Days"),
-    (100_000_031_445, "Snow Days"),
-    (100_000_031_455, "Festival of Hearts"),
-    (100_000_031_456, "Festival of Hearts"),
-    (100_000_031_457, "Festival of Hearts"),
-    (100_000_031_459, "Festival of Hearts"),
-    (100_000_031_460, "Festival of Hearts"),
-    (100_000_031_480, "Halloween"),
-    (100_000_031_482, "Halloween"),
+/// The Legacy event block and its event (EV: `live_event` keys replaced the season names); the
+/// content gate below pins it. The other tagged rows are `tests/event_assets.rs`'s.
+const SEASONAL: [(u64, &str); 15] = [
+    // QF: Going Batty's bat stands only while its quest's event runs, as its giver Vladimir does.
+    (9_500_001_077, "halloween"),
+    (100_000_004_059, "birthday_bash"),
+    (100_000_031_334, "halloween"),
+    (100_000_031_425, "snow_days"),
+    (100_000_031_427, "snow_days"),
+    (100_000_031_428, "snow_days"),
+    (100_000_031_443, "snow_days"),
+    (100_000_031_445, "snow_days"),
+    (100_000_031_455, "festival_of_hearts"),
+    (100_000_031_456, "festival_of_hearts"),
+    (100_000_031_457, "festival_of_hearts"),
+    (100_000_031_459, "festival_of_hearts"),
+    (100_000_031_460, "festival_of_hearts"),
+    (100_000_031_480, "halloween"),
+    (100_000_031_482, "halloween"),
 ];
+
+/// EV: every drawn actor id (extra spawn guid or regional NPC id) that names `key`.
+fn event_rows(key: &str) -> BTreeSet<u64> {
+    let mut rows = Vec::new();
+    rows.extend(json::read(&content_dir().join("npc_spawns_extra.json"))["records"].as_array().unwrap().clone());
+    for entry in std::fs::read_dir(content_dir().join("npcs")).unwrap() {
+        let path = entry.unwrap().path();
+        rows.extend(json::read(&path)["records"].as_array().unwrap().clone());
+    }
+    (rows.iter())
+        .filter(|row| row["live_event"].as_str() == Some(key))
+        .filter_map(|row| row["spawn_guid"].as_u64().or_else(|| row["npc_id"].as_u64()))
+        .collect()
+}
 
 /// The 35/2 AddNpc bodies in `packets`, as actor ids (reader 0x00921a10).
 fn adds(packets: &[Vec<u8>]) -> BTreeSet<u64> {
@@ -123,24 +140,22 @@ fn the_shipped_rows_tag_every_event_npc_with_a_defined_season() {
         .filter_map(|row| {
             Some((
                 row["spawn_guid"].as_u64()?,
-                row["season"].as_str()?.to_owned(),
+                row["live_event"].as_str()?.to_owned(),
             ))
         })
         .collect();
-    let expected: std::collections::BTreeMap<u64, String> = SEASONAL
-        .iter()
-        .map(|(guid, season)| (*guid, (*season).to_owned()))
-        .collect();
-    assert_eq!(
-        shipped, expected,
-        "the seasonal rows are the Legacy event block; an untagged row spawns all year"
-    );
-    let areas = ClientAreas::load(&content_dir()).unwrap();
-    for season in shipped.values() {
-        assert!(
-            areas.season_state(season, 0).is_some(),
-            "{season} is not a client_areas.json season"
+    for (guid, key) in SEASONAL {
+        assert_eq!(
+            shipped.get(&guid).map(String::as_str),
+            Some(key),
+            "the Legacy event block keeps its event; an untagged row spawns all year"
         );
+    }
+    assert!(doc["records"].as_array().unwrap().iter().all(|row| row.get("season").is_none()),
+        "EV: no row reads the old season field");
+    let areas = ClientAreas::load(&content_dir()).unwrap();
+    for key in shipped.values() {
+        assert!(areas.calendar().has_event(key), "{key} is not an event_calendar.json event");
     }
 }
 
@@ -188,12 +203,14 @@ fn inside_its_season_its_npcs_appear_and_other_seasons_stay_off() {
 /// nearby shared viewer gets the 35/3 removals (and later the 35/2 additions) with no reload.
 #[test]
 fn a_season_ending_removes_them_for_a_nearby_shared_viewer() {
-    let pumpkins: BTreeSet<u64> = PUMPKINS.into_iter().collect();
     let mut visibility = load(HALLOWEEN_MS);
     let (wanted, packets) = visibility
         .shared_view(0, PUMPKINS_AT, &[], &BTreeSet::new())
         .unwrap();
-    assert!(pumpkins.is_subset(&wanted), "the pumpkin rows are nearby");
+    // EV: the prince and his ghosts, and every other Halloween row in view (the Sinking
+    // Graveyard's Halloween people).
+    let pumpkins: BTreeSet<u64> = wanted.intersection(&event_rows("halloween")).copied().collect();
+    assert!(PUMPKINS.iter().all(|guid| pumpkins.contains(guid)), "the pumpkin rows are nearby");
     assert!(
         pumpkins.is_subset(&adds(&packets)),
         "the first view adds them"
@@ -294,8 +311,13 @@ fn quiet_package(tag: &str) -> std::path::PathBuf {
         "npc_spawns_extra.json",
         json!({"schema_version": 1, "records": [{
             "spawn_guid": QUIET_GUID, "model_id": 7, "position": [1.0, 0.0, 1.0],
-            "season": "Quiet", "content_key": QUIET_KEY,
+            "live_event": "quiet", "content_key": QUIET_KEY,
         }]}),
+    );
+    write(
+        "event_calendar.json",
+        json!({"schema_version": 1, "source": "test", "events": [{"key": "quiet", "name": "Quiet",
+            "season": "Quiet", "source": "test"}]}),
     );
     write(
         "client_areas.json",

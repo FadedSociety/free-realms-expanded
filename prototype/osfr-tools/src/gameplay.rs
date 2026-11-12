@@ -1008,7 +1008,12 @@ impl Gameplay {
             .map(|visibility| visibility.ambient_actors().collect())
             .unwrap_or_default();
         let npc_ambient = crate::npc_ambient::NpcAmbient::load(npc_content, &ambient_actors)?
-            .map(std::sync::Arc::new);
+            .map(|mut ambient| {
+                if let Some(visibility) = npc_visibility.as_ref() {
+                    ambient.clear_idles(visibility.pose_row_actors());
+                }
+                std::sync::Arc::new(ambient)
+            });
         let battle_file = npc_content.join("field_battles.json");
         // T022: optional chess rows; an absent file publishes none.
         let chess_path = npc_content.join(crate::chess_service::CONTENT_FILE);

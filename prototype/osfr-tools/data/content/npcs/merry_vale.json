@@ -2696,7 +2696,7 @@
     },
     {
       "npc_id": 9500000373,
-      "season": "Birthday Bash",
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakenstein",
@@ -2776,7 +2776,16 @@
         }
       ],
       "field_sources": {
-        "season": [{"kind": "wiki", "evidence": "rc-0136 F4: title 'Birthday Bash event boss' (this row's title_or_role, wiki); 'has risen in Merry Vale!' (38764221) during the event."}],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "rc-0136 F4: title 'Birthday Bash event boss' (this row's title_or_role, wiki); 'has risen in Merry Vale!' (38764221) during the event."
+          },
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fr.fanbyte.com/wiki/FR_Mob:Cakenstein (Birthday Bash)"
+          }
+        ],
         "npc_id": [
           {
             "kind": "client",
@@ -3125,6 +3134,7 @@
     },
     {
       "npc_id": 9500000374,
+      "live_event": "festival_of_hearts",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Changeling Heartbreaker",
@@ -3612,6 +3622,12 @@
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3322; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4751 (ModelId=2041, ModelFileName=changeling_emo_f.adr, NameId=427522)."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event festival_of_hearts: fr.fanbyte.com/wiki/FR_Mob:Changeling_Heartbreaker (Festival of Hearts)"
           }
         ]
       },
@@ -5227,6 +5243,7 @@
     },
     {
       "npc_id": 9500000377,
+      "live_event": "festival_of_hearts",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cudip",
@@ -5998,6 +6015,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event festival_of_hearts: fr.fanbyte.com/wiki/FR_Mob:Cudip (Festival of Hearts, Event mob type); a cupid model; every quest he gives is the event's"
           }
         ]
       },
@@ -11241,9 +11264,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1185.08533,
-        -34.879,
-        -436.320594
+        -1182.736098,
+        -34.7537,
+        -435.465544
       ],
       "position_w": null,
       "rotation": [
@@ -11263,7 +11286,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 14. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 14. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1185.08533, -34.879, -436.320594]: it stood 2.0 m from Persipina; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -14483,9 +14506,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1175.443696,
-        -34.879,
-        -440.155605
+        -1177.180342,
+        -34.8787,
+        -441.953955
       ],
       "position_w": null,
       "rotation": [
@@ -14505,7 +14528,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 14 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 14 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1175.443696, -34.879, -440.155605]: it stood 1.9 m from Rylan; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -15635,6 +15658,7 @@
     },
     {
       "npc_id": 9000000134,
+      "live_event": "saint_patricks",
       "id_kind": "reconstructed_from_job_reference",
       "reference_ids": [
         9000000134,
@@ -16467,6 +16491,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event saint_patricks: Fandom Lucky_Chance_McXander: the Saint Patrick's leprechaun; his four quests are the event's"
           }
         ]
       }
@@ -23562,9 +23592,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1186.389462,
-        -34.879,
-        -437.860921
+        -1112.637,
+        -38.7726,
+        -342.133
       ],
       "position_w": null,
       "rotation": [
@@ -23584,7 +23614,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 14. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 14. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1186.389462, -34.879, -437.860921]: it stood 121 m away on a guessed point (zone centre); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the place its own location text names: data/content/npcs/merry_vale.json npc_id 9500000395 (legacy_data_spawn); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -26995,9 +27025,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1173.646772,
-        -35.2139,
-        -440.864097
+        -1188.634,
+        -35.4369,
+        -431.306
       ],
       "position_w": null,
       "rotation": [
@@ -27017,7 +27047,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 14. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 14. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-1173.646772, -35.2139, -440.864097]: it stood 18 m away on a guessed point (zone centre); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the place its own location text names: ../lab/content/startup-snapshot/startup.json world.points_of_interest id=14 (Merry Vale, name per ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json); the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -28836,6 +28866,7 @@
     },
     {
       "npc_id": 9500000426,
+      "live_event": "festival_of_hearts",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Stone Heart",
@@ -29323,6 +29354,12 @@
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4187; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31338 (ModelId=2055, ModelFileName=stoneheart_m.adr, NameId=427068)."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "client",
+            "evidence": "EV live_event festival_of_hearts: client Models.txt 2055 'valentines day boss'; fanbyte FR_Mob:Stone_Heart (Festival of Hearts)"
           }
         ]
       },

@@ -175,8 +175,10 @@ fn burglz_is_drawn_as_the_troll() {
         .find(|npc| npc.actor_id == BURGLZ)
         .expect("AddNpc for Burglz");
     assert_eq!(added.position[..3], position);
-    // troll_peasant_02.adr, and the client locale name 'Burglz'.
-    assert_eq!((added.model_id, added.name_string_id), (167, 441_415));
+    // troll_peasant_02.adr, and (QF) the client name every quest line uses, 'Burgl' (47170):
+    // the listed-only Burgl row folded into this one, the one quarry troll. The reference
+    // servers' 'Burglz' (441415) stays in the row's name ids.
+    assert_eq!((added.model_id, added.name_string_id), (167, 47_170));
     assert_eq!(visibility.content_key(BURGLZ), Some(BURGLZ));
 }
 

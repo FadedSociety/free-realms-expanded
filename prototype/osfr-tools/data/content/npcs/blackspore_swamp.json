@@ -548,9 +548,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2138.893874,
-        -32.948,
-        1037.533649
+        -2133.39,
+        -32.895,
+        1041.53
       ],
       "position_w": null,
       "rotation": [
@@ -570,7 +570,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.8 m north-east from [-2138.893874, -32.948, 1037.533649] to [-2133.39, -32.895, 1041.53], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -1393,9 +1393,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2139.397283,
-        -32.948,
-        1045.88731
+        -2121.9,
+        -32.378,
+        1020.7
       ],
       "position_w": null,
       "rotation": [
@@ -1415,7 +1415,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row sat 1.0 m from Petra at the Mire's Edge hub. The notes place his ghost at \"A tombstone just north of Mire's Edge\"; the video placement index (lab/reports/placement/solved-checked.json, key bergramstumpfinger: medium, 4 sightings in 3 videos, error 3.9 m) puts him at -2121.9, 1020.7, north-west of the Blackspore POI 16 (-2140.8, 1041.5). Used that spot (project compass: north = +x, east = +z); moved 30.7 m north-west from [-2139.397283, -32.948, 1045.88731] to [-2121.9, -32.378, 1020.7], world editor /api/probe: stand.y -32.378 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -1901,9 +1901,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2144.842694,
-        -32.948,
-        1039.166314
+        -2144.84,
+        -32.74,
+        1038.67
       ],
       "position_w": null,
       "rotation": [
@@ -1923,7 +1923,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.5 m west from [-2144.842694, -32.948, 1039.166314] to [-2144.84, -32.74, 1038.67], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "wiki",
@@ -2231,9 +2231,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2136.021701,
-        -32.948,
-        1040.487419
+        -2141.02,
+        -32.949,
+        1039.99
       ],
       "position_w": null,
       "rotation": [
@@ -2253,7 +2253,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.0 m south from [-2136.021701, -32.948, 1040.487419] to [-2141.02, -32.949, 1039.99], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -2643,9 +2643,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2143.634849,
-        -32.948,
-        1045.613487
+        -2143.13,
+        -32.874,
+        1048.61
       ],
       "position_w": null,
       "rotation": [
@@ -2665,7 +2665,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 3.0 m east from [-2143.634849, -32.948, 1045.613487] to [-2143.13, -32.874, 1048.61], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -3834,6 +3834,7 @@
     },
     {
       "npc_id": 9500000009,
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakeling",
@@ -3868,9 +3869,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2136.749593,
-        -32.948,
-        1044.913347
+        -2132.75,
+        -32.62,
+        1046.91
       ],
       "position_w": null,
       "rotation": [
@@ -3890,7 +3891,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 4.5 m north-east from [-2136.749593, -32.948, 1044.913347] to [-2132.75, -32.62, 1046.91], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "wiki",
@@ -4155,11 +4156,18 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fr.fanbyte.com/wiki/FR_Mob:Cakeling (Birthday Bash)"
+          }
         ]
       }
     },
     {
       "npc_id": 9500000010,
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakenstein",
@@ -4202,9 +4210,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2146.132517,
-        -32.948,
-        1041.752005
+        -2152.13,
+        -29.861,
+        1039.75
       ],
       "position_w": null,
       "rotation": [
@@ -4224,7 +4232,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.3 m south from [-2146.132517, -32.948, 1041.752005] to [-2152.13, -29.861, 1039.75], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -4572,6 +4580,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fr.fanbyte.com/wiki/FR_Mob:Cakenstein (Birthday Bash)"
           }
         ]
       }
@@ -5055,9 +5069,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        2.6,
-        41.08,
-        1114.5
+        24.0,
+        61.05,
+        1231.5
       ],
       "position_w": null,
       "rotation": [
@@ -5077,7 +5091,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 8 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 8 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): DUPLICATE: Ceard Bauchlog is also the Legacy spawn 9500000658 (shrouded_glade.json, FabledRealms.lua:203, 20.17, 61.14, 1230.15; wiki \"He stands in front of the hut next to Headmaster Merk\"). This blackspore_swamp row matched the Shrouded Glade POI by name and sat 1.2 m from Captain Sunspark. Quest 3955824 names this id as its giver, so the row stays; moved beside the Legacy position. Follow-up (E4): point the quest at 9500000658 and retire this row; moved 118.9 m east from [2.6, 41.08, 1114.5] to [24.0, 61.05, 1231.5], world editor /api/probe: stand.y 61.05 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -6391,9 +6405,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2266.4485,
-        -29.34597,
-        896.0162
+        -2264.95,
+        -31.51,
+        900.02
       ],
       "position_w": null,
       "rotation": [
@@ -6413,7 +6427,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 85 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 85 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 4.3 m east from [-2266.4485, -29.34597, 896.0162] to [-2264.95, -31.51, 900.02], world editor /api/probe: stand.y -31.51 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -6818,9 +6832,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2141.023083,
-        -32.948,
-        1047.132912
+        -2148.5,
+        -29.113,
+        1050.5
       ],
       "position_w": null,
       "rotation": [
@@ -6840,7 +6854,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row sat 1.9 m from Hannibal at the Mire's Edge hub. Its location text is \"The Mysterious Merchant has appeared in Blackspore!\" (client 1352990895): he visits at random, so there is no fixed spot; moved onto free flat terrain; moved 8.2 m south-east from [-2141.023083, -32.948, 1047.132912] to [-2148.5, -29.113, 1050.5], world editor /api/probe: stand.y -29.113 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -8452,9 +8466,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2589.60638,
-        -19.11012,
-        1025.708853
+        -2584.61,
+        -20.95,
+        1030.21
       ],
       "position_w": null,
       "rotation": [
@@ -8474,7 +8488,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.7 m north-east from [-2589.60638, -19.11012, 1025.708853] to [-2584.61, -20.95, 1030.21], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -9163,6 +9177,7 @@
     },
     {
       "npc_id": 9500000020,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Drake Sullenfangs",
@@ -9600,6 +9615,12 @@
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Drake_Sullenfangs (the wiki files it under Super Spooktacular); the event page names the Vampire Camp in Blackspore Swamp as event dressing"
+          }
         ]
       },
       "model_id": 3312,
@@ -9608,6 +9629,7 @@
     },
     {
       "npc_id": 9500000021,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Ed Sullenfangs",
@@ -9649,16 +9671,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2146.71833,
-        -32.0999,
-        1039.630406
+        -2136.071,
+        -32.9525,
+        1038.784
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.3485278377731611,
+        -0.01159075371204537,
         0.0,
-        0.9372984296888399
+        0.9999328249579502
       ],
       "placement": "unanchored",
       "placement_source": "reconstructed_zone_center",
@@ -9671,7 +9693,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): LIVE CAPTURE: the original server's own AddNpc (lab/content/startup-snapshot/startup.json world.npc_spawns, actor 2732686529148769137, name_string_id 432135, model 3311) stands at -2136.071, -32.9525, 1038.784 with rotation (-0.02317995, 0, 0.9997313). The earlier reconstructed spot was 10.7 m from it; moved 10.7 m north from [-2146.71833, -32.0999, 1039.630406] to the captured transform [-2136.071, -32.9525, 1038.784].",
       "source": [
         {
           "kind": "client",
@@ -10023,6 +10045,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=40010 (same name)"
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: the Super Spooktacular event page: Team Vampire's head vampire at the Vampire Camp in Blackspore Swamp, event dressing; boss of Werewolf Dance Practice"
           }
         ]
       },
@@ -10701,9 +10729,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2135.000416,
-        -32.948,
-        1038.867078
+        -2132.5,
+        -32.967,
+        1032.87
       ],
       "position_w": null,
       "rotation": [
@@ -10723,7 +10751,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.5 m north-west from [-2135.000416, -32.948, 1038.867078] to [-2132.5, -32.967, 1032.87], world editor /api/probe: stand.y -32.967 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -11044,9 +11072,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1419.51224,
-        -27.631,
-        354.959761
+        -1419.01,
+        -28.095,
+        353.96
       ],
       "position_w": null,
       "rotation": [
@@ -11066,7 +11094,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 1.1 m north-west from [-1419.51224, -27.631, 354.959761] to [-1419.01, -28.095, 353.96], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -12534,9 +12562,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2587.714379,
-        -19.11012,
-        1021.534988
+        -2581.9,
+        -21.384,
+        1025.2
       ],
       "position_w": null,
       "rotation": [
@@ -12556,7 +12584,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood 9.8 m under the terrain at the Haunted Mines POI 88 (-2587.9, -19.1, 1024.2; probe: 75 degree slope). Moved onto the nearest open flat terrain; moved 6.9 m north-east from [-2587.714379, -19.11012, 1021.534988] to [-2581.9, -21.384, 1025.2], world editor /api/probe: stand.y -21.384 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -13254,6 +13282,7 @@
     },
     {
       "npc_id": 9500000029,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Ghost Hunters",
@@ -13288,9 +13317,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2147.269025,
-        -32.948,
-        1043.244704
+        -2150.27,
+        -28.956,
+        1047.24
       ],
       "position_w": null,
       "rotation": [
@@ -13310,7 +13339,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 5.0 m south-east from [-2147.269025, -32.948, 1043.244704] to [-2150.27, -28.956, 1047.24], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "wiki",
@@ -13571,6 +13600,12 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: the wiki's group of players who fight the Pumpkin Prince during the Super Spooktacular"
+          }
         ]
       }
     },
@@ -13614,9 +13649,9 @@
       ],
       "services_reason": null,
       "position": [
-        898.851881,
-        2.463198,
-        2239.751509
+        895.85,
+        1.017,
+        2247.75
       ],
       "position_w": null,
       "rotation": [
@@ -13651,7 +13686,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 152 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 152 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 8.5 m east from [898.851881, 2.463198, 2239.751509] to [895.85, 1.017, 2247.75], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -14450,9 +14485,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2139.594143,
-        -32.948,
-        1048.33706
+        -2141.59,
+        -33.0,
+        1051.84
       ],
       "position_w": null,
       "rotation": [
@@ -14472,7 +14507,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 4.0 m south-east from [-2139.594143, -32.948, 1048.33706] to [-2141.59, -33.0, 1051.84], world editor /api/probe: stand.y -33.0 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -15652,9 +15687,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2585.005912,
-        -19.11012,
-        1022.31793
+        -2583.01,
+        -20.694,
+        1021.32
       ],
       "position_w": null,
       "rotation": [
@@ -15674,7 +15709,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 2.2 m north-west from [-2585.005912, -19.11012, 1022.31793] to [-2583.01, -20.694, 1021.32], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -16620,6 +16655,7 @@
     },
     {
       "npc_id": 9500000036,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Jake Blackforest",
@@ -16662,16 +16698,16 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2133.707225,
-        -32.948,
-        1040.945361
+        -2136.285,
+        -32.94931,
+        1044.861
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.3485278377731611,
+        0.9946347562878344,
         0.0,
-        0.9372984296888399
+        0.10344902891878797
       ],
       "placement": "poi_anchor",
       "placement_source": "reconstructed_poi_name_match",
@@ -16684,7 +16720,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): LIVE CAPTURE: the original server's own AddNpc (lab/content/startup-snapshot/startup.json world.npc_spawns, actor 1544684192064241910, name_string_id 432094, model 3296) stands at -2136.285, -32.94931, 1044.861 with rotation (0.205788, 0, -0.9785966); a server capture outranks the wiki (\"In the Sinking Graveyard\"). The earlier reconstructed spot was 4.9 m from it; moved 4.7 m south-east from [-2133.707225, -32.948, 1040.945361] to the captured transform [-2136.285, -32.94931, 1044.861].",
       "source": [
         {
           "kind": "client",
@@ -17045,6 +17081,12 @@
             "kind": "reconstructed",
             "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=40011 (same name)"
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Jake_Blackforest (the wiki files it under Super Spooktacular); client Models.txt calls the model a Halloween Combat NPC; the Werewolf Camp is event dressing"
+          }
         ]
       },
       "model_id": 3296,
@@ -17398,6 +17440,7 @@
     },
     {
       "npc_id": 9500000038,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Lon Blackforest",
@@ -17459,9 +17502,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2140.728632,
-        -32.948,
-        1034.280086
+        -2449.0,
+        -31.7,
+        1188.0
       ],
       "position_w": null,
       "rotation": [
@@ -17481,7 +17524,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row sat at the Mire's Edge hub. The wiki (FR_Mob Lon Blackforest) says \"In the Sinking Graveyard\"; moved beside the Sinking Graveyard solved point of Lord William IV (video index -2446.6, 1191.8). No server capture exists for him; moved 344.5 m south-east from [-2140.728632, -32.948, 1034.280086] to [-2449.0, -31.7, 1188.0], world editor /api/probe: stand.y -31.7 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -17844,6 +17887,12 @@
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Lon_Blackforest (the wiki files it under Super Spooktacular); client Models.txt calls the model a Halloween Combat NPC; the Werewolf Camp is event dressing"
+          }
         ]
       },
       "model_id": 3295,
@@ -17852,6 +17901,7 @@
     },
     {
       "npc_id": 9500000039,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Lord William IV",
@@ -18258,6 +18308,12 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Lord_William_IV (the wiki files it under Super Spooktacular): Guardians of the Tomb and Sealed with a Signet"
+          }
         ]
       },
       "model_id": 945,
@@ -18307,9 +18363,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2269.35758,
-        -29.34597,
-        897.536053
+        -2268.86,
+        -31.149,
+        901.04
       ],
       "position_w": null,
       "rotation": [
@@ -18329,7 +18385,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 85 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 85 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 3.5 m east from [-2269.35758, -29.34597, 897.536053] to [-2268.86, -31.149, 901.04], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -18683,6 +18739,7 @@
     },
     {
       "npc_id": 9500000041,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Lucinda",
@@ -18726,9 +18783,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2388.24088,
-        -23.4435,
-        1238.162153
+        -2389.5,
+        -23.775,
+        1233.5
       ],
       "position_w": null,
       "rotation": [
@@ -18748,7 +18805,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 119 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 119 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): Lucinda stood in the gateway of the Bone Bog Cemetery gate (2014 placement bs_gate_01.adr at -2386.2, -23.9, 1237.9; probe: north-side movement blocked) with the Banshee and Pumpkin Prince rows on the same anchor (owner 2026-11-12: \"the girl sitting outside the cemetery gate\"). Location text: \"Just outside Bone Bog Cemetery\". The graves and the fence arc lie at higher z, so outside is lower z (west); the Vampires vs. Werewolves crowd of world_events events.2 stands at z 1210 to 1228; moved 4.8 m west from [-2388.24088, -23.4435, 1238.162153] to [-2389.5, -23.775, 1233.5], world editor /api/probe: stand.y -23.775 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -19173,13 +19230,13 @@
         "model_id": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Lucinda"
+            "evidence": "(R) Review 2026-11-12 (npc-placement-b): the stand-in body was model 7 (humanchild_f_skirtandtunic.adr, the most common model of drawn human female NPCs), a child body whose only idle is the sit loop with no seat anywhere near. The wiki page shows an adult, so the stand-in is the client model whose outfit matches the portrait: fanbyte images/f4a3a0a9cf9a9e6be378de2e4f7c0cb6.jpg (Lucinda: a grown woman in a black wide-brim hat; video 0LoQe5VZ0PY frame 00104 shows her at adult height). Model 733 human_f_gloam_agent.agr is in no npc_ambient idle row and no npc_poses model row, so it stands on loc_stand. Still a stand-in (the client names no body for her)."
           }
         ],
         "model_file_name": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn human female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob:Lucinda"
+            "evidence": "(R) Review 2026-11-12 (npc-placement-b): the stand-in body was model 7 (humanchild_f_skirtandtunic.adr, the most common model of drawn human female NPCs), a child body whose only idle is the sit loop with no seat anywhere near. The wiki page shows an adult, so the stand-in is the client model whose outfit matches the portrait: fanbyte images/f4a3a0a9cf9a9e6be378de2e4f7c0cb6.jpg (Lucinda: a grown woman in a black wide-brim hat; video 0LoQe5VZ0PY frame 00104 shows her at adult height). Model 733 human_f_gloam_agent.agr is in no npc_ambient idle row and no npc_poses model row, so it stands on loc_stand. Still a stand-in (the client names no body for her)."
           }
         ],
         "greeting_reason": [
@@ -19187,10 +19244,16 @@
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
           }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Lucinda (the wiki files it under Super Spooktacular): the Super Spooktacular guide of A Ghostly Discovery and The Pumpkin Prince"
+          }
         ]
       },
-      "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "model_id": 733,
+      "model_file_name": "human_f_gloam_agent.agr",
       "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
@@ -19648,9 +19711,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1905.420403,
-        -39.79,
-        416.888653
+        -1908.42,
+        -39.854,
+        417.89
       ],
       "position_w": null,
       "rotation": [
@@ -19670,7 +19733,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 7 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 7 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 3.2 m south from [-1905.420403, -39.79, 416.888653] to [-1908.42, -39.854, 417.89], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -22019,9 +22082,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2144.840097,
-        -32.948,
-        1035.052675
+        -2142.84,
+        -33.0,
+        1035.05
       ],
       "position_w": null,
       "rotation": [
@@ -22041,7 +22104,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 2.0 m north from [-2144.840097, -32.948, 1035.052675] to [-2142.84, -33.0, 1035.05], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -22930,9 +22993,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2133.308186,
-        -32.948,
-        1043.573329
+        -2129.31,
+        -33.048,
+        1049.07
       ],
       "position_w": null,
       "rotation": [
@@ -22952,7 +23015,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.8 m north-east from [-2133.308186, -32.948, 1043.573329] to [-2129.31, -33.048, 1049.07], world editor /api/probe: stand.y -33.048 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -23350,9 +23413,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2147.710171,
-        -33.5252,
-        1045.09466
+        -2149.2,
+        -29.548,
+        1043.1
       ],
       "position_w": null,
       "rotation": [
@@ -23372,7 +23435,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood about 3.7 m under the terrain at the Mire's Edge hub. Moved onto the nearest open flat terrain; moved 2.5 m south-west from [-2147.710171, -33.5252, 1045.09466] to [-2149.2, -29.548, 1043.1], world editor /api/probe: stand.y -29.548 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -23870,9 +23933,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2138.02365,
-        -32.948,
-        1034.138376
+        -2137.52,
+        -33.0,
+        1029.64
       ],
       "position_w": null,
       "rotation": [
@@ -23892,7 +23955,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 4.5 m west from [-2138.02365, -32.948, 1034.138376] to [-2137.52, -33.0, 1029.64], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -24711,9 +24774,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2588.907703,
-        -19.2699,
-        1027.761653
+        -2594.4,
+        -6.714,
+        1027.3
       ],
       "position_w": null,
       "rotation": [
@@ -24733,7 +24796,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 88 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood about 8.8 m under the terrain at the Haunted Mines (probe: 67 degree slope, hemmed in). Moved onto the nearest open flat terrain; moved 5.5 m south from [-2588.907703, -19.2699, 1027.761653] to [-2594.4, -6.714, 1027.3], world editor /api/probe: stand.y -6.714 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -25054,9 +25117,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2148.022462,
-        -32.0679,
-        1038.090079
+        -2151.02,
+        -32.098,
+        1035.59
       ],
       "position_w": null,
       "rotation": [
@@ -25076,7 +25139,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 3.9 m south-west from [-2148.022462, -32.0679, 1038.090079] to [-2151.02, -32.098, 1035.59], world editor /api/probe: stand.y -32.098 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -27459,6 +27522,7 @@
     },
     {
       "npc_id": 9500000057,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Pumpkin Prince",
@@ -27503,9 +27567,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2386.348879,
-        -23.78794,
-        1233.988288
+        -2442.5,
+        -31.544,
+        1193.5
       ],
       "position_w": null,
       "rotation": [
@@ -27530,7 +27594,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 119 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 119 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row sat on the Bone Bog Cemetery anchor with Lucinda and the Banshee. The wiki (FR_Mob Pumpkin Prince) puts the roaming Blackspore version \"At the large, single tombstone in the alcove of Sinking Graveyard\"; the nearest solved point there is Lord William IV (video index -2446.6, 1191.8). Moved beside it (the row has no model, so nothing is drawn); moved 69.2 m south-west from [-2386.348879, -23.78794, 1233.988288] to [-2442.5, -31.544, 1193.5], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -27970,6 +28034,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Pumpkin_Prince (the wiki files it under Super Spooktacular)"
           }
         ]
       }
@@ -30908,9 +30978,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1432.33,
-        -13.73,
-        -904.22
+        -1431.83,
+        -14.449,
+        -903.22
       ],
       "position_w": null,
       "rotation": [
@@ -30930,7 +31000,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 64 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 64 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 1.1 m north-east from [-1432.33, -13.73, -904.22] to [-1431.83, -14.449, -903.22], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -32898,9 +32968,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2146.799383,
-        -32.948,
-        1035.405637
+        -2146.8,
+        -32.829,
+        1034.91
       ],
       "position_w": null,
       "rotation": [
@@ -32920,7 +32990,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 0.5 m west from [-2146.799383, -32.948, 1035.405637] to [-2146.8, -32.829, 1034.91], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -33311,9 +33381,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2132.109108,
-        -32.948,
-        1041.97253
+        -2128.11,
+        -31.992,
+        1039.97
       ],
       "position_w": null,
       "rotation": [
@@ -33333,7 +33403,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 4.5 m north-west from [-2132.109108, -32.948, 1041.97253] to [-2128.11, -31.992, 1039.97], world editor /api/probe: stand.y -31.992 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -34174,9 +34244,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2139.548038,
-        -32.948,
-        1032.814581
+        -2144.55,
+        -33.0,
+        1031.31
       ],
       "position_w": null,
       "rotation": [
@@ -34196,7 +34266,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.2 m south from [-2139.548038, -32.948, 1032.814581] to [-2144.55, -33.0, 1031.31], world editor /api/probe: stand.y -33.0 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -34550,6 +34620,7 @@
     },
     {
       "npc_id": 9500000068,
+      "live_event": "halloween",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "The Pumpkin Prince's undead army",
@@ -34870,6 +34941,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event halloween: the Pumpkin Prince's open-world escort (Fandom Super Spooktacular)"
           }
         ]
       }
@@ -35695,9 +35772,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2132.936951,
-        -32.948,
-        1037.095507
+        -2131.44,
+        -32.278,
+        1037.6
       ],
       "position_w": null,
       "rotation": [
@@ -35717,7 +35794,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 1.6 m north from [-2132.936951, -32.948, 1037.095507] to [-2131.44, -32.278, 1037.6], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "video",
@@ -37693,9 +37770,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2136.391491,
-        -32.948,
-        1033.30812
+        -2136.89,
+        -33.0,
+        1033.81
       ],
       "position_w": null,
       "rotation": [
@@ -37715,7 +37792,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.7 m south-east from [-2136.391491, -32.948, 1033.30812] to [-2136.89, -33.0, 1033.81], world editor /api/probe: stand.y -33.0 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "wiki",
@@ -39149,9 +39226,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2138.418897,
-        -32.948,
-        1050.605962
+        -2137.92,
+        -32.996,
+        1051.61
       ],
       "position_w": null,
       "rotation": [
@@ -39171,7 +39248,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.1 m north-east from [-2138.418897, -32.948, 1050.605962] to [-2137.92, -32.996, 1051.61], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -40979,9 +41056,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2131.39726,
-        -32.1497,
-        1039.967243
+        -2127.4,
+        -32.393,
+        1036.47
       ],
       "position_w": null,
       "rotation": [
@@ -41001,7 +41078,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 5.3 m north-west from [-2131.39726, -32.1497, 1039.967243] to [-2127.4, -32.393, 1036.47], world editor /api/probe: stand.y -32.393 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -41318,9 +41395,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2146.652339,
-        -32.948,
-        1049.057053
+        -2147.15,
+        -29.389,
+        1054.06
       ],
       "position_w": null,
       "rotation": [
@@ -41340,7 +41417,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 16 by longest normalized whole-name score 10; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.0 m east from [-2146.652339, -32.948, 1049.057053] to [-2147.15, -29.389, 1054.06], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "wiki",
@@ -41652,9 +41729,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -2141.511234,
-        -32.948,
-        1031.942475
+        -2145.01,
+        -32.976,
+        1026.94
       ],
       "position_w": null,
       "rotation": [
@@ -41674,7 +41751,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 16. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.1 m south-west from [-2141.511234, -32.948, 1031.942475] to [-2145.01, -32.976, 1026.94], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -42067,9 +42144,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        -2166.748,
-        -29.4871,
-        1079.633
+        -2166.25,
+        -29.546,
+        1080.13
       ],
       "position_w": 1.0,
       "rotation": [
@@ -42089,7 +42166,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.7 m north-east from [-2166.748, -29.4871, 1079.633] to [-2166.25, -29.546, 1080.13], world editor /api/probe: stand.y -29.546 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "heading": 0.0,
       "model_id": 425,
       "model_file_name": "fairy_m_bullseye.agr",
@@ -42398,9 +42475,9 @@
       "services": [],
       "services_reason": null,
       "position": [
-        -2165.938,
-        -29.5645,
-        1080.895
+        -2174.0,
+        -29.3,
+        1077.5
       ],
       "position_w": 1.0,
       "rotation": [
@@ -42420,10 +42497,10 @@
         }
       ],
       "capture_match": null,
-      "position_reason": null,
+      "position_reason": "(R) Review 2026-11-12 (npc-placement-b): the row sat 1.5 m from Bullseye. Her only place text is \"Blackspore Swamp\", so there is no fixed spot; moved onto free terrain; moved 8.7 m south-west from [-2165.938, -29.5645, 1080.895] to [-2174.0, -29.3, 1077.5], world editor /api/probe: stand.y -29.3 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "heading": 0.0,
-      "model_id": 7,
-      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "model_id": 181,
+      "model_file_name": "human_f_explorer_caucasian01.agr",
       "source": [
         {
           "kind": "wiki",
@@ -42662,13 +42739,13 @@
         "model_id": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) stand-in body: most common model of drawn human female NPCs"
+            "evidence": "(R) Review 2026-11-12 (npc-placement-b): the stand-in body was model 7 (humanchild_f_skirtandtunic.adr, the most common model of drawn human female NPCs), a child body whose only idle is the sit loop with no seat anywhere near. The wiki page shows an adult, so the stand-in is the client model whose outfit matches the portrait: fanbyte images/c2cad8da0f6c3d29daca64475cf98c24.jpg (Callie: an explorer in a brimmed hat, tied purple shirt, cargo trousers and backpack). Model 181 human_f_explorer_caucasian01.agr is in no npc_ambient idle row and no npc_poses model row, so it stands on loc_stand. Still a stand-in (the client names no body for her)."
           }
         ],
         "model_file_name": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) stand-in body: most common model of drawn human female NPCs"
+            "evidence": "(R) Review 2026-11-12 (npc-placement-b): the stand-in body was model 7 (humanchild_f_skirtandtunic.adr, the most common model of drawn human female NPCs), a child body whose only idle is the sit loop with no seat anywhere near. The wiki page shows an adult, so the stand-in is the client model whose outfit matches the portrait: fanbyte images/c2cad8da0f6c3d29daca64475cf98c24.jpg (Callie: an explorer in a brimmed hat, tied purple shirt, cargo trousers and backpack). Model 181 human_f_explorer_caucasian01.agr is in no npc_ambient idle row and no npc_poses model row, so it stands on loc_stand. Still a stand-in (the client names no body for her)."
           }
         ],
         "greeting_reason": [

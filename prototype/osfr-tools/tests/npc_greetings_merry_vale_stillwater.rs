@@ -562,10 +562,11 @@ fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
 /// L924: giving positioned rows a body (model, client name id, a nudge off an overlapping
 /// actor) so the world draws them touches every region; the drawing suites pin the values.
 /// rc-0136 F4: so does the `season` that draws an event NPC only while its event runs
-/// (`seasonal_npc_clock` pins it).
+/// (`seasonal_npc_clock` pins it). EV: that tag is `live_event` now (an event key, the same
+/// body edit); `season` stays listed for a branch that still writes it.
 fn is_npc_body_change_between(old: &Value, new: &Value) -> bool {
     changed_rows_are(old, new, false, |old, new| {
-        let fields = ["model_id", "model_file_name", "name_string_id", "position", "season", "field_sources"];
+        let fields = ["model_id", "model_file_name", "name_string_id", "position", "season", "live_event", "field_sources"];
         without_fields(old, &fields) == without_fields(new, &fields)
     })
 }

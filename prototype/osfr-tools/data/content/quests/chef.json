@@ -895,7 +895,7 @@
       "id": 3050011,
       "job": 45,
       "title_string_id": 104134,
-      "giver_npc_id": 9000000019,
+      "giver_npc_id": 9000000402,
       "prerequisite_quest_ids": [],
       "objectives": [
         {
@@ -985,6 +985,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T202: job 45 (Chef) gate. Auguste Frydaze is the Highroad Junction Chef trainer and the client title is \"Chef: Ranger Requisition\"; the line is offered only while Chef is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
+        },
+        {
+          "kind": "client",
+          "evidence": "Giver 9000000402 (Merigold), hand-in 9000000178 (Ranger Ricardo): the offer 104133 speaks of Auguste in the third person and sends the player to Ranger Ricardo; the closing 104136 is Ricardo's, so he takes the hand-in; the wiki starts it at Merigold (https://fr.fanbyte.com/wiki/FR_Quest%3AChef%3A_Ranger_Requisition) (scripts/quest_fidelity.py GIVER_MOVES)."
         }
       ],
       "description_string_id": 104135,

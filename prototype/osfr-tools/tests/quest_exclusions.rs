@@ -19,7 +19,7 @@ mod npc_quest_chain;
 use npc_quest_chain::{
     CHARACTER, Fixture, accept, assert_no_offer, assert_packet_changes_nothing, character_at_for,
     content_dir, copy_tree, finish_quest, offer, pending_offer, quest_abandon, quest_reply,
-    quest_status, release_end_screen, send, talk_step,
+    quest_status, release_end_screen, seed_quest, send, talk_step,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -38,10 +38,22 @@ const MERIGOLD: u64 = 9_000_000_402;
 const SAMANTHA: u64 = 9_000_000_189;
 const VALERIE: u64 = 9_000_000_227;
 const RICKY_DANGER: u64 = 9_500_000_254;
+/// Ricky Danger's closing line, the wiki's Closing Comments (QF: client text 116463).
+const INTRODUCE_END_TEXT: u32 = 116_463;
 const ADVENTURER: i32 = 1;
 /// 3000021's authored reward row: 5 coins and 20 Adventurer XP; no end text.
 const COBBLESTONE_COINS: u32 = 5;
 const COBBLESTONE_XP: u32 = 20;
+/// QF: Samantha also gives the Brawler's Bringing Back Brazenfist (the wiki's giver).
+const BRAZENFIST: u32 = 3_030_004;
+
+/// The fixture character knows Brawler, so Samantha would offer Bringing Back Brazenfist where
+/// these tests prove she offers no Introduce Yourself version: it is marked done first.
+fn game_with_brazenfist_done(fixture: &Fixture) -> Gameplay {
+    let mut state = fixture.game(None).state();
+    seed_quest(&mut state, BRAZENFIST, QuestStatus::Completed, &[1, 1]);
+    fixture.game(Some(state))
+}
 
 /// Where `guid` stands to click `npc` (the content row the 26/8 range check reads).
 fn at(guid: u64, npc: u64) -> CharacterState {
@@ -65,7 +77,7 @@ fn finish_cobblestone(game: &mut Gameplay, guid: u64, now: &mut u64) {
     *now += 10;
     talk_step(game, &ricky, RICKY_DANGER, *now, "Ricky Danger");
     *now += 10;
-    release_end_screen(game, &ricky, COBBLESTONE, RICKY_DANGER, 0, *now);
+    release_end_screen(game, &ricky, COBBLESTONE, RICKY_DANGER, INTRODUCE_END_TEXT, *now);
     *now += 10;
     finish_quest(
         game,
@@ -93,7 +105,7 @@ fn finishing_one_version_hides_the_other_two() {
 #[test]
 fn an_active_version_blocks_the_others() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = game_with_brazenfist_done(&fixture);
     let merigold = at(CHARACTER, MERIGOLD);
     let samantha = at(CHARACTER, SAMANTHA);
     let mut now = 1_000;
@@ -137,7 +149,7 @@ fn an_active_version_blocks_the_others() {
 #[test]
 fn abandoning_a_version_reopens_the_others() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = game_with_brazenfist_done(&fixture);
     let merigold = at(CHARACTER, MERIGOLD);
     let samantha = at(CHARACTER, SAMANTHA);
     let mut now = 1_000;
@@ -177,7 +189,7 @@ fn an_old_save_with_two_versions_keeps_both() {
     let ricky = at(CHARACTER, RICKY_DANGER);
     let mut now = 1_000;
     talk_step(&mut game, &ricky, RICKY_DANGER, now, "Ricky Danger");
-    release_end_screen(&mut game, &ricky, COBBLESTONE, RICKY_DANGER, 0, now + 10);
+    release_end_screen(&mut game, &ricky, COBBLESTONE, RICKY_DANGER, INTRODUCE_END_TEXT, now + 10);
     finish_quest(
         &mut game,
         &ricky,

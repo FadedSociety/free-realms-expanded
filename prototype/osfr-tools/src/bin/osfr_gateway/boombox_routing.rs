@@ -5,6 +5,7 @@
 //! queues the packets. A refused queue is logged and skips only that recipient.
 use super::*;
 use osfr_tools::boombox::{Boomboxes, Catalogue, Sends};
+use osfr_tools::client_areas::unix_now_ms;
 
 /// T536: the world's permanent boxes (the extra NPC rows naming a boombox), read once at startup
 /// from the NPC content set `Gameplay::load` binds. No content means none. A row naming an item
@@ -60,6 +61,10 @@ pub(super) fn place(
 /// not stop the server: the boxes are dropped (logged once) and the tick goes on without them.
 pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
     let ticked = contain(|| {
+        // EV: a permanent box whose prop names an event dances only while the event runs.
+        let (areas, unix_ms) = (&world.client_areas, unix_now_ms());
+        let running = |key: &str| areas.calendar().is_running(key, areas, unix_ms);
+        world.boomboxes.follow_events(&running);
         // T537: the summoned pets ride along, so a dancer's pet dances too.
         let sends = world
             .boomboxes
@@ -718,6 +723,7 @@ mod tests {
             spawn_guid: 100_000_033_617,
             item_id: 48244, // Boombox XVD-S
             position: at,
+            live_event: None,
         };
         let catalogue = osfr_tools::boombox::Catalogue::load(&shipped).unwrap();
         osfr_tools::boombox::Boomboxes::permanent(&catalogue, &[prop]).unwrap()

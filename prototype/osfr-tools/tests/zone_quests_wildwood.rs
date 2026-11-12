@@ -4,8 +4,10 @@
 //! - `3080007` Kart Driver: Challenging T.R. (quest-lines/quests.json q3080007): giver
 //!   Linx Redline 9500000164, one Talk to T.R. Walker Jr. 9500000950. The 49/13 end
 //!   screen opens at T.R. because he is the only objective's named target.
-//! - `3080009` Kart Driver: Exploder's League Sponsorship (q3080009): giver and only
-//!   target Blammo 9500000872.
+//! - `3080009` Kart Driver: Exploder's League Sponsorship (q3080009): only target and
+//!   hand-in Blammo 9500000872. QF: its giver is T.R. Walker Jr., the wiki's (the
+//!   description 394485 reads "T.R. suggested talking to Blammo"; T.R.'s offer is 394483),
+//!   and Blammo's pitch 394486 is its closing line.
 //!
 //! P-kart-racing (lead 2026-11-10) since enabled `3080011` and `3080012`: the kart rows now
 //! serve races 632 and 633, and the test below pins that each race objective names a served row.
@@ -65,7 +67,7 @@ fn challenge() -> ZoneQuest {
 }
 
 fn sponsorship() -> ZoneQuest {
-    ZoneQuest::from_record(shipped_quest(LEAGUE), BLAMMO, BLAMMO, KART)
+    ZoneQuest::from_record(shipped_quest(LEAGUE), TR_WALKER, BLAMMO, KART)
 }
 
 #[test]
@@ -164,6 +166,13 @@ fn only_the_active_kart_driver_is_offered_and_forged_packets_change_nothing() {
         BLAMMO,
         &mut now,
         "Blammo as Adventurer",
+    );
+    assert_no_offer(
+        &mut game,
+        &MAP.at(CHARACTER, TR_WALKER),
+        TR_WALKER,
+        &mut now,
+        "T.R. as Adventurer",
     );
     assert_packet_changes_nothing(
         &mut game,
@@ -272,7 +281,7 @@ fn progress_survives_reconnect_and_players_are_independent() {
 fn shipped_records_keep_the_checked_objectives_and_payouts() {
     let checked: [(u32, u64, u64, u32, u32, u32); 2] = [
         (TR, LINX, TR_WALKER, 394_235, 101_178, 101_160),
-        (LEAGUE, BLAMMO, BLAMMO, 394_484, 394_486, 394_485),
+        (LEAGUE, TR_WALKER, BLAMMO, 394_484, 394_483, 394_485),
     ];
     for (quest, giver, target, title, intro, description) in checked {
         let record = shipped_quest(quest);
@@ -357,16 +366,24 @@ fn shipped_records_keep_the_checked_objectives_and_payouts() {
         .find(|row| row["npc_id"].as_u64() == Some(BLAMMO))
         .expect("Blammo's placed row");
     assert!(
-        blammo["quest_ids_given"]
+        blammo["quests_accepted"]
             .as_array()
             .unwrap()
-            .contains(&json!(LEAGUE)),
-        "Blammo gives the sponsorship"
+            .iter()
+            .any(|row| row["quest_id"].as_u64() == Some(u64::from(LEAGUE))),
+        "Blammo takes the sponsorship's hand-in"
     );
     let walker = rows
         .iter()
         .find(|row| row["npc_id"].as_u64() == Some(TR_WALKER))
         .expect("T.R.'s placed row");
+    assert!(
+        walker["quest_ids_given"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(LEAGUE)),
+        "T.R. gives the sponsorship"
+    );
     assert!(
         walker["quests_accepted"]
             .as_array()

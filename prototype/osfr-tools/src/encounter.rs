@@ -207,25 +207,26 @@ struct Actor {
     boss: bool,
     #[serde(default)]
     stages: Vec<u32>,
-    /// Summoned minion: absent until the encounter's summoner drops below
-    /// this percentage of its health, then appears in a puff (The owner's field
-    /// notes on the Troll Summoner). Not counted toward the goal.
+    /// Summoned minion: absent until the encounter's summoner drops below this percentage of its
+    /// health, then appears in a puff (the owner's Troll Summoner notes). Not a goal count.
     #[serde(default)]
     summon_below_percent: Option<u32>,
-    /// Skittish (the Troll Summoner, after the owner's notes and design): fights
-    /// in melee while its summoned minions stand, and when alone runs from the
-    /// player, stops to catch its breath, then runs again (R).
+    /// Skittish (the Troll Summoner, after the owner's notes and design): fights in melee while
+    /// its summoned minions stand; alone, it runs from the player, rests, then runs again (R).
     #[serde(default)]
     skittish: bool,
+    /// EV: an `event_calendar.json` key; a field enemy or battle starter is there only while
+    /// that event runs (`SharedFieldState::set_active_quests`).
+    #[serde(default)]
+    live_event: Option<String>,
     /// AddNpc scale; the summoned "small trolls" are shrunken troll models.
     #[serde(default)]
     scale: Option<f32>,
     /// A `behaviours.json` preset name, or `{"preset": ..., overrides}`.
     #[serde(default)]
     behaviour: Option<serde_json::Value>,
-    /// Drop table id in `power_ups.json`; absent means this enemy drops nothing
-    /// (training dummies and summoned minions stay off the table so they cannot
-    /// be farmed).
+    /// Drop table id in `power_ups.json`; absent means this enemy drops nothing (training
+    /// dummies and summoned minions stay off the table so they cannot be farmed).
     #[serde(default)]
     power_up_table: Option<String>,
     // The rows below are read by the combat pieces only; the engine itself reads `dormant`.
@@ -237,8 +238,7 @@ struct Actor {
     #[serde(default)]
     #[allow(dead_code)]
     tags: Vec<String>,
-    /// Not there when the fight starts, until something wakes it. Unlike a
-    /// `summon_below_percent` row it still counts toward the goal.
+    /// Absent when the fight starts, until woken; unlike `summon_below_percent` it counts to goals.
     #[serde(default)]
     dormant: bool,
 }

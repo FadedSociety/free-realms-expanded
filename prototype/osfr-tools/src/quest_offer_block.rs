@@ -19,6 +19,17 @@ pub enum OfferBlock {
     Offered,
     Active,
     Done,
+    /// A repeatable quest finished less than `repeat_hours` ago: offered again from `until`
+    /// (unix seconds).
+    Resting {
+        until: u64,
+    },
+    /// Another quest must be finished `need` times first (Halloween Fanatic).
+    Completions {
+        quest: u32,
+        need: u32,
+        done: u32,
+    },
     /// T465: an exclusive branch already taken.
     Excluded {
         by: u32,
@@ -46,7 +57,7 @@ impl OfferBlock {
     pub fn denial(&self) -> QuestDenial {
         match self {
             Self::WrongGiver => QuestDenial::WrongGiver,
-            Self::Prerequisite { .. } => QuestDenial::Prerequisite,
+            Self::Prerequisite { .. } | Self::Completions { .. } => QuestDenial::Prerequisite,
             Self::Level { .. } => QuestDenial::Level,
             Self::Job { .. } => QuestDenial::Job,
             Self::Membership => QuestDenial::Membership,
@@ -87,7 +98,14 @@ impl QuestEngine {
         {
             Some(QuestStatus::Offered) => return Some(OfferBlock::Offered),
             Some(QuestStatus::Active) => return Some(OfferBlock::Active),
-            Some(QuestStatus::Completed) => return Some(OfferBlock::Done),
+            // A repeatable quest comes round again `repeat_hours` after its last run.
+            Some(QuestStatus::Completed) => match self.repeat_ready_at(quest_id) {
+                Some(until) if until > self.now_secs() => {
+                    return Some(OfferBlock::Resting { until });
+                }
+                Some(_) => {}
+                None => return Some(OfferBlock::Done),
+            },
             _ => {}
         }
         if let Some(block) = self.requirement_block(definition) {
@@ -109,7 +127,8 @@ impl QuestEngine {
     /// The gates `offer_block` and `accept` share, after the quest's own status.
     pub(super) fn requirement_block(&self, definition: &QuestDefinition) -> Option<OfferBlock> {
         let status = |id: &u32| self.state.quests.get(id).map(|progress| &progress.status);
-        let done = |id: &u32| status(id) == Some(&QuestStatus::Completed);
+        // Ever finished: a repeatable prerequisite on another run still counts.
+        let done = |id: &u32| self.state.is_done(*id);
         // T465: an excluded quest that is offered, active or completed closes this one, checked
         // before the prerequisite (Lxzxrus b84b467: two exclusive branches behind one
         // prerequisite were both offered). Abandoned reopens (R).
@@ -133,6 +152,9 @@ impl QuestEngine {
         }
         if !missing.is_empty() {
             return Some(OfferBlock::Prerequisite { missing });
+        }
+        if let Some((quest, need, done)) = self.completions_short(definition.id) {
+            return Some(OfferBlock::Completions { quest, need, done });
         }
         let have = self.eligibility.player_level;
         if let Some(need) = definition

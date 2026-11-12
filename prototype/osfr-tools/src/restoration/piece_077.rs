@@ -1042,6 +1042,11 @@ pub struct WarpRegistry {
     /// Marker id -> the warpstone that must be found before it travels (the comic alias 153).
     /// Boxed: the registry is cloned with every staged packet, so it stays small.
     requires: Box<BTreeMap<i32, i32>>,
+    /// EV: marker id -> the `event_calendar.json` event it is listed for (Halloween Harry's
+    /// Atlas icon), and the events running now; a row whose event is not running is neither in
+    /// the `57` table nor travelled to.
+    events: BTreeMap<i32, String>,
+    running: BTreeSet<String>,
 }
 
 /// (R) How the whole-table `57` shows a warpstone the character has not found.
@@ -1103,6 +1108,24 @@ impl WarpRegistry {
         }
     }
 
+    /// EV: the markers that exist only for an event (marker id -> event key).
+    pub fn set_event_rows(&mut self, events: BTreeMap<i32, String>) {
+        self.events = events;
+    }
+
+    /// EV: follow the events running now (`EventCalendar::active_at`, the one gate). True when a
+    /// marker came or went, so the caller sends a fresh `57` (the client replaces its table).
+    pub fn set_running_events(&mut self, running: &BTreeSet<String>) -> bool {
+        let moved = (self.events.values()).any(|key| running.contains(key) != self.running.contains(key));
+        self.running.clone_from(running);
+        moved
+    }
+
+    /// EV: an untagged marker is always listed; a tagged one while its event runs.
+    fn listed(&self, id: i32) -> bool {
+        self.events.get(&id).is_none_or(|key| self.running.contains(key))
+    }
+
     pub fn set_rules(&mut self, rules: WarpRules) -> Result<(), &'static str> {
         self.rules = rules.checked()?;
         Ok(())
@@ -1148,15 +1171,11 @@ impl WarpRegistry {
         let found = |row: &PointOfInterestDefinition| {
             row.notification_type != WARPSTONE_NOTIFICATION || self.attuned.contains(&row.id)
         };
+        let listed = self.definitions.iter().filter(|row| self.listed(row.id));
         let rows: Vec<_> = match self.atlas {
-            None => (self.definitions.iter())
-                .filter(|row| self.attuned.contains(&row.id))
-                .cloned()
-                .collect(),
-            Some(Undiscovered::Hidden) => {
-                (self.definitions.iter().filter(|row| found(row)).cloned()).collect()
-            }
-            Some(Undiscovered::Disabled) => (self.definitions.iter())
+            None => (listed.filter(|row| self.attuned.contains(&row.id)).cloned()).collect(),
+            Some(Undiscovered::Hidden) => (listed.filter(|row| found(row)).cloned()).collect(),
+            Some(Undiscovered::Disabled) => listed
                 .map(|row| PointOfInterestDefinition {
                     notification_type: if found(row) {
                         row.notification_type
@@ -1243,8 +1262,7 @@ impl WarpRegistry {
     ) -> Result<WarpReply, WarpRejection> {
         let request = ZoneTeleportRequest::decode(body).map_err(WarpRejection::MalformedRequest)?;
         let id = request.destination_id;
-        let destination = self
-            .destination(id)
+        let destination = (self.destination(id).filter(|_| self.listed(id)))
             .ok_or(WarpRejection::UnknownDestination(id))?
             .clone();
         let marker = !destination.is_warpstone;

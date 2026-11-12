@@ -521,10 +521,27 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3080019,
+          "title": "Kart Driver: Seaside Board of Tourism Sponsorship",
+          "title_string_id": 394663,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the description 394664 sends the player to Petal Oceanmist; the lines run offer 394662 (Amber's 'I've heard that Petal Oceanmist is looking to sponsor a racer'), title 394663, description 394664, then Petal's pitch 394665, so the pitch is the closing (R) and Petal keeps the hand-in; 394666 is 3080020's offer (scripts/quest_fidelity.py GIVER_MOVES)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki starts it at Amber Violet (https://fr.fanbyte.com/wiki/FR_Quest%3AKart_Driver%3A_Seaside_Board_of_Tourism_Sponsorship)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3080018
+        3080018,
+        3080019
       ],
       "quests_given_text": [
         "Race target of Kart Driver: Self Promotion and Kart Driver: Icy Perfection."
@@ -708,12 +725,20 @@
           {
             "kind": "client",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Frost Ridge Speedway (Northern Wilds), row 165; source cell: [client]"
+          },
+          {
+            "kind": "client",
+            "evidence": "the description 394664 sends the player to Petal Oceanmist; the lines run offer 394662 (Amber's 'I've heard that Petal Oceanmist is looking to sponsor a racer'), title 394663, description 394664, then Petal's pitch 394665, so the pitch is the closing (R) and Petal keeps the hand-in; 394666 is 3080020's offer (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          },
+          {
+            "kind": "client",
+            "evidence": "the description 394664 sends the player to Petal Oceanmist; the lines run offer 394662 (Amber's 'I've heard that Petal Oceanmist is looking to sponsor a racer'), title 394663, description 394664, then Petal's pitch 394665, so the pitch is the closing (R) and Petal keeps the hand-in; 394666 is 3080020's offer (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_given_text": [
@@ -3024,7 +3049,6 @@
         }
       ],
       "quest_ids_given": [
-        3080009,
         3080010,
         3080011,
         3080012,
@@ -3033,8 +3057,20 @@
       "quests_given_text": [
         "Kart Driver: Exploder's League Sponsorship, Kart Driver: Wildwood Sprint Challenge, Kart Driver: Wildwood Endurance Challenge, Kart Driver: Dominating at Wildwood, Kart Driver: Guest of Honor (hands off to Squee at the Robgoblin Camp)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3080009,
+          "title": "Kart Driver: Exploder's League Sponsorship",
+          "title_string_id": 394484,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the description 394485 reads 'T.R. suggested talking to Blammo'; the lines run offer 394483 (T.R.'s 'you're going to need to get a sponsor'), title 394484, description 394485, then Blammo's pitch 394486, as 3080008's run 394433-394436 with its closing last, so the pitch is the closing (R) and Blammo takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Hand-in of 3080009: the quest's last step is here and its giver is the wiki's; see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -3230,6 +3266,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          },
+          {
+            "kind": "client",
+            "evidence": "the description 394485 reads 'T.R. suggested talking to Blammo'; the lines run offer 394483 (T.R.'s 'you're going to need to get a sponsor'), title 394484, description 394485, then Blammo's pitch 394486, as 3080008's run 394433-394436 with its closing last, so the pitch is the closing (R) and Blammo takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_accepted_reason": [
@@ -7367,368 +7407,6 @@
       "model_file_name": "fairy_m_farmer_01.adr"
     },
     {
-      "npc_id": 9500000883,
-      "id_kind": "reconstructed_content_key",
-      "reference_ids": [],
-      "name": "Burgl",
-      "name_reason": null,
-      "name_string_id": 47170,
-      "name_string_ids": [
-        {
-          "table": "ucdt",
-          "id": 1354921582
-        },
-        {
-          "table": "ugdt",
-          "id": 293985437
-        }
-      ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
-      "zone": "Wilds",
-      "zone_id": 16,
-      "zone_reason": null,
-      "region_pages": [
-        "Wilds"
-      ],
-      "presence": "listed",
-      "title_or_role": [
-        "Runs the troll mining camp and quarry (\"Burgl's Quarry\", 1655844911; \"Burgl's workers\", 2090604938)."
-      ],
-      "roles": [
-        "quest_giver"
-      ],
-      "enemy_kind": null,
-      "location_evidence": [
-        "The mining camp (1320635932)."
-      ],
-      "quests_given": [],
-      "quest_ids_given": [],
-      "quests_given_text": [
-        "Get food and water for his miners (2090604938, 3224745330), search for his lost picks and shovels (946401124, 2152416661), water from the smithing camp (880600495), find his missing worker Tooga (bonus objective \"Find out what happened to Tooga\", 1449038490). Titles not found."
-      ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
-      "vendor_stock": null,
-      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
-      "services": [],
-      "services_reason": "The regional row lists no distinct service.",
-      "position": [
-        -991.929637,
-        -6.470751,
-        438.371796
-      ],
-      "position_w": null,
-      "rotation": [
-        0.0,
-        -0.6271587360211663,
-        0.0,
-        0.7788914685836102
-      ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 31,
-          "poi_name": "Wildwood Speedway",
-          "match_score": 0
-        },
-        {
-          "poi_id": 32,
-          "poi_name": "Thunder Falls Speedway",
-          "match_score": 0
-        },
-        {
-          "poi_id": 60,
-          "poi_name": "Robgoblin Treasure Trove",
-          "match_score": 0
-        },
-        {
-          "poi_id": 69,
-          "poi_name": "Floren Forest",
-          "match_score": 0
-        }
-      ],
-      "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform.",
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
-        }
-      ],
-      "field_sources": {
-        "npc_id": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
-          }
-        ],
-        "id_kind": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
-          }
-        ],
-        "reference_ids": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
-          }
-        ],
-        "name": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "name_reason": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "name_string_id": [
-          {
-            "kind": "client",
-            "evidence": "client locale npc_name 'Burgl' = Global.Text 47170 (lab/references/quest-lines/index.sqlite, the one npc_name with this text)"
-          }
-        ],
-        "name_string_ids": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "name_string_id_reason": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "zone": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
-          }
-        ],
-        "zone_id": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
-          }
-        ],
-        "zone_reason": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
-          }
-        ],
-        "region_pages": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "presence": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) presence is a directory classification derived from the guide section"
-          }
-        ],
-        "title_or_role": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "roles": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
-          }
-        ],
-        "enemy_kind": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) this row does not establish an enemy kind"
-          }
-        ],
-        "location_evidence": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "quests_given": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "quest_ids_given": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
-          }
-        ],
-        "quests_given_text": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "quests_accepted": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
-          }
-        ],
-        "quests_accepted_reason": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
-          }
-        ],
-        "vendor_stock": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) The page provides no vendor stock for this NPC."
-          }
-        ],
-        "vendor_stock_reason": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "services": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) The regional row lists no distinct service."
-          }
-        ],
-        "services_reason": [
-          {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part F. Forest Troll Village and Fort (Central Wilds), row 119; source cell: [client]"
-          }
-        ],
-        "position": [
-          {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 31,32,60,69 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
-          }
-        ],
-        "position_reason": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
-          }
-        ],
-        "position_w": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
-          }
-        ],
-        "rotation": [
-          {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 31,32,60,69 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
-          }
-        ],
-        "placement": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
-          }
-        ],
-        "placement_source": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
-          }
-        ],
-        "placement_confidence": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
-          }
-        ],
-        "placement_candidates": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
-          }
-        ],
-        "capture_match": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
-          }
-        ],
-        "model_id": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn forest troll male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABurgl"
-          }
-        ],
-        "model_file_name": [
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) stand-in body: the most common model of drawn forest troll male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3ABurgl"
-          }
-        ]
-      },
-      "model_id": 166,
-      "model_file_name": "troll_peasant_01.adr"
-    },
-    {
       "npc_id": 9500000884,
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
@@ -8708,9 +8386,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -984.725308,
-        -6.470751,
-        440.27139
+        -457.1,
+        9.1,
+        -223.9
       ],
       "position_w": null,
       "rotation": [
@@ -8745,7 +8423,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was a zone-centre guess under the ground (y -6.5) in a pile of Wilds rows. The client says \"Just south of the Roadhouse\" (1804566446); the wiki says \"He stands SE of The Roadhouse, SW of Highroad Junction, in a small rest area along a dirt road\" and its map (fanbyte images/e148b3ed8e141aa0413e285c9ad8c467.jpg) shows him below the Tavern Cellar and left of Highroad Junction. Project compass: north = +x, east = +z, so he is at x lower than the tavern (sh_tavern_01.adr, -415.7) and z between -262 and 190. Moved onto terrain beside road_graph node 310 (-457.1, 9.1, -223.9); moved 848.2 m north-west from [-984.725308, -6.470751, 440.27139] to [-457.1, 9.1, -223.9], world editor /api/probe: stand.y 9.1 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -9213,9 +8891,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -234.008683,
-        1.18629,
-        -46.863267
+        -238.51,
+        1.1,
+        -50.36
       ],
       "position_w": null,
       "rotation": [
@@ -9235,7 +8913,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.7 m south-west from [-234.008683, 1.18629, -46.863267] to [-238.51, 1.1, -50.36], world editor /api/probe: stand.y 1.1 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -11374,9 +11052,9 @@
       ],
       "services_reason": null,
       "position": [
-        -539.19148,
-        26.03942,
-        773.982013
+        -539.0,
+        25.26,
+        764.5
       ],
       "position_w": null,
       "rotation": [
@@ -11396,7 +11074,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 60 by longest normalized whole-name score 24; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 60 by longest normalized whole-name score 24; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row stood on a raised object top at the Robgoblin Treasure Trove entrance (probe stand.y 26.08 from an obstacle, terrain 25.44; four directions blocked). The wiki puts him \"West of the Robgoblin Treasure Trove\" (POI -537.53, 26.04, 772.46); the ground just west of the entrance is a 76 degree hillside (probe), so he stands 8 m west of it along the entrance, on open terrain; moved 9.5 m west from [-539.19148, 26.03942, 773.982013] to [-539.0, 25.26, 764.5], world editor /api/probe: stand.y 25.26 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -13552,56 +13230,25 @@
       "location_evidence": [
         "\"Outside of Thunder Falls\" (883115591)."
       ],
-      "quests_given": [
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "Demo Derby: Rules of the Road."
+      ],
+      "quests_accepted": [
         {
           "quest_id": 3060004,
           "title": "Demo Derby: Rules of the Road",
           "title_string_id": 403450,
-          "relation": "gives",
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 1; name 'Demo Derby: Rules of the Road'; title id cell 942027732 ucdt; 2890454062 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3060004 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 942027732 to Global.Text id 403450 (content_check text_raw_hash, 2026-10-15)"
+              "evidence": "the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
             }
           ]
         }
       ],
-      "quest_ids_given": [
-        3060004
-      ],
-      "quests_given_text": [
-        "Demo Derby: Rules of the Road."
-      ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted_reason": "Hand-in of 3060004: the quest's last step is here and its giver is the wiki's; see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -13853,6 +13500,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_accepted_reason": [
@@ -15690,9 +15341,9 @@
       ],
       "services_reason": null,
       "position": [
-        8.452996,
-        41.038,
-        1108.414019
+        5.95,
+        38.32,
+        1099.91
       ],
       "position_w": null,
       "rotation": [
@@ -15717,7 +15368,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 8 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 8 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 8.9 m west from [8.452996, 41.038, 1108.414019] to [5.95, 38.32, 1099.91], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -18487,9 +18138,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -221.8758,
-        3.543965,
-        -800.55
+        -221.38,
+        3.548,
+        -801.05
       ],
       "position_w": null,
       "rotation": [
@@ -18509,7 +18160,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 69 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 69 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.7 m north-west from [-221.8758, 3.543965, -800.55] to [-221.38, 3.548, -801.05], world editor /api/probe: stand.y 3.548 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -19300,9 +18951,9 @@
       ],
       "services_reason": null,
       "position": [
-        -811.390115,
-        -19.8137,
-        1621.873665
+        -814.89,
+        -18.577,
+        1620.87
       ],
       "position_w": null,
       "rotation": [
@@ -19322,7 +18973,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 4 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 4 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 3.6 m south from [-811.390115, -19.8137, 1621.873665] to [-814.89, -18.577, 1620.87], world editor /api/probe: stand.y -18.577 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -26478,9 +26129,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2265.820604,
-        -16.33359,
-        587.812758
+        -2264.82,
+        -16.424,
+        586.81
       ],
       "position_w": null,
       "rotation": [
@@ -26500,7 +26151,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 31 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 31 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 1.4 m north-west from [-2265.820604, -16.33359, 587.812758] to [-2264.82, -16.424, 586.81], world editor /api/probe: stand.y -16.424 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -33535,9 +33186,9 @@
       ],
       "services_reason": null,
       "position": [
-        -224.78488,
-        3.543965,
-        -799.030147
+        -225.28,
+        3.605,
+        -798.53
       ],
       "position_w": null,
       "rotation": [
@@ -33557,7 +33208,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 69 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 69 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.7 m south-east from [-224.78488, 3.543965, -799.030147] to [-225.28, 3.605, -798.53], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -34338,9 +33989,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -985.664443,
-        -6.470751,
-        448.795834
+        -424.0,
+        17.5,
+        -263.0
       ],
       "position_w": null,
       "rotation": [
@@ -34375,7 +34026,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was a zone-centre guess under the ground (y -6.5) in a pile of Wilds rows. The client says he is \"Relaxing on the back porch of The Roadhouse\" (3156436810) and the wiki \"Stands on the porch\"; the Roadhouse is the 2014 sh_tavern_01.adr placement at -415.7, 17.5, -262.2 with Terrence (Legacy spawn) at -397.6, 16.7, -265.8. Moved to the south side of the tavern (lower x), onto terrain; the exact porch is (R) without the building's rotation; moved 906.7 m north-west from [-985.664443, -6.470751, 448.795834] to [-424.0, 17.5, -263.0], world editor /api/probe: stand.y 17.5 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -34778,9 +34429,9 @@
       ],
       "services_reason": null,
       "position": [
-        -229.217327,
-        1.18629,
-        -49.036862
+        -226.22,
+        1.2,
+        -51.04
       ],
       "position_w": null,
       "rotation": [
@@ -34800,7 +34451,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 33 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 3.6 m north-west from [-229.217327, 1.18629, -49.036862] to [-226.22, 1.2, -51.04], world editor /api/probe: stand.y 1.2 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -37650,9 +37301,9 @@
       ],
       "services_reason": null,
       "position": [
-        -70.186079,
-        38.789,
-        -447.819012
+        -65.19,
+        38.474,
+        -452.32
       ],
       "position_w": null,
       "rotation": [
@@ -37672,7 +37323,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 12 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.7 m north-west from [-70.186079, 38.789, -447.819012] to [-65.19, 38.474, -452.32], world editor /api/probe: stand.y 38.474 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -44095,10 +43746,27 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3080009,
+          "title": "Kart Driver: Exploder's League Sponsorship",
+          "title_string_id": 394484,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the description 394485 reads 'T.R. suggested talking to Blammo'; the lines run offer 394483 (T.R.'s 'you're going to need to get a sponsor'), title 394484, description 394485, then Blammo's pitch 394486, as 3080008's run 394433-394436 with its closing last, so the pitch is the closing (R) and Blammo takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki starts it at T.R. Walker Jr. (https://fr.fanbyte.com/wiki/FR_Quest%3AKart_Driver%3A_Exploder%27s_League_Sponsorship)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3080008
+        3080008,
+        3080009
       ],
       "quests_given_text": [
         "Target of Kart Driver: You Want To Go Fast?; sends the player to Blammo for a sponsor (241877165)."
@@ -44286,12 +43954,20 @@
           {
             "kind": "client",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Wildwood Speedway (South Sacred Grove), row 147; source cell: [client]"
+          },
+          {
+            "kind": "client",
+            "evidence": "the description 394485 reads 'T.R. suggested talking to Blammo'; the lines run offer 394483 (T.R.'s 'you're going to need to get a sponsor'), title 394484, description 394485, then Blammo's pitch 394486, as 3080008's run 394433-394436 with its closing last, so the pitch is the closing (R) and Blammo takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          },
+          {
+            "kind": "client",
+            "evidence": "the description 394485 reads 'T.R. suggested talking to Blammo'; the lines run offer 394483 (T.R.'s 'you're going to need to get a sponsor'), title 394484, description 394485, then Blammo's pitch 394486, as 3080008's run 394433-394436 with its closing last, so the pitch is the closing (R) and Blammo takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_given_text": [
@@ -44473,9 +44149,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1575.393633,
-        -45.37643,
-        -550.219534
+        -1573.39,
+        -44.626,
+        -551.22
       ],
       "position_w": null,
       "rotation": [
@@ -44500,7 +44176,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 6 by longest normalized whole-name score 16; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 6 by longest normalized whole-name score 16; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 2.2 m north-west from [-1575.393633, -45.37643, -550.219534] to [-1573.39, -44.626, -551.22], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -45697,9 +45373,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -989.761671,
-        -6.470751,
-        431.970127
+        -407.0,
+        5.15,
+        1086.0
       ],
       "position_w": null,
       "rotation": [
@@ -45734,7 +45410,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 31,32,60,69. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was a zone-centre guess under the ground (y -6.5) in a pile of Wilds rows. The wiki says \"Wandering around west of the village\" (Forest Troll Village) and the client \"between the smithing camp and Nog's camp\" (2901885317); Nog stands at the west end of the camp (Legacy spawn 9500000925, -392.6, 4.8, 1086.4). Moved onto terrain beside Nog's camp; the side is (R); moved 876.0 m north-east from [-989.761671, -6.470751, 431.970127] to [-407.0, 5.15, 1086.0], world editor /api/probe: stand.y 5.15 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -46465,11 +46141,28 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             }
           ]
+        },
+        {
+          "quest_id": 3060004,
+          "title": "Demo Derby: Rules of the Road",
+          "title_string_id": 403450,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki starts it at Tucker Thunderjolt (https://fr.fanbyte.com/wiki/FR_Quest%3ADemo_Derby%3A_Rules_of_the_Road)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3060016,
-        3060008
+        3060008,
+        3060004
       ],
       "quests_given_text": [
         "Demo Derby: Curious Crash (inferred), Demo Derby: Arena Revenge (inferred), Demo Derby: Seeking a Sponsor (sends the player to Kanan in Stillwater Crossing, 880667942)."
@@ -46771,6 +46464,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) quest id 3060015 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quest_ids_given": [
@@ -46809,6 +46506,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) quest id 3060015 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_given_text": [
@@ -51611,16 +51312,24 @@
       "npc_id": 9500001007,
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
-      "name": "Burglz",
+      "name": "Burgl",
       "name_reason": null,
-      "name_string_id": 441415,
+      "name_string_id": 47170,
       "name_string_ids": [
         {
+          "table": "ucdt",
+          "id": 1354921582
+        },
+        {
+          "table": "ugdt",
+          "id": 293985437
+        },
+        {
           "table": "client_locale",
-          "id": 441415
+          "id": 47170
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "47170 is the client name every quest line gives him; the ucdt/ugdt keys are the guide's.",
       "zone": "Wilds",
       "zone_id": 16,
       "zone_reason": null,
@@ -51629,7 +51338,8 @@
       ],
       "presence": "listed",
       "title_or_role": [
-        "Troll who runs the quarry; turn-in of Question at the Quarry and giver of its Tools for Smashing and Box O' Rocks follow-ups"
+        "Troll who runs the quarry; turn-in of Question at the Quarry and giver of its Tools for Smashing and Box O' Rocks follow-ups",
+        "Runs the troll mining camp and quarry (\"Burgl's Quarry\", 1655844911; \"Burgl's workers\", 2090604938)."
       ],
       "roles": [
         "quest_giver"
@@ -51717,6 +51427,10 @@
           {
             "kind": "legacy-data",
             "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy. NameId resolves in client locale table to 'Burglz'."
+          },
+          {
+            "kind": "client",
+            "evidence": "every client line that names the quarry troll says Burgl (npc_name Global.Text 47170; 70106 'Foreman Burgl', 70110 'Speak to Burgl', 70230 'Return to Burgl') and the wiki gives Tools for Smashing and Box O' Rocks to Burgl. The reference servers' spawn definition 3120 named him with 441415 'Burglz', which is the Seaside robgoblin banker's name (npcs/seaside.json 9500000563). The listed-only Burgl row 9500000883 (no spawn of its own) folds into this placed row (scripts/quest_fidelity.py SAME_NPC)."
           }
         ],
         "name_reason": [
@@ -51729,12 +51443,20 @@
           {
             "kind": "legacy-data",
             "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy. NameId resolves in client locale table to 'Burglz'."
+          },
+          {
+            "kind": "client",
+            "evidence": "every client line that names the quarry troll says Burgl (npc_name Global.Text 47170; 70106 'Foreman Burgl', 70110 'Speak to Burgl', 70230 'Return to Burgl') and the wiki gives Tools for Smashing and Box O' Rocks to Burgl. The reference servers' spawn definition 3120 named him with 441415 'Burglz', which is the Seaside robgoblin banker's name (npcs/seaside.json 9500000563). The listed-only Burgl row 9500000883 (no spawn of its own) folds into this placed row (scripts/quest_fidelity.py SAME_NPC)."
           }
         ],
         "name_string_ids": [
           {
             "kind": "legacy-data",
             "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy. NameId resolves in client locale table to 'Burglz'."
+          },
+          {
+            "kind": "client",
+            "evidence": "every client line that names the quarry troll says Burgl (npc_name Global.Text 47170; 70106 'Foreman Burgl', 70110 'Speak to Burgl', 70230 'Return to Burgl') and the wiki gives Tools for Smashing and Box O' Rocks to Burgl. The reference servers' spawn definition 3120 named him with 441415 'Burglz', which is the Seaside robgoblin banker's name (npcs/seaside.json 9500000563). The listed-only Burgl row 9500000883 (no spawn of its own) folds into this placed row (scripts/quest_fidelity.py SAME_NPC)."
           }
         ],
         "name_string_id_reason": [

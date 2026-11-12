@@ -78,7 +78,7 @@ const NINJA_PATH: u32 = 3_110_001;
 const BECOME_A_NINJA: u32 = 3_110_026;
 
 /// The 49/13 end text (`end_text_string_id`) of each quest, from `data/content/quests`.
-const INTRODUCE_END_TEXT: u32 = 0;
+const INTRODUCE_END_TEXT: u32 = 116_463;
 const BURDEN_END_TEXT: u32 = 104_108;
 const RANGER_END_TEXT: u32 = 104_136;
 const NINJA_END_TEXT: u32 = 9_731;
@@ -225,12 +225,12 @@ fn burden_of_fame(game: &mut Gameplay, now: &mut u64) {
 }
 
 fn ranger_requisition(game: &mut Gameplay, now: &mut u64) {
-    let auguste = character_at(AUGUSTE);
+    let merigold = character_at(MERIGOLD);
     let ricardo = character_at(RICARDO);
     *now += 10;
-    offer(game, &auguste, AUGUSTE, RANGER_REQUISITION, *now);
+    offer(game, &merigold, MERIGOLD, RANGER_REQUISITION, *now);
     *now += 10;
-    accept(game, &auguste, RANGER_REQUISITION, *now);
+    accept(game, &merigold, RANGER_REQUISITION, *now);
     *now += 10;
     talk_step(game, &ricardo, RICARDO, *now, "Chef: Ranger Requisition");
     assert_eq!(counts(game, RANGER_REQUISITION), [1]);
@@ -490,12 +490,12 @@ fn locked_profile_turnin_is_refused_cleanly() {
     let fixture = Fixture::for_character(CHARACTER);
     let mut game = seeded(&fixture, CHEF, &[1, CHEF]);
     let mut now = 7_000;
-    let auguste = character_at(AUGUSTE);
+    let merigold = character_at(MERIGOLD);
     let ricardo = character_at(RICARDO);
 
-    offer(&mut game, &auguste, AUGUSTE, RANGER_REQUISITION, now);
+    offer(&mut game, &merigold, MERIGOLD, RANGER_REQUISITION, now);
     now += 10;
-    accept(&mut game, &auguste, RANGER_REQUISITION, now);
+    accept(&mut game, &merigold, RANGER_REQUISITION, now);
     now += 10;
     talk_step(
         &mut game,
@@ -581,12 +581,12 @@ fn locked_profile_turnin_refuses_without_profile_content() {
     let fixture = Fixture::for_character(CHARACTER);
     let mut game = seeded(&fixture, CHEF, &[1, CHEF]);
     let mut now = 8_000;
-    let auguste = character_at(AUGUSTE);
+    let merigold = character_at(MERIGOLD);
     let ricardo = character_at(RICARDO);
 
-    offer(&mut game, &auguste, AUGUSTE, RANGER_REQUISITION, now);
+    offer(&mut game, &merigold, MERIGOLD, RANGER_REQUISITION, now);
     now += 10;
-    accept(&mut game, &auguste, RANGER_REQUISITION, now);
+    accept(&mut game, &merigold, RANGER_REQUISITION, now);
     now += 10;
     talk_step(
         &mut game,
@@ -642,20 +642,20 @@ fn refused_turn_in_changes_nothing() {
     let fixture = Fixture::for_character(CHARACTER);
     let mut game = seeded(&fixture, CHEF, &[1, CHEF]);
     let mut now = 9_000;
-    let auguste = character_at(AUGUSTE);
+    let merigold = character_at(MERIGOLD);
     let ricardo = character_at(RICARDO);
     let far = CharacterState {
         position: [
-            auguste.position[0] + 400.0,
-            auguste.position[1],
-            auguste.position[2],
+            merigold.position[0] + 400.0,
+            merigold.position[1],
+            merigold.position[2],
         ],
-        ..auguste.clone()
+        ..merigold.clone()
     };
 
-    offer(&mut game, &auguste, AUGUSTE, RANGER_REQUISITION, now);
+    offer(&mut game, &merigold, MERIGOLD, RANGER_REQUISITION, now);
     now += 10;
-    accept(&mut game, &auguste, RANGER_REQUISITION, now);
+    accept(&mut game, &merigold, RANGER_REQUISITION, now);
 
     // Missing objective: the 49/14 has no pending screen to settle.
     now += 10;
@@ -679,7 +679,7 @@ fn refused_turn_in_changes_nothing() {
     now += 10;
     let before_far = saved(&game);
     assert!(
-        game.handle_in_world(&npc_interact(AUGUSTE), &far, now)
+        game.handle_in_world(&npc_interact(MERIGOLD), &far, now)
             .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a far interact must be refused"
     );
@@ -707,10 +707,10 @@ fn refused_turn_in_changes_nothing() {
     );
     let held = saved(&game);
 
-    // The formal giver Auguste is not the actor that opened the screen: the Talk
-    // reopens nothing and the pending screen stays at Ricardo.
+    // The formal giver Merigold (QF: the wiki's; Ricardo takes the hand-in) is not the actor
+    // that opened the screen: the Talk reopens nothing and the pending screen stays at Ricardo.
     now += 10;
-    let _ = talk(&mut game, &auguste, AUGUSTE, now);
+    let _ = talk(&mut game, &merigold, MERIGOLD, now);
     assert_eq!(
         saved(&game),
         held,
@@ -721,7 +721,7 @@ fn refused_turn_in_changes_nothing() {
     // Out-of-range menu selection leaves the held screen untouched as well.
     now += 10;
     assert!(
-        game.handle_in_world(&npc_select(AUGUSTE, 1), &far, now)
+        game.handle_in_world(&npc_select(MERIGOLD, 1), &far, now)
             .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a far menu selection must be refused"
     );
@@ -743,7 +743,7 @@ fn refused_turn_in_changes_nothing() {
     now += 10;
     assert_packet_changes_nothing(
         &mut game,
-        &auguste,
+        &merigold,
         &quest_reply(RANGER_REQUISITION, true),
         now,
         "replayed 49/2",
@@ -1104,7 +1104,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         (
             "chef.json",
             RANGER_REQUISITION,
-            AUGUSTE,
+            MERIGOLD,
             &[],
             0,
             &[75_665],
@@ -1147,13 +1147,14 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             KART_DRIVER,
             30,
         ),
-        // T726: the Seaside Board of Tourism Sponsorship (Petal Oceanmist, 9500000613);
+        // T726: the Seaside Board of Tourism Sponsorship (Petal Oceanmist, 9500000613, its
+        // talk target and hand-in; QF: offered by Amber Violet, the wiki's giver);
         // the wiki's 13 coins, and 30 Kart Driver XP repeating 3080002's rung.
         // F745 keeps the row as the decision pin the final scan's allowlist needs.
         (
             "kart_driver.json",
             3_080_019,
-            9_500_000_613,
+            9_500_000_868,
             &[],
             13,
             &[],
@@ -1174,10 +1175,11 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             KART_DRIVER,
             188, // L926: wiki stars
         ),
+        // QF: offered by T.R. Walker Jr. (the wiki's giver); Blammo is its talk target and hand-in.
         (
             "kart_driver.json",
             3_080_009,
-            9_500_000_872,
+            9_500_000_950,
             &[],
             13,
             &[],
@@ -1305,10 +1307,11 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         // T252's two Cobblestone Brawler records; T331's C6 is the hand-off they lead to.
         // The table now covers every job-gated Brawler record in `brawler.json`, so the
         // final scan below can reject a new gate or XP row in that file.
+        // QF: offered by Samantha (the wiki's giver); Carlos keeps its Talk and its hand-in.
         (
             "brawler.json",
             3_030_004,
-            9_000_000_042,
+            9_000_000_189,
             &[],
             6,
             &[],

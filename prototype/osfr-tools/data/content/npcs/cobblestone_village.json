@@ -1347,50 +1347,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3030004,
-          "title": "Brawler: Bringing Back Brazenfist",
-          "title_string_id": 140531,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3030004 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 4039116213 to Global.Text id 140531 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3030005,
           "title": "Brawler: Honor Lost",
           "title_string_id": 94283,
@@ -1480,15 +1436,26 @@
         }
       ],
       "quest_ids_given": [
-        3030004,
         3030005,
         3030006
       ],
       "quests_given_text": [
         "Brawler: Bringing Back Brazenfist (unlocks the job; fight Mongo), Brawler: Honor Lost, Brawler: Building your Rep (sends the player to Jones). Possibly Brawler: Prized Brawlers (defeat \"one of Kibler's unstoppable recruits\", 1714012446; ends \"Report to Petra in Blackspore\", 3556251182; unproven). Hooligan text: \"Carlos needs you help with some Hooligans.\" (1429650934), \"Carlos Brazenfist, the retired Brawler, is looking for some brave souls to help out with the Hooligan issue here in Cobblestone Village.\" (3636618686) (title not found). Sends brawlers to Chaz Strongarm in Lakeshore for an arm-wrestling referral (3599197409, see NPCs - Lakeshore). Target of \"Carlos' Conundrum\" (ugdt 3938227018, ucdt 4282759441; both \"NOT LIVE\", no text found)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3030004,
+          "title": "Brawler: Bringing Back Brazenfist",
+          "title_string_id": 140531,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the offer 140530 is a referral ('go talk to Carlos, he's east of here') and the description 140532 reads 'Samantha has pointed you towards Carlos Brazenfist'; Carlos's own line is the closing 140533, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Hand-in of 3030004: the quest's last step is here and its giver is the wiki's; see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -1882,6 +1849,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 140530 is a referral ('go talk to Carlos, he's east of here') and the description 140532 reads 'Samantha has pointed you towards Carlos Brazenfist'; Carlos's own line is the closing 140533, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_accepted_reason": [
@@ -8143,9 +8114,26 @@
               "evidence": "title_string_id corrected from raw locale hash 4206471822 to Global.Text id 94247 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3030004,
+          "title": "Brawler: Bringing Back Brazenfist",
+          "title_string_id": 140531,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the offer 140530 is a referral ('go talk to Carlos, he's east of here') and the description 140532 reads 'Samantha has pointed you towards Carlos Brazenfist'; Carlos's own line is the closing 140533, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki starts it at Samantha (https://fr.fanbyte.com/wiki/FR_Quest%3ABrawler%3A_Bringing_Back_Brazenfist)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
+        3030004,
         3000021
       ],
       "quests_given_text": [
@@ -8484,6 +8472,10 @@
           {
             "kind": "client",
             "evidence": "(client) title string ID 4206471822 recovered from the guide title ID cell; Adventurer C2/C3 explicitly reuse C1 ID 4206471822."
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 140530 is a referral ('go talk to Carlos, he's east of here') and the description 140532 reads 'Samantha has pointed you towards Carlos Brazenfist'; Carlos's own line is the closing 140533, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quest_ids_given": [
@@ -8522,6 +8514,10 @@
           {
             "kind": "client",
             "evidence": "(client) title string ID 4206471822 recovered from the guide title ID cell; Adventurer C2/C3 explicitly reuse C1 ID 4206471822."
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 140530 is a referral ('go talk to Carlos, he's east of here') and the description 140532 reads 'Samantha has pointed you towards Carlos Brazenfist'; Carlos's own line is the closing 140533, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_given_text": [

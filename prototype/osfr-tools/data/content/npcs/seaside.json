@@ -4790,9 +4790,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -637.618358,
-        7.6878,
-        -1046.695504
+        -637.270425,
+        7.1889,
+        -1049.171174
       ],
       "position_w": null,
       "rotation": [
@@ -4812,7 +4812,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 13 by longest normalized whole-name score 7; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-637.618358, 7.6878, -1046.695504]: it stood 2.4 m from quest-table-2; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -8253,6 +8253,7 @@
     },
     {
       "npc_id": 9500000564,
+      "live_event": "birthday_bash",
       "id_kind": "reconstructed_content_key",
       "reference_ids": [],
       "name": "Cakenstein and Cakeling",
@@ -8695,6 +8696,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "live_event": [
+          {
+            "kind": "wiki",
+            "evidence": "EV live_event birthday_bash: fanbyte FR_Mob:Cakenstein and FR_Mob:Cakeling (Birthday Bash)"
           }
         ]
       }
@@ -29523,9 +29530,9 @@
       ],
       "services_reason": null,
       "position": [
-        -634.018612,
-        9.0507,
-        -1043.48607
+        -349.648,
+        -16.7814,
+        -1169.116
       ],
       "position_w": null,
       "rotation": [
@@ -29545,7 +29552,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 13. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 13. This is not a recovered NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-634.018612, 9.0507, -1043.48607]: it stood 311 m away on a guessed point (zone centre); the placement research (opus/pieces/npc-placement, 2026-11-11) puts it at the place its own location text names: data/content/npc_spawns_extra.json spawn_guid 100000001775 on ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:503 spawnNpcWithGuid(1775, 100000001775); Sanctuary-main-20261019 src/Resources/Npcs.json Id=1775; the new spot is on walkable ground clear of props and other bodies.",
       "source": [
         {
           "kind": "client",
@@ -33049,7 +33056,7 @@
       "services_reason": "The regional row lists no distinct service.",
       "position": [
         -640.746364,
-        9.31,
+        5.7996,
         -1049.916263
       ],
       "position_w": null,
@@ -33070,7 +33077,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 13. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 13. This is not a recovered NPC transform. (R) PL-A npc-placement-a: the zone-centre default height was the mean of the POI heights (9.31), 3.5 m off the terrain here; the body now stands on the floor under its spot (5.7996).",
       "source": [
         {
           "kind": "client",
@@ -33966,22 +33973,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3080019,
-          "title": "Kart Driver: Seaside Board of Tourism Sponsorship",
-          "title_string_id": 394663,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 17; name 'Kart Driver: Seaside Board of Tourism Sponsorship'; title id cell 2204157846 ucdt / 3766626738 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) T726: quest id 3080019 is a stable batch key; the guide does not provide a numeric server quest id, and data/content/quests/kart_driver.json binds title_string_id 394663 (Global.Text.394663 = the guide title)."
-            }
-          ]
-        },
-        {
           "quest_id": 3080020,
           "title": "Kart Driver: Frost Ridge Sprint Challenge",
           "title_string_id": 394667,
@@ -34155,7 +34146,6 @@
         }
       ],
       "quest_ids_given": [
-        3080019,
         3080020,
         3080021,
         3080022,

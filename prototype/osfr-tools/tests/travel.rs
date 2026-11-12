@@ -106,7 +106,10 @@ fn world_entry_sends_the_whole_atlas_and_walking_to_a_stone_finds_it() {
     let mut game = game();
     let entry = game.initialize_world(&at(START), 500).unwrap();
     let rows = atlas(&entry);
-    assert_eq!(rows.len(), points().len());
+    // EV: an event marker (Halloween Harry's, row 140) stays closed until the session's calendar
+    // runs its event; with no quest catalogue bound here, no calendar runs (`event_assets`).
+    let year_round = points().iter().filter(|p| p.get("live_event").is_none()).count();
+    assert_eq!(rows.len(), year_round);
     assert!(
         rows.iter().all(|row| row.notification_type != 7),
         "a fresh character found none"
@@ -166,7 +169,8 @@ fn every_point_is_a_teleport_that_lands_on_walkable_ground() {
         now += 1;
     }
     let (mut on_ground, mut interior) = (0, 0);
-    for point in &points {
+    // EV: an event marker is closed here (no calendar runs); `gameplay/travel.rs` tests it.
+    for point in points.iter().filter(|p| p.get("live_event").is_none()) {
         let (id, name) = (
             point["id"].as_i64().unwrap(),
             point["name"].as_str().unwrap(),
@@ -227,9 +231,10 @@ fn every_point_is_a_teleport_that_lands_on_walkable_ground() {
             );
         }
     }
+    // EV: 127 on the ground with Halloween Harry's event marker (row 140) closed here.
     assert_eq!(
         (on_ground, interior),
-        (128, 8),
+        (127, 8),
         "measured against the zone 0 grid"
     );
 }

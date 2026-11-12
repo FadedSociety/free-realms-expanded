@@ -1098,12 +1098,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Contract:_All_Around_Win)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 388247,
       "intro_text_string_id": 388245,
       "end_text_string_id": 388248,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3010011,
@@ -1731,9 +1741,19 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 388257 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AContract%3A_Bowman_for_Hire)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3010019,
@@ -2173,9 +2193,19 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 388330 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AContract%3A_No_Boundaries_on_Bounties)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3010026,
@@ -2532,9 +2562,19 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AContract%3A_That%27ll_Teach_%27Em)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3010032,
@@ -2685,12 +2725,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AArcher%3A_Attack_from_Above)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 78495,
       "intro_text_string_id": 78493,
       "end_text_string_id": 78496,
-      "enabled": false
+      "enabled": false,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3010035,

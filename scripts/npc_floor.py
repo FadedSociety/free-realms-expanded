@@ -13,7 +13,7 @@ the field enemy homes (`field_enemies.json`) and the quest pick-ups with a body
 The rule, as `src/npc_life.rs` and `src/terrain.rs` have it:
 - The floor is the higher of the height grid when it is at most 2 m above the feet (the
   client's own ground cast for a moved NPC, `010ba6e0`, starts at Y+2) and the highest baked
-  collision top at most 0.5 m above them.
+  collision top at most 0.1 m above them (a body is never raised onto a cart rim, table or crate).
 - A body more than 0.1 m off its floor moves onto it; the height written is the fixpoint (the
   floor of the floor), so a second run, and the load-time snap, change nothing.
 - Not moved: props (`npc_poses.json` `props`), rows with `keep_height` evidence, a zone's own
@@ -35,11 +35,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "prototype" / "osfr-tools" / "data" / "content"
 LIFT_M = 2.0  # terrain.rs FLOOR_CAST_LIFT_M
-STEP_UP_M = 0.5  # terrain.rs FLOOR_STEP_UP_M
+STEP_UP_M = 0.1  # terrain.rs FLOOR_STEP_UP_M: a body is never raised onto a baked top (PL-A)
 DEPTH_M = 2000.0  # terrain.rs FLOOR_CAST_DEPTH_M
 SETTLED_M = 0.1  # npc_life.rs SETTLED_M
 MAX_SLOPE_DEGREES = 50.0  # obstacles.rs
 EPS = 1e-6  # obstacles.rs
+WATER_EDGE_M = 100.0  # obstacles.rs WATER_EDGE_M: a longer edge is water, never a body's floor
 VIDEO_DRAW_CONFIDENCE = ("high", "medium")  # world.rs
 QUEST_NODE_GUID = 0x4E4F_4400_0000_0000 | 3 << 32  # harvest_nodes.rs node_guid(QUEST_NODE_TAG, id)
 
@@ -90,7 +91,7 @@ class Obstacles:
         at += buckets * 4
         self.items = array.array("I", data[at:at + items * 4])
 
-    def surface_below(self, x, z, from_y, step_down):
+    def surface_below(self, x, z, from_y, step_down, dry=False):
         col, row = math.floor((x - self.min_x) / self.cell), math.floor((z - self.min_z) / self.cell)
         if col < 0 or row < 0 or col >= self.cols or row >= self.rows:
             return None
@@ -98,10 +99,18 @@ class Obstacles:
         best = None
         for index in self.items[self.starts[bucket]:self.starts[bucket + 1]]:
             v = self.vertices[index * 9:index * 9 + 9]
+            if dry and is_water((v[0:3], v[3:6], v[6:9])):
+                continue
             y = triangle_surface((v[0:3], v[3:6], v[6:9]), x, z)
             if y is not None and from_y - step_down <= y <= from_y and (best is None or y > best):
                 best = y
         return best
+
+
+def is_water(triangle):
+    """`obstacles.rs` is_water: an edge longer than WATER_EDGE_M."""
+    a, b, c = triangle
+    return any(math.hypot(p[0] - q[0], p[2] - q[2]) > WATER_EDGE_M for p, q in ((a, b), (b, c), (a, c)))
 
 
 def triangle_surface(triangle, x, z):
@@ -135,7 +144,7 @@ class Floor:
         ground = self.grid.height_at(x, z)
         if ground is not None and ground > y + LIFT_M:
             ground = None
-        top = self.obstacles.surface_below(x, z, y + STEP_UP_M, DEPTH_M)
+        top = self.obstacles.surface_below(x, z, y + STEP_UP_M, DEPTH_M, dry=True)
         present = [v for v in (ground, top) if v is not None]
         return max(present) if present else None
 

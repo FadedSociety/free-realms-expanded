@@ -538,8 +538,10 @@ fn every_pose_is_a_looping_idle_its_own_model_has() {
             "{owner}: model {model} {files:?} has no clip for {id} {name}"
         );
         if let Some(idles) = ambient_idles.get(&model) {
+            // A stand row (loc_stand) beats the table: the world skips the ambient idle of an
+            // actor with its own pose row, so a child with no seat can stand.
             assert!(
-                idles.contains(&id),
+                id == i64::from(STAND) || idles.contains(&id),
                 "{owner}: npc_ambient idles model {model} on {idles:?}"
             );
         }
@@ -667,5 +669,283 @@ fn the_snowhill_miners_swing_their_picks_in_the_session_view() {
         stands,
         BTreeSet::from([STAND]),
         "the vendor stands at his stall"
+    );
+}
+
+// ---- placement faults the owner reported on 2026-11-12 (npc-placement-b) ------------------------
+//
+// "those on objects like npcs on carts appear floating on top of whatever they were inside" and
+// "the girl sitting outside the cemetery gate": a reconstructed spot (a POI anchor or a zone
+// centre, never a captured transform) must not pile bodies on one point, put one on top of an
+// object or the water, or sit a child on nothing. These cover the regional files this review
+// owns; the other regional files have their own review.
+
+const REVIEWED_FILES: [&str; 8] = [
+    "wilds",
+    "blackspore_swamp",
+    "quest_spawned",
+    "shrouded_glade",
+    "sunstone_valley",
+    "wugachug",
+    "stillwater_crossing",
+    "highroad_junction",
+];
+
+struct Body {
+    file: String,
+    id: u64,
+    name: String,
+    pos: [f32; 3],
+    guessed: bool,
+    drawn: bool,
+    /// The Wilds zone-centre pile is another review's (its heights and spots are re-derived there).
+    exempt: bool,
+}
+
+/// Every body the world draws, at the position it is drawn from: the regional row, or the
+/// `npc_spawns_extra.json` body that draws it. `guessed` is a reconstructed POI-anchor or
+/// zone-centre spot (the body's own source says so when it has one). With `hidden`, regional rows
+/// with no model (nothing drawn) are listed too: an anchor stacked with them is still a pile.
+fn drawn_bodies(hidden: bool) -> Vec<Body> {
+    let extras = read(&content_dir().join("npc_spawns_extra.json"));
+    let rows = extras["records"].as_array().unwrap();
+    let bound: HashMap<u64, &Value> = rows
+        .iter()
+        .filter_map(|row| Some((row["content_key"].as_u64()?, row)))
+        .collect();
+    let xyz = |row: &Value| {
+        let p = row["position"].as_array().unwrap();
+        [0, 1, 2].map(|i| p[i].as_f64().unwrap() as f32)
+    };
+    let mut bodies = Vec::new();
+    for entry in fs::read_dir(content_dir().join("npcs")).unwrap() {
+        let path = entry.unwrap().path();
+        let file = path.file_stem().unwrap().to_string_lossy().into_owned();
+        for row in read(&path)["records"].as_array().unwrap() {
+            if !row["house_zone_id"].is_null() {
+                continue;
+            }
+            let id = row["npc_id"].as_u64().unwrap();
+            let body = bound.get(&id).copied();
+            let source = body.unwrap_or(row);
+            let drawn = source["model_id"].as_i64().unwrap_or(0) > 0
+                && (body.is_some() || row["name_string_id"].as_i64().unwrap_or(0) > 0);
+            let reconstructed =
+                matches!(row["placement"].as_str(), Some("poi_anchor" | "unanchored"))
+                    && !row["position_reason"]
+                        .as_str()
+                        .is_some_and(|reason| reason.contains("LIVE CAPTURE"))
+                    && body.map_or(true, |body| {
+                        body["source"].as_array().unwrap().iter().any(|s| {
+                            s["kind"] == "reconstructed"
+                                && s["evidence"].as_str().is_some_and(|e| {
+                                    e.contains("reconstructed poi_anchor")
+                                        || e.contains("reconstructed unanchored")
+                                })
+                        })
+                    });
+            if drawn || hidden {
+                bodies.push(Body {
+                    file: file.clone(),
+                    id,
+                    name: row["name"].as_str().unwrap_or("?").to_owned(),
+                    pos: xyz(source),
+                    guessed: reconstructed,
+                    drawn,
+                    exempt: file == "wilds"
+                        && row["placement_source"] == "reconstructed_zone_center",
+                });
+            }
+        }
+    }
+    for row in rows.iter().filter(|row| row["content_key"].is_null()) {
+        if row["model_id"].as_i64().unwrap_or(0) > 0 {
+            bodies.push(Body {
+                file: "extras".to_owned(),
+                id: row["spawn_guid"].as_u64().unwrap(),
+                name: row["name"].as_str().unwrap_or("?").to_owned(),
+                pos: xyz(row),
+                guessed: false,
+                drawn: true,
+                exempt: false,
+            });
+        }
+    }
+    bodies
+}
+
+/// Bodies on one guessed point read as a pile (Lucinda, the Banshee and the Pumpkin Prince on
+/// the Bone Bog Cemetery anchor, 3.3 and 4.6 m apart): the POI spiral steps about 2 to 4 m, so
+/// no guessed body stands within 3.5 m of another drawn body or another row of the same files.
+#[test]
+fn guessed_bodies_do_not_pile_on_one_point() {
+    let bodies = drawn_bodies(true);
+    let mut piles = Vec::new();
+    for a in bodies
+        .iter()
+        .filter(|b| b.guessed && !b.exempt && REVIEWED_FILES.contains(&b.file.as_str()))
+    {
+        for b in bodies.iter().filter(|b| {
+            b.id != a.id && !b.exempt && (b.drawn || REVIEWED_FILES.contains(&b.file.as_str()))
+        }) {
+            let near = (a.pos[0] - b.pos[0]).hypot(a.pos[2] - b.pos[2]);
+            if near < 3.5 && (a.pos[1] - b.pos[1]).abs() < 3.0 {
+                piles.push(format!(
+                    "{} {:?} ({}) and {} {:?} are {near:.2} m apart at {:?}",
+                    a.id, a.name, a.file, b.id, b.name, a.pos
+                ));
+            }
+        }
+    }
+    assert!(
+        piles.is_empty(),
+        "guessed bodies on one point:\n{}",
+        piles.join("\n")
+    );
+}
+
+/// A reconstructed spot is on the ground: not on a prop or the water surface above the terrain
+/// (the Sacred Grove Shallows people stood on the water of the river, the Treasure Trove
+/// merchant on a raised object), and not buried in it. World-wide; a guessed body kept at its
+/// authored height (`keep_height`: a pier, a dock, paving, a cave) is the row's own evidence.
+/// The under-the-terrain check covers the files outside `REVIEWED_FILES`: the Wilds, Blackspore
+/// and quest-spawned rows are the other placement review's.
+#[test]
+fn guessed_bodies_do_not_stand_on_an_object_above_the_ground() {
+    let Some(terrain) = terrain() else { return };
+    let poses = read(&content_dir().join("npc_poses.json"));
+    let kept: HashSet<u64> = poses["spawns"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|row| row["keep_height"].is_string())
+        .filter_map(|row| row["guid"].as_u64())
+        .collect();
+    let extras = read(&content_dir().join("npc_spawns_extra.json"));
+    let drawn_as: HashMap<u64, u64> = extras["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| Some((row["content_key"].as_u64()?, row["spawn_guid"].as_u64()?)))
+        .collect();
+    let (mut floating, mut buried) = (Vec::new(), Vec::new());
+    for body in drawn_bodies(false).iter().filter(|b| b.guessed) {
+        if kept.contains(&body.id) || drawn_as.get(&body.id).is_some_and(|g| kept.contains(g)) {
+            continue;
+        }
+        let Some(ground) = terrain.height_at(0, body.pos[0], body.pos[2]) else {
+            continue;
+        };
+        let floor = terrain.floor_at(0, body.pos);
+        let line = |what: &str| {
+            format!(
+                "{} {:?} ({}) stands at {:?}, {what}",
+                body.id, body.name, body.file, body.pos
+            )
+        };
+        match floor {
+            Some(floor) if floor - ground > 0.4 => {
+                floating.push(line(&format!("{:.2} m above the ground", floor - ground)))
+            }
+            None if ground - body.pos[1] > 0.5
+                && !REVIEWED_FILES.contains(&body.file.as_str())
+                && body.file != "durango_zoo" =>
+            {
+                buried.push(line(&format!("{:.2} m under the terrain", ground - body.pos[1])))
+            }
+            _ => {}
+        }
+    }
+    assert!(
+        floating.is_empty(),
+        "bodies on an object:\n{}",
+        floating.join("\n")
+    );
+    assert!(
+        buried.is_empty(),
+        "bodies buried in the terrain:\n{}",
+        buried.join("\n")
+    );
+}
+
+/// A child's only idle is the sit loop, so a child with no seat sits on the ground (Lucinda at
+/// the Bone Bog Cemetery gate, whose stand-in body was a child's). Every sitting body in the world has a 2014 seat placement
+/// (a bench, chair, stool, stump, sofa, cot, bedroll or log) within 2 m, or evidence for its
+/// height (`keep_height`: something the bake lacks holds it up), or it stands.
+#[test]
+fn a_sitting_body_has_a_seat() {
+    let seats_file = lab().join("references/fr-spatial-20261029/prop_placements_2014.tsv");
+    let Ok(seats_tsv) = fs::read_to_string(&seats_file) else {
+        eprintln!("the 2014 prop placements are absent: the seat check skips");
+        return;
+    };
+    const SEAT: [&str; 11] = [
+        "bench", "chair", "stool", "stump", "sofa", "loveseat", "cot_", "bedroll", "logs_01",
+        "throne", "lounge",
+    ];
+    let seats: Vec<[f32; 3]> = seats_tsv
+        .lines()
+        .skip(1)
+        .filter_map(|line| {
+            let mut c = line.split('\t').skip(1);
+            let asset = c.next()?;
+            SEAT.iter().any(|s| asset.contains(s)).then_some(())?;
+            Some([
+                c.next()?.parse().ok()?,
+                c.next()?.parse().ok()?,
+                c.next()?.parse().ok()?,
+            ])
+        })
+        .collect();
+    assert!(
+        seats.len() > 100,
+        "the seat placements parse: {}",
+        seats.len()
+    );
+    // The child bodies sit on every loop of their pose row; a drinker sits on `sitdrink` (2140),
+    // its other loop (2150) stands.
+    let pose_rows = read(&content_dir().join("npc_poses.json"));
+    let sits = |model: i32, id: i32| {
+        pose_rows["models"].as_array().unwrap().iter().any(|row| {
+            row["model_ids"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|m| m == model)
+                && match row["role"].as_str() {
+                    Some("child") => row["animation_ids"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|a| a == id),
+                    Some("drinker") => id == 2140,
+                    _ => false,
+                }
+        })
+    };
+    let game = shipped();
+    let table = game.npc_table().unwrap();
+    let mut seatless = Vec::new();
+    for (zone, spawn) in table.drawn_spawns() {
+        let p = at(spawn);
+        let area = region(&game, zone, p);
+        if !sits(spawn.model_id, spawn.animation_id) || table.life().keeps_height(spawn.actor_id)
+        {
+            continue;
+        }
+        let near = seats
+            .iter()
+            .any(|s| (s[0] - p[0]).hypot(s[2] - p[2]) <= 2.0 && (s[1] - p[1]).abs() < 1.5);
+        if !near {
+            seatless.push(format!(
+                "{} {:?} model {} sits (loop {}) at {p:?} ({area}) with no seat within 2 m",
+                spawn.actor_id, spawn.npc_name, spawn.model_id, spawn.animation_id
+            ));
+        }
+    }
+    assert!(
+        seatless.is_empty(),
+        "sitting on nothing:\n{}",
+        seatless.join("\n")
     );
 }

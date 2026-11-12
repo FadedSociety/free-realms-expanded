@@ -139,6 +139,9 @@ pub struct SharedFieldState {
     pub(super) battles: Arc<Vec<FieldBattle>>,
     /// Heading and scale of the entrances among `battles` (`director/entrances.rs`).
     pub(super) doors: Arc<director::entrances::Doors>,
+    /// EV: the events running at the last [`Self::set_active_quests`]; an enemy or battle starter
+    /// tagged `live_event` is there only while its event is in this set.
+    pub(super) events: BTreeSet<String>,
 }
 
 impl SharedFieldState {
@@ -267,17 +270,25 @@ impl SharedFieldState {
         self.field_sim.parties = parties;
         self.field_sim.party_reach_m = reach_m;
     }
-    /// (R) Eligibility changes never reset health or corpse deadlines.
-    pub fn set_active_quests(&mut self, active: &BTreeSet<u32>) {
+    /// (R) Eligibility changes never reset health or corpse deadlines. EV: `events` are the
+    /// events running now (`EventCalendar::active_at`, the one gate); an enemy tagged with an event
+    /// outside them is gone at once, mid-chase or not, so nothing of an ended event stays.
+    pub fn set_active_quests(&mut self, active: &BTreeSet<u32>, events: &BTreeSet<String>) {
+        self.events.clone_from(events);
         for f in &mut self.field_sim.enemies {
+            let on = in_event(&f.actor, events);
             let eligible =
                 f.quest_ids.is_empty() || f.quest_ids.iter().any(|id| active.contains(id));
-            f.present = eligible || f.motion != FieldMotion::Idle && f.state.health > 0;
-            if !eligible && f.motion == FieldMotion::Chasing {
+            f.present = on && (eligible || f.motion != FieldMotion::Idle && f.state.health > 0);
+            if !(eligible && on) && f.motion == FieldMotion::Chasing {
                 f.motion = FieldMotion::Returning;
                 f.target = None;
             }
         }
+    }
+    /// EV: the battle starters and entrances whose event runs (all the untagged ones).
+    fn open_battles(&self) -> impl Iterator<Item = &FieldBattle> {
+        self.battles.iter().filter(|b| in_event(&b.spawner, &self.events))
     }
     /// (R) Candidates for the common NPC budget. Dead rows are retained only
     /// for existing observers until their committed lethal HP delta is flushed.
@@ -291,7 +302,7 @@ impl SharedFieldState {
                 position: f.state.position,
                 engaged: f.motion == FieldMotion::Chasing,
             })
-            .chain(self.battles.iter().map(|b| crate::world::NpcInterest {
+            .chain(self.open_battles().map(|b| crate::world::NpcInterest {
                 guid: b.spawner.guid,
                 position: self.position(b.spawner.guid).unwrap_or(b.spawner.position),
                 engaged: false,
@@ -336,7 +347,7 @@ impl SharedFieldState {
             .flatten()
             .collect());
         }
-        if let Some(b) = self.battles.iter().find(|b| b.spawner.guid == guid) {
+        if let Some(b) = self.open_battles().find(|b| b.spawner.guid == guid) {
             let mut spawn = crate::world::content_spawn_template();
             spawn.actor_id = guid;
             spawn.name_string_id = b.spawner.name_id;
@@ -400,6 +411,8 @@ impl EncounterEngine {
             template: self.content.clone(),
             battles: Arc::new(self.battles.clone()),
             doors: self.fight_state.doors.clone(),
+            // Closed until the host's first tick names the running events.
+            events: BTreeSet::new(),
         })
     }
 
@@ -626,6 +639,11 @@ impl EncounterEngine {
     }
 }
 
+/// EV: an untagged actor is always there; a tagged one only while its event runs.
+fn in_event(actor: &Actor, events: &BTreeSet<String>) -> bool {
+    actor.live_event.as_ref().is_none_or(|key| events.contains(key))
+}
+
 #[cfg(test)]
 pub(super) mod tests {
     use super::*;
@@ -740,6 +758,29 @@ pub(super) mod tests {
             engine.field_sim.wander.is_empty(),
             "the live walks moved out"
         );
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    /// EV: a field enemy (a `field_enemies.json` row or a camp member, whose body's or camp's tag
+    /// lands on the same actor) is present only while its event runs, mid-chase or not, and
+    /// stands untouched by the gate when untagged.
+    #[test]
+    fn a_field_enemy_with_an_event_is_there_only_while_it_runs() {
+        let (dir, mut engine) = engine();
+        let mut field = engine.take_shared_fields().unwrap();
+        let present = |field: &SharedFieldState| {
+            field.interest_candidates(false).iter().any(|c| c.guid == TEST_ENEMY)
+        };
+        let (quests, none) = (BTreeSet::new(), BTreeSet::new());
+        field.set_active_quests(&quests, &none);
+        assert!(present(&field), "an untagged enemy ignores the gate");
+        field.field_sim.enemies[0].actor.live_event = Some("halloween".into());
+        field.field_sim.enemies[0].motion = FieldMotion::Chasing;
+        field.set_active_quests(&quests, &none);
+        assert!(!present(&field), "gone when its event is not running, even mid-chase");
+        assert!(field.initialization(TEST_ENEMY).unwrap().is_empty());
+        field.set_active_quests(&quests, &BTreeSet::from(["halloween".to_owned()]));
+        assert!(present(&field), "back when it runs");
         let _ = fs::remove_dir_all(dir);
     }
 }

@@ -153,6 +153,7 @@ mod tests {
                 pending_turnin_actor: None,
                 selected_quest_id: None,
                 auto_switch_selected: false,
+                repeats: Default::default(),
             }),
         )
         .expect("the delivery quest definition loads");

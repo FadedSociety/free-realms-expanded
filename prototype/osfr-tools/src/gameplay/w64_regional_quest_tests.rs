@@ -213,6 +213,17 @@ fn level_three_world_game(label: &str) -> (Gameplay, CharacterState, Scratch) {
     quest["min_level"] = serde_json::json!(3);
     quest["job"] = serde_json::Value::Null;
     std::fs::write(&path, serde_json::to_vec(&file).unwrap()).unwrap();
+    // QF: Samantha also gives the Brawler's Bringing Back Brazenfist (3030004, the wiki's
+    // giver), which a Brawler is offered first; this fixture is about Introduce Yourself.
+    let path = scratch.join("quests/brawler.json");
+    let mut file: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+    for quest in file["records"].as_array_mut().unwrap() {
+        if quest["id"] == 3_030_004 {
+            quest["enabled"] = serde_json::Value::Bool(false);
+        }
+    }
+    std::fs::write(&path, serde_json::to_vec(&file).unwrap()).unwrap();
 
     let mut game = Gameplay::load(&reference(), None).unwrap();
     game.profiles = Some(Profiles::load(&reference(), Some(native_test_profiles())).unwrap());
@@ -3116,7 +3127,7 @@ fn cobblestone_starter_chain_runs_in_order() {
 
     offer_and_accept(&mut game, SAMANTHA_ID, INTRODUCE_YOURSELF_ID);
     let (at_ricky, _) = talk(&mut game, RICKY);
-    turn_in(&mut game, &at_ricky, INTRODUCE_YOURSELF_ID, 0);
+    turn_in(&mut game, &at_ricky, INTRODUCE_YOURSELF_ID, 116_463); // QF: Ricky's closing line
 
     offer_and_accept(&mut game, RICKY, CALL_THE_CREW);
     let (_, early) = talk(&mut game, RICKY);

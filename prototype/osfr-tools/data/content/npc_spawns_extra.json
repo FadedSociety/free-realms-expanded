@@ -41,9 +41,9 @@
       "name": "Geoffrey",
       "name_string_id": 70318,
       "position": [
-        -1414.895083,
-        -27.631,
-        357.169912
+        -1056.98817,
+        4.6666,
+        306.647951
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -66,7 +66,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The spawn reuses Sanctuary NPC key 9000000330 as the runtime actor GUID and the NPC row's reconstructed Royal Palace position [-1414.895083, -27.631, 357.169912], so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading or captured transform exists for the original placement. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+          "evidence": "(R) The spawn reuses Sanctuary NPC key 9000000330 as the runtime actor GUID and the NPC row's position, which PL-A npc-placement-a moved from the reconstructed zone centre [-1414.895083, -27.631, 357.169912] into the Royal Palace throne room beside Queen Valerian (the row's own location text), so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading or captured transform exists for the original placement. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
         }
       ],
       "position_w": null
@@ -7529,9 +7529,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Going Batty (3950200): the wiki's tip (eq2.fanbyte.com/wiki/fr_quest:Going_Batty) is to teleport to Forgotten Caves, where 'the bat will be just ahead of you, at the bottom of the hill'. The bat stands 5 m ahead of that teleport's arrival (travel.json row 63, (-912.19, -63.66, 399.11), heading -1.0755; facing (sin h, cos h)) on the arrival's own floor height, at least 2.5 m from Amoranth, Archmage Petulia and the changeling mages there, facing the player. The caverns' floor is in neither the baked collision nor Studio's probe (both answer the Sanctuary surface above), so the height is the arrival's."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Going Batty's bat: its quest is Super Spooktacular's (fanbyte Category:Super_Spooktacular) and its giver Vladimir stands only during it, so the bat stands only while event halloween (season Halloween) runs."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "live_event": "halloween"
     },
     {
       "spawn_guid": 100000001738,
@@ -35461,9 +35466,9 @@
       "name": "Bollylog",
       "name_string_id": 22168,
       "position": [
-        -1926.984,
-        -38.42006,
-        -633.9166
+        -1927.461022,
+        -38.3539,
+        -636.370668
       ],
       "heading": 1.569097,
       "capture_match": null,
@@ -44371,7 +44376,7 @@
     },
     {
       "spawn_guid": 100000004059,
-      "season": "Birthday Bash",
+      "live_event": "birthday_bash",
       "legacy_npc_id": 4059,
       "model_id": 315,
       "model_file_name": "evnt_anniversary_fireworks_wagon_01.adr",
@@ -44388,6 +44393,10 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2725; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4059 (ModelId=315, ModelFileName=evnt_anniversary_fireworks_wagon_01.adr, NameId=None)."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event birthday_bash: client model name prefix evnt_anniversary_ (Models.txt), the client's own event art"
         }
       ],
       "position_w": null
@@ -54603,6 +54612,7 @@
     },
     {
       "spawn_guid": 100000004750,
+      "live_event": "festival_of_hearts",
       "legacy_npc_id": 4750,
       "model_id": 2056,
       "model_file_name": "changeling_emo_m.adr",
@@ -54619,6 +54629,10 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3321; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4750 (ModelId=2056, ModelFileName=changeling_emo_m.adr, NameId=426971)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "EV live_event festival_of_hearts: Stone Heart's Hideaway is the Festival of Hearts' Tier 5 battle (Fandom Festival of Hearts)"
         }
       ],
       "position_w": null
@@ -59123,7 +59137,7 @@
     },
     {
       "spawn_guid": 100000031334,
-      "season": "Halloween",
+      "live_event": "halloween",
       "legacy_npc_id": 31334,
       "model_id": 1702,
       "model_file_name": "pumpkinprince_m_boss.adr",
@@ -59140,13 +59154,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4185; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31334 (ModelId=1702, ModelFileName=pumpkinprince_m_boss.adr, NameId=414863)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event halloween: Legacy season tag Halloween on the boss body; fanbyte FR_Mob:Pumpkin_Prince (Super Spooktacular)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031425,
-      "season": "Snow Days",
+      "live_event": "snow_days",
       "legacy_npc_id": 31425,
       "model_id": 1776,
       "model_file_name": "evnt_winter_holiday_tree_presents_03.adr",
@@ -59163,13 +59181,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4189; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31425 (ModelId=1776, ModelFileName=evnt_winter_holiday_tree_presents_03.adr, NameId=None)."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client model name prefix evnt_winter_holiday_ (Models.txt), the client's own event art"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031427,
-      "season": "Snow Days",
+      "live_event": "snow_days",
       "legacy_npc_id": 31427,
       "model_id": 17,
       "model_file_name": "present_01.adr",
@@ -59186,13 +59208,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4190; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31427 (ModelId=17, ModelFileName=present_01.adr, NameId=None)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event snow_days: Legacy season tag Snow Days on this model's live rows (Snowhill's Gifting Tree presents)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031428,
-      "season": "Snow Days",
+      "live_event": "snow_days",
       "legacy_npc_id": 31428,
       "model_id": 18,
       "model_file_name": "present_02.adr",
@@ -59209,13 +59235,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4191; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31428 (ModelId=18, ModelFileName=present_02.adr, NameId=None)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event snow_days: Legacy season tag Snow Days on this model's live rows (Snowhill's Gifting Tree presents)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031443,
-      "season": "Snow Days",
+      "live_event": "snow_days",
       "legacy_npc_id": 31443,
       "model_id": 1907,
       "model_file_name": "snowman_present.adr",
@@ -59232,13 +59262,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4192; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31443 (ModelId=1907, ModelFileName=snowman_present.adr, NameId=420986)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event snow_days: Legacy season tag Snow Days; fanbyte FR_Mob:Snowman_Invader (Snow Days)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031445,
-      "season": "Snow Days",
+      "live_event": "snow_days",
       "legacy_npc_id": 31445,
       "model_id": 1907,
       "model_file_name": "snowman_present.adr",
@@ -59255,13 +59289,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4193; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31445 (ModelId=1907, ModelFileName=snowman_present.adr, NameId=420986)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event snow_days: Legacy season tag Snow Days; fanbyte FR_Mob:Snowman_Invader (Snow Days)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031455,
-      "season": "Festival of Hearts",
+      "live_event": "festival_of_hearts",
       "legacy_npc_id": 31455,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -59278,13 +59316,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4194; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31455 (ModelId=2035, ModelFileName=heart_critter.adr, NameId=10822)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event festival_of_hearts: Legacy season tag Festival of Hearts"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031456,
-      "season": "Festival of Hearts",
+      "live_event": "festival_of_hearts",
       "legacy_npc_id": 31456,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -59301,13 +59343,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4195; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31456 (ModelId=2035, ModelFileName=heart_critter.adr, NameId=10822)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event festival_of_hearts: Legacy season tag Festival of Hearts"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031457,
-      "season": "Festival of Hearts",
+      "live_event": "festival_of_hearts",
       "legacy_npc_id": 31457,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -59324,13 +59370,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4196; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31457 (ModelId=2035, ModelFileName=heart_critter.adr, NameId=10822)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event festival_of_hearts: Legacy season tag Festival of Hearts"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031459,
-      "season": "Festival of Hearts",
+      "live_event": "festival_of_hearts",
       "legacy_npc_id": 31459,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -59347,13 +59397,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4197; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31459 (ModelId=2035, ModelFileName=heart_critter.adr, NameId=10822)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event festival_of_hearts: Legacy season tag Festival of Hearts"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031460,
-      "season": "Festival of Hearts",
+      "live_event": "festival_of_hearts",
       "legacy_npc_id": 31460,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -59370,13 +59424,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4198; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31460 (ModelId=2035, ModelFileName=heart_critter.adr, NameId=10822)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event festival_of_hearts: Legacy season tag Festival of Hearts"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031480,
-      "season": "Halloween",
+      "live_event": "halloween",
       "legacy_npc_id": 31480,
       "model_id": 751,
       "model_file_name": "wraith_m_cloakedskelly.adr",
@@ -59393,13 +59451,17 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4199; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31480 (ModelId=751, ModelFileName=wraith_m_cloakedskelly.adr, NameId=414860)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event halloween: Legacy season tag Halloween; fanbyte FR_Mob:Pumpkin_Prince_Ghost (Super Spooktacular)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000031482,
-      "season": "Halloween",
+      "live_event": "halloween",
       "legacy_npc_id": 31482,
       "model_id": 751,
       "model_file_name": "wraith_m_cloakedskelly.adr",
@@ -59416,6 +59478,10 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4200; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=31482 (ModelId=751, ModelFileName=wraith_m_cloakedskelly.adr, NameId=414860)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "EV live_event halloween: Legacy season tag Halloween; fanbyte FR_Mob:Pumpkin_Prince_Ghost (Super Spooktacular)"
         }
       ],
       "position_w": null
@@ -60130,9 +60196,9 @@
       "name": "Therin",
       "name_string_id": 185,
       "position": [
-        405.39592,
-        47.112,
-        347.076853
+        402.896301,
+        47.288,
+        347.120484
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -60255,9 +60321,9 @@
       "name": "Hannibal",
       "name_string_id": 5102439,
       "position": [
-        -2139.594143,
-        -32.948,
-        1048.33706
+        -2141.59,
+        -33.0,
+        1051.84
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -60273,6 +60339,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [-2139.594143, -32.948, 1048.33706] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4556/human_m_merchant_warrior_caucasian.agr is a male human warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 4.0 m south-east from [-2139.594143, -32.948, 1048.33706] to [-2141.59, -33.0, 1051.84], world editor /api/probe: stand.y -33.0 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -60286,9 +60356,9 @@
       "name": "Striking Cheetah",
       "name_string_id": 5102379,
       "position": [
-        -2139.548038,
-        -32.948,
-        1032.814581
+        -2144.55,
+        -33.0,
+        1031.31
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -60304,6 +60374,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [-2139.548038, -32.948, 1032.814581] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4526/human_f_merchant_ninja_asian.agr is a female human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 5.2 m south from [-2139.548038, -32.948, 1032.814581] to [-2144.55, -33.0, 1031.31], world editor /api/probe: stand.y -33.0 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -60348,9 +60422,9 @@
       "name": "Hidden Dragon",
       "name_string_id": 5102393,
       "position": [
-        -5.779171,
-        40.5302,
-        1118.52366
+        93.0,
+        40.85,
+        1020.0
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -60366,6 +60440,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [-5.779171, 41.038, 1118.52366] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4523/human_m_merchant_ninja_asian.agr is a male human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row sat 1.84 m from Snowface in the Shrouded Glade warpstone cluster. The wiki puts him \"on top of the mountain near the Shrouded Glade Cooking Table\"; the Cooking Table is POI 11 at 89.0, 42.0, 1020.0 (startup.json points_of_interest). Moved beside it onto terrain; moved 139.5 m north-west from [-5.779171, 40.5302, 1118.52366] to [93.0, 40.85, 1020.0], world editor /api/probe: stand.y 40.85 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -60690,9 +60768,9 @@
       "name": "Coiled Viper",
       "name_string_id": 5102378,
       "position": [
-        -539.19148,
-        26.03942,
-        773.982013
+        -539.0,
+        25.26,
+        764.5
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -60708,6 +60786,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [-539.19148, 26.03942, 773.982013] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4522/human_m_merchant_ninja_african.agr is a male human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row stood on a raised object top at the Robgoblin Treasure Trove entrance (probe stand.y 26.08 from an obstacle, terrain 25.44; four directions blocked). The wiki puts him \"West of the Robgoblin Treasure Trove\" (POI -537.53, 26.04, 772.46); the ground just west of the entrance is a 76 degree hillside (probe), so he stands 8 m west of it along the entrance, on open terrain; moved 9.5 m west from [-539.19148, 26.03942, 773.982013] to [-539.0, 25.26, 764.5], world editor /api/probe: stand.y 25.26 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -60791,9 +60873,9 @@
       "name": "Elinor",
       "name_string_id": 5101996,
       "position": [
-        7.040378,
-        41.1406,
-        1118.045883
+        12.04,
+        40.589,
+        1122.05
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -60809,6 +60891,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [7.040378, 41.038, 1118.045883] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4484/human_f_merchant_archer_caucasian.agr is a female human archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.4 m north-east from [7.040378, 41.1406, 1118.045883] to [12.04, 40.589, 1122.05], world editor /api/probe: stand.y 40.589 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -60997,9 +61083,9 @@
       "name": "Alusru",
       "name_string_id": 5102523,
       "position": [
-        0.206597,
-        41.038,
-        1118.531653
+        -0.29,
+        40.997,
+        1117.53
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -61015,6 +61101,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [0.206597, 41.038, 1118.531653] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4585/human_f_merchant_wizard_caucasian.agr is a female human wizard merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.1 m south-west from [0.206597, 41.038, 1118.531653] to [-0.29, 40.997, 1117.53], world editor /api/probe: stand.y 40.997 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -61028,9 +61118,9 @@
       "name": "Razzle",
       "name_string_id": 413068,
       "position": [
-        908.835926,
-        1.3992,
-        2245.136441
+        908.84,
+        0.381,
+        2251.64
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -61046,6 +61136,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The position [908.835926, 2.463198, 2245.136441] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4/robgoblin_m_basic.adr is a male robgoblin merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 6.5 m east from [908.835926, 1.3992, 2245.136441] to [908.84, 0.381, 2251.64], world editor /api/probe: stand.y 0.381 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -61059,9 +61153,9 @@
       "name": "Selvi Slowreel",
       "name_string_id": 37339,
       "position": [
-        -737.152319,
-        9.3028,
-        945.406909
+        -734.72658,
+        8.9784,
+        944.802104
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -61203,9 +61297,9 @@
       "name": "Manager Landon",
       "name_string_id": 401744,
       "position": [
-        -70.714,
-        11.04,
-        226.4
+        -68.350204,
+        11.0,
+        227.21392
       ],
       "heading": 0.0,
       "capture_match": null,
@@ -61865,6 +61959,7 @@
     },
     {
       "spawn_guid": 9500000485,
+      "live_event": "halloween",
       "legacy_npc_id": null,
       "content_key": 9500000485,
       "model_id": 438,
@@ -61890,6 +61985,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Ghost_Hunter (the wiki files it under Super Spooktacular)"
         }
       ],
       "position_w": null
@@ -62119,6 +62218,7 @@
     },
     {
       "spawn_guid": 9500000478,
+      "live_event": "halloween",
       "legacy_npc_id": null,
       "content_key": 9500000478,
       "model_id": 1713,
@@ -62144,6 +62244,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/FR_Mob:Finklestein (the wiki files it under Super Spooktacular)"
         }
       ],
       "position_w": null
@@ -62601,6 +62705,7 @@
     },
     {
       "spawn_guid": 9500000534,
+      "live_event": "halloween",
       "legacy_npc_id": null,
       "content_key": 9500000534,
       "model_id": 1708,
@@ -62626,6 +62731,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) another emulator placement with no stated source; ground offset +1.2 m"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "EV live_event halloween: fr.fanbyte.com/wiki/fr_mob:Skelly (the wiki files it under Super Spooktacular); a skeleton costume model; his one quest, Dem Bones, is the event's"
         }
       ],
       "position_w": null
@@ -66117,7 +66226,7 @@
       "name_string_id": 2230,
       "position": [
         200.31204,
-        29.3605,
+        28.914505,
         436.7041
       ],
       "heading": -0.81196234,
@@ -76044,6 +76153,7 @@
     },
     {
       "spawn_guid": 100000033337,
+      "live_event": "halloween",
       "legacy_npc_id": null,
       "model_id": 1726,
       "model_file_name": "evnt_halloween_candybag_01.adr",
@@ -76068,6 +76178,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Decoration only: the row binds no interaction or ability."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event halloween: client model evnt_halloween_candybag_01.adr; Goo'd Candy is the Super Spooktacular candy game (fanbyte FR_Minigame:Goo'd_Candy)"
         }
       ],
       "position_w": null
@@ -77125,6 +77239,7 @@
     },
     {
       "spawn_guid": 100000033599,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 140,
       "model_file_name": "snowman.adr",
@@ -77149,12 +77264,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Decoration only: the row binds no interaction or ability."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "EV live_event snow_days: (R) a snowman standing at the Crafty Robgoblins holiday battle starter south of the Snowhill warpstone (fanbyte FR_Mob:Crafty_Robgoblin, Snow Days)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000033613,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 1757,
       "model_file_name": "evnt_winter_holiday_snowballs_01.adr",
@@ -77179,12 +77299,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Plain prop: the InteractionList and Ability are not imported and no snowball ability is wired; the interactive design belongs to a later task."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client Models.txt 1757 'Snowball fighting snowball pile' (evnt_winter_holiday_snowballs_01.adr); Snow Days' snowball piles around Snowhill (Fandom Snow Days)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000033622,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 1757,
       "model_file_name": "evnt_winter_holiday_snowballs_01.adr",
@@ -77209,6 +77334,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Plain prop: the InteractionList and Ability are not imported and no snowball ability is wired; the interactive design belongs to a later task."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client Models.txt 1757 'Snowball fighting snowball pile' (evnt_winter_holiday_snowballs_01.adr); Snow Days' snowball piles around Snowhill (Fandom Snow Days)"
         }
       ],
       "position_w": null
@@ -77637,6 +77766,7 @@
     },
     {
       "spawn_guid": 100000033716,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 1757,
       "model_file_name": "evnt_winter_holiday_snowballs_01.adr",
@@ -77661,6 +77791,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Plain prop: the InteractionList and Ability are not imported and no snowball ability is wired; the interactive design belongs to a later task."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client Models.txt 1757 'Snowball fighting snowball pile' (evnt_winter_holiday_snowballs_01.adr); Snow Days' snowball piles around Snowhill (Fandom Snow Days)"
         }
       ],
       "position_w": null
@@ -77907,6 +78041,7 @@
     },
     {
       "spawn_guid": 100000033778,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 1960,
       "model_file_name": "evnt_winter_holiday_party_banner_01.adr",
@@ -77931,6 +78066,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Decoration only: the row binds no interaction or ability."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client Models.txt 1960 'Winter Event Party Banner' (evnt_winter_holiday_party_banner_01.adr)"
         }
       ],
       "position_w": null
@@ -77967,6 +78106,7 @@
     },
     {
       "spawn_guid": 100000033794,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 1960,
       "model_file_name": "evnt_winter_holiday_party_banner_01.adr",
@@ -77991,12 +78131,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Decoration only: the row binds no interaction or ability."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client Models.txt 1960 'Winter Event Party Banner' (evnt_winter_holiday_party_banner_01.adr)"
         }
       ],
       "position_w": null
     },
     {
       "spawn_guid": 100000033795,
+      "live_event": "snow_days",
       "legacy_npc_id": null,
       "model_id": 1960,
       "model_file_name": "evnt_winter_holiday_party_banner_01.adr",
@@ -78021,6 +78166,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T550: Sanctuary-main places this 2014 client prop here; no source is stated upstream. The spawn guid is the Lua capture guid (100000000000 + Npcs.json Id), legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values (VerticalOffset is not applied). Decoration only: the row binds no interaction or ability."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event snow_days: client Models.txt 1960 'Winter Event Party Banner' (evnt_winter_holiday_party_banner_01.adr)"
         }
       ],
       "position_w": null
@@ -78828,6 +78977,7 @@
     },
     {
       "spawn_guid": 100000090018,
+      "live_event": "saint_patricks",
       "legacy_npc_id": null,
       "model_id": 4210,
       "model_file_name": "lepregoblin_m_basic.adr",
@@ -78856,6 +79006,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No model carries his name. lepregoblin_m_basic chosen by file name against the Fandom picture and not rendered; it replaces quest-research/npcs.json's unchecked 4106 robgoblin_m_banker. Has a record (npc 9000000134, placement video_index) with no drawn body. quest_wire's spawned_people() ignores a spawn whose name is already a record, so applying this row also needs content_key 9000000134 (npc_spawns_extra.json). Position kept identical to the record. Probe: all directions open, no water, slope 11. Event NPC: Saint Patrick's only."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "EV live_event saint_patricks: Fandom Lucky_Chance_McXander: the Saint Patrick's leprechaun; his four quests are the event's"
         }
       ],
       "position_w": null,
@@ -78904,9 +79058,9 @@
       "name": "Wompugg",
       "name_string_id": 37719,
       "position": [
-        -2158.7,
+        -2155.788667,
         -32.0,
-        377.9
+        383.146346
       ],
       "heading": 3.1,
       "capture_match": null,
@@ -79990,6 +80144,7 @@
     },
     {
       "legacy_npc_id": null,
+      "live_event": "spring_eggstravaganza",
       "model_id": 4203,
       "model_file_name": "sg_eggbasket_01.adr",
       "name": "Hidden Egg",
@@ -80014,6 +80169,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Body: the baby egg models do not render, so the egg basket 4203 stands in (seen in model-view). Spot is 11 m west of Spruce on the mine floor (probe floors include 47.1, the terrain answer of 166 is the hillside above the cave); 17 m west has no floor at his level in the obstacle data. Birthday Bash event quest."
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event spring_eggstravaganza: client prop 4203 sg_eggbasket_01.adr 'Easter Egg basket'; the egg the Spring Eggstravaganza hunt finds (quest 3955710)"
         }
       ],
       "spawn_guid": 100000090062,
@@ -80378,9 +80537,9 @@
       "name": "Cragara",
       "name_string_id": 440941,
       "position": [
-        -2141.023083,
-        -32.948,
-        1047.132912
+        -2148.5,
+        -29.113,
+        1050.5
       ],
       "heading": 0.712,
       "capture_match": null,
@@ -80396,6 +80555,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 4103/sogg_f_vendor.adr is the snail vendor body Cragara's Snowhill spawn (9500000739) already uses; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row sat 1.9 m from Hannibal at the Mire's Edge hub. Its location text is \"The Mysterious Merchant has appeared in Blackspore!\" (client 1352990895): he visits at random, so there is no fixed spot; moved onto free flat terrain; moved 8.2 m south-east from [-2141.023083, -32.948, 1047.132912] to [-2148.5, -29.113, 1050.5], world editor /api/probe: stand.y -29.113 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -80642,9 +80805,9 @@
       "name": "Shiny Straightshot",
       "name_string_id": 115804,
       "position": [
-        -2157.966,
-        -31.96,
-        373.505
+        -2159.317476,
+        -32.0,
+        370.276454
       ],
       "heading": -1.797,
       "capture_match": null,
@@ -80859,9 +81022,9 @@
       "name": "Buzz",
       "name_string_id": 7602,
       "position": [
-        -1409.709226,
-        -27.7364,
-        356.99805
+        -1259.368616,
+        -14.2663,
+        275.473257
       ],
       "heading": 2.247,
       "capture_match": null,
@@ -81053,11 +81216,11 @@
       "name": "Guppie",
       "name_string_id": 409079,
       "position": [
-        -1322.739479,
-        -64.82256,
-        902.505048
+        -1313.0,
+        -63.987,
+        903.5
       ],
-      "heading": 0.08236,
+      "heading": -2.16556,
       "capture_match": null,
       "source": [
         {
@@ -81071,6 +81234,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) P-vendor-stock: this slice gives the vendor a body so its reconstructed stock is reachable (tests/priced_vendors_drawable.rs). (R) The position is the NPC row's reconstructed_poi_name_match placement, not a captured transform; the heading is the row's quaternion yaw. (R) Model 1590/human_m_fisherman_01.agr is the male human fisherman body for the lure vendor; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the NPC content key as the runtime GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Review 2026-11-12 (npc-placement-b): the row stood on the water of the Sacred Grove Shallows fishing area (probe water object water_sanctuary_eastmarsh02.adr, surface y -65.945, lake bed 1 to 2.4 m below) with eight other people. The travel POI \"Sacred Grove Shallows\" (travel.json id 120) arrives on the bank at spawn -1317, -65, 894 and the 2014 placements put the fishing camp there (sg_fishing_pole_02 at -1317.4, -64.6, 899.1; sh_crate_01 and mkt_baitbucket_01 at -1318.6, 900.4), with Reed Stillwater (Legacy spawn) at -1319.8, -65.6, 898.9. Moved onto the dry bank north of the camp (project compass: north = +x), 1 to 3 m above the water, 3.4 m apart, facing the camp; moved 9.8 m north from [-1322.739479, -64.82256, 902.505048] to [-1313.0, -63.987, 903.5], world editor /api/probe: stand.y -63.987 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform."
         }
       ],
       "position_w": null
@@ -81141,6 +81308,94 @@
       ],
       "position_w": null,
       "sub_text_name_string_id": 441418
+    },
+    {
+      "spawn_guid": 100000090110,
+      "live_event": "halloween",
+      "legacy_npc_id": null,
+      "model_id": 1062,
+      "model_file_name": "bw_boombox_01.adr",
+      "name": "Happy Halloween!",
+      "name_string_id": null,
+      "position": [
+        -2129.362,
+        -32.16377,
+        1084.563
+      ],
+      "position_w": null,
+      "heading": -3.012714,
+      "capture_match": null,
+      "hide_nameplate": false,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "startup/snapshot.json world.npc_spawns[2] (actor 13429610547643547107): the 2014 login capture's AddNpc of model 1062 bw_boombox_01.adr at the Blackspore warpstone, sent to every login all year; client Models.txt 1062 bw_boombox_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) set down onto the dispenser's floor (y -32.16): the capture held it 2 m up, on the dispenser it stood beside"
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event halloween: its name, 'Happy Halloween!'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000090111,
+      "live_event": "halloween",
+      "legacy_npc_id": null,
+      "model_id": 4579,
+      "model_file_name": "mkt_halloween_dispenser_02.adr",
+      "name": null,
+      "name_string_id": null,
+      "position": [
+        -2129.362,
+        -32.16377,
+        1084.563
+      ],
+      "position_w": null,
+      "heading": -3.012714,
+      "capture_match": null,
+      "hide_nameplate": true,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "startup/snapshot.json world.npc_spawns[3] (actor 16705899947322027288): the 2014 login capture's AddNpc of model 4579 mkt_halloween_dispenser_02.adr at the Blackspore warpstone, sent to every login all year; client Models.txt 4579 mkt_halloween_dispenser_02.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "EV live_event halloween: client model mkt_halloween_dispenser, the Super Spooktacular's ectoplasmic destabilizer dispenser"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000090112,
+      "live_event": "halloween",
+      "legacy_npc_id": null,
+      "model_id": 1013,
+      "model_file_name": "cat_longhairghost.adr",
+      "name": null,
+      "name_string_id": null,
+      "position": [
+        -2126.807,
+        -32.0055,
+        1082.46
+      ],
+      "position_w": null,
+      "heading": -2.846508,
+      "capture_match": null,
+      "hide_nameplate": true,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "startup/snapshot.json world.npc_spawns[5] (actor 118156699913799548): the 2014 login capture's AddNpc of model 1013 cat_longhairghost.adr at the Blackspore warpstone, sent to every login all year; client Models.txt 1013 cat_longhairghost.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "EV live_event halloween: (R) a ghost cat beside the Halloween boombox and dispenser, one Halloween group in the capture"
+        }
+      ]
     }
   ]
 }

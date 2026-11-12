@@ -1199,17 +1199,19 @@ impl NpcInteraction {
         active_job: Option<i32>,
     ) -> Option<u32> {
         let candidates = self.quest_candidates(npc_id, quests);
-        let offerable = |id: &&u32| quests.can_offer(**id, npc_id);
-        let in_job = |id: &&u32| {
+        let in_job = |id: u32| {
             active_job.is_none_or(|active| {
                 quests
-                    .required_profile(**id)
+                    .required_profile(id)
                     .is_none_or(|job| job == active)
             })
         };
-        (candidates.iter().filter(in_job).find(offerable))
-            .or_else(|| candidates.iter().find(offerable))
-            .copied()
+        // QF: a quest never done comes before a repeatable quest's next run, so a daily quest
+        // does not hide its giver's new ones; then the active job's quests first.
+        let rank = |id: u32| (quests.state().is_done(id), !in_job(id));
+        (candidates.into_iter())
+            .filter(|id| quests.can_offer(*id, npc_id))
+            .min_by_key(|id| rank(*id))
     }
 
     /// The quests a Talk with this giver may offer, in the order it tries them: the NPC row's

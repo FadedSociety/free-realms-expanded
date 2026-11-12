@@ -47,7 +47,8 @@ pub struct Placement {
     pub heading: f32,
     #[serde(default = "unit_scale")]
     pub scale: f32,
-    /// Other fields (`source`, notes) are kept when tools rewrite the file.
+    /// Other fields (`source`, notes, an EV `live_event` key) are kept when tools rewrite the
+    /// file.
     #[serde(flatten)]
     pub extra: serde_json::Map<String, serde_json::Value>,
 }
@@ -72,10 +73,10 @@ struct VisibleNpc {
     position: [f32; 3],
     /// (R) Content yaw the actor faces; `None` when the row carries no transform.
     heading: Option<f32>,
-    /// T491/T775: the `client_areas.json` season this row belongs to; `None` rows show all
-    /// year. A table loaded for play ([`NpcVisibility::load_in_season`]) hides the row while
-    /// the season is inactive at the view clock.
-    season: Option<String>,
+    /// EV: the `event_calendar.json` event this row exists for; `None` rows show all year. A
+    /// table loaded for play ([`NpcVisibility::load_in_season`]) hides the row while the event
+    /// is not running at the view clock (`EventCalendar::is_running`).
+    live_event: Option<String>,
     /// T555: minimap/overhead notifications sent right after this actor's 35/2.
     notifications: Vec<Notification>,
     /// T899: the hover cursor sent after the notifications (`npc_presentation.json`).
@@ -233,10 +234,10 @@ struct RegionalNpc {
     /// label the content tables group the row by.
     #[serde(default)]
     house_zone_id: Option<u32>,
-    /// rc-0136 F4: a `client_areas.json` season, as an extra spawn's `season`: an event NPC
-    /// (the Snow Days snowman in Snowhill) is drawn only while its event runs.
+    /// EV: an `event_calendar.json` event key, as an extra spawn's: an event NPC (Halloween
+    /// Harry, the Snow Days snowman) is drawn only while its event runs.
     #[serde(default)]
-    season: Option<String>,
+    live_event: Option<String>,
     /// `vendor` keeps the name shown (`nameplate::Named`).
     #[serde(default)]
     roles: Vec<String>,
@@ -294,9 +295,9 @@ struct ExtraNpc {
     heading: Option<f32>,
     #[serde(default)]
     capture_match: Option<serde_json::Value>,
-    /// T491 (R): a client_areas.json season name; the prop shows only while it is active.
+    /// EV: an `event_calendar.json` event key; the row is drawn only while that event runs.
     #[serde(default)]
-    season: Option<String>,
+    live_event: Option<String>,
     /// T508: AddNpc display fields (reader 0x00921a10); absent keeps the content template.
     #[serde(default)]
     texture_alias: String,
@@ -368,6 +369,8 @@ pub struct BoomboxProp {
     pub spawn_guid: u64,
     pub item_id: i32,
     pub position: [f32; 3],
+    /// EV: the row's event; the box dances only while it runs (`Boomboxes::follow_events`).
+    pub live_event: Option<String>,
 }
 
 /// The permanent boombox props of `npc_spawns_extra.json` (T536). A content set without the file
@@ -387,6 +390,7 @@ pub fn boombox_props(content_dir: &Path) -> io::Result<Vec<BoomboxProp>> {
                 spawn_guid: npc.spawn_guid,
                 item_id: npc.boombox_item_id?,
                 position: npc.position,
+                live_event: npc.live_event,
             })
         })
         .collect())
@@ -601,7 +605,7 @@ impl NpcVisibility {
                     name: npc.name,
                     position,
                     heading: heading.filter(|value| value.is_finite()),
-                    season: npc.season,
+                    live_event: npc.live_event,
                     notifications,
                     cursor,
                     picked_until_ms: 0,
@@ -667,7 +671,7 @@ impl NpcVisibility {
                     name: npc.name,
                     position: npc.position,
                     heading: npc.heading.filter(|value| value.is_finite()),
-                    season: npc.season,
+                    live_event: npc.live_event,
                     notifications,
                     cursor,
                     picked_until_ms: 0,
@@ -684,7 +688,7 @@ impl NpcVisibility {
             npcs.sort_by_key(|npc| npc.spawn.actor_id);
         }
         if let Some(areas) = &result.seasons {
-            result.validate_seasons(areas)?;
+            result.validate_events(areas)?;
         }
         Ok(result)
     }
@@ -740,52 +744,44 @@ impl NpcVisibility {
             .unwrap_or_else(crate::client_areas::unix_now_ms)
     }
 
-    /// T775: whether `npc` is drawn at `now_ms`. An untagged row always is; a tagged one only
-    /// while its season is active. An undefined season is not active (fail closed; the loader
-    /// refuses such a tag before this can see it).
+    /// T775/EV: whether `npc` is drawn at `now_ms`. An untagged row always is; a tagged one only
+    /// while its event runs (`EventCalendar::is_running`, the one gate). An unknown event never
+    /// runs (fail closed; the loader refuses such a tag before this can see it).
     fn season_shown(&self, npc: &VisibleNpc, now_ms: u64) -> bool {
-        let Some(season) = npc.season.as_deref() else {
+        let Some(key) = npc.live_event.as_deref() else {
             return true;
         };
-        self.seasons
-            .as_ref()
-            .is_none_or(|areas| areas.is_season_active(season, now_ms))
+        (self.seasons.as_ref()).is_none_or(|areas| areas.calendar().is_running(key, areas, now_ms))
     }
 
-    /// Every `season` tag must name a `client_areas.json` row; a typo refuses the whole table
-    /// naming the spawn, as [`Self::retain_in_season`] did for the load-time rule.
-    fn validate_seasons(&self, areas: &crate::client_areas::ClientAreas) -> io::Result<()> {
-        for npc in self.by_zone.values().flatten() {
-            let Some(season) = npc.season.as_deref() else {
-                continue;
-            };
-            if areas.season_state(season, 0).is_none() {
-                return Err(invalid(format!(
-                    "NPC spawn {} names season {season:?}, which client_areas.json does not define",
-                    npc.spawn.actor_id
-                )));
-            }
+    /// Every `live_event` tag must name an `event_calendar.json` event; a typo refuses the whole
+    /// table naming the spawn, as [`Self::retain_in_season`] does. A content set with no calendar
+    /// has no events to name: its tagged rows never run (fail closed) and the load stands.
+    fn validate_events(&self, areas: &crate::client_areas::ClientAreas) -> io::Result<()> {
+        if areas.calendar().is_empty() {
+            return Ok(());
         }
-        Ok(())
+        let unknown = |npc: &&VisibleNpc| {
+            (npc.live_event.as_deref()).is_some_and(|key| !areas.calendar().has_event(key))
+        };
+        match self.by_zone.values().flatten().find(unknown) {
+            Some(npc) => Err(unknown_event(npc)),
+            None => Ok(()),
+        }
     }
 
-    /// Drops the rows of seasons `active` reports as over; `None` means the season is not
+    /// Drops the rows of events `active` reports as over; `None` means the event is not
     /// defined, which fails the call (naming the row) and drops nothing. This is the load-time
     /// physical rule before T775's view gate; the live path keeps the rows and
-    /// [`Self::season_shown`] hides them, so they return when the season does.
+    /// [`Self::season_shown`] hides them, so they return when the event does.
     pub fn retain_in_season(&mut self, active: impl Fn(&str) -> Option<bool>) -> io::Result<()> {
         let mut over = BTreeSet::new();
         for npc in self.by_zone.values().flatten() {
-            let Some(season) = npc.season.as_deref() else {
+            let Some(key) = npc.live_event.as_deref() else {
                 continue;
             };
-            match active(season) {
-                None => {
-                    return Err(invalid(format!(
-                        "NPC spawn {} names season {season:?}, which client_areas.json does not define",
-                        npc.spawn.actor_id
-                    )));
-                }
+            match active(key) {
+                None => return Err(unknown_event(npc)),
                 Some(false) => {
                     over.insert(npc.spawn.actor_id);
                 }
@@ -837,8 +833,9 @@ impl NpcVisibility {
             name: placement.name.clone(),
             position: p,
             heading: Some(placement.heading).filter(|value| value.is_finite()),
-            // T491: placed and battle actors are never seasonal.
-            season: None,
+            live_event: (placement.extra.get("live_event"))
+                .and_then(serde_json::Value::as_str)
+                .map(str::to_owned),
             notifications: Vec::new(),
             cursor: None,
             click: None,
@@ -924,8 +921,8 @@ impl NpcVisibility {
             position,
             // (R) Static actors keep the approach rule; no content yaw is sent.
             heading: None,
-            // T491: placed and battle actors are never seasonal.
-            season: None,
+            // EV: a node or a spawner its owner adds and removes itself, event gate included.
+            live_event: None,
             notifications: Vec::new(),
             cursor: None,
             click: None,
@@ -1068,6 +1065,17 @@ impl NpcVisibility {
                 let model_id = u32::try_from(npc.spawn.model_id).ok()?;
                 Some((npc.spawn.actor_id, model_id, npc.position))
             })
+    }
+
+    /// Actors with their own pose row (`npc_poses.json` `animation_id`): a child with no seat
+    /// stands, so the model's ambient idle table must not push its sit loop over the row. Their
+    /// emotes, conversation turns and look-at stay.
+    pub fn pose_row_actors(&self) -> impl Iterator<Item = u64> + '_ {
+        self.by_zone
+            .values()
+            .flatten()
+            .map(|npc| npc.spawn.actor_id)
+            .filter(|guid| self.life.has_pose_row(*guid))
     }
 
     /// F6: every row this table draws, by draw zone, as its AddNpc carries it (excluded rows,
@@ -1414,6 +1422,14 @@ pub(crate) fn unframe_tunnel(bytes: &[u8]) -> io::Result<Vec<u8>> {
 
 fn invalid(message: impl Into<String>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message.into())
+}
+
+fn unknown_event(npc: &VisibleNpc) -> io::Error {
+    invalid(format!(
+        "NPC spawn {} names live_event {:?}, which event_calendar.json does not define",
+        npc.spawn.actor_id,
+        npc.live_event.as_deref().unwrap_or_default()
+    ))
 }
 
 pub type PlayerId = u64;

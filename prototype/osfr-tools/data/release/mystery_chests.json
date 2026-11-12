@@ -111,5 +111,96 @@
       ],
       "source": "Wiki 'Mystery Chest', Chest of Wonders (mysterychest_genie): the prizes the owner's field notes list from it, by the client catalogue's ids; members and gender rules as the wiki gives them. Left out, no definition anywhere: Magic Lamp, Magical Scimitar. Chest id reconstructed (R); drop odds are equal (R)."
     }
+  ],
+  "gifts": [
+    {
+      "definition_id": 9099,
+      "name": "Mystery Gift",
+      "rewards": [
+        69107,
+        69108,
+        69109,
+        69110,
+        69111,
+        69112,
+        69113,
+        69115,
+        69116,
+        69117,
+        69114,
+        69118,
+        {
+          "item": 69560,
+          "gender": 1
+        },
+        {
+          "item": 69551,
+          "gender": 2
+        },
+        {
+          "item": 69549,
+          "gender": 2
+        },
+        {
+          "item": 69550,
+          "gender": 2
+        },
+        {
+          "item": 36042,
+          "gender": 1
+        },
+        {
+          "item": 69559,
+          "gender": 1
+        },
+        {
+          "item": 69558,
+          "gender": 1
+        },
+        {
+          "item": 69553,
+          "gender": 2
+        },
+        {
+          "item": 69555,
+          "gender": 1
+        },
+        {
+          "item": 69552,
+          "gender": 2
+        },
+        {
+          "item": 36043,
+          "gender": 1
+        },
+        {
+          "item": 69554,
+          "gender": 2
+        },
+        69818,
+        69845,
+        69847,
+        69848,
+        69846
+      ],
+      "source": "Super Spooktacular's Mystery Gift (2013), fanbyte Category:Super_Spooktacular, 2013 quest series (lab/references/fanbyte-events-20261111/super_spooktacular.html): 'can be anything from candy to a nifty costume'. 12 costumes (Bixie, Changeling Ninja, Chatty, Chugawug, Darkthorne, Floren, Man-Eating Plant, Robgoblin, Shambler, Tree Soldier, Valerian, Yeti), 12 face paint cards (Bandit, Flower, Gothic Rag Doll, Kitty, Phantom, Saber-toothed, Sea Monster, Starry Moons, The Monster, Tiger, Troll, Witch; each a boys' or girls' row in the item table) and 5 candies (Pumpkin, Skeleton, Tarantula, Widow, Wraith). Item 9099 is the client's 'Mystery Gift' (type 6, icon 6412; 9100-9111 are copies of it and quests pay the lowest). (R) Phantom and Troll Face Paint Card have two rows each; the lowest id is used. (R) Equal odds."
+    },
+    {
+      "definition_id": 7892,
+      "name": "Festival of Hearts Mystery Gift",
+      "rewards": [
+        76824,
+        76801,
+        76803,
+        76805,
+        76802,
+        76820,
+        76618,
+        76617,
+        76745,
+        76804
+      ],
+      "source": "Festival of Hearts Mystery Gift (fanbyte Category:Festival_of_Hearts, Mystery Gifts; audit lab/autopilot/opus/audits/events/festival_of_hearts.md): its 10 named prizes, Be-Mine Small Floral Arrangement, Candy Hearts, Cupid Cut-Out Cookie, Cupid's Arrow, Heart-Shaped Sucker, Hearts Wall Sticker, Large Heart Wall Sticker, Small Heart Wall Sticker, Teddy Bear and Valentine Party Popper. Item 7892 is the client's 'Festival of Hearts Mystery Gift' (type 6, icon 6098; 7893-7905 are copies of it and quests pay the lowest). (R) Equal odds."
+    }
   ]
 }

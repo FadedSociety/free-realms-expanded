@@ -36,6 +36,7 @@ fn the_two_sanctuary_radios_are_the_only_permanent_boxes_and_bind_to_the_catalog
             spawn_guid: *spawn_guid,
             item_id: XVD,
             position: *position,
+            live_event: None,
         })
         .collect();
     assert_eq!(props, expected);

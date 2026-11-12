@@ -987,12 +987,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3ABetter_Bacon_Bait)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 409706,
       "intro_text_string_id": 409704,
       "end_text_string_id": 409707,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3070013,

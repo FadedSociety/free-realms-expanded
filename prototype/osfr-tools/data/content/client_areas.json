@@ -101,6 +101,15 @@
       "end_day": 7,
       "area_ids": [],
       "source": "quest-lines/schedules.json svspring-eggstravaganza: daily egg days March 28 to March 31 2013 (locale 5100000, 5100569; fanbyte Alyssa Eggelyn: 'expected with the March 28 game update'). (R) The tracker says 'Open on March 31st'; a week after it is kept for opening and turning in, and the yearly repeat is a judgement. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Seaside Summer Splash",
+      "start_month": 7,
+      "start_day": 3,
+      "end_month": 7,
+      "end_day": 15,
+      "area_ids": [],
+      "source": "fanbyte Category:Seaside_Summer_Splash: 'the Seaside Summer Splash celebration, which ran from July 3 to July 15, 2009' (lab/references/fanbyte-quest-pages-20261111). (R) Only 2009 is dated and the yearly repeat follows the owner's once-a-year rule (2026-11-10). No switchable client area carries this season's name in FabledRealmsAreas.xml, so area_ids is empty and the row only gates events."
     }
   ]
 }

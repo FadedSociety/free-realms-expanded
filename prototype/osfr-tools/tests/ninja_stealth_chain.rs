@@ -64,6 +64,7 @@ fn completed_through_stolen_away(character_id: u64, stealth: Option<QuestProgres
         pending_turnin_actor: None,
         selected_quest_id: None,
         auto_switch_selected: false,
+        repeats: Default::default(),
     }
 }
 

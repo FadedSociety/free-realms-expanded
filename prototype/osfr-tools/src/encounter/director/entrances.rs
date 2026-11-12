@@ -113,6 +113,9 @@ pub struct Entrance {
     pub scene: Option<String>,
     #[serde(default)]
     pub enter_scene: bool,
+    /// EV: an `event_calendar.json` key; the entrance stands only while that event runs.
+    #[serde(default)]
+    pub live_event: Option<String>,
     #[serde(default)]
     pub source: Vec<Value>,
 }
@@ -410,6 +413,7 @@ impl EncounterEngine {
                 "damage": 0,
                 "boss": false,
                 "scale": row.scale,
+                "live_event": row.live_event,
             }))
             .map_err(|e| refuse(&row.id, &e.to_string()))?;
             let marker = MarkerSetting::default().resolve(table.combat_marker, row.name_id)?;

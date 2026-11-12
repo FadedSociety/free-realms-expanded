@@ -67,13 +67,14 @@ fn archived_halloween_rows() -> Vec<Value> {
     rows
 }
 
-/// Every row that names a season, live or archived, as GUID -> season name.
+/// Every row that names an event, live or archived, as GUID -> event key (EV: `live_event`
+/// replaced the old `season` display name).
 fn seasonal_rows(live: &[Value], archived: &[Value]) -> BTreeMap<u64, String> {
     live.iter()
         .chain(archived)
         .filter_map(|row| {
-            let season = row["season"].as_str()?;
-            Some((guid(row), season.to_owned()))
+            let key = row["live_event"].as_str()?;
+            Some((guid(row), key.to_owned()))
         })
         .collect()
 }
@@ -87,23 +88,21 @@ fn tagged_rows(live: &[Value], archived: &[Value]) -> BTreeSet<u64> {
         "the archive holds the 12 Halloween decoration rows"
     );
     let areas = ClientAreas::load(&bundled()).unwrap();
-    let live_seasons: BTreeSet<&str> = live
+    let live_events: BTreeSet<&str> = live
         .iter()
-        .filter_map(|row| row["season"].as_str())
+        .filter_map(|row| row["live_event"].as_str())
         .collect();
     assert!(
-        live_seasons
-            .iter()
-            .all(|season| areas.season_state(season, 0).is_some()),
-        "a live season tag names a season client_areas.json does not define: {live_seasons:?}"
+        live_events.iter().all(|key| areas.calendar().has_event(key)),
+        "a live event tag names an event event_calendar.json does not define: {live_events:?}"
     );
     let tagged: BTreeSet<u64> = archived.iter().map(guid).collect();
     assert_eq!(tagged.len(), 12, "a Halloween spawn GUID repeats");
     assert!(
         archived
             .iter()
-            .all(|row| row["season"].as_str() == Some("Halloween")),
-        "every archived row names the Halloween season"
+            .all(|row| row["live_event"].as_str() == Some("halloween")),
+        "every archived row names the halloween event"
     );
     let live_guids: BTreeSet<u64> = live.iter().map(guid).collect();
     assert!(
@@ -226,26 +225,25 @@ fn the_twelve_halloween_rows_are_tagged_and_leave_only_when_the_season_is_over()
 fn an_unknown_season_fails_naming_the_row_and_drops_nothing() {
     let live = live_rows();
     let archived = archived_halloween_rows();
-    // Rows are sorted by actor id, so this is the first seasonal row the check sees (a live row
-    // now precedes the archive; T775 tags both). rc-0136 F4 tags regional `npcs/` rows too (the
-    // Snow Days snowman, the Birthday Bash Cakenstein), whose content keys sort first.
+    // EV: the refusal names a tagged row; the regional `npcs/` rows are tagged too now, and
+    // their ids sort before the extras', so any tagged id may be the first the check sees.
     let regional = fs::read_dir(bundled().join("npcs"))
         .unwrap()
         .map(|entry| entry.unwrap().path())
         .filter(|path| path.extension().is_some_and(|ext| ext == "json"))
         .flat_map(|path| rows_of(&path))
-        .filter(|row| row["season"].is_string() && row["position"].is_array())
+        .filter(|row| row["live_event"].is_string())
         .filter_map(|row| row["npc_id"].as_u64());
-    let first = (seasonal_rows(&live, &archived).into_keys())
-        .chain(regional)
-        .min()
-        .unwrap();
+    let tagged_ids: BTreeSet<u64> = seasonal_rows(&live, &archived).into_keys().chain(regional).collect();
     let guids: BTreeSet<u64> = live.iter().chain(&archived).map(guid).collect();
     let fixture = Fixture::new("unknown", &live, &archived);
     let mut visibility = NpcVisibility::load(fixture.path()).unwrap();
     let before = present(&visibility, &guids);
     let error = visibility.retain_in_season(|_| None).unwrap_err();
-    assert!(error.to_string().contains(&first.to_string()), "{error}");
+    assert!(
+        tagged_ids.iter().any(|guid| error.to_string().contains(&guid.to_string())),
+        "{error}"
+    );
     assert_eq!(
         present(&visibility, &guids),
         before,
@@ -275,7 +273,7 @@ fn loading_for_play_follows_the_shipped_season_dates() {
         .filter(|guid| {
             seasonal
                 .get(guid)
-                .is_none_or(|season| areas.is_season_active(season, IN_SEASON_MS))
+                .is_none_or(|key| areas.calendar().is_running(key, &areas, IN_SEASON_MS))
         })
         .collect();
     assert_eq!(
@@ -320,7 +318,7 @@ fn a_row_naming_a_season_the_content_lacks_fails_the_load() {
     // A season name `client_areas.json` does not define fails the fixed-clock load and the
     // production caller, both naming the row. `NpcVisibility::load` alone ignores the tag, so a
     // call site reverted to `load` would accept this table.
-    archived[0]["season"] = json!("Halloweeen");
+    archived[0]["live_event"] = json!("halloweeen");
     let mut rows = live;
     rows.extend(archived);
     fixture.write_rows(&rows);

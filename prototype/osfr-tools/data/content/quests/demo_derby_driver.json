@@ -174,7 +174,7 @@
       "id": 3060004,
       "title_string_id": 403450,
       "intro_text_string_id": 393375,
-      "giver_npc_id": 9000000295,
+      "giver_npc_id": 9000000495,
       "job": 49,
       "prerequisite_quest_ids": [],
       "objectives": [
@@ -273,6 +273,10 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393375 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Giver 9000000495 (Tucker Thunderjolt), hand-in 9000000295 (Dalton Narrowbrow): the offer 393375 tells the player to 'speak with the commissioner', and the talk step's Dalton Narrowbrow is the derby commissioner, so the offer is not his; he takes the hand-in; the wiki starts it at Tucker Thunderjolt (https://fr.fanbyte.com/wiki/FR_Quest%3ADemo_Derby%3A_Rules_of_the_Road) (scripts/quest_fidelity.py GIVER_MOVES)."
         }
       ],
       "enabled": true
@@ -451,7 +455,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59612,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Derby Stock Engine (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_taking_the_wheel_ca3b5b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 225
           },
@@ -1148,10 +1163,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_thunder_falls_crash_for_coin_881a87) is Global.Text 6200002, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393449: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_thunder_falls_crash_for_coin_881a87)."
         }
       ],
       "enabled": true,
-      "job": 49
+      "job": 49,
+      "end_text_string_id": 393449
     },
     {
       "id": 3060013,
@@ -2669,9 +2689,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T666: enabled."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393436: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_stunt_double_5ba215)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 393436
     },
     {
       "id": 3060031,
@@ -2934,7 +2959,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76059,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leaf-Springed Derby Trousers (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_hurtin_crewe_act_ii_5feed1)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) no row is named 'Leaf-Springed Derby Trousers'; item-table row 76059 'Leaf-Springed Derby Pants' is the set's legs piece, as Frame-Notched Derby Trousers is wired to its Pants row."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "49": 167
           },
@@ -2986,10 +3026,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393399 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393439: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_hurtin_crewe_act_ii_5feed1)."
         }
       ],
       "enabled": true,
-      "job": 49
+      "job": 49,
+      "end_text_string_id": 393439
     },
     {
       "id": 3060034,
@@ -3113,12 +3158,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393441: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_pixiewood_premiere_f3cbc3)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393401,
-      "intro_text_string_id": 393401
+      "intro_text_string_id": 393401,
+      "end_text_string_id": 393441
     },
     {
       "id": 3060035,
@@ -3221,10 +3271,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393400 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393440: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_sir_horace_the_horrible_cf8100)."
         }
       ],
       "enabled": true,
-      "job": 49
+      "job": 49,
+      "end_text_string_id": 393440
     },
     {
       "id": 3060036,
@@ -3536,11 +3591,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393403 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393443: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_copy_cat_6993cd)."
         }
       ],
       "enabled": true,
       "job": 49,
-      "description_string_id": 393363
+      "description_string_id": 393363,
+      "end_text_string_id": 393443
     },
     {
       "id": 3060039,
@@ -3678,11 +3738,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_demo_derby_tangletrack_trio_40a446) is Global.Text 6200004, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393447: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_tangletrack_trio_40a446)."
         }
       ],
       "enabled": true,
       "job": 49,
-      "description_string_id": 393367
+      "description_string_id": 393367,
+      "end_text_string_id": 393447
     },
     {
       "id": 3060041,
@@ -3802,11 +3867,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 393405 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393445: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_booby_trapped_0aeaee)."
         }
       ],
       "enabled": true,
       "job": 49,
-      "description_string_id": 393365
+      "description_string_id": 393365,
+      "end_text_string_id": 393445
     },
     {
       "id": 3060042,
@@ -3953,12 +4023,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393448: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_a_hero_s_homecoming_e42a6e)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393368,
-      "intro_text_string_id": 393408
+      "intro_text_string_id": 393408,
+      "end_text_string_id": 393448
     },
     {
       "id": 3060043,
@@ -4161,12 +4236,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 393444: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_demo_derby_down_and_dirty_derby_70bd09)."
         }
       ],
       "enabled": true,
       "job": 49,
       "description_string_id": 393364,
-      "intro_text_string_id": 393404
+      "intro_text_string_id": 393404,
+      "end_text_string_id": 393444
     },
     {
       "id": 3060046,

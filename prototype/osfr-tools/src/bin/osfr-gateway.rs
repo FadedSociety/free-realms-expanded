@@ -2995,7 +2995,7 @@ impl Server {
             }
         }
         field.retain_casters(&active.iter().map(|(_, p)| p.guid).collect(), now_ms);
-        field.set_active_quests(&quests);
+        field.set_active_quests(&quests, &client_area_routing::running_events(&self.world));
         // (R) Current poses/caps first. Hold only already-known corpses through
         // lethal HP delivery, then remove once. New observers get current HP,
         // never a replay of action deltas committed before their AddNpc.

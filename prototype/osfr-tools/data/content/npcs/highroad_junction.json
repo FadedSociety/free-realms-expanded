@@ -56,9 +56,9 @@
       ],
       "services_reason": null,
       "position": [
-        -448.399469,
-        -3.885,
-        187.858615
+        -450.9,
+        -4.49,
+        193.86
       ],
       "position_w": null,
       "rotation": [
@@ -78,7 +78,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 17. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 17. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 6.5 m south-east from [-448.399469, -3.885, 187.858615] to [-450.9, -4.49, 193.86], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -822,55 +822,10 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3050011,
-          "title": "Chef: Ranger Requisition",
-          "title_string_id": 104134,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H2; name 'Chef: Ranger Requisition'; title id cell ucdt 3792677643 / ugdt 984140246"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Chef.md: Quest line > Trainer series 2: Highroad Junction (Auguste Frydaze), row H2; name 'Chef: Ranger Requisition'; title id cell ucdt 3792677643 / ugdt 984140246"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3050011 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3792677643 to Global.Text id 104134 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3050004
         }
       ],
       "quest_ids_given": [
-        3050011,
         3050004
       ],
       "quests_given_text": [
@@ -1410,9 +1365,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -442.600874,
-        -3.885,
-        182.240649
+        -443.6,
+        -4.018,
+        181.24
       ],
       "position_w": null,
       "rotation": [
@@ -1432,7 +1387,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.4 m south-west from [-442.600874, -3.885, 182.240649] to [-443.6, -4.018, 181.24], world editor /api/probe: stand.y -4.018 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -1831,9 +1786,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -441.02,
-        -3.75,
-        190.85
+        -439.5,
+        -3.625,
+        193.3
       ],
       "position_w": null,
       "rotation": [
@@ -1858,7 +1813,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row sat 1.35 m from Coin Farmer Goldwupp and 2 m from Mercy Merrywings. The wiki gives it only as the Highroad Junction version of the Queensfields Bixie Battlemage; moved onto free terrain; moved 2.9 m north-east from [-441.02, -3.75, 190.85] to [-439.5, -3.625, 193.3], world editor /api/probe: stand.y -3.625 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -2690,9 +2645,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -439.728701,
-        -3.885,
-        185.194419
+        -437.23,
+        -3.352,
+        183.69
       ],
       "position_w": null,
       "rotation": [
@@ -2712,7 +2667,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 2.9 m north-west from [-439.728701, -3.885, 185.194419] to [-437.23, -3.352, 183.69], world editor /api/probe: stand.y -3.352 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -3113,9 +3068,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -447.341849,
-        -3.885,
-        190.320487
+        -446.84,
+        -4.225,
+        194.82
       ],
       "position_w": null,
       "rotation": [
@@ -3135,7 +3090,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 17. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 17. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 4.5 m east from [-447.341849, -3.885, 190.320487] to [-446.84, -4.225, 194.82], world editor /api/probe: stand.y -4.225 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -5592,9 +5547,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -440.577655,
-        -3.885,
-        182.362601
+        -439.58,
+        -3.872,
+        180.86
       ],
       "position_w": null,
       "rotation": [
@@ -5614,7 +5569,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 17. This is not a recovered NPC transform.",
+      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 17. This is not a recovered NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.8 m north-west from [-440.577655, -3.885, 182.362601] to [-439.58, -3.872, 180.86], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -6082,9 +6037,9 @@
       ],
       "services_reason": null,
       "position": [
-        -442.656604,
-        -3.885,
-        188.603558
+        -442.16,
+        -3.808,
+        186.1
       ],
       "position_w": null,
       "rotation": [
@@ -6104,7 +6059,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 2.6 m west from [-442.656604, -3.885, 188.603558] to [-442.16, -3.808, 186.1], world editor /api/probe: stand.y -3.808 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -6586,9 +6541,26 @@
       "quests_given": [
         {
           "quest_id": 3000020
+        },
+        {
+          "quest_id": 3050011,
+          "title": "Chef: Ranger Requisition",
+          "title_string_id": 104134,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the offer 104133 speaks of Auguste in the third person and sends the player to Ranger Ricardo; the closing 104136 is Ricardo's, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki starts it at Merigold (https://fr.fanbyte.com/wiki/FR_Quest%3AChef%3A_Ranger_Requisition)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
+        3050011,
         3000020
       ],
       "quests_given_text": [
@@ -6835,12 +6807,20 @@
           {
             "kind": "video",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md#Part A. Greeters and the new-player flow, row 37; source cell: [client] [video]"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 104133 speaks of Auguste in the third person and sends the player to Ranger Ricardo; the closing 104136 is Ricardo's, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 104133 speaks of Auguste in the third person and sends the player to Ranger Ricardo; the closing 104136 is Ricardo's, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_given_text": [
@@ -7618,9 +7598,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -444.730083,
-        -3.885,
-        191.839912
+        -443.23,
+        -4.047,
+        196.34
       ],
       "position_w": null,
       "rotation": [
@@ -7645,7 +7625,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 4.7 m east from [-444.730083, -3.885, 191.839912] to [-443.23, -4.047, 196.34], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -8045,8 +8025,20 @@
       "quests_given_text": [
         "Chef: Fireworks Frenzy! (video giver Ricardo; five \"Collect the ... of Fireworks\" goals); target of Chef: Ranger Requisition (\"Ingredients for Auguste?\" 3360869312). He then points the player at Perry (\"Ranger Ricardo has pointed you at Perry, who runs Perry's Pastures, north of Highroad Junction\" 2373419185)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3050011,
+          "title": "Chef: Ranger Requisition",
+          "title_string_id": 104134,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "the offer 104133 speaks of Auguste in the third person and sends the player to Ranger Ricardo; the closing 104136 is Ricardo's, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Hand-in of 3050011: the quest's last step is here and its giver is the wiki's; see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -8378,6 +8370,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          },
+          {
+            "kind": "client",
+            "evidence": "the offer 104133 speaks of Auguste in the third person and sends the player to Ranger Ricardo; the closing 104136 is Ricardo's, so he takes the hand-in (scripts/quest_fidelity.py GIVER_MOVES)."
           }
         ],
         "quests_accepted_reason": [
@@ -8985,9 +8981,9 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -438.690513,
-        -3.885,
-        187.014756
+        -437.19,
+        -3.279,
+        187.51
       ],
       "position_w": null,
       "rotation": [
@@ -9007,7 +9003,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 1.6 m north from [-438.690513, -3.885, 187.014756] to [-437.19, -3.279, 187.51], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -10124,9 +10120,9 @@
       ],
       "services_reason": null,
       "position": [
-        -447.52,
-        -4.15,
-        188.32
+        -448.52,
+        -4.226,
+        188.82
       ],
       "position_w": null,
       "rotation": [
@@ -10151,7 +10147,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 1.1 m south-east from [-447.52, -4.15, 188.32] to [-448.52, -4.226, 188.82], world editor /api/probe: stand.y -4.226 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",
@@ -10753,9 +10749,9 @@
       ],
       "services_reason": null,
       "position": [
-        -446.266579,
-        -3.885,
-        182.779722
+        -446.27,
+        -4.053,
+        185.28
       ],
       "position_w": null,
       "rotation": [
@@ -10775,7 +10771,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Chosen POI id 17 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 2.5 m east from [-446.266579, -3.885, 182.779722] to [-446.27, -4.053, 185.28], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
       "source": [
         {
           "kind": "client",

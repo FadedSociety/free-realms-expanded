@@ -148,6 +148,14 @@ impl NpcAmbient {
             })
     }
 
+    /// Take these actors off the idle-loop schedule (their own pose row names the idle); they
+    /// keep their emotes, conversation turns and look-at.
+    pub fn clear_idles(&mut self, guids: impl Iterator<Item = u64>) {
+        for guid in guids {
+            self.idles.remove(&guid);
+        }
+    }
+
     fn from_json(bytes: &[u8]) -> io::Result<Self> {
         let document: Document = serde_json::from_slice(bytes).map_err(invalid)?;
         if document.schema_version != 1 {

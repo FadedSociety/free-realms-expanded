@@ -33,7 +33,7 @@ const RABBIT: (u64, [f32; 3]) = (100_000_033_100, [-1430.057, -31.778555, 217.45
 const COIN: (u64, [f32; 3]) = (100_000_001_946, [-507.1435, -27.20111, -1201.367]);
 const QUEEN_VALERIAN: (u64, [f32; 3]) = (9_500_000_519, [-1054.135, 4.629629, 305.7209]);
 /// A Blackspore quest giver on a model every 2014 row hid (3295).
-const LON_BLACKFOREST: (u64, [f32; 3]) = (9_500_000_038, [-2140.7286, -32.948, 1034.2800]);
+const LON_BLACKFOREST: (u64, [f32; 3]) = (9_500_000_038, [-2449.0, -31.7, 1188.0]);
 /// A quest giver whose 2014 name was always hidden (the extra spawn that draws him).
 const ROSCOE: u64 = 9_000_000_184;
 /// Boddington, a placed Blackspore vendor (`npcs/`, `vendors.json`).

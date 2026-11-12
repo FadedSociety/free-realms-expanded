@@ -1742,9 +1742,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T465 exclusion 3000020<->3000022, transitive: neither source pairs Highroad with Stillwater."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 116463: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_introduce_yourself_422b12)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 116463
     },
     {
       "id": 3000021,
@@ -1842,8 +1847,13 @@
         {
           "kind": "wiki",
           "evidence": "T465 exclusion 3000021<->3000022: lab/references/freerealms-wiki/wikitext/8990-23969-57192e22bb75.wiki line 1, 'When you complete one, the other quest becomes unavailable for that player'; the page names the Cobblestone version (Samantha to Ricky Danger) and the Stillwater version (Valerie to Francis Panic)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 116463: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_introduce_yourself_422b12)."
         }
-      ]
+      ],
+      "end_text_string_id": 116463
     },
     {
       "id": 3000022,
@@ -1944,9 +1954,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T465 exclusion 3000020<->3000022, transitive: neither source pairs Highroad with Stillwater."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 116463: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_introduce_yourself_422b12)."
         }
       ],
-      "description_string_id": 116637
+      "description_string_id": 116637,
+      "end_text_string_id": 116463
     },
     {
       "id": 3000023,
@@ -4936,12 +4951,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event saint_patricks runs; event_calendar.json event saint_patricks's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 5100413,
       "intro_text_string_id": 5100411,
       "end_text_string_id": 5100414,
-      "enabled": false
+      "enabled": false,
+      "live_event": "saint_patricks"
     },
     {
       "id": 3000056,
@@ -4990,12 +5010,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event saint_patricks runs; event_calendar.json event saint_patricks's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 5100417,
       "intro_text_string_id": 5100415,
       "end_text_string_id": 5100418,
-      "enabled": false
+      "enabled": false,
+      "live_event": "saint_patricks"
     },
     {
       "id": 3000057,
@@ -5040,12 +5065,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event saint_patricks runs; event_calendar.json event saint_patricks's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 5100421,
       "intro_text_string_id": 5100419,
       "end_text_string_id": 5100422,
-      "enabled": false
+      "enabled": false,
+      "live_event": "saint_patricks"
     },
     {
       "id": 3000058,
@@ -5110,12 +5140,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event saint_patricks runs; event_calendar.json event saint_patricks's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 5100425,
       "intro_text_string_id": 5100423,
       "end_text_string_id": 5100426,
-      "enabled": false
+      "enabled": false,
+      "live_event": "saint_patricks"
     },
     {
       "id": 3000059,

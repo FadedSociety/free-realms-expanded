@@ -13,7 +13,7 @@
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    ADVENTURER, Fixture, accept, assert_no_offer, character_at_for, npc_location, offer,
+    ADVENTURER, Fixture, accept, assert_no_offer, character_at_for, interact, npc_location, offer,
     seed_quest, visible_npcs, zone_player,
 };
 use osfr_tools::{
@@ -35,6 +35,24 @@ use std::{
 
 const PLAYER: u64 = 835_001;
 const ALYSSA: u64 = 9_500_000_436;
+
+/// EV: Alyssa Eggelyn is tagged with her event (`live_event: spring_eggstravaganza`), so out of it
+/// she is not in the world: a 26/8 on her opens no menu and offers nothing, and the save is the
+/// same. Inside her event she answers as before (`assert_no_offer` for a finished hunt).
+fn assert_closed(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    target: u64,
+    now: &mut u64,
+    label: &str,
+) {
+    *now += 10;
+    let reply = interact(game, character, target, *now);
+    assert!(
+        !reply.replies.iter().any(|p| p.starts_with(&[26, 0, 9, 0]) || p.starts_with(&[49, 0, 1, 0])),
+        "{label}: the giver of a closed event answered"
+    );
+}
 const EGG_HUNT: u32 = 3_955_710;
 /// The Pumpkin Prince, a Halloween-tagged row of `npc_spawns_extra.json`.
 const PUMPKIN_PRINCE: u64 = 100_000_031_334;
@@ -121,20 +139,31 @@ fn the_shipped_calendar_names_defined_seasons_and_real_quests() {
     let calendar = areas.calendar();
     assert!(!calendar.is_empty(), "the calendar ships with events");
     let mut records = BTreeSet::new();
+    let mut keyed = BTreeMap::new();
     for entry in fs::read_dir(content_dir().join("quests")).unwrap() {
         let file: Value = serde_json::from_slice(&fs::read(entry.unwrap().path()).unwrap()).unwrap();
-        let rows = file["records"].as_array().into_iter().flatten();
-        records.extend(rows.filter_map(|row| row["id"].as_u64()));
+        for row in file["records"].as_array().into_iter().flatten() {
+            records.extend(row["id"].as_u64());
+            if let (Some(id), Some(key)) = (row["id"].as_u64(), row["live_event"].as_str()) {
+                keyed.insert(id, key.to_owned());
+            }
+        }
     }
     for id in calendar.gated_quests() {
         assert!(records.contains(&u64::from(id)), "event quest {id} is not a record");
+    }
+    // QF: shipped quests carry their event's key on the row; each key is a calendar event.
+    assert!(calendar.gated_quests().is_empty(), "the rows, not the calendar, list event quests");
+    for (id, key) in &keyed {
+        assert!(calendar.has_event(key), "quest {id} names unknown event {key}");
     }
     // Every event is reachable by its key, and each one's season answers the clock.
     for state in calendar.states(&BTreeMap::new(), &areas, JULY) {
         assert!(calendar.has_event(state.key), "{}", state.key);
     }
-    assert!(calendar.open_quests(&areas, EGG_DAY).contains(&EGG_HUNT));
-    assert!(!calendar.open_quests(&areas, JULY).contains(&EGG_HUNT));
+    assert_eq!(keyed[&u64::from(EGG_HUNT)], "spring_eggstravaganza");
+    assert!(calendar.is_running("spring_eggstravaganza", &areas, EGG_DAY));
+    assert!(!calendar.is_running("spring_eggstravaganza", &areas, JULY));
 }
 
 #[test]
@@ -292,7 +321,7 @@ fn an_event_quest_is_offered_in_season_and_leaves_the_journal_when_it_ends() {
     let (alyssa, mut now) = (at_alyssa(), 1_000);
 
     clock(&mut game, JULY, &mut now);
-    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt in July");
+    assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt in July");
 
     clock(&mut game, EGG_DAY, &mut now);
     offer(&mut game, &alyssa, ALYSSA, EGG_HUNT, now);
@@ -305,7 +334,7 @@ fn an_event_quest_is_offered_in_season_and_leaves_the_journal_when_it_ends() {
     assert_eq!(status(&game, EGG_HUNT), Some(QuestStatus::Abandoned));
     assert!(ended.changed, "the cleaned journal must be saved");
     assert!(!ended.replies.is_empty(), "the client is told the quest left");
-    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt after the event");
+    assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt after the event");
 }
 
 #[test]
@@ -323,7 +352,7 @@ fn an_admin_runs_an_event_by_hand_and_ends_it_again() {
     );
     let refused = realm(&mut game, "realm event season easter on", &mut now);
     assert!(refused.contains("not a calendar event"), "{refused}");
-    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "a refused toggle");
+    assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "a refused toggle");
 
     // On by hand in July: Alyssa offers the hunt and Halloween's people are drawn.
     let prince = character_at_for(PLAYER, 0, PRINCE_AT);
@@ -336,7 +365,7 @@ fn an_admin_runs_an_event_by_hand_and_ends_it_again() {
     let set = realm(&mut game, "/event spring_eggstravaganza on", &mut now);
     // A toggle holds until the event's next calendar edge: here each event's next start.
     let told = "spring_eggstravaganza (The Spring Eggstravaganza): on, running by hand until \
-                2027-03-28 00:00, then by its dates. Active now: spring_eggstravaganza, summer_camp.";
+                2027-03-28 00:00, then by its dates. Active now: spring_eggstravaganza, summer_camp, seaside_summer_splash.";
     assert_eq!(set, told);
     settle();
     let set = realm(&mut game, "/halloween on", &mut now);
@@ -369,7 +398,7 @@ fn an_admin_runs_an_event_by_hand_and_ends_it_again() {
     assert_eq!(summer, "summer_camp (Summer Camp): calendar, running until 2026-09-07 00:00.");
     clock(&mut game, JULY, &mut now);
     assert_eq!(status(&game, EGG_HUNT), Some(QuestStatus::Abandoned));
-    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the hunt after the toggle is cleared");
+    assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "the hunt after the toggle is cleared");
 }
 
 #[test]
@@ -436,7 +465,7 @@ fn only_an_admin_may_toggle_an_event() {
         assert!(!live.join("event_overrides.json").exists(), "{role:?} wrote the toggle file");
         clock(&mut game, JULY, &mut now);
         let alyssa = at_alyssa();
-        assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "a refused toggle");
+        assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "a refused toggle");
     }
     // An ordinary chat line that merely starts with a slash is not ours to answer.
     let (mut game, _live) = with_role(&fixture, AccountRole::Player);
@@ -750,12 +779,9 @@ fn every_shipped_event_starts_and_stops_on_its_window_edges() {
         assert_eq!(calendar.next_edge(key, &areas, start), Some(after), "{key}");
         let next_year = unix(2027, first.0, first.1);
         assert_eq!(calendar.next_occurrence(key, &areas, after), Some(next_year), "{key}");
-        // The event's quests open and close on those edges too.
-        for quest in event["quest_ids"].as_array().unwrap() {
-            let quest = u32::try_from(quest.as_u64().unwrap()).unwrap();
-            assert!(calendar.open_quests(&areas, start).contains(&quest), "{key} {quest}");
-            assert!(!calendar.open_quests(&areas, after).contains(&quest), "{key} {quest}");
-        }
+        // The event's quests (rows tagged with its key) open and close on those edges too.
+        assert!(calendar.is_running(key, &areas, start), "{key}");
+        assert!(!calendar.is_running(key, &areas, after), "{key}");
     }
     // The one window a dated run fixes to the day: October 1 through November 12 (2013).
     assert!(calendar.active_at(&areas, unix(2026, 10, 1)).contains(&"halloween"));
@@ -782,7 +808,7 @@ fn a_server_restarted_inside_a_window_is_in_the_event_and_ends_it_on_time() {
     assert_eq!(halloween_areas(&areas.world_ready_packets(inside)), all(true));
     assert!(areas.season_changes(inside).is_empty(), "the first tick only records the state");
     assert!(areas.calendar().active_at(&areas, inside).contains(&"halloween"));
-    assert!(areas.calendar().open_quests(&areas, inside).contains(&3_950_200));
+    assert!(areas.calendar().is_running("halloween", &areas, inside), "Going Batty's event");
 
     // A second restart, later in the window, then the real clock runs over the edge.
     let mut areas = load();
@@ -886,11 +912,11 @@ fn a_toggle_typed_in_chat_outlives_a_restart_and_gives_way_to_the_dates() {
     let mut game = admin(&fixture);
     let mut now = 1_000;
     clock(&mut game, JULY, &mut now);
-    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt in July");
+    assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt in July");
     settle();
     let set = realm(&mut game, "realm spring_eggstravaganza on", &mut now);
     let told = "spring_eggstravaganza (The Spring Eggstravaganza): on, running by hand until \
-                2027-03-28 00:00, then by its dates. Active now: spring_eggstravaganza, summer_camp.";
+                2027-03-28 00:00, then by its dates. Active now: spring_eggstravaganza, summer_camp, seaside_summer_splash.";
     assert_eq!(set, told);
     clock(&mut game, JULY, &mut now);
     offer(&mut game, &alyssa, ALYSSA, EGG_HUNT, now);
@@ -914,19 +940,19 @@ fn a_toggle_typed_in_chat_outlives_a_restart_and_gives_way_to_the_dates() {
     // And the dates end it: nobody typed `off`.
     clock(&mut game, AFTER_EGGS + 365 * DAY, &mut now);
     assert_eq!(status(&game, EGG_HUNT), Some(QuestStatus::Abandoned));
-    assert_no_offer(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt after its window");
+    assert_closed(&mut game, &alyssa, ALYSSA, &mut now, "the egg hunt after its window");
 
     // Off inside a window, cleared with `default` before its edge.
     clock(&mut game, JULY + 365 * DAY, &mut now);
     settle();
     let off = realm(&mut game, "realm summer_camp off", &mut now);
     let held = "summer_camp (Summer Camp): off, not running by hand until 2027-09-07 00:00, then \
-                by its dates. Active now: nothing.";
+                by its dates. Active now: seaside_summer_splash.";
     assert_eq!(off, held);
     settle();
     let cleared = realm(&mut game, "realm summer_camp default", &mut now);
     let back = "summer_camp (Summer Camp): calendar, running until 2027-09-07 00:00. Active now: \
-                summer_camp.";
+                summer_camp, seaside_summer_splash.";
     assert_eq!(cleared, back);
     let usage = realm(&mut game, "realm summer_camp sometimes", &mut now);
     assert!(usage.starts_with("Usage: realm halloween on|off|calendar"), "{usage}");

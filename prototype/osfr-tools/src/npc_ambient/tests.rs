@@ -409,3 +409,25 @@ fn conversation_members_do_not_also_play_the_random_emote() {
     assert_eq!(emoting, BTreeSet::from([30]));
     assert_eq!(talking, BTreeSet::from([10, 20]));
 }
+
+/// PL-A npc-placement-a: an actor with its own pose row (a child with no seat stands) leaves the
+/// idle-loop schedule, which would push the sit loop, but keeps its conversation turns.
+#[test]
+fn a_pose_row_actor_leaves_the_idle_schedule_but_keeps_its_conversation() {
+    let mut ambient = table(json!([with_extra(
+        row(json!([MODEL]), json!([3101]), 1000, 1000),
+        json!({
+            "idle_animation_ids": [2100],
+            "idle_interval_ms": 1000,
+            "conversation_animation_ids": [3101],
+            "conversation_min_gap_ms": 500,
+            "conversation_max_gap_ms": 500,
+        }),
+    )]));
+    ambient.place_actors(&[(GUID, MODEL, [0.0, 0.0, 0.0]), (GUID + 1, MODEL, [1.0, 0.0, 0.0])]);
+    assert!(ambient.idles.contains_key(&GUID));
+    ambient.clear_idles([GUID].into_iter());
+    assert!(!ambient.idles.contains_key(&GUID));
+    assert!(ambient.idles.contains_key(&(GUID + 1)));
+    assert!(ambient.talking.contains(&GUID), "its conversation turns stay");
+}

@@ -494,11 +494,16 @@
         {
           "kind": "wiki",
           "evidence": "Day 9: Snowhill Soccer (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_9_snowhill_soccer_a49743)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event twelve_days runs; event_calendar.json event twelve_days's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 441111,
       "intro_text_string_id": 441109,
-      "enabled": true
+      "enabled": true,
+      "live_event": "twelve_days"
     },
     {
       "id": 3950125,
@@ -1101,11 +1106,31 @@
         {
           "kind": "wiki",
           "evidence": "Going Batty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_going_batty_245eb0)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Going_Batty)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Going_Batty)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415297: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_going_batty_245eb0)."
         }
       ],
       "description_string_id": 415296,
       "intro_text_string_id": 415294,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415297
     },
     {
       "id": 3950210,
@@ -1772,11 +1797,16 @@
         {
           "kind": "wiki",
           "evidence": "Meet and Greet (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_and_greet_aa36f4)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 429031,
       "intro_text_string_id": 429029,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp"
     },
     {
       "id": 3950273,
@@ -1841,11 +1871,31 @@
         {
           "kind": "wiki",
           "evidence": "Mum's the Word (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_mum_s_the_word_53d00e)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Mum's_the_Word)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Mum's_the_Word)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415630: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_mum_s_the_word_53d00e)."
         }
       ],
       "description_string_id": 415359,
       "intro_text_string_id": 415360,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415630
     },
     {
       "id": 3950277,
@@ -2133,11 +2183,16 @@
         {
           "kind": "wiki",
           "evidence": "Power Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_power_problems_b1b613)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 116769: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_power_problems_b1b613)."
         }
       ],
       "description_string_id": 116470,
       "intro_text_string_id": 116468,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 116769
     },
     {
       "id": 3950333,
@@ -2234,11 +2289,16 @@
         {
           "kind": "wiki",
           "evidence": "Rags to Riches (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_rags_to_riches_4e4683)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 429097,
       "intro_text_string_id": 429095,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp"
     },
     {
       "id": 3950348,
@@ -2913,11 +2973,16 @@
         {
           "kind": "wiki",
           "evidence": "That Robgoblin's Story (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_robgoblin_s_story_c9b34a)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 429546,
       "intro_text_string_id": 429544,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp"
     },
     {
       "id": 3950401,
@@ -3171,11 +3236,21 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 384768 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:There's_Silver_in_Those_Hills)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 14,
       "description_string_id": 384770,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3950436,
@@ -3796,11 +3871,31 @@
         {
           "kind": "wiki",
           "evidence": "Apples! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_apples_ee35c8)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Apples!)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Apples!)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415402: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_apples_ee35c8)."
         }
       ],
       "description_string_id": 415268,
       "intro_text_string_id": 415266,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415402
     },
     {
       "id": 3950687,
@@ -4265,11 +4360,31 @@
         {
           "kind": "wiki",
           "evidence": "The Gifting Tree (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_gifting_tree_b608e7)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; event_calendar.json event snow_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:The_Gifting_Tree)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:The_Gifting_Tree)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 419837: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_gifting_tree_b608e7)."
         }
       ],
       "description_string_id": 419836,
       "intro_text_string_id": 419834,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 419837
     },
     {
       "id": 3951093,
@@ -4320,11 +4435,21 @@
         {
           "kind": "wiki",
           "evidence": "Worms! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_worms_884e9e)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Worms!)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 38787,
       "intro_text_string_id": 38787,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3951126,
@@ -4529,11 +4654,31 @@
         {
           "kind": "wiki",
           "evidence": "Bundles of Balloons (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event birthday_bash runs; event_calendar.json event birthday_bash's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3ABundles_of_Balloons)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3ABundles_of_Balloons)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 428079: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_bundles_of_balloons_8cb1e1)."
         }
       ],
       "description_string_id": 428078,
       "intro_text_string_id": 428076,
-      "enabled": true
+      "enabled": true,
+      "live_event": "birthday_bash",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 428079
     },
     {
       "id": 3951159,
@@ -4675,9 +4820,19 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 430163 (0.98) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3ACoin_Clean-Up)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3ACoin_Clean-Up)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3951271,
@@ -5058,9 +5213,19 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 37984, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3APicking_Up_Chicks)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3951364,
@@ -5534,12 +5699,17 @@
         {
           "kind": "wiki",
           "evidence": "Brawler: Grave Danger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_grave_danger_71a369)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 140313: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_brawler_grave_danger_71a369)."
         }
       ],
       "job": 43,
       "description_string_id": 140312,
       "intro_text_string_id": 140310,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 140313
     },
     {
       "id": 3951668,
@@ -5856,10 +6026,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 421000 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; event_calendar.json event snow_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 421003: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_curious_gift_baskets_3cdd14)."
         }
       ],
       "description_string_id": 421002,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 421003
     },
     {
       "id": 3951987,
@@ -5915,10 +6095,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428825 (0.96) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3APopularly_Healthy)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3APopularly_Healthy)."
         }
       ],
       "description_string_id": 428827,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3951995,
@@ -6005,11 +6195,21 @@
         {
           "kind": "wiki",
           "evidence": "Present Problems (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_present_problems_47802d)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; event_calendar.json event snow_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420311: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_present_problems_47802d)."
         }
       ],
       "description_string_id": 420269,
       "intro_text_string_id": 420267,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 420311
     },
     {
       "id": 3952076,
@@ -6128,9 +6328,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): (R) the client's string block [intro, title, description, end] around title 432195, as the nearest quests with a known intro (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween"
     },
     {
       "id": 3952343,
@@ -6196,11 +6401,21 @@
         {
           "kind": "wiki",
           "evidence": "Pretty Presents (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pretty_presents_0a1c33)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; event_calendar.json event snow_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 421072: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_pretty_presents_0a1c33)."
         }
       ],
       "description_string_id": 421071,
       "intro_text_string_id": 421069,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 421072
     },
     {
       "id": 3952371,
@@ -6251,11 +6466,21 @@
         {
           "kind": "wiki",
           "evidence": "Seaside Treasure Hunting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_seaside_treasure_hunting_790700)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ASeaside_Treasure_Hunting)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 100216,
       "intro_text_string_id": 100216,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3952407,
@@ -6522,12 +6747,21 @@
         {
           "kind": "wiki",
           "evidence": "Deck of Buzzing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_deck_of_buzzing_076b3b)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The page gates Deck of Buzzing behind a purchased Pumpkin Costume or Deadman's Party quest pack (fanbyte Category:Super_Spooktacular, 2013 quest series (lab/references/fanbyte-events-20261111/super_spooktacular.html)); the economy is free (owner), so the row has no gate."
         }
       ],
       "job": 120,
       "description_string_id": 416493,
       "intro_text_string_id": 416491,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween"
     },
     {
       "id": 3952619,
@@ -6608,11 +6842,16 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 400812 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3AMatching_Wits) (scripts/quest_fidelity.py)."
         }
       ],
       "job": 120,
       "description_string_id": 400814,
-      "enabled": true
+      "enabled": true,
+      "live_event": "seaside_summer_splash"
     },
     {
       "id": 3952640,
@@ -7029,10 +7268,30 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_oops_29af81) is Global.Text 6200015, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Oops!)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Oops!)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415277: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_oops_29af81)."
         }
       ],
       "description_string_id": 415276,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415277
     },
     {
       "id": 3952928,
@@ -7164,13 +7423,22 @@
         {
           "kind": "wiki",
           "evidence": "Creepy Crawly Cards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_creepy_crawly_cards_39c23c)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The page gates Creepy Crawly Cards behind a purchased Chiller Boombox or Deadman's Party quest pack (fanbyte Category:Super_Spooktacular, 2013 quest series (lab/references/fanbyte-events-20261111/super_spooktacular.html)); the economy is free (owner), so the row has no gate."
         }
       ],
       "job": 120,
       "description_string_id": 416479,
       "intro_text_string_id": 416477,
       "enabled": true,
-      "end_text_string_id": 416480
+      "end_text_string_id": 416480,
+      "live_event": "halloween"
     },
     {
       "id": 3953012,
@@ -7582,11 +7850,16 @@
         {
           "kind": "wiki",
           "evidence": "Day 11: Snowhill Derby (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_day_11_snowhill_derby_97de36)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event twelve_days runs; event_calendar.json event twelve_days's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 441119,
       "intro_text_string_id": 441117,
-      "enabled": true
+      "enabled": true,
+      "live_event": "twelve_days"
     },
     {
       "id": 3953106,
@@ -7797,11 +8070,31 @@
         {
           "kind": "wiki",
           "evidence": "Defensive Strategy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_defensive_strategy_d8c5d1)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3ADefensive_Strategy)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3ADefensive_Strategy)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429317: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defensive_strategy_d8c5d1)."
         }
       ],
       "description_string_id": 429316,
       "intro_text_string_id": 429314,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 429317
     },
     {
       "id": 3953110,
@@ -7902,11 +8195,31 @@
         {
           "kind": "wiki",
           "evidence": "Dem Bones (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_dem_bones_eddff2)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Dem_Bones)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Dem_Bones)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415289: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_dem_bones_eddff2)."
         }
       ],
       "description_string_id": 415288,
       "intro_text_string_id": 415286,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415289
     },
     {
       "id": 3953111,
@@ -8062,11 +8375,21 @@
         {
           "kind": "wiki",
           "evidence": "Digging for Glory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_digging_for_glory_601834)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ADigging_for_Glory)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 70384,
       "intro_text_string_id": 71547,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953116,
@@ -8199,11 +8522,31 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 415290 (0.95) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Double%2C_Double%2C_Toil_and_Trouble)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Double%2C_Double%2C_Toil_and_Trouble)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415561: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_double_double_toil_and_trouble_1b36f3)."
         }
       ],
       "description_string_id": 415292,
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415561
     },
     {
       "id": 3953125,
@@ -8831,11 +9174,21 @@
         {
           "kind": "wiki",
           "evidence": "Garden Gnawers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_garden_gnawers_fb8f6d)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Garden_Gnawers)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 92178,
       "intro_text_string_id": 92176,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953172,
@@ -9316,11 +9669,21 @@
         {
           "kind": "wiki",
           "evidence": "Precursor Prospecting (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_precursor_prospecting_488b30)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Precursor_Prospecting)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 91773,
       "intro_text_string_id": 91771,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953277,
@@ -10475,11 +10838,31 @@
         {
           "kind": "wiki",
           "evidence": "Unearthing Treasures (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_unearthing_treasures_19517e)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Unearthing_Treasures)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:Unearthing_Treasures)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429358: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_unearthing_treasures_19517e)."
         }
       ],
       "description_string_id": 429355,
       "intro_text_string_id": 429355,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 429358
     },
     {
       "id": 3953373,
@@ -10537,10 +10920,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 390210 (0.97) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Vegetable_Medley)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "enabled": true,
-      "job": 45
+      "job": 45,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953383,
@@ -10976,10 +11369,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 410461 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ABayou%3A_Catch_of_the_Day)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953730,
@@ -11151,12 +11554,22 @@
         {
           "kind": "wiki",
           "evidence": "Is it Safe to Swim (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_is_it_safe_to_swim_ea676b)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Is_it_Safe_to_Swim%3F)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
       "description_string_id": 409945,
       "intro_text_string_id": 409943,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953973,
@@ -11253,11 +11666,21 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 410287 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:The_Roach_Coach)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
       "description_string_id": 410289,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3953979,
@@ -11386,11 +11809,21 @@
         {
           "kind": "wiki",
           "evidence": "A Race Against Grime (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_race_against_grime_68b662)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AA_Race_Against_Grime)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 90664,
       "intro_text_string_id": 90664,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954019,
@@ -11509,11 +11942,21 @@
         {
           "kind": "wiki",
           "evidence": "Certified Treasure Hunter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429176: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_certified_treasure_hunter_53ce56)."
         }
       ],
       "description_string_id": 429175,
       "intro_text_string_id": 429173,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "end_text_string_id": 429176
     },
     {
       "id": 3954036,
@@ -11792,11 +12235,21 @@
         {
           "kind": "wiki",
           "evidence": "Free the Balloons! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_free_the_balloons_c1fdb5)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AFree_the_Balloons%21)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 115532,
       "intro_text_string_id": 115532,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954150,
@@ -12368,11 +12821,31 @@
         {
           "kind": "wiki",
           "evidence": "The Great Treeble Race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_great_treeble_race_112705)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:The_Great_Treeble_Race)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:The_Great_Treeble_Race)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429255: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_great_treeble_race_112705)."
         }
       ],
       "description_string_id": 429254,
       "intro_text_string_id": 429252,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 429255
     },
     {
       "id": 3954290,
@@ -12633,12 +13106,22 @@
         {
           "kind": "wiki",
           "evidence": "Keep it Clean (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_keep_it_clean_a8dd8a)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AKeep_it_Clean)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
       "description_string_id": 409694,
       "intro_text_string_id": 409692,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954475,
@@ -12834,11 +13317,21 @@
         {
           "kind": "wiki",
           "evidence": "Bucket O'Fish (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bucket_o_fish_503c93)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ABucket_O%27Fish)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 101094,
       "intro_text_string_id": 101094,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954524,
@@ -13054,10 +13547,30 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428088 (0.97) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event birthday_bash runs; event_calendar.json event birthday_bash's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AFeeding_the_Crowd)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3AFeeding_the_Crowd)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 428091: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_feeding_the_crowd_b6c048)."
         }
       ],
       "description_string_id": 428090,
-      "enabled": true
+      "enabled": true,
+      "live_event": "birthday_bash",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 428091
     },
     {
       "id": 3954580,
@@ -13136,10 +13649,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 409947 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Finicky_Felines)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954584,
@@ -13518,11 +14041,31 @@
         {
           "kind": "wiki",
           "evidence": "Forest Friends (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_forest_friends_954cf8)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Forest_Friends)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:Forest_Friends)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429433: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_forest_friends_954cf8)."
         }
       ],
       "description_string_id": 429432,
       "intro_text_string_id": 429430,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 429433
     },
     {
       "id": 3954594,
@@ -13629,12 +14172,22 @@
         {
           "kind": "wiki",
           "evidence": "Funky Fungus (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_funky_fungus_c89b66)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AFunky_Fungus)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
       "description_string_id": 410373,
       "intro_text_string_id": 410371,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954604,
@@ -13803,10 +14356,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 400817 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3AHidden_Treasure) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 400819,
-      "enabled": true
+      "enabled": true,
+      "live_event": "seaside_summer_splash"
     },
     {
       "id": 3954612,
@@ -13873,11 +14431,21 @@
         {
           "kind": "wiki",
           "evidence": "History Comes Alive! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_history_comes_alive_b403a5)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:History_Comes_Alive!)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 15136,
       "intro_text_string_id": 24856,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954617,
@@ -14028,11 +14596,21 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 410103 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Keeping_the_Bears_at_Bay)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 137,
       "description_string_id": 410105,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954642,
@@ -14373,10 +14951,25 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428821 (0.91) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Only_the_Freshest)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:Only_the_Freshest)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 428824: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_only_the_freshest_90c392)."
         }
       ],
       "description_string_id": 428823,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 428824
     },
     {
       "id": 3954675,
@@ -14759,11 +15352,31 @@
         {
           "kind": "wiki",
           "evidence": "Snowman Showdown (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_snowman_showdown_0555d1)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; event_calendar.json event snow_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Snowman_Showdown)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420814: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_snowman_showdown_0555d1)."
         }
       ],
       "description_string_id": 420813,
       "intro_text_string_id": 420811,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 420814
     },
     {
       "id": 3954730,
@@ -15015,10 +15628,30 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 429341 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:The_Great_Scavenger_Hunt)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:The_Great_Scavenger_Hunt)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429344: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_great_scavenger_hunt_02164b)."
         }
       ],
       "description_string_id": 429343,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 429344
     },
     {
       "id": 3954774,
@@ -15530,12 +16163,27 @@
         {
           "kind": "wiki",
           "evidence": "Boom Powder Preparation (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_boom_powder_preparation_78db82)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3ABoom_Powder_Preparation) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ABoom_Powder_Preparation)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 14,
       "description_string_id": 400841,
       "intro_text_string_id": 400839,
-      "enabled": true
+      "enabled": true,
+      "live_event": "seaside_summer_splash",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954823,
@@ -16033,11 +16681,31 @@
         {
           "kind": "wiki",
           "evidence": "Holiday Recital (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_holiday_recital_ccf51b)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; event_calendar.json event snow_days's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AHoliday_Recital)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3AHoliday_Recital)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420724: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_holiday_recital_ccf51b)."
         }
       ],
       "description_string_id": 420723,
       "intro_text_string_id": 420721,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 420724
     },
     {
       "id": 3954923,
@@ -16230,11 +16898,21 @@
         {
           "kind": "wiki",
           "evidence": "Open House Clean-Up (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_open_house_clean_up_0f354e)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AOpen_House_Clean-Up)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 46813,
       "intro_text_string_id": 46813,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3954977,
@@ -16807,11 +17485,31 @@
         {
           "kind": "wiki",
           "evidence": "Toadal Trouble (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toadal_trouble_eb749d)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Toadal_Trouble)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest:Toadal_Trouble)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 415281: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_toadal_trouble_eb749d)."
         }
       ],
       "description_string_id": 415280,
       "intro_text_string_id": 415278,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 415281
     },
     {
       "id": 3955059,
@@ -17202,11 +17900,21 @@
         {
           "kind": "wiki",
           "evidence": "Camp Troubles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; event_calendar.json event summer_camp's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429064: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_camp_troubles_049260)."
         }
       ],
       "description_string_id": 429063,
       "intro_text_string_id": 429061,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "end_text_string_id": 429064
     },
     {
       "id": 3955141,
@@ -18448,6 +19156,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/FR_Quest%3ACook-off_Contest) (scripts/quest_fidelity.py)."
         }
       ],
       "job": 45,
@@ -18455,7 +19167,8 @@
       "intro_text_string_id": 400113,
       "description_string_id": 400115,
       "end_text_string_id": 400116,
-      "min_level": 8
+      "min_level": 8,
+      "live_event": "seaside_summer_splash"
     },
     {
       "id": 3955403,
@@ -19450,7 +20163,28 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 911058,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Alyssa's Spotted Egg (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+                }
+              ]
+            },
+            {
+              "definition_id": 911054,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Egg Coloring Kit (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_eggxtremely_eggcitingly_eggcellent_egg_hunt_3f84a5)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -19472,12 +20206,17 @@
         {
           "kind": "client",
           "evidence": "Text ids from quests.merged.json and the client's numbering around the title, each read against the quest: the block filled earlier held another quest's line."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event spring_eggstravaganza runs; event_calendar.json event spring_eggstravaganza's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 5100006,
       "enabled": true,
       "intro_text_string_id": 5100094,
-      "end_text_string_id": 5100008
+      "end_text_string_id": 5100008,
+      "live_event": "spring_eggstravaganza"
     },
     {
       "id": 3955714,
@@ -19856,11 +20595,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; event_calendar.json event festival_of_hearts's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 427043: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_a_bundle_of_love_c7cd11)."
         }
       ],
       "description_string_id": 427042,
       "intro_text_string_id": 427040,
-      "enabled": true
+      "enabled": true,
+      "live_event": "festival_of_hearts",
+      "end_text_string_id": 427043
     },
     {
       "id": 3955745,
@@ -20069,11 +20818,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 432211,
       "enabled": true,
-      "intro_text_string_id": 432260
+      "intro_text_string_id": 432260,
+      "live_event": "halloween"
     },
     {
       "id": 3955781,
@@ -20273,12 +21027,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; event_calendar.json event festival_of_hearts's quest list (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 427206,
       "intro_text_string_id": 427204,
       "enabled": true,
-      "end_text_string_id": 427207
+      "end_text_string_id": 427207,
+      "live_event": "festival_of_hearts"
     },
     {
       "id": 3955806,
@@ -21197,11 +21956,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; event_calendar.json event halloween's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 432274: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_howl_of_hunger_c7899a)."
         }
       ],
       "description_string_id": 432273,
       "intro_text_string_id": 432271,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "end_text_string_id": 432274
     },
     {
       "id": 3955860,
@@ -21644,11 +22413,31 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; event_calendar.json event festival_of_hearts's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3APetal_Picker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3APetal_Picker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 426992: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_petal_picker_86c2f1)."
         }
       ],
       "description_string_id": 426991,
       "intro_text_string_id": 426989,
-      "enabled": true
+      "enabled": true,
+      "live_event": "festival_of_hearts",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 426992
     },
     {
       "id": 3955891,
@@ -21965,10 +22754,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 427045 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; event_calendar.json event festival_of_hearts's quest list (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 427048: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_potion_testing_version_6_0_50cfd1)."
         }
       ],
       "description_string_id": 427047,
-      "enabled": true
+      "enabled": true,
+      "live_event": "festival_of_hearts",
+      "end_text_string_id": 427048
     },
     {
       "id": 3955903,
@@ -23515,11 +24314,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 438463: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_defending_the_glade_1b16af)."
         }
       ],
       "description_string_id": 438462,
       "intro_text_string_id": 438460,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 438463
     },
     {
       "id": 3956052,
@@ -23801,11 +24605,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; the wiki files it under 'Snow Days' (https://fr.fanbyte.com/wiki/FR_Quest%3AGuarding_the_Gifting_Tree) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420475: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_guarding_the_gifting_tree_71c43f)."
         }
       ],
       "description_string_id": 420281,
       "intro_text_string_id": 420279,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 420475
     },
     {
       "id": 3956060,
@@ -23890,11 +24704,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; the wiki files it under 'Snow Days' (https://fr.fanbyte.com/wiki/FR_Quest%3AHoliday_Cheer) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420274: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_holiday_cheer_aa9e9a)."
         }
       ],
       "description_string_id": 420273,
       "intro_text_string_id": 420271,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 420274
     },
     {
       "id": 3956066,
@@ -24213,11 +25037,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 424933: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_launching_the_distance_c18e27)."
         }
       ],
       "description_string_id": 424932,
       "intro_text_string_id": 424930,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 424933
     },
     {
       "id": 3956080,
@@ -24927,11 +25756,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; the wiki files it under 'Snow Days' (https://fr.fanbyte.com/wiki/FR_Quest%3ASilversnow%27s_Sapling) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420414: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_silversnow_s_sapling_d120b8)."
         }
       ],
       "description_string_id": 420277,
       "intro_text_string_id": 420275,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 420414
     },
     {
       "id": 3956132,
@@ -25382,11 +26221,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event snow_days runs; the wiki files it under 'Snow Days' (https://fr.fanbyte.com/wiki/fr_quest:The_Perfect_Disguise) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 420557: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_the_perfect_disguise_4ee3f9)."
         }
       ],
       "description_string_id": 420285,
       "intro_text_string_id": 420283,
-      "enabled": true
+      "enabled": true,
+      "live_event": "snow_days",
+      "end_text_string_id": 420557
     },
     {
       "id": 3956165,
@@ -25660,12 +26509,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 415317: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest%3AA_Formal_Report) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 415316,
       "intro_text_string_id": 415314,
       "enabled": true,
-      "end_text_string_id": 415317
+      "end_text_string_id": 415317,
+      "live_event": "halloween"
     },
     {
       "id": 3957007,
@@ -25756,11 +26610,26 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the wiki offer line matches client id 428033 (0.89) (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event birthday_bash runs; the wiki files it under 'Birthday Bash' (https://fr.fanbyte.com/wiki/FR_Quest%3AA_Piece_of_Cake) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AA_Piece_of_Cake)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest%3AA_Piece_of_Cake)."
         }
       ],
       "description_string_id": 428035,
       "enabled": true,
-      "end_text_string_id": 428036
+      "end_text_string_id": 428036,
+      "live_event": "birthday_bash",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957009,
@@ -25841,12 +26710,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 415321: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest%3AA_Trip_to_the_Swamp) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 415320,
       "intro_text_string_id": 415318,
       "enabled": true,
-      "end_text_string_id": 415321
+      "end_text_string_id": 415321,
+      "live_event": "halloween"
     },
     {
       "id": 3957017,
@@ -25946,12 +26820,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 415305: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest%3ABag_Snatchers) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 415304,
       "intro_text_string_id": 415302,
       "enabled": true,
-      "end_text_string_id": 415305
+      "end_text_string_id": 415305,
+      "live_event": "halloween"
     },
     {
       "id": 3957022,
@@ -26108,12 +26987,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 428083: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event birthday_bash runs; the wiki files it under 'Birthday Bash' (https://fr.fanbyte.com/wiki/FR_Quest:Birthday_Cake_Bake-off) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 428082,
       "intro_text_string_id": 428080,
       "enabled": true,
-      "end_text_string_id": 428083
+      "end_text_string_id": 428083,
+      "live_event": "birthday_bash"
     },
     {
       "id": 3957028,
@@ -26398,12 +27282,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 415313: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest%3ACandy_Gram) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 415312,
       "intro_text_string_id": 415310,
       "enabled": true,
-      "end_text_string_id": 415313
+      "end_text_string_id": 415313,
+      "live_event": "halloween"
     },
     {
       "id": 3957041,
@@ -26569,12 +27458,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 432224: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest:First_Bite) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 432223,
       "intro_text_string_id": 432221,
       "enabled": true,
-      "end_text_string_id": 432224
+      "end_text_string_id": 432224,
+      "live_event": "halloween"
     },
     {
       "id": 3957090,
@@ -26776,12 +27670,27 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 415349: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/fr_quest%3AGhostly_Games) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AGhostly_Games)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/fr_quest%3AGhostly_Games)."
         }
       ],
       "description_string_id": 415348,
       "intro_text_string_id": 415346,
       "enabled": true,
-      "end_text_string_id": 415349
+      "end_text_string_id": 415349,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957105,
@@ -26840,11 +27749,28 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/fr_quest%3AHalloween_Fanatic) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Halloween Fanatic 'must complete the Trick-or-Treat quest three times first' (fanbyte Category:Super_Spooktacular, 2013 quest series (lab/references/fanbyte-events-20261111/super_spooktacular.html))."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 416802: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_halloween_fanatic_39c95b)."
         }
       ],
       "description_string_id": 416808,
       "intro_text_string_id": 416801,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween",
+      "prerequisite_completions": {
+        "3957217": 3
+      },
+      "end_text_string_id": 416802
     },
     {
       "id": 3957131,
@@ -27118,12 +28044,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 428711: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event birthday_bash runs; the wiki files it under 'Birthday Bash' (https://fr.fanbyte.com/wiki/FR_Quest%3AMystery_Meat_Mystery) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 428710,
       "intro_text_string_id": 428708,
       "enabled": true,
-      "end_text_string_id": 428711
+      "end_text_string_id": 428711,
+      "live_event": "birthday_bash"
     },
     {
       "id": 3957143,
@@ -27276,12 +28207,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 427119: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; the wiki files it under 'Festival of Hearts' (https://fr.fanbyte.com/wiki/FR_Quest%3AOoey%2C_Gooey_Love) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 427118,
       "intro_text_string_id": 427116,
       "enabled": true,
-      "end_text_string_id": 427119
+      "end_text_string_id": 427119,
+      "live_event": "festival_of_hearts"
     },
     {
       "id": 3957159,
@@ -27404,12 +28340,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 427143: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; the wiki files it under 'Festival of Hearts' (https://fr.fanbyte.com/wiki/FR_Quest%3APotion_Testing%3A_Version_7.0) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 427142,
       "intro_text_string_id": 427140,
       "enabled": true,
-      "end_text_string_id": 427143
+      "end_text_string_id": 427143,
+      "live_event": "festival_of_hearts"
     },
     {
       "id": 3957169,
@@ -27628,12 +28569,27 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 427175: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; the wiki files it under 'Festival of Hearts' (https://fr.fanbyte.com/wiki/FR_Quest:Secret_Admirer) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Secret_Admirer)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:Secret_Admirer)."
         }
       ],
       "description_string_id": 427174,
       "intro_text_string_id": 427172,
       "enabled": true,
-      "end_text_string_id": 427175
+      "end_text_string_id": 427175,
+      "live_event": "festival_of_hearts",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957191,
@@ -27904,12 +28860,27 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 415052: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest:Trick-or-Treat) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Trick-or-Treat)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:Trick-or-Treat)."
         }
       ],
       "description_string_id": 415051,
       "intro_text_string_id": 415049,
       "enabled": true,
-      "end_text_string_id": 415052
+      "end_text_string_id": 415052,
+      "live_event": "halloween",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957219,
@@ -27972,12 +28943,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 428041: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event birthday_bash runs; the wiki files it under 'Birthday Bash' (https://fr.fanbyte.com/wiki/fr_quest:Undelivered_Confections) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 428040,
       "intro_text_string_id": 428038,
       "enabled": true,
-      "end_text_string_id": 428041
+      "end_text_string_id": 428041,
+      "live_event": "birthday_bash"
     },
     {
       "id": 3957222,
@@ -28505,12 +29481,17 @@
         {
           "kind": "client",
           "evidence": "Global.Text end_text_string_id 427147: the strings beside this quest's title in the client's string table, read by eye on 2026-11-10 (the tool pairs a line only when it can match its speaker)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; the wiki files it under 'Festival of Hearts' (https://fr.fanbyte.com/wiki/FR_Quest:Where_is_the_Love%3F) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 427146,
       "intro_text_string_id": 427144,
       "enabled": true,
-      "end_text_string_id": 427147
+      "end_text_string_id": 427147,
+      "live_event": "festival_of_hearts"
     },
     {
       "id": 3957235,
@@ -28802,11 +29783,31 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; the wiki files it under 'Summer Camp' (https://fr.fanbyte.com/wiki/FR_Quest:What's_for_Dinner%3F) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:What's_for_Dinner%3F)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:What's_for_Dinner%3F)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "end_text_string_id 429450: the page's closing line, a client locale id (lab/references/quest-table-20261102/quests.json wiki:fr_quest_what_s_for_dinner_dc9be0)."
         }
       ],
       "description_string_id": 429449,
       "intro_text_string_id": 429447,
-      "enabled": true
+      "enabled": true,
+      "live_event": "summer_camp",
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 429450
     },
     {
       "id": 3957299,
@@ -28886,12 +29887,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ABrawler%3A_Fit_to_Fight)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 43,
       "description_string_id": 73019,
       "intro_text_string_id": 73017,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957300,
@@ -28959,10 +29970,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 73005 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ABrawler%3A_Night_Fights)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 43,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957319,
@@ -29021,11 +30042,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3AChangeling_Bounty)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 74509,
       "intro_text_string_id": 74509,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957335,
@@ -29147,11 +30178,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ACruisin%27_for_a_Bruisin%27)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 24946,
       "intro_text_string_id": 24946,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957357,
@@ -29682,11 +30723,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AReturn_to_Sender)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 46226,
       "intro_text_string_id": 46224,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957507,
@@ -29761,11 +30812,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) 49/1 offer line: the client strings hold none for this quest, so the wiki's offer text (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_royal_honey_18d904) is Global.Text 6200024, a row the launcher adds from data/release/locale-additions.json (ShowQuestStartScreen 0x00a94be0 shows it as QuestNpcIntroTextMessage)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3ARoyal_Honey)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 390489,
       "enabled": true,
-      "end_text_string_id": 390490
+      "end_text_string_id": 390490,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957511,
@@ -29828,11 +30889,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3ARun_off_the_Robgoblins)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 384830,
       "intro_text_string_id": 384830,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957514,
@@ -29998,11 +31069,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event halloween runs; the wiki files it under 'Super Spooktacular' (https://fr.fanbyte.com/wiki/FR_Quest:Spectral_Spectacles) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 415324,
       "intro_text_string_id": 415322,
-      "enabled": true
+      "enabled": true,
+      "live_event": "halloween"
     },
     {
       "id": 3957562,
@@ -30370,11 +31446,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Wands_a_Blazin')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 71407,
       "intro_text_string_id": 71405,
-      "enabled": true
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957622,
@@ -30433,12 +31519,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Who's_the_Boss)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 76116,
       "intro_text_string_id": 76114,
       "enabled": true,
-      "end_text_string_id": 76117
+      "end_text_string_id": 76117,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957715,
@@ -30485,11 +31581,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event twelve_days runs; the wiki files it under 'Snow Days' (https://fr.fanbyte.com/wiki/fr_quest:Day_7:_Snowhill_Racing) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 441103,
       "intro_text_string_id": 441101,
-      "enabled": true
+      "enabled": true,
+      "live_event": "twelve_days"
     },
     {
       "id": 3957750,
@@ -30744,7 +31845,22 @@
       "rewards": [
         {
           "coins": 2,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 29361,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Kitty Checkered Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_purr_fect_secret_b5a0b4)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
