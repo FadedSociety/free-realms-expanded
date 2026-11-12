@@ -261,6 +261,7 @@ impl FishingService {
                 !lure.name.is_empty()
                     && !lure.source.is_empty()
                     && lure.fish.iter().all(|key| species(key).is_some())
+                    && CONTENT.lures.iter().filter(|l| l.item_id == lure.item_id).count() == 1
             })
     }
 
@@ -452,6 +453,20 @@ impl FishingService {
             .ok_or(Error::OutOfOrder)?
             .anchor = anchor;
         Ok(())
+    }
+
+    /// C3: the lure an item puts on the line (`fishing.json` `lures/*/item_id`).
+    pub fn lure_key_for_item(item_id: i32) -> Option<&'static str> {
+        CONTENT
+            .lures
+            .iter()
+            .find(|lure| lure.item_id == item_id)
+            .map(|lure| lure.key.as_str())
+    }
+
+    /// C3: the lure on `guid`'s line, if any.
+    pub fn lure_key(&self, guid: u64) -> Option<&str> {
+        self.sessions.get(&guid)?.lure_key.as_deref()
     }
 
     /// Called by trusted inventory/action-bar code after validating possession.
@@ -2007,6 +2022,8 @@ struct Species {
 #[derive(Deserialize)]
 struct Lure {
     key: String,
+    /// C3: the lure item that puts it on the line; unique.
+    item_id: i32,
     name: String,
     bonus_percent: u32,
     fish: Vec<String>,

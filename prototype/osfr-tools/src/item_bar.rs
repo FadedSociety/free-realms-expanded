@@ -63,7 +63,8 @@ pub mod use_wire;
 use bar_wire::{ActionBarBinding, ActionBarItems, ActionBarSlot, AssignRejection, OwnedAction};
 
 const EFFECTS_FILE: &str = "consumables.json";
-const MAX_EFFECTS_FILE: u64 = 256 * 1024;
+/// (R) Sanity bound: C3's rows took the shipped table past 256 KiB.
+const MAX_EFFECTS_FILE: u64 = 1024 * 1024;
 const MAX_EFFECT_ROWS: usize = 512;
 const MAX_COOLDOWN_MS: u32 = 86_400_000;
 /// (R) OSFR `MinCooldownMs`: the client never shows a shorter recast than this.
@@ -100,7 +101,7 @@ pub struct Effect {
     pub scare: Option<Scare>,
 }
 
-/// The nine row effects. A heal (to health) and a strike (L088, at enemies) are applied by the caller; the aura, transform, scale, boost,
+/// The ten row effects. A heal (to health), a restore (C3, health and energy) and a strike (L088, at enemies) are applied by the caller; the aura, transform, scale, boost,
 /// burst and stat (B1) become a [`consumable_effects::Spec`] the caller applies through the shared effect stack;
 /// a placed cake is put in the world by the host (T557).
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
@@ -169,13 +170,44 @@ pub enum EffectKind {
         at_target: bool,
     },
     /// B1: a minigame buff (Timing, Talent, Matcher's and Maker's stats): character stat
-    /// `stat_id` is `value` for `duration_ms`.
+    /// `stat_id` is `value` for `duration_ms`. C3: or a combat buff or a lure
+    /// (`consumable_effects::Kind::Stat`).
     Stat {
         stat_id: i32,
         value: i32,
         duration_ms: u64,
         icon_id: i32,
     },
+    /// C3: an energy, replenishment or shared potion (or a health potion that shows its cast):
+    /// `health_percent` of maximum health and `energy_percent` of maximum energy, at once or a step
+    /// a second over `over_ms`, with `instant_percent` of each at once first (the wiki's "Instantly
+    /// restores 2 energy"). With `shared`, the user's group in the same place gets the health part
+    /// too (the group-heal route). `cast_effect_id` (0 for none) plays on the user.
+    Restore {
+        #[serde(default)]
+        health_percent: u32,
+        #[serde(default)]
+        energy_percent: u32,
+        #[serde(default)]
+        instant_percent: u32,
+        #[serde(default)]
+        over_ms: u64,
+        #[serde(default)]
+        shared: bool,
+        #[serde(default)]
+        cast_effect_id: i32,
+    },
+}
+
+/// C3: what a [`EffectKind::Restore`] row hands the caller's encounter engine.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Restore {
+    pub health_percent: u32,
+    pub energy_percent: u32,
+    pub instant_percent: u32,
+    pub over_ms: u64,
+    pub shared: bool,
+    pub cast_effect_id: i32,
 }
 
 impl Effect {
@@ -206,6 +238,28 @@ impl Effect {
                         })
                 }
                 EffectKind::PlacedCake { row } => row == self.definition && !self.single_use,
+                EffectKind::Restore {
+                    health_percent,
+                    energy_percent,
+                    instant_percent,
+                    over_ms,
+                    shared,
+                    cast_effect_id,
+                } => {
+                    // The part at once is less than each restored amount, and only over time.
+                    let part = |percent: u32| percent == 0 || instant_percent < percent;
+                    health_percent <= 100
+                        && energy_percent <= 100
+                        && health_percent + energy_percent > 0
+                        && over_ms <= 60_000
+                        && (if over_ms == 0 {
+                            instant_percent == 0
+                        } else {
+                            part(health_percent) && part(energy_percent)
+                        })
+                        && (!shared || health_percent > 0)
+                        && cast_effect_id >= 0
+                }
                 EffectKind::Aura {
                     composite_effect_id,
                     duration_ms,
@@ -311,6 +365,28 @@ impl Effect {
         }
     }
 
+    /// C3: a restore row's amounts.
+    fn restore(&self) -> Option<Restore> {
+        match self.effect {
+            EffectKind::Restore {
+                health_percent,
+                energy_percent,
+                instant_percent,
+                over_ms,
+                shared,
+                cast_effect_id,
+            } => Some(Restore {
+                health_percent,
+                energy_percent,
+                instant_percent,
+                over_ms,
+                shared,
+                cast_effect_id,
+            }),
+            _ => None,
+        }
+    }
+
     /// L085: the rest of a heal over time, `(percent, over_ms)`.
     fn heal_over(&self) -> Option<(u32, u64)> {
         match self.effect {
@@ -331,7 +407,10 @@ impl Effect {
     /// B1: the spec with an `at_target` burst aimed at `aimed` (0: the user).
     fn spec_aimed(&self, aimed: u64) -> Option<consumable_effects::Spec> {
         let (kind, duration_ms, icon_id) = match self.effect {
-            EffectKind::Heal { .. } | EffectKind::PlacedCake { .. } | EffectKind::Strike { .. } => {
+            EffectKind::Heal { .. }
+            | EffectKind::Restore { .. }
+            | EffectKind::PlacedCake { .. }
+            | EffectKind::Strike { .. } => {
                 return None;
             }
             EffectKind::Aura {
@@ -496,7 +575,7 @@ impl Effects {
         let mut bytes = Vec::new();
         file.take(MAX_EFFECTS_FILE + 1).read_to_end(&mut bytes)?;
         if bytes.len() as u64 > MAX_EFFECTS_FILE {
-            return Err(invalid("consumables.json exceeds 256 KiB"));
+            return Err(invalid("consumables.json exceeds 1 MiB"));
         }
         let version: FileVersion = serde_json::from_slice(&bytes).map_err(invalid)?;
         let rows = match version.schema_version {
@@ -619,6 +698,8 @@ pub struct Reply {
     pub heal_percent: u32,
     /// L085: the rest of a heal over time, `(percent, over_ms)`, for the caller's encounter engine.
     pub heal_over: Option<(u32, u64)>,
+    /// C3: the restore row just used, for the caller's encounter engine.
+    pub restore: Option<Restore>,
     /// L088: the battle item just spent, for the caller to throw.
     pub strike: Option<Strike>,
     /// L092: the scare of the row just used, for the caller's encounter engine.
@@ -640,6 +721,7 @@ struct Use {
     replies: Vec<Vec<u8>>,
     heal_percent: u32,
     heal_over: Option<(u32, u64)>,
+    restore: Option<Restore>,
     strike: Option<Strike>,
     scare: Option<Scare>,
     effect: Option<consumable_effects::Spec>,
@@ -942,6 +1024,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     heal_over: used.heal_over,
+                    restore: used.restore,
                     strike: used.strike,
                     scare: used.scare,
                     effect: used.effect,
@@ -1004,6 +1087,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     heal_over: used.heal_over,
+                    restore: used.restore,
                     strike: used.strike,
                     scare: used.scare,
                     effect: used.effect,
@@ -1039,6 +1123,7 @@ impl ItemBar {
         let spent = effect.single_use;
         let heal_percent = effect.heal_percent();
         let heal_over = effect.heal_over();
+        let restore = effect.restore();
         let strike = effect.strike();
         let scare = effect.scare;
         let spec = effect.spec_aimed(aimed);
@@ -1059,6 +1144,7 @@ impl ItemBar {
             replies,
             heal_percent,
             heal_over,
+            restore,
             strike,
             scare,
             effect: spec,
@@ -1116,7 +1202,11 @@ impl ItemBar {
         let Some(effect) = self.effects.get(item.definition_id) else {
             return Ok(());
         };
-        if matches!(effect.effect, EffectKind::Heal { .. }) && !player.can_heal {
+        if matches!(
+            effect.effect,
+            EffectKind::Heal { .. } | EffectKind::Restore { .. }
+        ) && !player.can_heal
+        {
             return Err(Refusal::NotUsable);
         }
         if matches!(effect.effect, EffectKind::Strike { .. }) && !player.can_strike {

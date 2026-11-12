@@ -32,6 +32,66 @@
       "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 11002 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 11002 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146). L085: our client's description 422916 reads 'A potion that restores some of your health over 5 seconds.'; the wiki tooltip (another era) reads 'Instantly heals you for 2% health' and 'Heals you for 11% health/second for 3 seconds' (35% in all). So 35% in all, 2% at once, the rest over our client's 5 seconds (R: the per-second split)."
     },
     {
+      "definition": 30,
+      "name_id": 37108,
+      "description_id": 167,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 40,
+          "over_ms": 15000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion heals over a set amount of time.'; 40% health over 15 s, cast 16324; recast 30 s (BubbaJoeX fork ItemAbilities.json ability 3093). Client item table: Id 30 NameId 37108 DescriptionId 167 ActivatableAbilityId 3093 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 32,
+      "name_id": 172,
+      "description_id": 167,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 55,
+          "over_ms": 15000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion heals over a set amount of time.'; 55% health over 15 s, cast 16324; recast 30 s (BubbaJoeX fork ItemAbilities.json ability 1599). Client item table: Id 32 NameId 172 DescriptionId 167 ActivatableAbilityId 1599 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 34,
+      "name_id": 174,
+      "description_id": 167,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 60,
+          "over_ms": 15000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion heals over a set amount of time.'; 60% health over 15 s, cast 16324; recast 30 s (BubbaJoeX fork ItemAbilities.json ability 1601). Client item table: Id 34 NameId 174 DescriptionId 167 ActivatableAbilityId 1601 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 35,
+      "name_id": 1232,
+      "description_id": 3172,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "scale": {
+          "scale": 1.3,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food increases the health and size of the player.'; scale 1.3 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3264); its +500 MaxHealth has no encounter-engine hook yet, so the size is what shows (R). Client item table: Id 35 NameId 1232 DescriptionId 3172 ActivatableAbilityId 3264 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
       "definition": 36,
       "name_id": 2951,
       "description_id": 2952,
@@ -93,6 +153,66 @@
         }
       },
       "source": "Super Coin Booster: +50% coins (R), the Super Star Booster's wiki percent ('Activatable Effects: + 50% Stars'); the client text 2449 reads 'use this scroll for great luck earning extra money for a while'. Client item table: Id 81 NameId 2443 DescriptionId 2449 Icon 1156 ActivatableAbilityId 206 SingleUse true (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree). Duration 1800000 and cooldown 5000 (R), as the star scroll. P-games-window."
+    },
+    {
+      "definition": 83,
+      "name_id": 2425,
+      "description_id": 2426,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15148,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will cause purple bubbles to appear around the player.'; effect 15148 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1971). Client item table: Id 83 NameId 2425 DescriptionId 2426 ActivatableAbilityId 1971 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 175,
+      "name_id": 3966,
+      "description_id": 7685,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 50,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Health FTW!'; 50% health at once, cast 16324; recast 30 s (BubbaJoeX fork ItemAbilities.json ability 1207). Client item table: Id 175 NameId 3966 DescriptionId 7685 ActivatableAbilityId 1207 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 176,
+      "name_id": 3968,
+      "description_id": 7684,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 50,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Revitalizes your mana.'; 50% energy at once, cast 16325; recast 30 s (BubbaJoeX fork ItemAbilities.json ability 1208). Client item table: Id 176 NameId 3968 DescriptionId 7684 ActivatableAbilityId 1208 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 213,
+      "name_id": 4125,
+      "description_id": 4126,
+      "cooldown_ms": 120000,
+      "single_use": false,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15049,
+          "duration_ms": 60000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'increasing run speed for 60 seconds ... slowly refills itself'; effect 15049 PFX_beam_red_feet_speed-run_loop for 60 s and a 2 minute refill (BubbaJoeX fork ItemAbilities.json ability 250); the +4 m/s run speed is not applied (R: stat 2 belongs to the ride, as for the Gingerbread Cookie). Client item table: Id 213 NameId 4125 DescriptionId 4126 ActivatableAbilityId 250 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 120000 ms (R)."
     },
     {
       "definition": 306,
@@ -167,6 +287,144 @@
       "source": "Wiki: the Spook Sphere tooltip reads 'A magical orb that transforms the player into a frightful creature.' and 'Illusion: Mauthedog - 30 minutes' (no flee is named, so no scare); Cannot Sell, Cannot Trade. (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 896 NameId 2822 DescriptionId 2827 Icon 2587 ActivatableAbilityId 227 SingleUse true). Model 175 mauthedog.adr with poof 21 PFX_smoke_black_explosion and buff icon 3843, as the existing Mauthe Dog transform rows. (R): the 30-minute recast, as the other 30-minute transforms. L092."
     },
     {
+      "definition": 1146,
+      "name_id": 3978,
+      "description_id": 3979,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 1,
+          "value": 712,
+          "duration_ms": 1800000,
+          "icon_id": 4065
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Carton of milk that boosts your health when consumed.'; fandom wiki Whole Milk Carton 'increases your health by 712 in combat', the max-health foods' line (Honey Roasted Moonbean's too): MaxHealth +712 for 30 minutes (R: the food length); the buff row shows, the encounter engine has no max-health bonus yet. Client item table: Id 1146 NameId 3978 DescriptionId 3979 ActivatableAbilityId 235 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1147,
+      "name_id": 3980,
+      "description_id": 3981,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 4063
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Carton of low fat milk that temporarily increases your timing as a Blacksmith, Chef, Miner, and Postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 236). Client item table: Id 1147 NameId 3980 DescriptionId 3981 ActivatableAbilityId 236 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1148,
+      "name_id": 3982,
+      "description_id": 3983,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 4064
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Carton of non-fat milk that temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 237). Client item table: Id 1148 NameId 3982 DescriptionId 3983 ActivatableAbilityId 237 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1167,
+      "name_id": 395522,
+      "description_id": 395529,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15658,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a red pinwheel firework into the air.'; effect 15658 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4068). Client item table: Id 1167 NameId 395522 DescriptionId 395529 ActivatableAbilityId 4068 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1168,
+      "name_id": 395523,
+      "description_id": 395530,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15659,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a green pinwheel firework into the air.'; effect 15659 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4069). Client item table: Id 1168 NameId 395523 DescriptionId 395530 ActivatableAbilityId 4069 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1169,
+      "name_id": 395524,
+      "description_id": 395531,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15660,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a purple pinwheel firework into the air.'; effect 15660 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4070). Client item table: Id 1169 NameId 395524 DescriptionId 395531 ActivatableAbilityId 4070 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1194,
+      "name_id": 6277,
+      "description_id": 426702,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1031
+        }
+      },
+      "source": "C3 item_behaviour: item text 'All you need to do now is shuffle!'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 228). Client item table: Id 1194 NameId 6277 DescriptionId 426702 ActivatableAbilityId 228 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1195,
+      "name_id": 6278,
+      "description_id": 6282,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1241
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Now made with real corn!'; ability 232 has no fork row; Talent +2 for 30 minutes (R: Sparkling Corn on the Cob shares ability 232 and its text reads 'increases your talent'). Client item table: Id 1195 NameId 6278 DescriptionId 6282 ActivatableAbilityId 232 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 1196,
+      "name_id": 6279,
+      "description_id": 6283,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 35,
+          "instant_percent": 2,
+          "over_ms": 3000,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some energy upon consumption.'; fandom wiki Wheeler Energy Potion 'Restores 11 energy/second for 3 seconds. Instantly restores 2 energy.': 35 of max energy 100, 2 at once and the rest over the wiki's 3 s (the item text gives no length); cast 16325 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4694, R). Client item table: Id 1196 NameId 6279 DescriptionId 6283 ActivatableAbilityId 4694 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
       "definition": 1197,
       "name_id": 6280,
       "description_id": 6284,
@@ -178,6 +436,52 @@
         }
       },
       "source": "Wiki: the Wheeler Frag Orb tooltip reads 'Deals 254 damage.'; it shares the Frag Orb's ability 1644. (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 1197 NameId 6280 DescriptionId 6284 Icon 1904 ActivatableAbilityId 1644 SingleUse true). Damage is the tier-1 value; the engine scales it by the job level's tier (x1.75 at levels 4/8/12/16) like every hit. (R): the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 1914,
+      "name_id": 4143,
+      "description_id": 4538,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "stat": {
+          "stat_id": 18,
+          "value": 50,
+          "duration_ms": 30000,
+          "icon_id": 5914
+        }
+      },
+      "source": "C3 item_behaviour: item text 'reduces the damage you take from opponents for 30 seconds ... will slowly refill itself'; fandom wiki Darkthorne's Embrace 'Increases damage reduction by 50%' and 'a cool down period of one hour': 50% less damage taken for 30 s, recast one hour. Client item table: Id 1914 NameId 4143 DescriptionId 4538 ActivatableAbilityId 264 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 3600000 ms (R)."
+    },
+    {
+      "definition": 2265,
+      "name_id": 23304,
+      "description_id": 389011,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 5376,
+          "duration_ms": 3000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Caution!: Extremely Potent.'; effect 5376 for 3 s (R: the fork plays it once) (BubbaJoeX fork ItemAbilities.json ability 1932). Client item table: Id 2265 NameId 23304 DescriptionId 389011 ActivatableAbilityId 1932 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 2271,
+      "name_id": 401076,
+      "description_id": 401511,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 35,
+          "instant_percent": 2,
+          "over_ms": 3000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this pizza will heal you.'; fandom wiki Mushroom Pizza Slice 'Heals you for 11% health/second for 3 seconds. Instantly heals you for 2% health.': 35%, 2% at once, the rest over 3 s; cast 16324; recast 10 s (R: the Small Health Potion 2173's). Client item table: Id 2271 NameId 401076 DescriptionId 401511 ActivatableAbilityId 4696 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
     },
     {
       "definition": 2466,
@@ -210,6 +514,382 @@
         }
       },
       "source": "B1 festival_of_hearts: effect 16487 PFX_rose-petals_dark-purple_falling_med_cylinder, 30 s (R, BubbaJoeX fork ItemAbilities.json ability 5158). Client item table: Id 2467 NameId 8014 DescriptionId 1114 ActivatableAbilityId 5158 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2580,
+      "name_id": 1929,
+      "description_id": 1952,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 29,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this cookie makes you batty.'; fandom wiki Batwing Cookie card 1L54 'Creates the illusion that you are a shrieker for 15 minutes.'; model 29 screecher_01.adr (R: the card's shrieker; the fork's bat 28 bat_01.adr is the other bat; check in model-view). Client item table: Id 2580 NameId 1929 DescriptionId 1952 ActivatableAbilityId 1913 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2581,
+      "name_id": 1930,
+      "description_id": 1953,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 212,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Chicken Feed Brand Soup... It'll make you feel younger!'; fandom wiki Chicken Feed card 'Creates the illusion that you are a baby chick for 15 minutes.'; model 212 chick.adr (BubbaJoeX fork ItemAbilities.json ability 1914). Client item table: Id 2581 NameId 1930 DescriptionId 1953 ActivatableAbilityId 1914 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2582,
+      "name_id": 1931,
+      "description_id": 1954,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "scale": {
+          "scale": 0.5,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this cupcake makes the world get bigger.'; fandom wiki Cupcake of Tim the Tiny card 1L63 'Eating this cupcake will make you tiny like Tim for 15 minutes.'; scale 0.5 (R, BubbaJoeX fork ItemAbilities.json ability 1915). Client item table: Id 2582 NameId 1931 DescriptionId 1954 ActivatableAbilityId 1915 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2585,
+      "name_id": 1934,
+      "description_id": 1957,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 47,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This cold magical treat reminds you of penguins.'; fandom wiki Ice Cream Sandwich card 1L59 'Creates the illusion that you are a baby penguin for 15 minutes.'; model 47 penguin_baby_01.adr (the fork's 16 is the grown penguin). Client item table: Id 2585 NameId 1934 DescriptionId 1957 ActivatableAbilityId 1918 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2586,
+      "name_id": 1935,
+      "description_id": 1958,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 1669,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this candy makes you feel like jumping.'; fandom wiki Lilipad Lollipop card 1L75 'Creates the illusion that you are a frog for 15 minutes.'; model 1669 toad_purple.adr, which Models.txt describes as 'Purple toad duplicate for a tcg item' (B1's frog 2959 is toad.adr 141; check in model-view). Client item table: Id 2586 NameId 1935 DescriptionId 1958 ActivatableAbilityId 1919 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2589,
+      "name_id": 1938,
+      "description_id": 1961,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 4,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'You'll feel funny after eating this apple...'; fandom wiki Goblin Smith Apple card 1L67 'Creates the illusion that you are a robgoblin for 15 minutes.'; model 4 robgoblin_m_basic.adr (BubbaJoeX fork ItemAbilities.json ability 1922). Client item table: Id 2589 NameId 1938 DescriptionId 1961 ActivatableAbilityId 1922 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2590,
+      "name_id": 1939,
+      "description_id": 1962,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 199,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Thugawugs love to burgle burgers.'; fandom wiki Bandit Burger card 1L53 'Creates the illusion that you are a thugawug for 15 minutes.'; model 199 chugawug_m_bandit_01.adr (BubbaJoeX fork ItemAbilities.json ability 1923). Client item table: Id 2590 NameId 1939 DescriptionId 1962 ActivatableAbilityId 1923 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2591,
+      "name_id": 422911,
+      "description_id": 422916,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 75,
+          "over_ms": 5000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your health over 5 seconds.'; fandom wiki Large Health Potion 'Heals you for 25% health/second for 3 seconds.': 75% over our client's 5 s; cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4698, R). Client item table: Id 2591 NameId 422911 DescriptionId 422916 ActivatableAbilityId 4698 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 2592,
+      "name_id": 422908,
+      "description_id": 422915,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 50,
+          "instant_percent": 2,
+          "over_ms": 5000,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your energy over 5 seconds.'; fandom wiki Large Energy Potion 'Restores 16 energy/second for 3 seconds. Instantly restores 2 energy.': 50, 2 at once, the rest over our client's 5 s; cast 16325 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4695, R). Client item table: Id 2592 NameId 422908 DescriptionId 422915 ActivatableAbilityId 4695 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 2593,
+      "name_id": 422914,
+      "description_id": 422917,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 75,
+          "energy_percent": 50,
+          "cast_effect_id": 16326
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your health and energy instantly.'; fandom wiki Large Replenishment Potion 'Instantly restores 50 energy. Instantly heals you for 75% health.'; cast 16326 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4701, R). Client item table: Id 2593 NameId 422914 DescriptionId 422917 ActivatableAbilityId 4701 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 2595,
+      "name_id": 1943,
+      "description_id": 1967,
+      "cooldown_ms": 1800000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 187,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A 'Qualitee' Robgoblin disguise.'; model 187 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1927). Client item table: Id 2595 NameId 1943 DescriptionId 1967 ActivatableAbilityId 1927 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2596,
+      "name_id": 1944,
+      "description_id": 1968,
+      "cooldown_ms": 1800000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 88,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A 'Qualitee' Plant disguise.'; model 88 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1928). Client item table: Id 2596 NameId 1944 DescriptionId 1968 ActivatableAbilityId 1928 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2598,
+      "name_id": 1946,
+      "description_id": 1970,
+      "cooldown_ms": 1800000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 47,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A 'Qualitee' Baby Penguin disguise.'; model 47 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1930). Client item table: Id 2598 NameId 1946 DescriptionId 1970 ActivatableAbilityId 1930 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2602,
+      "name_id": 1950,
+      "description_id": 1974,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15459,
+          "duration_ms": 900000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This magical candy fills you with love.'; fandom wiki Heart Candy card 1L58 'Causes hearts to float from your head for 15 minutes.'; effect 15459 (BubbaJoeX fork ItemAbilities.json ability 1934). Client item table: Id 2602 NameId 1950 DescriptionId 1974 ActivatableAbilityId 1934 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2646,
+      "name_id": 11437,
+      "description_id": 11497,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15362,
+          "duration_ms": 900000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Open the bottle to let out the butterflies!'; fandom wiki Bottle of Butterflies card 1L56 'they will fly around you for 15 minutes'; effect 15362 PFX_butterflies_swirl (R: the Butterfly Swirls Potion's loop; the fork's one-shot 5456 flies away). Client item table: Id 2646 NameId 11437 DescriptionId 11497 ActivatableAbilityId 3790 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2654,
+      "name_id": 11445,
+      "description_id": 11505,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "coins",
+          "percent": 100,
+          "duration_ms": 7200000,
+          "icon_id": 1156
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Feeling lucky?  Read this scroll to increase your fortune!'; fandom wiki Crazy Coin Scroll card 1L61 'Increases coin rewards by 100% for two hours.'; recast 5 s (R, the L087 boosters'). Client item table: Id 2654 NameId 11445 DescriptionId 11505 ActivatableAbilityId 223 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 2655,
+      "name_id": 11445,
+      "description_id": 11506,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "coins",
+          "percent": 100,
+          "duration_ms": 7200000,
+          "icon_id": 1156
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Feeling lucky? Read this scroll to increase your fortune!'; fandom wiki Crazy Coin Scroll card 1L61 'Increases coin rewards by 100% for two hours.'; recast 5 s (R, the L087 boosters'). Client item table: Id 2655 NameId 11445 DescriptionId 11506 ActivatableAbilityId 223 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 2656,
+      "name_id": 11447,
+      "description_id": 11507,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15531,
+          "duration_ms": 900000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'It feels like spring time.'; fandom wiki Crimson Rose card 1L62 'Causes rose petals to follow your footsteps for 15 minutes.'; effect 15531 PFX_rose_petal_trail_feet (BubbaJoeX fork ItemAbilities.json ability 224). Client item table: Id 2656 NameId 11447 DescriptionId 11507 ActivatableAbilityId 224 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
+    },
+    {
+      "definition": 2659,
+      "name_id": 11450,
+      "description_id": 11510,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "stars",
+          "percent": 100,
+          "duration_ms": 7200000,
+          "icon_id": 1157
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Learning just got a little bit easier.'; fandom wiki Super Star Scroll card 1L98 'Increases your experience by 100% for two hours.'; recast 5 s (R, the L087 boosters'). Client item table: Id 2659 NameId 11450 DescriptionId 11510 ActivatableAbilityId 222 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 2660,
+      "name_id": 11450,
+      "description_id": 11510,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "stars",
+          "percent": 100,
+          "duration_ms": 7200000,
+          "icon_id": 1157
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Learning just got a little bit easier.'; fandom wiki Super Star Scroll card 1L98 'Increases your experience by 100% for two hours.'; recast 5 s (R, the L087 boosters'). Client item table: Id 2660 NameId 11450 DescriptionId 11510 ActivatableAbilityId 222 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 2675,
+      "name_id": 1940,
+      "description_id": 11526,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 45,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This jumbo potion restores a large portion of your health.'; no wiki page: 45% at once (R: the Jumbo Energy Potion's wiki 42% - 47%); cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 230, R). Client item table: Id 2675 NameId 1940 DescriptionId 11526 ActivatableAbilityId 230 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 2676,
+      "name_id": 1941,
+      "description_id": 11527,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 45,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This jumbo potion restores a large portion of your energy.'; fandom wiki Jumbo Energy Potion 'Restores up to 42% - 47% of your energy.': 45 at once (R: within the wiki's range); cast 16325 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 229, R). Client item table: Id 2676 NameId 1941 DescriptionId 11527 ActivatableAbilityId 229 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 2677,
+      "name_id": 1942,
+      "description_id": 11528,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 20,
+          "energy_percent": 20,
+          "cast_effect_id": 16326
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This jumbo potion restores a large portion of your health and energy.'; fandom wiki Jumbo Replenishing Potion 'Restores up to 19% - 21% of your energy. Heals up to 19% - 21% of your health.': 20 and 20 at once (R: within the range); cast 16326 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 231, R). Client item table: Id 2677 NameId 1942 DescriptionId 11528 ActivatableAbilityId 231 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 2697,
+      "name_id": 11488,
+      "description_id": 11548,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5568,
+          "duration_ms": 900000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'You're in the spotlight now!'; fandom wiki Superstar Spotlight card 1L99 'Directs the spotlight at you for 15 minutes.'; effect 5568 PFX_light_white_root_god-beam_sm_loop (BubbaJoeX fork ItemAbilities.json ability 3794). Client item table: Id 2697 NameId 11488 DescriptionId 11548 ActivatableAbilityId 3794 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
     },
     {
       "definition": 2939,
@@ -324,6 +1004,22 @@
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1983 (Warthog); item 2954 ActivatableAbilityId 1983 (Legacy@9e08202 ClientItemDefinitions Id 2954 NameId 249 DescriptionId 3121 SingleUse true); model 139 warthog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 2956,
+      "name_id": 251,
+      "description_id": 2721,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 219,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will temporarily change the player into a Bixie.'; model 219 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1981). Client item table: Id 2956 NameId 251 DescriptionId 2721 ActivatableAbilityId 1981 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
       "definition": 2957,
       "name_id": 252,
       "description_id": 2717,
@@ -388,6 +1084,22 @@
       "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 2004 (Steaming Pretzels); item 2963 ActivatableAbilityId 2004 (Legacy@9e08202 ClientItemDefinitions Id 2963 NameId 258 DescriptionId 2703 SingleUse true); effect 5698 WFX_fire_orange_loop; duration locale 2703: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 2964,
+      "name_id": 259,
+      "description_id": 2708,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15891,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will cause a storm to appear around the player for thirty minutes.'; effect 15891 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1974). Client item table: Id 2964 NameId 259 DescriptionId 2708 ActivatableAbilityId 1974 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
       "definition": 2965,
       "name_id": 260,
       "description_id": 2699,
@@ -402,6 +1114,22 @@
         }
       },
       "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1973 (Scrumptious Soup); item 2965 ActivatableAbilityId 1973 (Legacy@9e08202 ClientItemDefinitions Id 2965 NameId 260 DescriptionId 2699 SingleUse true); effect 16471 PFX_hearts_red_up_skel_loop; duration locale 2699: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2966,
+      "name_id": 261,
+      "description_id": 2694,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 47,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will cause blue lightning to appear around the player for thirty minutes.'; effect 47 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1972). Client item table: Id 2966 NameId 261 DescriptionId 2694 ActivatableAbilityId 1972 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
     },
     {
       "definition": 2968,
@@ -676,6 +1404,19 @@
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 2031 (Wolf); item 3006 ActivatableAbilityId 2031 (Legacy@9e08202 ClientItemDefinitions Id 3006 NameId 242 DescriptionId 3153 SingleUse true); model 176 wolf.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3153: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 3007,
+      "name_id": 16149,
+      "description_id": 16150,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 3007
+        }
+      },
+      "source": "C3 item_behaviour: item text 'If it be cake you want, you've come to the right place.'; prop 2115 mkt_cakes_pirate_01.adr; a click turns the clicker into a pirate skeleton 2121 skeleton_m_pirate.adr for 30 minutes (R: 'cursed booty', the regional birthday cakes' length). Client item table: Id 3007 NameId 16149 DescriptionId 16150 ActivatableAbilityId 318 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
       "definition": 3011,
       "name_id": 36525,
       "description_id": 9164,
@@ -716,6 +1457,38 @@
         }
       },
       "source": "Wiki: the Flabbergast Sphere tooltip reads 'Stuns all targets caught in the blast.'; Coin Shop, 50 coins (the client cost 50). No time is given: the Flabbergast Orb's 5 s (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3015 NameId 36523 DescriptionId 9166 Icon 1899 ActivatableAbilityId 5294 SingleUse true). (R): the 10 m blast (our Flame Wave power-up's radius), the 20 m throw (the Wizard's reach), the 10 s recast (the BubbaJoeX fork's orb cooldown). L088."
+    },
+    {
+      "definition": 3021,
+      "name_id": 422910,
+      "description_id": 422916,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 50,
+          "instant_percent": 2,
+          "over_ms": 5000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your health over 5 seconds.'; fandom wiki Medium Health Potion 'Heals you for 16% health/second for 3 seconds. Instantly heals you for 2% health.': 50%, 2% at once, the rest over our client's 5 s; cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4697, R). Client item table: Id 3021 NameId 422910 DescriptionId 422916 ActivatableAbilityId 4697 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 3023,
+      "name_id": 422907,
+      "description_id": 422915,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 35,
+          "instant_percent": 2,
+          "over_ms": 5000,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your energy over 5 seconds.'; fandom wiki Medium Energy Potion 'Restores 11 energy/second for 3 seconds. Instantly restores 2 energy.': 35 of max energy 100, 2 at once, the rest over our client's 5 s; cast 16325 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4694, R). Client item table: Id 3023 NameId 422907 DescriptionId 422915 ActivatableAbilityId 4694 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
     },
     {
       "definition": 3025,
@@ -759,17 +1532,34 @@
       "source": "Wiki: the Blast Sphere page and tooltip read 'Knocks back all targets caught in the blast.' (Coin Shop, 50 coins; the client cost 50). No distance is given: the Blast Orb's 6 yd, and a 10 m blast (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 3074 NameId 37409 DescriptionId 9167 Icon 1887 ActivatableAbilityId 5307 SingleUse true). 6 yd is 5.5 m. The push lands on the ground facing the thrower and holds the enemy 2 s with the client's com_knock_down clip 1402 (AnimationTypes.xml); a push off the terrain does not move it (R). (R): the 20 m throw, the 10 s recast (as L088). L091."
     },
     {
+      "definition": 3082,
+      "name_id": 422912,
+      "description_id": 422917,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 25,
+          "energy_percent": 20,
+          "cast_effect_id": 16326
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your health and energy instantly.'; no wiki page: 25% health and 20 energy (R: below the Medium Replenishment Potion's wiki 50% and 35 and the Large's 75% and 50); cast 16326 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4699, R). Client item table: Id 3082 NameId 422912 DescriptionId 422917 ActivatableAbilityId 4699 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
       "definition": 3084,
       "name_id": 422913,
       "description_id": 422917,
       "cooldown_ms": 30000,
       "single_use": true,
       "effect": {
-        "heal": {
-          "percent": 50
+        "restore": {
+          "health_percent": 50,
+          "energy_percent": 35,
+          "cast_effect_id": 16326
         }
       },
-      "source": "B1 codes: item text 'restores some of your health and energy instantly'; 50% health and a 30 s recast (R, BubbaJoeX fork ItemAbilities.json ability 4700); the energy half is not applied. Client item table: Id 3084 NameId 422913 DescriptionId 422917 ActivatableAbilityId 4700 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+      "source": "B1 codes: item text 'restores some of your health and energy instantly'; fandom wiki Medium Replenishment Potion 'Instantly restores 35 energy. Instantly heals you for 50% health.' (C3); cast 16326 and a 30 s recast (R, BubbaJoeX fork ItemAbilities.json ability 4700). Client item table: Id 3084 NameId 422913 DescriptionId 422917 ActivatableAbilityId 4700 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
     },
     {
       "definition": 3087,
@@ -815,6 +1605,20 @@
       "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 660 (Can of Beans); item 3991 ActivatableAbilityId 660 (Legacy@9e08202 ClientItemDefinitions Id 3991 NameId 3967 DescriptionId 3971 SingleUse true); effect 5343 PFX_smoke_green_pelvis_fart-m; duration 1800000 (R) OSFR default; cooldown 1800000 (R, OSFR #125); EffectDelayMs 300; QuickChatId 3340 ignored; the effect is not a loop, so it plays once (R); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 3992,
+      "name_id": 391690,
+      "description_id": 391691,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15729,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Launches fireworks into the sky!'; effect 15729 for 10 s (R: the fork plays it once) (BubbaJoeX fork ItemAbilities.json ability 3955). Client item table: Id 3992 NameId 391690 DescriptionId 391691 ActivatableAbilityId 3955 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
       "definition": 3993,
       "name_id": 411119,
       "description_id": 411118,
@@ -829,6 +1633,21 @@
         }
       },
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3058 (Snake); item 3993 ActivatableAbilityId 3058 (Legacy@9e08202 ClientItemDefinitions Id 3993 NameId 411119 DescriptionId 411118 SingleUse true); model 180 snake.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 3995,
+      "name_id": 413440,
+      "description_id": 413441,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 75,
+          "over_ms": 3000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A huge potion that heals lots of health.'; fandom wiki Ginormous Health Potion 'Heals you for 25% health/second for 3 seconds.': 75% over 3 s; cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4698, R). Client item table: Id 3995 NameId 413440 DescriptionId 413441 ActivatableAbilityId 4698 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
     },
     {
       "definition": 4001,
@@ -1727,6 +2546,19 @@
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3072 (Necro Wart Zombie); item 4072 ActivatableAbilityId 3072 (Legacy@9e08202 ClientItemDefinitions Id 4072 NameId 1231 DescriptionId 3118 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3118: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 4829,
+      "name_id": 5664,
+      "description_id": 5666,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 4829
+        }
+      },
+      "source": "C3 item_behaviour: item text 'It's full of birthday party supplies! Place this crate on the ground to get the party started.'; prop 1836 hsg_crate_01.adr and its fireworks 16517, 16516 and 16441 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 4829); a click sets one off on the clicker for 10 s (R); the balloons it hands out are not wired. Client item table: Id 4829 NameId 5664 DescriptionId 5666 ActivatableAbilityId 344 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
       "definition": 7966,
       "name_id": 9392,
       "description_id": 30110,
@@ -1892,6 +2724,19 @@
       "source": "B1 summer_camp: fanbyte Bucket_of_Bouncing_Bait 'transforms you into a fish' (unlimited use); client locale 17043 'Illusion: Flopping Fish - 5 minutes'; model 418 fish.adr. Client item table: Id 9295 NameId 17037 DescriptionId 17038 ActivatableAbilityId 362 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 300000 ms, the effect length (R)."
     },
     {
+      "definition": 9296,
+      "name_id": 17039,
+      "description_id": 17040,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 9296
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Look out!  Once sand gets in everything, people start to get crabby!'; prop 1066 mkt_sandcastle_01.adr; a click turns the clicker into a crab 1667 crab_m_basic.adr for 15 minutes (R: the Crustay Ocean Cake's crab and length). Client item table: Id 9296 NameId 17039 DescriptionId 17040 ActivatableAbilityId 363 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
       "definition": 10433,
       "name_id": 6628,
       "description_id": 6629,
@@ -1978,6 +2823,22 @@
       "source": "Wiki: the Blast Sphere page and tooltip read 'Knocks back all targets caught in the blast.' (Coin Shop, 50 coins; the client cost 50). No distance is given: the Blast Orb's 6 yd, and a 10 m blast (R). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 10520 NameId 37409 DescriptionId 9167 Icon 1887 ActivatableAbilityId 5307 SingleUse true). 6 yd is 5.5 m. The push lands on the ground facing the thrower and holds the enemy 2 s with the client's com_knock_down clip 1402 (AnimationTypes.xml); a push off the terrain does not move it (R). (R): the 20 m throw, the 10 s recast (as L088). L091."
     },
     {
+      "definition": 11005,
+      "name_id": 422906,
+      "description_id": 422915,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 20,
+          "instant_percent": 2,
+          "over_ms": 5000,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your energy over 5 seconds.'; no wiki page: 20, 2 at once (R: one step below the Medium Energy Potion's wiki 35, as the Large is one above at 50), over our client's 5 s; cast 16325 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4693, R). Client item table: Id 11005 NameId 422906 DescriptionId 422915 ActivatableAbilityId 4693 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
       "definition": 11008,
       "name_id": 20441,
       "description_id": 20438,
@@ -2046,6 +2907,19 @@
       "source": "B1 summer_camp: fanbyte Tasty_Marshmallow 'Illusion: Marshmallow - 2 minutes' (client locale 5048); model 2194 marshmallow_critter.adr. Client item table: Id 15896 NameId 5353 DescriptionId 5354 ActivatableAbilityId 342 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 120000 ms, the effect length (R)."
     },
     {
+      "definition": 15915,
+      "name_id": 394790,
+      "description_id": 395153,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 15915
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Dazzle your friends and wake your neighbors with this box of explosive fun!'; prop 1836 hsg_crate_01.adr; Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 15915 sets off 15656, 15657, 15658, 15661, 15664, 15717, 15727, 15729 and 15731; a click sets one of the first eight off on the clicker for 10 s (R: eight outcomes is the table's cap). Client item table: Id 15915 NameId 394790 DescriptionId 395153 ActivatableAbilityId 4009 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
       "definition": 15958,
       "name_id": 272,
       "description_id": 2710,
@@ -2110,6 +2984,62 @@
       "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3072 (Necro Wart Zombie); item 15961 ActivatableAbilityId 3072 (Legacy@9e08202 ClientItemDefinitions Id 15961 NameId 1231 DescriptionId 3118 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3118: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
+      "definition": 16033,
+      "name_id": 395520,
+      "description_id": 395527,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15656,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This firework launches golden sparkles into the air.'; effect 15656 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4066). Client item table: Id 16033 NameId 395520 DescriptionId 395527 ActivatableAbilityId 4066 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 16034,
+      "name_id": 395522,
+      "description_id": 395529,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15658,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a red pinwheel firework into the air.'; effect 15658 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4068). Client item table: Id 16034 NameId 395522 DescriptionId 395529 ActivatableAbilityId 4068 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 16035,
+      "name_id": 395523,
+      "description_id": 395530,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15659,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a green pinwheel firework into the air.'; effect 15659 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4069). Client item table: Id 16035 NameId 395523 DescriptionId 395530 ActivatableAbilityId 4069 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 16036,
+      "name_id": 395524,
+      "description_id": 395531,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15660,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a purple pinwheel firework into the air.'; effect 15660 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4070). Client item table: Id 16036 NameId 395524 DescriptionId 395531 ActivatableAbilityId 4070 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
       "definition": 16537,
       "name_id": 7336,
       "description_id": 7337,
@@ -2124,6 +3054,1320 @@
         }
       },
       "source": "B1 halloween: fanbyte Werewolf_Cake_Slice 'Illusion: Black Wolf - 5 minutes' (client locale 7338); model 177 wolf_evil.adr, the client's dark wolf (R: no model is named black wolf). Client item table: Id 16537 NameId 7336 DescriptionId 7337 ActivatableAbilityId 370 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 300000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21807,
+      "name_id": 38645,
+      "description_id": 47446,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 1,
+          "value": 712,
+          "duration_ms": 1800000,
+          "icon_id": 1005
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your health.'; MaxHealth +712 for 30 minutes (R: fandom wiki Honey Roasted Moonbean 'increases your health by 712 in combat', its sibling); the buff row shows, the encounter engine has no max-health bonus yet (BubbaJoeX fork ItemAbilities.json ability 2626 gives +250). Client item table: Id 21807 NameId 38645 DescriptionId 47446 ActivatableAbilityId 2626 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21809,
+      "name_id": 38647,
+      "description_id": 47442,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 5,
+          "value": 25,
+          "duration_ms": 1800000,
+          "icon_id": 1017
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your energy.'; stat 5 MaxMana +25 (the buff row shows; the encounter engine has no max health or energy bonus yet) for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2627). Client item table: Id 21809 NameId 38647 DescriptionId 47442 ActivatableAbilityId 2627 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21810,
+      "name_id": 38648,
+      "description_id": 47439,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 14,
+          "value": 8,
+          "duration_ms": 1800000,
+          "icon_id": 1009
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your attack.'; stat 14 Attack: the fork's +20 weapon damage is 8% more damage dealt (R: +20 on the tier-1 basic hit of 254) for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2622). Client item table: Id 21810 NameId 38648 DescriptionId 47439 ActivatableAbilityId 2622 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21811,
+      "name_id": 38649,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1003
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 438). Client item table: Id 21811 NameId 38649 DescriptionId 47445 ActivatableAbilityId 438 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21812,
+      "name_id": 38650,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1004
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 439). Client item table: Id 21812 NameId 38650 DescriptionId 47445 ActivatableAbilityId 439 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21814,
+      "name_id": 38652,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1006
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 440). Client item table: Id 21814 NameId 38652 DescriptionId 47445 ActivatableAbilityId 440 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21815,
+      "name_id": 38653,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1014
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 429). Client item table: Id 21815 NameId 38653 DescriptionId 47445 ActivatableAbilityId 429 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21816,
+      "name_id": 38654,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1017
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 430). Client item table: Id 21816 NameId 38654 DescriptionId 47445 ActivatableAbilityId 430 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21817,
+      "name_id": 38655,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2628). Client item table: Id 21817 NameId 38655 DescriptionId 47445 ActivatableAbilityId 2628 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21818,
+      "name_id": 31338,
+      "description_id": 47446,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 1,
+          "value": 712,
+          "duration_ms": 1800000,
+          "icon_id": 1818
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your health.'; MaxHealth +712 for 30 minutes (R: fandom wiki Honey Roasted Moonbean 'increases your health by 712 in combat', its sibling); the buff row shows, the encounter engine has no max-health bonus yet (BubbaJoeX fork ItemAbilities.json ability 2635 gives +250). Client item table: Id 21818 NameId 31338 DescriptionId 47446 ActivatableAbilityId 2635 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21819,
+      "name_id": 38657,
+      "description_id": 47442,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 5,
+          "value": 25,
+          "duration_ms": 1800000,
+          "icon_id": 1008
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your energy.'; stat 5 MaxMana +25 (the buff row shows; the encounter engine has no max health or energy bonus yet) for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2636). Client item table: Id 21819 NameId 38657 DescriptionId 47442 ActivatableAbilityId 2636 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21820,
+      "name_id": 38658,
+      "description_id": 47439,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 14,
+          "value": 8,
+          "duration_ms": 1800000,
+          "icon_id": 999
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your attack.'; stat 14 Attack: the fork's +20 weapon damage is 8% more damage dealt (R: +20 on the tier-1 basic hit of 254) for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2631). Client item table: Id 21820 NameId 38658 DescriptionId 47439 ActivatableAbilityId 2631 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21821,
+      "name_id": 38659,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1821
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 453). Client item table: Id 21821 NameId 38659 DescriptionId 47445 ActivatableAbilityId 453 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21822,
+      "name_id": 38660,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1010
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 441). Client item table: Id 21822 NameId 38660 DescriptionId 47445 ActivatableAbilityId 441 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21823,
+      "name_id": 38661,
+      "description_id": 47447,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1005
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your timing as a Blacksmith, Chef, Miner, and Postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2637). Client item table: Id 21823 NameId 38661 DescriptionId 47447 ActivatableAbilityId 2637 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21825,
+      "name_id": 38663,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1006
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 454). Client item table: Id 21825 NameId 38663 DescriptionId 47445 ActivatableAbilityId 454 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21826,
+      "name_id": 38664,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1004
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 455). Client item table: Id 21826 NameId 38664 DescriptionId 47445 ActivatableAbilityId 455 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21827,
+      "name_id": 38665,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1009
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 445). Client item table: Id 21827 NameId 38665 DescriptionId 47445 ActivatableAbilityId 445 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21828,
+      "name_id": 38666,
+      "description_id": 47441,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "scale": {
+          "scale": 1.15,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will make you larger.'; scale 1.15 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1950). Client item table: Id 21828 NameId 38666 DescriptionId 47441 ActivatableAbilityId 1950 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21829,
+      "name_id": 38667,
+      "description_id": 47446,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 1,
+          "value": 712,
+          "duration_ms": 1800000,
+          "icon_id": 1003
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your health.'; fandom wiki Honey Roasted Moonbean 'increases your health by 712 in combat': MaxHealth +712 for 30 minutes (R: the food length); the buff row shows, the encounter engine has no max-health bonus yet. Client item table: Id 21829 NameId 38667 DescriptionId 47446 ActivatableAbilityId 2644 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21830,
+      "name_id": 38668,
+      "description_id": 47442,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 5,
+          "value": 25,
+          "duration_ms": 1800000,
+          "icon_id": 999
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your energy.'; stat 5 MaxMana +25 (the buff row shows; the encounter engine has no max health or energy bonus yet) for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2645). Client item table: Id 21830 NameId 38668 DescriptionId 47442 ActivatableAbilityId 2645 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21831,
+      "name_id": 38669,
+      "description_id": 47439,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 14,
+          "value": 8,
+          "duration_ms": 1800000,
+          "icon_id": 1005
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your attack.'; stat 14 Attack: the fork's +20 weapon damage is 8% more damage dealt (R: +20 on the tier-1 basic hit of 254) for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 2640). Client item table: Id 21831 NameId 38669 DescriptionId 47439 ActivatableAbilityId 2640 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21832,
+      "name_id": 38670,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 456). Client item table: Id 21832 NameId 38670 DescriptionId 47445 ActivatableAbilityId 456 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21833,
+      "name_id": 38671,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1002
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 459). Client item table: Id 21833 NameId 38671 DescriptionId 47445 ActivatableAbilityId 459 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 21834,
+      "name_id": 38929,
+      "description_id": 47454,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "scale": {
+          "scale": 0.85,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will make you smaller.'; scale 0.85 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 1945). Client item table: Id 21834 NameId 38929 DescriptionId 47454 ActivatableAbilityId 1945 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31221,
+      "name_id": 96627,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 929
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 391). Client item table: Id 31221 NameId 96627 DescriptionId 47445 ActivatableAbilityId 391 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31223,
+      "name_id": 96629,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 940
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 393). Client item table: Id 31223 NameId 96629 DescriptionId 47445 ActivatableAbilityId 393 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31224,
+      "name_id": 96630,
+      "description_id": 47447,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 935
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your timing as a Blacksmith, Chef, Miner, and Postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 394). Client item table: Id 31224 NameId 96630 DescriptionId 47447 ActivatableAbilityId 394 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31230,
+      "name_id": 96636,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 954
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 400). Client item table: Id 31230 NameId 96636 DescriptionId 47445 ActivatableAbilityId 400 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31231,
+      "name_id": 96637,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 957
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 401). Client item table: Id 31231 NameId 96637 DescriptionId 47445 ActivatableAbilityId 401 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31232,
+      "name_id": 96638,
+      "description_id": 47447,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 961
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your timing as a Blacksmith, Chef, Miner, and Postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 402). Client item table: Id 31232 NameId 96638 DescriptionId 47447 ActivatableAbilityId 402 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31240,
+      "name_id": 96646,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1248
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 410). Client item table: Id 31240 NameId 96646 DescriptionId 47445 ActivatableAbilityId 410 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31244,
+      "name_id": 96650,
+      "description_id": 47447,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1236
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your timing as a Blacksmith, Chef, Miner, and Postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 414). Client item table: Id 31244 NameId 96650 DescriptionId 47447 ActivatableAbilityId 414 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31250,
+      "name_id": 96656,
+      "description_id": 3027,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 3164
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a blacksmith, chef, miner, and postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 420). Client item table: Id 31250 NameId 96656 DescriptionId 3027 ActivatableAbilityId 420 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31253,
+      "name_id": 96659,
+      "description_id": 3027,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 3169
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a blacksmith, chef, miner, and postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 423). Client item table: Id 31253 NameId 96659 DescriptionId 3027 ActivatableAbilityId 423 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31255,
+      "name_id": 96661,
+      "description_id": 97374,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 3166
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your timing as a blacksmith, chef, miner, and postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 425). Client item table: Id 31255 NameId 96661 DescriptionId 97374 ActivatableAbilityId 425 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31256,
+      "name_id": 96662,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1243
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 426). Client item table: Id 31256 NameId 96662 DescriptionId 47445 ActivatableAbilityId 426 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31259,
+      "name_id": 96665,
+      "description_id": 47445,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 1241
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a Blacksmith, Chef, Miner, and Postman.'; ability 232 has no fork row; Talent +2 for 30 minutes (R: the fork's talent foods). Client item table: Id 31259 NameId 96665 DescriptionId 47445 ActivatableAbilityId 232 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31301,
+      "name_id": 96707,
+      "description_id": 3027,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 3170
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a blacksmith, chef, miner, and postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 471). Client item table: Id 31301 NameId 96707 DescriptionId 3027 ActivatableAbilityId 471 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31313,
+      "name_id": 96719,
+      "description_id": 3027,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 24,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 3172
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your talent as a blacksmith, chef, miner, and postman.'; stat 24 Talent +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 483). Client item table: Id 31313 NameId 96719 DescriptionId 3027 ActivatableAbilityId 483 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 31315,
+      "name_id": 96721,
+      "description_id": 97374,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 27,
+          "value": 2,
+          "duration_ms": 1800000,
+          "icon_id": 3174
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food temporarily increases your timing as a blacksmith, chef, miner, and postman.'; stat 27 Timing +2 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 485). Client item table: Id 31315 NameId 96721 DescriptionId 97374 ActivatableAbilityId 485 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 38822,
+      "name_id": 33952,
+      "description_id": 33953,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 1521,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Drink this bottle of juice to turn into a Coyote.' (inventory.json row, ability 653); model 1521 wolf_coyote.adr for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 653). Client item table: Id 38822 NameId 33952 DescriptionId 33953 ActivatableAbilityId 653 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 38823,
+      "name_id": 33954,
+      "description_id": 33955,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 1516,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Drink this bottle of juice to turn into a Road Runner.' (inventory.json row, ability 654); model 1516 birds_roadrunner.adr for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 654). Client item table: Id 38823 NameId 33954 DescriptionId 33955 ActivatableAbilityId 654 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 38827,
+      "name_id": 33962,
+      "description_id": 33963,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 1692,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Looks like something a Vulture would cough up.' (inventory.json row, ability 658, no fork row, no wiki page); model 1692 skeleton_m_01.adr for 30 minutes (R: its siblings 38822 and 38823 turn you into their namesake, so Dusty Bones a skeleton). Client item table: Id 38827 NameId 33962 DescriptionId 33963 ActivatableAbilityId 658 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 48100,
+      "name_id": 139461,
+      "description_id": 139462,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 48100
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A large cake full of hidden surprises. [This cake can only be used once per hour. Click on the cake to take a slice!]'; prop 897 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 48100, GiftCake sg_pretty_cake); a click gives one of the slice's surprises at once for 1 minute (fandom wiki Slice of Mystery Cake: an orange aura, a foggy black mist, a female changeling with a frying pan, bigger, or a cow): 5733 WFX_glow_orange_skel_loop and 16 PFX_smoke_black-yellow_skel_loop (R), changeling cook 208 and cow 145 (Sanctuary OSFR abilities 900120 and 900121); 'bigger' is not an outcome kind, and the Slice item is not handed out (R); recast one hour from the text. Client item table: Id 48100 NameId 139461 DescriptionId 139462 ActivatableAbilityId 3701 SingleUse false; Sanctuary-main@10f129e Consumables.json lists Cakes ItemId 48100 (Mystery Cake (sg_pretty_cake)); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 3600000 ms (R)."
+    },
+    {
+      "definition": 48104,
+      "name_id": 139600,
+      "description_id": 139602,
+      "cooldown_ms": 60000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 208,
+          "poof_effect_id": 21,
+          "duration_ms": 60000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'It's a piece of cake to eat a piece of cake. [You can only eat 1 slice per minute.]'; Sanctuary RandomTransformFoods 48104 rolls the OSFR abilities 900120-900124; the first, model 208 changeling_f_cook_01.adr for 1 minute (R: the roll is not wired); recast 60 s from the text. Client item table: Id 48104 NameId 139600 DescriptionId 139602 ActivatableAbilityId 3713 SingleUse true; Sanctuary-main@10f129e Consumables.json lists RandomTransformFoods ItemId 48104 (Slice of Mystery Cake); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms, the effect length (R)."
+    },
+    {
+      "definition": 48155,
+      "name_id": 139634,
+      "description_id": 139635,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 4470,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This amazing potion turns you into a bug!'; model 4470 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3712). Client item table: Id 48155 NameId 139634 DescriptionId 139635 ActivatableAbilityId 3712 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 48156,
+      "name_id": 139669,
+      "description_id": 139670,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "stun_ms": 5000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this orb to cocoon your opponent.'; stun 5 s (BubbaJoeX fork ItemAbilities.json ability 3717). Client item table: Id 48156 NameId 139669 DescriptionId 139670 ActivatableAbilityId 3717 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 49997,
+      "name_id": 2909,
+      "description_id": 2912,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 75,
+          "over_ms": 3000,
+          "shared": true,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A special potion that heals the Health of you and all your pals nearby.'; fandom wiki Shared Health Potion 'Heals you for 25% health/second for 3 seconds.': 75% over 3 s for the user; the user's group in the same place gets the 75% at once through the group-heal route (R: the fork's 15 m pals); cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4722, R). Client item table: Id 49997 NameId 2909 DescriptionId 2912 ActivatableAbilityId 4722 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 49998,
+      "name_id": 2910,
+      "description_id": 2913,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 50,
+          "instant_percent": 2,
+          "over_ms": 3000,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'use this potion during Combat to restore Energy for everyone'; fandom wiki Shared Energy Potion 'Restores 16 energy/second for 3 seconds. Instantly restores 2 energy.': 50, 2 at once, over 3 s, for the user; the 'for everyone' half is not applied (R: the group-heal route carries health only); cast 16325 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4723, R). Client item table: Id 49998 NameId 2910 DescriptionId 2913 ActivatableAbilityId 4723 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 49999,
+      "name_id": 2911,
+      "description_id": 2914,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 75,
+          "energy_percent": 50,
+          "shared": true,
+          "cast_effect_id": 16326
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Sharing is caring with this cure all potion for both Energy and Health.'; fandom wiki Shared Replenishment Potion 'Instantly restores 50 energy. Instantly heals your for 75% health.'; the user's group in the same place gets the 75% health (R: the group-heal route carries health only); cast 16326 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4724, R). Client item table: Id 49999 NameId 2911 DescriptionId 2914 ActivatableAbilityId 4724 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 55404,
+      "name_id": 3693,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15208,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15208 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3855). Client item table: Id 55404 NameId 3693 DescriptionId 3704 ActivatableAbilityId 3855 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55405,
+      "name_id": 3693,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15222,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15222 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3856). Client item table: Id 55405 NameId 3693 DescriptionId 3705 ActivatableAbilityId 3856 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55406,
+      "name_id": 3694,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15291,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15291 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3857). Client item table: Id 55406 NameId 3694 DescriptionId 3704 ActivatableAbilityId 3857 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55407,
+      "name_id": 3694,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15292,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15292 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3858). Client item table: Id 55407 NameId 3694 DescriptionId 3705 ActivatableAbilityId 3858 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55408,
+      "name_id": 3695,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15294,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15294 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3859). Client item table: Id 55408 NameId 3695 DescriptionId 3704 ActivatableAbilityId 3859 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55409,
+      "name_id": 3695,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15296,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15296 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3860). Client item table: Id 55409 NameId 3695 DescriptionId 3705 ActivatableAbilityId 3860 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55410,
+      "name_id": 3696,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15297,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15297 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3861). Client item table: Id 55410 NameId 3696 DescriptionId 3704 ActivatableAbilityId 3861 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55411,
+      "name_id": 3696,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15298,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15298 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3862). Client item table: Id 55411 NameId 3696 DescriptionId 3705 ActivatableAbilityId 3862 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55412,
+      "name_id": 3697,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15299,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15299 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3863). Client item table: Id 55412 NameId 3697 DescriptionId 3704 ActivatableAbilityId 3863 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55413,
+      "name_id": 3697,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15300,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15300 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3864). Client item table: Id 55413 NameId 3697 DescriptionId 3705 ActivatableAbilityId 3864 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55414,
+      "name_id": 3698,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15303,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15303 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3866). Client item table: Id 55414 NameId 3698 DescriptionId 3704 ActivatableAbilityId 3866 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55415,
+      "name_id": 3698,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15301,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15301 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3867). Client item table: Id 55415 NameId 3698 DescriptionId 3705 ActivatableAbilityId 3867 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55416,
+      "name_id": 3699,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15304,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15304 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3868). Client item table: Id 55416 NameId 3699 DescriptionId 3704 ActivatableAbilityId 3868 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55417,
+      "name_id": 3699,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15305,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15305 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3869). Client item table: Id 55417 NameId 3699 DescriptionId 3705 ActivatableAbilityId 3869 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55418,
+      "name_id": 3700,
+      "description_id": 3704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15306,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives humans button eyes!'; effect 15306 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3870). Client item table: Id 55418 NameId 3700 DescriptionId 3704 ActivatableAbilityId 3870 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55419,
+      "name_id": 3700,
+      "description_id": 3705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15307,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion gives pixies button eyes!'; effect 15307 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3871). Client item table: Id 55419 NameId 3700 DescriptionId 3705 ActivatableAbilityId 3871 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55420,
+      "name_id": 3701,
+      "description_id": 3706,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15363,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion attracts fireflies to you!'; effect 15363 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3873). Client item table: Id 55420 NameId 3701 DescriptionId 3706 ActivatableAbilityId 3873 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55421,
+      "name_id": 3702,
+      "description_id": 3707,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15362,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion attracts butterflies to you!'; effect 15362 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3874). Client item table: Id 55421 NameId 3702 DescriptionId 3707 ActivatableAbilityId 3874 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55422,
+      "name_id": 3703,
+      "description_id": 3708,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15369,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This potion showers you in flowers!'; effect 15369 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 3875). Client item table: Id 55422 NameId 3703 DescriptionId 3708 ActivatableAbilityId 3875 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 55850,
+      "name_id": 391689,
+      "description_id": 391688,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "strike": {
+          "stun_ms": 5000,
+          "radius": 10.0
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Freezes up to five opponents for five seconds.'; stun 5 s within 10 m (the fork's grenade centres on the user; ours on the enemy it lands on, R) (the fork's cap of 5 targets is not applied, R) (BubbaJoeX fork ItemAbilities.json ability 3954). Client item table: Id 55850 NameId 391689 DescriptionId 391688 ActivatableAbilityId 3954 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 56776,
+      "name_id": 393153,
+      "description_id": 156751,
+      "cooldown_ms": 1800000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 88,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Using this fungus will turn the player into a nettleseed plant for thirty minutes.' (fanbyte Nettleseed_Fungus: unlimited use; its note says one hour); model 88 maneatingplant.adr (R: Nettleseed's man-eating plants); 30 minutes from the item text. Client item table: Id 56776 NameId 393153 DescriptionId 156751 ActivatableAbilityId 3984 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57010,
+      "name_id": 394743,
+      "description_id": 17040,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 57010
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Look out!  Once sand gets in everything, people start to get crabby!'; prop 1066 mkt_sandcastle_01.adr; a click turns the clicker into a crab 1667 crab_m_basic.adr for 15 minutes (R: the Crustay Ocean Cake's crab and length). Client item table: Id 57010 NameId 394743 DescriptionId 17040 ActivatableAbilityId 4004 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
+      "definition": 57011,
+      "name_id": 394788,
+      "description_id": 395151,
+      "cooldown_ms": 300000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 418,
+          "poof_effect_id": 21,
+          "duration_ms": 300000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Don't let your pet lick your face after feeding from the bucket!'; ability 4007 has no fork row; model 418 fish.adr for 5 minutes (R: the Bucket of Bouncing Bait 9295 'transforms you into a fish', client locale 17043 'Illusion: Flopping Fish - 5 minutes'). Client item table: Id 57011 NameId 394788 DescriptionId 395151 ActivatableAbilityId 4007 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 300000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57013,
+      "name_id": 394790,
+      "description_id": 395153,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 57013
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Dazzle your friends and wake your neighbors with this box of explosive fun!'; prop 1836 hsg_crate_01.adr; Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 57013 sets off 15656, 15657, 15658, 15661, 15664, 15717, 15727, 15729 and 15731; a click sets one of the first eight off on the clicker for 10 s (R: eight outcomes is the table's cap). Client item table: Id 57013 NameId 394790 DescriptionId 395153 ActivatableAbilityId 4009 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
+      "definition": 57022,
+      "name_id": 395520,
+      "description_id": 395527,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15656,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This firework launches golden sparkles into the air.'; effect 15656 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4066). Client item table: Id 57022 NameId 395520 DescriptionId 395527 ActivatableAbilityId 4066 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57023,
+      "name_id": 395521,
+      "description_id": 395528,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15657,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a blue pinwheel firework into the air.'; effect 15657 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4067). Client item table: Id 57023 NameId 395521 DescriptionId 395528 ActivatableAbilityId 4067 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57024,
+      "name_id": 395522,
+      "description_id": 395529,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15658,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a red pinwheel firework into the air.'; effect 15658 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4068). Client item table: Id 57024 NameId 395522 DescriptionId 395529 ActivatableAbilityId 4068 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57025,
+      "name_id": 395523,
+      "description_id": 395530,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15659,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a green pinwheel firework into the air.'; effect 15659 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4069). Client item table: Id 57025 NameId 395523 DescriptionId 395530 ActivatableAbilityId 4069 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57026,
+      "name_id": 395524,
+      "description_id": 395531,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15660,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This launches a purple pinwheel firework into the air.'; effect 15660 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4070). Client item table: Id 57026 NameId 395524 DescriptionId 395531 ActivatableAbilityId 4070 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57027,
+      "name_id": 395525,
+      "description_id": 395527,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15664,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This firework launches golden sparkles into the air.'; effect 15664 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4071). Client item table: Id 57027 NameId 395525 DescriptionId 395527 ActivatableAbilityId 4071 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 57028,
+      "name_id": 395526,
+      "description_id": 395533,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15661,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This firwork launches stars and stripes into the air.'; effect 15661 for 10 s (R: the fork plays it once) (BubbaJoeX fork ItemAbilities.json ability 4072). Client item table: Id 57028 NameId 395526 DescriptionId 395533 ActivatableAbilityId 4072 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 60259,
+      "name_id": 400997,
+      "description_id": 401065,
+      "cooldown_ms": 60000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 18,
+          "value": 25,
+          "duration_ms": 60000,
+          "icon_id": 4043
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Spider Anti-venom reduces damage taken.'; stat 18 Damage Reduction +25 for 1 minute (BubbaJoeX fork ItemAbilities.json ability 4073). Client item table: Id 60259 NameId 400997 DescriptionId 401065 ActivatableAbilityId 4073 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms, the effect length (R)."
+    },
+    {
+      "definition": 60262,
+      "name_id": 401076,
+      "description_id": 401078,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 35,
+          "instant_percent": 2,
+          "over_ms": 3000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This tasty pizza will restore some health!'; fandom wiki Mushroom Pizza Slice 'Heals you for 11% health/second for 3 seconds. Instantly heals you for 2% health.': 35%, 2% at once, the rest over 3 s; cast 16324; recast 10 s (R: the Small Health Potion 2173's). Client item table: Id 60262 NameId 401076 DescriptionId 401078 ActivatableAbilityId 1638 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
     },
     {
       "definition": 60267,
@@ -2158,6 +4402,22 @@
       "source": "B1 codes: item text 'Buffs your timing': stat 27 Timing (AbilityEffectTypeSettings 24 '+ N Timing'); +2 and 30 minutes (R, BubbaJoeX fork ItemAbilities.json ability 4089 M3Timer). Client item table: Id 60269 NameId 401519 DescriptionId 401534 ActivatableAbilityId 4089 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
     },
     {
+      "definition": 60271,
+      "name_id": 401521,
+      "description_id": 2706,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5232,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will cause shadow flames to appear around the player for thirty minutes.'; effect 5232 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 4091). Client item table: Id 60271 NameId 401521 DescriptionId 2706 ActivatableAbilityId 4091 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
       "definition": 60272,
       "name_id": 401522,
       "description_id": 2701,
@@ -2190,6 +4450,22 @@
       "source": "B1 codes: item text 'snow flakes to appear around the player for thirty minutes'; effect 53 PFX_snowflakes_white_sphere_loop. Client item table: Id 60273 NameId 401523 DescriptionId 2695 ActivatableAbilityId 4093 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
     },
     {
+      "definition": 60275,
+      "name_id": 401525,
+      "description_id": 2743,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 250,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Eating this food will change the player into a female chugawug farmer for thirty minutes.'; model 250 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 4095). Client item table: Id 60275 NameId 401525 DescriptionId 2743 ActivatableAbilityId 4095 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
       "definition": 60277,
       "name_id": 401527,
       "description_id": 2772,
@@ -2206,17 +4482,95 @@
       "source": "B1 codes: item text 'a large floppy eared dog for thirty minutes'; model 169 dog_large_floppy.adr. Client item table: Id 60277 NameId 401527 DescriptionId 2772 ActivatableAbilityId 4097 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
     },
     {
+      "definition": 60280,
+      "name_id": 401080,
+      "description_id": 401620,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "restore": {
+          "health_percent": 35,
+          "shared": true,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Nothing says combat party like a mushroom pizza.' (unlimited use); fandom wiki Mushroom Pizza 'a cool down period of one hour' and 'Players who click on a Mushroom Pizza in a combat mini-game receive one Mushroom Pizza Slice': the slice's 35% at once for the user and the user's group in the same place (R: the slices are not handed out); cast 16324. Client item table: Id 60280 NameId 401080 DescriptionId 401620 ActivatableAbilityId 4100 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 3600000 ms (R)."
+    },
+    {
       "definition": 60563,
       "name_id": 422913,
       "description_id": 422917,
       "cooldown_ms": 30000,
       "single_use": true,
       "effect": {
-        "heal": {
-          "percent": 50
+        "restore": {
+          "health_percent": 50,
+          "energy_percent": 35,
+          "cast_effect_id": 16326
         }
       },
-      "source": "B1 codes: item text 'restores some of your health and energy instantly'; 50% health and a 30 s recast (R, BubbaJoeX fork ItemAbilities.json ability 4700); the energy half is not applied. Client item table: Id 60563 NameId 422913 DescriptionId 422917 ActivatableAbilityId 4700 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+      "source": "B1 codes: item text 'restores some of your health and energy instantly'; fandom wiki Medium Replenishment Potion 'Instantly restores 35 energy. Instantly heals you for 50% health.' (C3); cast 16326 and a 30 s recast (R, BubbaJoeX fork ItemAbilities.json ability 4700). Client item table: Id 60563 NameId 422913 DescriptionId 422917 ActivatableAbilityId 4700 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 60986,
+      "name_id": 403405,
+      "description_id": 1114,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 1385,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: no item text; model 1385 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 4132). Client item table: Id 60986 NameId 403405 DescriptionId 1114 ActivatableAbilityId 4132 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 62516,
+      "name_id": 407382,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15825,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15825 PFX_silly-string_beam_blue_p2p at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 62516); cooldown (R). Client item table: Id 62516 NameId 407382 DescriptionId 408137 ActivatableAbilityId 4160 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 62516 (Blue Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 62529,
+      "name_id": 407420,
+      "description_id": 407422,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15813,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This party popper blasts confetti into the air.'; effect 15813 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4161). Client item table: Id 62529 NameId 407420 DescriptionId 407422 ActivatableAbilityId 4161 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 65820,
+      "name_id": 4531,
+      "description_id": 4532,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 35,
+          "instant_percent": 2,
+          "over_ms": 3000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Potion that heals the player on consumption.'; fandom wiki Wheeler Health Potion 'Heals you for 11% health/second for 3 seconds. Instantly heals you for 2% health.': 35%, 2% at once, the rest over the wiki's 3 s, as the Small Health Potion 2173's 35%; cast 16324; recast 10 s (R: 2173's). Client item table: Id 65820 NameId 4531 DescriptionId 4532 ActivatableAbilityId 4696 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
     },
     {
       "definition": 65821,
@@ -2251,6 +4605,375 @@
       "source": "Wiki: the Wheeler Coin Booster Scroll page and item tooltip read '+ 25% Coins' (Daily Wheel, Potions and Scrolls wedge; Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 65822 NameId 4535 DescriptionId 4536 Icon 1156 ActivatableAbilityId 239 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
     },
     {
+      "definition": 67888,
+      "name_id": 407352,
+      "description_id": 407774,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 67888
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Break out the confetti and silly string! It's time to party!'; prop 1646 5m_crate_01 and its confetti 16441 and 16417 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 67888); a click sets one off on the clicker for 10 s (R); the silly string and poppers it hands out are not wired. Client item table: Id 67888 NameId 407352 DescriptionId 407774 ActivatableAbilityId 4168 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
+      "definition": 67961,
+      "name_id": 408140,
+      "description_id": 6,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15818,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 6 is the client's line-of-sight message (a table slip); effect 15818 red silly string at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 67961); cooldown (R). Client item table: Id 67961 NameId 408140 DescriptionId 6 ActivatableAbilityId 4177 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 67961 (Red Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 67962,
+      "name_id": 408141,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15826,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15826 green silly string at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 67962); cooldown (R). Client item table: Id 67962 NameId 408141 DescriptionId 408137 ActivatableAbilityId 4178 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 67962 (Green Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 67963,
+      "name_id": 408142,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15827,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15827 PFX_silly-string_beam_orange_p2p at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 67963); cooldown (R). Client item table: Id 67963 NameId 408142 DescriptionId 408137 ActivatableAbilityId 4179 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 67963 (Orange Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 67964,
+      "name_id": 408143,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15828,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15828 yellow silly string at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 67964); cooldown (R). Client item table: Id 67964 NameId 408143 DescriptionId 408137 ActivatableAbilityId 4180 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 67964 (Yellow Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 68152,
+      "name_id": 4139,
+      "description_id": 4141,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4387
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Winter Pirahna, Toothy Tetra and Blind Swurglefish.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4287). Client item table: Id 68152 NameId 4139 DescriptionId 4141 ActivatableAbilityId 4287 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68153,
+      "name_id": 4140,
+      "description_id": 4142,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4388
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Chilly Grouper, Butter Flyfish and Briar Nibbler.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4288). Client item table: Id 68153 NameId 4140 DescriptionId 4142 ActivatableAbilityId 4288 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68154,
+      "name_id": 409542,
+      "description_id": 409555,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4389
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Blubracuda, Baconfish and Changed Salmon.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4289). Client item table: Id 68154 NameId 409542 DescriptionId 409555 ActivatableAbilityId 4289 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68155,
+      "name_id": 409543,
+      "description_id": 409556,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4390
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Frostgill Smelt, Flutterfish and Ink Cod.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4290). Client item table: Id 68155 NameId 409543 DescriptionId 409556 ActivatableAbilityId 4290 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68156,
+      "name_id": 409544,
+      "description_id": 409557,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4391
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Goofy Grouper, Finless Fish and Fanged Grouper.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4291). Client item table: Id 68156 NameId 409544 DescriptionId 409557 ActivatableAbilityId 4291 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68157,
+      "name_id": 409545,
+      "description_id": 409558,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4392
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Plattypus, Lady Tetra and Roach Loach.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4292). Client item table: Id 68157 NameId 409545 DescriptionId 409558 ActivatableAbilityId 4292 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68158,
+      "name_id": 409546,
+      "description_id": 409559,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4393
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Pacu Pacu, Peachy Perch and Globfish.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4293). Client item table: Id 68158 NameId 409546 DescriptionId 409559 ActivatableAbilityId 4293 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68159,
+      "name_id": 409547,
+      "description_id": 409560,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4394
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Coach Loach, Feral Catfish and Creeping Cod.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4294). Client item table: Id 68159 NameId 409547 DescriptionId 409560 ActivatableAbilityId 4294 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68160,
+      "name_id": 409548,
+      "description_id": 409561,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4395
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Frozen Char, Slugmud Skipper and Old Sole.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4295). Client item table: Id 68160 NameId 409548 DescriptionId 409561 ActivatableAbilityId 4295 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68161,
+      "name_id": 409549,
+      "description_id": 409562,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4396
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Talking Bass, Cheery Salmon and Bitter Betta.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4296). Client item table: Id 68161 NameId 409549 DescriptionId 409562 ActivatableAbilityId 4296 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68162,
+      "name_id": 409550,
+      "description_id": 409563,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4397
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Blue Thornfin, Chipsen Fish and Thorny Trout.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4297). Client item table: Id 68162 NameId 409550 DescriptionId 409563 ActivatableAbilityId 4297 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68163,
+      "name_id": 409551,
+      "description_id": 409564,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4398
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This lure gives a 10% better chance of catching Spineless Stickleback, Calico Catfish and Purplenosed Shark.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4298). Client item table: Id 68163 NameId 409551 DescriptionId 409564 ActivatableAbilityId 4298 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68164,
+      "name_id": 409552,
+      "description_id": 409565,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "stat": {
+          "stat_id": 48,
+          "value": 10,
+          "duration_ms": 600000,
+          "icon_id": 4399
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This magnet gives a 10% better chance of catching Treasure.'; stat 48 FishingLuck +10 for 10 minutes (the buff row and stat show; fishing_service::set_lure has no caller yet) (BubbaJoeX fork ItemAbilities.json ability 4299). Client item table: Id 68164 NameId 409552 DescriptionId 409565 ActivatableAbilityId 4299 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 68783,
+      "name_id": 411115,
+      "description_id": 411114,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15710,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Places a halo above the player for thirty minutes.'; effect 15710 for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 4276). Client item table: Id 68783 NameId 411115 DescriptionId 411114 ActivatableAbilityId 4276 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 68908,
+      "name_id": 407420,
+      "description_id": 407422,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15813,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This party popper blasts confetti into the air.'; effect 15813 for 10 s (BubbaJoeX fork ItemAbilities.json ability 4161). Client item table: Id 68908 NameId 407420 DescriptionId 407422 ActivatableAbilityId 4161 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 68909,
+      "name_id": 408140,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15818,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15818 red silly string at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 68909); cooldown (R). Client item table: Id 68909 NameId 408140 DescriptionId 408137 ActivatableAbilityId 4177 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 68909 (Red Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 68910,
+      "name_id": 408141,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15826,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15826 green silly string at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 68910); cooldown (R). Client item table: Id 68910 NameId 408141 DescriptionId 408137 ActivatableAbilityId 4178 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 68910 (Green Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 68911,
+      "name_id": 408143,
+      "description_id": 408137,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 15828,
+          "duration_ms": 5000,
+          "at_target": true
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Use this to spray silly string all over your favorite things!'; effect 15828 yellow silly string at the aimed player (BubbaJoeX fork ItemAbilities.json PartyFavors ItemId 68911); cooldown (R). Client item table: Id 68911 NameId 408143 DescriptionId 408137 ActivatableAbilityId 4180 SingleUse true; Sanctuary-main@10f129e Consumables.json lists PartyFavors ItemId 68911 (Yellow Silly String Can); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 68932,
+      "name_id": 407352,
+      "description_id": 407774,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 68932
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Break out the confetti and silly string! It's time to party!'; prop 1646 5m_crate_01 and its confetti 16441 and 16417 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 68932); a click sets one off on the clicker for 10 s (R); the silly string and poppers it hands out are not wired. Client item table: Id 68932 NameId 407352 DescriptionId 407774 ActivatableAbilityId 4168 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
       "definition": 69818,
       "name_id": 416335,
       "description_id": 416356,
@@ -2265,6 +4988,32 @@
         }
       },
       "source": "B1 halloween: item text 'Turns the user into a Jack-o-Lantern for 30 minutes' (client locale 147631); model 1689 jackolantern_m_01.adr. Client item table: Id 69818 NameId 416335 DescriptionId 416356 ActivatableAbilityId 4379 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 69819,
+      "name_id": 16634,
+      "description_id": 16647,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 69819
+        }
+      },
+      "source": "C3 item_behaviour: item text 'It's just a cake... don't be scared!  Place this cake on the ground and it'll surely spook your friends!'; prop 1724 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 69819, ScaredyCake); a click turns the clicker into the Pumpkin Prince 1702 pumpkinprince_m_boss.adr for 30 minutes (its TransformAbilityIds 4372); its scare effects are not wired. Client item table: Id 69819 NameId 16634 DescriptionId 16647 ActivatableAbilityId 4360 SingleUse false; Sanctuary-main@10f129e Consumables.json lists Cakes ItemId 69819 (Scaredy Cake); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
+      "definition": 69820,
+      "name_id": 16638,
+      "description_id": 16651,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 69820
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Place this headstone on the ground and click on it to turn into a skeleton.'; prop 1750 mkt_gravestone_01.adr; skeleton 1692 skeleton_m_01.adr for 3 minutes (R: the Skeleton treat 69845's 'skeleton for 3 minutes'). Client item table: Id 69820 NameId 16638 DescriptionId 16651 ActivatableAbilityId 4362 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
     },
     {
       "definition": 69821,
@@ -2310,6 +5059,19 @@
         }
       },
       "source": "B1 halloween: item text 'spray spooky string all over your favorite things'; effect 15827 PFX_silly-string_beam_orange_p2p (BubbaJoeX fork ItemAbilities.json PartyFavors); cooldown (R). Client item table: Id 69823 NameId 16645 DescriptionId 16653 ActivatableAbilityId 4366 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 69828,
+      "name_id": 16635,
+      "description_id": 16648,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 69828
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Place this pumpkin on the ground and click on it to receive a smaller one'; prop 1722 evnt_halloween_jackolantern_01.adr; a click turns the clicker into a jack-o-lantern 1689 jackolantern_m_01.adr for 30 minutes (R: the Jack-o-Lantern treat 69818's look; the Mini Jack-O-Lantern item is not handed out). Client item table: Id 69828 NameId 16635 DescriptionId 16648 ActivatableAbilityId 4371 SingleUse false; Sanctuary-main@10f129e Consumables.json lists RandomTransformFoods ItemId 69828 (Jack-O-Lantern); the item's own text wins; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
     },
     {
       "definition": 69839,
@@ -2358,6 +5120,19 @@
         }
       },
       "source": "B1 halloween: item text 'leave you wanting Nevermore'; model 198 birds_raven.adr (BubbaJoeX fork ItemAbilities.json ability 4375); 30 minutes (R). Client item table: Id 69841 NameId 16646 DescriptionId 16659 ActivatableAbilityId 4375 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 1800000 ms, the effect length (R)."
+    },
+    {
+      "definition": 69842,
+      "name_id": 16637,
+      "description_id": 16650,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 69842
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Place this cauldron on the ground and click on it to receive a spooky treat.'; prop 1725 evnt_halloween_cauldron_01.adr; a click gives one spooky cupcake's effect at once: bat 3305, ghosts 15909 or raven 198 for 30 minutes (R: B1's 69839-69841 rows; the treat item is not handed out). Client item table: Id 69842 NameId 16637 DescriptionId 16650 ActivatableAbilityId 4376 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
     },
     {
       "definition": 69845,
@@ -2438,6 +5213,38 @@
         }
       },
       "source": "Members Only Star Booster: the Super Star Booster's ability 203 in the client data, so its effect. Wiki: the Super Star Booster page and item tooltip read 'Activatable Effects: + 50% Stars' (SC Shop, 200 SC; Cannot Sell, Cannot Trade). (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree, and so does our client item table: Id 70327 NameId 393502 DescriptionId 1114 Icon 1157 ActivatableAbilityId 203 SingleUse true). Duration 1800000 (R): the client and the wiki say only 'for a while'; the BubbaJoeX fork's ItemAbilities.json picks 30 minutes. Cooldown 5000 (R, the fork's buff cooldown). The buff row shows the item's own icon (R). L087."
+    },
+    {
+      "definition": 70328,
+      "name_id": 393503,
+      "description_id": 1114,
+      "cooldown_ms": 5000,
+      "single_use": true,
+      "effect": {
+        "boost": {
+          "raises": "coins",
+          "percent": 50,
+          "duration_ms": 1800000,
+          "icon_id": 1156
+        }
+      },
+      "source": "C3 item_behaviour: no item text; +50% coins for 30 minutes (BubbaJoeX fork ItemAbilities.json ability 206). Client item table: Id 70328 NameId 393503 DescriptionId 1114 ActivatableAbilityId 206 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 70329,
+      "name_id": 393504,
+      "description_id": 1114,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 50,
+          "instant_percent": 2,
+          "over_ms": 5000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: no item text; its ability 4697 is the Medium Health Potion's, so its wiki 50% (2% at once, the rest over 5 s, R); cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4697, R). Client item table: Id 70329 NameId 393504 DescriptionId 1114 ActivatableAbilityId 4697 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
     },
     {
       "definition": 76609,
@@ -2623,6 +5430,19 @@
       "source": "B1 snow_days: fanbyte Penguin_Cut-Out_Cookie 'Turns you into a snowballed penguin for two minutes' (client locale 147640 'Illusion: Giant Snowball - 2 minutes'); model 1942 giantsnowball.adr (R). Client item table: Id 76634 NameId 4049 DescriptionId 4061 ActivatableAbilityId 5054 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 120000 ms, the effect length (R)."
     },
     {
+      "definition": 76642,
+      "name_id": 134442,
+      "description_id": 134549,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 76642
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Stockings come stuffed with holiday fireworks!'; prop 1971 mkt_holiday_fireplace_01.adr; a click sets off one holiday firework on the clicker for 10 s: 16413, 16380 or 16381 (R: B1's 2011 firework effects; the firework items are not handed out). Client item table: Id 76642 NameId 134442 DescriptionId 134549 ActivatableAbilityId 5091 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
+    },
+    {
       "definition": 76710,
       "name_id": 426573,
       "description_id": 426574,
@@ -2637,6 +5457,22 @@
         }
       },
       "source": "B1 halloween: item text 'boosts the amount of coin you earn for an hour'; +50% (R, BubbaJoeX fork ItemAbilities.json ability 251 GoldBoostPercent 50), the L087 booster recast. Client item table: Id 76710 NameId 426573 DescriptionId 426574 ActivatableAbilityId 251 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 5000 ms (R)."
+    },
+    {
+      "definition": 76713,
+      "name_id": 426579,
+      "description_id": 426580,
+      "cooldown_ms": 900000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 1667,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Secretly sold from a strange old sea salt in Seaside.  Transforms you into a crab for 15 minutes.'; model 1667 for 15 minutes (BubbaJoeX fork ItemAbilities.json ability 252). Client item table: Id 76713 NameId 426579 DescriptionId 426580 ActivatableAbilityId 252 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 900000 ms, the effect length (R)."
     },
     {
       "definition": 76800,
@@ -2748,6 +5584,54 @@
       "source": "B1 festival_of_hearts: fanbyte Stone_Heart_s_Candy 'Turns you into a Stone Heart Changeling for 2 minutes' (client locale 147645); model 2056 changeling_emo_m.adr (item text 'Emolicious'). Client item table: Id 76806 NameId 134675 DescriptionId 134728 ActivatableAbilityId 5156 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 120000 ms, the effect length (R)."
     },
     {
+      "definition": 77039,
+      "name_id": 5511,
+      "description_id": 6961,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 5021,
+          "duration_ms": 3000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'These stinky bombs cause opponents to run away from you in fear.'; fandom wiki Stink Bombs 'a cool down period of one hour'; stink cloud 5021 on the user for 3 s (R) and every enemy within 10 m runs for 6 s (R, BubbaJoeX fork ItemAbilities.json ability 269). Client item table: Id 77039 NameId 5511 DescriptionId 6961 ActivatableAbilityId 269 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 3600000 ms (R).",
+      "scare": {
+        "radius": 10.0,
+        "flee_ms": 6000
+      }
+    },
+    {
+      "definition": 77041,
+      "name_id": 5513,
+      "description_id": 6963,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "strike": {
+          "sleep_ms": 8000,
+          "radius": 10.0
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This magical flute will put your opponents straight to sleep!'; fandom wiki Flute of Slumber 'a cool down period of one hour'; sleep 8 s within 10 m (R, BubbaJoeX fork ItemAbilities.json ability 270; the fork's grenade centres on the user, ours on the enemy it lands on). Client item table: Id 77041 NameId 5513 DescriptionId 6963 ActivatableAbilityId 270 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 3600000 ms (R)."
+    },
+    {
+      "definition": 77043,
+      "name_id": 6960,
+      "description_id": 6965,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 75,
+          "poof_effect_id": 21,
+          "duration_ms": 3600000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: item text 'This mask is so fun, it's scary!'; fanbyte Masher_Mask 'Illusion: Forest Giant Boss - 1 hour', unlimited use; model 75 forestgiantboss.adr. Client item table: Id 77043 NameId 6960 DescriptionId 6965 ActivatableAbilityId 367 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 3600000 ms, the effect length (R)."
+    },
+    {
       "definition": 77330,
       "name_id": 134703,
       "description_id": 134756,
@@ -2774,6 +5658,21 @@
         }
       },
       "source": "B1 festival_of_hearts: item text 'Toss your friends a little bit of love'; effect 15456 PFX_petals-sparkles_up on the aimed player (R). Client item table: Id 77331 NameId 4871 DescriptionId 4872 ActivatableAbilityId 5160 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 10000 ms (R)."
+    },
+    {
+      "definition": 77417,
+      "name_id": 422911,
+      "description_id": 422916,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "health_percent": 75,
+          "over_ms": 5000,
+          "cast_effect_id": 16324
+        }
+      },
+      "source": "C3 item_behaviour: item text 'A potion that restores some of your health over 5 seconds.'; fandom wiki Large Health Potion 'Heals you for 25% health/second for 3 seconds.': 75% over our client's 5 s; cast 16324 and recast 30 s (BubbaJoeX fork ItemAbilities.json ability 4698, R). Client item table: Id 77417 NameId 422911 DescriptionId 422916 ActivatableAbilityId 4698 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 30000 ms (R)."
     },
     {
       "definition": 77418,
@@ -2949,6 +5848,19 @@
       "source": "B1 birthday_bash: item text 'It's made out of real cakelings...'; prop 407 mkt_cakes_glerga_01.adr; outcome cakeling 152 cakeling_m_basic.adr and 30 minutes (R, as the regional birthday cakes). Client item table: Id 77459 NameId 5170 DescriptionId 5171 ActivatableAbilityId 311 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions agrees. Recast 60000 ms (R)."
     },
     {
+      "definition": 78580,
+      "name_id": 5102546,
+      "description_id": 5102547,
+      "cooldown_ms": 60000,
+      "single_use": false,
+      "effect": {
+        "placed_cake": {
+          "row": 78580
+        }
+      },
+      "source": "B1 halloween: fandom Toxic Barrel 'Place the barrel and then click it to acquire some toxic effects!', 'a green fire effect appears around the player's head'; prop 4592 mkt_toxic_barrel_01.adr; effect 15974 PFX_fire_green_head_pumpkin-prince_loop (R) for 30 minutes (R). Client item table: Id 78580 NameId 5102546 DescriptionId 5102547 ActivatableAbilityId 0 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 78580. Recast 60000 ms (R)."
+    },
+    {
       "definition": 79153,
       "name_id": 5101135,
       "description_id": 5101136,
@@ -2963,6 +5875,114 @@
         }
       },
       "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 660 (Can of Beans); item 79153 ActivatableAbilityId 660 (Legacy@9e08202 ClientItemDefinitions Id 79153 NameId 5101135 DescriptionId 5101136 SingleUse true); effect 5343 PFX_smoke_green_pelvis_fart-m; duration 1800000 (R) OSFR default; cooldown 1800000 (R, OSFR #125); EffectDelayMs 300; QuickChatId 3340 ignored; the effect is not a loop, so it plays once (R); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 910206,
+      "name_id": 33960,
+      "description_id": 33961,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "burst": {
+          "composite_effect_id": 16517,
+          "duration_ms": 10000
+        }
+      },
+      "source": "C3 item_behaviour: item text 'It's a firework extravaganza!'; its ability 345 is the Birthday Firework's: effect 16517 for 10 s (BubbaJoeX fork ItemAbilities.json ability 345). Client item table: Id 910206 NameId 33960 DescriptionId 33961 ActivatableAbilityId 345 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 910206. Recast 10000 ms, the effect length (R)."
+    },
+    {
+      "definition": 910224,
+      "name_id": 33964,
+      "description_id": 33965,
+      "cooldown_ms": 30000,
+      "single_use": true,
+      "effect": {
+        "restore": {
+          "energy_percent": 50,
+          "cast_effect_id": 16325
+        }
+      },
+      "source": "C3 item_behaviour: item text 'Sure to brighten up your day.'; its ability 1208 is the Mana Potion's: 50% energy at once, cast 16325 (BubbaJoeX fork ItemAbilities.json ability 1208). Client item table: Id 910224 NameId 33964 DescriptionId 33965 ActivatableAbilityId 1208 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 910224. Recast 30000 ms (R)."
+    },
+    {
+      "definition": 911060,
+      "name_id": 5100048,
+      "description_id": 5100638,
+      "cooldown_ms": 180000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 403,
+          "poof_effect_id": 21,
+          "duration_ms": 180000,
+          "icon_id": 3843
+        }
+      },
+      "source": "B1 spring_eggstravaganza: fanbyte Handful_of_Jelly_Beans 'Eating these will turn you into a rabbit for 3 minutes'; model 403 rabbit.adr. Client item table: Id 911060 NameId 5100048 DescriptionId 5100638 ActivatableAbilityId 0 SingleUse true; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 911060. Recast 180000 ms, the effect length (R)."
+    },
+    {
+      "definition": 911137,
+      "name_id": 441215,
+      "description_id": 441230,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 140,
+          "poof_effect_id": 21,
+          "duration_ms": 3600000,
+          "icon_id": 3843
+        }
+      },
+      "source": "B1 twelve_days: fanbyte Snowman_Mask 'Turns you into a snowman. Use it as many times as you want!' 'Illusion: Snowman - 1 hour' (client locale 441237); model 140 snowman.adr. Client item table: Id 911137 NameId 441215 DescriptionId 441230 ActivatableAbilityId 0 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 911137. Recast 3600000 ms, the effect length (R)."
+    },
+    {
+      "definition": 911158,
+      "name_id": 5102960,
+      "description_id": 5102961,
+      "cooldown_ms": 3600000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 1928,
+          "poof_effect_id": 21,
+          "duration_ms": 3600000,
+          "icon_id": 3843
+        }
+      },
+      "source": "B1 twelve_days: audit: 'Illusion: Holigoblin 1 hour' (client locale 5102962); model 1928 robgoblin_m_xmas.adr (R). Client item table: Id 911158 NameId 5102960 DescriptionId 5102961 ActivatableAbilityId 0 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 911158. Recast 3600000 ms, the effect length (R)."
+    },
+    {
+      "definition": 911312,
+      "name_id": 147628,
+      "description_id": 147628,
+      "cooldown_ms": 900000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 1386,
+          "poof_effect_id": 21,
+          "duration_ms": 900000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: client name 'Illusion: Cloudy Meatball  - 15 minutes' (locale 147628); model 1386 cloudy_meatball_01.adr. Client item table: Id 911312 NameId 147628 DescriptionId 0 ActivatableAbilityId 0 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 911312. Recast 900000 ms, the effect length (R). DescriptionId 0: the confirm window's body is the item's name (R)."
+    },
+    {
+      "definition": 911313,
+      "name_id": 147629,
+      "description_id": 147629,
+      "cooldown_ms": 1800000,
+      "single_use": false,
+      "effect": {
+        "transform": {
+          "model_id": 1385,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "C3 item_behaviour: client name 'Illusion: Meatball - 30 minutes' (locale 147629); model 1385 meatball.adr (the Meatball Costume's, BubbaJoeX fork ItemAbilities.json ability 4132). Client item table: Id 911313 NameId 147629 DescriptionId 0 ActivatableAbilityId 0 SingleUse false; Sanctuary-main@10f129e Consumables.json has no row for it; Legacy@9e08202 ClientItemDefinitions has no Id 911313. Recast 1800000 ms, the effect length (R). DescriptionId 0: the confirm window's body is the item's name (R)."
     }
   ]
 }

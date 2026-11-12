@@ -296,6 +296,594 @@
       "source": "Sanctuary-main@10f129e Consumables.json Cakes row 7973 (Briarwood), outcomes resolved inline from its Transformations/FoodEffects (ability 285 = model 121 shroomgiant); client rows checked: Models.txt 2089 mkt_cakes_briarwood_01.adr, ClientLocaleDefinitions 9399, itemdefinitions 7973 (name id, ability id), ActorCompositeEffectDefinitions 21, Cursors.txt 5 cursor_talk; the 60 s lifetime and 5 s click window are Sanctuary's defaults (R); buff icon 3843 icon_status_changeform_32.dds (R, the consumables.json convention)"
     },
     {
+      "item_id": 3007,
+      "name_id": 16149,
+      "model_id": 2115,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 2121,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'If it be cake you want, you've come to the right place.'; prop 2115 mkt_cakes_pirate_01.adr; a click turns the clicker into a pirate skeleton 2121 skeleton_m_pirate.adr for 30 minutes (R: 'cursed booty', the regional birthday cakes' length); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 4829,
+      "name_id": 5664,
+      "model_id": 1836,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16517
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16516
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16441
+            }
+          },
+          "duration_ms": 10000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'It's full of birthday party supplies! Place this crate on the ground to get the party started.'; prop 1836 hsg_crate_01.adr and its fireworks 16517, 16516 and 16441 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 4829); a click sets one off on the clicker for 10 s (R); the balloons it hands out are not wired; cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 9296,
+      "name_id": 17039,
+      "model_id": 1066,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1667,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 900000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Look out!  Once sand gets in everything, people start to get crabby!'; prop 1066 mkt_sandcastle_01.adr; a click turns the clicker into a crab 1667 crab_m_basic.adr for 15 minutes (R: the Crustay Ocean Cake's crab and length); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 15915,
+      "name_id": 394790,
+      "model_id": 1836,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15656
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15657
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15658
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15661
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15664
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15717
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15727
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15729
+            }
+          },
+          "duration_ms": 10000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Dazzle your friends and wake your neighbors with this box of explosive fun!'; prop 1836 hsg_crate_01.adr; Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 15915 sets off 15656, 15657, 15658, 15661, 15664, 15717, 15727, 15729 and 15731; a click sets one of the first eight off on the clicker for 10 s (R: eight outcomes is the table's cap); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 48100,
+      "name_id": 139461,
+      "model_id": 897,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 3600000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 5733
+            }
+          },
+          "duration_ms": 60000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16
+            }
+          },
+          "duration_ms": 60000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 208,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 60000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 145,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 60000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'A large cake full of hidden surprises. [This cake can only be used once per hour. Click on the cake to take a slice!]'; prop 897 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 48100, GiftCake sg_pretty_cake); a click gives one of the slice's surprises at once for 1 minute (fandom wiki Slice of Mystery Cake: an orange aura, a foggy black mist, a female changeling with a frying pan, bigger, or a cow): 5733 WFX_glow_orange_skel_loop and 16 PFX_smoke_black-yellow_skel_loop (R), changeling cook 208 and cow 145 (Sanctuary OSFR abilities 900120 and 900121); 'bigger' is not an outcome kind, and the Slice item is not handed out (R); recast one hour from the text; cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window are the regional birthday cakes' (R) and the recast the item text's"
+    },
+    {
+      "item_id": 57010,
+      "name_id": 394743,
+      "model_id": 1066,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1667,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 900000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Look out!  Once sand gets in everything, people start to get crabby!'; prop 1066 mkt_sandcastle_01.adr; a click turns the clicker into a crab 1667 crab_m_basic.adr for 15 minutes (R: the Crustay Ocean Cake's crab and length); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 57013,
+      "name_id": 394790,
+      "model_id": 1836,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15656
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15657
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15658
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15661
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15664
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15717
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15727
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15729
+            }
+          },
+          "duration_ms": 10000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Dazzle your friends and wake your neighbors with this box of explosive fun!'; prop 1836 hsg_crate_01.adr; Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 57013 sets off 15656, 15657, 15658, 15661, 15664, 15717, 15727, 15729 and 15731; a click sets one of the first eight off on the clicker for 10 s (R: eight outcomes is the table's cap); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 67888,
+      "name_id": 407352,
+      "model_id": 1646,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16441
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16417
+            }
+          },
+          "duration_ms": 10000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Break out the confetti and silly string! It's time to party!'; prop 1646 5m_crate_01 and its confetti 16441 and 16417 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 67888); a click sets one off on the clicker for 10 s (R); the silly string and poppers it hands out are not wired; cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 68932,
+      "name_id": 407352,
+      "model_id": 1646,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16441
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16417
+            }
+          },
+          "duration_ms": 10000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Break out the confetti and silly string! It's time to party!'; prop 1646 5m_crate_01 and its confetti 16441 and 16417 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 68932); a click sets one off on the clicker for 10 s (R); the silly string and poppers it hands out are not wired; cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 69819,
+      "name_id": 16634,
+      "model_id": 1724,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1702,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'It's just a cake... don't be scared!  Place this cake on the ground and it'll surely spook your friends!'; prop 1724 (Sanctuary-BubbaJoeX Consumables.json Cakes ItemId 69819, ScaredyCake); a click turns the clicker into the Pumpkin Prince 1702 pumpkinprince_m_boss.adr for 30 minutes (its TransformAbilityIds 4372); its scare effects are not wired; cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 69820,
+      "name_id": 16638,
+      "model_id": 1750,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1692,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 180000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Place this headstone on the ground and click on it to turn into a skeleton.'; prop 1750 mkt_gravestone_01.adr; skeleton 1692 skeleton_m_01.adr for 3 minutes (R: the Skeleton treat 69845's 'skeleton for 3 minutes'); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 69828,
+      "name_id": 16635,
+      "model_id": 1722,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 1689,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Place this pumpkin on the ground and click on it to receive a smaller one'; prop 1722 evnt_halloween_jackolantern_01.adr; a click turns the clicker into a jack-o-lantern 1689 jackolantern_m_01.adr for 30 minutes (R: the Jack-o-Lantern treat 69818's look; the Mini Jack-O-Lantern item is not handed out); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 69842,
+      "name_id": 16637,
+      "model_id": 1725,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "transform": {
+              "model_id": 3305,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15909
+            }
+          },
+          "duration_ms": 1800000
+        },
+        {
+          "effect": {
+            "transform": {
+              "model_id": 198,
+              "poof_effect_id": 21
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Place this cauldron on the ground and click on it to receive a spooky treat.'; prop 1725 evnt_halloween_cauldron_01.adr; a click gives one spooky cupcake's effect at once: bat 3305, ghosts 15909 or raven 198 for 30 minutes (R: B1's 69839-69841 rows; the treat item is not handed out); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 76642,
+      "name_id": 134442,
+      "model_id": 1971,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16413
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16380
+            }
+          },
+          "duration_ms": 10000
+        },
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 16381
+            }
+          },
+          "duration_ms": 10000
+        }
+      ],
+      "source": "C3 item_behaviour: item text 'Stockings come stuffed with holiday fireworks!'; prop 1971 mkt_holiday_fireplace_01.adr; a click sets off one holiday firework on the clicker for 10 s: 16413, 16380 or 16381 (R: B1's 2011 firework effects; the firework items are not handed out); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
       "item_id": 77330,
       "name_id": 134703,
       "model_id": 2061,
@@ -350,6 +938,33 @@
         }
       ],
       "source": "B1 birthday_bash: item text 'It's made out of real cakelings...'; prop 407 mkt_cakes_glerga_01.adr; outcome cakeling 152 cakeling_m_basic.adr and 30 minutes (R, as the regional birthday cakes); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
+    },
+    {
+      "item_id": 78580,
+      "name_id": 5102546,
+      "model_id": 4592,
+      "cursor_id": 5,
+      "animation_id": 1,
+      "spawn_effect_ids": [
+        21
+      ],
+      "lifetime_ms": 60000,
+      "item_cooldown_ms": 60000,
+      "click_window_ms": 5000,
+      "click_range_m": 5.0,
+      "spawn_offset_m": 1.5,
+      "icon_id": 3843,
+      "outcomes": [
+        {
+          "effect": {
+            "aura": {
+              "composite_effect_id": 15974
+            }
+          },
+          "duration_ms": 1800000
+        }
+      ],
+      "source": "B1 halloween: fandom Toxic Barrel 'Place the barrel and then click it to acquire some toxic effects!', 'a green fire effect appears around the player's head'; prop 4592 mkt_toxic_barrel_01.adr; effect 15974 PFX_fire_green_head_pumpkin-prince_loop (R) for 30 minutes (R); cursor 5 cursor_talk, spawn poof 21, the 60 s lifetime, 5 s click window and 60 s recast are the regional birthday cakes' (R)"
     }
   ]
 }

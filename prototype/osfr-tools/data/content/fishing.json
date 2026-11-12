@@ -1758,138 +1758,151 @@
   "lures": [
     {
       "key": "16oz_steak",
+      "item_id": 68152,
       "name": "16oz Steak - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "talking_bass",
-        "cheery_salmon",
-        "bitter_betta"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "flyfisher_3000",
-      "name": "Flyfisher 3000 - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "plattypus",
-        "lady_tetra",
-        "roach_loach"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "french_fry",
-      "name": "French Fry - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "spineless_stickleback",
-        "calico_catfish",
-        "purplenosed_shark"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "frostflies",
-      "name": "Frostflies - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "goofy_grouper",
-        "finless_fish",
-        "fanged_grouper"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "mega_slider",
-      "name": "Mega Slider - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "blue_thornfin",
-        "chipsen_fish",
-        "thorny_trout"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "nightcrawlers",
-      "name": "Nightcrawlers - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "pacu_pacu",
-        "peachy_perch",
-        "globfish"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "perch_pinpointer",
-      "name": "Perch Pinpointer - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "chilly_grouper",
-        "butter_flyfish",
-        "briar_nibbler"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "shiny_crankbait",
-      "name": "Shiny Crankbait - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "frostgill_smelt",
-        "flutterfish",
-        "ink_cod"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "skipper_seeker",
-      "name": "Skipper Seeker - Lure",
       "bonus_percent": 10,
       "fish": [
         "winter_piranha",
         "toothy_tetra",
         "blind_swurglefish"
       ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
     },
     {
-      "key": "sleek_clicker",
-      "name": "Sleek Clicker - Lure",
+      "key": "flyfisher_3000",
+      "item_id": 68153,
+      "name": "Flyfisher 3000 - Lure",
       "bonus_percent": 10,
       "fish": [
-        "coach_loach",
-        "feral_catfish",
-        "creeping_cod"
+        "chilly_grouper",
+        "butter_flyfish",
+        "briar_nibbler"
       ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
     },
     {
-      "key": "thorn_jig",
-      "name": "Thorn Jig - Lure",
-      "bonus_percent": 10,
-      "fish": [
-        "frozen_char",
-        "slugmud_skipper",
-        "old_sole"
-      ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
-    },
-    {
-      "key": "tiny_rib",
-      "name": "Tiny Rib - Lure",
+      "key": "french_fry",
+      "item_id": 68154,
+      "name": "French Fry - Lure",
       "bonus_percent": 10,
       "fish": [
         "blubracuda",
         "baconfish",
         "changed_salmon"
       ],
-      "source": "10%: client lure text; name-to-group pairing: wiki"
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "frostflies",
+      "item_id": 68155,
+      "name": "Frostflies - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "frostgill_smelt",
+        "flutterfish",
+        "ink_cod"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "mega_slider",
+      "item_id": 68156,
+      "name": "Mega Slider - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "goofy_grouper",
+        "finless_fish",
+        "fanged_grouper"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "nightcrawlers",
+      "item_id": 68157,
+      "name": "Nightcrawlers - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "plattypus",
+        "lady_tetra",
+        "roach_loach"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "perch_pinpointer",
+      "item_id": 68158,
+      "name": "Perch Pinpointer - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "pacu_pacu",
+        "peachy_perch",
+        "globfish"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "shiny_crankbait",
+      "item_id": 68159,
+      "name": "Shiny Crankbait - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "coach_loach",
+        "feral_catfish",
+        "creeping_cod"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "skipper_seeker",
+      "item_id": 68160,
+      "name": "Skipper Seeker - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "frozen_char",
+        "slugmud_skipper",
+        "old_sole"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "sleek_clicker",
+      "item_id": 68161,
+      "name": "Sleek Clicker - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "talking_bass",
+        "cheery_salmon",
+        "bitter_betta"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "thorn_jig",
+      "item_id": 68162,
+      "name": "Thorn Jig - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "blue_thornfin",
+        "chipsen_fish",
+        "thorny_trout"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
+    },
+    {
+      "key": "tiny_rib",
+      "item_id": 68163,
+      "name": "Tiny Rib - Lure",
+      "bonus_percent": 10,
+      "fish": [
+        "spineless_stickleback",
+        "calico_catfish",
+        "purplenosed_shark"
+      ],
+      "source": "10%: client lure text; fish: the lure item's own client description (C3, 2026-11-12; the wiki pairing had them one lure off)"
     },
     {
       "key": "treasure_magnet",
+      "item_id": 68164,
       "name": "Treasure Magnet",
       "bonus_percent": 10,
       "fish": [],

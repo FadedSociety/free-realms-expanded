@@ -1726,6 +1726,7 @@ impl Gateway {
                         outcome.open_lobby = result.open_lobby.or(outcome.open_lobby.take());
                         outcome.boombox = result.boombox.or(outcome.boombox.take());
                         outcome.shared_cake = result.shared_cake.or(outcome.shared_cake.take());
+                        outcome.group_heal = result.group_heal.or(outcome.group_heal.take());
                         outcome.house_broadcast = crate::housing_service::HouseBroadcast::merge(
                             outcome.house_broadcast.take(),
                             result.house_broadcast,

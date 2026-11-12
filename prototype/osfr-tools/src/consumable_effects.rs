@@ -44,7 +44,15 @@ pub const MAX_BURSTS: usize = 4;
 /// Matcher's Fortune, Talent, .., Timing 27, Maker's Advantage 29, Maker's Power 30; the captured
 /// startup stats hold none of them).
 pub const MINIGAME_STATS: std::ops::RangeInclusive<i32> = 23..=32;
-pub const MAX_STAT_VALUE: i32 = 100;
+/// C3: the combat stats a food or potion buff raises (`CharacterStatId`: MaxHealth 1, MaxMana 5,
+/// EquippedMeleeWeaponDamage 14, DamageReductionPercent 18). They are the server's: the client's
+/// own values start at 2500, 100 and 1 (Sanctuary `ClientPcData`), so a 38/7 with the bonus alone
+/// would overwrite them. The buff row shows; `item_use.rs` hands 14 and 18 to the encounter engine.
+pub const COMBAT_STATS: [i32; 4] = [1, 5, 14, 18];
+/// C3: a fishing lure's stat, 0 at login (Sanctuary `ClientPcData`).
+pub const FISHING_LUCK: i32 = 48;
+/// (R) Sanity bound: the largest shipped value is Strong Arm Stew's +500 health.
+pub const MAX_STAT_VALUE: i32 = 1_000;
 
 // (R) Buff ids and world tags live in their own id ranges, far above the captured startup tags
 // (2 and 4), the job tags (composite ids such as 15255) and the power-up tags (definition ids).
@@ -101,6 +109,23 @@ pub fn encode_stat(guid: u64, stat_id: i32, value: i32) -> Vec<u8> {
     bytes
 }
 
+/// The 38/7 a stat buff sends with `value` (0 when it ends): none for a combat stat, an integer
+/// for the rest.
+fn stat_packet(guid: u64, stat_id: i32, value: i32) -> Option<Vec<u8>> {
+    (!COMBAT_STATS.contains(&stat_id)).then(|| encode_stat(guid, stat_id, value))
+}
+
+/// (R) The slot of a stat buff: one minigame buff (B1), one combat buff and one lure live at a
+/// time; a buff of the same slot replaces the live one. `None` for any other stat.
+fn stat_slot(stat_id: i32) -> Option<usize> {
+    match stat_id {
+        id if MINIGAME_STATS.contains(&id) => Some(STAT),
+        id if COMBAT_STATS.contains(&id) => Some(COMBAT),
+        FISHING_LUCK => Some(FISHING),
+        _ => None,
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Kind {
     /// `poof_effect_id` 0 plays no poof.
@@ -127,7 +152,9 @@ pub enum Kind {
         composite_effect_id: i32,
         target: u64,
     },
-    /// B1: a minigame buff: character stat `stat_id` is `value` while live and 0 after.
+    /// B1: a minigame buff: character stat `stat_id` is `value` while live and 0 after. C3: or a
+    /// combat buff ([`COMBAT_STATS`]: 14 is a percent more damage dealt, 18 a percent less taken),
+    /// or a lure ([`FISHING_LUCK`]).
     Stat {
         stat_id: i32,
         value: i32,
@@ -186,7 +213,8 @@ pub enum Refusal {
     Id,
     /// L087: a booster percent outside `1..=MAX_BOOST_PERCENT`.
     Percent,
-    /// B1: a stat outside [`MINIGAME_STATS`] or a value outside `1..=MAX_STAT_VALUE`.
+    /// B1: a stat no buff slot takes (C3: minigame, combat or lure) or a value outside
+    /// `1..=MAX_STAT_VALUE`.
     Stat,
 }
 
@@ -242,11 +270,14 @@ const SCALE: usize = 2;
 const STARS: usize = 3;
 const COINS: usize = 4;
 const STAT: usize = 5;
+const COMBAT: usize = 6;
+const FISHING: usize = 7;
+const SLOTS: usize = 8;
 
 /// One player's live effects. Session-only: nothing here is saved.
 #[derive(Clone, Debug, PartialEq)]
 pub struct EffectStack {
-    slots: [Option<Live>; 6],
+    slots: [Option<Live>; SLOTS],
     bursts: Vec<Burst>,
     next_buff_id: i32,
     next_world_tag: i32,
@@ -255,7 +286,7 @@ pub struct EffectStack {
 impl Default for EffectStack {
     fn default() -> Self {
         Self {
-            slots: [None; 6],
+            slots: [None; SLOTS],
             bursts: Vec::new(),
             next_buff_id: BUFF_ID_BASE,
             next_world_tag: WORLD_TAG_BASE,
@@ -299,7 +330,7 @@ pub fn admits(spec: &Spec) -> Result<(), Refusal> {
             ..
         } if composite_effect_id <= 0 => Err(Refusal::Id),
         Kind::Stat { stat_id, value }
-            if !MINIGAME_STATS.contains(&stat_id) || !(1..=MAX_STAT_VALUE).contains(&value) =>
+            if stat_slot(stat_id).is_none() || !(1..=MAX_STAT_VALUE).contains(&value) =>
         {
             Err(Refusal::Stat)
         }
@@ -317,6 +348,20 @@ impl EffectStack {
     /// is (R, OSFR: a treat never replaces a transform).
     pub fn has_transform(&self) -> bool {
         self.slots[TRANSFORM].is_some()
+    }
+
+    /// C3: whether a fishing lure's buff is live.
+    pub fn has_lure(&self) -> bool {
+        self.slots[FISHING].is_some()
+    }
+
+    /// C3: the live combat buff as `(stat id, value, end ms)`, for the encounter engine.
+    pub fn combat_buff(&self) -> Option<(i32, i32, u64)> {
+        let live = self.slots[COMBAT]?;
+        match live.spec.kind {
+            Kind::Stat { stat_id, value } => Some((stat_id, value, live.ends_at)),
+            _ => None,
+        }
     }
 
     /// L087: the live boosters. The tick ends one on time, so no clock is needed here.
@@ -354,7 +399,8 @@ impl EffectStack {
                 raises: Boosted::Coins,
                 ..
             } => COINS,
-            Kind::Stat { .. } => STAT,
+            // `admits` refused every stat without a slot.
+            Kind::Stat { stat_id, .. } => stat_slot(stat_id).unwrap_or(STAT),
             Kind::Burst {
                 composite_effect_id,
                 target,
@@ -408,9 +454,9 @@ impl EffectStack {
                 self.slots[SCALE] = Some(live);
             }
             Kind::Stat { stat_id, value } => {
-                emit.to_self.push(encode_stat(guid, stat_id, value));
+                emit.to_self.extend(stat_packet(guid, stat_id, value));
                 emit.to_self.push(row);
-                self.slots[STAT] = Some(live);
+                self.slots[slot] = Some(live);
             }
             Kind::Boost { .. } | Kind::Burst { .. } => {
                 emit.to_self.push(row);
@@ -454,7 +500,7 @@ impl EffectStack {
         if due(&self.slots[SCALE]) {
             self.end(guid, SCALE, &mut emit);
         }
-        for slot in [STARS, COINS, STAT] {
+        for slot in [STARS, COINS, STAT, COMBAT, FISHING] {
             if due(&self.slots[slot]) {
                 self.end(guid, slot, &mut emit);
             }
@@ -516,8 +562,10 @@ impl EffectStack {
         for (tag, composite) in visual.auras {
             packets.push(encode_add_composite_effect(guid, tag, composite, guid));
         }
-        if let Some(Kind::Stat { stat_id, value }) = self.slots[STAT].map(|l| l.spec.kind) {
-            packets.push(encode_stat(guid, stat_id, value));
+        for slot in [STAT, COMBAT, FISHING] {
+            if let Some(Kind::Stat { stat_id, value }) = self.slots[slot].map(|l| l.spec.kind) {
+                packets.extend(stat_packet(guid, stat_id, value));
+            }
         }
         for live in self.slots.iter().flatten() {
             let remaining = live.ends_at.saturating_sub(now_ms);
@@ -607,7 +655,7 @@ fn retire(guid: u64, live: Live, revert: bool, emit: &mut Emit) {
         }
         Kind::Scale { .. } if revert => emit.both(encode_update_scale(guid, 1.0)),
         // A replacing buff sets its own stat after this, so the old one is always cleared.
-        Kind::Stat { stat_id, .. } => emit.to_self.push(encode_stat(guid, stat_id, 0)),
+        Kind::Stat { stat_id, .. } => emit.to_self.extend(stat_packet(guid, stat_id, 0)),
         _ => {}
     }
     emit.to_self.push(encode_remove_effect_tag(live.buff_id));

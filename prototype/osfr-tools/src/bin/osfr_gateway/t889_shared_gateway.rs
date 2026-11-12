@@ -341,7 +341,7 @@ fn the_collection_plant_near_the_hooligan_tent_is_shown_and_gathered_by_both_cli
 }
 
 /// One `Session::tick` of client `index`, as `Server::step` runs it.
-fn tick_client(table: &mut Table, index: usize, now: u64) {
+pub(super) fn tick_client(table: &mut Table, index: usize, now: u64) {
     let key = table.keys[index];
     let server = &mut table.server;
     let mut session = server.sessions.remove(&key).unwrap();

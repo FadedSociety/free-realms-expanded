@@ -1018,7 +1018,7 @@ fn schema_two_rows_load_within_sanity_bounds() {
     assert!(Effects::new(rows(513)).is_err());
     fs::write(
         fixture.path.join("consumables.json"),
-        vec![b'x'; 256 * 1024 + 1],
+        vec![b'x'; 1024 * 1024 + 1],
     )
     .unwrap();
     assert!(Effects::load(&fixture.path).is_err());

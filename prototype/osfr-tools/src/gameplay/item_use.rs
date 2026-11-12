@@ -7,6 +7,9 @@
 use super::*;
 use crate::consumable_effects::{self, Emit, Refusal, Spec};
 
+/// C3: the high word of a shared potion's group-heal key ('POTI'); kill keys carry enemy guids.
+const SHARED_POTION: u64 = 0x504f_5449_0000_0000;
+
 /// `Outcome.changed` follows what a stranger can see (R): the AddPc snapshot a late joiner gets
 /// must be refreshed, so a visual change marks the character changed. That is one save per apply
 /// or expiry, which is rare. A buff row alone changes nothing visible.
@@ -44,8 +47,46 @@ impl Gameplay {
     pub(super) fn tick_consumable_effects(&mut self, guid: u64, now_ms: u64, out: &mut Outcome) {
         let emit = self.consumable_effects.tick(guid, now_ms);
         if !emit.is_empty() {
+            self.sync_lure(guid);
             out.absorb(outcome_of(emit));
         }
+    }
+
+    /// C3: a lure that ended (on time or cancelled) comes off the line. There is no session to
+    /// clear outside fishing, so the error is the no-op it looks like.
+    fn sync_lure(&mut self, guid: u64) {
+        if !self.consumable_effects.has_lure() {
+            let _ = self.fishing.set_lure(guid, None);
+        }
+    }
+
+    /// C3: a lure item pressed, checked or used while the player is not fishing is refused with a
+    /// reason, before the bar spends it: the lure goes on a fishing session's line.
+    fn lure_refusal(&self, inner: &[u8]) -> Option<Outcome> {
+        if !self.fishing.is_empty() {
+            return None;
+        }
+        let pressed = inner.starts_with(&[36, 0, 10, 0]);
+        let instance = if pressed {
+            if inner.get(4..8) != Some(&2_i32.to_le_bytes()[..]) {
+                return None;
+            }
+            let slot = i32::from_le_bytes(inner.get(8..12)?.try_into().ok()?);
+            let bound = self.item_bar.bindings().iter().find(|b| b.slot == slot)?;
+            bound.item_instance_id
+        } else {
+            crate::item_bar::use_wire::decode_immediate_activation(inner)?.1
+        };
+        let item = self.inventory.state().items.iter().find(|i| i.id == instance)?;
+        crate::fishing_service::FishingService::lure_key_for_item(item.definition_id)?;
+        let mut replies = vec![crate::chat::system("Use a lure while you are fishing.")];
+        if pressed {
+            replies.insert(0, crate::abilities::unsupported_cast_failure());
+        }
+        Some(Outcome {
+            replies,
+            ..Outcome::default()
+        })
     }
 
     /// 35/33, the buff bar's cancel (client sender `00934740`, one i32 id). Only an effect this
@@ -61,7 +102,83 @@ impl Gameplay {
             return Ok(None);
         };
         let emit = self.consumable_effects.strip(guid, id).unwrap_or_default();
+        self.sync_consumable_buff();
+        self.sync_lure(guid);
         Ok(Some(outcome_of(emit)))
+    }
+
+    /// C3: a restore row: its cast on the user (seen by neighbours too), its health and energy at
+    /// once or over time through the encounter engine, and, shared, the gateway's group-heal route
+    /// for the health part (the user's group in the same place). The key is this use's own, so
+    /// every shared potion heals once. The energy half is the user's alone (R): the group route
+    /// carries health only.
+    fn apply_restore(
+        &mut self,
+        restore: crate::item_bar::Restore,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) {
+        if restore.cast_effect_id > 0 {
+            let cast = crate::abilities::effect_packets::encode_play_composite_effect(
+                character.guid,
+                restore.cast_effect_id,
+                character.position,
+            );
+            out.nearby.push(cast.clone());
+            out.replies.push(cast);
+        }
+        let Some(engine) = self.encounter.as_mut() else {
+            return;
+        };
+        let (health, energy) = (restore.health_percent, restore.energy_percent);
+        // The part at once (all of it without `over_ms`), then the rest a step a second.
+        let now = |percent: u32| {
+            if restore.over_ms == 0 {
+                percent
+            } else {
+                restore.instant_percent.min(percent)
+            }
+        };
+        if health > 0 && now(health) > 0 {
+            out.replies.extend(engine.heal_player_percent(now(health)));
+        }
+        if energy > 0 && now(energy) > 0 {
+            out.replies.extend(engine.restore_player_energy_percent(now(energy)));
+        }
+        if restore.over_ms > 0 {
+            if health > now(health) {
+                engine.heal_player_over_time(health - now(health), restore.over_ms, now_ms);
+            }
+            if energy > now(energy) {
+                let rest = energy - now(energy);
+                engine.restore_player_energy_over_time(rest, restore.over_ms, now_ms);
+            }
+        }
+        if restore.shared && health > 0 {
+            out.group_heal = Some(crate::encounter::GroupHeal {
+                percent: health,
+                kill: (SHARED_POTION | character.guid, now_ms),
+            });
+        }
+    }
+
+    /// C3: the encounter engine's share of the live combat buff: Attack (stat 14) deals its value
+    /// in percent more damage and Defense (stat 18) takes its value in percent less, until the
+    /// buff ends (the engine drops it on time). MaxHealth and MaxMana have no engine hook, so only
+    /// their buff row shows. Run after every apply, cancel and scene load (the engine clears its
+    /// buffs on a knock-out, a job change and a session reset).
+    fn sync_consumable_buff(&mut self) {
+        let Some(engine) = self.encounter.as_mut() else {
+            return;
+        };
+        let percent = |value: i32| u32::try_from(value).unwrap_or(0);
+        let (damage, taken, until) = match self.consumable_effects.combat_buff() {
+            Some((14, value, until)) => (percent(value), 0, until),
+            Some((18, value, until)) => (0, percent(value), until),
+            _ => (0, 0, 0),
+        };
+        engine.set_consumable_buff(damage, taken, until);
     }
 
     /// W146: the four item-bar slots (38/25 at world entry), then the live effects again (R):
@@ -77,6 +194,7 @@ impl Gameplay {
             .extend(self.item_bar.refresh(&self.inventory, now_ms)?);
         out.replies
             .extend(self.consumable_effects.resend_to_self(guid, now_ms));
+        self.sync_consumable_buff();
         Ok(())
     }
 
@@ -109,6 +227,9 @@ impl Gameplay {
         // upgrade picker (36/17) and changes nothing.
         if let Some(out) = self.use_upgrade_item(inner)? {
             return Ok(Some(out));
+        }
+        if let Some(refused) = self.lure_refusal(inner) {
+            return Ok(Some(refused));
         }
         let aimed = inner
             .starts_with(&[36, 0, 10, 0])
@@ -175,6 +296,9 @@ impl Gameplay {
         {
             encounter.heal_player_over_time(percent, over_ms, now_ms);
         }
+        if let Some(restore) = reply.restore {
+            self.apply_restore(restore, character, now_ms, &mut out);
+        }
         if let Some(spec) = reply.effect {
             // The item bar admitted this exact spec in the same call, before spending the item,
             // and `apply` runs the same pure check: an error here is unreachable.
@@ -183,6 +307,14 @@ impl Gameplay {
             {
                 out.absorb(applied);
             }
+            self.sync_consumable_buff();
+        }
+        // C3: a lure goes on the fishing session's line (`lure_refusal` saw one open).
+        let lure = reply
+            .used_definition
+            .and_then(crate::fishing_service::FishingService::lure_key_for_item);
+        if let Some(key) = lure {
+            let _ = self.fishing.set_lure(character.guid, Some(key));
         }
         if let Some(strike) = reply.strike {
             let throw = move |engine: &mut crate::encounter::EncounterEngine| {
@@ -388,6 +520,81 @@ mod tests {
             free.shared_cake,
             Some(crate::placed_cakes::Action::Click { guid })
         );
+    }
+
+    /// C3: a lure is refused (and kept) with a reason outside fishing; used while fishing it goes
+    /// on the session's line, and comes off when its buff ends.
+    #[test]
+    fn c3_a_lure_goes_on_the_fishing_line_for_its_time() {
+        use crate::item_bar::use_wire::{ImmediateActivation, encode_immediate_activation};
+        const LURE: i32 = 68152; // 16oz Steak
+        let reference = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        // The reference with the release item tables beside it, which define the lure.
+        let dir = std::env::temp_dir().join(format!("osfr-c3-lure-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        for entry in std::fs::read_dir(&reference).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_file() {
+                std::fs::copy(&path, dir.join(path.file_name().unwrap())).unwrap();
+            }
+        }
+        let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+        for name in ["item-table.json", "item-table-supplement.json"] {
+            std::fs::copy(release.join(name), dir.join(name)).unwrap();
+        }
+        let mut saved = Gameplay::load(&dir, None).unwrap().state();
+        let id = saved.inventory.items.iter().map(|i| i.id).max().unwrap_or(0) + 1000;
+        saved.inventory.items.push(InventoryItem {
+            definition_id: LURE,
+            tint: 0,
+            id,
+            count: 2,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        let mut game = Gameplay::load(&dir, Some(saved)).unwrap();
+        game.initialize_world(&who(), 0).unwrap();
+        let check = encode_immediate_activation(ImmediateActivation::Check, id);
+        let use_it = encode_immediate_activation(ImmediateActivation::Use, id);
+        let refused = game.handle_in_world(&check, &who(), 1_000).unwrap();
+        let said = |out: &Outcome| {
+            out.replies
+                .iter()
+                .any(|p| String::from_utf8_lossy(p).contains("Use a lure while you are fishing."))
+        };
+        assert!(said(&refused), "not fishing: the reason");
+        let held = |game: &Gameplay| {
+            let items = &game.state().inventory.items;
+            items.iter().find(|i| i.id == id).map(|i| i.count - i.consumed_count)
+        };
+        assert_eq!(held(&game), Some(2), "kept");
+
+        let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let spots = crate::fishing_service::FishingSpots::load(&directory)
+            .unwrap()
+            .unwrap();
+        let rewards = game.reward_snapshot();
+        game.fishing
+            .enter(&spots, REED, 1, 0, who().position, false, 1, rewards)
+            .unwrap();
+        game.handle_in_world(&check, &who(), 2_000).unwrap();
+        game.handle_in_world(&use_it, &who(), 2_001).unwrap();
+        assert_eq!(game.fishing.lure_key(1), Some("16oz_steak"), "on the line");
+        assert_eq!(held(&game), Some(1), "one lure spent");
+        let length = match game.item_bar.effect(LURE).map(|row| row.effect) {
+            Some(crate::item_bar::EffectKind::Stat { duration_ms, .. }) => duration_ms,
+            other => panic!("{other:?}"),
+        };
+        let mut out = Outcome::default();
+        game.tick_consumable_effects(1, 2_001 + length, &mut out);
+        assert_eq!(game.fishing.lure_key(1), None, "off the line when the buff ends");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     /// F690: the host's row is the catalogue's shared pointer, not a fresh copy of the clip table.
