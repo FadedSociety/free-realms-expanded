@@ -2653,7 +2653,77 @@
                 "kind": "reconstructed",
                 "evidence": "(R) Robgoblins uses the generic client Robgoblin name and basic combat body."
               }
-            ]
+            ],
+            "behaviour": {
+              "rules": [
+                {
+                  "id": "l1189_bark",
+                  "when": {
+                    "engaged": {}
+                  },
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          36790,
+                          36791,
+                          36792,
+                          36793,
+                          36794,
+                          36795,
+                          36802,
+                          36803,
+                          42044,
+                          42045,
+                          42046,
+                          42047,
+                          42052
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "once": true
+                },
+                {
+                  "id": "l1189_taunt",
+                  "when": {
+                    "every": {
+                      "ms": 9000,
+                      "first_ms": 7000
+                    }
+                  },
+                  "if": [
+                    {
+                      "chance": 0.35
+                    }
+                  ],
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          36790,
+                          36791,
+                          36792,
+                          36793,
+                          36794,
+                          36795,
+                          36802,
+                          36803,
+                          42044,
+                          42045,
+                          42046,
+                          42047,
+                          42052
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "cooldown_ms": 15000
+                }
+              ]
+            }
           },
           {
             "source_field": "enemies",

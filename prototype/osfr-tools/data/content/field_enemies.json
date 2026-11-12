@@ -1499,7 +1499,59 @@
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 62.4 m from the nearest same-kind Legacy NPC row 2930 (FabledRealms.lua:1673), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102007 (W102-Q1); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 131000102020,
@@ -1547,7 +1599,59 @@
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 72.3 m from the nearest same-kind Legacy NPC row 2930 (FabledRealms.lua:1673), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102008 (W102-Q2); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 131000102021,
@@ -1859,7 +1963,59 @@
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 79.7 m from the nearest same-kind Legacy NPC row 2915 (FabledRealms.lua:1658), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 17 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 131000102034,
@@ -1899,7 +2055,59 @@
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 89.3 m from the nearest same-kind Legacy NPC row 2915 (FabledRealms.lua:1658), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 18 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38287,
+                    38288,
+                    38289,
+                    38290
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 131000102035,
@@ -2015,7 +2223,71 @@
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000024 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    77907,
+                    77908,
+                    77909,
+                    77910,
+                    387650,
+                    387651,
+                    387652,
+                    387653,
+                    387654,
+                    387655
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    77907,
+                    77908,
+                    77909,
+                    77910,
+                    387650,
+                    387651,
+                    387652,
+                    387653,
+                    387654,
+                    387655
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 5064655448674664452,
@@ -2342,7 +2614,59 @@
           "kind": "reconstructed",
           "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3020035 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    439268,
+                    439269,
+                    439270,
+                    439271
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    439268,
+                    439269,
+                    439270,
+                    439271
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 5064655448674664461,
@@ -2554,7 +2878,57 @@
           "kind": "reconstructed",
           "evidence": "(R) T730: the spot is about 19 m from Pappy Farnum, whose quest asks for it, and 32 m from the Sheep Watch marker (battle 12350), on the standable ground that the T103 disc rule samples (the opening stage 910008's own Gloam Creature placement, encounters.json guid 5715144128442925075, sits 21 m from that marker and so could not be reused). Level 4 (the top of the starter bands: a level 5 band sits 21 m from low-level battle 12350's marker, inside the 40 m clearance), health 100, damage 8, respawn 60 s and aggro 8.0 m are the local balance on the field ladder T699 used, not the opening's scripted 300/35. Present only while quest 3000010 is active. The GUID is a fresh actor id, not the opening actor's. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest, so it cannot be farmed."
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    438343,
+                    438345,
+                    438347
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    438343,
+                    438345,
+                    438347
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     {
       "guid": 100000004667,
@@ -2642,7 +3016,59 @@
           "kind": "reconstructed",
           "evidence": "(R) T889: the owner saw this Legacy spawn as a blue (friendly) Hooligan Archer that could not be fought, so it is promoted to a hostile always-on body in the mid_highroad_tent_hooligans group. The Legacy spot passes the same check, so the body keeps it to within a metre. T889 reran lab/reports/field-enemies-w102/check_placements.py validate() over lab/terrain/zone_0.hgt for this centre with the group's 12 m leash and 2.5 m reach: height error under 0.051 m, max slope 8.5 deg over every 2 m node of the leash disc, 55.1 m from the nearest NPC body (need 39.5), and a 4-neighbour walk over 2 m nodes with slope <= 25 deg reaches the W102-H1 camp. Level 8 in band 7-8 as the MID-H1/MID-H2 Hooligans beside it; HP/damage are the enemies.json definition 930012 values (140/11); W105 scaling by level produces the live stats. 12 m leash, melee reach and the 90 s group respawn are as mid_highroad_hooligans; count and rates are local policy."
         }
-      ]
+      ],
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37167,
+                    37168,
+                    37169,
+                    37170
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37167,
+                    37168,
+                    37169,
+                    37170
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     }
   ]
 }

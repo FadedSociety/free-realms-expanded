@@ -45,14 +45,118 @@
       "name": "Robgoblin Bruiser",
       "name_id": 6944,
       "model_id": 189,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    117230,
+                    117231,
+                    117236,
+                    117237,
+                    117238
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    117230,
+                    117231,
+                    117236,
+                    117237,
+                    117238
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "robgoblin_wiz_ord": {
       "definition_id": 950109,
       "name": "Robgoblin Wiz-ord",
       "name_id": 6945,
       "model_id": 191,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    36799,
+                    36800,
+                    36801
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    36799,
+                    36800,
+                    36801
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "wizard_hildegarde": {
       "definition_id": 950110,
@@ -60,7 +164,59 @@
       "name_id": 6946,
       "model_id": 188,
       "rank": "dungeon_boss",
-      "boss": true
+      "boss": true,
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    7588,
+                    7592,
+                    7596,
+                    7600
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    7588,
+                    7592,
+                    7596,
+                    7600
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     }
   },
   "actors": {

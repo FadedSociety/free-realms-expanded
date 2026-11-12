@@ -42,7 +42,73 @@
       "name": "Rebel Bixie Warrior",
       "name_id": 74152,
       "model_id": 220,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38279,
+                    38280,
+                    38281,
+                    38282,
+                    38283,
+                    38284,
+                    38285,
+                    38286,
+                    74963,
+                    74964,
+                    74965
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38279,
+                    38280,
+                    38281,
+                    38282,
+                    38283,
+                    38284,
+                    38285,
+                    38286,
+                    74963,
+                    74964,
+                    74965
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "rebel_bixie_mage": {
       "definition_id": 1402902,
@@ -64,7 +130,53 @@
       "name_id": 74022,
       "model_id": 211,
       "rank": "dungeon_boss",
-      "boss": true
+      "boss": true,
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    74029
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    74029
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     }
   },
   "actors": {

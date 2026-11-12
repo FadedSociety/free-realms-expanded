@@ -54,6 +54,12 @@ const LOOK_AT_SALT: u64 = 0x2545_f491_4f6c_dd1d;
 const CONVERSATION_GAP_SALT: u64 = 0x8ebc_6af0_9c88_c6e3;
 const CONVERSATION_PHASE_SALT: u64 = 0xd6e8_feb8_6659_fd93;
 const CONVERSATION_ID_SALT: u64 = 0xbf58_476d_1ce4_e5b9;
+const SPEECH_PERIOD_SALT: u64 = 0x5851_f42d_4c95_7f2d;
+const SPEECH_PHASE_SALT: u64 = 0x1405_7b7e_f767_814f;
+const SPEECH_LINE_SALT: u64 = 0xa076_1d64_78bd_642f;
+/// A line carries farther than a look-at: Samantha greets a player arriving 40 m below her hill.
+const MAX_SPEECH_RADIUS: f32 = 60.0;
+const MAX_SPEAKERS: usize = 4096;
 
 #[derive(Clone, Debug)]
 pub struct NpcAmbient {
@@ -65,6 +71,51 @@ pub struct NpcAmbient {
     talking: BTreeSet<u64>,
     idles: BTreeMap<u64, IdleSchedule>,
     look_at: BTreeMap<u64, LookAtSchedule>,
+    /// Ambient chat-bubble lines by actor GUID; `position` is set for actors the world shows.
+    speakers: BTreeMap<u64, Speaker>,
+}
+
+/// Owner 2026-11-12: an NPC says its own lines unprompted, as a player typing in chat would,
+/// to the players near it. Legacy's Samantha (`FreeRealms-Legacy` `Scripts/Npc/welcomer.lua`)
+/// says Global.Text 8130 "Welcome to Free Realms!" to her viewers every 10-20 s.
+#[derive(Clone, Debug)]
+struct Speaker {
+    text_ids: Vec<i32>,
+    radius: f32,
+    min_interval_ms: u64,
+    max_interval_ms: u64,
+    position: Option<[f32; 3]>,
+}
+
+impl Speaker {
+    /// (R) The line a firing in `(from_ms, to_ms]` says, with the same stateless schedule as
+    /// the emote rows: every viewer hears the same line in the same window.
+    fn due(&self, guid: u64, from_ms: u64, to_ms: u64) -> Option<(i32, [f32; 3])> {
+        let position = self.position?;
+        let span = self.max_interval_ms - self.min_interval_ms + 1;
+        let period = self.min_interval_ms + mix64(guid ^ SPEECH_PERIOD_SALT) % span;
+        let phase = mix64(guid ^ SPEECH_PHASE_SALT) % period;
+        let last = phase + to_ms.checked_sub(phase)? / period * period;
+        if last <= from_ms {
+            return None;
+        }
+        let firing = (last - phase) / period;
+        let pick = mix64(guid ^ firing.wrapping_add(1).wrapping_mul(SPEECH_LINE_SALT));
+        Some((self.text_ids[(pick % self.text_ids.len() as u64) as usize], position))
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LinesDocument {
+    /// The drawn actors: a regional row's `npc_id` or an extra spawn's `spawn_guid`.
+    actor_ids: Vec<u64>,
+    name: String,
+    text_ids: Vec<i32>,
+    radius_m: f32,
+    min_interval_ms: u64,
+    max_interval_ms: u64,
+    source: String,
 }
 
 #[derive(Clone, Debug)]
@@ -90,6 +141,8 @@ struct Document {
     #[serde(default = "default_conversation_radius_m")]
     conversation_radius_m: f32,
     rows: Vec<RowDocument>,
+    #[serde(default)]
+    lines: Vec<LinesDocument>,
 }
 
 fn default_conversation_radius_m() -> f32 {
@@ -273,6 +326,7 @@ impl NpcAmbient {
             talking: BTreeSet::new(),
             idles: BTreeMap::new(),
             look_at: BTreeMap::new(),
+            speakers: speakers(document.lines)?,
         })
     }
 
@@ -363,6 +417,24 @@ impl NpcAmbient {
             updates.push(AmbientUpdate::Conversation { guid, animation_id });
             used += 1;
         }
+        for (&guid, speaker) in &self.speakers {
+            if used + 2 > cap {
+                break;
+            }
+            if !known.contains(&guid) {
+                continue;
+            }
+            let Some((text_id, position)) = speaker.due(guid, from_ms, to_ms) else {
+                continue;
+            };
+            updates.push(AmbientUpdate::Say {
+                guid,
+                text_id,
+                position,
+                radius: speaker.radius,
+            });
+            used += 2;
+        }
         for &guid in known {
             if used == cap {
                 break;
@@ -385,6 +457,46 @@ impl NpcAmbient {
         }
         updates
     }
+}
+
+/// The `lines` rows by actor GUID; positions arrive with the shown actors.
+fn speakers(lines: Vec<LinesDocument>) -> io::Result<BTreeMap<u64, Speaker>> {
+    let mut speakers = BTreeMap::new();
+    for line in lines {
+        check_ids(&line.text_ids, "line")?;
+        if line.actor_ids.is_empty()
+            || line.text_ids.is_empty()
+            || line.name.trim().is_empty()
+            || line.source.trim().is_empty()
+        {
+            return Err(invalid(
+                "npc ambient line row needs actors, text ids, a name and a source",
+            ));
+        }
+        if !(MIN_LOOK_AT_RADIUS..=MAX_SPEECH_RADIUS).contains(&line.radius_m)
+            || !(MIN_INTERVAL_MS..=MAX_INTERVAL_MS).contains(&line.min_interval_ms)
+            || !(line.min_interval_ms..=MAX_INTERVAL_MS).contains(&line.max_interval_ms)
+        {
+            return Err(invalid(
+                "npc ambient line radius/interval is outside 1..=60 m / 500..=600000 ms",
+            ));
+        }
+        for guid in line.actor_ids {
+            let speaker = Speaker {
+                text_ids: line.text_ids.clone(),
+                radius: line.radius_m,
+                min_interval_ms: line.min_interval_ms,
+                max_interval_ms: line.max_interval_ms,
+                position: None,
+            };
+            if speakers.insert(guid, speaker).is_some() || speakers.len() > MAX_SPEAKERS {
+                return Err(invalid(
+                    "npc ambient lines bind one actor twice or too many actors",
+                ));
+            }
+        }
+    }
+    Ok(speakers)
 }
 
 fn check_ids(ids: &[i32], what: &str) -> io::Result<()> {

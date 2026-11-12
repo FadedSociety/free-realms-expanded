@@ -337,6 +337,8 @@ struct SayJson {
     text_id: Option<i32>,
     text: Option<String>,
     how: Option<String>,
+    #[serde(default)]
+    text_ids: Vec<i32>,
 }
 
 #[derive(Deserialize)]
@@ -478,16 +480,20 @@ fn line(value: &Value, what: &str) -> Result<Line, String> {
         Some("system") => How::System,
         Some(other) => return Err(format!("{what}: unknown how '{other}'")),
     };
-    if s.text_id.is_none() && s.text.as_deref().is_none_or(str::is_empty) {
+    if s.text_id.is_none() && s.text_ids.is_empty() && s.text.as_deref().is_none_or(str::is_empty) {
         return Err(format!("{what}: say needs text_id or text"));
     }
     if s.text.as_ref().is_some_and(|t| t.len() > 200) {
         return Err(format!("{what}: say text is over 200 bytes"));
     }
+    if s.text_ids.len() > 16 || s.text_ids.iter().any(|id| *id <= 0) {
+        return Err(format!("{what}: say text_ids holds 1..=16 positive ids"));
+    }
     Ok(Line {
         text_id: s.text_id,
         text: s.text,
         how,
+        text_ids: s.text_ids,
     })
 }
 

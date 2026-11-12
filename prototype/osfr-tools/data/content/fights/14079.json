@@ -45,7 +45,57 @@
       "name": "Changeling Bruiser",
       "name_id": 16785,
       "model_id": 239,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    427615,
+                    427616,
+                    427617
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    427615,
+                    427616,
+                    427617
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "changeling_defiler": {
       "definition_id": 950189,

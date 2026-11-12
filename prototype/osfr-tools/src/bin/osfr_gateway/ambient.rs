@@ -43,6 +43,10 @@ pub(super) fn queue_due(
                     players.knows_character(viewer, character)
                 })
             }
+            // A line is heard only by a viewer standing within its reach; the speaker turns to it.
+            AmbientUpdate::Say {
+                position, radius, ..
+            } => hearer(players, membership, zone, instance, viewer, *position, *radius),
             _ => Some(0),
         };
         let Some(target) = target else {
@@ -79,6 +83,27 @@ fn visible_target(
         }
         Some(_) => None,
     }
+}
+
+/// The viewer's own character when it is a ready player of this instance within `radius` of
+/// `position`, else `None`.
+fn hearer(
+    players: &PlayerRegistry,
+    membership: &World,
+    zone: ZoneInstance,
+    instance: i32,
+    viewer: SessionId,
+    position: [f32; 3],
+    radius: f32,
+) -> Option<u64> {
+    players
+        .nearest_session(zone, position, radius, |player| {
+            player.session_id == viewer
+                && membership
+                    .player_location(player.character_guid)
+                    .is_some_and(|location| location.instance_id == instance && location.ready)
+        })
+        .map(|player| player.character_guid)
 }
 
 /// Nearest ready player in the same instance and inside `radius`.
@@ -165,6 +190,27 @@ mod tests {
             nearest(&players, &world, 7, 10.0),
             None,
             "a player of another instance is never a target"
+        );
+    }
+
+    /// Owner 2026-11-12: only a viewer within a line's reach hears it, whoever else stands nearer.
+    #[test]
+    fn a_line_is_heard_only_by_a_ready_viewer_within_its_reach() {
+        if !super::super::tests::test_support::bin_test_target("t552") {
+            return;
+        }
+        let (players, world) = rig([true, true, true]);
+        let hears = |viewer: u64, radius: f32| {
+            hearer(&players, &world, ZONE, 0, SessionId(viewer), [0.0; 3], radius)
+        };
+        assert_eq!(hears(2, 10.0), Some(602), "a farther viewer still hears it");
+        assert_eq!(hears(3, 10.0), None, "40 m is out of a 10 m reach");
+        assert_eq!(hears(3, 50.0), Some(603));
+        let (players, world) = rig([true, false, true]);
+        assert_eq!(
+            hearer(&players, &world, ZONE, 0, SessionId(2), [0.0; 3], 10.0),
+            None,
+            "a viewer still loading hears nothing"
         );
     }
 

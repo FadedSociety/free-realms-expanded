@@ -230,9 +230,10 @@ const EXISTING_GROUPS: [&str; 10] = [
 /// field (including evidence text) changes this digest, except the placement
 /// of the 12 MID/HIGH rows T415 moved (`placement_masked`); the value is the
 /// pre-T415 prefix's masked digest. F6 (op-P-npc-life) set two Hooligan homes onto the floor
-/// (`scripts/npc_floor.py`), which moved this value.
+/// (`scripts/npc_floor.py`), which moved this value. L1189 gave the two Bixie Soldiers their
+/// bark rules (`behaviour`), which moved it again.
 const EXISTING_PREFIX_SHA256: &str =
-    "bce6bdfe646eae5ff97d10a43a0a137c4e0df41f462f55bad38210e046fac9cf";
+    "e94658cdcac68c39506f2969b22e2a7dd864806a327a099671a66caf82420e28";
 
 /// The existing level-10 and level-14 controls used to prove the actor level,
 /// not the player level, selects the reward band.

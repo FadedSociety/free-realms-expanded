@@ -51,21 +51,181 @@
       "name": "Robgoblin Boomer",
       "name_id": 42034,
       "model_id": 4,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    42049,
+                    42050,
+                    42051
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    42049,
+                    42050,
+                    42051
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "robgoblin_bruiser": {
       "definition_id": 950108,
       "name": "Robgoblin Bruiser",
       "name_id": 6944,
       "model_id": 189,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    117230,
+                    117231,
+                    117236,
+                    117237,
+                    117238
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    117230,
+                    117231,
+                    117236,
+                    117237,
+                    117238
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "robgoblin_kaboomer": {
       "definition_id": 3936,
       "name": "Robgoblin Kaboomer",
       "name_id": 6720,
       "model_id": 1682,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    36796,
+                    36797,
+                    36798,
+                    42049,
+                    42050,
+                    42051
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    36796,
+                    36797,
+                    36798,
+                    42049,
+                    42050,
+                    42051
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     }
   },
   "actors": {

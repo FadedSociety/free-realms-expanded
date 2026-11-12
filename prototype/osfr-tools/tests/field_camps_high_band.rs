@@ -86,8 +86,10 @@ const EXISTING_ACTORS: [(u64, &str); 24] = [
     (131000102016, "eaa0c43e0c6e28f84c9918ef47820c771e81f93853807b107866d09d756045f3"),
     (131000102017, "925a94ac887c3e94feb7e5e8e856806d365a489802563ae00ea1539359490fea"),
     (131000102018, "c76d2bf2c45b2da6ee8ebc4644be054c397f505a734c477c669c08aa4574ec5f"),
-    (131000102019, "2fab27c957a63ed49a490a2d62fed9e9b3102aadfdd03e02927b739fd5fb53bb"),
-    (131000102020, "da2762a99d74d4c8724f0c8d24558f5e5e1dee68359daf847ccd84697af3f9b0"),
+    // L1189 (lead, owner 2026-11-12 "every npc and enemy to say their chat bubble lines"): the two
+    // Bixie Soldiers gained their bark rules (`behaviour`), which moved both digests.
+    (131000102019, "0fb73b63b700ac09b707a602d4147c523531cbd1612a813d3c70b2e658ff08be"),
+    (131000102020, "9e9b2a2e1f2e86d3f9b64d0c6975cc76e70c4385abf2802f8e3e6d65d88b2a0b"),
 ];
 
 /// The eight pre-T296 spawn groups in file order, pinned the same way.

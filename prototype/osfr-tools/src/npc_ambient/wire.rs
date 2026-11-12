@@ -17,6 +17,15 @@ pub enum AmbientUpdate {
         position: [f32; 3],
         radius: f32,
     },
+    /// A due chat-bubble line (owner 2026-11-12). The gateway sends it only to a viewer
+    /// within `radius`: the speaker turns to that viewer (35/17), then says the line as 15/4
+    /// from its own GUID (`chat::string_say`), Legacy's `SayLocalized` shape.
+    Say {
+        guid: u64,
+        text_id: i32,
+        position: [f32; 3],
+        radius: f32,
+    },
 }
 
 impl AmbientUpdate {
@@ -32,6 +41,10 @@ impl AmbientUpdate {
                 crate::encounter::animation(*guid, *animation_id, true),
             ],
             Self::LookAt { guid, .. } => vec![look_at(*guid, target)],
+            Self::Say { guid, text_id, .. } => vec![
+                look_at(*guid, target),
+                crate::chat::string_say(*guid, *text_id),
+            ],
         }
     }
 }

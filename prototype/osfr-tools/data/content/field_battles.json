@@ -819,7 +819,61 @@
           ],
           "max_health": 220,
           "damage": 12,
-          "boss": true
+          "boss": true,
+          "behaviour": {
+            "rules": [
+              {
+                "id": "l1189_bark",
+                "when": {
+                  "engaged": {}
+                },
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        389685,
+                        389686,
+                        389690,
+                        103809,
+                        103810
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "once": true
+              },
+              {
+                "id": "l1189_taunt",
+                "when": {
+                  "every": {
+                    "ms": 9000,
+                    "first_ms": 7000
+                  }
+                },
+                "if": [
+                  {
+                    "chance": 0.35
+                  }
+                ],
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        389685,
+                        389686,
+                        389690,
+                        103809,
+                        103810
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "cooldown_ms": 15000
+              }
+            ]
+          }
         },
         {
           "guid": 100001234002,
@@ -1747,7 +1801,73 @@
           "max_health": 1020,
           "damage": 62,
           "level": 13,
-          "boss": true
+          "boss": true,
+          "behaviour": {
+            "rules": [
+              {
+                "id": "l1189_bark",
+                "when": {
+                  "engaged": {}
+                },
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        427126,
+                        427127,
+                        427128,
+                        427129,
+                        427130,
+                        427131,
+                        427609,
+                        427612,
+                        427613,
+                        427614,
+                        427191
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "once": true
+              },
+              {
+                "id": "l1189_taunt",
+                "when": {
+                  "every": {
+                    "ms": 9000,
+                    "first_ms": 7000
+                  }
+                },
+                "if": [
+                  {
+                    "chance": 0.35
+                  }
+                ],
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        427126,
+                        427127,
+                        427128,
+                        427129,
+                        427130,
+                        427131,
+                        427609,
+                        427612,
+                        427613,
+                        427614,
+                        427191
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "cooldown_ms": 15000
+              }
+            ]
+          }
         },
         {
           "guid": 100001230302,
@@ -2220,7 +2340,57 @@
         ],
         "max_health": 1,
         "damage": 0,
-        "boss": false
+        "boss": false,
+        "behaviour": {
+          "rules": [
+            {
+              "id": "l1189_bark",
+              "when": {
+                "engaged": {}
+              },
+              "do": [
+                {
+                  "say": {
+                    "text_ids": [
+                      78160,
+                      78161,
+                      78162
+                    ],
+                    "how": "bubble"
+                  }
+                }
+              ],
+              "once": true
+            },
+            {
+              "id": "l1189_taunt",
+              "when": {
+                "every": {
+                  "ms": 9000,
+                  "first_ms": 7000
+                }
+              },
+              "if": [
+                {
+                  "chance": 0.35
+                }
+              ],
+              "do": [
+                {
+                  "say": {
+                    "text_ids": [
+                      78160,
+                      78161,
+                      78162
+                    ],
+                    "how": "bubble"
+                  }
+                }
+              ],
+              "cooldown_ms": 15000
+            }
+          ]
+        }
       },
       "enemies": [
         {
@@ -2237,7 +2407,57 @@
           ],
           "max_health": 180,
           "damage": 15,
-          "boss": false
+          "boss": false,
+          "behaviour": {
+            "rules": [
+              {
+                "id": "l1189_bark",
+                "when": {
+                  "engaged": {}
+                },
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        78160,
+                        78161,
+                        78162
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "once": true
+              },
+              {
+                "id": "l1189_taunt",
+                "when": {
+                  "every": {
+                    "ms": 9000,
+                    "first_ms": 7000
+                  }
+                },
+                "if": [
+                  {
+                    "chance": 0.35
+                  }
+                ],
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        78160,
+                        78161,
+                        78162
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "cooldown_ms": 15000
+              }
+            ]
+          }
         },
         {
           "guid": 100001231002,
@@ -2253,7 +2473,57 @@
           ],
           "max_health": 180,
           "damage": 15,
-          "boss": false
+          "boss": false,
+          "behaviour": {
+            "rules": [
+              {
+                "id": "l1189_bark",
+                "when": {
+                  "engaged": {}
+                },
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        78160,
+                        78161,
+                        78162
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "once": true
+              },
+              {
+                "id": "l1189_taunt",
+                "when": {
+                  "every": {
+                    "ms": 9000,
+                    "first_ms": 7000
+                  }
+                },
+                "if": [
+                  {
+                    "chance": 0.35
+                  }
+                ],
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        78160,
+                        78161,
+                        78162
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "cooldown_ms": 15000
+              }
+            ]
+          }
         },
         {
           "guid": 100001231003,
@@ -2269,7 +2539,57 @@
           ],
           "max_health": 180,
           "damage": 15,
-          "boss": false
+          "boss": false,
+          "behaviour": {
+            "rules": [
+              {
+                "id": "l1189_bark",
+                "when": {
+                  "engaged": {}
+                },
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        78160,
+                        78161,
+                        78162
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "once": true
+              },
+              {
+                "id": "l1189_taunt",
+                "when": {
+                  "every": {
+                    "ms": 9000,
+                    "first_ms": 7000
+                  }
+                },
+                "if": [
+                  {
+                    "chance": 0.35
+                  }
+                ],
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        78160,
+                        78161,
+                        78162
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "cooldown_ms": 15000
+              }
+            ]
+          }
         }
       ],
       "reward_coins": 25,
@@ -2586,7 +2906,59 @@
           ],
           "max_health": 180,
           "damage": 15,
-          "boss": false
+          "boss": false,
+          "behaviour": {
+            "rules": [
+              {
+                "id": "l1189_bark",
+                "when": {
+                  "engaged": {}
+                },
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        36301,
+                        36304,
+                        36305,
+                        36306
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "once": true
+              },
+              {
+                "id": "l1189_taunt",
+                "when": {
+                  "every": {
+                    "ms": 9000,
+                    "first_ms": 7000
+                  }
+                },
+                "if": [
+                  {
+                    "chance": 0.35
+                  }
+                ],
+                "do": [
+                  {
+                    "say": {
+                      "text_ids": [
+                        36301,
+                        36304,
+                        36305,
+                        36306
+                      ],
+                      "how": "bubble"
+                    }
+                  }
+                ],
+                "cooldown_ms": 15000
+              }
+            ]
+          }
         },
         {
           "guid": 100001231103,

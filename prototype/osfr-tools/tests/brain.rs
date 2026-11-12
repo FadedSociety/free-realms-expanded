@@ -399,6 +399,7 @@ fn every_action_reads_into_its_act() {
             text_id: None,
             text: Some("Spiders, attack!".into()),
             how: How::Red,
+            text_ids: Vec::new(),
         }),
         Act::Summon {
             kind: "cave_bat".into(),

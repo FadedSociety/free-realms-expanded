@@ -42,14 +42,122 @@
       "name": "Hooligan Brawler",
       "name_id": 6686,
       "model_id": 203,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37156,
+                    37157,
+                    37158,
+                    37159,
+                    37160,
+                    37164
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "w58_hooligan_archer_l3_enemy": {
       "definition_id": 930012,
       "name": "Hooligan Archer",
       "name_id": 5100400,
       "model_id": 520,
-      "rank": "normal"
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37167,
+                    37168,
+                    37169,
+                    37170
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    37167,
+                    37168,
+                    37169,
+                    37170
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
     },
     "cal": {
       "definition_id": 1404313,

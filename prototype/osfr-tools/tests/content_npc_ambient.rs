@@ -301,3 +301,38 @@ fn ambient_rows_name_client_slots_and_models() {
     assert_eq!(child["idle_animation_ids"], serde_json::json!([2100]));
     assert_eq!(child["idle_interval_ms"], 3621);
 }
+
+/// L1189 (owner 2026-11-12): every `lines` speaker is an NPC the world draws (a positioned
+/// regional row or an extra spawn), so no line is written for someone who never stands
+/// anywhere; Samantha keeps Legacy's welcome (`welcomer.lua`, Global.Text 8130).
+#[test]
+fn every_line_speaker_is_a_drawn_npc() {
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let document = json::read(&content.join("npc_ambient.json"));
+    let mut drawn = HashSet::new();
+    for entry in std::fs::read_dir(content.join("npcs")).unwrap() {
+        for row in json::read(&entry.unwrap().path())["records"].as_array().unwrap() {
+            if row["position"].is_array() {
+                drawn.insert(row["npc_id"].as_u64().unwrap());
+            }
+        }
+    }
+    let extras = json::read(&content.join("npc_spawns_extra.json"));
+    for row in extras["records"].as_array().unwrap() {
+        drawn.insert(row["spawn_guid"].as_u64().unwrap());
+    }
+    let lines = document["lines"].as_array().expect("a lines list");
+    assert!(!lines.is_empty());
+    for line in lines {
+        assert!(line["source"].as_str().is_some_and(|s| !s.trim().is_empty()));
+        for actor in line["actor_ids"].as_array().unwrap() {
+            let actor = actor.as_u64().unwrap();
+            assert!(drawn.contains(&actor), "{}: {actor} is not drawn", line["name"]);
+        }
+    }
+    let samantha = lines
+        .iter()
+        .find(|line| line["actor_ids"] == serde_json::json!([9_000_000_189_u64]))
+        .expect("Samantha's line");
+    assert_eq!(samantha["text_ids"], serde_json::json!([8130]));
+}

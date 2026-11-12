@@ -2446,7 +2446,53 @@
                 "kind": "reconstructed",
                 "evidence": "(R) Bergram Stumpfinger links to definition_id=930049; model and name provenance is in enemies_unresolved.json."
               }
-            ]
+            ],
+            "behaviour": {
+              "rules": [
+                {
+                  "id": "l1189_bark",
+                  "when": {
+                    "engaged": {}
+                  },
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          90987
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "once": true
+                },
+                {
+                  "id": "l1189_taunt",
+                  "when": {
+                    "every": {
+                      "ms": 9000,
+                      "first_ms": 7000
+                    }
+                  },
+                  "if": [
+                    {
+                      "chance": 0.35
+                    }
+                  ],
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          90987
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "cooldown_ms": 15000
+                }
+              ]
+            }
           },
           {
             "source_field": "enemies",
@@ -2485,7 +2531,53 @@
                 "kind": "reconstructed",
                 "evidence": "(R) Bergram Stumpfinger links to definition_id=930049; model and name provenance is in enemies_unresolved.json."
               }
-            ]
+            ],
+            "behaviour": {
+              "rules": [
+                {
+                  "id": "l1189_bark",
+                  "when": {
+                    "engaged": {}
+                  },
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          90987
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "once": true
+                },
+                {
+                  "id": "l1189_taunt",
+                  "when": {
+                    "every": {
+                      "ms": 9000,
+                      "first_ms": 7000
+                    }
+                  },
+                  "if": [
+                    {
+                      "chance": 0.35
+                    }
+                  ],
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          90987
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "cooldown_ms": 15000
+                }
+              ]
+            }
           }
         ]
       }

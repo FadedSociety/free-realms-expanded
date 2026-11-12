@@ -86,6 +86,7 @@ fn a_dungeon_chain_completes_in_order_with_its_bonus_goal() {
             text_id: None,
             text: Some("Intruders!".into()),
             how: osfr_tools::encounter::wire::How::Red,
+            text_ids: Vec::new(),
         }),
     };
     assert_eq!(shout, [said(g1), said(g2)]);

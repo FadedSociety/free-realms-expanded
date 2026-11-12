@@ -62,7 +62,7 @@ impl EncounterEngine {
             Act::Stance(stance) => self.memory(guid, field).set_stance(stance.clone()),
             Act::Phase(n) => self.memory(guid, field).set_phase(*n),
             Act::Attack(id) => self.memory(guid, field).ordered = Some(id.clone()),
-            Act::Say(line) => out.replies.push(wire::say(guid, line)),
+            Act::Say(line) => out.replies.push(wire::say(guid, &line.pick(guid, now_ms))),
             Act::Telegraph { say, ms, attack } => {
                 out.replies.push(wire::say(guid, say));
                 self.memory(guid, field).defer(

@@ -423,7 +423,12 @@ fn line(v: &Value) -> Result<Line, String> {
     if text_id.is_none() && text.is_none() {
         return Err("say needs text_id or text".into());
     }
-    Ok(Line { text_id, text, how })
+    Ok(Line {
+        text_id,
+        text,
+        how,
+        ..Line::default()
+    })
 }
 
 fn who(v: Option<&Value>) -> Result<Who, String> {

@@ -51,7 +51,7 @@
       "name_id": 74753,
       "model_id": 203,
       "rank": "normal",
-      "behaviour": {"rules": [{"id": "bark", "when": {"engaged": {}}, "do": [{"say": {"text_id": 36787, "how": "bubble"}}], "once": true}]}
+      "behaviour": {"rules": [{"id": "l1189_bark", "when": {"engaged": {}}, "do": [{"say": {"text_ids": [37156, 37157, 37158, 37159, 37160, 37164], "how": "bubble"}}], "once": true}, {"id": "l1189_taunt", "when": {"every": {"ms": 9000, "first_ms": 7000}}, "if": [{"chance": 0.35}], "do": [{"say": {"text_ids": [37156, 37157, 37158, 37159, 37160, 37164], "how": "bubble"}}], "cooldown_ms": 15000}]}
     },
     "hooligan_scrapper": {
       "definition_id": 950040,
@@ -59,7 +59,8 @@
       "name_id": 37614,
       "model_id": 489,
       "rank": "boss",
-      "boss": true
+      "boss": true,
+      "behaviour": {"rules": [{"id": "l1189_bark", "when": {"engaged": {}}, "do": [{"say": {"text_ids": [37162, 37163, 37165, 37166], "how": "bubble"}}], "once": true}, {"id": "l1189_taunt", "when": {"every": {"ms": 9000, "first_ms": 7000}}, "if": [{"chance": 0.35}], "do": [{"say": {"text_ids": [37162, 37163, 37165, 37166], "how": "bubble"}}], "cooldown_ms": 15000}]}
     },
     "w58_hooligan_archer_l3_enemy": {
       "definition_id": 930012,
@@ -67,7 +68,7 @@
       "name_id": 5100400,
       "model_id": 520,
       "rank": "normal",
-      "behaviour": {"rules": [{"id": "bark", "when": {"engaged": {}}, "do": [{"say": {"text_id": 91395, "how": "bubble"}}], "once": true}]}
+      "behaviour": {"rules": [{"id": "l1189_bark", "when": {"engaged": {}}, "do": [{"say": {"text_ids": [37167, 37168, 37169, 37170], "how": "bubble"}}], "once": true}, {"id": "l1189_taunt", "when": {"every": {"ms": 9000, "first_ms": 7000}}, "if": [{"chance": 0.35}], "do": [{"say": {"text_ids": [37167, 37168, 37169, 37170], "how": "bubble"}}], "cooldown_ms": 15000}]}
     }
   },
   "actors": {
@@ -498,7 +499,7 @@
     },
     {
       "kind": "reconstructed",
-      "evidence": "(R) rc-0137 (owner: the hooligans 'say no lines' and 'don't all come at the player'): each bully and archer barks once when it engages, Global.Text 36787 'Get 'em!' and 91395 'You're going down!' (client locale). The chase is the engine's battle rule (no notice radius in a paced fight, as the captured Frostfang wave wolves); the melee default's 40 m had left the far wave points idle (w1 spawns 35 to 41 m from the arrival)."
+      "evidence": "(R) rc-0137 (owner: the hooligans 'say no lines' and 'don't all come at the player'): each bully, archer and the Scrapper says one of its own lines when it engages and now and then while it fights (L1189, owner 2026-11-12: 'the hooligans saying they could bench you'): Global.Text 37156-37170, the brawler-initiation block of the client locale; bullies 37156-37160/37164, the Scrapper 37162/37163/37165/37166 ('I can bench ten of you!'), archers 37167-37170. The chase is the engine's battle rule (no notice radius in a paced fight, as the captured Frostfang wave wolves); the melee default's 40 m had left the far wave points idle (w1 spawns 35 to 41 m from the arrival)."
     }
   ]
 }

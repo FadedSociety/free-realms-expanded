@@ -53,7 +53,8 @@ fn guids(updates: &[AmbientUpdate]) -> Vec<u64> {
             AmbientUpdate::Animation { guid, .. }
             | AmbientUpdate::Idle { guid, .. }
             | AmbientUpdate::Conversation { guid, .. }
-            | AmbientUpdate::LookAt { guid, .. } => *guid,
+            | AmbientUpdate::LookAt { guid, .. }
+            | AmbientUpdate::Say { guid, .. } => *guid,
         })
         .collect()
 }
@@ -430,4 +431,82 @@ fn a_pose_row_actor_leaves_the_idle_schedule_but_keeps_its_conversation() {
     assert!(!ambient.idles.contains_key(&GUID));
     assert!(ambient.idles.contains_key(&(GUID + 1)));
     assert!(ambient.talking.contains(&GUID), "its conversation turns stay");
+}
+
+fn with_lines(lines: serde_json::Value) -> io::Result<NpcAmbient> {
+    NpcAmbient::from_json(
+        &serde_json::to_vec(&json!({
+            "schema_version": 1,
+            "source": "test content",
+            "max_packets_per_viewer_per_tick": 4,
+            "rows": [row(json!([MODEL]), json!([3302]), 500, 500)],
+            "lines": lines,
+        }))
+        .unwrap(),
+    )
+}
+
+fn line_row(text_ids: serde_json::Value, radius: f32) -> serde_json::Value {
+    json!({
+        "actor_ids": [GUID],
+        "name": "Samantha",
+        "text_ids": text_ids,
+        "radius_m": radius,
+        "min_interval_ms": 10_000,
+        "max_interval_ms": 20_000,
+        "source": "welcomer.lua (test)",
+    })
+}
+
+/// Owner 2026-11-12: a shown speaker says one of its own lines once per 10-20 s firing, the
+/// same line for every viewer in the same window; an actor the world does not show never
+/// speaks, and the line costs two packets (the turn to the viewer, then the 15/4).
+#[test]
+fn a_shown_speaker_says_one_of_its_lines_every_firing() {
+    let mut ambient = with_lines(json!([line_row(json!([8130, 37163]), 50.0)])).unwrap();
+    let known = BTreeSet::from([GUID]);
+    assert!(
+        ambient.due_for_known(&known, |_| None, 0, 60_000).is_empty(),
+        "an actor the world does not show has no position and never speaks"
+    );
+    ambient.place_actors(&[(GUID, MODEL, [1.0, 2.0, 3.0])]);
+    let mut said = Vec::new();
+    for t in (1_000..=120_000).step_by(1_000) {
+        for update in ambient.due_for_known(&known, |_| None, t - 1_000, t) {
+            if let AmbientUpdate::Say { guid, text_id, position, radius } = update {
+                assert_eq!((guid, position, radius), (GUID, [1.0, 2.0, 3.0], 50.0));
+                said.push((t, text_id));
+            }
+        }
+    }
+    assert!((6..=12).contains(&said.len()), "a 10-20 s period over two minutes: {said:?}");
+    assert!(said.iter().all(|(_, id)| [8130, 37163].contains(id)));
+    assert_eq!(
+        ambient.due_for_known(&known, |_| None, 0, 120_000).len(),
+        1,
+        "a long stall replays only the latest line"
+    );
+    let unknown = BTreeSet::new();
+    assert!(ambient.due_for_known(&unknown, |_| None, 0, 120_000).is_empty());
+
+    let packets = AmbientUpdate::Say {
+        guid: GUID,
+        text_id: 8130,
+        position: [0.0; 3],
+        radius: 50.0,
+    }
+    .packets(7);
+    assert_eq!(packets, vec![look_at(GUID, 7), crate::chat::string_say(GUID, 8130)]);
+}
+
+#[test]
+fn a_line_row_outside_its_bounds_is_refused() {
+    assert!(with_lines(json!([line_row(json!([]), 50.0)])).is_err(), "no text ids");
+    assert!(with_lines(json!([line_row(json!([8130, 8130]), 50.0)])).is_err(), "a repeat");
+    assert!(with_lines(json!([line_row(json!([8130]), 61.0)])).is_err(), "too far");
+    assert!(
+        with_lines(json!([line_row(json!([8130]), 50.0), line_row(json!([1]), 5.0)])).is_err(),
+        "one actor bound twice"
+    );
+    assert!(with_lines(json!([line_row(json!([8130]), 50.0)])).is_ok());
 }

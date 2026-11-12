@@ -1751,7 +1751,59 @@
                 "kind": "reconstructed",
                 "evidence": "(R) Cruel Fairy Cultist has an exact client name; its model is the client Fairy Cultist body."
               }
-            ]
+            ],
+            "behaviour": {
+              "rules": [
+                {
+                  "id": "l1189_bark",
+                  "when": {
+                    "engaged": {}
+                  },
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          36301,
+                          36304,
+                          36305,
+                          36306
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "once": true
+                },
+                {
+                  "id": "l1189_taunt",
+                  "when": {
+                    "every": {
+                      "ms": 9000,
+                      "first_ms": 7000
+                    }
+                  },
+                  "if": [
+                    {
+                      "chance": 0.35
+                    }
+                  ],
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          36301,
+                          36304,
+                          36305,
+                          36306
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "cooldown_ms": 15000
+                }
+              ]
+            }
           },
           {
             "source_field": "bosses",

@@ -820,5 +820,127 @@
       "idle_interval_ms": 3400,
       "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=dog_small_pointy.adr (R); IdleAnimationIds/IdleIntervalMs values (R); client slots pet_lie_loop_3(5403)"
     }
+  ],
+  "lines": [
+    {
+      "actor_ids": [
+        9000000189
+      ],
+      "name": "Samantha",
+      "text_ids": [
+        8130
+      ],
+      "radius_m": 50.0,
+      "min_interval_ms": 10000,
+      "max_interval_ms": 20000,
+      "source": "FreeRealms-Legacy, Lxzxrus and Sanctuary src/Scripts/Npc/welcomer.lua: sayLocalized(8130) 'Welcome to Free Realms!' to her visible players every 10-20 s; Npcs.json Id 2045 Samantha, NameId 19685 (= our name_string_id). Radius (R): she stands about 40 m from the new-player start, so a 50 m reach greets a player who spawns in."
+    },
+    {
+      "actor_ids": [
+        9000000093
+      ],
+      "name": "Frostpetal",
+      "text_ids": [
+        5650
+      ],
+      "radius_m": 30.0,
+      "min_interval_ms": 60000,
+      "max_interval_ms": 120000,
+      "source": "Sanctuary src/Scripts/Npc/frostpetal.lua: GreetOnApproach radius 30, re-greet cooldown 120 s, sayLocalized(5650) 'Welcome to Snowhill...'; Sanctuary Npcs.json NameId 5448 = our name_string_id. The 60-120 s period stands in for the approach cooldown (R)."
+    },
+    {
+      "actor_ids": [
+        9000000487,
+        9500000350,
+        9500000388
+      ],
+      "name": "Clothing vendors",
+      "text_ids": [
+        73849,
+        73850,
+        73851,
+        384308,
+        384313
+      ],
+      "radius_m": 15.0,
+      "min_interval_ms": 30000,
+      "max_interval_ms": 60000,
+      "source": "(R) Global.Text vendor calls 73849-73851 and the market block 384308/384313 (clothing shouts); given to the vendors whose rows say they sell clothing: Tennin, Lacy Trembletoes, Giggles. Interval and reach (R)."
+    },
+    {
+      "actor_ids": [
+        9500000264,
+        9500000385
+      ],
+      "name": "Sweets sellers",
+      "text_ids": [
+        73852,
+        73853
+      ],
+      "radius_m": 15.0,
+      "min_interval_ms": 30000,
+      "max_interval_ms": 60000,
+      "source": "(R) Global.Text 73852-73853 'Sweets Here!' calls; given to Zanna Sugarzing (runs the candy cart in Durango Zoo) and Fenwink (sells sweet treats). Interval and reach (R)."
+    },
+    {
+      "actor_ids": [
+        9500000034,
+        9500000155,
+        9500000269,
+        9500000780,
+        9500000817,
+        9500000826
+      ],
+      "name": "Blacksmith merchants",
+      "text_ids": [
+        384311,
+        384312
+      ],
+      "radius_m": 15.0,
+      "min_interval_ms": 30000,
+      "max_interval_ms": 60000,
+      "source": "(R) Global.Text market block 384311 'battle supplies' and 384312 'You can't smith or mine without supplies!'; given to the Blacksmith gear merchants Hess, Keller, Estus, Wayland, Fry and Ishi. Interval and reach (R)."
+    },
+    {
+      "actor_ids": [
+        9000000079
+      ],
+      "name": "Enaine",
+      "text_ids": [
+        384307
+      ],
+      "radius_m": 15.0,
+      "min_interval_ms": 30000,
+      "max_interval_ms": 60000,
+      "source": "(R) Global.Text 384307 rings-and-necklaces call; Enaine is the seashell-necklace maker. Interval and reach (R)."
+    },
+    {
+      "actor_ids": [
+        9000000396
+      ],
+      "name": "Mae Farnum",
+      "text_ids": [
+        384315
+      ],
+      "radius_m": 15.0,
+      "min_interval_ms": 30000,
+      "max_interval_ms": 60000,
+      "source": "(R) Global.Text 384315 'Do you want to cook like Bordon Cloo?! Then try my special ingredients!'; Mae Farnum is the cook and merchant. Interval and reach (R)."
+    },
+    {
+      "actor_ids": [
+        9500000376
+      ],
+      "name": "Cragara",
+      "text_ids": [
+        73855,
+        73856,
+        73857
+      ],
+      "radius_m": 15.0,
+      "min_interval_ms": 30000,
+      "max_interval_ms": 60000,
+      "source": "(R) Global.Text 73855-73857 general-goods calls; Cragara is the Mysterious Merchant. Interval and reach (R)."
+    }
   ]
 }

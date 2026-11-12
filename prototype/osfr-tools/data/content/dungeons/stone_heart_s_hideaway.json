@@ -846,7 +846,73 @@
                 "kind": "reconstructed",
                 "evidence": "(R) definition_id 930022 is a W58 local projection."
               }
-            ]
+            ],
+            "behaviour": {
+              "rules": [
+                {
+                  "id": "l1189_bark",
+                  "when": {
+                    "engaged": {}
+                  },
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          427126,
+                          427127,
+                          427128,
+                          427129,
+                          427130,
+                          427131,
+                          427609,
+                          427612,
+                          427613,
+                          427614,
+                          427191
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "once": true
+                },
+                {
+                  "id": "l1189_taunt",
+                  "when": {
+                    "every": {
+                      "ms": 9000,
+                      "first_ms": 7000
+                    }
+                  },
+                  "if": [
+                    {
+                      "chance": 0.35
+                    }
+                  ],
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          427126,
+                          427127,
+                          427128,
+                          427129,
+                          427130,
+                          427131,
+                          427609,
+                          427612,
+                          427613,
+                          427614,
+                          427191
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "cooldown_ms": 15000
+                }
+              ]
+            }
           },
           {
             "source_field": "enemies",
@@ -898,7 +964,73 @@
                 "kind": "reconstructed",
                 "evidence": "(R) definition_id 930022 is a W58 local projection."
               }
-            ]
+            ],
+            "behaviour": {
+              "rules": [
+                {
+                  "id": "l1189_bark",
+                  "when": {
+                    "engaged": {}
+                  },
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          427126,
+                          427127,
+                          427128,
+                          427129,
+                          427130,
+                          427131,
+                          427609,
+                          427612,
+                          427613,
+                          427614,
+                          427191
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "once": true
+                },
+                {
+                  "id": "l1189_taunt",
+                  "when": {
+                    "every": {
+                      "ms": 9000,
+                      "first_ms": 7000
+                    }
+                  },
+                  "if": [
+                    {
+                      "chance": 0.35
+                    }
+                  ],
+                  "do": [
+                    {
+                      "say": {
+                        "text_ids": [
+                          427126,
+                          427127,
+                          427128,
+                          427129,
+                          427130,
+                          427131,
+                          427609,
+                          427612,
+                          427613,
+                          427614,
+                          427191
+                        ],
+                        "how": "bubble"
+                      }
+                    }
+                  ],
+                  "cooldown_ms": 15000
+                }
+              ]
+            }
           }
         ]
       }

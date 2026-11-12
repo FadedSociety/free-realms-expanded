@@ -97,6 +97,9 @@ impl NpcAmbient {
             if !position.iter().all(|value| value.is_finite()) {
                 continue;
             }
+            if let Some(speaker) = self.speakers.get_mut(&guid) {
+                speaker.position = Some(position);
+            }
             let Some(row) = self.rows.get(&model_id) else {
                 continue;
             };

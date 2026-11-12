@@ -424,6 +424,22 @@ pub struct Line {
     pub text_id: Option<i32>,
     pub text: Option<String>,
     pub how: How,
+    /// L1189: several client lines, one said per firing (a pack of hooligans each taunts with
+    /// its own line instead of chanting one).
+    pub text_ids: Vec<i32>,
+}
+
+impl Line {
+    /// The line `guid` says at `now_ms`: one of `text_ids`, picked by speaker and moment, or
+    /// the line as written when it lists none.
+    pub fn pick(&self, guid: u64, now_ms: u64) -> Line {
+        let mut line = self.clone();
+        if !self.text_ids.is_empty() {
+            let pick = crate::hash::mix64(guid ^ now_ms.rotate_left(29)) % self.text_ids.len() as u64;
+            line.text_id = Some(self.text_ids[pick as usize]);
+        }
+        line
+    }
 }
 
 /// One 38/7 stat value.
@@ -648,4 +664,32 @@ pub fn stats(guid: u64, rows: &[(i32, StatValue)]) -> Vec<u8> {
         }
     }
     b
+}
+
+#[cfg(test)]
+mod line_tests {
+    use super::*;
+
+    /// L1189: a rule that lists several lines says one of them, chosen per speaker and moment,
+    /// so a pack does not chant one taunt; a plain line is said as written.
+    #[test]
+    fn a_line_with_several_ids_says_one_of_them_per_speaker() {
+        let line = Line {
+            text_ids: vec![37156, 37157, 37158, 37163],
+            ..Line::default()
+        };
+        let mut said = std::collections::BTreeSet::new();
+        for guid in 0..64 {
+            let picked = line.pick(guid, 1_000).text_id.expect("a picked id");
+            assert!(line.text_ids.contains(&picked));
+            said.insert(picked);
+        }
+        assert!(said.len() > 1, "different speakers say different lines");
+        assert_eq!(line.pick(7, 1_000), line.pick(7, 1_000), "the pick is stable");
+        let plain = Line {
+            text_id: Some(8130),
+            ..Line::default()
+        };
+        assert_eq!(plain.pick(7, 1_000), plain);
+    }
 }
