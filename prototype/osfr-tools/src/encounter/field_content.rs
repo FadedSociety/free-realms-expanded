@@ -8,7 +8,8 @@ impl EncounterEngine {
     /// collide with opening, dungeon or battle-spawner actors.
     pub fn load_field_enemies(&mut self, path: &Path) -> io::Result<()> {
         let bytes = fs::read(path)?;
-        if bytes.len() > 128 * 1024 {
+        // L1191: 256 KiB as for field_camps.json; the three instance fields on all 52 rows passed 128.
+        if bytes.len() > 256 * 1024 {
             return Err(invalid("field enemy content too large"));
         }
         let content: FieldContent =
@@ -163,7 +164,12 @@ impl EncounterEngine {
         // curve and weapon tiers, rather than inventing per-kind curves.
         self.scale.scale_field_enemy(&mut f.actor);
         let marker = f.combat_marker.resolve(combat_marker, f.actor.name_id)?;
+        if f.instance_enemy && f.instance.is_none() {
+            return Err(invalid("an instance_enemy field enemy needs its instance guid"));
+        }
         Ok(FieldEnemy {
+            instance: f.instance.filter(|_| f.instance_enemy),
+            attacks: f.attacks_in_overworld,
             marker,
             state: enemy_state(&f.actor),
             respawn_ms: u64::from(respawn_seconds) * 1000,
@@ -219,6 +225,47 @@ impl EncounterEngine {
             })
             .min_by_key(|b| b.id)?;
         Some((battle.spawner.guid, battle.spawner.position))
+    }
+
+    /// Owner 2026-11-12: world objects (`npc_spawns_extra.json` records and regional `npcs/*.json`
+    /// rows) with `interactable` and an `instance` starter guid open that starter's start card
+    /// when clicked, as its own entrance does. Call after the battles load; an `instance` that is
+    /// no battle starter or entrance is skipped and logged (`tests/entrances.rs` refuses it).
+    pub fn load_object_links(&mut self, directory: &Path) -> io::Result<()> {
+        let mut paths = vec![directory.join("npc_spawns_extra.json")];
+        if let Ok(entries) = fs::read_dir(directory.join("npcs")) {
+            paths.extend(
+                entries
+                    .filter_map(|entry| entry.ok().map(|entry| entry.path()))
+                    .filter(|path| path.extension().is_some_and(|ext| ext == "json")),
+            );
+        }
+        let mut links = std::collections::BTreeMap::new();
+        for path in paths {
+            let Ok(bytes) = fs::read(&path) else {
+                continue;
+            };
+            let file: serde_json::Value =
+                serde_json::from_slice(&bytes).map_err(|e| invalid(&e.to_string()))?;
+            for row in file["records"].as_array().into_iter().flatten() {
+                if row["interactable"] != true {
+                    continue;
+                }
+                let guid = row["spawn_guid"].as_u64().or_else(|| row["npc_id"].as_u64());
+                let at = serde_json::from_value::<[f32; 3]>(row["position"].clone()).ok();
+                let (Some(guid), Some(at), Some(starter)) = (guid, at, row["instance"].as_u64())
+                else {
+                    continue;
+                };
+                if !self.is_battle_spawner(starter) {
+                    eprintln!("object {guid}: instance {starter} is no battle starter; skipped");
+                    continue;
+                }
+                links.insert(guid, (at, starter));
+            }
+        }
+        Arc::make_mut(&mut self.content).object_links = links;
+        Ok(())
     }
 
     /// Load overworld battles (`field_battles.json`); spawner and enemy GUIDs

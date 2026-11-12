@@ -46,6 +46,14 @@ struct Camp {
     #[serde(default)]
     live_event: Option<String>,
     source: Vec<serde_json::Value>,
+    /// Owner 2026-11-12 (`FieldActor`): every member's click opens `instance`'s start card.
+    #[serde(default)]
+    instance_enemy: bool,
+    /// Owner 2026-11-12: whether the camp's members notice and chase players in the overworld.
+    #[serde(default = "super::attacks_in_overworld")]
+    attacks_in_overworld: bool,
+    #[serde(default)]
+    instance: Option<u64>,
 }
 
 /// The slice of `enemies.json` a camp needs (the catalogue loader in `enemies.rs` is stricter and
@@ -197,6 +205,9 @@ impl EncounterEngine {
                     quest_ids: Vec::new(),
                     combat_marker: MarkerSetting::Shared,
                     source: serde_json::Value::Null,
+                    instance_enemy: camp.instance_enemy,
+                    attacks_in_overworld: camp.attacks_in_overworld,
+                    instance: camp.instance,
                 };
                 field.push(self.build_field_enemy(
                     actor,

@@ -222,7 +222,12 @@ fn low_difficulty_battle_markers_are_clear_of_higher_bands() {
 
 #[test]
 fn a_level_three_player_at_each_starter_camp_is_hit_only_by_its_own_band() {
-    let field = read(&content_path());
+    let mut field = read(&content_path());
+    // L1191: shipped rows no longer notice a player by distance. The separation is measured on
+    // a private copy whose rows still do: which band would reach a player standing there.
+    for row in field["enemies"].as_array_mut().unwrap() {
+        row.as_object_mut().unwrap().remove("attacks_in_overworld");
+    }
     let fixture = RewardFixture::new(Vec::new());
     fixture.write_field(&field);
     // Starter rows are levels 1-3, weapon tier 1, so their hit is the authored

@@ -1002,6 +1002,7 @@ impl Gameplay {
             let battles = npc_content.join("field_battles.json");
             if battles.is_file() {
                 engine.load_field_battles(&battles)?;
+                engine.load_object_links(npc_content)?;
                 if let Some(visibility) = npc_visibility.as_mut() {
                     visibility.add_battle_spawners(engine);
                 }

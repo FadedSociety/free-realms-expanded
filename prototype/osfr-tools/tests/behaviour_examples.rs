@@ -866,6 +866,31 @@ fn speeds(out: &EncounterOutcome, guid: u64) -> Vec<f32> {
         .collect()
 }
 
+/// Owner 2026-11-12 ("the black spore cray claw cavern ... has the enemies attack me"): a field
+/// enemy with `attacks_in_overworld` off never notices a player standing beside it, while a row
+/// left at the default still does, so the check cannot pass vacuously.
+#[test]
+fn a_field_enemy_that_does_not_attack_in_the_overworld_never_notices() {
+    let mut calm = field_row(SOLDIER, [0.0, 0.0, 0.0]);
+    calm["attacks_in_overworld"] = json!(false);
+    let fixture = Fixture::new(
+        vec![actor(200, "Cave wolf", [0.0; 3], 100, 1)],
+        vec![calm, field_row(FAR, [0.0, 0.0, 40.0])],
+    );
+    let mut engine = fixture.load();
+    engine.toggle_god();
+    let mut now = 1000;
+    for _ in 0..20 {
+        now += 250;
+        let out = engine.tick([2.0, 0.0, 0.0], BRAWLER, now).unwrap();
+        assert!(states(&out, SOLDIER).is_empty(), "the calm enemy never turns on the player");
+    }
+    assert_eq!(field_place(&engine, SOLDIER), [0.0, 0.0, 0.0], "it never left home");
+    now += 250;
+    let out = engine.tick([0.0, 0.0, 37.0], BRAWLER, now).unwrap();
+    assert_eq!(states(&out, FAR), [0x8001], "a default enemy still notices at 3 m");
+}
+
 /// A field enemy notices, chases, gives up at its leash and runs home at speed 10 under
 /// state 0x4001; a neighbour within 6 m joins and one farther off does not.
 #[test]

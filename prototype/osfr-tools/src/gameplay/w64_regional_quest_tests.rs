@@ -2860,6 +2860,8 @@ fn behaviour_presets_drive_enemy_movement() {
         for e in enemies["enemies"].as_array_mut().unwrap() {
             if e["name"] == "Hooligan" {
                 e["behaviour"] = behaviour.clone();
+                // L1191: shipped rows no longer notice a player by distance; this copy's do.
+                e["attacks_in_overworld"] = serde_json::Value::Bool(true);
             }
         }
         let path = dir.join("field_enemies.json");

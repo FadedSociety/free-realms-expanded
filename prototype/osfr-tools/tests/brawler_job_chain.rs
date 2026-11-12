@@ -206,7 +206,8 @@ fn eligibility() -> CharacterEligibility {
 
 /// The first spawned field enemy whose defeat definition is not C4's `930050`.
 /// An empty `quest_ids` list is production's "always present" field rule
-/// (`EncounterEngine` load), so this actor is live without starting a quest.
+/// (`EncounterEngine` load), so this actor is live without starting a quest. L1191: not an
+/// `instance_enemy`, whose click opens its battle's card instead of the Attack menu.
 fn ungated_enemy_other_than_hooligans() -> (u64, [f32; 3], u32) {
     let document: Value =
         serde_json::from_slice(&fs::read(content_dir().join("field_enemies.json")).unwrap())
@@ -220,6 +221,7 @@ fn ungated_enemy_other_than_hooligans() -> (u64, [f32; 3], u32) {
                 .as_array()
                 .is_some_and(|ids| ids.is_empty())
                 && enemy["definition_id"].as_u64() != Some(u64::from(HOOLIGAN_DEFINITION))
+                && enemy["instance_enemy"] != true
         })
         .expect("content has an always-present non-Hooligan field enemy");
     (

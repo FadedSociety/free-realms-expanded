@@ -285,6 +285,10 @@ struct Content {
     /// outlive `take_shared_fields` moving the live rows into the shared field.
     #[serde(skip)]
     field_sites: Vec<(i32, u64, [f32; 3])>,
+    /// Owner 2026-11-12: an `interactable` world object's guid -> (its position, the starter or
+    /// entrance guid its click opens), from `npc_spawns_extra.json` and `npcs/*.json`.
+    #[serde(skip)]
+    object_links: std::collections::BTreeMap<u64, ([f32; 3], u64)>,
 }
 
 /// Overworld enemy that patrols outside the opening's story stages (e.g. the
@@ -322,6 +326,21 @@ struct FieldActor {
     #[serde(default)]
     #[allow(dead_code)]
     source: serde_json::Value,
+    /// Owner 2026-11-12: clicking this enemy opens `instance`'s start card instead of a fight in
+    /// the overworld (the original game fought every battle in an instance).
+    #[serde(default)]
+    instance_enemy: bool,
+    /// Owner 2026-11-12: whether it notices and chases a player in the overworld. Off, it only
+    /// answers a player who hurts it.
+    #[serde(default = "attacks_in_overworld")]
+    attacks_in_overworld: bool,
+    /// The starter or entrance guid whose start card an `instance_enemy` click opens.
+    #[serde(default)]
+    instance: Option<u64>,
+}
+
+fn attacks_in_overworld() -> bool {
+    true
 }
 
 /// One always-on population. The group owns the policy shared by its explicit
@@ -393,6 +412,10 @@ struct FieldEnemy {
     marker: Option<Notification>,
     /// L083: who hurt it and by how much (Sanctuary `MobBrain`).
     threat: threat::Threat,
+    /// Owner 2026-11-12: the starter or entrance its click opens (`instance_enemy` rows only).
+    instance: Option<u64>,
+    /// Owner 2026-11-12: whether it notices players in the overworld.
+    attacks: bool,
 }
 
 /// Overworld battle started from a spawner (red crossed swords): clicking it
@@ -1480,6 +1503,9 @@ impl EncounterEngine {
                 let guid = crate::le::u64(inner, 4).ok_or_else(|| invalid(SHORT))?;
                 if self.is_battle_spawner(guid) {
                     return Ok(self.battle_screen(guid, position, profile_id));
+                }
+                if let Some(card) = self.linked_battle_screen(guid, position, profile_id) {
+                    return Ok(card);
                 }
                 Ok(self.interact(guid, position, now_ms))
             }

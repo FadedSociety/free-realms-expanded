@@ -1227,3 +1227,170 @@ fn pb2_a_member_in_any_job_joins_the_leaders_entrance_run() {
     assert_ne!(active_profile(&member), job_before, "in a combat job");
     assert_eq!(member.joinable_run().map(|(b, ..)| b), Some(battle), "the leader's battle");
 }
+
+/// The shipped camp members of `camp` with their drawn positions.
+fn camp_members(camp: &str) -> Vec<(u64, [f32; 3])> {
+    let read = |name: &str| -> Value {
+        serde_json::from_slice(&fs::read(content_dir().join(name)).unwrap()).unwrap()
+    };
+    let (camps, spawns) = (read("field_camps.json"), read("npc_spawns_extra.json"));
+    let row = camps["camps"].as_array().unwrap().iter().find(|c| c["id"] == camp).unwrap();
+    row["members"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|guid| {
+            let spawn = spawns["records"].as_array().unwrap().iter().find(|s| s["spawn_guid"] == *guid).unwrap();
+            let p = spawn["position"].as_array().unwrap();
+            (guid.as_u64().unwrap(), [0, 1, 2].map(|i| p[i].as_f64().unwrap() as f32))
+        })
+        .collect()
+}
+
+/// Owner 2026-11-12: "the black spore cray claw cavern ... has the enemies attack me instead of
+/// letting me click the dungeon to start the dungeon instance." The marauders by the Cracked Claw
+/// Caverns door no longer chase (the no-chase rule is `behaviour_examples`), so the door is free to
+/// click; each is an `instance_enemy` whose click opens its own battle, Cray Marauders (the wiki's
+/// FR_Mob Cray Marauder: "Battle Starter", Battles: "Cray Marauders"), as that starter's click does.
+#[test]
+fn an_instance_enemy_opens_its_entrance_card() {
+    let table = table();
+    let door = table.entrances.iter().find(|r| r.id == "cray_marauders").unwrap();
+    let mut base = engine();
+    base.load_behaviours(&content_dir().join("behaviours.json")).unwrap();
+    base.load_field_enemies(&content_dir().join("field_enemies.json")).unwrap();
+    base.load_field_camps(&content_dir()).unwrap();
+    let at_door = base.clone().handle(&click(door.guid), 77, door.at, BRAWLER, 1_000).unwrap();
+    let subs = |out: &osfr_tools::encounter::EncounterOutcome| -> Vec<(u8, u8)> {
+        out.replies.iter().map(|p| (p[0], p[2])).collect()
+    };
+    assert!(!at_door.replies.is_empty(), "the starter answers its own click");
+    let marauders = camp_members("anon-cray-arctic-swamp-w58b-cray-marauder");
+    assert_eq!(marauders.len(), 8);
+    // The camp's bodies are spread over the map: only those homed in the starter's area link to it.
+    let at_this_door = |at: [f32; 3]| (at[0] - door.at[0]).hypot(at[2] - door.at[2]) < 400.0;
+    assert_eq!(marauders.iter().filter(|m| at_this_door(m.1)).count(), 4, "the four by the Cracked Claw door");
+    for &(guid, at) in &marauders {
+        let out = base.clone().handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
+        if !at_this_door(at) {
+            assert_ne!(subs(&out), subs(&at_door), "Cray Marauder {guid}, homed elsewhere, opens no Cray Marauders card");
+            continue;
+        }
+        assert_eq!(subs(&out), subs(&at_door), "Cray Marauder {guid} opens the Cray Marauders card");
+        let far = [at[0] + 40.0, at[1], at[2]];
+        let missed = base.clone().handle(&click(guid), 77, far, BRAWLER, 1_000).unwrap();
+        assert_ne!(subs(&missed), subs(&at_door), "out of reach, {guid} opens nothing");
+    }
+}
+
+/// Owner 2026-11-12: "doors for dungeons can be hotswapped to open a specific dungeon or
+/// instance". Any drawn object marked `interactable` with an `instance` opens that starter's own
+/// card when clicked, and nothing out of reach.
+#[test]
+fn an_interactable_object_opens_its_linked_dungeon_card() {
+    let door = table().entrances.into_iter().find(|r| r.id == "cracked_claw_caverns").unwrap();
+    let dir = std::env::temp_dir().join(format!("osfr-object-link-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    content_copy::copy_tree(&content_dir(), &dir);
+    let shipped = engine();
+    let path = dir.join("npc_spawns_extra.json");
+    let mut extras: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let row = extras["records"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|r| {
+            let guid = r["spawn_guid"].as_u64().unwrap();
+            !shipped.is_battle_spawner(guid) && !shipped.is_field_enemy(guid)
+        })
+        .unwrap();
+    row["interactable"] = json!(true);
+    row["instance"] = json!(door.guid);
+    let (guid, p) = (row["spawn_guid"].as_u64().unwrap(), row["position"].clone());
+    let at: [f32; 3] = serde_json::from_value(p).unwrap();
+    // The copy may hard-link the shipped file: replace it rather than write through it.
+    fs::remove_file(&path).unwrap();
+    fs::write(&path, serde_json::to_vec(&extras).unwrap()).unwrap();
+    let mut linked = engine_in(&dir);
+    linked.load_object_links(&dir).unwrap();
+    assert!(linked.is_field_actor(guid), "the encounter owns the linked object's click");
+    let subs = |out: &osfr_tools::encounter::EncounterOutcome| -> Vec<(u8, u8)> {
+        out.replies.iter().map(|p| (p[0], p[2])).collect()
+    };
+    let at_door = linked.clone().handle(&click(door.guid), 77, door.at, BRAWLER, 1_000).unwrap();
+    let out = linked.clone().handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
+    assert_eq!(subs(&out), subs(&at_door), "object {guid} opens the door's card");
+    let far = [at[0] + 40.0, at[1], at[2]];
+    let missed = linked.clone().handle(&click(guid), 77, far, BRAWLER, 1_000).unwrap();
+    assert_ne!(subs(&missed), subs(&at_door), "out of reach it opens nothing");
+    let _ = fs::remove_dir_all(&dir);
+}
+
+/// L1191: every shipped instance link is live. A field enemy or camp with `instance_enemy` names a
+/// placed door, starter or field battle; the row (or at least one camp member) is homed within the
+/// 400 m the click honours; each such actor's click opens exactly that starter's own card; and no
+/// row carries an `instance` its switch leaves unread. Object rows with `interactable` name one too.
+#[test]
+fn every_shipped_instance_link_opens_its_starter() {
+    let read = |name: &str| -> Value {
+        serde_json::from_slice(&fs::read(content_dir().join(name)).unwrap()).unwrap()
+    };
+    let mut starters: Vec<(u64, [f32; 3])> = table().entrances.iter().map(|e| (e.guid, e.at)).collect();
+    for b in read("field_battles.json")["battles"].as_array().unwrap() {
+        let p = b["spawner"]["position"].as_array().unwrap();
+        starters.push((b["spawner"]["guid"].as_u64().unwrap(), [0, 1, 2].map(|i| p[i].as_f64().unwrap() as f32)));
+    }
+    let mut base = engine();
+    base.load_behaviours(&content_dir().join("behaviours.json")).unwrap();
+    base.load_field_enemies(&content_dir().join("field_enemies.json")).unwrap();
+    base.load_field_camps(&content_dir()).unwrap();
+    let subs = |out: &osfr_tools::encounter::EncounterOutcome| -> Vec<(u8, u8)> {
+        out.replies.iter().map(|p| (p[0], p[2])).collect()
+    };
+    let point = |v: &Value| -> [f32; 3] {
+        let p = v.as_array().unwrap();
+        [0, 1, 2].map(|i| p[i].as_f64().unwrap() as f32)
+    };
+    // (who, instance, actors homed with their positions, drawn without a quest)
+    let mut links: Vec<(String, u64, Vec<(u64, [f32; 3])>, bool)> = Vec::new();
+    for e in read("field_enemies.json")["enemies"].as_array().unwrap() {
+        let who = format!("field enemy {}", e["guid"]);
+        if e["instance_enemy"] != true {
+            assert!(e["instance"].is_null(), "{who}: an instance its switch leaves unread");
+            continue;
+        }
+        let drawn = e["quest_ids"].as_array().is_none_or(|q| q.is_empty());
+        links.push((who, e["instance"].as_u64().unwrap(), vec![(e["guid"].as_u64().unwrap(), point(&e["position"]))], drawn));
+    }
+    for c in read("field_camps.json")["camps"].as_array().unwrap() {
+        let who = format!("camp {}", c["id"]);
+        if c["instance_enemy"] != true {
+            assert!(c["instance"].is_null(), "{who}: an instance its switch leaves unread");
+            continue;
+        }
+        links.push((who, c["instance"].as_u64().unwrap(), camp_members(c["id"].as_str().unwrap()), true));
+    }
+    assert!(links.len() >= 9, "the shipped links: {}", links.len());
+    for (who, instance, actors, drawn) in &links {
+        assert!(base.is_battle_spawner(*instance), "{who}: instance {instance} is no placed starter");
+        let marker = starters.iter().find(|s| s.0 == *instance).unwrap().1;
+        let own = base.clone().handle(&click(*instance), 77, marker, BRAWLER, 1_000).unwrap();
+        assert!(!own.replies.is_empty(), "{who}: starter {instance} answers its own click");
+        let near: Vec<_> = actors.iter().filter(|a| (a.1[0] - marker[0]).hypot(a.1[2] - marker[2]) < 390.0).collect();
+        assert!(!near.is_empty(), "{who}: nothing homed within 400 m of {instance}, so the link is dead");
+        // A quest-gated row is drawn only while its quest runs; its link and area are checked above.
+        for &&(guid, at) in near.iter().filter(|_| *drawn) {
+            let out = base.clone().handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
+            assert_eq!(subs(&out), subs(&own), "{who}: {guid} opens {instance}'s card");
+        }
+    }
+    let mut objects = read("npc_spawns_extra.json")["records"].as_array().unwrap().clone();
+    for path in fs::read_dir(content_dir().join("npcs")).unwrap() {
+        let file: Value = serde_json::from_slice(&fs::read(path.unwrap().path()).unwrap()).unwrap();
+        objects.extend(file["records"].as_array().unwrap().iter().cloned());
+    }
+    for r in objects.iter().filter(|r| r["interactable"] == true) {
+        let starter = r["instance"].as_u64().unwrap_or(0);
+        assert!(base.is_battle_spawner(starter), "object {}: instance {starter} is no placed starter", r["spawn_guid"]);
+    }
+}

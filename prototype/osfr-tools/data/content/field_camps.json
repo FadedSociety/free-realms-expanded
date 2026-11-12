@@ -23,8 +23,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json ice_troll; level 9 is a local choice (the definition has no level); respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-ghostdwarf-m-miner-01-w58b-ghost-dwarf",
@@ -53,8 +58,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_ghost_dwarf; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-floren-floren-default1",
@@ -77,8 +87,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "floren-leafling-floren",
@@ -111,8 +126,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "floren-defender-floren-default1",
@@ -138,8 +158,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "bitterleaf-floren-default3",
@@ -161,8 +186,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json floren; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-wolf-vinegolum-vicious-vinewolf",
@@ -185,8 +215,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json vicious_vinewolf; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-manguana-m-base-w58-sandscale-hunter-l3-enemy",
@@ -209,8 +244,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_hunter_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "sandscale-hunter-w58-sandscale-hunter-l3-enemy",
@@ -249,8 +289,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_hunter_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "nettleseed-pest-w58-nettleseed-pest-l13-enemy",
@@ -276,8 +321,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_nettleseed_pest_l13_enemy; level 14 is that definition (the l13 in its id is not the level); respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-snake-snake",
@@ -311,8 +361,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) rc-0136 (2026-11-11): the five snakes within 120 m of the Bone Bog Cemetery point of interest (1597, 4416-4419) left this camp: they start the Snakes in a Maze! battle (entrances.json), as the owner asked. The reference server defines all of these snakes neutral (scenery)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "snake-snake",
@@ -334,8 +389,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json snake; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-troll-scout-troll-roughguard",
@@ -358,8 +418,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "thugawug-thug-thugawug-thug",
@@ -381,8 +446,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json thugawug_thug; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-bear-vinegolem-fungus-fungus-golem",
@@ -405,8 +475,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json fungus_golem; level 20 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-bat-01-w58b-bats",
@@ -428,8 +503,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_bats; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-maneatingplant-w58-nettleseed-nibbler-l5-enemy",
@@ -454,8 +534,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_nettleseed_nibbler_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Nettleseed Nibblers (100003000034, nearest actor 366 m): wiki FR_Mob page: Battle Starter, Battles: 'Nettleseed Nibblers!'."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100003000034
     },
     {
       "id": "nettleseed-nibbler-w58-nettleseed-nibbler-l5-enemy",
@@ -481,8 +568,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_nettleseed_nibbler_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Nettleseed Nibblers (100003000034, nearest actor 7 m): wiki FR_Mob page: Battle Starter, Battles: 'Nettleseed Nibblers!'."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100003000034
     },
     {
       "id": "anon-wolf-generic-wolf",
@@ -506,8 +600,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json wolf; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-wolf-generic-wolf-2",
@@ -532,8 +631,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json wolf; level 11 is a local choice (the definition has no level); respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-vulture-bristlewood-vulture",
@@ -561,8 +665,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json bristlewood_vulture; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Vulture Watch! (100003000059, nearest actor 304 m): wiki FR_Mob page: Battle Starter, Battles: 'Vulture Watch!'."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100003000059
     },
     {
       "id": "bristlewood-vulture-bristlewood-vulture",
@@ -586,8 +697,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json bristlewood_vulture; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Vulture Watch! (100003000059, nearest actor 48 m): wiki FR_Mob page: Battle Starter, Battles: 'Vulture Watch!'."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100003000059
     },
     {
       "id": "anon-manguana-m-scavenger-w58-sandscale-scavenger-l3-enemy",
@@ -610,8 +728,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_scavenger_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "sandscale-scavenger-w58-sandscale-scavenger-l3-enemy",
@@ -659,8 +782,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_sandscale_scavenger_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-dwarf-m-bikerthug-skullz-skullz-brawler",
@@ -682,8 +810,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-dwarf-m-bikerthug-skullz-skullz-brawler-skullz-mohawkthug",
@@ -710,8 +843,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "skullz-thug-skullz-brawler-skullz-mohawkthug",
@@ -770,8 +908,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "skullz-hooligan-skullz-brawler-skullz-mohawkthug",
@@ -806,8 +949,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "skullz-commander-skullz-brawler",
@@ -832,8 +980,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json skullz_brawler; level 7 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-manguana-m-shaman-sandscale-water-seeker",
@@ -855,8 +1008,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json sandscale_water_seeker; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "sandscale-water-seeker-sandscale-water-seeker",
@@ -879,8 +1037,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json sandscale_water_seeker; level 3 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "cray-snapper-w58-cray-snapper-l5-enemy",
@@ -918,8 +1081,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_cray_snapper_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-cray-arctic-swamp-w58b-cray-marauder",
@@ -948,8 +1116,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_cray_marauder; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Cray Marauders (100003000055, nearest actor 223 m): wiki FR_Mob page: Battle Starter, Battles: 'Cray Marauders'. Owner 2026-11-12: the Cray Claw marauders attacked instead of letting the player click the dungeon; now they stand passive by the door and open their own battle."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100003000055
     },
     {
       "id": "cray-bubbler-w58b-cray-marauder",
@@ -980,8 +1155,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_cray_marauder; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "cultist-initiate-w58-fairy-cultist-l3-enemy",
@@ -1019,8 +1199,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_fairy_cultist_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens field battle 12311 Fairy Cultist (100001231100, nearest actor 330 m): (R) no wiki mob page; the field battle's spawner is a Fairy Cultist."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100001231100
     },
     {
       "id": "fairy-cultist-w58-fairy-cultist-l3-enemy",
@@ -1053,8 +1240,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_fairy_cultist_l3_enemy; level 3 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens field battle 12311 Fairy Cultist (100001231100, nearest actor 331 m): (R) no wiki mob page; the field battle's spawner is a Fairy Cultist."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100001231100
     },
     {
       "id": "anon-blackwidow-01-w58b-black-widow",
@@ -1090,8 +1284,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_black_widow; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "bristlewood-arachnid-w58b-black-widow",
@@ -1114,8 +1313,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58b_black_widow; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "shady-smuggler-w58-shady-smuggler-l9-enemy-03",
@@ -1137,8 +1341,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_shady_smuggler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Shady Smugglers (100003000040, nearest actor 140 m): (R) no wiki mob page; the placed starter's battle is named for it."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100003000040
     },
     {
       "id": "scavenger-swooper-w58-scavenger-swooper-l5-enemy",
@@ -1168,8 +1379,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_scavenger_swooper_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "lazy-swooper-w58-lazy-swooper-l5-enemy",
@@ -1195,8 +1411,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_lazy_swooper_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-wraith-m-cloakedskelly-wraith",
@@ -1218,8 +1439,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json wraith; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-troll-forest-troll-naturalist",
@@ -1241,8 +1467,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_naturalist; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-troll-forest-troll-roughguard",
@@ -1268,8 +1499,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-troll-forest-troll-spider-trainer",
@@ -1291,8 +1527,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_spider_trainer; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "troll-guard-troll-roughguard",
@@ -1314,8 +1555,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json troll_roughguard; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-robgoblin-m-brute-w58-brutus-the-brute-l13-enemy",
@@ -1337,8 +1583,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_brutus_the_brute_l13_enemy; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "brutus-the-brute-w58-brutus-the-brute-l13-enemy",
@@ -1360,8 +1611,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_brutus_the_brute_l13_enemy; level 13 is that definition; respawn 120 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-human-m-courier-evil-w58-evil-postman-l5-enemy",
@@ -1389,8 +1645,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_evil_postman_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "evil-postman-w58-evil-postman-l5-enemy",
@@ -1412,8 +1673,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_evil_postman_l5_enemy; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "anon-bear-normal-bear",
@@ -1439,8 +1705,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json bear; level 5 is a local choice (the definition has no level); respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "ghost-ninja-w58-stealthy-despoiler-l9-enemy",
@@ -1475,8 +1746,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "ghost-ninja-striker-w58-stealthy-despoiler-l9-enemy",
@@ -1504,8 +1780,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "stealthy-despoiler-w58-stealthy-despoiler-l9-enemy",
@@ -1528,8 +1809,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Stats and kill-credit definition id come from enemies.json w58_stealthy_despoiler_l9_enemy; level 9 is that definition; respawn 90 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "id": "qf-robgoblin_kaboomer-1",
@@ -1558,8 +1844,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 3 (median of the shipped camps in Sunstone Valley); respawn 30 s, aggro 8 m, leash 14 m are the design's field rules (5.4). The positions are the reference spawns, so they stand where the original bodies stood."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     }
   ]
 }

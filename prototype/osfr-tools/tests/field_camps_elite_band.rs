@@ -232,8 +232,9 @@ const EXISTING_GROUPS: [&str; 10] = [
 /// pre-T415 prefix's masked digest. F6 (op-P-npc-life) set two Hooligan homes onto the floor
 /// (`scripts/npc_floor.py`), which moved this value. L1189 gave the two Bixie Soldiers their
 /// bark rules (`behaviour`), which moved it again.
+/// L1191 gave every row `attacks_in_overworld: false` and one (R) source line, which moved it again.
 const EXISTING_PREFIX_SHA256: &str =
-    "e94658cdcac68c39506f2969b22e2a7dd864806a327a099671a66caf82420e28";
+    "ce234de33eecf662cedf04765c3853f40713bc64c2d082de67e648a86a3b6b8c";
 
 /// The existing level-10 and level-14 controls used to prove the actor level,
 /// not the player level, selects the reward band.

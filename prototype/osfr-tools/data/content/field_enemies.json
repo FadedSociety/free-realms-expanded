@@ -450,8 +450,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 100000004155,
@@ -494,8 +499,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664449,
@@ -538,8 +548,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664450,
@@ -582,8 +597,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) present only while Brawler: Delinquent Dilemma (3030007) is active, per the owner's field notes (overworld enemies belong to active quests)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102001,
@@ -630,8 +650,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 26.83 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102002,
@@ -678,8 +703,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102003,
@@ -726,8 +756,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 36.88 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102004,
@@ -774,8 +809,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102005,
@@ -822,8 +862,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102006,
@@ -870,8 +915,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 3 in band 3-4; existing Hooligan HP/damage 220/8; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 60.13 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102007,
@@ -918,8 +968,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 8.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102008,
@@ -966,8 +1021,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 5.66 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102009,
@@ -1014,8 +1074,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 45 s respawn. Offset 0.0 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102010,
@@ -1062,8 +1127,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 112.07 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102011,
@@ -1110,8 +1180,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W102: always-on, one explicit actor per area; proposed level 1 in band 1-2; enemies.json level-1 Bone Shaman HP/damage 100/7; the field_roamer preset with group-owned overrides, 8 m aggro, 6 m roam area, 12 m home leash, 2.5 m reach and 60 s respawn. Offset 116.82 m horizontally from the community anchor onto height-grid terrain with full leash slope <=25 degrees. Free-field use, model/name pairing, counts and all numbers are local policy, not recovered 2014 spawn tables. The spawn group owns the shared respawn timer, aggro radius, level band, region, zone and 12 m leash; each member owns its GUID, position and spawn area. The runtime consumes all of these fields."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102012,
@@ -1162,8 +1237,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Third troll is an additional actor using NPC 3149 as a location anchor, not a third recovered community spawn. Friendly troll patrollers, Troll Summoner battle 96 and its small summoned trolls are unchanged."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102013,
@@ -1210,8 +1290,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) F621 re-audited centre 97.3 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/8); W105 scaling by level produces the live stats. T398 (R): damage 25 -> 8, the Hooligan row's value, so a level-5 camp keeps the starter band's knockout time on the final-era health curve (it was 17 s for the pair against a level-5 Wizard)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102014,
@@ -1258,8 +1343,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) F621 re-audited centre 85.8 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/8); W105 scaling by level produces the live stats. T398 (R): damage 25 -> 8, the Hooligan row's value, so a level-5 camp keeps the starter band's knockout time on the final-era health curve (it was 17 s for the pair against a level-5 Wizard)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102015,
@@ -1306,8 +1396,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 39.6 m from the nearest same-kind Legacy NPC row 4667 (FabledRealms.lua:3301), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102004 (W102-H1); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102016,
@@ -1354,8 +1449,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 48.7 m from the nearest same-kind Legacy NPC row 4667 (FabledRealms.lua:3301), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102005 (W102-H2); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102017,
@@ -1402,8 +1502,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 153.9 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102010 (W102-T1); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102018,
@@ -1450,8 +1555,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 158.7 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102011 (W102-T2); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102019,
@@ -1498,6 +1608,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 62.4 m from the nearest same-kind Legacy NPC row 2930 (FabledRealms.lua:1673), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102007 (W102-Q1); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -1551,7 +1665,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102020,
@@ -1598,6 +1713,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 72.3 m from the nearest same-kind Legacy NPC row 2930 (FabledRealms.lua:1673), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102008 (W102-Q2); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -1651,7 +1770,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102021,
@@ -1698,8 +1818,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 65.1 m from the nearest same-kind Legacy NPC row 3158 (FabledRealms.lua:1901), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102003 (W102-F3); level 11 in band 11-12 chosen as the next local progression step above the level 5-10 mid camps and below the level-13 battle gate; count, 120 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102022,
@@ -1746,8 +1871,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 72.1 m from the nearest same-kind Legacy NPC row 3158 (FabledRealms.lua:1901), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102002 (W102-F2); level 12 in band 11-12 chosen as the next local progression step above the level 5-10 mid camps and below the level-13 battle gate; count, 120 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102023,
@@ -1794,8 +1924,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 172.2 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102012 (W102-T3); level 13 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102024,
@@ -1842,8 +1977,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 175.0 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102011 (W102-T2); level 14 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102031,
@@ -1882,8 +2022,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 192.9 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 15 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102032,
@@ -1922,8 +2067,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 197.3 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 16 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102033,
@@ -1962,6 +2112,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 79.7 m from the nearest same-kind Legacy NPC row 2915 (FabledRealms.lua:1658), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 17 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -2015,7 +2169,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102034,
@@ -2054,6 +2209,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 89.3 m from the nearest same-kind Legacy NPC row 2915 (FabledRealms.lua:1658), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 18 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -2107,7 +2266,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102035,
@@ -2146,8 +2306,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 39.8 m from the nearest same-kind Legacy NPC row 23623 (FabledRealms.lua:4152), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 19 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 131000102036,
@@ -2186,8 +2351,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T415 audited centre 40.4 m from the nearest same-kind Legacy NPC row 23623 (FabledRealms.lua:4152), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 20 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664451,
@@ -2222,6 +2392,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000024 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -2287,7 +2461,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664452,
@@ -2322,8 +2497,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010005 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664453,
@@ -2359,8 +2539,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010018/3150012 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664454,
@@ -2395,8 +2580,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150012 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664455,
@@ -2433,8 +2623,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010011/3090007 (3010008 gates the row for its drop count) is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664456,
@@ -2469,8 +2664,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160006 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664457,
@@ -2505,8 +2705,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000040 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664458,
@@ -2541,8 +2746,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664459,
@@ -2577,8 +2787,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664460,
@@ -2613,6 +2828,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3020035 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -2666,7 +2885,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664461,
@@ -2701,8 +2921,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 9, health 180, damage 8, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3030040 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664462,
@@ -2737,8 +2962,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664463,
@@ -2773,8 +3003,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664464,
@@ -2809,8 +3044,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150002 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. Opens Frostfang Snarlers (100000003592, nearest actor 311 m): (R) no wiki mob page; the 2014 frames show the Snarler den as this battle's starter."
         }
-      ]
+      ],
+      "attacks_in_overworld": false,
+      "instance_enemy": true,
+      "instance": 100000003592
     },
     {
       "guid": 5064655448674664465,
@@ -2845,8 +3087,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160031 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 5064655448674664466,
@@ -2877,6 +3124,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T730: the spot is about 19 m from Pappy Farnum, whose quest asks for it, and 32 m from the Sheep Watch marker (battle 12350), on the standable ground that the T103 disc rule samples (the opening stage 910008's own Gloam Creature placement, encounters.json guid 5715144128442925075, sits 21 m from that marker and so could not be reused). Level 4 (the top of the starter bands: a level 5 band sits 21 m from low-level battle 12350's marker, inside the 40 m clearance), health 100, damage 8, respawn 60 s and aggro 8.0 m are the local balance on the field ladder T699 used, not the opening's scripted 300/35. Present only while quest 3000010 is active. The GUID is a fresh actor id, not the opening actor's. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest, so it cannot be farmed."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -2928,7 +3179,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     },
     {
       "guid": 100000004667,
@@ -2971,8 +3223,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T889: the owner saw this Legacy spawn as a blue (friendly) Hooligan that could not be fought, so it is promoted to a hostile always-on body in the mid_highroad_tent_hooligans group. The Legacy spot itself fails the T415 slope check (a hostile camp's 12 m leash must stay under 25 degrees), so the camp stands on the nearest passing ground. T889 reran lab/reports/field-enemies-w102/check_placements.py validate() over lab/terrain/zone_0.hgt for this centre with the group's 12 m leash and 2.5 m reach: height error under 0.051 m, max slope 22.6 deg over every 2 m node of the leash disc, 86.3 m from the nearest NPC body (need 39.5), and a 4-neighbour walk over 2 m nodes with slope <= 25 deg reaches the W102-H1 camp. Level 7 in band 7-8 as the MID-H1/MID-H2 Hooligans beside it; HP/damage are the enemies.json definition 930060 values (180/15); W105 scaling by level produces the live stats. 12 m leash, melee reach and the 90 s group respawn are as mid_highroad_hooligans; count and rates are local policy."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
-      ]
+      ],
+      "attacks_in_overworld": false
     },
     {
       "guid": 100000004675,
@@ -3015,6 +3272,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T889: the owner saw this Legacy spawn as a blue (friendly) Hooligan Archer that could not be fought, so it is promoted to a hostile always-on body in the mid_highroad_tent_hooligans group. The Legacy spot passes the same check, so the body keeps it to within a metre. T889 reran lab/reports/field-enemies-w102/check_placements.py validate() over lab/terrain/zone_0.hgt for this centre with the group's 12 m leash and 2.5 m reach: height error under 0.051 m, max slope 8.5 deg over every 2 m node of the leash disc, 55.1 m from the nearest NPC body (need 39.5), and a 4-neighbour walk over 2 m nodes with slope <= 25 deg reaches the W102-H1 camp. Level 8 in band 7-8 as the MID-H1/MID-H2 Hooligans beside it; HP/damage are the enemies.json definition 930012 values (140/11); W105 scaling by level produces the live stats. 12 m leash, melee reach and the 90 s group respawn are as mid_highroad_hooligans; count and rates are local policy."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
         }
       ],
       "behaviour": {
@@ -3068,7 +3329,8 @@
             "cooldown_ms": 15000
           }
         ]
-      }
+      },
+      "attacks_in_overworld": false
     }
   ]
 }

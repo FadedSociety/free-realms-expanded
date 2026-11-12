@@ -135,6 +135,9 @@ impl Fixture {
         for enemy in field["enemies"].as_array_mut().unwrap() {
             if enemy["guid"].as_u64() == Some(SECOND) {
                 enemy["max_health"] = json!(SECOND_HEALTH);
+                // L1191: shipped rows no longer notice a player by distance; the shield's
+                // window is measured against a Hooligan that swings unprovoked.
+                enemy["attacks_in_overworld"] = json!(true);
             }
         }
         fs::write(dir.join("field_enemies.json"), field.to_string()).unwrap();

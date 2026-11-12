@@ -135,22 +135,24 @@ const QUEST_ID: u64 = 3_030_007;
 /// The provenance shape of each starter row (`source[].kind`, in order). The
 /// evidence text stays editable for a future provenance correction; a missing,
 /// added or reordered evidence row fails here.
+/// L1191 appended one (R) row to every one: no overworld aggro, and its instance link.
 const STARTER_SOURCE: [&[&str]; 12] = [
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
-    &["client", "reference", "legacy-data", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
+    &["client", "reference", "legacy-data", "reconstructed", "reconstructed"],
     &[
         "client",
         "reference",
         "legacy-data",
+        "reconstructed",
         "reconstructed",
         "reconstructed",
     ],
@@ -165,24 +167,28 @@ const QUEST_SOURCE: [&[&str]; 4] = [
         "reconstructed",
         "legacy-data",
         "reconstructed",
-    ],
-    &[
-        "legacy-data",
-        "client",
-        "reconstructed",
-        "legacy-data",
         "reconstructed",
     ],
     &[
         "legacy-data",
         "client",
         "reconstructed",
+        "legacy-data",
         "reconstructed",
         "reconstructed",
     ],
     &[
         "legacy-data",
         "client",
+        "reconstructed",
+        "reconstructed",
+        "reconstructed",
+        "reconstructed",
+    ],
+    &[
+        "legacy-data",
+        "client",
+        "reconstructed",
         "reconstructed",
         "reconstructed",
         "reconstructed",
@@ -375,7 +381,8 @@ fn every_new_home_is_a_verified_w102_centre() {
 #[test]
 fn the_actor_and_group_counts_stay_inside_the_loader_bounds() {
     let bytes = fs::read(content_path()).unwrap();
-    assert!(bytes.len() <= 128 * 1024, "whole field file is 128 KiB max");
+    // L1191 raised the loader's bound to 256 KiB (`load_field_enemies`), as for field_camps.json.
+    assert!(bytes.len() <= 256 * 1024, "whole field file is 256 KiB max");
     let field: Value = serde_json::from_slice(&bytes).unwrap();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();

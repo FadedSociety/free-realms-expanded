@@ -38,6 +38,10 @@ pub(super) const WANDER_NOTICE: f32 = 8.0;
 /// Battle-marker interaction radius: the start screen opens, and its Go
 /// (41/108) may start the battle, only within this distance of the marker.
 pub(super) const BATTLE_SCREEN_RADIUS: f32 = 8.0;
+/// (R) How near an `instance_enemy` the player must stand for its click to open the linked card.
+const LINKED_CLICK_REACH: f32 = 12.0;
+/// (R) An `instance_enemy` homed farther than this from its linked starter does not open it.
+const LINKED_AREA: f32 = 400.0;
 
 /// The one level rule for a published battle: the active job level must reach
 /// the row's configured floor. Portal admission, the battle marker and
@@ -297,7 +301,38 @@ impl EncounterEngine {
     /// Actors whose interactions the encounter owns (overworld enemies and
     /// battle spawners); Legacy also lists some of their GUIDs as plain NPCs.
     pub fn is_field_actor(&self, guid: u64) -> bool {
-        self.is_field_enemy(guid) || self.is_battle_spawner(guid)
+        self.is_field_enemy(guid)
+            || self.is_battle_spawner(guid)
+            || self.content.object_links.contains_key(&guid)
+    }
+
+    /// Owner 2026-11-12: a click on an `instance_enemy` within reach opens its linked starter's or
+    /// entrance's start card, exactly as a click on that starter does; `None` leaves the click to
+    /// the ordinary interaction.
+    pub(super) fn linked_battle_screen(
+        &mut self,
+        guid: u64,
+        position: [f32; 3],
+        profile: i32,
+    ) -> Option<EncounterOutcome> {
+        let enemy = self.field_sim.enemies.iter().find(|f| f.actor.guid == guid && f.present);
+        // An enemy without a link fights as before; any other actor may be a linked object.
+        let (object_at, starter, home) = match enemy {
+            Some(enemy) => (enemy.state.position, enemy.instance?, Some(enemy.actor.position)),
+            None => {
+                let (at, starter) = *self.content.object_links.get(&guid)?;
+                (at, starter, None)
+            }
+        };
+        if distance(position, object_at) > LINKED_CLICK_REACH {
+            return None;
+        }
+        let at = self.marker_position(self.battles.iter().find(|b| b.spawner.guid == starter)?);
+        // A camp spreads over the map: only its members homed in the instance's own area link.
+        if home.is_some_and(|home| distance(home, at) > LINKED_AREA) {
+            return None;
+        }
+        Some(self.battle_screen(starter, at, profile))
     }
 
     /// Spawner click: show the battle's start screen (difficulty, description,
@@ -595,7 +630,7 @@ impl EncounterEngine {
                     && now_ms >= p.grace_until
                     && valid_position(p.position)
                     && (!shared || horizontal_distance(p.position, home) <= leash + b.reach)
-                    && (distance(p.position, f.state.position)
+                    && (f.attacks && distance(p.position, f.state.position)
                         <= if f.motion == FieldMotion::Chasing {
                             f.aggro_range + 4.0
                         } else {

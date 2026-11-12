@@ -35,9 +35,17 @@ fn damage_multiplier() -> f32 {
     scale["enemy_damage_multiplier"].as_f64().unwrap_or(1.0) as f32
 }
 
-/// The shipped engine with every quest-gated enemy present too.
-fn loaded(field: &Value) -> osfr_tools::encounter::EncounterEngine {
-    let mut engine = Fixture::shipped().load();
+/// The shipped engine with every quest-gated enemy present too. L1191: shipped rows no longer
+/// notice a player by distance, so the budget is measured on a private copy whose rows do (the
+/// damage a row deals once it fights is unchanged).
+fn loaded(field: &Value) -> (Fixture, osfr_tools::encounter::EncounterEngine) {
+    let fixture = Fixture::copied();
+    let mut aggressive = field.clone();
+    for row in aggressive["enemies"].as_array_mut().unwrap() {
+        row.as_object_mut().unwrap().remove("attacks_in_overworld");
+    }
+    std::fs::write(fixture.field_path(), aggressive.to_string()).unwrap();
+    let mut engine = fixture.load();
     let quests: BTreeSet<u32> = field["enemies"]
         .as_array()
         .unwrap()
@@ -46,14 +54,14 @@ fn loaded(field: &Value) -> osfr_tools::encounter::EncounterEngine {
         .map(|id| id.as_u64().unwrap() as u32)
         .collect();
     engine.set_active_quests(&quests);
-    engine
+    (fixture, engine)
 }
 
 /// The weakest level-matched player's max health and the damage per second
 /// `row` deals it, both read from a fresh engine over the shipped file.
 fn measure(field: &Value, row: &Value, level: u32) -> (u32, f32) {
     let guid = row["guid"].as_u64().unwrap();
-    let mut engine = loaded(field);
+    let (_fixture, mut engine) = loaded(field);
     engine.set_player_job(WIZARD, level);
     engine.on_zone_ready(WIZARD, 0).unwrap();
     let at: Vec<f32> = row["position"]
@@ -92,7 +100,7 @@ fn starter_enemies_and_camps_stay_inside_the_final_era_budget() {
     // camp -> (lowest member level, summed damage per second)
     let mut camps: BTreeMap<String, (u32, f32)> = BTreeMap::new();
     let mut starters = 0;
-    let levels = loaded(&field);
+    let (_fixture, levels) = loaded(&field);
     for row in field["enemies"].as_array().unwrap() {
         let guid = row["guid"].as_u64().unwrap();
         let level = levels.field_level(guid).unwrap();

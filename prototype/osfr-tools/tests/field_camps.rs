@@ -108,17 +108,23 @@ fn the_sandscale_camp_fights_and_respawns() {
     let (_fixture, mut game) = rig();
     let mut now = 1_000;
 
-    // It fights back: standing at a body, the camp hits the player.
+    // L1191 (owner 2026-11-12): no overworld aggro. Standing at a body, nothing swings; hit it
+    // once, and it fights back.
     let (first, at, _) = camp[0];
     let character = character_at_for(CHARACTER, 0, at);
-    let hits: Vec<u32> = (0..30)
-        .flat_map(|step| game.tick(&character, now + step * 100).unwrap().replies)
-        .flat_map(|packet| job_playtest::hits_from(&[packet], first))
-        .collect();
-    assert!(
-        hits.iter().any(|damage| *damage > 0),
-        "{first} swings at a player in reach"
-    );
+    let swings = |game: &mut Gameplay, from: u64| -> Vec<u32> {
+        (0..30)
+            .flat_map(|step| game.tick(&character, from + step * 100).unwrap().replies)
+            .flat_map(|packet| job_playtest::hits_from(&[packet], first))
+            .filter(|damage| *damage > 0)
+            .collect()
+    };
+    assert!(swings(&mut game, now).is_empty(), "{first} leaves a player in reach alone");
+    now += 3_100;
+    npc_quest_chain::send(&mut game, &character, &npc_quest_chain::npc_interact(first), now);
+    npc_quest_chain::send(&mut game, &character, &npc_quest_chain::npc_select(first, 103), now + 700);
+    now += 800;
+    assert!(!swings(&mut game, now).is_empty(), "{first} swings back once hit");
     now += 3_100;
 
     // Every body is fightable, dies, and returns exactly on its camp's timer.
