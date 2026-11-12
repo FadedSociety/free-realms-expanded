@@ -223,6 +223,9 @@ pub struct CraftOutcome {
     pub transaction: Option<CraftTransaction>,
     pub completed: bool,
     pub changed: bool,
+    /// A won craft's coins and wheel slot (`minigame_rewards.json`, C4/C9); the stars are the
+    /// transaction's `experience_points`. `None` for a recipe the table does not list.
+    pub payout: Option<crate::minigame::WinPayout>,
 }
 
 /// The started run. The caller applies it exactly like a tutorial start.

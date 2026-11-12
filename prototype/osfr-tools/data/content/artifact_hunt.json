@@ -1,5 +1,12 @@
 {
   "schema_version": 1,
+  "powerup_definitions": [
+    {"value": 950, "spawn_chance": 25, "duration": 0, "power": 6},
+    {"value": 951, "spawn_chance": 25, "duration": 0, "power": 4},
+    {"value": 952, "spawn_chance": 25, "duration": 0, "power": 6},
+    {"value": 953, "spawn_chance": 25, "duration": 0, "power": 12}
+  ],
+  "locked_percent": 8,
   "game_id": 57,
   "profile_id": 1,
   "name_id": 35604,
@@ -664,7 +671,7 @@
     "wildcard_percent": 5,
     "collectable_percent": 0,
     "blocker_percent": 0,
-    "powerup_percent": 0,
+    "powerup_percent": 5,
     "meter_id": 0,
     "reconstructed_rules": true,
     "rule_notice": "Recovered: game_artifact.gfx is the type-8 match-three movie of game_mining.gfx, and its text asks four kinds of artifact per level. Seen on a retail level 1: its four artifacts, quota 15, difficulty 2. Levels 2 to 5 are the wiki's rounds; round II lists five artifacts, so the Goblet is left out (R). Reconstructed: quotas and times past level 1, Mail Sorting's board tuning and the XP."

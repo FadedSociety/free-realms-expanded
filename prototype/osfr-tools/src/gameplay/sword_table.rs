@@ -14,7 +14,8 @@ pub(super) fn load_sword(content: &Path) -> io::Result<Option<Box<SwordGame>>> {
     if !content.join(CONTENT_FILE).is_file() {
         return Ok(None);
     }
-    SwordGame::new(SwordContent::load(content)?).map(|game| Some(Box::new(game)))
+    let rewards = crate::minigame::MinigameRewards::load(content)?;
+    SwordGame::new(SwordContent::load(content)?).map(|game| Some(Box::new(game.with_rewards(rewards))))
 }
 
 /// Each Practice Dummy's menu: a game table with one game.
@@ -42,10 +43,13 @@ impl Gameplay {
             replies: vec![chat::system(text)],
             ..Outcome::default()
         };
+        // C4: the wheel shows this player only what they can hold and wear.
+        let (inventory, gender) = (&self.inventory, self.gender);
+        let fits = |item: i32| inventory.has_definition(item) && inventory.reward_fits_gender(item, gender);
         let Some(sword) = self.sword.as_mut() else {
             return Ok(refused("Hack 'n' Slash is not available."));
         };
-        Ok(match sword.begin()? {
+        Ok(match sword.begin_for(&fits)? {
             Some(run) => Outcome {
                 changed: run.changed,
                 replies: run.replies,
@@ -67,7 +71,8 @@ impl Gameplay {
         if !(self.sword.as_deref()).is_some_and(SwordGame::is_active) {
             return Ok(None);
         }
-        let rewards = self.reward_snapshot();
+        // The player's gender, so the wheel lands only on what they wear.
+        let rewards = self.reward_snapshot().with_gender(self.gender);
         let Some(sword) = self.sword.as_mut() else {
             return Ok(None);
         };

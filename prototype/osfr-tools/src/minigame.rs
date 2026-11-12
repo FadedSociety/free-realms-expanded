@@ -5,9 +5,9 @@
 //! The run counter and reward snapshot must be saved together before packets
 //! are sent by the eventual gateway integration.
 
-use crate::rewards::{RewardBundleRow, RewardGrant, RewardState, apply_grant};
+use crate::rewards::{ItemGrant, RewardBundleRow, RewardGrant, RewardState, apply_grant};
 use serde::{Deserialize, Serialize};
-use std::io;
+use std::{collections::BTreeMap, fs, io, path::Path};
 
 const FAMILY_MINIGAME: u16 = 39;
 const FAMILY_COMMAND: u16 = 26;
@@ -20,6 +20,322 @@ const EMPTY_REWARD_BUNDLES_BYTES: usize = 3 * 69;
 pub const MAX_GOALS: usize = 64;
 /// A movie message's text length cap, its NUL included.
 const MAX_MOVIE_TEXT: u32 = 4096;
+/// `minigame_rewards.json` bounds (R): operational caps, not balance.
+const MAX_REWARDS_FILE: u64 = 1024 * 1024;
+const MAX_WHEEL_SLICES: usize = 32;
+const MAX_REWARD_AMOUNT: u32 = 1_000_000;
+const MAX_SLICE_QUANTITY: u32 = 1_000;
+
+/// One prize-wheel slot: an item the wheel shows by its client name and icon.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WheelSlice {
+    pub item_id: i32,
+    pub name_id: i32,
+    pub icon_id: i32,
+    #[serde(default = "one")]
+    pub quantity: u32,
+    /// The item's GenderUsage: 0 anyone, 1 boys, 2 girls.
+    #[serde(default)]
+    pub gender: i32,
+}
+
+fn one() -> u32 {
+    1
+}
+
+/// A won game's prize wheel (`LootWheelOfAwesomeness.gfx`). The score screen lists the preview
+/// bundle's entries, then a Coins slot when its coins are above 0 (`ScoreScreen:PopulateLootWheel`);
+/// it shows the wheel only for a win with at least one entry.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Wheel {
+    #[serde(default)]
+    pub coins: u32,
+    #[serde(default)]
+    pub slices: Vec<WheelSlice>,
+}
+
+/// Where a won run's wheel lands.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum Prize {
+    Item(WheelSlice),
+    Coins(u32),
+}
+
+impl Prize {
+    pub fn coins(&self) -> u32 {
+        match self {
+            Prize::Coins(coins) => *coins,
+            Prize::Item(_) => 0,
+        }
+    }
+
+    pub fn item(&self) -> Option<(i32, u32)> {
+        match self {
+            Prize::Item(slice) => Some((slice.item_id, slice.quantity)),
+            Prize::Coins(_) => None,
+        }
+    }
+}
+
+impl Wheel {
+    /// The wheel one wearer sees: the slots anyone can wear and their own gender's. Gender 0
+    /// (unknown) keeps every slot.
+    pub fn for_wearer(&self, gender: i32) -> Wheel {
+        Wheel {
+            coins: self.coins,
+            slices: (self.slices.iter())
+                .filter(|slice| gender == 0 || slice.gender == 0 || slice.gender == gender)
+                .cloned()
+                .collect(),
+        }
+    }
+
+    /// The client draws a wheel only around at least one entry.
+    pub fn shows(&self) -> bool {
+        !self.slices.is_empty()
+    }
+
+    /// The slots whose item `keep` accepts, and the Coins slot.
+    pub fn keep(&self, keep: impl Fn(i32) -> bool) -> Wheel {
+        Wheel {
+            coins: self.coins,
+            slices: (self.slices.iter()).filter(|slice| keep(slice.item_id)).cloned().collect(),
+        }
+    }
+
+    /// The wheel one player sees and lands on: items their inventory defines and their gender
+    /// wears (`Inventory::reward_fits_gender`, the rule every reward grant applies), and the Coins
+    /// slot. Its preview and its landing both come from it, so the slot paid is always one shown.
+    pub fn for_player(&self, inventory: &crate::inventory::Inventory, gender: i32) -> Wheel {
+        self.keep(|item| inventory.has_definition(item) && inventory.reward_fits_gender(item, gender))
+    }
+
+    fn validate(&self) -> io::Result<()> {
+        if self.coins > MAX_REWARD_AMOUNT
+            || self.slices.len() > MAX_WHEEL_SLICES
+            || self.slices.iter().any(|slice| {
+                slice.item_id <= 0
+                    || slice.name_id < 0
+                    || !(1..=MAX_SLICE_QUANTITY).contains(&slice.quantity)
+                    || !(0..=2).contains(&slice.gender)
+            })
+        {
+            return Err(invalid("invalid prize wheel"));
+        }
+        Ok(())
+    }
+
+    /// The three 39/16 reward bundles: reward and member reward empty, then the preview
+    /// (state `+0x200`, `BaseClient.MiniGame.RewardPreview`) listing this wheel.
+    pub fn offer_bundles(&self) -> Vec<u8> {
+        let mut bytes = vec![0; 2 * 69];
+        let rows: Vec<RewardBundleRow> = self.slices.iter().map(WheelSlice::row).collect();
+        bytes.extend(reward_bundle(self.coins, &rows));
+        bytes
+    }
+
+    /// The slot a won run lands on, uniform over the item slots and the Coins slot (R), fixed by
+    /// the run's instance id so the payout and the 39/45 always agree.
+    pub fn prize(&self, instance_id: i32) -> Option<Prize> {
+        let slots = self.slices.len() + usize::from(self.coins > 0);
+        if slots == 0 {
+            return None;
+        }
+        let mixed = (instance_id as u32).wrapping_mul(0x9e37_79b9).rotate_left(13);
+        let pick = mixed as usize % slots;
+        Some(match self.slices.get(pick) {
+            Some(slice) => Prize::Item(slice.clone()),
+            None => Prize::Coins(self.coins),
+        })
+    }
+}
+
+impl WheelSlice {
+    /// The slot as a type-1 Item entry; its body is the base reader's (`0103c460`): hidden,
+    /// icon, tint, name, quantity, item id, parameter, empty string, text colour, members-only.
+    pub fn row(&self) -> RewardBundleRow {
+        let mut body = vec![0];
+        let quantity = i32::try_from(self.quantity).unwrap_or(1);
+        for value in [self.icon_id, 0, self.name_id, quantity, self.item_id, 0, 0, 0] {
+            body.extend(value.to_le_bytes());
+        }
+        body.push(0);
+        RewardBundleRow { type_id: 1, body }
+    }
+}
+
+/// A RewardBundleBase (reader `008e7930`), the one writer every prize wheel uses: flag 0, so an
+/// Item entry carries no trailing word (`0103c5c0` reads it only when the flag is set); coins,
+/// stars and four words; the float at +0x78, 1.0, the client's own default for it (`0091c110`; no
+/// client reader scales the coins by it: they scale by the player's own factor); two words, two
+/// guids, icon and name; the entry count, each entry's type and body; a trailing word. Empty, it
+/// is the 69 bytes the reader needs before any entry.
+pub(crate) fn reward_bundle(coins: u32, rows: &[RewardBundleRow]) -> Vec<u8> {
+    let mut bytes = vec![0];
+    let coins = i32::try_from(coins.min(MAX_REWARD_AMOUNT)).unwrap_or(0);
+    for value in [coins, 0, 0, 0, 0, 0] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.extend(1.0f32.to_le_bytes());
+    bytes.extend([0; 32]);
+    bytes.extend(i32::try_from(rows.len()).unwrap_or(0).to_le_bytes());
+    for row in rows {
+        bytes.extend(row.type_id.to_le_bytes());
+        bytes.extend(&row.body);
+    }
+    bytes.extend(0_i32.to_le_bytes());
+    bytes
+}
+
+/// 39/45 `MiniGameLootWheelSetItemToLandOn` (`009b9e20`, one RewardBundleBase): the landing slot,
+/// sent before the player spins. `StopMiniGameLootWheelAt` (`009b6da0`) finds the bundle's entry
+/// among the preview's entries; a bundle with coins and no entry lands on the Coins slot.
+pub fn wheel_land_packet(instance_id: i32, game_id: i32, prize: &Prize) -> Vec<u8> {
+    match prize {
+        Prize::Item(slice) => wheel_prize_packet(instance_id, game_id, &slice.row()),
+        Prize::Coins(coins) => {
+            let mut bytes = family39_header(45, instance_id, game_id);
+            bytes.extend(reward_bundle(*coins, &[]));
+            bytes
+        }
+    }
+}
+
+/// What a win pays on top of the game's own grant: goal coins and stars, and the wheel's slot.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct WinPayout {
+    pub coins: u32,
+    pub stars: u32,
+    pub items: Vec<(i32, u32)>,
+}
+
+impl WinPayout {
+    /// Add the wheel's slot.
+    pub fn add_prize(&mut self, prize: &Prize) {
+        self.coins = self.coins.saturating_add(prize.coins());
+        self.items.extend(prize.item());
+    }
+}
+
+/// Put the wheel's 39/45 ahead of a result set's closing 39/19.
+pub fn insert_before_close(replies: &mut Vec<Vec<u8>>, packet: Vec<u8>) {
+    let at = replies.len().saturating_sub(1);
+    replies.insert(at, packet);
+}
+
+/// One goal's payout, paid on a win when the goal was met.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GoalReward {
+    #[serde(default)]
+    pub coins: u32,
+    #[serde(default)]
+    pub stars: u32,
+}
+
+/// A game's goal payouts (in its Goals panel order) and prize wheel.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GameRewards {
+    pub game_id: i32,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub goals: Vec<GoalReward>,
+    #[serde(default)]
+    pub wheel: Wheel,
+    #[serde(default)]
+    pub source: String,
+}
+
+/// A recipe's craft payout: its coins (the stars are the recipe's `experience_points`) and wheel.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RecipeRewards {
+    pub recipe: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub coins: u32,
+    #[serde(default)]
+    pub wheel: Wheel,
+    #[serde(default)]
+    pub source: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct RewardsFile {
+    schema_version: u32,
+    #[allow(dead_code)]
+    #[serde(default)]
+    source: String,
+    #[serde(default)]
+    games: Vec<GameRewards>,
+    #[serde(default)]
+    recipes: Vec<RecipeRewards>,
+}
+
+/// `minigame_rewards.json`: every minigame's goal payouts and prize wheel. Empty without the file.
+#[derive(Clone, Debug, Default)]
+pub struct MinigameRewards {
+    games: BTreeMap<i32, GameRewards>,
+    recipes: BTreeMap<String, RecipeRewards>,
+}
+
+impl MinigameRewards {
+    pub const FILE: &'static str = "minigame_rewards.json";
+
+    pub fn load(directory: &Path) -> io::Result<Self> {
+        let path = directory.join(Self::FILE);
+        if !path.is_file() {
+            return Ok(Self::default());
+        }
+        if fs::metadata(&path)?.len() > MAX_REWARDS_FILE {
+            return Err(invalid("minigame rewards file exceeds bounds"));
+        }
+        Self::parse(&fs::read(path)?)
+    }
+
+    pub fn parse(bytes: &[u8]) -> io::Result<Self> {
+        let file: RewardsFile = serde_json::from_slice(bytes).map_err(invalid)?;
+        if file.schema_version != 1 {
+            return Err(invalid("unsupported minigame rewards schema"));
+        }
+        let amount = |goal: &GoalReward| goal.coins > MAX_REWARD_AMOUNT || goal.stars > MAX_REWARD_AMOUNT;
+        let mut games = BTreeMap::new();
+        for game in file.games {
+            game.wheel.validate()?;
+            if game.game_id <= 0 || game.goals.len() > MAX_GOALS || game.goals.iter().any(amount) {
+                return Err(invalid("invalid minigame reward row"));
+            }
+            if games.insert(game.game_id, game).is_some() {
+                return Err(invalid("duplicate minigame reward row"));
+            }
+        }
+        let mut recipes = BTreeMap::new();
+        for recipe in file.recipes {
+            recipe.wheel.validate()?;
+            if recipe.recipe.is_empty() || recipe.coins > MAX_REWARD_AMOUNT {
+                return Err(invalid("invalid recipe reward row"));
+            }
+            if recipes.insert(recipe.recipe.clone(), recipe).is_some() {
+                return Err(invalid("duplicate recipe reward row"));
+            }
+        }
+        Ok(Self { games, recipes })
+    }
+
+    pub fn game(&self, game_id: i32) -> Option<&GameRewards> {
+        self.games.get(&game_id)
+    }
+
+    pub fn recipe(&self, key: &str) -> Option<&RecipeRewards> {
+        self.recipes.get(key)
+    }
+}
 
 /// Generic lifecycle phase. Terminal state is retained until the real result
 /// close arrives; `39/7` is only the automatic removal acknowledgement.
@@ -321,6 +637,11 @@ impl MinigameRuns {
 
     pub fn current_instance_id(&self) -> Option<i32> {
         self.current.as_ref().map(|run| run.instance_id)
+    }
+
+    /// The open run's game id.
+    pub fn current_game_id(&self) -> Option<i32> {
+        self.current.as_ref().map(|run| run.spec.game_id)
     }
 
     /// Whether `packet` is a lifecycle packet (family 39) naming the current or the last run.
@@ -740,7 +1061,21 @@ impl MinigameRuns {
         activity: &A,
         settlement: Option<(&RewardState, &RewardGrant)>,
     ) -> io::Result<RunOutcome> {
-        self.finish_inner(instance_id, activity, settlement, Payout::Strict)
+        self.finish_inner(instance_id, activity, settlement, Payout::Strict, None)
+    }
+
+    /// [`Self::finish`] for a game with a prize wheel (its offer carried
+    /// [`Wheel::offer_bundles`]). A win lands the wheel (39/45 between 39/18 and 39/19) on a slot
+    /// the winner can wear and adds it to the win's grant, so it pays with the run, once.
+    pub fn finish_with_wheel<A: Activity>(
+        &mut self,
+        instance_id: i32,
+        activity: &A,
+        settlement: Option<(&RewardState, &RewardGrant)>,
+        wheel: &Wheel,
+    ) -> io::Result<RunOutcome> {
+        let payout = if settlement.is_some() { Payout::Strict } else { Payout::UnpaidWin };
+        self.finish_inner(instance_id, activity, settlement, payout, Some(wheel))
     }
 
     /// Settle a won run that pays nothing. The named entry point keeps
@@ -751,7 +1086,7 @@ impl MinigameRuns {
         instance_id: i32,
         activity: &A,
     ) -> io::Result<RunOutcome> {
-        self.finish_inner(instance_id, activity, None, Payout::UnpaidWin)
+        self.finish_inner(instance_id, activity, None, Payout::UnpaidWin, None)
     }
 
     /// Settle a lost run that still pays: soccer's "played" share, where a loss can level the job
@@ -762,7 +1097,7 @@ impl MinigameRuns {
         activity: &A,
         settlement: (&RewardState, &RewardGrant),
     ) -> io::Result<RunOutcome> {
-        self.finish_inner(instance_id, activity, Some(settlement), Payout::PaidLoss)
+        self.finish_inner(instance_id, activity, Some(settlement), Payout::PaidLoss, None)
     }
 
     fn finish_inner<A: Activity>(
@@ -771,6 +1106,7 @@ impl MinigameRuns {
         activity: &A,
         settlement: Option<(&RewardState, &RewardGrant)>,
         payout: Payout,
+        wheel: Option<&Wheel>,
     ) -> io::Result<RunOutcome> {
         let Some(run) = self.current.as_ref() else {
             return Ok(RunOutcome::default());
@@ -810,8 +1146,28 @@ impl MinigameRuns {
             result.elapsed_seconds,
             score_i32,
         )?);
+        // The wheel lands on a slot the winner can wear, ahead of 39/19 so the score screen holds
+        // its index before the spin; the slot pays inside the win's own grant.
+        let prize = (wheel.filter(|_| result.won))
+            .map(|wheel| match settlement {
+                Some((state, _)) => wheel.for_player(&state.inventory, state.gender),
+                None => wheel.clone(),
+            })
+            .filter(Wheel::shows)
+            .and_then(|wheel| wheel.prize(instance_id));
+        if let Some(prize) = &prize {
+            let at = replies.len().saturating_sub(1);
+            replies.insert(at, wheel_land_packet(instance_id, run.spec.game_id, prize));
+        }
+        let mut prized = settlement.map(|(_, grant)| grant.clone());
+        if let (Some(grant), Some(prize)) = (prized.as_mut(), &prize) {
+            grant.coins = grant.coins.saturating_add(prize.coins());
+            if let Some((definition_id, count)) = prize.item() {
+                grant.items.push(ItemGrant { definition_id, count });
+            }
+        }
 
-        let (reward_state, reward_packets) = if let Some((state, grant)) = settlement {
+        let (reward_state, reward_packets) = if let (Some((state, _)), Some(grant)) = (settlement, &prized) {
             let key = format!("minigame-run:{instance_id}");
             let (next, packets) = apply_grant(state, grant, &key)?;
             (Some(next), packets)
@@ -824,8 +1180,14 @@ impl MinigameRuns {
         } else {
             RunState::Lost
         };
-        self.current.as_mut().unwrap().state = terminal;
-        self.current.as_mut().unwrap().score = score;
+        if let Some(run) = self.current.as_mut() {
+            run.state = terminal;
+            run.score = score;
+            // The wheel's stop report (39/46) is then accepted once (`handle_client`).
+            if prize.is_some() {
+                run.wheel_entry = Some(WheelEntry { type_id: 1, body: Vec::new() });
+            }
+        }
         Ok(RunOutcome {
             accepted: true,
             changed: true,
@@ -1130,28 +1492,6 @@ fn result_packets(
 /// terminal path (results, cancel, lobby timeout) reuses this one header writer.
 pub(crate) fn state_remove_packet(instance_id: i32, game_id: i32) -> Vec<u8> {
     family39_header(19, instance_id, game_id)
-}
-
-/// A RewardBundleBase (reader `008e7930`), the one writer every prize wheel uses: flag 0, so an
-/// Item entry carries no trailing word (`0103c5c0` reads it only when the flag is set); coins,
-/// stars and four words; the multiplier 1.0 (the client scales the coins by it); two words, two
-/// guids, icon and name; the entry count, each entry's type and body; a trailing word. Empty, it
-/// is the 69 bytes the reader needs before any entry.
-pub(crate) fn reward_bundle(coins: u32, rows: &[RewardBundleRow]) -> Vec<u8> {
-    let mut bytes = vec![0];
-    let coins = i32::try_from(coins).unwrap_or(0);
-    for value in [coins, 0, 0, 0, 0, 0] {
-        bytes.extend(value.to_le_bytes());
-    }
-    bytes.extend(1.0f32.to_le_bytes());
-    bytes.extend([0; 32]);
-    bytes.extend(i32::try_from(rows.len()).unwrap_or(0).to_le_bytes());
-    for row in rows {
-        bytes.extend(row.type_id.to_le_bytes());
-        bytes.extend(&row.body);
-    }
-    bytes.extend(0_i32.to_le_bytes());
-    bytes
 }
 
 /// Prize-wheel landing 39/45: the header, then one whole RewardBundleBase holding `entry`

@@ -217,6 +217,10 @@ pub struct Challenge {
     pub coins: u32,
     /// The XP when the job has no `activity_xp` rate.
     pub xp: u32,
+    /// C9: `xp` is the wiki's own figure for this challenge (its goal row's stars), so it pays in
+    /// every job instead of the job's `activity_xp` rate.
+    #[serde(default)]
+    pub pays_own_xp: bool,
     pub source: Vec<String>,
 }
 
@@ -927,6 +931,7 @@ mod tests {
             bonuses: Vec::new(),
             coins: 10,
             xp: 20,
+            pays_own_xp: false,
             source: vec!["test".into()],
         })
     }

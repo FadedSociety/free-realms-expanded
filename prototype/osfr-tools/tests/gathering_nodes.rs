@@ -339,9 +339,19 @@ impl Fixture {
         self
     }
 
+    /// The shipped boards, less their clickable powerups in this private copy: the test's bot
+    /// plays chains and falls only, so pressable tiles would pile up until no chain is left (C5's
+    /// spawns are proven in `minigame_rewards_gateway.rs`).
     fn with_shipped_mining(self) -> Self {
         let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/mining.json");
-        fs::copy(source, self.directory.join(mining::CONTENT_FILE)).unwrap();
+        let mut content: Value = serde_json::from_slice(&fs::read(source).unwrap()).unwrap();
+        content["spec"]["powerup_percent"] = json!(0);
+        content.as_object_mut().unwrap().remove("powerup_definitions");
+        fs::write(
+            self.directory.join(mining::CONTENT_FILE),
+            serde_json::to_vec(&content).unwrap(),
+        )
+        .unwrap();
         self
     }
 
@@ -2037,7 +2047,8 @@ fn games_window_play_opens_a_checkers_table_against_the_server() {
 /// open is refused by the occupation gate.
 #[test]
 fn games_window_play_opens_a_feeling_the_beat_song() {
-    let fixture = Fixture::new(PLOT);
+    // The release item table, so the wheel's items are defined and the wheel shows (C4).
+    let fixture = Fixture::new(PLOT).with_release_items();
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
     let offered = play(&mut gateway, 511, 2_000);
@@ -2086,9 +2097,18 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
             .map(<[u8]>::to_vec)
     };
     assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
-    // `music_game.json` win_coins: 5, as the video's Very Hard win shows.
-    let paid = 5;
-    assert_eq!(coins(&gateway), before + paid);
+    // The song's `music_game.json` win_coins, and C4's wheel: an item, or its Coins slot.
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let music = osfr_tools::music_game::MusicContent::load(&content).unwrap();
+    let win_coins = music.games.iter().find(|row| row.game_id == 201).unwrap().win_coins;
+    let rewards = osfr_tools::minigame::MinigameRewards::load(&content).unwrap();
+    let wheel_coins = rewards.game(201).map_or(0, |game| game.wheel.coins);
+    assert!(inners(&won).iter().any(|p| p.starts_with(&[39, 0, 45])), "the wheel lands");
+    let paid = coins(&gateway) - before;
+    assert!(
+        paid == i64::from(win_coins) || paid == i64::from(win_coins + wheel_coins),
+        "the song's coins and at most the wheel's Coins slot: {paid}"
+    );
     let again = send(
         &mut gateway,
         &payload(id, "FRServer_GameWon	1000	0"),
@@ -2110,7 +2130,8 @@ fn games_window_play_opens_a_feeling_the_beat_song() {
 /// row go out, six rounds win once and pay once, and the job never changes. A later Play reopens.
 #[test]
 fn games_window_play_opens_hack_n_slash_and_keeps_the_job() {
-    let fixture = Fixture::new(PLOT);
+    // The release item table, so the wheel's items are defined and the wheel shows (C4).
+    let fixture = Fixture::new(PLOT).with_release_items();
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
     let job = gateway.gameplay().unwrap().active_profile();
@@ -2154,10 +2175,19 @@ fn games_window_play_opens_hack_n_slash_and_keeps_the_job() {
     };
     assert_eq!(result(&won).expect("the result screen")[15], 1, "won");
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-    let paid = osfr_tools::sword_game::SwordContent::load(&content).unwrap().win_coins;
-    assert_eq!(coins(&gateway), before + i64::from(paid));
+    // C4: the win also lands the game's prize wheel (39/45) and pays its slot: an item, or the
+    // wheel's Coins slot on top of the win's coins.
+    let win_coins = osfr_tools::sword_game::SwordContent::load(&content).unwrap().win_coins;
+    let rewards = osfr_tools::minigame::MinigameRewards::load(&content).unwrap();
+    let wheel_coins = rewards.game(79).map_or(0, |game| game.wheel.coins);
+    assert!(inners(&won).iter().any(|p| p.starts_with(&[39, 0, 45])), "the wheel lands");
+    let paid = coins(&gateway) - before;
+    assert!(
+        paid == i64::from(win_coins) || paid == i64::from(win_coins + wheel_coins),
+        "the win's coins and at most the wheel's Coins slot: {paid}"
+    );
     assert!(result(&send(&mut gateway, &win, 31_200)).is_none(), "given once");
-    assert_eq!(coins(&gateway), before + i64::from(paid), "and paid once");
+    assert_eq!(coins(&gateway), before + paid, "and paid once");
     assert_eq!(gateway.gameplay().unwrap().active_profile(), job);
     send(&mut gateway, &payload(id, "FRServer_GameOver"), 31_300);
     send(&mut gateway, &CLOSE, 32_000);

@@ -22,7 +22,7 @@
     {"profile_id": 45, "job": "Chef", "total_to_20": 28100, "activity_xp": 86, "activity": "cook", "source": "one-time 12,626"},
     {"profile_id": 48, "job": "Kart Driver", "total_to_20": 31700, "activity_xp": 97, "activity": "race", "source": "one-time 14,272"},
     {"profile_id": 49, "job": "Demo Derby Driver", "total_to_20": 20400, "activity_xp": 78, "activity": "match", "source": "one-time 9,194"},
-    {"profile_id": 52, "job": "Soccer Star", "total_to_20": 7500, "activity_xp": 72, "activity": "match", "source": "one-time 574 (harvest gaps): floor"},
+    {"profile_id": 52, "job": "Soccer Star", "total_to_20": 7500, "activity_xp": 99, "activity": "match", "source": "one-time 574 (harvest gaps): floor; activity_xp C9 2026-11-12: the fanbyte Snowy Scrimmage primary goal, 99 stars a match"},
     {"profile_id": 120, "job": "Card Duelist", "total_to_20": 81300, "activity_xp": 466, "activity": "duel", "source": "one-time 36,600"},
     {"profile_id": 121, "job": "Pet Trainer", "total_to_20": 7500, "source": "job removed 2009-12-14: floor"},
     {"profile_id": 137, "job": "Fisherman", "total_to_20": 7500, "activity_xp": 8, "activity": "catch", "source": "one-time 240; 10 repeatables x 32 (harvest gaps): floor"}

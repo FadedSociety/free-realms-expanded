@@ -372,9 +372,12 @@ pub struct CheckersTable {
     started_ms: u64,
     /// A lobby game's table id; the board is then the World's.
     hosted: Option<u64>,
-    /// That board, on loan for one message, and what the other seat is owed.
-    lent: Option<HostedGame>,
+    /// That board, on loan for one message, and what the other seat is owed. Boxed so the wheel
+    /// table's handle leaves `Gameplay` no larger.
+    lent: Option<Box<HostedGame>>,
     relay: Vec<ChessMessage>,
+    /// `minigame_rewards.json`'s wheels (C4); empty until the session attaches the table.
+    rewards: std::sync::Arc<crate::minigame::MinigameRewards>,
 }
 
 struct Finish {
@@ -406,7 +409,19 @@ impl CheckersTable {
             hosted: None,
             lent: None,
             relay: Vec::new(),
+            rewards: Default::default(),
         })
+    }
+
+    /// Attach `minigame_rewards.json`: the table's prize wheel (C4).
+    pub fn with_rewards(mut self, rewards: crate::minigame::MinigameRewards) -> Self {
+        self.rewards = std::sync::Arc::new(rewards);
+        self
+    }
+
+    /// `game_id`'s wheel, when it has one.
+    fn wheel(&self, game_id: i32) -> Option<crate::minigame::Wheel> {
+        Some(self.rewards.game(game_id)?.wheel.clone()).filter(crate::minigame::Wheel::shows)
     }
 
     /// A table with its own random stream for the computer's choices.
@@ -468,21 +483,33 @@ impl CheckersTable {
 
     /// Lend the World's board for one message.
     pub fn lend(&mut self, game: HostedGame) {
-        self.lent = Some(game);
+        self.lent = Some(Box::new(game));
     }
 
     /// The lent board back, with what the other seat is owed.
     pub fn reclaim(&mut self) -> Option<(HostedGame, Vec<ChessMessage>)> {
-        let game = self.lent.take()?;
+        let game = *self.lent.take()?;
         Some((game, std::mem::take(&mut self.relay)))
     }
 
     /// Offer the table (39/16); `None` while a run is already open.
     pub fn begin(&mut self) -> io::Result<Option<TableOutcome>> {
+        self.begin_for(&|_| true)
+    }
+
+    /// [`Self::begin`] for one player: the wheel's preview lists only the items `fits` accepts (their
+    /// inventory defines them and their gender wears them, `Wheel::for_player`), the same rows the
+    /// win then lands on.
+    pub fn begin_for(&mut self, fits: &dyn Fn(i32) -> bool) -> io::Result<Option<TableOutcome>> {
         if self.is_active() {
             return Ok(None);
         }
-        let spec = Self::run_spec(GAME_ID);
+        let mut spec = Self::run_spec(GAME_ID);
+        // C4: the offer previews the wheel the win lands on (`StopMiniGameLootWheelAt` matches the
+        // landing against these entries).
+        if let Some(wheel) = self.wheel(GAME_ID) {
+            spec.reward_bundles = wheel.keep(fits).offer_bundles();
+        }
         let mut staged = self.clone();
         let offered = staged.runs.offer(spec)?;
         if !offered.accepted {
@@ -570,12 +597,11 @@ impl CheckersTable {
                 won,
                 elapsed_seconds: u32::try_from(elapsed).unwrap_or(u32::MAX),
             };
+            let wheel = self.runs.current_game_id().and_then(|game| self.wheel(game)).unwrap_or_default();
             let run = match (won, payer) {
-                (true, Some((player, rewards))) => {
-                    self.runs
-                        .finish(instance, &finish, Some((rewards, &win_grant(player))))?
-                }
-                (true, None) => self.runs.finish_win_without_reward(instance, &finish)?,
+                (true, Some((player, rewards))) => (self.runs)
+                    .finish_with_wheel(instance, &finish, Some((rewards, &win_grant(player))), &wheel)?,
+                (true, None) => self.runs.finish_with_wheel(instance, &finish, None, &wheel)?,
                 (false, _) => self.runs.finish(instance, &finish, None)?,
             };
             self.board = None;
@@ -656,7 +682,12 @@ impl CheckersTable {
             };
             let grant = win_grant(player);
             let settlement = won.then_some((rewards, &grant));
-            return Ok(TableOutcome::from_run(self.runs.finish(instance, &finish, settlement)?));
+            let wheel = self.runs.current_game_id().and_then(|game| self.wheel(game)).unwrap_or_default();
+            let run = match settlement {
+                Some(paid) => self.runs.finish_with_wheel(instance, &finish, Some(paid), &wheel)?,
+                None => self.runs.finish(instance, &finish, None)?,
+            };
+            return Ok(TableOutcome::from_run(run));
         }
         let messages = match parse(text) {
             Some(Request::Ready) => game.ready(player)?,
@@ -830,8 +861,17 @@ mod tests {
 
     /// Offer, start, handshake: the table's own instance and the movie's opening events.
     fn opened(seed: u64) -> (CheckersTable, i32) {
-        let mut table = CheckersTable::new(Rng::seeded(seed)).unwrap();
-        let offer = table.begin().unwrap().expect("offered");
+        let table = CheckersTable::new(Rng::seeded(seed)).unwrap();
+        let (table, instance, _) = opened_for(table, &|_| true);
+        (table, instance)
+    }
+
+    /// `opened` with one player's wheel filter; the 39/16 offer too.
+    fn opened_for(
+        mut table: CheckersTable,
+        fits: &dyn Fn(i32) -> bool,
+    ) -> (CheckersTable, i32, Vec<u8>) {
+        let offer = table.begin_for(fits).unwrap().expect("offered");
         assert!(offer.replies[0].starts_with(&[39, 0, 16]));
         let instance = i32::from_le_bytes(offer.replies[0][3..7].try_into().unwrap());
         assert!(table.begin().unwrap().is_none(), "one open table at a time");
@@ -857,7 +897,7 @@ mod tests {
             say(&mut table, "OnReadyMsg"),
             ["OnCheckersEventMsg\t0\t0\t1", "OnCheckersEventMsg\t1\t0"]
         );
-        (table, instance)
+        (table, instance, offer.replies[0].clone())
     }
 
     #[test]
@@ -967,6 +1007,12 @@ mod tests {
 
     /// An empty bag with 0 coins, as `Inventory::load` reads it (the chess tests' fixture).
     fn rewards(player: u64) -> RewardState {
+        rewards_with(player, &[])
+    }
+
+    /// `rewards` whose inventory also defines `items`, with the release item table's own rows
+    /// for them (their GenderUsage included).
+    fn rewards_with(player: u64, items: &[i32]) -> RewardState {
         use sha2::{Digest, Sha256};
         // Tests run side by side, so each call has its own folder.
         static NEXT: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
@@ -988,6 +1034,16 @@ mod tests {
             "definitions": []
         });
         std::fs::write(directory.join("inventory.json"), manifest.to_string()).unwrap();
+        if !items.is_empty() {
+            let release = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("data/release/item-table.json");
+            let mut table: serde_json::Value =
+                serde_json::from_slice(&std::fs::read(release).unwrap()).unwrap();
+            let rows = table["rows"].as_array_mut().unwrap();
+            rows.retain(|row| items.contains(&(row[0].as_i64().unwrap() as i32)));
+            assert_eq!(rows.len(), items.len(), "every item has its release row");
+            std::fs::write(directory.join("item-table.json"), table.to_string()).unwrap();
+        }
         let inventory = crate::inventory::Inventory::load(&directory, None).unwrap();
         let _ = std::fs::remove_dir_all(&directory);
         let profiles = crate::profiles::ProfileState {
@@ -1017,6 +1073,47 @@ mod tests {
                 .map_or(0, |next| next.inventory.state().coins);
             assert_eq!(paid, coins, "won {won}");
             assert_eq!(out.reward_packets.is_empty(), !won);
+        }
+    }
+
+    /// C4 (B1, B2): the offer previews the wheel the win lands on, and each player sees and lands
+    /// only on the rows their gender wears, by the release item table's GenderUsage
+    /// (`Wheel::for_player`, `Inventory::reward_fits_gender`): Suede Shoes 7292 (anyone) and
+    /// 17390 (boys), Sporty Sandals 418 (girls). Bundles read in `008e7930`'s order.
+    #[test]
+    fn a_win_lands_on_a_wheel_row_the_offer_showed_for_each_gender() {
+        let wheel = r#"{"schema_version": 1, "games": [{"game_id": 21, "wheel": {"coins": 5,
+            "slices": [{"item_id": 7292, "name_id": 31169, "icon_id": 3625},
+                {"item_id": 17390, "name_id": 31169, "icon_id": 3625},
+                {"item_id": 418, "name_id": 8589, "icon_id": 1}]}}]}"#;
+        let word = |bytes: &[u8], at: usize| i32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+        for (gender, own, other) in [(1, 17390, 418), (2, 418, 17390)] {
+            let state = rewards_with(7, &[7292, 17390, 418]).with_gender(gender);
+            let rewards = crate::minigame::MinigameRewards::parse(wheel.as_bytes()).unwrap();
+            let table = CheckersTable::new(Rng::seeded(9)).unwrap().with_rewards(rewards);
+            let fits = |item: i32| {
+                state.inventory.has_definition(item) && state.inventory.reward_fits_gender(item, gender)
+            };
+            let (mut table, instance, offer) = opened_for(table, &fits);
+            // Header 15, six words and the members byte; the two empty bundles; then the
+            // preview: its entry count at +61, each Item entry 38 bytes, its item id at +86.
+            let preview = 40 + 2 * 69;
+            let shown: Vec<i32> = (0..word(&offer, preview + 61) as usize)
+                .map(|row| word(&offer, preview + 86 + 38 * row))
+                .collect();
+            assert!(shown.contains(&7292) && shown.contains(&own), "gender {gender}: {shown:?}");
+            assert!(!shown.contains(&other), "gender {gender} never sees the other's row");
+            table.won = Some(true);
+            let over = payload_packet(instance, GAME_ID, "FRServer_GameOver").unwrap();
+            let out = table.route_with(&over, 9_000, Some((7, &state))).unwrap().unwrap();
+            let land = (out.replies.iter())
+                .find(|reply| reply.starts_with(&[39, 0, 45]))
+                .expect("the win lands the wheel");
+            match word(land, 15 + 61) {
+                1 => assert!(shown.contains(&word(land, 15 + 86)), "a row the offer showed"),
+                0 => assert_eq!(word(land, 15 + 1), 5, "or the Coins slot"),
+                rows => panic!("one landing entry, not {rows}"),
+            }
         }
     }
 

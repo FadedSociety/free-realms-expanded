@@ -1,0 +1,6961 @@
+{
+  "schema_version": 1,
+  "source": "MG 2026-11-12 (KNOWN-BUGS C4, C9): goal coins/stars and prize wheels from the fanbyte FR_Minigame pages' Goals rows (alt Coins/Stars icons in the raw HTML) and Prize Wheel Rewards lists. Item ids by client NameId text (item-table.json, inventory.json definitions); gendered rows keep their GenderUsage so a wheel shows each wearer only what they can wear. Goals pay on a win, each goal met; the wheel lands on one slot per win, uniform (R). Rows marked (R) borrow the nearest analogue where the page leaves a value blank.",
+  "games": [
+    {
+      "game_id": 18,
+      "name": "Mining",
+      "goals": [
+        {
+          "coins": 11,
+          "stars": 230
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76144,
+            "name_id": 133152,
+            "icon_id": 5812,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76146,
+            "name_id": 133154,
+            "icon_id": 5498,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75602,
+            "name_id": 29535,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75691,
+            "name_id": 132137,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75700,
+            "name_id": 132146,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "(R) the node game (developer start) plays the copper board: Copper Mining's primary goal and wheel; it has no Goals panel, so the primary pays on the win"
+    },
+    {
+      "game_id": 21,
+      "name": "Checkers",
+      "goals": [
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 427,
+            "name_id": 8620,
+            "icon_id": 3487,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Checkers' Goals and Prize Wheel Rewards; wheel Coins slot (R) 5, unnumbered on the page"
+    },
+    {
+      "game_id": 57,
+      "name": "Artifacts Schmartifacts!",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 264,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 421,
+            "name_id": 8602,
+            "icon_id": 3495,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 18048,
+            "name_id": 8602,
+            "icon_id": 437,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 203,
+            "name_id": 8530,
+            "icon_id": 3496,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 391,
+            "name_id": 8524,
+            "icon_id": 3528,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Artifacts Schmartifacts!' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; coins and stars (R) mail sorting's, the other multi-level board"
+    },
+    {
+      "game_id": 79,
+      "name": "Hack 'n' Slash",
+      "goals": [
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 427,
+            "name_id": 8620,
+            "icon_id": 3487,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Hack 'n' Slash' Goals and Prize Wheel Rewards"
+    },
+    {
+      "game_id": 91,
+      "name": "Copper Mining",
+      "goals": [
+        {
+          "coins": 11,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76144,
+            "name_id": 133152,
+            "icon_id": 5812,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76146,
+            "name_id": 133154,
+            "icon_id": 5498,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75602,
+            "name_id": 29535,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75691,
+            "name_id": 132137,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75700,
+            "name_id": 132146,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Copper Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 92,
+      "name": "Rich Copper Mining",
+      "goals": [
+        {
+          "coins": 1,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76147,
+            "name_id": 133155,
+            "icon_id": 5519,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76148,
+            "name_id": 133156,
+            "icon_id": 5534,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75603,
+            "name_id": 29536,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75690,
+            "name_id": 132136,
+            "icon_id": 560,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75701,
+            "name_id": 132147,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rich Copper Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 93,
+      "name": "Tin Mining",
+      "goals": [
+        {
+          "coins": 16,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76153,
+            "name_id": 133161,
+            "icon_id": 5520,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76155,
+            "name_id": 133163,
+            "icon_id": 5825,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76150,
+            "name_id": 133158,
+            "icon_id": 5806,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75604,
+            "name_id": 29537,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75693,
+            "name_id": 132139,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75702,
+            "name_id": 132148,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Tin Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 94,
+      "name": "Rich Tin Mining",
+      "goals": [
+        {
+          "coins": 1,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76159,
+            "name_id": 133167,
+            "icon_id": 5820,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76161,
+            "name_id": 133169,
+            "icon_id": 5828,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76156,
+            "name_id": 133164,
+            "icon_id": 5808,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75605,
+            "name_id": 29538,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75692,
+            "name_id": 132138,
+            "icon_id": 561,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75703,
+            "name_id": 132149,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rich Tin Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 95,
+      "name": "Iron Mining",
+      "goals": [
+        {
+          "coins": 27,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76165,
+            "name_id": 133173,
+            "icon_id": 2553,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76167,
+            "name_id": 133175,
+            "icon_id": 5824,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76162,
+            "name_id": 133170,
+            "icon_id": 5805,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75607,
+            "name_id": 29540,
+            "icon_id": 3234,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75694,
+            "name_id": 132140,
+            "icon_id": 562,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75705,
+            "name_id": 132151,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Iron Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 96,
+      "name": "Rich Iron Mining",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76171,
+            "name_id": 133179,
+            "icon_id": 5514,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76173,
+            "name_id": 133181,
+            "icon_id": 5826,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76168,
+            "name_id": 133176,
+            "icon_id": 5810,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75606,
+            "name_id": 29539,
+            "icon_id": 3234,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75695,
+            "name_id": 132141,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75704,
+            "name_id": 132150,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rich Iron Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 97,
+      "name": "Silver Mining",
+      "goals": [
+        {
+          "coins": 49,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76177,
+            "name_id": 133185,
+            "icon_id": 5513,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76179,
+            "name_id": 133187,
+            "icon_id": 5823,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76174,
+            "name_id": 133182,
+            "icon_id": 5811,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75608,
+            "name_id": 29541,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75611,
+            "name_id": 29544,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75696,
+            "name_id": 132142,
+            "icon_id": 563,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75707,
+            "name_id": 132153,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31234,
+            "name_id": 96640,
+            "icon_id": 1235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Silver Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 98,
+      "name": "Rich Silver Mining",
+      "goals": [
+        {
+          "coins": 16,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76183,
+            "name_id": 133191,
+            "icon_id": 5512,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76185,
+            "name_id": 133193,
+            "icon_id": 5830,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76180,
+            "name_id": 133188,
+            "icon_id": 5804,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75609,
+            "name_id": 29542,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75610,
+            "name_id": 29543,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75697,
+            "name_id": 132143,
+            "icon_id": 1218,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75706,
+            "name_id": 132152,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rich Silver Mining' Goals and Prize Wheel Rewards; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 99,
+      "name": "Gold Mining",
+      "goals": [
+        {
+          "coins": 84,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 60,
+            "gender": 0
+          },
+          {
+            "item_id": 76199,
+            "name_id": 133207,
+            "icon_id": 5819,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76198,
+            "name_id": 133206,
+            "icon_id": 5818,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76189,
+            "name_id": 133197,
+            "icon_id": 2554,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76190,
+            "name_id": 133198,
+            "icon_id": 5831,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76186,
+            "name_id": 133194,
+            "icon_id": 5816,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75616,
+            "name_id": 29549,
+            "icon_id": 3234,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75612,
+            "name_id": 29545,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75615,
+            "name_id": 29548,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75698,
+            "name_id": 132144,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75709,
+            "name_id": 132155,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31234,
+            "name_id": 96640,
+            "icon_id": 1235,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Gold Mining' Goals and Prize Wheel Rewards"
+    },
+    {
+      "game_id": 100,
+      "name": "Rich Gold Mining",
+      "goals": [
+        {
+          "coins": 84,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 447,
+        "slices": [
+          {
+            "item_id": 76201,
+            "name_id": 133209,
+            "icon_id": 5822,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76196,
+            "name_id": 133204,
+            "icon_id": 5803,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76200,
+            "name_id": 133208,
+            "icon_id": 5821,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76194,
+            "name_id": 133202,
+            "icon_id": 5516,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76195,
+            "name_id": 133203,
+            "icon_id": 5827,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75617,
+            "name_id": 29550,
+            "icon_id": 3234,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75613,
+            "name_id": 29546,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75614,
+            "name_id": 29547,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75699,
+            "name_id": 132145,
+            "icon_id": 1220,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75708,
+            "name_id": 132154,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rich Gold Mining' Goals and Prize Wheel Rewards; primary stars (R) 230, the family's recorded median; primary coins (R) Gold Mining's 84; wheel Coins slot (R) 447, unnumbered on the page"
+    },
+    {
+      "game_id": 109,
+      "name": "Queensfields Harvesting",
+      "goals": [
+        {
+          "coins": 18,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 421,
+            "name_id": 8602,
+            "icon_id": 3495,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 18048,
+            "name_id": 8602,
+            "icon_id": 437,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 395,
+            "name_id": 8547,
+            "icon_id": 3598,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 413,
+            "name_id": 2875,
+            "icon_id": 3302,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 200,
+            "name_id": 2494,
+            "icon_id": 414,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Queensfields Harvesting' Goals and Prize Wheel Rewards; stars (R) mining's primary 230"
+    },
+    {
+      "game_id": 111,
+      "name": "Farnum's Farm Harvesting",
+      "goals": [
+        {
+          "coins": 18,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 427,
+            "name_id": 8620,
+            "icon_id": 3487,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 414,
+            "name_id": 8565,
+            "icon_id": 3606,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 418,
+            "name_id": 8589,
+            "icon_id": 3599,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 203,
+            "name_id": 8530,
+            "icon_id": 3496,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 200,
+            "name_id": 2494,
+            "icon_id": 414,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Farnum's Farm Harvesting' Goals and Prize Wheel Rewards; stars (R) mining's primary 230"
+    },
+    {
+      "game_id": 113,
+      "name": "Chugaroot Farm Harvesting",
+      "goals": [
+        {
+          "coins": 13,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 2,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 36,
+        "slices": [
+          {
+            "item_id": 421,
+            "name_id": 8602,
+            "icon_id": 3495,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 18048,
+            "name_id": 8602,
+            "icon_id": 437,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 417,
+            "name_id": 8583,
+            "icon_id": 3317,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 396,
+            "name_id": 8553,
+            "icon_id": 3316,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 419,
+            "name_id": 8595,
+            "icon_id": 3533,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Chugaroot Farm Harvesting' Goals and Prize Wheel Rewards; primary coins (R) 13, the family's recorded median; stars (R) mining's primary 230"
+    },
+    {
+      "game_id": 115,
+      "name": "Perry's Pastures Harvesting",
+      "goals": [
+        {
+          "coins": 9,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 427,
+            "name_id": 8620,
+            "icon_id": 3487,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 203,
+            "name_id": 8530,
+            "icon_id": 3496,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 415,
+            "name_id": 8571,
+            "icon_id": 3318,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76497,
+            "name_id": 29950,
+            "icon_id": 5154,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 205,
+            "name_id": 8518,
+            "icon_id": 3540,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 419,
+            "name_id": 8595,
+            "icon_id": 3533,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Perry's Pastures Harvesting' Goals and Prize Wheel Rewards; stars (R) mining's primary 230"
+    },
+    {
+      "game_id": 117,
+      "name": "Lakesfield Harvesting",
+      "goals": [
+        {
+          "coins": 13,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 421,
+            "name_id": 8602,
+            "icon_id": 3495,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 18048,
+            "name_id": 8602,
+            "icon_id": 437,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 76498,
+            "name_id": 29951,
+            "icon_id": 5165,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76499,
+            "name_id": 29952,
+            "icon_id": 5160,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 423,
+            "name_id": 8476,
+            "icon_id": 3645,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 195,
+            "name_id": 8476,
+            "icon_id": 3600,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 205,
+            "name_id": 8518,
+            "icon_id": 3540,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Lakesfield Harvesting' Goals and Prize Wheel Rewards; primary coins (R) 13, the family's recorded median; stars (R) mining's primary 230; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 119,
+      "name": "Thorny Tillage Harvesting",
+      "goals": [
+        {
+          "coins": 9,
+          "stars": 230
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 427,
+            "name_id": 8620,
+            "icon_id": 3487,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 203,
+            "name_id": 8530,
+            "icon_id": 3496,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76500,
+            "name_id": 29953,
+            "icon_id": 5147,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 193,
+            "name_id": 2487,
+            "icon_id": 3320,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 423,
+            "name_id": 8476,
+            "icon_id": 3645,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 195,
+            "name_id": 8476,
+            "icon_id": 3600,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 201,
+            "name_id": 8506,
+            "icon_id": 3646,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Thorny Tillage Harvesting' Goals and Prize Wheel Rewards; stars (R) mining's primary 230"
+    },
+    {
+      "game_id": 201,
+      "name": "Feeling the Beat! (Novice)",
+      "goals": [],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 414,
+            "name_id": 8565,
+            "icon_id": 3606,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 418,
+            "name_id": 8589,
+            "icon_id": 3599,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Feeling the Beat!' Novice section; (R) no prizes listed for this level, the Musician level's wheel; wheel Coins slot (R) 5, Hack 'n' Slash's recorded slot; goals stay music_game.json's"
+    },
+    {
+      "game_id": 202,
+      "name": "Feeling the Beat! (Musician)",
+      "goals": [],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 414,
+            "name_id": 8565,
+            "icon_id": 3606,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 418,
+            "name_id": 8589,
+            "icon_id": 3599,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Feeling the Beat!' Musician section Prize Wheel Rewards; wheel Coins slot (R) 5, Hack 'n' Slash's recorded slot; goals stay music_game.json's"
+    },
+    {
+      "game_id": 203,
+      "name": "Feeling the Beat! (Bandmaster)",
+      "goals": [],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 414,
+            "name_id": 8565,
+            "icon_id": 3606,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 418,
+            "name_id": 8589,
+            "icon_id": 3599,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Feeling the Beat!' Bandmaster section; (R) no prizes listed for this level, the Musician level's wheel; wheel Coins slot (R) 5, Hack 'n' Slash's recorded slot; goals stay music_game.json's"
+    },
+    {
+      "game_id": 204,
+      "name": "Feeling the Beat! (Conductor)",
+      "goals": [],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 414,
+            "name_id": 8565,
+            "icon_id": 3606,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 418,
+            "name_id": 8589,
+            "icon_id": 3599,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Feeling the Beat!' Conductor section; (R) no prizes listed for this level, the Musician level's wheel; wheel Coins slot (R) 5, Hack 'n' Slash's recorded slot; goals stay music_game.json's"
+    },
+    {
+      "game_id": 205,
+      "name": "Feeling the Beat! (Maestro)",
+      "goals": [],
+      "wheel": {
+        "coins": 5,
+        "slices": [
+          {
+            "item_id": 10482,
+            "name_id": 6666,
+            "icon_id": 973,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 199,
+            "name_id": 2493,
+            "icon_id": 3531,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 414,
+            "name_id": 8565,
+            "icon_id": 3606,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 418,
+            "name_id": 8589,
+            "icon_id": 3599,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 422,
+            "name_id": 8608,
+            "icon_id": 3532,
+            "quantity": 1,
+            "gender": 1
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Feeling the Beat!' Maestro section; (R) no prizes listed for this level, the Musician level's wheel; wheel Coins slot (R) 5, Hack 'n' Slash's recorded slot; goals stay music_game.json's"
+    },
+    {
+      "game_id": 376,
+      "name": "Sanctuary Mail Sorting",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 75963,
+            "name_id": 132971,
+            "icon_id": 5105,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75964,
+            "name_id": 132972,
+            "icon_id": 5116,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75969,
+            "name_id": 132977,
+            "icon_id": 5107,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75970,
+            "name_id": 132978,
+            "icon_id": 5117,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75957,
+            "name_id": 132965,
+            "icon_id": 2464,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75958,
+            "name_id": 132966,
+            "icon_id": 2466,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76508,
+            "name_id": 15155,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76507,
+            "name_id": 15154,
+            "icon_id": 560,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76518,
+            "name_id": 15165,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76517,
+            "name_id": 15164,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Sanctuary Mail Sorting' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 377,
+      "name": "Seaside Mail Sorting",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 75978,
+            "name_id": 132986,
+            "icon_id": 5132,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75975,
+            "name_id": 132983,
+            "icon_id": 5106,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75977,
+            "name_id": 132985,
+            "icon_id": 5124,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75980,
+            "name_id": 132988,
+            "icon_id": 5097,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 75976,
+            "name_id": 132984,
+            "icon_id": 5118,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76510,
+            "name_id": 15157,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76520,
+            "name_id": 15167,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Seaside Mail Sorting' Goals and Prize Wheel Rewards; primary stars (R) 303, the family's recorded median; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 378,
+      "name": "Wugachug Mail Sorting",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 76002,
+            "name_id": 133010,
+            "icon_id": 5110,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76003,
+            "name_id": 133011,
+            "icon_id": 5135,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 76004,
+            "name_id": 133011,
+            "icon_id": 5093,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 75995,
+            "name_id": 133003,
+            "icon_id": 5109,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75996,
+            "name_id": 133004,
+            "icon_id": 5136,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 75997,
+            "name_id": 133004,
+            "icon_id": 5095,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 75988,
+            "name_id": 132996,
+            "icon_id": 5111,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75989,
+            "name_id": 132997,
+            "icon_id": 5137,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 75990,
+            "name_id": 132997,
+            "icon_id": 5096,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76512,
+            "name_id": 15159,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76511,
+            "name_id": 15158,
+            "icon_id": 562,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76522,
+            "name_id": 15169,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76521,
+            "name_id": 15168,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Wugachug Mail Sorting' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; primary stars (R) 303, the family's recorded median; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 379,
+      "name": "Snowhill Mail Sorting",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 76023,
+            "name_id": 133031,
+            "icon_id": 5670,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76025,
+            "name_id": 133033,
+            "icon_id": 5673,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76027,
+            "name_id": 133035,
+            "icon_id": 5676,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76013,
+            "name_id": 133021,
+            "icon_id": 2471,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76009,
+            "name_id": 133017,
+            "icon_id": 2463,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76012,
+            "name_id": 133020,
+            "icon_id": 2468,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76010,
+            "name_id": 133018,
+            "icon_id": 2473,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 76011,
+            "name_id": 133018,
+            "icon_id": 2459,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76514,
+            "name_id": 15161,
+            "icon_id": 1218,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76513,
+            "name_id": 15160,
+            "icon_id": 563,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76524,
+            "name_id": 15171,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76523,
+            "name_id": 15170,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Snowhill Mail Sorting' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; primary stars (R) 303, the family's recorded median; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 380,
+      "name": "Shrouded Glade Mail Sorting",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 76026,
+            "name_id": 133034,
+            "icon_id": 5675,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76024,
+            "name_id": 133032,
+            "icon_id": 5671,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76020,
+            "name_id": 133028,
+            "icon_id": 5129,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76016,
+            "name_id": 133024,
+            "icon_id": 5104,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76022,
+            "name_id": 133030,
+            "icon_id": 5103,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76017,
+            "name_id": 133025,
+            "icon_id": 5134,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 76018,
+            "name_id": 133025,
+            "icon_id": 5096,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76516,
+            "name_id": 15163,
+            "icon_id": 1220,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76515,
+            "name_id": 15162,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76526,
+            "name_id": 15173,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76525,
+            "name_id": 15172,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31234,
+            "name_id": 96640,
+            "icon_id": 1235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Shrouded Glade Mail Sorting' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; primary stars (R) 303, the family's recorded median; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 381,
+      "name": "Merry Vale Mail Sorting",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 343,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75985,
+            "name_id": 132993,
+            "icon_id": 2470,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75987,
+            "name_id": 132995,
+            "icon_id": 2462,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 75982,
+            "name_id": 132990,
+            "icon_id": 2474,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 75983,
+            "name_id": 132990,
+            "icon_id": 2458,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 75986,
+            "name_id": 132994,
+            "icon_id": 2477,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 76519,
+            "name_id": 15166,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76509,
+            "name_id": 15156,
+            "icon_id": 561,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Merry Vale Mail Sorting' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; primary stars (R) 303, the family's recorded median; wheel Coins slot (R) 343, unnumbered on the page"
+    },
+    {
+      "game_id": 681,
+      "name": "Ambrose's Dig",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 264,
+        "slices": [
+          {
+            "item_id": 2173,
+            "name_id": 422909,
+            "icon_id": 730,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 421,
+            "name_id": 8602,
+            "icon_id": 3495,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 18048,
+            "name_id": 8602,
+            "icon_id": 437,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 76503,
+            "name_id": 29956,
+            "icon_id": 5151,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76502,
+            "name_id": 29955,
+            "icon_id": 5162,
+            "quantity": 1,
+            "gender": 2
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Ambrose's Dig' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; coins and stars (R) mail sorting's, the other multi-level board; wheel Coins slot (R) 264, unnumbered on the page"
+    },
+    {
+      "game_id": 682,
+      "name": "Tyrone's Dig",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 264,
+        "slices": [
+          {
+            "item_id": 11005,
+            "name_id": 422906,
+            "icon_id": 726,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 203,
+            "name_id": 8530,
+            "icon_id": 3496,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 427,
+            "name_id": 8620,
+            "icon_id": 3487,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76505,
+            "name_id": 29958,
+            "icon_id": 5156,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 76504,
+            "name_id": 29957,
+            "icon_id": 5167,
+            "quantity": 1,
+            "gender": 2
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Tyrone's Dig' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; coins and stars (R) mail sorting's, the other multi-level board; wheel Coins slot (R) 264, unnumbered on the page"
+    },
+    {
+      "game_id": 683,
+      "name": "Wellington's Dig",
+      "goals": [
+        {
+          "coins": 2,
+          "stars": 303
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        },
+        {
+          "coins": 0,
+          "stars": 0
+        }
+      ],
+      "wheel": {
+        "coins": 264,
+        "slices": [
+          {
+            "item_id": 3082,
+            "name_id": 422912,
+            "icon_id": 731,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 421,
+            "name_id": 8602,
+            "icon_id": 3495,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 18048,
+            "name_id": 8602,
+            "icon_id": 437,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 7292,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 17390,
+            "name_id": 31169,
+            "icon_id": 3625,
+            "quantity": 1,
+            "gender": 1
+          },
+          {
+            "item_id": 416,
+            "name_id": 8577,
+            "icon_id": 3295,
+            "quantity": 1,
+            "gender": 2
+          },
+          {
+            "item_id": 394,
+            "name_id": 8541,
+            "icon_id": 3298,
+            "quantity": 1,
+            "gender": 2
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Wellington's Dig' Goals and Prize Wheel Rewards; primary coins (R) 2, the family's recorded median; coins and stars (R) mail sorting's, the other multi-level board; wheel Coins slot (R) 264, unnumbered on the page"
+    }
+  ],
+  "recipes": [
+    {
+      "recipe": "blacksmith.alley_fighter_hammer",
+      "name": "Alley Fighter Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Alley Fighter Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.anguish_aid_bonesaw",
+      "name": "Anguish Aid Bonesaw",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Anguish Aid Bonesaw' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.archer_s_forged_bow_of_advantage",
+      "name": "Archer's Forged Bow of Advantage",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Archer's Forged Bow of Advantage' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.biting_mongoose_blade",
+      "name": "Biting Mongoose Blade",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Biting Mongoose Blade' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.brawler_s_forged_hammer_of_challenge",
+      "name": "Brawler's Forged Hammer of Challenge",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Brawler's Forged Hammer of Challenge' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.brutal_blast_bow",
+      "name": "Brutal Blast Bow",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Brutal Blast Bow' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.chivalrous_guardian_hammer",
+      "name": "Chivalrous Guardian Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 114,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75814,
+            "name_id": 132822,
+            "icon_id": 5491,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75820,
+            "name_id": 132828,
+            "icon_id": 5511,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75633,
+            "name_id": 132079,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75622,
+            "name_id": 132068,
+            "icon_id": 562,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Chivalrous Guardian Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's"
+    },
+    {
+      "recipe": "blacksmith.chrome_drakeling",
+      "name": "Chrome Drakeling",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Chrome Drakeling' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.chrome_mini_rocklar",
+      "name": "Chrome Mini-Rocklar",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Chrome Mini-Rocklar' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.dancing_monkey_bokken",
+      "name": "Dancing Monkey Bokken",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75801,
+            "name_id": 132809,
+            "icon_id": 5527,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75570,
+            "name_id": 29503,
+            "icon_id": 3182,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75618,
+            "name_id": 132064,
+            "icon_id": 560,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75629,
+            "name_id": 132075,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Dancing Monkey Bokken' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's"
+    },
+    {
+      "recipe": "blacksmith.diving_hawk_scythe",
+      "name": "Diving Hawk Scythe",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Diving Hawk Scythe' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.drake_statue",
+      "name": "Drake Statue",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Drake Statue' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.dust_storm_flair_shard",
+      "name": "Dust Storm Flair Shard",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Dust Storm Flair Shard' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.dwarf_biker_firework",
+      "name": "Dwarf Biker Firework",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Dwarf Biker Firework' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.eclipse_infused_wand",
+      "name": "Eclipse Infused Wand",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Eclipse Infused Wand' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.fast_blast_bow",
+      "name": "Fast Blast Bow",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Fast Blast Bow' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.field_support_scalpel",
+      "name": "Field Support Scalpel",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Field Support Scalpel' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.first_aid_hammer",
+      "name": "First Aid Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'First Aid Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.focus_fire_bow",
+      "name": "Focus Fire Bow",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Focus Fire Bow' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.frenzy_fighter_hammer",
+      "name": "Frenzy Fighter Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Frenzy Fighter Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Brutal Blast Bow's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.hammer_fist",
+      "name": "Hammer Fist",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Hammer Fist' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.intrepid_protector_axe",
+      "name": "Intrepid Protector Axe",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Intrepid Protector Axe' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.lunar_enchanted_wand",
+      "name": "Lunar Enchanted Wand",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Lunar Enchanted Wand' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.manguana_statue",
+      "name": "Manguana Statue",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Manguana Statue' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.medic_s_forged_saw_of_promise",
+      "name": "Medic's Forged Saw of Promise",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Medic's Forged Saw of Promise' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.medic_s_forged_scalpel_of_vitals",
+      "name": "Medic's Forged Scalpel of Vitals",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Medic's Forged Scalpel of Vitals' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.mini_mech",
+      "name": "Mini-Mech",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Mini-Mech' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.motorsmith_boots",
+      "name": "Motorsmith Boots",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Motorsmith Boots' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.motorsmith_gloves",
+      "name": "Motorsmith Gloves",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Motorsmith Gloves' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.motorsmith_pants",
+      "name": "Motorsmith Pants",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Motorsmith Pants' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.motorsmith_tank_top",
+      "name": "Motorsmith Tank Top",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Motorsmith Tank Top' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.motorsmith_tool_belt",
+      "name": "Motorsmith Tool Belt",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Motorsmith Tool Belt' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.motorsmith_welding_mask",
+      "name": "Motorsmith Welding Mask",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Motorsmith Welding Mask' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.ninja_s_forged_sword_of_purge",
+      "name": "Ninja's Forged Sword of Purge",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Ninja's Forged Sword of Purge' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.pain_relief_bonesaw",
+      "name": "Pain Relief Bonesaw",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Pain Relief Bonesaw' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.power_charmed_wand",
+      "name": "Power Charmed Wand",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Power Charmed Wand' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.power_crystal_flair_shard",
+      "name": "Power Crystal Flair Shard",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Power Crystal Flair Shard' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.quick_shot_bow",
+      "name": "Quick Shot Bow",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75570,
+            "name_id": 29503,
+            "icon_id": 3182,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75628,
+            "name_id": 132074,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75619,
+            "name_id": 132065,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75797,
+            "name_id": 132805,
+            "icon_id": 5468,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Quick Shot Bow' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points"
+    },
+    {
+      "recipe": "blacksmith.robgoblin_archway",
+      "name": "Robgoblin Archway",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Robgoblin Archway' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.rowdy_rumbler_hammer",
+      "name": "Rowdy Rumbler Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75806,
+            "name_id": 132814,
+            "icon_id": 5522,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75811,
+            "name_id": 132819,
+            "icon_id": 2557,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75573,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75630,
+            "name_id": 132076,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75620,
+            "name_id": 132066,
+            "icon_id": 561,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rowdy Rumbler Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's"
+    },
+    {
+      "recipe": "blacksmith.savage_sting_bow",
+      "name": "Savage Sting Bow",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Savage Sting Bow' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Brutal Blast Bow's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.skullz_wall_hanging",
+      "name": "Skullz Wall Hanging",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Skullz Wall Hanging' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.spirited_protector_axe",
+      "name": "Spirited Protector Axe",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Spirited Protector Axe' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.spunky_scrapper_hammer.sample",
+      "name": "Spunky Scrapper Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 4,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75619,
+            "name_id": 132065,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75570,
+            "name_id": 29503,
+            "icon_id": 3182,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75799,
+            "name_id": 132807,
+            "icon_id": 5490,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75628,
+            "name_id": 132074,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Spunky Scrapper Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's"
+    },
+    {
+      "recipe": "blacksmith.stalking_panther_scythe",
+      "name": "Stalking Panther Scythe",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Stalking Panther Scythe' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.stalwart_protector_hammer",
+      "name": "Stalwart Protector Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Stalwart Protector Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.striking_serpent_sword",
+      "name": "Striking Serpent Sword",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Striking Serpent Sword' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Brutal Blast Bow's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.striped_mini_mech",
+      "name": "Striped Mini-Mech",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Striped Mini-Mech' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.strong_scrapper_hammer",
+      "name": "Strong Scrapper Hammer",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Strong Scrapper Hammer' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Brutal Blast Bow's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.sturdy_summersaber",
+      "name": "Sturdy Summersaber",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Sturdy Summersaber' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Brutal Blast Bow's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.sunny_potion",
+      "name": "Sunny Potion",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Sunny Potion' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.tempest_woven_wand",
+      "name": "Tempest Woven Wand",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Tempest Woven Wand' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.trauma_support_shockrod",
+      "name": "Trauma Support Shockrod",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Trauma Support Shockrod' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.valiant_guardian_cudgel",
+      "name": "Valiant Guardian Cudgel",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Valiant Guardian Cudgel' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.void_woven_wand",
+      "name": "Void Woven Wand",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75845,
+            "name_id": 132853,
+            "icon_id": 5521,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75835,
+            "name_id": 132843,
+            "icon_id": 5507,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75583,
+            "name_id": 29516,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75626,
+            "name_id": 132072,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75636,
+            "name_id": 132082,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Void Woven Wand' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Brutal Blast Bow's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.warrior_s_forged_axe_of_boon",
+      "name": "Warrior's Forged Axe of Boon",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 75574,
+            "name_id": 29507,
+            "icon_id": 3180,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75632,
+            "name_id": 132078,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75623,
+            "name_id": 132069,
+            "icon_id": 1216,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Warrior's Forged Axe of Boon' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Alley Fighter Hammer's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "blacksmith.wizard_s_forged_wand_of_cunning",
+      "name": "Wizard's Forged Wand of Cunning",
+      "coins": 6,
+      "wheel": {
+        "coins": 106,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75631,
+            "name_id": 132077,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75807,
+            "name_id": 132815,
+            "icon_id": 3581,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75621,
+            "name_id": 132067,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75572,
+            "name_id": 29505,
+            "icon_id": 3183,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Wizard's Forged Wand of Cunning' Goals and Prize Wheel Rewards; stars 230 live in recipes.json experience_points; primary coins (R) 6, Quick Shot Bow's; primary stars (R) 230, Quick Shot Bow's; wheel (R) Lunar Enchanted Wand's, none listed; wheel Coins slot (R) 106, the job's recorded median"
+    },
+    {
+      "recipe": "chef.briarmelon_surprise",
+      "name": "Briarmelon Surprise",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Briarmelon Surprise' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.burnetta_s_curious_creation",
+      "name": "Burnetta's Curious Creation",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75665,
+            "name_id": 132111,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75654,
+            "name_id": 132100,
+            "icon_id": 560,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75586,
+            "name_id": 29519,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75917,
+            "name_id": 132925,
+            "icon_id": 5181,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Burnetta's Curious Creation' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; primary stars (R) 50, Briarmelon Surprise's"
+    },
+    {
+      "recipe": "chef.candied_briarmelon",
+      "name": "Candied Briarmelon",
+      "coins": 2,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75953,
+            "name_id": 132961,
+            "icon_id": 5192,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75949,
+            "name_id": 132957,
+            "icon_id": 5637,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75601,
+            "name_id": 29534,
+            "icon_id": 3246,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75663,
+            "name_id": 132109,
+            "icon_id": 1220,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75672,
+            "name_id": 132118,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Candied Briarmelon' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 2, Glerga's Gourmet Goulash's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.crispy_choychoy_delight",
+      "name": "Crispy Choychoy Delight",
+      "coins": 46,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75589,
+            "name_id": 29522,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75657,
+            "name_id": 132103,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75666,
+            "name_id": 132112,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75922,
+            "name_id": 132930,
+            "icon_id": 5199,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75927,
+            "name_id": 132935,
+            "icon_id": 5224,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Crispy Choychoy Delight' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.de_flor_family_fried_dumplings",
+      "name": "De'Flor Family Fried Dumplings",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'De'Flor Family Fried Dumplings' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.fried_starnut_stick",
+      "name": "Fried Starnut Stick",
+      "coins": 1,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Fried Starnut Stick' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.glerga_s_gourmet_goulash",
+      "name": "Glerga's Gourmet Goulash",
+      "coins": 2,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75941,
+            "name_id": 132949,
+            "icon_id": 5186,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75592,
+            "name_id": 29525,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75660,
+            "name_id": 132106,
+            "icon_id": 563,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75671,
+            "name_id": 132117,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Glerga's Gourmet Goulash' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Candied Briarmelon's; wheel (R) Merri's Marinated Mystery Meat's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.gummyfruit_gumbo",
+      "name": "Gummyfruit Gumbo",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Gummyfruit Gumbo' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.gummyfruit_topped_sundae",
+      "name": "Gummyfruit Topped Sundae",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75928,
+            "name_id": 132936,
+            "icon_id": 5694,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75921,
+            "name_id": 132929,
+            "icon_id": 5636,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75588,
+            "name_id": 29521,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75656,
+            "name_id": 132102,
+            "icon_id": 561,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75667,
+            "name_id": 132113,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Gummyfruit Topped Sundae' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.honey_roasted_moonbean",
+      "name": "Honey Roasted Moonbean",
+      "coins": 2,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75956,
+            "name_id": 132964,
+            "icon_id": 5780,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75948,
+            "name_id": 132956,
+            "icon_id": 3492,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75599,
+            "name_id": 29532,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75663,
+            "name_id": 132109,
+            "icon_id": 1220,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75672,
+            "name_id": 132118,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31234,
+            "name_id": 96640,
+            "icon_id": 1235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Honey Roasted Moonbean' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 2, Glerga's Gourmet Goulash's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.jacque_s_dinner_rolls",
+      "name": "Jacque's Dinner Rolls",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Jacque's Dinner Rolls' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.merri_s_marinated_mystery_meat",
+      "name": "Merri's Marinated Mystery Meat",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75941,
+            "name_id": 132949,
+            "icon_id": 5186,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75592,
+            "name_id": 29525,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75660,
+            "name_id": 132106,
+            "icon_id": 563,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75671,
+            "name_id": 132117,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Merri's Marinated Mystery Meat' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Candied Briarmelon's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.moonbean_mousse",
+      "name": "Moonbean Mousse",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75954,
+            "name_id": 132962,
+            "icon_id": 5206,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75946,
+            "name_id": 132954,
+            "icon_id": 3610,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75597,
+            "name_id": 29530,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75663,
+            "name_id": 132109,
+            "icon_id": 1220,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75672,
+            "name_id": 132118,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Moonbean Mousse' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.moonbean_sundae_sweettreat",
+      "name": "Moonbean Sundae Sweettreat",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75953,
+            "name_id": 132961,
+            "icon_id": 5192,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75945,
+            "name_id": 132953,
+            "icon_id": 3379,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75596,
+            "name_id": 29529,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31234,
+            "name_id": 96640,
+            "icon_id": 1235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Moonbean Sundae Sweettreat' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.mystery_pot_roast",
+      "name": "Mystery Pot Roast",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Mystery Pot Roast' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.oddly_colored_omelette",
+      "name": "Oddly Colored Omelette",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75941,
+            "name_id": 132949,
+            "icon_id": 5186,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75592,
+            "name_id": 29525,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75660,
+            "name_id": 132106,
+            "icon_id": 563,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75671,
+            "name_id": 132117,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Oddly Colored Omelette' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Candied Briarmelon's; wheel (R) Merri's Marinated Mystery Meat's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.rainleaf_wrapped_dumplings",
+      "name": "Rainleaf Wrapped Dumplings",
+      "coins": 3,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Rainleaf Wrapped Dumplings' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.royal_stew_du_jour",
+      "name": "Royal Stew Du Jour",
+      "coins": 70,
+      "wheel": {
+        "coins": 50,
+        "slices": [
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75937,
+            "name_id": 132945,
+            "icon_id": 5187,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75592,
+            "name_id": 29525,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75661,
+            "name_id": 132107,
+            "icon_id": 1218,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75670,
+            "name_id": 132116,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Royal Stew Du Jour' Goals and Prize Wheel Rewards; stars 53 live in recipes.json experience_points"
+    },
+    {
+      "recipe": "chef.savory_spiralmint_soup",
+      "name": "Savory Spiralmint Soup",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75919,
+            "name_id": 132927,
+            "icon_id": 5221,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75586,
+            "name_id": 29519,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75655,
+            "name_id": 132101,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75665,
+            "name_id": 132111,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Savory Spiralmint Soup' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; primary stars (R) 50, Briarmelon Surprise's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.seared_stainberry",
+      "name": "Seared Stainberry",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75938,
+            "name_id": 132946,
+            "icon_id": 5194,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75593,
+            "name_id": 29526,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75660,
+            "name_id": 132106,
+            "icon_id": 563,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75671,
+            "name_id": 132117,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Seared Stainberry' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.sizzling_snowberry_saute",
+      "name": "Sizzling Snowberry Saute",
+      "coins": 3,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75589,
+            "name_id": 29522,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75657,
+            "name_id": 132103,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75666,
+            "name_id": 132112,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75922,
+            "name_id": 132930,
+            "icon_id": 5199,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75927,
+            "name_id": 132935,
+            "icon_id": 5224,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Sizzling Snowberry Saute' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Crispy Choychoy Delight's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.slugmud_surprise",
+      "name": "Slugmud Surprise",
+      "coins": 46,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75589,
+            "name_id": 29522,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75657,
+            "name_id": 132103,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75666,
+            "name_id": 132112,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75922,
+            "name_id": 132930,
+            "icon_id": 5199,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75927,
+            "name_id": 132935,
+            "icon_id": 5224,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Slugmud Surprise' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 46, Crispy Choychoy Delight's; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Crispy Choychoy Delight's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.spicy_vegetable_stirfry",
+      "name": "Spicy Vegetable Stirfry",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75933,
+            "name_id": 132941,
+            "icon_id": 5185,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75932,
+            "name_id": 132940,
+            "icon_id": 3491,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75591,
+            "name_id": 29524,
+            "icon_id": 3246,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75658,
+            "name_id": 132104,
+            "icon_id": 562,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75669,
+            "name_id": 132115,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Spicy Vegetable Stirfry' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; primary stars (R) 50, Briarmelon Surprise's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.spiralmint_steak",
+      "name": "Spiralmint Steak",
+      "coins": 1,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75918,
+            "name_id": 132926,
+            "icon_id": 5193,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75587,
+            "name_id": 29520,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75655,
+            "name_id": 132101,
+            "icon_id": 1212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75664,
+            "name_id": 132110,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31221,
+            "name_id": 96627,
+            "icon_id": 929,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Spiralmint Steak' Goals and Prize Wheel Rewards; stars 5 live in recipes.json experience_points; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.stainberry_chocolate_gumdrop",
+      "name": "Stainberry Chocolate Gumdrop",
+      "coins": 3,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75589,
+            "name_id": 29522,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75657,
+            "name_id": 132103,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75666,
+            "name_id": 132112,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75922,
+            "name_id": 132930,
+            "icon_id": 5199,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75927,
+            "name_id": 132935,
+            "icon_id": 5224,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Stainberry Chocolate Gumdrop' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Crispy Choychoy Delight's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.starnut_sundae",
+      "name": "Starnut Sundae",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75936,
+            "name_id": 132944,
+            "icon_id": 5692,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75929,
+            "name_id": 132937,
+            "icon_id": 3370,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75590,
+            "name_id": 29523,
+            "icon_id": 3246,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75658,
+            "name_id": 132104,
+            "icon_id": 562,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75669,
+            "name_id": 132115,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Starnut Sundae' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.strong_arm_stew.sample",
+      "name": "Strong Arm Stew",
+      "coins": 4,
+      "wheel": {
+        "coins": 3,
+        "slices": [
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 75917,
+            "name_id": 132925,
+            "icon_id": 5181,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75587,
+            "name_id": 29520,
+            "icon_id": 3248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75665,
+            "name_id": 132111,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75654,
+            "name_id": 132100,
+            "icon_id": 560,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Strong Arm Stew' Goals and Prize Wheel Rewards; stars 25 live in recipes.json experience_points"
+    },
+    {
+      "recipe": "chef.tangy_tumtumnip_mishmash",
+      "name": "Tangy Tumtumnip Mishmash",
+      "coins": 4,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Tangy Tumtumnip Mishmash' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; primary coins (R) 4, De'Flor Family Fried Dumplings's; primary stars (R) 50, Briarmelon Surprise's; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "chef.three_leaf_omelette",
+      "name": "Three Leaf Omelette",
+      "coins": 1,
+      "wheel": {
+        "coins": 18,
+        "slices": [
+          {
+            "item_id": 75955,
+            "name_id": 132963,
+            "icon_id": 5212,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75947,
+            "name_id": 132955,
+            "icon_id": 3426,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75598,
+            "name_id": 29531,
+            "icon_id": 3235,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75662,
+            "name_id": 132108,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75673,
+            "name_id": 132119,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31224,
+            "name_id": 96630,
+            "icon_id": 935,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 378,
+            "name_id": 2404,
+            "icon_id": 2131,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Three Leaf Omelette' Goals and Prize Wheel Rewards; stars 5 live in recipes.json experience_points; wheel (R) Briarmelon Surprise's, none listed; wheel Coins slot (R) 18, the job's recorded median"
+    },
+    {
+      "recipe": "miner.copper_bar.sample",
+      "name": "Copper Bar",
+      "coins": 0,
+      "wheel": {
+        "coins": 78,
+        "slices": [
+          {
+            "item_id": 31240,
+            "name_id": 96646,
+            "icon_id": 1248,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76149,
+            "name_id": 133157,
+            "icon_id": 5832,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76145,
+            "name_id": 133153,
+            "icon_id": 5486,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75603,
+            "name_id": 29536,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75690,
+            "name_id": 132136,
+            "icon_id": 560,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75701,
+            "name_id": 132147,
+            "icon_id": 3717,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Copper Bar' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; wheel Coins slot (R) 78, the job's recorded median"
+    },
+    {
+      "recipe": "miner.gold_bar",
+      "name": "Gold Bar",
+      "coins": 0,
+      "wheel": {
+        "coins": 78,
+        "slices": [
+          {
+            "item_id": 76197,
+            "name_id": 133205,
+            "icon_id": 5817,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76192,
+            "name_id": 133200,
+            "icon_id": 5484,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76187,
+            "name_id": 133195,
+            "icon_id": 2545,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75615,
+            "name_id": 29548,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75698,
+            "name_id": 132144,
+            "icon_id": 564,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75708,
+            "name_id": 132154,
+            "icon_id": 3721,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31230,
+            "name_id": 96636,
+            "icon_id": 954,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Gold Bar' Goals and Prize Wheel Rewards; stars 55 live in recipes.json experience_points; wheel Coins slot (R) 78, the job's recorded median"
+    },
+    {
+      "recipe": "miner.iron_bar",
+      "name": "Iron Bar",
+      "coins": 0,
+      "wheel": {
+        "coins": 78,
+        "slices": [
+          {
+            "item_id": 31240,
+            "name_id": 96646,
+            "icon_id": 1248,
+            "quantity": 3,
+            "gender": 0
+          },
+          {
+            "item_id": 76166,
+            "name_id": 133174,
+            "icon_id": 2559,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76172,
+            "name_id": 133180,
+            "icon_id": 5531,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75607,
+            "name_id": 29540,
+            "icon_id": 3234,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75694,
+            "name_id": 132140,
+            "icon_id": 562,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75705,
+            "name_id": 132151,
+            "icon_id": 3719,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Iron Bar' Goals and Prize Wheel Rewards; stars 53 live in recipes.json experience_points; wheel Coins slot (R) 78, the job's recorded median"
+    },
+    {
+      "recipe": "miner.silver_bar",
+      "name": "Silver Bar",
+      "coins": 0,
+      "wheel": {
+        "coins": 78,
+        "slices": [
+          {
+            "item_id": 76184,
+            "name_id": 133192,
+            "icon_id": 5529,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76178,
+            "name_id": 133186,
+            "icon_id": 5530,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75608,
+            "name_id": 29541,
+            "icon_id": 3239,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75697,
+            "name_id": 132143,
+            "icon_id": 1218,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75706,
+            "name_id": 132152,
+            "icon_id": 3720,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31234,
+            "name_id": 96640,
+            "icon_id": 1235,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Silver Bar' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; wheel Coins slot (R) 78, the job's recorded median"
+    },
+    {
+      "recipe": "miner.tin_bar",
+      "name": "Tin Bar",
+      "coins": 0,
+      "wheel": {
+        "coins": 78,
+        "slices": [
+          {
+            "item_id": 76160,
+            "name_id": 133168,
+            "icon_id": 5532,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 76154,
+            "name_id": 133162,
+            "icon_id": 5532,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75604,
+            "name_id": 29537,
+            "icon_id": 3243,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75693,
+            "name_id": 132139,
+            "icon_id": 1214,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 75702,
+            "name_id": 132148,
+            "icon_id": 3718,
+            "quantity": 1,
+            "gender": 0
+          },
+          {
+            "item_id": 31242,
+            "name_id": 96648,
+            "icon_id": 939,
+            "quantity": 1,
+            "gender": 0
+          }
+        ]
+      },
+      "source": "fanbyte harvest lab/references/fanbyte-wiki-20261102/pages.jsonl 'Tin Bar' Goals and Prize Wheel Rewards; stars 50 live in recipes.json experience_points; wheel Coins slot (R) 78, the job's recorded median"
+    }
+  ]
+}

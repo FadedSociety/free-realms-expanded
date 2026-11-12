@@ -258,9 +258,12 @@ impl Gameplay {
         now_ms: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        let gender = self.gender;
         let Some(engine) = self.type8_mut(gather) else {
             return Err(invalid("gathering content is not loaded"));
         };
+        // The wheel shows and lands on what this player can wear (C4).
+        engine.set_wearer(gender);
         let result = engine.begin_game(game, gather.job())?;
         self.type8_tick_ms = Some(now_ms);
         self.apply_type8(gather, result, out)
@@ -441,6 +444,17 @@ impl Gameplay {
             anywhere,
         };
         let crafting_stations = self.crafting_stations();
+        // The wheel shows and lands on what this player can wear (C4).
+        let gender = self.gender;
+        if let Some(service) = self.cooking.as_mut() {
+            service.set_wearer(gender);
+        }
+        if let Some(service) = self.smelting.as_mut() {
+            service.set_wearer(gender);
+        }
+        if let Some(service) = self.forging.as_mut() {
+            service.set_wearer(gender);
+        }
         let started = crate::recipe_book::start(
             recipe_id,
             &self.recipe_catalog,
@@ -680,7 +694,12 @@ impl Gameplay {
                 )));
             }
             self.consume_materials(transaction.consumes, out)?;
-            self.grant_reward(0, &transaction.grants, out)?;
+            // C4/C9: the recipe's coins and the wheel's slot pay with the craft.
+            let payout = result.payout.clone().unwrap_or_default();
+            let mut grants = transaction.grants.clone();
+            // A wheel item the inventory cannot hold is dropped rather than failing the craft.
+            grants.extend((payout.items.iter().copied()).filter(|(id, _)| self.inventory.has_definition(*id)));
+            self.grant_reward(payout.coins, &grants, out)?;
             // (R) Only the Miner tutorial counts its Copper Bar (21785) grants;
             // cooking and forging advance their objective by one completion.
             let quantity: u32 = if job == CraftingJob::Miner {
@@ -736,8 +755,13 @@ impl Gameplay {
             // L927: a cook or a forge pays the job's `activity_xp` (`job_xp_curve.json`); the
             // recipes' own XP has never been paid and still is not. Smelting is not paid here:
             // its ore came from a mining round, which is what the Miner's rate counts.
-            let xp = self.activity_xp(job.profile_id(), 0);
-            if job != CraftingJob::Miner && xp > 0 {
+            // C9: a craft pays its recipe's stars (`recipes.json` experience_points, the wiki's
+            // primary goal); a recipe without any keeps the job's `activity_xp`, smelting none.
+            let xp = match transaction.experience_points {
+                0 if job != CraftingJob::Miner => self.activity_xp(job.profile_id(), 0),
+                stars => stars,
+            };
+            if xp > 0 {
                 self.award_job_xp(xp, out)?;
             }
         } else {
@@ -782,16 +806,23 @@ impl Gameplay {
         result: Type8Outcome,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        // C4/C9: a listed game pays each met goal's coins and stars and the wheel's slot. A wheel
+        // item the inventory cannot hold is dropped rather than failing the win.
+        let mut payout = result.payout.clone();
+        if let Some(paid) = payout.as_mut() {
+            paid.items.retain(|(id, _)| self.inventory.has_definition(*id));
+        }
+        let stars = |rate: u32| payout.as_ref().map_or(rate, |paid| paid.stars);
         if let Some(transaction) = result.transaction {
             // L927: the job's activity XP from `job_xp_curve.json`; the constants are the fallback.
             let grant = match gather {
                 Gather::Mining => crate::mining::lifecycle::reward_grant(
                     Some(&transaction),
                     0,
-                    self.activity_xp(
+                    stars(self.activity_xp(
                         gather.job(),
                         crate::mining::lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN,
-                    ),
+                    )),
                 )?,
                 // T553: the run's own region, not always the file's.
                 Gather::Harvesting => crate::harvesting::lifecycle::reward_grant(
@@ -799,10 +830,10 @@ impl Gameplay {
                     self.type8(gather)
                         .map_or(HARVESTING_GAME_ID, Type8Engine::game_id),
                     0,
-                    self.activity_xp(
+                    stars(self.activity_xp(
                         gather.job(),
                         crate::harvesting::lifecycle::RECONSTRUCTED_CHEF_XP_PER_WIN,
-                    ),
+                    )),
                 )?,
                 Gather::Mail | Gather::Artifact => return Err(invalid("this game pays no items")),
             };
@@ -821,6 +852,9 @@ impl Gameplay {
                 .map(|item| (item.definition_id, item.count))
                 .collect();
             self.grant_reward(0, &grants, out)?;
+            if let Some(paid) = &payout {
+                self.grant_reward(paid.coins, &paid.items, out)?;
+            }
             // (R) TYPE8 resource keys use the configured output item definition;
             // no retail regional resource-to-quest table has been recovered.
             for item in &grant.items {
@@ -853,14 +887,18 @@ impl Gameplay {
             }
             self.npc_minigame_win(&result.replies, out)?;
             let xp = match gather {
-                Gather::Mail => self.activity_xp(
+                Gather::Mail => stars(self.activity_xp(
                     gather.job(),
                     crate::mail_sorting::RECONSTRUCTED_POSTMAN_XP_PER_WIN,
-                ),
+                )),
                 // Flat: it pays whichever job the player is in, not a job's own rate.
-                Gather::Artifact => crate::artifact_hunt::RECONSTRUCTED_XP_PER_WIN,
-                Gather::Mining | Gather::Harvesting => 0,
+                Gather::Artifact => stars(crate::artifact_hunt::RECONSTRUCTED_XP_PER_WIN),
+                // L934: Mining Practice pays nothing; a listed board without outputs pays its goals.
+                Gather::Mining | Gather::Harvesting => stars(0),
             };
+            if let Some(paid) = &payout {
+                self.grant_reward(paid.coins, &paid.items, out)?;
+            }
             if xp > 0 {
                 self.award_job_xp(xp, out)?;
             }

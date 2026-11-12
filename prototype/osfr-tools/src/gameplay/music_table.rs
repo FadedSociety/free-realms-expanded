@@ -12,7 +12,8 @@ pub(super) fn load_music(content: &Path) -> io::Result<Option<MusicGame>> {
     if !content.join(CONTENT_FILE).is_file() {
         return Ok(None);
     }
-    MusicGame::new(MusicContent::load(content)?).map(Some)
+    let rewards = crate::minigame::MinigameRewards::load(content)?;
+    MusicGame::new(MusicContent::load(content)?).map(|game| Some(game.with_rewards(rewards)))
 }
 
 /// Each music stand's menu: a game table listing every song (fan wiki: the game "can be started
@@ -56,10 +57,13 @@ impl Gameplay {
             ..Outcome::default()
         };
         let game = i32::try_from(id).map_err(|_| invalid("music game id"))?;
+        // C4: the wheel shows this player only what they can hold and wear.
+        let (inventory, gender) = (&self.inventory, self.gender);
+        let fits = |item: i32| inventory.has_definition(item) && inventory.reward_fits_gender(item, gender);
         let Some(music) = self.music.as_mut() else {
             return Ok(refused("Feeling the Beat! is not available."));
         };
-        Ok(match music.begin(game)? {
+        Ok(match music.begin_for(game, &fits)? {
             Some(run) => Outcome {
                 changed: run.changed,
                 replies: run.replies,
@@ -81,7 +85,8 @@ impl Gameplay {
         if !(self.music.as_ref()).is_some_and(MusicGame::is_active) {
             return Ok(None);
         }
-        let rewards = self.reward_snapshot();
+        // The player's gender, so the wheel lands only on what they wear.
+        let rewards = self.reward_snapshot().with_gender(self.gender);
         let Some(music) = self.music.as_mut() else {
             return Ok(None);
         };

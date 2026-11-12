@@ -146,6 +146,9 @@ impl Gameplay {
     /// activity (a mail round, a race). A combat job's rate is per kill, so its skill tests keep
     /// the row's own constant (R).
     fn challenge_xp(&self, row: &Challenge) -> u32 {
+        if row.pays_own_xp {
+            return row.xp;
+        }
         let profile = self.challenge_profile(row);
         match &self.profiles {
             Some(profiles) if profiles.kill_xp(profile).is_none() => {

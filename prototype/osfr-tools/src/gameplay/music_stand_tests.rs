@@ -161,6 +161,9 @@ fn a_music_stand_offers_every_song() {
         .find(|packet| packet.starts_with(&[39, 0, 18]))
         .expect("the result screen");
     assert_eq!(result[15], 1, "won");
+    // C4: this item-less test inventory defines none of the song's wheel items, so no wheel shows
+    // and none lands: the win pays its own coins alone.
+    assert!(!(won.replies.iter()).any(|packet| packet.starts_with(&[39, 0, 45])));
     assert_eq!(coins(&game), before + 5);
     // A new song can be picked after the close.
     let again = pick_song(&mut game, &at, SNOWHILL_STAND, 388_938, 70_000);

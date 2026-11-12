@@ -798,3 +798,54 @@ fn movie_text_takes_only_an_exact_nul_terminated_text() {
         assert!(minigame::movie_text(&refused).is_err(), "{refused:?}");
     }
 }
+
+/// C4: a game on the shared lifecycle (Feeling the Beat, Hack 'n' Slash, Checkers) offers its
+/// wheel in the preview bundle; a win lands it (39/45 between 39/18 and 39/19) on a slot the
+/// winner can wear, pays that slot inside the run's one grant, and accepts the stop report once.
+#[test]
+fn a_won_run_lands_its_wheel_and_pays_the_slot_with_the_win() {
+    use minigame::{Prize, Wheel, WheelSlice};
+    let wheel = Wheel {
+        coins: 40,
+        slices: vec![
+            WheelSlice { item_id: 100, name_id: 7, icon_id: 8, quantity: 2, gender: 0 },
+            // A girls' slot: never this boy's prize.
+            WheelSlice { item_id: 101, name_id: 9, icon_id: 10, quantity: 1, gender: 2 },
+        ],
+    };
+    let fixture = Fixture::new(10);
+    let state = fixture.reward_state().with_gender(1);
+    for instance in 140..150 {
+        let mut runs = MinigameRuns::new(instance).unwrap();
+        let mut offered = spec();
+        offered.reward_bundles = wheel.offer_bundles();
+        let offer = runs.offer(offered).unwrap();
+        // The preview (third bundle) lists both slots and the Coins slot: header 15, six words
+        // and the members byte, two empty bundles.
+        let preview = &offer.replies[0][40 + 138..];
+        assert_eq!(i32::from_le_bytes(preview[1..5].try_into().unwrap()), 40);
+        assert_eq!(i32::from_le_bytes(preview[61..65].try_into().unwrap()), 2);
+        runs.handle_client(&request(5, instance)).unwrap();
+        runs.started(instance);
+        let won = TestActivity {
+            score: 9,
+            finish: Some(ActivityFinish { won: true, stars: 1, elapsed_seconds: 3 }),
+        };
+        let out = runs.finish_with_wheel(instance, &won, Some((&state, &grant())), &wheel).unwrap();
+        let subs: Vec<u8> = out.replies.iter().map(|reply| reply[2]).collect();
+        assert_eq!(subs, [14, 18, 47, 45, 19], "the wheel lands ahead of 39/19");
+        let prize = wheel.for_wearer(1).prize(instance).unwrap();
+        let paid = out.reward_state.unwrap();
+        match prize {
+            Prize::Item(slice) => {
+                assert_eq!(slice.item_id, 100, "a boy never lands on the girls' slot");
+                assert_eq!(paid.inventory.state().coins, 10 + 5);
+                assert!(paid.inventory.state().items.iter().any(|item| item.definition_id == 100));
+            }
+            Prize::Coins(coins) => assert_eq!(paid.inventory.state().coins, 10 + 5 + coins),
+        }
+        let stop = runs.handle_client(&request(46, instance)).unwrap();
+        assert!(stop.accepted && stop.reward_packets.is_empty(), "the stop report pays nothing");
+        assert!(!runs.handle_client(&request(46, instance)).unwrap().accepted, "once");
+    }
+}

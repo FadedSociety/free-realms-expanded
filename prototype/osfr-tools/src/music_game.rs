@@ -351,19 +351,34 @@ impl Activity for Finish {
 /// checkers table: a reconnect starts fresh.
 #[derive(Clone)]
 pub struct MusicGame {
-    content: MusicContent,
+    // Boxed so the wheel table's handle leaves `Gameplay` no larger.
+    content: Box<MusicContent>,
     runs: MinigameRuns,
     play: Option<Play>,
+    /// `minigame_rewards.json`'s wheels (C4); empty until the session attaches the table.
+    rewards: std::sync::Arc<minigame::MinigameRewards>,
 }
 
 impl MusicGame {
     pub fn new(content: MusicContent) -> io::Result<Self> {
         content.validate()?;
         Ok(Self {
-            content,
+            content: Box::new(content),
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
             play: None,
+            rewards: Default::default(),
         })
+    }
+
+    /// Attach `minigame_rewards.json`: each song's prize wheel (C4).
+    pub fn with_rewards(mut self, rewards: minigame::MinigameRewards) -> Self {
+        self.rewards = std::sync::Arc::new(rewards);
+        self
+    }
+
+    /// `game_id`'s wheel, when it has one.
+    fn wheel(&self, game_id: i32) -> Option<&minigame::Wheel> {
+        Some(&self.rewards.game(game_id)?.wheel).filter(|wheel| wheel.shows())
     }
 
     /// The MiniGameData ids this content offers (the Games window rows' ids).
@@ -389,6 +404,17 @@ impl MusicGame {
     /// Offer game `game_id` (39/16); `None` while a run is already open. An id the content does
     /// not carry is an error.
     pub fn begin(&mut self, game_id: i32) -> io::Result<Option<MusicOutcome>> {
+        self.begin_for(game_id, &|_| true)
+    }
+
+    /// [`Self::begin`] for one player: the wheel's preview lists only the items `fits` accepts (their
+    /// inventory defines them and their gender wears them, `Wheel::for_player`), the same rows the
+    /// win then lands on.
+    pub fn begin_for(
+        &mut self,
+        game_id: i32,
+        fits: &dyn Fn(i32) -> bool,
+    ) -> io::Result<Option<MusicOutcome>> {
         let row = *self
             .content
             .game(game_id)
@@ -412,6 +438,9 @@ impl MusicGame {
         spec.difficulty = row.difficulty;
         spec.objectives = row.goals(self.content.primary_goal_name_id);
         spec.preload_file = PRELOAD_FILE.into();
+        if let Some(wheel) = self.wheel(game_id).map(|wheel| wheel.keep(fits)) {
+            spec.reward_bundles = wheel.offer_bundles();
+        }
         // `offer` changes nothing on an error or a refusal.
         let offered = self.runs.offer(spec)?;
         if !offered.accepted {
@@ -584,15 +613,20 @@ impl MusicGame {
             elapsed_seconds: u32::try_from(elapsed).unwrap_or(u32::MAX),
         };
         // `finish` changes nothing on an error.
-        let run = match (won, payer) {
-            (true, Some((player, rewards))) => {
+        let wheel = self.wheel(play.level.row.game_id).cloned();
+        let run = match (won, payer, wheel) {
+            (true, Some((player, rewards)), wheel) => {
                 let row = play.level.row;
                 let grant = win_grant(player, row.win_coins, self.content.icon_id, row.name_id);
-                self.runs
-                    .finish(instance, &finish, Some((rewards, &grant)))?
+                match wheel {
+                    Some(wheel) => (self.runs)
+                        .finish_with_wheel(instance, &finish, Some((rewards, &grant)), &wheel)?,
+                    None => self.runs.finish(instance, &finish, Some((rewards, &grant)))?,
+                }
             }
-            (true, None) => self.runs.finish_win_without_reward(instance, &finish)?,
-            (false, _) => self.runs.finish(instance, &finish, None)?,
+            (true, None, Some(wheel)) => self.runs.finish_with_wheel(instance, &finish, None, &wheel)?,
+            (true, None, None) => self.runs.finish_win_without_reward(instance, &finish)?,
+            (false, _, _) => self.runs.finish(instance, &finish, None)?,
         };
         let mut out = MusicOutcome::from_run(run);
         // As Hack 'n' Slash: the goals' ticks go out ahead of the verdict and the result.

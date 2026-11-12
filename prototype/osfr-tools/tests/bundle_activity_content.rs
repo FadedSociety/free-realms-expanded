@@ -87,17 +87,22 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
         // L934: Tin, Iron, Silver and Gold Mining (93-99) and Mining Practice (375).
         // P-quest-games: the rich veins' rows 92-100, each its ore board paying the client's
         // bonus gem (malachite, garnet, amethyst, ruby, fire agate).
-        "217aab16d5e4d343f4584293d5647fbcd668085e081b027151913340055db1b0",
+        // MG (C5): the four clickable powerups and a 5% powerup share on every board (R).
+        "a0e43ed70cf1711ad8b2de192018d8de10a5b791ced47d3002dac5060df6295d",
     ),
     (
         "harvesting.json",
         // L934: Chugaroot Farm (113) and Thorny Tillage (119).
-        "7f51a097801c65a9a6f86c902861fbd0de74bc2629df835cce426c4df7e60b6f",
+        // MG (C5): powerups (5%, the four clickables) and locked tiles (8%) (R).
+        "c7930adfaf69c124d7d32da9b043c8135d3205d3d5103d732eea46bf337433a9",
     ),
     (
         // L103: the six Mail Sorting boards.
         "mail_sorting.json",
-        "45622fca85f6710c34ee96151f8aac24c25c53c83849d06f486b776bda1c515d",
+        // MG (C5): powerups (5%, the four clickables) and locked tiles (5%) (R); the Wugachug,
+        // Snowhill (14) and Shrouded Glade (22) Elite unlock goals, each with its own share (R),
+        // noted in the file's rule_notice.
+        "ba0e96ad894741dc9640d58922e5530dac868ecbc3342434e8beef05690d80a0",
     ),
 ];
 

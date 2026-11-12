@@ -222,6 +222,8 @@ pub struct SwordGame {
     content: SwordContent,
     runs: MinigameRuns,
     play: Option<Play>,
+    /// `minigame_rewards.json`'s wheels (C4); empty until the session attaches the table.
+    rewards: std::sync::Arc<minigame::MinigameRewards>,
 }
 
 impl SwordGame {
@@ -231,7 +233,19 @@ impl SwordGame {
             content,
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
             play: None,
+            rewards: Default::default(),
         })
+    }
+
+    /// Attach `minigame_rewards.json`: the game's prize wheel (C4).
+    pub fn with_rewards(mut self, rewards: minigame::MinigameRewards) -> Self {
+        self.rewards = std::sync::Arc::new(rewards);
+        self
+    }
+
+    /// The game's wheel, when it has one.
+    fn wheel(&self) -> Option<&minigame::Wheel> {
+        Some(&self.rewards.game(self.content.game_id)?.wheel).filter(|wheel| wheel.shows())
     }
 
     /// The MiniGameData id this content offers (the Games window row's id).
@@ -251,6 +265,13 @@ impl SwordGame {
 
     /// Offer the game (39/16); `None` while a run is already open.
     pub fn begin(&mut self) -> io::Result<Option<SwordOutcome>> {
+        self.begin_for(&|_| true)
+    }
+
+    /// [`Self::begin`] for one player: the wheel's preview lists only the items `fits` accepts (their
+    /// inventory defines them and their gender wears them, `Wheel::for_player`), the same rows the
+    /// win then lands on.
+    pub fn begin_for(&mut self, fits: &dyn Fn(i32) -> bool) -> io::Result<Option<SwordOutcome>> {
         if self.is_active() {
             return Ok(None);
         }
@@ -268,6 +289,9 @@ impl SwordGame {
         spec.difficulty = content.difficulty;
         spec.preload_file = PRELOAD_FILE.into();
         spec.objectives = content.goals();
+        if let Some(wheel) = self.wheel().map(|wheel| wheel.keep(fits)) {
+            spec.reward_bundles = wheel.offer_bundles();
+        }
         // `offer` changes nothing on an error or a refusal.
         let offered = self.runs.offer(spec)?;
         if !offered.accepted {
@@ -467,16 +491,21 @@ impl SwordGame {
             score: score as u32,
             elapsed_seconds: u32::try_from(elapsed).unwrap_or(u32::MAX),
         };
+        let wheel = self.wheel().cloned();
         let content = &self.content;
         // `finish` changes nothing on an error.
-        let run = match (won, payer) {
-            (true, Some((player, rewards))) => {
+        let run = match (won, payer, wheel) {
+            (true, Some((player, rewards)), wheel) => {
                 let grant = win_grant(player, content.win_coins, content.icon_id, content.name_id);
-                self.runs
-                    .finish(instance, &finish, Some((rewards, &grant)))?
+                match wheel {
+                    Some(wheel) => (self.runs)
+                        .finish_with_wheel(instance, &finish, Some((rewards, &grant)), &wheel)?,
+                    None => self.runs.finish(instance, &finish, Some((rewards, &grant)))?,
+                }
             }
-            (true, None) => self.runs.finish_win_without_reward(instance, &finish)?,
-            (false, _) => self.runs.finish(instance, &finish, None)?,
+            (true, None, Some(wheel)) => self.runs.finish_with_wheel(instance, &finish, None, &wheel)?,
+            (true, None, None) => self.runs.finish_win_without_reward(instance, &finish)?,
+            (false, _, _) => self.runs.finish(instance, &finish, None)?,
         };
         let mut out = SwordOutcome::from_run(run);
         let mut goals = if won {

@@ -85,7 +85,10 @@ impl Gameplay {
 
     /// Play on the checkers row: the 39/16 offer, or one refusal line while a game is open.
     pub(super) fn begin_checkers(&mut self) -> io::Result<Outcome> {
-        Ok(match self.checkers.begin()? {
+        // C4: the wheel shows this player only what they can hold and wear.
+        let (inventory, gender) = (&self.inventory, self.gender);
+        let fits = |item: i32| inventory.has_definition(item) && inventory.reward_fits_gender(item, gender);
+        Ok(match self.checkers.begin_for(&fits)? {
             Some(table) => Outcome {
                 changed: table.changed,
                 replies: table.replies,
@@ -110,7 +113,8 @@ impl Gameplay {
         if !self.checkers.is_active() {
             return Ok(None);
         }
-        let rewards = self.reward_snapshot();
+        // The player's gender, so the wheel lands only on what they wear.
+        let rewards = self.reward_snapshot().with_gender(self.gender);
         let Some(table) = self
             .checkers
             .route_with(inner, now_ms, Some((player_id, &rewards)))?

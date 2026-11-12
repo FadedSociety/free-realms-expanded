@@ -90,6 +90,10 @@ pub const TILE_EMPTY: u16 = 0;
 pub const TILE_DROPZONE: u16 = 100;
 pub const TILE_WILDCARD: u16 = 200;
 pub const TILE_SELECTABLE_START: u16 = 400;
+/// ORIGINAL `GameData.TILE_LOCKED`: a locked selectable travels as its value plus
+/// `TILE_LOCK_DELTA` (100). A chain through it unlocks it in place (`ServerGrid.doMatch3`).
+pub const TILE_LOCKED_START: u16 = 500;
+const TILE_LOCK_DELTA: u16 = TILE_LOCKED_START - TILE_SELECTABLE_START;
 pub const TILE_COLLECTABLE_START: u16 = 600;
 /// Ores are the 600 block and gems the 700 block (`TILE_BONUS`); both fall and are collected.
 const TILE_COLLECTABLE_END: u16 = 800;
@@ -269,7 +273,13 @@ pub struct Type8Outcome {
     pub changed: bool,
     pub completed: bool,
     pub transaction: Option<Type8Transaction>,
+    /// A win's goal payouts and wheel slot (`minigame_rewards.json`); `None` for a game the table
+    /// does not list, which keeps the job's own per-win rate.
+    pub payout: Option<Type8Payout>,
 }
+
+/// What a won board pays besides its outputs: each met goal's coins and stars, and the wheel slot.
+pub type Type8Payout = osfr_tools::minigame::WinPayout;
 
 #[derive(Clone, Debug, Deserialize)]
 struct Content {
@@ -297,6 +307,12 @@ struct Content {
     /// file without this key behaves exactly like the pre-powerup engine.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     powerup_definitions: Vec<Type8PowerupDefinition>,
+    /// RECONSTRUCTED share (percent) of new selectable tiles that arrive locked
+    /// (`GameData.TILE_HAZARD_LOCK`, `ServerTileGenerator.generate_hazard`: a selectable sent as
+    /// value + 100, `ServerTile.getNetworkValue`). The level tables held the real chance
+    /// (`LD_HAZARD_SPAWN`); 0, the movie's own default, spawns none.
+    #[serde(default)]
+    locked_percent: u32,
     /// T553 (R): further games that share this file's movie, board shape and tuning and differ
     /// only in the produce they ask for (the regional Harvesting games). L100 (R): Mining offers
     /// Copper Mining (client MiniGameData 91, the live Games window row 400) on the copper board
@@ -374,13 +390,31 @@ struct GameVariant {
     /// This game's own difficulty, where the client gives it one.
     #[serde(default)]
     difficulty: Option<i32>,
+    /// This game's own locked-tile share, where its Elite goal needs more unlocks than the
+    /// file's rate gives (R). Absent keeps the file's `locked_percent`.
+    #[serde(default)]
+    locked_percent: Option<u32>,
     selectable: Vec<u16>,
     tiles: Vec<Type8Kind>,
     goals: Vec<Type8Goal>,
     outputs: Vec<Type8Output>,
 }
 
+/// What a new tile may be beyond the board's own kinds: a clickable powerup or a locked tile.
+#[derive(Clone, Copy)]
+struct Spawns<'a> {
+    powerups: &'a [Type8PowerupDefinition],
+    locked_percent: u32,
+}
+
 impl Content {
+    fn spawns(&self) -> Spawns<'_> {
+        Spawns {
+            powerups: &self.powerup_definitions,
+            locked_percent: self.locked_percent,
+        }
+    }
+
     /// The content of one extra game: this file's with the variant's rows swapped in.
     fn variant(&self, game: GameVariant) -> io::Result<Self> {
         let mut content = self.clone();
@@ -392,6 +426,10 @@ impl Content {
         content.description_id = game.description_id;
         content.icon_id = game.icon_id;
         content.difficulty = game.difficulty.unwrap_or(content.difficulty);
+        content.locked_percent = game.locked_percent.unwrap_or(content.locked_percent);
+        if content.locked_percent > 100 {
+            return Err(invalid("invalid mining spawn percentage"));
+        }
         if let Some(shape) = game.shape {
             content.spec.shape = shape;
         }
@@ -485,6 +523,12 @@ pub struct Type8Engine {
     first_instance_id: i32,
     state: Type8State,
     results_presented: bool,
+    /// `minigame_rewards.json` from the content directory; empty without it.
+    rewards: Arc<osfr_tools::minigame::MinigameRewards>,
+    /// The player's gender for the wheel's wearable slots, set before a start (0 shows all).
+    wearer: i32,
+    /// Locked tiles this run has unlocked. A reconnect drops the run, so it is not saved.
+    unlocked: u32,
 }
 
 impl Type8Engine {
@@ -517,6 +561,9 @@ impl Type8Engine {
         validate_asset_name(&content.launch_movie, "launch movie")?;
         validate_spec(&content.spec)?;
         validate_powerup_definitions(&content)?;
+        if content.locked_percent > 100 {
+            return Err(invalid("invalid mining spawn percentage"));
+        }
         content.validate_levels()?;
         let mut games = BTreeMap::new();
         for game in content.games.clone() {
@@ -554,6 +601,7 @@ impl Type8Engine {
         }
         let content = Arc::new(content);
         games.insert(game_id, content.clone());
+        let rewards = Arc::new(osfr_tools::minigame::MinigameRewards::load(directory)?);
         Ok(Self {
             content,
             games: Arc::new(games),
@@ -562,7 +610,54 @@ impl Type8Engine {
             first_instance_id,
             state,
             results_presented: false,
+            rewards,
+            wearer: 0,
+            unlocked: 0,
         })
+    }
+
+    /// The player's gender (1 boy, 2 girl), so the next run's wheel shows and lands on what they
+    /// can wear. 0 shows every slot.
+    pub fn set_wearer(&mut self, gender: i32) {
+        self.wearer = gender;
+    }
+
+    /// The current game's wheel as this wearer sees it.
+    fn wheel(&self) -> Option<osfr_tools::minigame::Wheel> {
+        let game = self.rewards.game(self.game_id)?;
+        Some(game.wheel.for_wearer(self.wearer)).filter(osfr_tools::minigame::Wheel::shows)
+    }
+
+    /// A won run's payout: every met goal's coins and stars (the primary goal is met by the win)
+    /// and the wheel slot. `None` when the table does not list the game.
+    fn payout(&self, run: &Type8Run, unlocked: u32, with_wheel: bool) -> Option<Type8Payout> {
+        let game = self.rewards.game(self.game_id)?;
+        let facts = self.facts(run, unlocked);
+        let mut payout = Type8Payout::default();
+        for (index, reward) in game.goals.iter().enumerate() {
+            let met = match (self.content.objectives.get(index), facts.get(index)) {
+                (Some(row), _) if row.category == 1 => true,
+                (Some(row), Some(fact)) => *fact >= row.target,
+                // A row the panel does not show is the win's own (R).
+                (None, _) => index == 0,
+                (Some(_), None) => false,
+            };
+            if met {
+                payout.coins = payout.coins.saturating_add(reward.coins);
+                payout.stars = payout.stars.saturating_add(reward.stars);
+            }
+        }
+        let wheel = self.wheel().filter(|_| with_wheel);
+        if let Some(prize) = wheel.and_then(|wheel| wheel.prize(run.instance_id)) {
+            payout.add_prize(&prize);
+        }
+        Some(payout)
+    }
+
+    /// 39/45 for a won run whose game has a wheel.
+    fn wheel_packet(&self, run: &Type8Run) -> Option<Vec<u8>> {
+        let prize = self.wheel()?.prize(run.instance_id)?;
+        Some(osfr_tools::minigame::wheel_land_packet(run.instance_id, self.game_id, &prize))
     }
 
     pub fn state(&self) -> &Type8State {
@@ -756,6 +851,7 @@ impl Type8Engine {
         self.state.next_instance_id = next;
         self.state.active = Some(run);
         self.results_presented = false;
+        self.unlocked = 0;
         Ok(Type8Outcome {
             replies: vec![self.info_packet(id)],
             changed: true,
@@ -818,6 +914,7 @@ impl Type8Engine {
                     .ok_or_else(|| invalid("completion overflow"))?;
                 out.completed = true;
                 out.transaction = reward_transaction(run, &self.content.spec)?;
+                out.payout = self.payout(run, self.unlocked, true);
                 message(&mut out, run.instance_id, self.game_id, "OnGameWonMsg")?;
                 self.state = next;
                 return Ok(out);
@@ -903,6 +1000,8 @@ impl Type8Engine {
                     changed: true,
                     completed: true,
                     transaction: reward_transaction(run, &self.content.spec)?,
+                    // The movie closes without a score screen, so no wheel turns.
+                    payout: self.payout(run, self.unlocked, false),
                     ..Default::default()
                 };
                 message(&mut won, run.instance_id, self.game_id, "OnGameWonMsg")?;
@@ -929,6 +1028,7 @@ impl Type8Engine {
         let mut out = Type8Outcome::default();
         let mut presented = self.results_presented;
         let mut advanced = None;
+        let mut unlocked = self.unlocked;
         if sub == 5 {
             if run.phase == Type8Phase::Offered {
                 // (R) Ahead of 39/17, as `MinigameRuns::start`: the HUD opens on the rows it finds.
@@ -969,7 +1069,7 @@ impl Type8Engine {
                             &mut out,
                             self.game_id,
                             false,
-                            &self.content.powerup_definitions,
+                            self.content.spawns(),
                         )?;
                         message(
                             &mut out,
@@ -1016,18 +1116,21 @@ impl Type8Engine {
                         // `ServerGrid.doMatch3` adopts the chain color into every wildcard
                         // before the collected tiles are handled, so a wildcard counts as
                         // the chain value too.
-                        let collected_values: Vec<u16> = chain
-                            .iter()
-                            .map(|&(x, y)| {
-                                let value = run.board[y * width + x];
-                                if value == TILE_WILDCARD {
-                                    chain_value.unwrap_or(value)
-                                } else {
-                                    value
-                                }
-                            })
-                            .collect();
+                        // A locked tile in the chain only unlocks and stays (`ServerGrid.doMatch3`
+                        // and the movie's `Grid.doMatch3`): it neither empties nor fills a bin.
+                        let mut collected_values = Vec::with_capacity(chain.len());
                         for &(x, y) in &chain {
+                            let value = run.board[y * width + x];
+                            if is_locked(value) {
+                                run.board[y * width + x] = value - TILE_LOCK_DELTA;
+                                unlocked = unlocked.saturating_add(1);
+                                continue;
+                            }
+                            collected_values.push(if value == TILE_WILDCARD {
+                                chain_value.unwrap_or(value)
+                            } else {
+                                value
+                            });
                             run.board[y * width + x] = TILE_EMPTY;
                         }
                         run.best_chain = run.best_chain.max(chain.len() as u32);
@@ -1074,14 +1177,14 @@ impl Type8Engine {
                             &self.content.spec,
                             &mut out,
                             self.game_id,
-                            &self.content.powerup_definitions,
+                            self.content.spawns(),
                         )?;
                         settle_after_collect(
                             run,
                             &self.content.spec,
                             &mut out,
                             self.game_id,
-                            &self.content.powerup_definitions,
+                            self.content.spawns(),
                         )?;
                     }
                 }
@@ -1101,7 +1204,7 @@ impl Type8Engine {
                         apply_powerup_action(
                             run,
                             &self.content.spec,
-                            &self.content.powerup_definitions,
+                            self.content.spawns(),
                             index,
                             list,
                             &mut out,
@@ -1152,7 +1255,7 @@ impl Type8Engine {
                             self.game_id,
                             cell(x)?,
                             cell(y)?,
-                            &self.content.powerup_definitions,
+                            self.content.spawns(),
                         )?;
                     }
                 }
@@ -1204,16 +1307,19 @@ impl Type8Engine {
                         message(&mut out, id, self.game_id, "OnGameWonMsg")?;
                         out.completed = true;
                         out.transaction = reward_transaction(run, &self.content.spec)?;
+                        out.payout = self.payout(run, unlocked, true);
                     }
                 }
                 ["FRServer_GameOver"] => {
                     if matches!(run.phase, Type8Phase::Won | Type8Phase::Lost) && !presented {
-                        out.replies.extend(results(
-                            run,
-                            run.phase == Type8Phase::Won,
-                            self.content.spec.duration_seconds,
-                            self.game_id,
-                        ));
+                        let won = run.phase == Type8Phase::Won;
+                        let mut shown =
+                            results(run, won, self.content.spec.duration_seconds, self.game_id);
+                        // The wheel's slot goes out with the results, ahead of 39/19 (C4).
+                        if let Some(wheel) = self.wheel_packet(run).filter(|_| won) {
+                            shown.insert(shown.len().saturating_sub(1), wheel);
+                        }
+                        out.replies.extend(shown);
                         run.end_sent = true;
                         presented = true;
                     }
@@ -1250,19 +1356,25 @@ impl Type8Engine {
         }
         self.state = next;
         self.results_presented = presented;
+        self.unlocked = unlocked;
         Ok(out)
     }
 
     /// The Goals panel's rows, numbered from 1.
     fn panel_goals(&self) -> Vec<osfr_tools::minigame::Goal> {
+        // Each row shows what it pays (`minigame_rewards.json`, C9).
+        let paid = |index: usize| {
+            let game = self.rewards.game(self.game_id);
+            game.and_then(|game| game.goals.get(index)).copied().unwrap_or_default()
+        };
         let goal = |(index, row): (usize, &Objective)| osfr_tools::minigame::Goal {
             id: index as u32 + 1,
             name_id: row.name_id,
             description_id: row.name_id,
             category: row.category,
             bonus: row.category == 4,
-            stars: 0,
-            coins: 0,
+            stars: i32::try_from(paid(index).stars).unwrap_or(0),
+            coins: i32::try_from(paid(index).coins).unwrap_or(0),
             total: if matches!(row.counts, Counts::Bin(_)) { row.target } else { 0 },
             failure_condition: false,
             members_only: false,
@@ -1272,9 +1384,14 @@ impl Type8Engine {
 
     /// Where each Goals panel row stands; empty without a run.
     fn panel_facts(&self) -> Vec<u32> {
-        let Some(run) = self.state.active.as_ref() else {
-            return Vec::new();
-        };
+        match self.state.active.as_ref() {
+            Some(run) => self.facts(run, self.unlocked),
+            None => Vec::new(),
+        }
+    }
+
+    /// Where each Goals panel row stands for `run`, with `unlocked` locked tiles opened.
+    fn facts(&self, run: &Type8Run, unlocked: u32) -> Vec<u32> {
         let cleared = u32::from(matches!(run.phase, Type8Phase::LevelComplete | Type8Phase::Won));
         let goals = &self.content.spec.goals;
         let fact = |row: &Objective| match row.counts {
@@ -1285,7 +1402,7 @@ impl Type8Engine {
             Counts::Score => run.score,
             Counts::Chain => run.best_chain,
             Counts::Levels => self.content.level - 1 + cleared,
-            Counts::Locked => 0,
+            Counts::Locked => unlocked,
         };
         self.content.objectives.iter().map(fact).collect()
     }
@@ -1325,7 +1442,11 @@ impl Type8Engine {
             b.extend(n.to_le_bytes());
         }
         b.push(0);
-        b.extend([0; 207]); // Three empty 69-byte RewardBundleBase records.
+        // The reward and member bundles stay empty; the preview lists the game's wheel (C4).
+        match self.wheel() {
+            Some(wheel) => b.extend(wheel.offer_bundles()),
+            None => b.extend([0; 207]),
+        }
         let goals = self.panel_goals();
         b.extend((goals.len() as i32).to_le_bytes());
         for goal in &goals {
@@ -1673,6 +1794,7 @@ fn valid_value(v: u16) -> bool {
         || v == TILE_DROPZONE
         || v == TILE_WILDCARD
         || (TILE_SELECTABLE_START..TILE_SELECTABLE_START + 100).contains(&v)
+        || is_locked(v)
         || (TILE_COLLECTABLE_START..TILE_COLLECTABLE_END).contains(&v)
         || v == TILE_BLOCKER
         || (900..=953).contains(&v)
@@ -1684,7 +1806,7 @@ fn initialize_board(
     out: &mut Type8Outcome,
     game_id: i32,
     reshuffle: bool,
-    powerup_definitions: &[Type8PowerupDefinition],
+    spawns: Spawns<'_>,
 ) -> io::Result<()> {
     if reshuffle {
         run.reshuffles += 1;
@@ -1703,8 +1825,8 @@ fn initialize_board(
                 0 => TILE_EMPTY,
                 // `1` is TILE_BUILDREGULAR: the original regular randomizer
                 // excludes collectables (ServerTileGenerator.as 107-110, 126-137).
-                1 => random_tile(run, spec, false, powerup_definitions)?,
-                2 => random_tile(run, spec, true, powerup_definitions)?,
+                1 => random_tile(run, spec, false, spawns)?,
+                2 => random_tile(run, spec, true, spawns)?,
                 3 => TILE_BLOCKER,
                 4 => TILE_DROPZONE,
                 code if code < 0 => (-code) as u16,
@@ -1714,7 +1836,7 @@ fn initialize_board(
         }
     }
     while run.tile_queue.len() < QUEUE_TARGET {
-        let value = random_tile(run, spec, true, powerup_definitions)?;
+        let value = random_tile(run, spec, true, spawns)?;
         run.tile_queue.push(value);
     }
     if !reshuffle {
@@ -1741,7 +1863,7 @@ fn initialize_board(
         // Recovered original: one `OnPowerupInitMsg value, duration, power` per
         // authored spawn row, emitted at level start (GameLevel.as 120-128,
         // ServerNetwork 60-63). Ascending value keeps the order deterministic.
-        let mut definitions = powerup_definitions.to_vec();
+        let mut definitions = spawns.powerups.to_vec();
         definitions.sort_by_key(|definition| definition.value);
         for definition in &definitions {
             message(
@@ -1836,16 +1958,20 @@ fn random_tile(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
     allow_collectable: bool,
-    powerup_definitions: &[Type8PowerupDefinition],
+    spawns: Spawns<'_>,
 ) -> io::Result<u16> {
     // `powerup_percent = 0` (the shipped default and every existing content
     // file) takes the original branch below and draws exactly as before.
     if spec.powerup_percent > 0 {
-        if let Some(definition) = weighted_powerup(run, powerup_definitions) {
+        if let Some(definition) = weighted_powerup(run, spawns.powerups) {
             if rng(run) % 100 < spec.powerup_percent {
                 return Ok(definition.value);
             }
         }
+    }
+    // `ServerTileGenerator.generate_hazard`: a hazard is a selectable that arrives locked.
+    if spawns.locked_percent > 0 && rng(run) % 100 < spawns.locked_percent {
+        return Ok(category_tile(run, spec, 400)? + TILE_LOCK_DELTA);
     }
     let roll = rng(run) % 100;
     if spec.wildcard_percent > 0 && roll < spec.wildcard_percent {
@@ -1865,7 +1991,7 @@ fn gravity(
     spec: &Type8BoardSpec,
     out: &mut Type8Outcome,
     game_id: i32,
-    powerup_definitions: &[Type8PowerupDefinition],
+    spawns: Spawns<'_>,
 ) -> io::Result<()> {
     // AS2 scans columns right-to-left and holes bottom-to-top; the earliest
     // queued replacement ends lowest among the new top rows of that column.
@@ -1901,7 +2027,7 @@ fn gravity(
             if run.tile_queue.len() < QUEUE_MIN {
                 let mut add = Vec::new();
                 for _ in 0..QUEUE_BATCH {
-                    add.push(random_tile(run, spec, true, powerup_definitions)?);
+                    add.push(random_tile(run, spec, true, spawns)?);
                 }
                 run.tile_queue.extend(&add);
                 message(
@@ -1923,7 +2049,7 @@ fn collect_fall(
     game_id: i32,
     x: usize,
     y: usize,
-    powerup_definitions: &[Type8PowerupDefinition],
+    spawns: Spawns<'_>,
 ) -> io::Result<()> {
     if !in_board(x, y, spec) || column_span(spec, x).map(|(_, bottom)| bottom) != Some(y) {
         return Err(invalid("mining fall outside the bottom row"));
@@ -1972,8 +2098,8 @@ fn collect_fall(
         game_id,
         &format!("OnLevelEventMsg\t21\t{COLLECTABLE_SCORE}\t3"),
     )?;
-    gravity(run, spec, out, game_id, powerup_definitions)?;
-    settle_after_collect(run, spec, out, game_id, powerup_definitions)
+    gravity(run, spec, out, game_id, spawns)?;
+    settle_after_collect(run, spec, out, game_id, spawns)
 }
 
 /// ORIGINAL `GameLevel.HandleCollected` through `HandleSelectableTile`: every
@@ -2021,7 +2147,7 @@ fn settle_after_collect(
     spec: &Type8BoardSpec,
     out: &mut Type8Outcome,
     game_id: i32,
-    powerup_definitions: &[Type8PowerupDefinition],
+    spawns: Spawns<'_>,
 ) -> io::Result<()> {
     let complete = spec
         .goals
@@ -2037,7 +2163,7 @@ fn settle_after_collect(
         }
         message(out, run.instance_id, game_id, "OnStopLevel\t1\ttrue")?;
     } else if !has_move(run, spec) {
-        initialize_board(run, spec, out, game_id, true, powerup_definitions)?;
+        initialize_board(run, spec, out, game_id, true, spawns)?;
     }
     Ok(())
 }
@@ -2105,7 +2231,7 @@ fn validate_chain(
         if !run.idle[i] {
             return Err(invalid("mining chain tile is not idle"));
         }
-        let v = run.board[i];
+        let v = unlocked_value(run.board[i]);
         if v == TILE_WILDCARD {
             previous = Some((x, y));
             continue;
@@ -2134,13 +2260,14 @@ fn validate_chain(
 fn apply_powerup_action(
     run: &mut Type8Run,
     spec: &Type8BoardSpec,
-    definitions: &[Type8PowerupDefinition],
+    spawns: Spawns<'_>,
     index: u16,
     list: &str,
     out: &mut Type8Outcome,
     game_id: i32,
 ) -> io::Result<()> {
-    let Some(definition) = definitions
+    let Some(definition) = spawns
+        .powerups
         .iter()
         .find(|definition| definition.value == index)
     else {
@@ -2165,9 +2292,9 @@ fn apply_powerup_action(
         TILE_POWERUP_SHUFFLE => shuffle_tiles(run, spec, &points, power, out, game_id)?,
         _ => return Err(invalid("unsupported mining action")),
     }
-    gravity(run, spec, out, game_id, definitions)?;
+    gravity(run, spec, out, game_id, spawns)?;
     if !has_move(run, spec) {
-        initialize_board(run, spec, out, game_id, true, definitions)?;
+        initialize_board(run, spec, out, game_id, true, spawns)?;
     }
     Ok(())
 }
@@ -2364,7 +2491,18 @@ fn shatter(
 }
 
 fn is_selectable(value: u16) -> bool {
-    (TILE_SELECTABLE_START..TILE_SELECTABLE_START + 100).contains(&value)
+    (TILE_SELECTABLE_START..TILE_SELECTABLE_START + 100).contains(&unlocked_value(value))
+}
+
+/// A locked selectable (`500..=599`).
+fn is_locked(value: u16) -> bool {
+    (TILE_LOCKED_START..TILE_LOCKED_START + 100).contains(&value)
+}
+
+/// The value a tile matches as: a locked tile matches its own selectable value
+/// (`ServerTile.getValue`; only the network value carries the lock).
+fn unlocked_value(value: u16) -> u16 {
+    if is_locked(value) { value - TILE_LOCK_DELTA } else { value }
 }
 
 fn board_index(spec: &Type8BoardSpec, position: (usize, usize)) -> usize {
@@ -2493,7 +2631,7 @@ fn neighbour(
 /// wildcard, and all non-wildcard values are equal. A pure-wildcard path is legal.
 fn chain_values_match(values: [u16; 3]) -> bool {
     let mut colour = None;
-    for value in values {
+    for value in values.map(unlocked_value) {
         if value == TILE_WILDCARD {
             continue;
         }
@@ -2858,7 +2996,8 @@ mod shape_tests {
         run.board[GRID + 12] = TILE_EMPTY;
         run.tile_queue[..2].copy_from_slice(&[403, 402]);
         let mut out = Type8Outcome::default();
-        gravity(&mut run, &spec, &mut out, 18, &[]).unwrap();
+        let spawns = Spawns { powerups: &[], locked_percent: 0 };
+        gravity(&mut run, &spec, &mut out, 18, spawns).unwrap();
 
         // Column 12 scans first, so it takes the first queued tile.
         assert_eq!(run.board[GRID + 12], 403);

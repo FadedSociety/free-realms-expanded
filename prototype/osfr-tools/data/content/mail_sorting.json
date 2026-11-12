@@ -1,5 +1,12 @@
 {
   "schema_version": 1,
+  "powerup_definitions": [
+    {"value": 950, "spawn_chance": 25, "duration": 0, "power": 6},
+    {"value": 951, "spawn_chance": 25, "duration": 0, "power": 4},
+    {"value": 952, "spawn_chance": 25, "duration": 0, "power": 6},
+    {"value": 953, "spawn_chance": 25, "duration": 0, "power": 12}
+  ],
+  "locked_percent": 5,
   "game_id": 376,
   "profile_id": 4,
   "name_id": 102030,
@@ -122,6 +129,7 @@
     },
     {
       "game_id": 378,
+      "locked_percent": 6,
       "name_id": 102036,
       "description_id": 35611,
       "icon_id": 911,
@@ -219,15 +227,16 @@
           "target": 1
         },
         {
-          "name_id": 92916,
+          "name_id": 102268,
           "category": 5,
           "counts": "locked",
-          "target": 4
+          "target": 14
         }
       ]
     },
     {
       "game_id": 379,
+      "locked_percent": 6,
       "name_id": 31336,
       "description_id": 35611,
       "icon_id": 911,
@@ -316,15 +325,16 @@
           "target": 1
         },
         {
-          "name_id": 92916,
+          "name_id": 102268,
           "category": 5,
           "counts": "locked",
-          "target": 4
+          "target": 14
         }
       ]
     },
     {
       "game_id": 380,
+      "locked_percent": 9,
       "name_id": 102038,
       "description_id": 35611,
       "icon_id": 911,
@@ -422,10 +432,10 @@
           "target": 1
         },
         {
-          "name_id": 92916,
+          "name_id": 102278,
           "category": 5,
           "counts": "locked",
-          "target": 4
+          "target": 22
         }
       ]
     },
@@ -625,10 +635,10 @@
     "wildcard_percent": 5,
     "collectable_percent": 0,
     "blocker_percent": 0,
-    "powerup_percent": 0,
+    "powerup_percent": 5,
     "meter_id": 0,
     "reconstructed_rules": true,
-    "rule_notice": "Recovered: game_mailsorting.gfx is the type-8 match-three movie of game_mining.gfx (identical server network, level, spawn, progression and bin classes; ConfigServer GAME_ID 12), the eight mail items are the client CodeStringMappings mailValue401..408 (Global.Text 40975, 117132-117135, 40979, 117137, 73630), the tutorial (Global.Text 19323) asks four items per level filled by chains of three or more, the six towns are client MiniGameData 376-381 with their name ids and description 35611, the preload list MailsortingAssets.txt and the movie from the client packs. Reconstructed (server tables never shipped): the four items per town, the farming board's shape, duration, quotas and spawn percentages, and the payout (no item; Postman XP per sorted run)."
+    "rule_notice": "Recovered: game_mailsorting.gfx is the type-8 match-three movie of game_mining.gfx (identical server network, level, spawn, progression and bin classes; ConfigServer GAME_ID 12), the eight mail items are the client CodeStringMappings mailValue401..408 (Global.Text 40975, 117132-117135, 40979, 117137, 73630), the tutorial (Global.Text 19323) asks four items per level filled by chains of three or more, the six towns are client MiniGameData 376-381 with their name ids and description 35611, the preload list MailsortingAssets.txt and the movie from the client packs. Reconstructed (server tables never shipped): the four items per town, the farming board's shape, duration, quotas and spawn percentages, and the payout (no item; Postman XP per sorted run). The Elite rows' locked-tile rates (R): Wugachug and Snowhill (378, 379) spawn 6% for their 14 unlocks and Shrouded Glade (380) 9% for its 22, so they can be met in the 180 s run; the other towns keep the file's 5%."
   },
   "objectives": [
     {

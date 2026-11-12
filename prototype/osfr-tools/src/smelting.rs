@@ -136,6 +136,10 @@ pub struct Smelting {
     recipes: HashMap<String, Recipe>,
     state: SmeltingState,
     results_presented: bool,
+    /// `minigame_rewards.json` from the content directory; empty without it (C4, C9).
+    rewards: Arc<crate::minigame::MinigameRewards>,
+    /// The player's gender for the wheel's wearable slots, set before a start (0 shows all).
+    wearer: i32,
 }
 
 impl Smelting {
@@ -169,6 +173,8 @@ impl Smelting {
             recipes,
             state,
             results_presented: false,
+            rewards: Arc::new(crate::minigame::MinigameRewards::load(directory)?),
+            wearer: 0,
         })
     }
     pub fn state(&self) -> &SmeltingState {
@@ -526,6 +532,12 @@ impl Smelting {
                 out.completed = true;
                 out.replies = vec![payload_packet_with_game(id, "OnGameWonMsg", game_id)?];
                 out.replies.extend(results(a, true, game_id));
+                // The wheel's slot goes out with the results, ahead of 39/19, and pays with the
+                // craft (C4).
+                if let Some(wheel) = self.wheel_packet(a.instance_id, game_id) {
+                    crate::minigame::insert_before_close(&mut out.replies, wheel);
+                }
+                out.payout = self.win_payout(a.instance_id);
                 self.results_presented = true;
             }
             ["FRServer_GameLost", score] | ["FRServer_GameQuit", score] => {
@@ -566,6 +578,34 @@ impl Smelting {
         Ok(out)
     }
 
+    /// The player's gender (1 boy, 2 girl), so the next craft's wheel shows and lands on what
+    /// they can wear. 0 shows every slot.
+    pub fn set_wearer(&mut self, gender: i32) {
+        self.wearer = gender;
+    }
+
+    /// The selected recipe's wheel as this wearer sees it.
+    fn wheel(&self) -> Option<crate::minigame::Wheel> {
+        let recipe = self.rewards.recipe(self.recipe_key())?;
+        Some(recipe.wheel.for_wearer(self.wearer)).filter(crate::minigame::Wheel::shows)
+    }
+
+    /// A won craft's coins and wheel slot; `None` for a recipe the table does not list.
+    fn win_payout(&self, instance_id: i32) -> Option<crate::minigame::WinPayout> {
+        let recipe = self.rewards.recipe(self.recipe_key())?;
+        let mut payout = crate::minigame::WinPayout { coins: recipe.coins, ..Default::default() };
+        if let Some(prize) = self.wheel().and_then(|wheel| wheel.prize(instance_id)) {
+            payout.add_prize(&prize);
+        }
+        Some(payout)
+    }
+
+    /// 39/45 for a won craft whose recipe has a wheel.
+    fn wheel_packet(&self, instance_id: i32, game_id: i32) -> Option<Vec<u8>> {
+        let prize = self.wheel()?.prize(instance_id)?;
+        Some(crate::minigame::wheel_land_packet(instance_id, game_id, &prize))
+    }
+
     fn info_packet(&self, id: i32) -> Vec<u8> {
         // Shared MiniGameInfo format: native FUN_009bdd70, corroborated PR76.
         let c = &self.content;
@@ -583,7 +623,11 @@ impl Smelting {
             b.extend(n.to_le_bytes());
         }
         b.push(0); // MembersOnly.
-        b.extend([0; 207]); // Three empty 69-byte RewardBundleBase records.
+        // The reward and member bundles stay empty; the preview lists the recipe's wheel (C4).
+        match self.wheel() {
+            Some(wheel) => b.extend(wheel.offer_bundles()),
+            None => b.extend([0; 207]),
+        }
         b.extend(0_i32.to_le_bytes()); // No inline objective rows.
         b.extend([1; 5]);
         // Native FUN_009beb70 passes this field to the asset-list preloader.

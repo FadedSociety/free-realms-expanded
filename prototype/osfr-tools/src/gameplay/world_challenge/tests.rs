@@ -381,6 +381,21 @@ fn a_delivery_walks_to_the_named_people_and_pays_the_jobs_rate() {
     );
 }
 
+/// C9 (B3): a row whose source records its own XP (`pays_own_xp`, the wiki's figure) pays it in
+/// every job; a row without the flag pays the job's `activity_xp` rate, its own XP the fallback.
+#[test]
+fn a_row_with_its_own_wiki_xp_pays_it_not_the_jobs_rate() {
+    let game = ready(POSTMAN, DELIVERY);
+    let content = game.world_challenge.content.as_ref().unwrap();
+    let mut row = (**content.get(DELIVERY).unwrap()).clone();
+    row.xp = 12_345;
+    row.pays_own_xp = false;
+    let rate = game.activity_xp(game.challenge_profile(&row), row.xp);
+    assert_eq!(game.challenge_xp(&row), rate, "the job's rate");
+    row.pays_own_xp = true;
+    assert_eq!(game.challenge_xp(&row), 12_345, "the row's own XP, whatever the job's rate");
+}
+
 #[test]
 fn closing_the_start_screen_answers_on_the_leave_not_the_close() {
     let mut game = ready(ARCHER, ARCHER_TEST);

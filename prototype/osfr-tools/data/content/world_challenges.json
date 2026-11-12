@@ -187,9 +187,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 30,
+      "coins": 2,
       "xp": 27,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Urgent Missive' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_urgent_missive",
         "3 of 10 people have no drawn NPC and are left out (R)",
@@ -219,9 +220,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 10,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 10 from the fanbyte 'Pig Pen Panic' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_pig_pen_panic",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -251,9 +253,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Catch the Crate Thief!' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_catch_the_crate_thief",
         "goals read by hand from the wiki page (R)",
@@ -319,9 +322,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Noglash Delivery' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_noglash_delivery",
         "goals read by hand from the wiki page (R)",
@@ -386,9 +390,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
+      "coins": 1,
       "xp": 30,
       "source": [
+        "C9 2026-11-12: coins 1 from the fanbyte 'Nooklings' Deliveries' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_nooklings_deliveries",
         "recipients: the 3 nearest drawn NPCs (R)",
@@ -417,9 +422,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 3,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 3 from the fanbyte 'Snowmen on the Loose!' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_snowmen_on_the_loose",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -521,9 +527,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Feed the Ducks' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_feed_the_ducks",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -588,9 +595,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 70,
+      "coins": 2,
       "xp": 45,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Merry Vale Party Flyers' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_merry_vale_party_flyers",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -620,9 +628,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 60,
+      "coins": 2,
       "xp": 41,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'The Nightmare Before Filming' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_the_nightmare_before_filming",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -652,9 +661,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Robgoblin Recycling Program' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_robgoblin_recycling_program",
         "Find all the scattered fliers: checked model for 'Find all the scattered fliers'",
@@ -783,9 +793,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
+      "coins": 7,
       "xp": 30,
       "source": [
+        "C9 2026-11-12: coins 7 from the fanbyte 'Can You Deliver' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_can_you_deliver",
         "Deliver Mail to the Addresses: mailbox model",
@@ -814,9 +825,11 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
-      "xp": 30,
+      "coins": 26,
+      "xp": 101,
+      "pays_own_xp": true,
       "source": [
+        "C9 2026-11-12: coins 26 and xp 101 from the fanbyte 'Mail Marksman' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_mail_marksman",
         "Deliver Mail to the Addresses: mailbox model",
@@ -845,9 +858,11 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
-      "xp": 30,
+      "coins": 26,
+      "xp": 101,
+      "pays_own_xp": true,
       "source": [
+        "C9 2026-11-12: coins 26 and xp 101 from the fanbyte 'Ditch the Doggies' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_ditch_the_doggies",
         "Deliver Mail to the Addresses: mailbox model",
@@ -881,9 +896,11 @@
         }
       ],
       "bonuses": [],
-      "coins": 70,
-      "xp": 43,
+      "coins": 26,
+      "xp": 103,
+      "pays_own_xp": true,
       "source": [
+        "C9 2026-11-12: coins 26 and xp 103 from the fanbyte 'Scattered Mail' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_scattered_mail",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -954,9 +971,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 70,
+      "coins": 23,
       "xp": 43,
       "source": [
+        "C9 2026-11-12: coins 23 from the fanbyte 'Bixie Bud Blitz' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_bixie_bud_blitz",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1058,9 +1076,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 45,
+      "coins": 23,
       "xp": 37,
       "source": [
+        "C9 2026-11-12: coins 23 from the fanbyte 'Merry Vale Package Pickup' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_merry_vale_package_pickup",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1197,9 +1216,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 60,
+      "coins": 23,
       "xp": 39,
       "source": [
+        "C9 2026-11-12: coins 23 from the fanbyte 'Invitation Investigation' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_invitation_investigation",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1229,9 +1249,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 45,
+      "coins": 19,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 19 from the fanbyte 'Sasparilla Sprint' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_sasparilla_sprint",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1266,9 +1287,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 70,
+      "coins": 28,
       "xp": 43,
       "source": [
+        "C9 2026-11-12: coins 28 from the fanbyte 'Beware of Dogs' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_beware_of_dogs",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1329,9 +1351,11 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
-      "xp": 30,
+      "coins": 26,
+      "xp": 101,
+      "pays_own_xp": true,
       "source": [
+        "C9 2026-11-12: coins 26 and xp 101 from the fanbyte 'Running the Route' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_running_the_route",
         "Deliver Mail to the Addresses: mailbox model",
@@ -1360,9 +1384,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 23,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 23 from the fanbyte 'PCA Takedown' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_pca_takedown",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1501,9 +1526,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 60,
+      "coins": 3,
       "xp": 39,
       "source": [
+        "C9 2026-11-12: coins 3 from the fanbyte 'Crystal Collection' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_crystal_collection",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1723,9 +1749,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 3,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 3 from the fanbyte 'A Race Against Grime' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_a_race_against_grime",
         "goals read by hand from the wiki page (R)",
@@ -1871,9 +1898,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 60,
+      "coins": 3,
       "xp": 43,
       "source": [
+        "C9 2026-11-12: coins 3 from the fanbyte 'Combo Challenge' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_combo_challenge",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1903,9 +1931,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 60,
+      "coins": 2,
       "xp": 39,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Mudpie!' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_mudpie",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -1939,9 +1968,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
+      "coins": 2,
       "xp": 31,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Shift Swap' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_shift_swap",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -2069,9 +2099,10 @@
           "within_seconds": 50
         }
       ],
-      "coins": 45,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Guest of Honor' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_guest_of_honor",
         "goals read by hand from the wiki page (R)",
@@ -2103,9 +2134,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 45,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Stopping the Sabotage' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_stopping_the_sabotage",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -2140,9 +2172,10 @@
           "within_seconds": 80
         }
       ],
-      "coins": 40,
+      "coins": 3,
       "xp": 33,
       "source": [
+        "C9 2026-11-12: coins 3 from the fanbyte 'Making Amends' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_making_amends",
         "kind, counts, timer: community fork Challenges.json (R)",
@@ -2488,9 +2521,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
+      "coins": 1,
       "xp": 30,
       "source": [
+        "C9 2026-11-12: coins 1 from the fanbyte 'Fireworks Frenzy!' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_fireworks_frenzy",
         "Collect five Piles of Fireworks: the fireworks model (R)",
@@ -2557,9 +2591,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
+      "coins": 2,
       "xp": 30,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'The Truant List' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_the_truant_list",
         "Truant Druids: the male fairy druid body the named truants use (R); radius from their spawns 48 to 112 m from Tilda",
@@ -2588,9 +2623,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 40,
+      "coins": 19,
       "xp": 30,
       "source": [
+        "C9 2026-11-12: coins 19 from the fanbyte 'Seaside Mail Delivery' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_seaside_mail_delivery",
         "Deliver the mail: mailbox model, six addresses (R)",
@@ -2637,8 +2673,10 @@
       ],
       "bonuses": [],
       "coins": 40,
-      "xp": 30,
+      "xp": 138,
+      "pays_own_xp": true,
       "source": [
+        "C9 2026-11-12: xp 138 from the fanbyte 'Self Promotion' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_self_promotion (Cillian, Ranger Ricardo, Assistant Archy)",
         "giver: Amber Violet, the wiki's start at the barrel next to her",
@@ -2708,9 +2746,10 @@
         }
       ],
       "bonuses": [],
-      "coins": 50,
+      "coins": 2,
       "xp": 35,
       "source": [
+        "C9 2026-11-12: coins 2 from the fanbyte 'Helping Hand' primary goal (fanbyte harvest lab/references/fanbyte-wiki-20261102); a value the page leaves blank stays (R)",
         "names, icon, difficulty: client MiniGameData",
         "goals: wiki fr_minigame_helping_hand (the guard dogs are not modelled)",
         "Stolen Parts: car parts model, five (R)",

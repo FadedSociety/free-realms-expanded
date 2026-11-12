@@ -1344,7 +1344,7 @@ impl Gameplay {
             soccer_content,
             soccer: None,
             chess,
-            checkers: crate::checkers::CheckersTable::fresh()?,
+            checkers: crate::checkers::CheckersTable::fresh()?.with_rewards(crate::minigame::MinigameRewards::load(npc_content)?),
             music,
             sword,
             spot,

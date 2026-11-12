@@ -599,11 +599,14 @@ fn play_a_paid_win(fixture: &Fixture, xp: u32, ticket: &str) -> (Gateway, Vec<Ve
     (gateway, packets, now)
 }
 
-/// L927: a won match pays the Soccer Star's `activity_xp` (72, `job_xp_curve.json`). L936: entering the
+/// L927: a won match pays the Soccer Star's `activity_xp` (`job_xp_curve.json`; C9: the wiki's 99). L936: entering the
 /// match unlocks and switches into Soccer Star, so a character who did not have the job is paid too.
 #[test]
 fn a_won_match_pays_the_soccer_stars_activity_xp_with_or_without_the_job_before() {
-    for (unlocked, paid) in [(vec![52], Some(72)), (vec![], Some(72))] {
+    let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    let rate = osfr_tools::profiles::Profiles::load(&release, None).unwrap().activity_xp(52);
+    assert!(rate.is_some_and(|xp| xp > 0), "the Soccer Star pays a match");
+    for (unlocked, paid) in [(vec![52], rate), (vec![], rate)] {
         let fixture = Fixture::new();
         let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
         fs::copy(

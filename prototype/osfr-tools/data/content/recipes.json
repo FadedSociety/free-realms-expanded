@@ -34,7 +34,7 @@
         "definition_id": 21832,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -57,8 +57,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Briarmelon Surprise' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -169,7 +169,7 @@
         "definition_id": 21812,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -193,7 +193,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -304,7 +304,7 @@
         "definition_id": 21831,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -327,8 +327,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Candied Briarmelon' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -439,7 +439,7 @@
         "definition_id": 21813,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -463,7 +463,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -574,7 +574,7 @@
         "definition_id": 21828,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -598,7 +598,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -713,7 +713,7 @@
         "definition_id": 21819,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -737,7 +737,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -848,7 +848,7 @@
         "definition_id": 21816,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -872,7 +872,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Candied Briarmelon's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -983,7 +983,7 @@
         "definition_id": 21809,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1007,7 +1007,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1118,7 +1118,7 @@
         "definition_id": 21817,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1141,8 +1141,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Gummyfruit Topped Sundae' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1253,7 +1253,7 @@
         "definition_id": 21829,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1276,8 +1276,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Honey Roasted Moonbean' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1388,7 +1388,7 @@
         "definition_id": 21823,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1412,7 +1412,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Candied Briarmelon's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1523,7 +1523,7 @@
         "definition_id": 21833,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1546,8 +1546,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Moonbean Mousse' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1658,7 +1658,7 @@
         "definition_id": 21830,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1681,8 +1681,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Moonbean Sundae Sweettreat' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1793,7 +1793,7 @@
         "definition_id": 21814,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1817,7 +1817,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -1928,7 +1928,7 @@
         "definition_id": 21827,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -1952,7 +1952,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Candied Briarmelon's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -2063,7 +2063,7 @@
         "definition_id": 21822,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2087,7 +2087,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -2198,7 +2198,7 @@
         "definition_id": 21824,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 53,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2221,8 +2221,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 53 stars, the primary goal on the fanbyte 'Royal Stew Du Jour' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -2333,7 +2333,7 @@
         "definition_id": 21834,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2357,7 +2357,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -2468,7 +2468,7 @@
         "definition_id": 21825,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2491,8 +2491,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because the native recipe row has no XP field and no per-recipe XP was recovered."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Seared Stainberry' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "client",
@@ -2599,7 +2599,7 @@
         "definition_id": 21818,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2623,7 +2623,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -2734,7 +2734,7 @@
         "definition_id": 21815,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2758,7 +2758,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -2869,7 +2869,7 @@
         "definition_id": 21826,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -2893,7 +2893,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3004,7 +3004,7 @@
         "definition_id": 21807,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 5,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3027,8 +3027,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 5 stars, the primary goal on the fanbyte 'Spiralmint Steak' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3139,7 +3139,7 @@
         "definition_id": 21821,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3163,7 +3163,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3274,7 +3274,7 @@
         "definition_id": 21820,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3297,8 +3297,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Starnut Sundae' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3431,7 +3431,7 @@
           "evidence": "(R) Game row 46 selection, one-food quantity and XP zero are local defaults."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 25,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3454,8 +3454,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 25 stars, the primary goal on the fanbyte 'Strong Arm Stew' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3566,7 +3566,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3590,7 +3590,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3701,7 +3701,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3725,7 +3725,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3836,7 +3836,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3860,7 +3860,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -3971,7 +3971,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -3995,7 +3995,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4110,7 +4110,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4134,7 +4134,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4253,7 +4253,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4277,7 +4277,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4388,7 +4388,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4412,7 +4412,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4523,7 +4523,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4547,7 +4547,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4658,7 +4658,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4682,7 +4682,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4793,7 +4793,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4817,7 +4817,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -4928,7 +4928,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -4952,7 +4952,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5063,7 +5063,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5087,7 +5087,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5198,7 +5198,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5221,8 +5221,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 8."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 230 stars, the primary goal on the fanbyte 'Quick Shot Bow' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5333,7 +5333,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5357,7 +5357,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5468,7 +5468,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5492,7 +5492,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5603,7 +5603,7 @@
           "evidence": "(R) Local forging transaction supplies counts, output tint, one output and minigame selection."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5627,7 +5627,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5738,7 +5738,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5762,7 +5762,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -5877,7 +5877,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -5901,7 +5901,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6020,7 +6020,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6044,7 +6044,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6155,7 +6155,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6179,7 +6179,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6290,7 +6290,7 @@
           "evidence": "(R) Output tint, one output and the sample board."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 230,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6314,7 +6314,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6417,7 +6417,7 @@
           "evidence": "(R) XP remains unknown; the client recipe row has no XP field."
         }
       ],
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6440,8 +6440,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Copper Bar' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6510,7 +6510,7 @@
         "definition_id": 21789,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 55,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6533,8 +6533,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 55 stars, the primary goal on the fanbyte 'Gold Bar' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6621,7 +6621,7 @@
         "definition_id": 21787,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 53,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6644,8 +6644,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 53 stars, the primary goal on the fanbyte 'Iron Bar' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6732,7 +6732,7 @@
         "definition_id": 21788,
         "count": 1
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6755,8 +6755,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Silver Bar' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6843,7 +6843,7 @@
         "definition_id": 21786,
         "count": 5
       },
-      "experience_points": 0,
+      "experience_points": 50,
       "field_sources": {
         "key": {
           "kind": "reconstructed",
@@ -6866,8 +6866,8 @@
           "evidence": "Client MiniGameData and job guide: crafting TYPE 9."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Default 0 XP because wiki is silent and the native recipe row has no XP field."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 50 stars, the primary goal on the fanbyte 'Tin Bar' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable."
         },
         "output.definition_id": {
           "kind": "legacy",
@@ -6985,7 +6985,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910208 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910208 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7054,7 +7054,7 @@
         "definition_id": 910208,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 50
     },
     {
       "key": "chef.tangy_tumtumnip_mishmash",
@@ -7128,7 +7128,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 21811 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 50 stars, Briarmelon Surprise's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 21811 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7197,7 +7197,7 @@
         "definition_id": 21811,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 50
     },
     {
       "key": "chef.three_leaf_omelette",
@@ -7266,8 +7266,8 @@
           "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 21810 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
         },
         "experience_points": {
-          "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 21810 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
+          "kind": "wiki",
+          "evidence": "C9 2026-11-12: 5 stars, the primary goal on the fanbyte 'Three Leaf Omelette' page (fanbyte harvest lab/references/fanbyte-wiki-20261102). Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 21810 (MinProfileRank 1); ingredients, minigame and XP follow Strong Arm Stew (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7336,7 +7336,7 @@
         "definition_id": 21810,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 5
     },
     {
       "key": "blacksmith.archer_s_forged_bow_of_advantage",
@@ -7394,7 +7394,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910200 (MinProfileRank 8); ingredients, minigame and XP follow Quick Shot Bow (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910200 (MinProfileRank 8); ingredients, minigame and XP follow Quick Shot Bow (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7463,7 +7463,7 @@
         "definition_id": 910200,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.brawler_s_forged_hammer_of_challenge",
@@ -7521,7 +7521,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910201 (MinProfileRank 4); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910201 (MinProfileRank 4); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7602,7 +7602,7 @@
         "definition_id": 910201,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.chrome_drakeling",
@@ -7660,7 +7660,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910202 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910202 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7729,7 +7729,7 @@
         "definition_id": 910202,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.chrome_mini_rocklar",
@@ -7787,7 +7787,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910203 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910203 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7856,7 +7856,7 @@
         "definition_id": 910203,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.drake_statue",
@@ -7914,7 +7914,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910204 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910204 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -7983,7 +7983,7 @@
         "definition_id": 910204,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.dust_storm_flair_shard",
@@ -8049,7 +8049,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910205 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910205 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8118,7 +8118,7 @@
         "definition_id": 910205,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.dwarf_biker_firework",
@@ -8176,7 +8176,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910206 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910206 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8245,7 +8245,7 @@
         "definition_id": 910206,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.fast_blast_bow",
@@ -8315,7 +8315,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30310 (MinProfileRank 4); ingredients, minigame and XP follow Quick Shot Bow (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30310 (MinProfileRank 4); ingredients, minigame and XP follow Quick Shot Bow (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8384,7 +8384,7 @@
         "definition_id": 30310,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.field_support_scalpel",
@@ -8442,7 +8442,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30330 (MinProfileRank 4); ingredients, minigame and XP follow Trauma Support Shockrod (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30330 (MinProfileRank 4); ingredients, minigame and XP follow Trauma Support Shockrod (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8511,7 +8511,7 @@
         "definition_id": 30330,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.first_aid_hammer",
@@ -8569,7 +8569,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30270 (MinProfileRank 1); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30270 (MinProfileRank 1); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8650,7 +8650,7 @@
         "definition_id": 30270,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.focus_fire_bow",
@@ -8708,7 +8708,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30370 (MinProfileRank 8); ingredients, minigame and XP follow Quick Shot Bow (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30370 (MinProfileRank 8); ingredients, minigame and XP follow Quick Shot Bow (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8777,7 +8777,7 @@
         "definition_id": 30370,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.frenzy_fighter_hammer",
@@ -8847,7 +8847,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30520 (MinProfileRank 16); ingredients, minigame and XP follow Strong Scrapper Hammer (rank 15, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30520 (MinProfileRank 16); ingredients, minigame and XP follow Strong Scrapper Hammer (rank 15, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -8916,7 +8916,7 @@
         "definition_id": 30520,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.hammer_fist",
@@ -8974,7 +8974,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910207 (MinProfileRank 1); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910207 (MinProfileRank 1); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9055,7 +9055,7 @@
         "definition_id": 910207,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.manguana_statue",
@@ -9129,7 +9129,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910209 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910209 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9198,7 +9198,7 @@
         "definition_id": 910209,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.medic_s_forged_saw_of_promise",
@@ -9256,7 +9256,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910210 (MinProfileRank 8); ingredients, minigame and XP follow Lunar Enchanted Wand (rank 5, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910210 (MinProfileRank 8); ingredients, minigame and XP follow Lunar Enchanted Wand (rank 5, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9325,7 +9325,7 @@
         "definition_id": 910210,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.medic_s_forged_scalpel_of_vitals",
@@ -9383,7 +9383,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910211 (MinProfileRank 1); ingredients, minigame and XP follow Trauma Support Shockrod (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910211 (MinProfileRank 1); ingredients, minigame and XP follow Trauma Support Shockrod (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9452,7 +9452,7 @@
         "definition_id": 910211,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.mini_mech",
@@ -9510,7 +9510,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910212 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910212 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9579,7 +9579,7 @@
         "definition_id": 910212,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.motorsmith_boots",
@@ -9637,7 +9637,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910213 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910213 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9706,7 +9706,7 @@
         "definition_id": 910213,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.motorsmith_gloves",
@@ -9764,7 +9764,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910214 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910214 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9833,7 +9833,7 @@
         "definition_id": 910214,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.motorsmith_pants",
@@ -9891,7 +9891,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910215 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910215 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -9960,7 +9960,7 @@
         "definition_id": 910215,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.motorsmith_tank_top",
@@ -10018,7 +10018,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910216 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910216 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10087,7 +10087,7 @@
         "definition_id": 910216,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.motorsmith_tool_belt",
@@ -10145,7 +10145,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910217 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910217 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10214,7 +10214,7 @@
         "definition_id": 910217,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.motorsmith_welding_mask",
@@ -10272,7 +10272,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910218 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910218 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10341,7 +10341,7 @@
         "definition_id": 910218,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.ninja_s_forged_sword_of_purge",
@@ -10399,7 +10399,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910219 (MinProfileRank 1); ingredients, minigame and XP follow Biting Mongoose Blade (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910219 (MinProfileRank 1); ingredients, minigame and XP follow Biting Mongoose Blade (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10468,7 +10468,7 @@
         "definition_id": 910219,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.power_crystal_flair_shard",
@@ -10526,7 +10526,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910220 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910220 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10595,7 +10595,7 @@
         "definition_id": 910220,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.robgoblin_archway",
@@ -10653,7 +10653,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910221 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910221 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10722,7 +10722,7 @@
         "definition_id": 910221,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.skullz_wall_hanging",
@@ -10780,7 +10780,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910222 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910222 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10849,7 +10849,7 @@
         "definition_id": 910222,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.spirited_protector_axe",
@@ -10907,7 +10907,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30320 (MinProfileRank 4); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30320 (MinProfileRank 4); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -10976,7 +10976,7 @@
         "definition_id": 30320,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.striped_mini_mech",
@@ -11034,7 +11034,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910223 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910223 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11103,7 +11103,7 @@
         "definition_id": 910223,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.sturdy_summersaber",
@@ -11161,7 +11161,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 37003 (MinProfileRank 16); ingredients, minigame and XP follow Biting Mongoose Blade (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 37003 (MinProfileRank 16); ingredients, minigame and XP follow Biting Mongoose Blade (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11230,7 +11230,7 @@
         "definition_id": 37003,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.sunny_potion",
@@ -11288,7 +11288,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910224 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910224 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11357,7 +11357,7 @@
         "definition_id": 910224,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.tempest_woven_wand",
@@ -11415,7 +11415,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30480 (MinProfileRank 12); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30480 (MinProfileRank 12); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11484,7 +11484,7 @@
         "definition_id": 30480,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.valiant_guardian_cudgel",
@@ -11542,7 +11542,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30260 (MinProfileRank 1); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30260 (MinProfileRank 1); ingredients, minigame and XP follow Stalwart Protector Hammer (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11623,7 +11623,7 @@
         "definition_id": 30260,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.void_woven_wand",
@@ -11693,7 +11693,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30541 (MinProfileRank 16); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 30541 (MinProfileRank 16); ingredients, minigame and XP follow Eclipse Infused Wand (rank 10, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11762,7 +11762,7 @@
         "definition_id": 30541,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.warrior_s_forged_axe_of_boon",
@@ -11820,7 +11820,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910225 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910225 (MinProfileRank 1); ingredients, minigame and XP follow Intrepid Protector Axe (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -11889,7 +11889,7 @@
         "definition_id": 910225,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     },
     {
       "key": "blacksmith.wizard_s_forged_wand_of_cunning",
@@ -11947,7 +11947,7 @@
         },
         "experience_points": {
           "kind": "reconstructed",
-          "evidence": "(R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910226 (MinProfileRank 4); ingredients, minigame and XP follow Power Charmed Wand (rank 1, same family, at or below this rank)."
+          "evidence": "(R) C9 2026-11-12: 230 stars, Quick Shot Bow's primary goal (fanbyte harvest); this recipe's page records none. Tunable. Earlier: (R) Reconstructed 2026-11-07 (the recipe rows were server side): output and rank are the client's item 910226 (MinProfileRank 4); ingredients, minigame and XP follow Power Charmed Wand (rank 1, same family, at or below this rank)."
         },
         "ingredients[0].definition_id": {
           "kind": "reconstructed",
@@ -12016,7 +12016,7 @@
         "definition_id": 910226,
         "count": 1
       },
-      "experience_points": 0
+      "experience_points": 230
     }
   ]
 }
