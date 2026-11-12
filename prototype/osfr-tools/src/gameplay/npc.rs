@@ -195,6 +195,10 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
+        // B2: every shop path below counts `per_player` limits for this character.
+        if let Some(shop) = self.npc_coin_shop.as_mut() {
+            shop.set_buyer(character.guid);
+        }
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Overworld enemies answer interact/select with the encounter's Attack
         // menu; Legacy also lists their GUIDs as ordinary NPCs (run 002115).

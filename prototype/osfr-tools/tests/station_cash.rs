@@ -933,6 +933,11 @@ fn every_priced_housing_fixture_lists_under_housing_at_its_item_cost() {
         if row["boombox"] == true {
             continue;
         }
+        // B2: a fixture B3 added after the round-70 capture has no definition in this suite's
+        // inventory, so this shop cannot list it; `tests/event_shops.rs` lists it from the release.
+        if !shop.inventory().has_definition(*id as i32) {
+            continue;
+        }
         listed += 1;
         let listing = shop
             .sc_catalogue()
@@ -978,7 +983,9 @@ fn every_priced_housing_fixture_lists_under_housing_at_its_item_cost() {
         }
     }
     assert!(
-        listed >= 1_100 && moved >= 1_100,
+        // B2 (event audits): about forty fixtures went back to the Coin Shop (fanbyte: Coin Shop
+        // only), so a little over 1,050 stay.
+        listed >= 1_050 && moved >= 1_050,
         "the Housing category lists the original fixtures, not the old handful: {listed} listed, {moved} moved"
     );
     // The unpriced fixture (no Legacy Cost) is untouched and refused without changing anything.
@@ -1176,10 +1183,13 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     // their Legacy coin price (the 16 wiki-priced fixtures are already in the 55), plus the Mystery
     // Key L094 lists at the wiki's 180 SC, minus the 7 Balloon Animal pet rows P-shops-marketplace
     // made earn-only (an event reward, ROADMAP item 10), plus the two booster scrolls
-    // P-games-window lists for the minigame offer.
+    // P-games-window lists for the minigame offer. B2 (the event audits): +58 net, the event rows
+    // that sell for Station Cash in their source shop, less those that went back to the Coin
+    // Shop, became rewards or are earn-only chest rides (B3's new rows are not in this suite's
+    // inventory).
     assert_eq!(
         decoded.len(),
-        1_924,
+        1_982,
         "the shipped ride, deed, wiki item, boombox, saddle and housing fixture count"
     );
     assert!(
@@ -1434,8 +1444,9 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         );
         assert_eq!(rides.get(&item), Some(&price_of(row)), "ride {item} price");
     }
+    // B2: the Reindeer and Santa's Sleigh-mobile are earn-only now (Snow Days chest rides).
     assert_eq!(
-        tagged, 82,
+        tagged, 80,
         "every listed ride and the T528 saddle name their final-era type"
     );
     assert_eq!(
@@ -1473,9 +1484,10 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         expected(true),
         "Boombox lists exactly the tagged boomboxes at their SC prices"
     );
+    // B2 (summer_camp audit): the Totem Boombox joined them.
     assert_eq!(
         boomboxes.len(),
-        11,
+        12,
         "the wiki-documented Marketplace boomboxes"
     );
     assert!(
@@ -2012,8 +2024,10 @@ fn catalogue_navigation_packets_match_the_client_readers() {
 
 /// T495: Realms Roll (wiki 1000 SC, 250 listed) is a boombox the Marketplace sells. The
 /// reward-only boomboxes (TCG and Mystery Chest prizes) have no Marketplace price on the wiki.
+/// B2 (summer_camp audit): the Totem Boombox 8185 left this list; fanbyte's Summer Camp
+/// category sells it in the Marketplace (Event Goodies), so it now lists at an (R) price.
 const REALMS_ROLL: i32 = 1_180;
-const REWARD_ONLY_BOOMBOXES: [i32; 4] = [8_185, 35_759, 56_774, 69_825];
+const REWARD_ONLY_BOOMBOXES: [i32; 3] = [35_759, 56_774, 69_825];
 
 fn buy_item(tracking: u32, item: i32) -> Vec<u8> {
     order_packet(3, tracking, item as u32, STORE, 1, "", "", "", "0")
@@ -2478,5 +2492,6 @@ fn boombox_rows_match_the_catalogue_and_their_wiki_pages() {
             "{item}: the wiki page does not say {price} SC"
         );
     }
-    assert_eq!(tagged, 11);
+    // B2 (summer_camp audit): the Totem Boombox joined the Marketplace boomboxes.
+    assert_eq!(tagged, 12);
 }

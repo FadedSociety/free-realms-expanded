@@ -74,18 +74,18 @@
     "named_video_stock_claims_without_item_id": 0,
     "named_content_stock_claims": 5,
     "item_names_considered": 1139,
-    "items_resolved": 2529,
+    "items_resolved": 2528,
     "items_ambiguous": 20,
     "items_unmatched": 82,
     "unique_name_id_matches_missing_from_startup": 0,
     "no_exact_name_id_match": 81,
     "member_only_flags_recovered": 0,
-    "items_with_stores_price": 2529,
+    "items_with_stores_price": 2528,
     "mapped_items_without_stores_price": 0,
     "vendors_with_runtime_item_ids": 165,
     "t797_pet_kit_rows": 326,
     "reconstructed_vendors": 67,
-    "reconstructed_stock_rows": 592
+    "reconstructed_stock_rows": 591
   },
   "vendors": [
     {
@@ -90870,7 +90870,6 @@
       },
       "item_ids": [
         340,
-        9095,
         69115,
         1191
       ],
@@ -90908,43 +90907,6 @@
           "price_source": {
             "kind": "stores.json",
             "item_id": 340,
-            "scope": "(R) reference price, not captured NPC quote"
-          },
-          "runtime_eligible": true
-        },
-        {
-          "item_id": 9095,
-          "item_name": "Sanctuary Birthday T-Shirt",
-          "source_stock_name": "Sanctuary Birthday T-Shirt",
-          "item_name_id": 19959,
-          "purchase_price_coins": 370,
-          "member_price_coins": 333,
-          "sell_price_coins": 37,
-          "member_only": null,
-          "price_basis": "(R) stores.json reference price (client item table Cost or stated analogue, tag RVS where this slice added it); no captured retail NPC quote.",
-          "source_tags": [
-            "client",
-            "catalogue",
-            "stores",
-            "reconstructed"
-          ],
-          "stock_source": {
-            "kind": "reconstructed",
-            "claim": "(R) P-vendor-stock: stocked by analogy with the vendor's named trade, its zone's level and the sibling vendors' shelves; see the record's reconstruction note."
-          },
-          "item_source": {
-            "kind": "item_table",
-            "path": "data/release/item-table.json",
-            "name_id": 19959,
-            "english_text": "Sanctuary Birthday T-Shirt",
-            "class": 1,
-            "min_profile_rank": 1,
-            "item_type": 1,
-            "mapping_policy": "(R) the client item table row by id; the runtime Inventory::presentation of this definition yields the same name id, so the 165/10 row renders a name."
-          },
-          "price_source": {
-            "kind": "stores.json",
-            "item_id": 9095,
             "scope": "(R) reference price, not captured NPC quote"
           },
           "runtime_eligible": true

@@ -175,7 +175,9 @@ fn every_ride_is_sold_by_a_vendor_inside_the_price_bounds() {
             .iter()
             .filter(|listing| listing.ride)
             .count(),
-        8
+        // B2 (snow_days audit): the Reindeer and Santa's Sleigh-mobile come only from the Snow
+        // Days Mystery Chest, so they joined the earn-only rides.
+        10
     );
 }
 
@@ -303,8 +305,8 @@ fn buying_each_ride_with_coins_grants_it() {
         })
         .copied()
         .collect();
-    // Every ride but the 8 earn-only ones is listed.
-    assert_eq!(listings.len(), 81);
+    // Every ride but the 10 earn-only ones is listed (B2: the two Snow Days chest rides).
+    assert_eq!(listings.len(), 79);
     let mut expected = 1_000_000u32;
     for (index, listing) in listings.iter().enumerate() {
         let ride = catalog

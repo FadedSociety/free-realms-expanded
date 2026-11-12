@@ -1000,6 +1000,14 @@ impl Catalogue {
         &self.listings
     }
 
+    /// B2: this catalogue without the listings whose item `hide` names (event stock out of
+    /// season). Earn-only rows stay: they are rewards, not stock.
+    pub fn without(&self, hide: impl Fn(i32) -> bool) -> Self {
+        let mut view = self.clone();
+        view.listings.retain(|listing| !hide(listing.item_id));
+        view
+    }
+
     /// The 66/7 tree nodes the store shows: Rides, Boombox and the T657 item shelves at the top
     /// level, then the ride sub-categories under Rides (T526).
     fn tree_nodes(&self) -> Vec<TreeNode> {

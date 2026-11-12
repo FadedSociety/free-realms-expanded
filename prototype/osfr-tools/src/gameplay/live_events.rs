@@ -95,6 +95,7 @@ impl Gameplay {
     /// the journal. Idempotent: it reads state, not transitions, so a character that was
     /// offline when an event ended is cleaned on its first tick.
     fn apply_events(&mut self, unix_ms: u64, out: Option<&mut Outcome>) {
+        self.follow_shop_events(unix_ms);
         let watch = &self.event_watch;
         let mut open = watch.admin_open.clone();
         let mut ended = BTreeSet::new();
@@ -151,6 +152,22 @@ impl Gameplay {
                 }));
             }
         }
+    }
+
+    /// B2: event shop stock follows the same gate. The shop hears which of its `live_event` keys
+    /// run (`EventCalendar::is_running`), each run named by the instant it ends (`shop_stock`'s
+    /// per-event counters), so a closed event's rows leave the Coin Shop, the vendors and the
+    /// Marketplace together. No calendar, no word: the shop then sells everything (as before).
+    fn follow_shop_events(&mut self, unix_ms: u64) {
+        let (Some(areas), Some(shop)) = (&self.event_watch.seasons, self.npc_coin_shop.as_mut())
+        else {
+            return;
+        };
+        let calendar = areas.calendar();
+        shop.follow_events(|key| {
+            (calendar.is_running(key, areas, unix_ms))
+                .then(|| calendar.running_until(key, areas, unix_ms).unwrap_or(0))
+        });
     }
 
     /// gifts-codes: whether calendar event `key` runs now for this session, through the shared

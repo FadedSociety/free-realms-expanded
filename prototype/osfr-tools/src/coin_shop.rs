@@ -20,6 +20,7 @@
 
 use crate::inventory::Inventory;
 use crate::le;
+use crate::shop_stock;
 use crate::station_cash::{self, RowKind, StoreRow, Wallet};
 use serde::Deserialize;
 use std::{
@@ -90,6 +91,12 @@ pub struct StoreCatalogue {
     /// without rides, or a fixture directory) means no listing is a ride.
     #[serde(skip)]
     rides: Option<Arc<crate::mounts::MountCatalog>>,
+    /// B2: item -> the `live_event` that alone sells it, built by `load`.
+    #[serde(skip)]
+    seasonal: BTreeMap<i32, String>,
+    /// B2: item -> its limited-stock counters (`shop_stock`), built by `load`.
+    #[serde(skip)]
+    limits: BTreeMap<i32, shop_stock::Limit>,
 }
 
 fn default_buy_back_window() -> usize {
@@ -130,6 +137,69 @@ struct StoreItem {
     /// maps it to a Marketplace shelf; absent or 0 falls back to the item type.
     #[serde(default)]
     category_id: Option<u32>,
+    /// B2: sold only while this `event_calendar.json` event runs (the event-repeat contract's
+    /// `live_event`); every coin, vendor and Marketplace path asks [`CoinShop::sale_block`] or
+    /// the in-season Marketplace view.
+    #[serde(default)]
+    live_event: Option<String>,
+    /// B2: units one run of `live_event` sells to everyone, shared by the row's `stock_group`.
+    #[serde(default)]
+    stock_per_event: Option<u32>,
+    /// B2: units one character may buy per run (per row group).
+    #[serde(default)]
+    per_player: Option<u32>,
+    /// B2: rows sharing one stock counter (every colour and gender row of an outfit).
+    #[serde(default)]
+    stock_group: Option<String>,
+}
+
+/// B2: the season tags and the limited-stock groups of `items`, refusing a malformed one: a key
+/// is 1..=32 ASCII graphic bytes, a cap is at least 1, a per-event cap needs an event, a group
+/// needs a cap, and every row of one group carries the same event and caps.
+fn event_index(
+    items: &[StoreItem],
+) -> io::Result<(BTreeMap<i32, String>, BTreeMap<i32, shop_stock::Limit>)> {
+    let key_ok =
+        |key: &str| (1..=32).contains(&key.len()) && key.bytes().all(|b| b.is_ascii_graphic());
+    let mut seasonal = BTreeMap::new();
+    let mut limits = BTreeMap::new();
+    let mut groups: BTreeMap<String, shop_stock::Limit> = BTreeMap::new();
+    for item in items {
+        let event = item.live_event.clone();
+        let limited = item.stock_per_event.is_some() || item.per_player.is_some();
+        if event.as_deref().is_some_and(|key| !key_ok(key))
+            || item.stock_per_event == Some(0)
+            || item.per_player == Some(0)
+            || (item.stock_per_event.is_some() && event.is_none())
+            || item
+                .stock_group
+                .as_deref()
+                .is_some_and(|group| !limited || !key_ok(group))
+        {
+            return Err(invalid("invalid store item event or stock fields"));
+        }
+        if let Some(key) = &event {
+            seasonal.insert(item.item_id, key.clone());
+        }
+        if !limited {
+            continue;
+        }
+        let limit = shop_stock::Limit {
+            group: (item.stock_group.clone()).unwrap_or_else(|| format!("item:{}", item.item_id)),
+            event,
+            per_event: item.stock_per_event,
+            per_player: item.per_player,
+        };
+        if groups
+            .entry(limit.group.clone())
+            .or_insert_with(|| limit.clone())
+            != &limit
+        {
+            return Err(invalid("store rows of one stock group disagree"));
+        }
+        limits.insert(item.item_id, limit);
+    }
+    Ok((seasonal, limits))
 }
 
 impl StoreCatalogue {
@@ -192,6 +262,7 @@ impl StoreCatalogue {
                 return Err(invalid("invalid store item entry"));
             }
         }
+        (catalogue.seasonal, catalogue.limits) = event_index(&catalogue.items)?;
         Ok(catalogue)
     }
 
@@ -252,6 +323,19 @@ pub struct CoinShop {
     open_stock: Vec<i32>,
     /// F3: the Marketplace bundles of the Station Cash window last opened (66/42, a display).
     open_bundles: Vec<u32>,
+    /// B2: every Marketplace listing, in season or not; `sc_catalogue` is the in-season view
+    /// every order, list, display and offer reads.
+    sc_all: Arc<station_cash::Catalogue>,
+    /// B2: the running events among the store's `live_event` keys, each with its run (the
+    /// instant it ends, `shop_stock`), as the session's calendar last said (`follow_events`).
+    /// `None` until it says: a shop no calendar drives (a bare fixture) sells everything.
+    open_events: Option<BTreeMap<String, u64>>,
+    /// B2: the character buying, for `per_player` limits (`set_buyer`).
+    buyer: u64,
+    /// B2: where the limited-stock counters live; `None` uses the realm file beside the account
+    /// store, or this session's memory when the realm has none (R).
+    stock_file: Option<PathBuf>,
+    stock_memory: shop_stock::Ledger,
 }
 
 /// F3: what the client's coin store already knows from the login 165/1 (`00c75fc0`): the static
@@ -316,6 +400,7 @@ impl CoinShop {
             }),
         )?;
         let sc_wallet = Wallet::restore(Some(wallet), sc_catalogue.config());
+        let sc_all = Arc::new(sc_catalogue);
         Ok(Self {
             inventory_content: inventory_content.to_path_buf(),
             inventory,
@@ -324,7 +409,12 @@ impl CoinShop {
             // (R) The caller must set the verified account flag after construction.
             is_member: false,
             sc_wallet,
-            sc_catalogue: Arc::new(sc_catalogue),
+            sc_catalogue: sc_all.clone(),
+            sc_all,
+            open_events: None,
+            buyer: 0,
+            stock_file: None,
+            stock_memory: shop_stock::Ledger::default(),
             // `load` fills this from the NPC content; `new` alone keeps earning off.
             sc_earn: None,
             pet_items,
@@ -341,6 +431,163 @@ impl CoinShop {
     /// F3: the login 165/1 lists this session's client was sent (the gateway's startup snapshot).
     pub fn set_store_lists(&mut self, lists: StoreLists) {
         self.store_lists = Arc::new(lists);
+    }
+
+    /// B2: follow the session's event calendar. `run_of(key)` is the running run of event
+    /// `key` (`EventCalendar::is_running`, named by the instant it ends) or `None` when it is not
+    /// running. A closed event's stock leaves the coin shop, every vendor window and the
+    /// Marketplace view (a store screen sees it at its next 66/10). True when anything moved.
+    pub fn follow_events(&mut self, run_of: impl Fn(&str) -> Option<u64>) -> bool {
+        let keys: BTreeSet<&String> = self.catalogue.seasonal.values().collect();
+        let open: BTreeMap<String, u64> = (keys.into_iter())
+            .filter_map(|key| run_of(key).map(|run| (key.clone(), run)))
+            .collect();
+        if self.open_events.as_ref() == Some(&open) {
+            return false;
+        }
+        self.open_events = Some(open);
+        self.sc_catalogue = Arc::new(self.sc_all.without(|item| !self.in_season(item)));
+        true
+    }
+
+    /// B2: whether `item_id` may be sold now: untagged, or its event is running (or no calendar
+    /// drives this shop).
+    pub fn in_season(&self, item_id: i32) -> bool {
+        match (self.catalogue.seasonal.get(&item_id), &self.open_events) {
+            (Some(key), Some(open)) => open.contains_key(key),
+            _ => true,
+        }
+    }
+
+    /// B2: the character whose buys `per_player` limits count.
+    pub fn set_buyer(&mut self, character_guid: u64) {
+        self.buyer = character_guid;
+    }
+
+    /// B2: keep the limited-stock counters in `path` (tests; the realm default is the file
+    /// beside the account store).
+    pub fn set_stock_file(&mut self, path: PathBuf) {
+        self.stock_file = Some(path);
+    }
+
+    fn stock_path(&self) -> Option<PathBuf> {
+        (self.stock_file.clone()).or_else(|| {
+            crate::redeem_codes::store().map(|codes| codes.with_file_name(shop_stock::FILE))
+        })
+    }
+
+    /// B2: `item_id`'s limit and the run it counts in, `None` for an unlimited row.
+    fn limit_now(&self, item_id: i32) -> Option<(shop_stock::Limit, u64)> {
+        let limit = self.catalogue.limits.get(&item_id)?.clone();
+        let run = (limit.event.as_ref())
+            .and_then(|key| self.open_events.as_ref()?.get(key).copied())
+            .unwrap_or(0);
+        Some((limit, run))
+    }
+
+    /// B2: why `quantity` more of `item_id` may not be sold to this buyer now (stock or share
+    /// spent), read without taking anything.
+    pub fn stock_refusal(
+        &self,
+        item_id: i32,
+        quantity: u32,
+    ) -> io::Result<Option<shop_stock::Refusal>> {
+        let Some((limit, run)) = self.limit_now(item_id) else {
+            return Ok(None);
+        };
+        let ledger = match self.stock_path() {
+            Some(path) => shop_stock::Ledger::load(&path)?,
+            None => self.stock_memory.clone(),
+        };
+        Ok(ledger.check(&limit, run, self.buyer, quantity).err())
+    }
+
+    /// B2: one sale of `quantity` units of `item_id` under its stock limit. An unlimited row runs
+    /// `sell` as it is. A limited one holds the counters' lock across the sale: a spent stock or
+    /// share answers `refused` and sells nothing; otherwise the units are counted (and saved)
+    /// before `sell` runs and handed back when it reports no sale, so a crash never oversells.
+    fn limited<T>(
+        &mut self,
+        item_id: i32,
+        quantity: u32,
+        refused: impl FnOnce(&mut Self, shop_stock::Refusal) -> T,
+        sell: impl FnOnce(&mut Self) -> io::Result<(T, bool)>,
+    ) -> io::Result<T> {
+        let Some((limit, run)) = self.limit_now(item_id) else {
+            return Ok(sell(self)?.0);
+        };
+        let path = self.stock_path();
+        // A counters file another writer holds, or cannot be read or written, sells nothing: the
+        // buy is refused as busy (the session goes on), never sold uncounted.
+        let opened: io::Result<_> = (path.as_deref())
+            .map(|path| {
+                let lock = crate::account_store::AccountStoreLock::acquire_within(
+                    path,
+                    crate::account_store::STAFF_LOCK_WAIT,
+                )?;
+                Ok((lock, shop_stock::Ledger::load(path)?))
+            })
+            .transpose();
+        let (_lock, mut ledger) = match opened {
+            Ok(Some((lock, ledger))) => (Some(lock), ledger),
+            Ok(None) => (None, std::mem::take(&mut self.stock_memory)),
+            Err(_) => return Ok(refused(self, shop_stock::Refusal::Busy)),
+        };
+        let buyer = self.buyer;
+        let outcome = match ledger.check(&limit, run, buyer, quantity) {
+            Err(refusal) => Ok(refused(self, refusal)),
+            Ok(()) => {
+                ledger.take(&limit, run, buyer, quantity);
+                match path.as_deref().map_or(Ok(()), |path| ledger.save(path)) {
+                    Err(_) => {
+                        ledger.give_back(&limit, run, buyer, quantity);
+                        Ok(refused(self, shop_stock::Refusal::Busy))
+                    }
+                    Ok(()) => match sell(self) {
+                        Ok((out, true)) => Ok(out),
+                        other => {
+                            ledger.give_back(&limit, run, buyer, quantity);
+                            // ponytail: a give-back that cannot be saved leaves the counter one
+                            // unit high (it never oversells); an operator can fix the file.
+                            if let Some(Err(error)) = path.as_deref().map(|path| ledger.save(path))
+                            {
+                                eprintln!(
+                                    "shop stock give-back for item {item_id} not saved: {error}"
+                                );
+                            }
+                            other.map(|(out, _)| out)
+                        }
+                    },
+                }
+            }
+        };
+        if path.is_none() {
+            self.stock_memory = ledger;
+        }
+        outcome
+    }
+
+    /// B2: one Station Cash order (66/3, or a display window's 66/43) under its bundle's stock
+    /// limit; `Err` is the spent stock or share, with nothing placed. Every listing's bundle id is
+    /// its item id (`station_cash::Catalogue::build`), and an order holds one unit.
+    fn limited_order(
+        &mut self,
+        order: &station_cash::OrderRequest,
+        place: impl FnOnce(&mut Self) -> station_cash::OrderOutcome,
+    ) -> io::Result<Result<station_cash::OrderOutcome, shop_stock::Refusal>> {
+        let item_id = (order.details.first())
+            .and_then(|detail| i32::try_from(detail.bundle_id).ok())
+            .unwrap_or(0);
+        self.limited(
+            item_id,
+            1,
+            |_, refusal| Err(refusal),
+            |shop| {
+                let outcome = place(shop);
+                let sold = outcome.changed && outcome.result_code == station_cash::ORDER_SUCCESS;
+                Ok((Ok(outcome), sold))
+            },
+        )
     }
 
     /// F3: a merchant window (165/10) listing `stock` was just sent; its 165/8 follows.
@@ -382,22 +629,35 @@ impl CoinShop {
             coupon: false,
             gift: false,
         };
-        let outcome = station_cash::place_order(
-            &self.sc_catalogue,
-            &mut self.sc_wallet,
-            &mut self.inventory,
-            &order,
-            self.bag_capacity,
-            busy,
-            grant_lot,
-        );
+        // B2: a spent stock says so in chat before the window's own 66/44 result; a counters lock
+        // the realm cannot take sells nothing, like any other refused order.
+        let (outcome, said) = match self.limited_order(&order, |shop| {
+            station_cash::place_order(
+                &shop.sc_catalogue,
+                &mut shop.sc_wallet,
+                &mut shop.inventory,
+                &order,
+                shop.bag_capacity,
+                busy,
+                grant_lot,
+            )
+        }) {
+            Ok(Ok(outcome)) => (outcome, None),
+            Ok(Err(refusal)) => (
+                Default::default(),
+                Some(crate::chat::system(refusal.message())),
+            ),
+            Err(_) => (Default::default(), None),
+        };
         let paid = outcome.changed && outcome.result_code == station_cash::ORDER_SUCCESS;
         Some(CoinShopOutcome {
             result_code: if paid { RESULT_SUCCESS } else { RESULT_FAILURE },
-            replies: vec![
-                merchant_buy_result_packet(paid),
-                station_cash::wallet_packet(self.sc_wallet.balance),
-            ],
+            replies: (said.into_iter())
+                .chain([
+                    merchant_buy_result_packet(paid),
+                    station_cash::wallet_packet(self.sc_wallet.balance),
+                ])
+                .collect(),
             transaction_id: tracking_id,
             changed: outcome.changed,
             granted: outcome.granted,
@@ -640,6 +900,10 @@ impl CoinShop {
     /// A definition that exists but cannot be read is refused here instead of becoming an error.
     /// The reason stays server-side: `buy_once` answers with the existing invalid-item reply.
     pub fn sale_block(&self, item_id: i32) -> Option<&'static str> {
+        // B2: event stock out of season leaves the window and the buy alike.
+        if !self.in_season(item_id) {
+            return Some("event stock is out of season");
+        }
         let item_type = match self.inventory.presentation(item_id) {
             Ok(presentation) => presentation.item_type,
             Err(_) => return Some("item definition type is unreadable"),
@@ -653,7 +917,39 @@ impl CoinShop {
         }
     }
 
+    /// Every coin buy (165/4, the 66/43 vendor buy, `buy`), under the row's stock limit (B2). A
+    /// spent stock or share is the invalid-quantity failure, with a chat line first that says so
+    /// (the 66/43 path swaps the last reply for its own result).
     fn buy_once(
+        &mut self,
+        transaction_id: u32,
+        item_id: i32,
+        quantity: u32,
+        merchant_id: u64,
+    ) -> io::Result<CoinShopOutcome> {
+        self.limited(
+            item_id,
+            quantity,
+            |shop, refusal| {
+                let code = match refusal {
+                    shop_stock::Refusal::Busy => RESULT_SERVICE_UNAVAILABLE,
+                    _ => RESULT_INVALID_QUANTITY,
+                };
+                let mut out =
+                    shop.failure(1, code, transaction_id, item_id, quantity, 0, merchant_id);
+                out.replies
+                    .insert(0, crate::chat::system(refusal.message()));
+                out
+            },
+            |shop| {
+                let out = shop.buy_unlimited(transaction_id, item_id, quantity, merchant_id)?;
+                let sold = out.changed && out.result_code == RESULT_SUCCESS;
+                Ok((out, sold))
+            },
+        )
+    }
+
+    fn buy_unlimited(
         &mut self,
         transaction_id: u32,
         item_id: i32,
@@ -1356,7 +1652,25 @@ impl CoinShop {
                         &order,
                         grant_lot,
                     );
-                    (outcome.result_code, outcome.replies)
+                    // B2: a spent stock or share fails the preview too, and says why.
+                    let bundle = order.details.first().map_or(0, |detail| detail.bundle_id);
+                    let item = i32::try_from(bundle).unwrap_or(0);
+                    let refusal =
+                        (self.stock_refusal(item, 1)).unwrap_or(Some(shop_stock::Refusal::Busy));
+                    match refusal {
+                        Some(refusal) if outcome.result_code == station_cash::ORDER_SUCCESS => (
+                            station_cash::ORDER_FAILURE,
+                            vec![
+                                crate::chat::system(refusal.message()),
+                                station_cash::preview_packet(
+                                    order.tracking_id,
+                                    station_cash::ORDER_FAILURE,
+                                    0,
+                                ),
+                            ],
+                        ),
+                        _ => (outcome.result_code, outcome.replies),
+                    }
                 }
             }
             3 => {
@@ -1373,15 +1687,33 @@ impl CoinShop {
                 } else {
                     let order = station_cash::decode_order(inner, false)?;
                     transaction_id = order.tracking_id;
-                    let outcome = station_cash::place_order(
-                        &self.sc_catalogue,
-                        &mut self.sc_wallet,
-                        &mut self.inventory,
-                        &order,
-                        self.bag_capacity,
-                        busy,
-                        grant_lot,
-                    );
+                    // B2: a spent stock or share is the order's failure, its text saying why.
+                    let outcome = match self.limited_order(&order, |shop| {
+                        station_cash::place_order(
+                            &shop.sc_catalogue,
+                            &mut shop.sc_wallet,
+                            &mut shop.inventory,
+                            &order,
+                            shop.bag_capacity,
+                            busy,
+                            grant_lot,
+                        )
+                    })? {
+                        Ok(outcome) => outcome,
+                        Err(refusal) => station_cash::OrderOutcome {
+                            result_code: station_cash::ORDER_FAILURE,
+                            replies: vec![
+                                crate::chat::system(refusal.message()),
+                                station_cash::order_packet(
+                                    order.tracking_id,
+                                    station_cash::ORDER_FAILURE,
+                                    refusal.message(),
+                                    0,
+                                ),
+                            ],
+                            ..Default::default()
+                        },
+                    };
                     changed = outcome.changed;
                     granted = outcome.granted;
                     let mut replies = outcome.replies;
