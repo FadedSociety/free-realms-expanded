@@ -504,15 +504,17 @@ impl Catalogue {
     }
 
     /// The one place the catalogue is assembled, at startup and on `realm reload battles`:
-    /// battles, then chess, soccer and card-game rows. Every append is validated together
-    /// (ids unique and nonzero, at most `MAX_ACTIVITIES`), so both callers publish the same list.
+    /// battles (the loaded engine's `EncounterEngine::portal_battles`: the open dungeon doors,
+    /// then the `field_battles.json` rows), then chess, soccer and card-game rows. Every append is
+    /// validated together (ids unique and nonzero, at most `MAX_ACTIVITIES`), so both callers
+    /// publish the same list.
     pub fn assemble(
-        battles: Option<&Path>,
+        battles: Option<Vec<Activity>>,
         chess: Option<&ChessService>,
         soccer: Option<&Arc<soccer_entry::Content>>,
         cards: Option<&Arc<card_game::Content>>,
     ) -> io::Result<Self> {
-        let base = battles.map_or_else(|| Ok(Self::default()), Self::load)?;
+        let base = battles.map_or_else(|| Ok(Self::default()), Self::new)?;
         let chess = chess.map(ChessService::activities).unwrap_or_default();
         let soccer = soccer.map(|content| content.portal_rows());
         let mut catalogue = base

@@ -15,7 +15,7 @@ use osfr_tools::{
 use std::{fs, path::PathBuf};
 
 #[path = "common/content_copy.rs"]
-#[allow(dead_code)] // this suite only links and overlays; the helper also has `copy_tree`
+#[allow(dead_code)] // this suite copies, links and overlays; not every helper is used
 mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
@@ -26,13 +26,16 @@ const BATTLE: u32 = 96;
 /// Brawler, the combat job the opening gives every player.
 const COMBAT_JOB: i32 = 43;
 
+/// The opening reference, with the release item table beside it as a release ships one: the
+/// reference's own `inventory.json` lacks one of the Brawler's battle-96 prizes, and the card and
+/// the prize preflight read the player's job's wheel (rc-0137).
 fn content() -> PathBuf {
-    std::env::var_os("OSFR_ACTIVITY_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/rust-opening-cooking-original-assets")
-        })
+    if let Some(dir) = std::env::var_os("OSFR_ACTIVITY_CONTENT") {
+        return PathBuf::from(dir);
+    }
+    static DIR: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    (DIR.get_or_init(|| content_copy::opening_with_release_items("activity-portal-route-content")))
+        .clone()
 }
 
 fn character() -> CharacterState {

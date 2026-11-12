@@ -31,10 +31,12 @@ use std::{collections::BTreeSet, fs, path::PathBuf};
 mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/encounter_card.rs"]
+mod encounter_card;
 use field_battle_fixture::{
-    Fixture, active_profile, arena_spawned, assert_returned, available, battle, battles, chat_text,
-    content_dir, details, go, i32_at, interact, melee, move_to, npc_select, quest_counts, send,
-    unframe, won_flag,
+    Fixture, active_profile, arena_spawned, assert_returned, available, battle, battles, chat,
+    chat_text, content_dir, details, go, i32_at, interact, melee, move_to, npc_select,
+    quest_counts, send, unframe, won_flag,
 };
 
 const BRAWLER: i32 = 43;
@@ -90,9 +92,10 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
         .count();
     assert_eq!(
         (table.entrances.len(), doors, table.scenes.len()),
-        (56, 35, 46),
-        "35 dungeon doors and 21 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
-         Legacy spawner huts, two of them in scenes of their own)"
+        (55, 35, 46),
+        "35 dungeon doors and 20 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
+         Legacy spawner huts, two of them in scenes of their own; rc-0137 holds the Troll \
+         Summoner starter, where battle 96's own marker now stands)"
     );
     for row in &table.entrances {
         let actor = spawners.iter().find(|actor| actor.0 == row.guid);
@@ -310,7 +313,6 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             "tanglewood_fort",
             "tavern_cellar",
             "tormented_spirits",
-            "troll_summoner_madness",
             "vulture_watch"
         ],
         "the entrances whose fight exists today; a new fight file opens its door by itself"
@@ -359,17 +361,23 @@ fn doors_stand_still_and_only_open_entrances_carry_the_marker() {
         "and still opens where it stands"
     );
 
-    // A developer reload of the battle file places every entrance again, once.
+    // A developer reload of the battle file places every entrance again, once. A row an
+    // entrance runs or counts as stands only as that entrance (rc-0137: the Troll Summoner
+    // stood twice).
+    let (battles, taken) = (field_battle_fixture::battles(), field_battle_fixture::entrance_rows());
+    let own = (battles["battles"].as_array().unwrap().iter())
+        .filter(|b| !taken.contains(&b["id"].as_u64().unwrap()))
+        .count();
     assert_eq!(
         engine.battle_spawners().len(),
-        11,
+        own,
         "the file's own markers stay apart"
     );
     assert_eq!(engine.entrance_spawners().len(), table.entrances.len());
     engine
         .reload_field_battles(&content_dir().join("field_battles.json"))
         .unwrap();
-    assert_eq!(engine.battle_spawners().len(), 11);
+    assert_eq!(engine.battle_spawners().len(), own);
     assert_eq!(engine.entrance_spawners().len(), table.entrances.len());
     assert_eq!(engine.entrance(hive.guid), Some((hive.encounter_id, true)));
     let growler = row(&table, "frostfang_growler");
@@ -672,9 +680,17 @@ fn the_bixie_hive_door_runs_the_whole_route() {
     let mut shown = base.clone();
     shown["id"] = json!(hive.encounter_id);
     field_battle_fixture::assert_start_screen(&card, &shown);
+    // rc-0137: the native client dropped the two-goal card (657 bytes, rows 21 bytes short), so
+    // Go did nothing. Read as the client reads it, the card ends on its last byte and opens the
+    // start screen with both goals: the main one, then the Bonus one with its four workers.
+    let read = encounter_card::read_card(&card);
+    assert!(!read.launch, "the start screen, not a refresh");
+    let goals: Vec<_> = (read.goals.iter()).map(|g| (g.key, g.category, g.counters)).collect();
+    assert_eq!(goals, [(16791, 0, [0, 0, 1, 0]), (430337, 4, [0, 0, 4, 0])]);
 
-    // Go: the job is switched, the live notice says so, and the zone is the hive.
-    let entered = send(&mut gateway, &go(&card), 500);
+    // Go, as the client sent it (trace 20261112T020333Z: id, instance, then 1 and 0): the job is
+    // switched, the live notice says so, and the zone is the hive.
+    let entered = send(&mut gateway, &client_go(&card), 500);
     assert!(entered.began_zoning, "{}", chat_text(&entered));
     assert_eq!(gateway.state().zone_id, scene.zone_id);
     let notice = packets(&entered.replies, [41, 0, 120, 0]);
@@ -700,6 +716,8 @@ fn the_bixie_hive_door_runs_the_whole_route() {
         .find(|f| Some(f.id) == hive.fight)
         .expect("the hive's fight ships");
     let ready = arena_spawned(&mut gateway, 600);
+    let refresh = packets(&ready.replies, [41, 0, 114, 0]);
+    assert!(encounter_card::read_card(refresh[0]).launch, "the zone-ready card refreshes the game");
     let key = |name: &str| fight.roster.iter().position(|s| s.key == name);
     let guid = |name: &str| fight.guid(key(name));
     let spot = |name: &str| fight.roster[key(name).unwrap()].spot;
@@ -708,6 +726,9 @@ fn the_bixie_hive_door_runs_the_whole_route() {
         .collect();
     assert!(spawned.contains(&guid("speaker")) && !spawned.contains(&guid("boss")));
     let mut now = 1_000;
+    // The route, not the fight: since the owner's x2 health and x1.5 hits (rc-0137) a fresh
+    // level-1 Brawler is knocked out in the hive's waves, so it walks the route in god mode.
+    send(&mut gateway, &chat("realm god"), now);
 
     // The bonus: each worker goes free with a talk (26/8) and says its thanks.
     for n in 1..=4 {
@@ -717,6 +738,7 @@ fn the_bixie_hive_door_runs_the_whole_route() {
         now += 300;
         let out = send(&mut gateway, &interact(guid(&worker)), now);
         assert!(said(&out.replies, guid(&worker), 130474), "worker {n} thanks the player");
+        assert!(panel_twins(&out.replies) > 0, "worker {n}: the bonus count on both lists");
     }
     // The Queen's call brings three waves; the quest that needs the hive waits.
     let mut heard = walk_to(&mut gateway, spot("speaker"), &mut now);
@@ -724,7 +746,8 @@ fn the_bixie_hive_door_runs_the_whole_route() {
         .filter(|&i| fight.roster[i].tags.iter().any(|t| t == "guards"))
         .map(|i| fight.guid(Some(i)))
         .collect();
-    for _ in 0..600 {
+    // Twice the swings since the owner doubled enemy health (rc-0137).
+    for _ in 0..1_200 {
         let targets: Vec<(u64, [f32; 3])> = (standing(&gateway).into_iter())
             .filter(|(g, _)| !guards.contains(g))
             .collect();
@@ -750,7 +773,7 @@ fn the_bixie_hive_door_runs_the_whole_route() {
     );
     // Drone Fauzz falls: Royal Honey counts now, and the exit opens.
     let mut replies = Vec::new();
-    for _ in 0..200 {
+    for _ in 0..400 {
         let Some((_, at)) = standing(&gateway).into_iter().find(|(g, _)| *g == guid("boss")) else {
             break;
         };
@@ -760,6 +783,8 @@ fn the_bixie_hive_door_runs_the_whole_route() {
     }
     assert_eq!(quest_counts(&gateway, ROYAL_HONEY), [1, 0], "Fauzz's honey, at the end");
     assert_eq!(won_flag(&replies), None, "no results before the exit");
+    // Drone Fauzz's fall meets the main goal on the card's record and on the Goals panel.
+    assert!(panel_twins(&replies) > 0, "the main goal met on both lists");
     // The exit door: the results card.
     replies.extend(walk_to(&mut gateway, fight.exit_spot(), &mut now));
     assert_eq!(won_flag(&replies), Some(1), "the results say won");
@@ -849,6 +874,326 @@ fn a_battle_starter_enters_its_scene_and_a_closed_one_refuses() {
         before,
         "a closed entrance changes nothing"
     );
+}
+
+/// Go (41/108) as the client sent it in the owner's recheck (trace 20261112T020333Z,
+/// `29006c00 cb320000 09000000 01000000 00000000`): the card's id and instance, then 1 and 0.
+fn client_go(card: &[u8]) -> Vec<u8> {
+    [&[41, 0, 108, 0], &card[4..12], &[1, 0, 0, 0, 0, 0, 0, 0][..]].concat()
+}
+
+/// The leave (41/109) as the client sent it: no encounter id, the run's instance (trace
+/// `29006d00 00000000 02000000`).
+fn client_leave(instance: i32) -> Vec<u8> {
+    [&[41, 0, 109, 0, 0, 0, 0, 0][..], &instance.to_le_bytes()].concat()
+}
+
+/// The BaseUi (47) or objective (45) rows with sub `sub` in one reply batch.
+fn rows(replies: &[Vec<u8>], family: u8, sub: u8) -> Vec<&[u8]> {
+    (replies.iter().map(|r| unframe(r)))
+        .filter(|p| p.len() >= 7 && p[..3] == [family, 0, sub])
+        .collect()
+}
+
+/// In one reply batch, every goal the card's records move (45/1, 45/2, 45/3) moves on the
+/// in-game Goals panel too (47/1 with the same total, 47/2 with the same count, 47/3), the
+/// panel's row first. Returns how many 45 rows it checked.
+fn panel_twins(replies: &[Vec<u8>]) -> usize {
+    let inner: Vec<&[u8]> = replies.iter().map(|r| unframe(r)).collect();
+    let mut checked = 0;
+    for (i, p) in inner.iter().enumerate() {
+        if p.len() < 7 || p[..2] != [45, 0] || !(1..=3).contains(&p[2]) {
+            continue;
+        }
+        let key = i32_at(p, 3);
+        let twin = (inner.iter())
+            .position(|q| q.len() >= 7 && q[..3] == [47, 0, p[2]] && i32_at(q, 3) == key)
+            .unwrap_or_else(|| panic!("45/{} {key} has no 47 row", p[2]));
+        assert!(twin < i, "the panel row comes first");
+        match p[2] {
+            1 => assert_eq!(i32_at(inner[twin], 22), i32_at(p, 7), "47/1 {key}: the record's total"),
+            2 => assert_eq!(i32_at(inner[twin], 7), i32_at(p, 7), "47/2 {key}: the record's count"),
+            _ => {}
+        }
+        checked += 1;
+    }
+    checked
+}
+
+/// Fight the run down: attack whatever stands, let the next wave come, until `exit` is drawn.
+fn fight_to_the_exit(gateway: &mut Gateway, exit: u64, now: &mut u64) -> Vec<Vec<u8>> {
+    let mut replies = Vec::new();
+    for _ in 0..900 {
+        if packets(&replies, [35, 0, 2, 0]).iter().any(|p| p[4..12] == exit.to_le_bytes()) {
+            return replies;
+        }
+        *now += 700;
+        let Some((target, at)) = standing(gateway).first().copied() else {
+            replies.extend(gateway.tick_at(*now).unwrap().replies);
+            continue;
+        };
+        replies.extend(walk_to(gateway, [at[0] + 1.5, at[1], at[2]], now));
+        *now += 700;
+        replies.extend(send(gateway, &melee(target), *now).replies);
+    }
+    panic!("the exit door never opened");
+}
+
+/// A fight file shipped beside the content.
+fn shipped_fight(id: u32) -> director::fight::Fight {
+    (director::load_dir(&content_dir()).unwrap().into_iter())
+        .find(|f| f.id == id)
+        .unwrap()
+}
+
+/// rc-0137 recheck (trace 20261112T020333Z): the owner's Frostfang Snarlers loaded the grass
+/// clearing (zone load 31/28, the 28-letter `sg_random_encounter_clearing`), every wolf wore the
+/// den's name, no Goals panel showed, and after the last wolf the owner left by the menu (41/109)
+/// with nothing paid. The 2014 video (5-IM2pBh2yY 01002) shows a snowy arena and "Goals (1)".
+/// Now: Snow Hill's arena, Frostfang Wolves and the Frostfang Alpha, the goal on the panel with
+/// its count, the Brawler's own wheel on the card, and the leave after the last wolf pays the win.
+#[test]
+fn the_snarlers_den_runs_in_snow_hill_and_leaving_after_the_last_wolf_pays_the_win() {
+    if !available() {
+        eprintln!("skipped: the private fixture is missing");
+        return;
+    }
+    let table = table();
+    let den = row(&table, "frostfang_snarlers");
+    let fight = shipped_fight(den.fight.unwrap());
+    let fixture = fixture_with_fights();
+    let (mut gateway, _) = fixture.session(den.at, 2903);
+    assert!(send(&mut gateway, &field_battle_fixture::switch_job(BRAWLER), 300).state_changed);
+    // The arena and the pay, not the fight: at the owner's x2 health and x1.5 hits (rc-0137) a
+    // fresh level-1 Brawler who walks past the hearts is knocked out by the ten wolves.
+    send(&mut gateway, &chat("realm god"), 350);
+    let card = details(&send(&mut gateway, &interact(den.guid), 400))
+        .expect("the click opens 41/114")
+        .to_vec();
+    let read = encounter_card::read_card(&card);
+    // "Knock out all Snarlers!": two, three and four wolves, and the Alpha.
+    let goals: Vec<_> = (read.goals.iter()).map(|g| (g.key, g.category, g.counters)).collect();
+    assert_eq!(goals, [(78093, 0, [0, 0, 10, 0])]);
+    let job_wheel = |job: i64| -> Vec<i32> {
+        (fight.rewards.wheel.iter())
+            .filter(|p| p["job"].as_i64() == Some(job))
+            .map(|p| p["item_id"].as_i64().unwrap() as i32)
+            .collect()
+    };
+    let shown: Vec<i32> = read.preview.items.iter().map(|i| i.0).collect();
+    assert_eq!(shown, job_wheel(i64::from(BRAWLER)), "the Brawler's wheel");
+    assert_ne!(shown, job_wheel(2), "not the Ninja's");
+    assert_eq!(read.preview.coins, fight.rewards.wheel_coins as i32, "and the coin slot");
+
+    let entered = send(&mut gateway, &client_go(&card), 500);
+    assert!(entered.began_zoning, "{}", chat_text(&entered));
+    assert!(
+        (packets(&entered.replies, [31, 0, 22, 0]).iter())
+            .any(|p| p[6..28] == *b"sh_random_encounter_01"),
+        "the zone load names Snow Hill's arena"
+    );
+    assert_eq!(gateway.state().zone_id, 1240);
+    let ready = arena_spawned(&mut gateway, 600);
+    let instance = i32_at(packets(&ready.replies, [41, 0, 114, 0])[0], 8);
+    assert_eq!(panel_twins(&ready.replies), 2, "the goal's row and count on both lists");
+
+    let mut now = 1_000;
+    let wheel: BTreeSet<i32> = job_wheel(i64::from(BRAWLER)).into_iter().collect();
+    let before = field_battle_fixture::economy(&gateway, &wheel);
+    let fought = fight_to_the_exit(&mut gateway, fight.guid(None), &mut now);
+    let ours: BTreeSet<u64> = (0..fight.roster.len()).map(|i| fight.guid(Some(i))).collect();
+    let names: BTreeSet<i32> = (packets(&fought, [35, 0, 2, 0]).into_iter())
+        .map(|p| parse_add_npc(p).unwrap())
+        .filter(|npc| ours.contains(&npc.actor_id) || npc.actor_id == fight.guid(None))
+        .map(|npc| npc.name_string_id)
+        .collect();
+    assert_eq!(names, BTreeSet::from([6468, 423045, 4826]), "Frostfang Wolves, the Alpha, the Exit");
+    assert!(rows(&fought, 47, 2).len() >= 10, "every knockout counted on the panel");
+    assert_eq!(won_flag(&fought), None, "the door is open, the results wait for it");
+
+    // The owner's way out: the leave, with the door open. The win is paid and the player goes home.
+    let left = send(&mut gateway, &client_leave(instance), now + 500);
+    assert!(left.began_zoning, "the leave goes home");
+    let after = field_battle_fixture::economy(&gateway, &wheel);
+    let prizes: u32 = after.prizes.values().sum::<u32>() - before.prizes.values().sum::<u32>();
+    let coins = after.coins - before.coins;
+    let pay = fight.rewards.coins;
+    assert!(
+        (prizes == 1 && coins == pay) || (prizes == 0 && coins == pay + fight.rewards.wheel_coins),
+        "one slot of the Brawler's wheel and the fight's coins: {prizes} prizes, {coins} coins"
+    );
+    // The wheel stops where the client stops it: the 39/45 read in `008e7930`'s order lands on
+    // the card's prize that was paid, or on the coin slot after them with the wheel's coins.
+    let landed = rows(&left.replies, 39, 45);
+    assert_eq!(landed.len(), 1, "the win's one wheel landing");
+    let landing = encounter_card::read_landing(landed[0]);
+    let slot = encounter_card::landing_slot(&read.preview, &landing)
+        .expect("the wheel stops on a slot the card showed");
+    let gained: Vec<i32> = (after.prizes.iter())
+        .filter(|(id, n)| **n > before.prizes.get(*id).copied().unwrap_or(0))
+        .map(|(id, _)| *id)
+        .collect();
+    match read.preview.items.get(slot) {
+        Some(item) => assert_eq!(gained, [item.0], "the prize the wheel stopped on was paid"),
+        None => assert_eq!(
+            (gained.len(), landing.coins),
+            (0, fight.rewards.wheel_coins as i32),
+            "the coin slot pays the wheel's coins"
+        ),
+    }
+}
+
+/// rc-0137 recheck: the owner clicked the old Petty Yetis marker (the wandering Yeti, guid
+/// 100001231000, trace 20261112T020333Z) and got the grass clearing (31/28) and three yetis 3 m
+/// apart that fell to one hit. Its row runs in Snow Hill's arena with its yetis far apart now.
+#[test]
+fn the_old_petty_yetis_marker_runs_in_snow_hill_with_its_yetis_apart() {
+    if !available() {
+        eprintln!("skipped: the private fixture is missing");
+        return;
+    }
+    let file = battles();
+    let row = battle(&file, 12310);
+    let marker = field_battle_fixture::position(&row["spawner"]["position"]);
+    let fixture = fixture_with_fights();
+    let (mut gateway, _) = fixture.session(marker, 2904);
+    assert!(send(&mut gateway, &field_battle_fixture::switch_job(BRAWLER), 300).state_changed);
+    let guid = row["spawner"]["guid"].as_u64().unwrap();
+    let card = details(&send(&mut gateway, &interact(guid), 400))
+        .expect("the click opens 41/114")
+        .to_vec();
+    assert_eq!(encounter_card::read_card(&card).id, 12310);
+    let entered = send(&mut gateway, &client_go(&card), 500);
+    assert!(entered.began_zoning, "{}", chat_text(&entered));
+    assert!(
+        (packets(&entered.replies, [31, 0, 22, 0]).iter())
+            .any(|p| p[6..28] == *b"sh_random_encounter_01"),
+        "the zone load names Snow Hill's arena"
+    );
+    assert_eq!(gateway.state().zone_id, 1240);
+    arena_spawned(&mut gateway, 600);
+    let yetis: Vec<[f32; 3]> = standing(&gateway).into_iter().map(|(_, at)| at).collect();
+    assert_eq!(yetis.len(), 3);
+    // The fork's first-wave spots for Petty Yetis! (8 to 29 m apart), not 3 m: one hit no longer
+    // reaches all three.
+    let mut apart = Vec::new();
+    for (i, a) in yetis.iter().enumerate() {
+        for b in &yetis[i + 1..] {
+            apart.push((a[0] - b[0]).hypot(a[2] - b[2]));
+        }
+    }
+    apart.sort_by(f32::total_cmp);
+    assert!(apart[0] > 7.5 && apart[2] > 25.0, "the yetis stand apart: {apart:?}");
+}
+
+/// rc-0137 recheck: in Hooligan Bullies the owner saw no Goals panel and no count; the trace
+/// has only the record's total (45/1 `2d000105240100 09000000`, key 74757, 9). The panel row and
+/// every knockout reach the Goals panel too now.
+#[test]
+fn the_hooligan_goal_shows_on_the_side_panel_with_its_count() {
+    if !available() {
+        eprintln!("skipped: the private fixture is missing");
+        return;
+    }
+    let table = table();
+    let hut = row(&table, "hooligan_bullies");
+    let fixture = fixture_with_fights();
+    let (mut gateway, _) = fixture.session(hut.at, 2905);
+    assert!(send(&mut gateway, &field_battle_fixture::switch_job(BRAWLER), 300).state_changed);
+    let card = details(&send(&mut gateway, &interact(hut.guid), 400))
+        .expect("the click opens 41/114")
+        .to_vec();
+    assert_eq!(encounter_card::read_card(&card).goals[0].counters, [0, 0, 9, 0]);
+    assert!(send(&mut gateway, &client_go(&card), 500).began_zoning);
+    let ready = arena_spawned(&mut gateway, 600);
+    let panel = rows(&ready.replies, 47, 1);
+    assert_eq!(panel.len(), 1, "one goal row on the panel");
+    assert_eq!(
+        (i32_at(panel[0], 3), i32_at(panel[0], 11), i32_at(panel[0], 22)),
+        (74757, 74757, 9),
+        "its key, its name and how many to defeat"
+    );
+    assert_eq!(panel_twins(&ready.replies), 2, "the row and its count, on both lists");
+    // The first knockout counts on both lists.
+    let mut now = 1_000;
+    for _ in 0..200 {
+        now += 700;
+        let Some((target, at)) = standing(&gateway).first().copied() else {
+            gateway.tick_at(now).unwrap();
+            continue;
+        };
+        walk_to(&mut gateway, [at[0] + 1.5, at[1], at[2]], &mut now);
+        now += 700;
+        let hit = send(&mut gateway, &melee(target), now);
+        if !rows(&hit.replies, 45, 2).is_empty() {
+            assert_eq!(panel_twins(&hit.replies), rows(&hit.replies, 45, 2).len());
+            assert_eq!(i32_at(rows(&hit.replies, 47, 2)[0], 7), 1, "one down");
+            return;
+        }
+    }
+    panic!("no knockout counted");
+}
+
+/// C2 (known bugs, 2026-11-12): 37 of the Games window's 38 Battles rows started nothing; the
+/// window joined a row only to a `field_battles.json` battle, and the dungeons are fight files
+/// behind their doors. Each row now runs the fight its dungeon's door runs: Play (167/1/2, the
+/// row's own id) from the open world zones into the door's scene through the same gates (a
+/// combat job, the level floor, the prize wheel). A row whose dungeon has no fight to run (no
+/// door, or a door that stands closed) still refuses and changes nothing.
+#[test]
+fn every_games_window_battle_row_starts_its_doors_fight() {
+    if !available() {
+        eprintln!("skipped: the private fixture is missing");
+        return;
+    }
+    let table = table();
+    let engine = engine();
+    let catalogue: Value =
+        serde_json::from_slice(&fs::read(content_dir().join("activity_catalogue.json")).unwrap())
+            .unwrap();
+    let rows: Vec<&Value> = (catalogue["rows"].as_array().unwrap().iter())
+        .filter(|row| row["category"] == 10)
+        .collect();
+    let fixture = fixture_with_fights();
+    let lakeshore = [-733.952, 9.09, 945.973];
+    let (mut gateway, _) = fixture.session(lakeshore, 2906);
+    assert!(send(&mut gateway, &field_battle_fixture::switch_job(BRAWLER), 300).state_changed);
+    send(&mut gateway, &osfr_tools::chat::local_request("realm level 20"), 400);
+    let (mut now, mut started, mut refused) = (1_000, 0, Vec::new());
+    for row in rows {
+        let (id, name_id) = (row["id"].as_u64().unwrap() as u32, row["name_id"].as_i64().unwrap());
+        let door = (table.entrances.iter()).find(|e| {
+            e.kind == EntranceKind::Door
+                && i64::from(e.name_id) == name_id
+                && engine.entrance(e.guid).is_some_and(|(_, open)| open)
+        });
+        now += 1_000;
+        let before = gateway.snapshot();
+        let out = send(&mut gateway, &field_battle_fixture::portal_play(id), now);
+        let Some(door) = door else {
+            assert!(!out.began_zoning, "row {id} ({name_id}): no fight to run");
+            assert_eq!(gateway.snapshot(), before, "row {id}: a refused Play changes nothing");
+            refused.push(id);
+            continue;
+        };
+        assert!(out.began_zoning, "row {id} ({}): {}", door.id, chat_text(&out));
+        let (encounter, _) = engine.entrance(door.guid).unwrap();
+        let mut world = engine.clone();
+        world.set_player_job(BRAWLER, 20);
+        let zone = (world.begin(encounter, at(door.at), BRAWLER).unwrap().zoning).unwrap();
+        assert_eq!(gateway.state().zone_id, zone.zone_id, "row {id}: the door's own scene");
+        let ready = arena_spawned(&mut gateway, now + 100);
+        let card = packets(&ready.replies, [41, 0, 114, 0]);
+        assert_eq!(i32_at(card[0], 4), encounter as i32, "row {id}: the door's own fight");
+        // Leave, back to the open world, for the next row.
+        now += 1_000;
+        assert!(send(&mut gateway, &client_leave(i32_at(card[0], 8)), now).began_zoning);
+        send(&mut gateway, &13_u16.to_le_bytes(), now + 100);
+        send(&mut gateway, &10_u16.to_le_bytes(), now + 200);
+        started += 1;
+    }
+    eprintln!("Games window Battles rows: {started} start their fight; no fight to run: {refused:?}");
+    assert!(started > 1, "the window's dungeons start ({started})");
 }
 
 /// PB2: a party enters an entrance's run together (T440/T441). The leader's Go opens the hive;

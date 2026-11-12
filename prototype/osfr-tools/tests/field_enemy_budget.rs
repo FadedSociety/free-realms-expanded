@@ -27,6 +27,14 @@ const STARTER_MAX_LEVEL: u32 = 5;
 const LONE_FLOOR_S: f32 = 90.0;
 const CAMP_FLOOR_S: f32 = 30.0;
 
+/// The owner's enemy hit multiplier (`combat_scale.json`, rc-0137: x1.5): a starter knocks a
+/// player out that much sooner, so the final-era floors above are divided by it.
+fn damage_multiplier() -> f32 {
+    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/data/content/combat_scale.json");
+    let scale: Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+    scale["enemy_damage_multiplier"].as_f64().unwrap_or(1.0) as f32
+}
+
 /// The shipped engine with every quest-gated enemy present too.
 fn loaded(field: &Value) -> osfr_tools::encounter::EncounterEngine {
     let mut engine = Fixture::shipped().load();
@@ -100,7 +108,7 @@ fn starter_enemies_and_camps_stay_inside_the_final_era_budget() {
         }
         let lone = health as f32 / dps;
         assert!(
-            lone > LONE_FLOOR_S,
+            lone > LONE_FLOOR_S / damage_multiplier(),
             "{guid} (level {level}) knocks out a level-{level} Wizard ({health} HP) in {lone:.0} s"
         );
         if let Some(camp) = camp_of.get(&guid) {
@@ -116,7 +124,7 @@ fn starter_enemies_and_camps_stay_inside_the_final_era_budget() {
         engine.set_player_job(WIZARD, level);
         let seconds = engine.player_health().1 as f32 / dps;
         assert!(
-            seconds > CAMP_FLOOR_S,
+            seconds > CAMP_FLOOR_S / damage_multiplier(),
             "{camp}: all members together knock out a level-{level} Wizard in {seconds:.0} s"
         );
     }

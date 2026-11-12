@@ -335,8 +335,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75093,
+        "name_id": 131977,
+        "icon_id": 3153,
+        "job": 2
+      },
+      {
+        "item_id": 75386,
+        "name_id": 131130,
+        "icon_id": 1199,
+        "job": 2
+      },
+      {
+        "item_id": 75409,
+        "name_id": 131153,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 76223,
+        "name_id": 133231,
+        "icon_id": 5391,
+        "job": 2
+      },
+      {
+        "item_id": 76093,
+        "name_id": 133101,
+        "icon_id": 5344,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75321,
+        "name_id": 131065,
+        "icon_id": 1199,
+        "job": 11
+      },
+      {
+        "item_id": 75344,
+        "name_id": 131088,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 75063,
+        "name_id": 131947,
+        "icon_id": 3221,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76406,
+        "name_id": 133414,
+        "icon_id": 5058,
+        "job": 12
+      },
+      {
+        "item_id": 75516,
+        "name_id": 131260,
+        "icon_id": 1199,
+        "job": 12
+      },
+      {
+        "item_id": 75539,
+        "name_id": 131283,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 75153,
+        "name_id": 132037,
+        "icon_id": 3157,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76333,
+        "name_id": 133341,
+        "icon_id": 5448,
+        "job": 32
+      },
+      {
+        "item_id": 75123,
+        "name_id": 132007,
+        "icon_id": 3099,
+        "job": 32
+      },
+      {
+        "item_id": 75451,
+        "name_id": 131195,
+        "icon_id": 1199,
+        "job": 32
+      },
+      {
+        "item_id": 75474,
+        "name_id": 131218,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75003,
+        "name_id": 131887,
+        "icon_id": 3110,
+        "job": 35
+      },
+      {
+        "item_id": 75191,
+        "name_id": 130935,
+        "icon_id": 1199,
+        "job": 35
+      },
+      {
+        "item_id": 75214,
+        "name_id": 130958,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75747,
+        "name_id": 132755,
+        "icon_id": 2394,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75033,
+        "name_id": 131917,
+        "icon_id": 3130,
+        "job": 43
+      },
+      {
+        "item_id": 75256,
+        "name_id": 131000,
+        "icon_id": 1199,
+        "job": 43
+      },
+      {
+        "item_id": 75279,
+        "name_id": 131023,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75868,
+        "name_id": 132876,
+        "icon_id": 4993,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 70
   },
   "source": [
     {
@@ -370,6 +557,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/danger_peaks.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Danger Peaks' (revision 49126) lists one prize wheel per combat job and a 70-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

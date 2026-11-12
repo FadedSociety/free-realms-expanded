@@ -56,6 +56,7 @@ mod kart_garage;
 mod pirates_arena;
 mod coin_authoring;
 mod combat_sim;
+mod developer_chat;
 mod collection_pickup;
 mod content_presence;
 mod content_reload;
@@ -1038,7 +1039,7 @@ impl Gameplay {
         };
         let daily_wheel = crate::daily_wheel::DailyWheel::load(npc_content, saved_wheel_spins)?;
         let activities = crate::activity_portal::Catalogue::assemble(
-            content_presence::battle_rows(&battle_file, encounter.is_some()),
+            content_presence::battle_rows(&battle_file, encounter.as_ref()),
             chess.as_ref(),
             soccer_content.as_ref(),
             crate::card_game::Content::load_optional(npc_content)?.as_ref(),
@@ -2338,6 +2339,9 @@ impl Gameplay {
         }
         let Some(before) = self.opening.as_ref().map(OpeningEngine::journal_entries) else {
             if let Some(result) = self.handle_item_bar(inner, character, now_ms, None)? {
+                return Ok(result);
+            }
+            if let Some(result) = self.developer_chat(inner, character, now_ms)? {
                 return Ok(result);
             }
             return self.handle(inner, character.guid, character.position, now_ms);
@@ -3884,35 +3888,7 @@ impl Gameplay {
         }
         if let Some(text) = chat::request(inner, character.guid)? {
             if let Some(command) = text.trim().to_ascii_lowercase().strip_prefix("realm ") {
-                let tool = self.may_run(command);
-                if tool && self.developer_npx_off(command, &mut out) {
-                    return Ok(out);
-                }
-                if tool && self.developer_quest_offer(command, character, &mut out)? {
-                    return Ok(out);
-                }
-                if tool && self.developer_teleport(command, character, &mut out)? {
-                    return Ok(out);
-                }
-                if tool && command == "here" {
-                    out.replies
-                        .push(chat::system(&self.developer_here(character)));
-                    return Ok(out);
-                }
-                // Same byte offsets as `command` (ASCII lowercasing keeps lengths):
-                // literal names keep their case.
-                let raw = &text.trim()["realm ".len()..];
-                // L081: every player may redeem a code (no role gate).
-                if command.split_whitespace().next() == Some("redeem") {
-                    let words: Vec<&str> = raw.split_whitespace().collect();
-                    self.realm_redeem(&words, character, now_ms, &mut out)?;
-                    return Ok(out);
-                }
-                if tool && command.split_whitespace().next() == Some("broadcast") {
-                    crate::world_notice::stage(raw, &mut out);
-                    return Ok(out);
-                }
-                if tool && self.developer_cheat(command, raw, character, now_ms, &mut out)? {
+                if self.developer_realm(&text, command, character, now_ms, &mut out)? {
                     return Ok(out);
                 }
                 match command {

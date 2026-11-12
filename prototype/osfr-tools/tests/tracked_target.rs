@@ -14,7 +14,8 @@ const MARKER: [f32; 3] = [-2165.513, -32.96, 328.1112];
 /// Battle 96's own kind: it fights only inside that battle, never in the field.
 const BATTLE_KIND: u32 = 930_096;
 const BATTLE_96_GUID: u64 = 100_000_096_000;
-const BATTLE_96: [f32; 3] = [-440.0, 0.8, 1290.0];
+/// Battle 96's marker, at the captured Troll Summoner starter (rc-0137).
+const BATTLE_96: [f32; 3] = [-793.26, -1.97, 1016.19];
 
 fn objective(id: u32, kind: ObjectiveKind) -> QuestObjective {
     QuestObjective {

@@ -63,7 +63,7 @@ impl Gameplay {
                 if let Some(encounter) = self.encounter.as_mut() {
                     encounter.reload_field_battles(&path)?;
                     self.activities = crate::activity_portal::Catalogue::assemble(
-                        Some(&path),
+                        Some(encounter.portal_battles()),
                         self.chess.as_ref(),
                         self.soccer_content.as_ref(),
                         self.activities.cards(),

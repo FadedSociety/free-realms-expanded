@@ -807,8 +807,8 @@ fn refusals_change_nothing() {
     );
 
     // Control: four free stacks fit the bundle and the same battle starts.
-    let (mut fitting, bag) = fixture.gateway_with_bag(MARKER, 4006, MAX_ITEMS - 4);
-    assert_eq!(bag.items.len(), MAX_ITEMS - 4);
+    let (mut fitting, bag) = fixture.gateway_with_bag(MARKER, 4006, MAX_ITEMS - job_prizes(battle(&battles(), SHEEP_WATCH), BRAWLER).len());
+    assert_eq!(bag.items.len(), MAX_ITEMS - job_prizes(battle(&battles(), SHEEP_WATCH), BRAWLER).len());
     let screen = open_battle(&mut fitting, MARKER_GUID, row, 800);
     let started = send(&mut fitting, &go(&screen), 900);
     assert!(started.began_zoning, "the fitting bundle starts the battle");
@@ -998,10 +998,10 @@ fn the_row_is_inside_the_loader_and_reward_bounds() {
     assert!(i32_field(row, "objective_id") > 0);
     assert!(u32_field(row, "reward_coins") <= 1_000_000);
     let prizes = row["prizes"].as_array().unwrap();
-    assert!(
-        (1..=4).contains(&prizes.len()),
-        "one prize is drawn per win"
-    );
+    // rc-0137: one wheel per combat job, each at most eight; one prize is drawn per win.
+    for job in [0, 2, 11, 12, 32, 35, 43] {
+        assert!((1..=8).contains(&job_prizes(row, job).len()), "job {job}'s wheel");
+    }
     assert_eq!(u32_field(&row["zone"], "zone_id"), ARENA_ZONE);
 
     let inventory = runtime_inventory();
@@ -1020,7 +1020,7 @@ fn the_row_is_inside_the_loader_and_reward_bounds() {
         engine.battle_prizes_available(SHEEP_WATCH, |item, quantity| {
             inventory.accepts_reward(item, quantity)
         }),
-        "T243's whole-bundle preflight accepts the four prizes"
+        "T243's whole-bundle preflight accepts the job's prizes"
     );
 
     // A duplicate GUID and a duplicate row are refused at load.
@@ -1087,7 +1087,7 @@ fn the_existing_battles_and_content_are_unchanged() {
         (
             96,
             &[
-                (100000096000, [-440.0, 0.8, 1290.0]),
+                (100000096000, [-793.26, -1.97, 1016.19]),
                 (100000096001, [136.0, -0.6, 175.0]),
                 (100000096002, [133.0, -0.6, 173.0]),
                 (100000096003, [139.0, -0.6, 173.0]),
@@ -1137,10 +1137,12 @@ fn the_existing_battles_and_content_are_unchanged() {
         (
             12310,
             &[
+                // rc-0137: Petty Yetis' yetis stand at the fork's first-wave spots in Snow
+                // Hill's arena, 8 to 29 m apart (one hit took all three at 3 m).
                 (100001231000, [364.0, 53.3, 572.0]),
-                (100001231001, [133.0, -0.6, 173.0]),
-                (100001231002, [136.0, -0.6, 175.0]),
-                (100001231003, [139.0, -0.6, 173.0]),
+                (100001231001, [129.46, 1.05, 112.22]),
+                (100001231002, [113.9, 1.88, 137.14]),
+                (100001231003, [124.17, 2.4, 117.88]),
             ],
         ),
         (

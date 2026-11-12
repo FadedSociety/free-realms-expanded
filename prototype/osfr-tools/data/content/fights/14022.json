@@ -195,8 +195,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75095,
+        "name_id": 131979,
+        "icon_id": 3153,
+        "job": 2
+      },
+      {
+        "item_id": 75420,
+        "name_id": 131164,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75391,
+        "name_id": 131135,
+        "icon_id": 553,
+        "job": 2
+      },
+      {
+        "item_id": 76224,
+        "name_id": 133232,
+        "icon_id": 5397,
+        "job": 2
+      },
+      {
+        "item_id": 76094,
+        "name_id": 133102,
+        "icon_id": 5789,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75355,
+        "name_id": 131099,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75326,
+        "name_id": 131070,
+        "icon_id": 553,
+        "job": 11
+      },
+      {
+        "item_id": 75065,
+        "name_id": 131949,
+        "icon_id": 3221,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76407,
+        "name_id": 133415,
+        "icon_id": 5091,
+        "job": 12
+      },
+      {
+        "item_id": 75550,
+        "name_id": 131294,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75521,
+        "name_id": 131265,
+        "icon_id": 553,
+        "job": 12
+      },
+      {
+        "item_id": 75155,
+        "name_id": 132039,
+        "icon_id": 3157,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76334,
+        "name_id": 133342,
+        "icon_id": 5454,
+        "job": 32
+      },
+      {
+        "item_id": 75125,
+        "name_id": 132009,
+        "icon_id": 3099,
+        "job": 32
+      },
+      {
+        "item_id": 75485,
+        "name_id": 131229,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75456,
+        "name_id": 131200,
+        "icon_id": 553,
+        "job": 32
+      },
+      {
+        "item_id": 75005,
+        "name_id": 131889,
+        "icon_id": 3110,
+        "job": 35
+      },
+      {
+        "item_id": 75225,
+        "name_id": 130969,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 75196,
+        "name_id": 130940,
+        "icon_id": 553,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75748,
+        "name_id": 132756,
+        "icon_id": 2395,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75035,
+        "name_id": 131919,
+        "icon_id": 3130,
+        "job": 43
+      },
+      {
+        "item_id": 75290,
+        "name_id": 131034,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75261,
+        "name_id": 131005,
+        "icon_id": 553,
+        "job": 43
+      },
+      {
+        "item_id": 75869,
+        "name_id": 132877,
+        "icon_id": 5007,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 26
   },
   "source": [
     {
@@ -226,6 +413,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) rc-0136 (2026-11-11): this row is the battle's starter, the prop 2014 drew it as (the Snarler's den: video 5-IM2pBh2yY frames 01048 and 01080, red name, crossed swords, Press X; capture p12 t=546051.7 model 1938). The fight's own kind carries the body its waves fight with."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Robgoblin Troublemakers!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Den of Secrets' (Ninja's Blade of Flame Wave; Warrior’s Axe of Warcry; Wizard's Wand of Tsunami; Medic's Scalpel of Immunization), so it spins that wheel, from fandom 'Den of Secrets' (revision 49127), one per combat job, and 26 coins. The same pages also name Fleetfoot Ninja!, den_of_secrets, fleetfoot_ninja."
     }
   ]
 }

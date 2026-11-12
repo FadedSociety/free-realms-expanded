@@ -50,6 +50,8 @@ use std::{collections::BTreeSet, fs};
 
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/encounter_card.rs"]
+mod encounter_card;
 #[path = "support/terrain.rs"]
 mod terrain;
 
@@ -97,24 +99,9 @@ const BIXIE_FIELD_GUIDS: [u64; 3] = [131000102007, 131000102008, 131000102009];
 /// is deliberately not part of it.
 const TASK_ROSTER: [u32; 5] = [96, 12301, 12302, 12310, 12311];
 const REFUSAL_PRIZE: &str = "one of its rewards cannot be granted";
-/// 41/114 details layout for four prizes, from `details_packet`:
-/// header 4 + id 4 + instance 4 + 24 + 3 + 8 + the six text dwords (47..71) +
-/// 1 + 138 + 61 + prize count 4 + four 38-byte entries + 4 = 431; then the
-/// objective block and 69 zero bytes place the roster count at 525. The whole
-/// packet is 575 bytes.
-const DETAILS_LEN: usize = 575;
+/// 41/114 header fields (the rest is read the client's way, `encounter_card::read_card`).
 const DETAILS_ID: usize = 4;
 const DETAILS_INSTANCE: usize = 8;
-const DETAILS_PRIZE_COUNT: usize = 271;
-const DETAILS_PRIZES: usize = 275;
-const DETAILS_ROSTER_COUNT: usize = 525;
-/// One prize-bundle Item entry: type i32, hidden u8, icon/name/quantity/item
-/// and four more i32, then members-only u8 (38 bytes, `prize_bundle`).
-const PRIZE_ENTRY: usize = 38;
-const PRIZE_ICON: usize = 5;
-const PRIZE_NAME: usize = 13;
-const PRIZE_QUANTITY: usize = 17;
-const PRIZE_ITEM: usize = 21;
 
 // ---------------------------------------------------------------------------
 // Local fixture seams: the full bag (same production save path as T319).
@@ -208,40 +195,21 @@ fn the_start_screen_carries_the_instance_and_roster_count() {
 
     let screen = send(&mut gateway, &interact(MARKER_GUID), 500);
     let details = details(&screen).expect("the marker opens 41/114");
-    assert_eq!(details.len(), DETAILS_LEN, "no field was added or dropped");
+    // Native reader 0x009bdd70 and the prize-bundle reader 0x008e7930: the whole card reads,
+    // and each previewed row of the Brawler's wheel is a type-1 Item entry.
+    let card = encounter_card::read_card(details);
     assert_eq!(i32_at(details, DETAILS_ID), BIXIE_HIVE as i32);
     let instance = i32_at(details, DETAILS_INSTANCE);
     assert!(instance > 0, "the instance is allocated, not zero");
+    let wheel: Vec<(i32, i32, i32)> = (job_prizes(row, BRAWLER).iter())
+        .map(|p| {
+            let quantity = p["quantity"].as_u64().unwrap_or(1) as i32;
+            (i32_field(p, "item_id"), i32_field(p, "name_id"), quantity)
+        })
+        .collect();
+    assert_eq!(card.preview.items, wheel, "the Brawler's wheel is previewed");
     assert_eq!(
-        i32_at(details, DETAILS_PRIZE_COUNT),
-        4,
-        "the four previewed prizes are in the bundle"
-    );
-    for (index, prize) in row["prizes"].as_array().unwrap().iter().enumerate() {
-        let at = DETAILS_PRIZES + index * PRIZE_ENTRY;
-        // Native reader 0x009bdd70 and the prize-bundle reader 0x008e7930:
-        // each previewed row is a type-1 Item entry with icon, name, quantity
-        // and item id.
-        assert_eq!(i32_at(details, at), 1, "prize {index} is an Item entry");
-        assert_eq!(
-            i32_at(details, at + PRIZE_ICON),
-            i32_field(prize, "icon_id")
-        );
-        assert_eq!(
-            i32_at(details, at + PRIZE_NAME),
-            i32_field(prize, "name_id")
-        );
-        assert_eq!(
-            i32_at(details, at + PRIZE_QUANTITY),
-            prize["quantity"].as_u64().unwrap_or(1) as i32
-        );
-        assert_eq!(
-            i32_at(details, at + PRIZE_ITEM),
-            i32_field(prize, "item_id")
-        );
-    }
-    assert_eq!(
-        i32_at(details, DETAILS_ROSTER_COUNT),
+        card.goals[0].counters[2],
         5,
         "the client receives the five-actor roster count"
     );
@@ -833,8 +801,8 @@ fn refusals_leave_everything_unchanged() {
     );
 
     // Control: four free stacks fit the bundle and the same battle starts.
-    let (mut fitting, bag) = fixture.gateway_with_bag(MARKER, 4006, MAX_ITEMS - 4);
-    assert_eq!(bag.items.len(), MAX_ITEMS - 4);
+    let (mut fitting, bag) = fixture.gateway_with_bag(MARKER, 4006, MAX_ITEMS - job_prizes(battle(&battles(), BIXIE_HIVE), BRAWLER).len());
+    assert_eq!(bag.items.len(), MAX_ITEMS - job_prizes(battle(&battles(), BIXIE_HIVE), BRAWLER).len());
     let screen = open_battle(&mut fitting, MARKER_GUID, row, 800);
     let started = send(&mut fitting, &go(&screen), 900);
     assert!(started.began_zoning, "the fitting bundle starts the battle");
@@ -852,7 +820,6 @@ fn every_previewed_prize_resolves_and_fits() {
     let inventory = runtime_inventory();
     let prizes = row["prizes"].as_array().unwrap();
     assert!(!prizes.is_empty());
-    let mut bundle = Vec::new();
     for prize in prizes {
         let item = i32_field(prize, "item_id");
         let quantity = prize["quantity"].as_u64().unwrap_or(1) as u32;
@@ -864,12 +831,18 @@ fn every_previewed_prize_resolves_and_fits() {
             inventory.accepts_reward(item, quantity),
             "prize {item} x{quantity} fits one stack"
         );
-        bundle.push((item, quantity));
     }
-    assert!(
-        inventory.accepts_reward_bundle(&bundle),
-        "all four previewed prizes fit the bag together"
-    );
+    // rc-0137: the card previews the player's job's wheel, so each job's wheel fits together.
+    let jobs: BTreeSet<i64> = (prizes.iter()).map(|p| p["job"].as_i64().unwrap_or(0)).collect();
+    for job in jobs {
+        let bundle: Vec<(i32, u32)> = (job_prizes(row, job as i32).iter())
+            .map(|p| (i32_field(p, "item_id"), p["quantity"].as_u64().unwrap_or(1) as u32))
+            .collect();
+        assert!(
+            inventory.accepts_reward_bundle(&bundle),
+            "job {job}'s previewed prizes fit the bag together"
+        );
+    }
 
     let mut engine = EncounterEngine::load(&fixture.content, None).unwrap();
     engine
@@ -879,18 +852,17 @@ fn every_previewed_prize_resolves_and_fits() {
         engine.battle_prizes_available(BIXIE_HIVE, |item, quantity| {
             inventory.accepts_reward(item, quantity)
         }),
-        "the whole-bundle preflight accepts the four prizes"
+        "the whole-bundle preflight accepts the job's prizes"
     );
 
     // A prize id absent from the catalogue passes the loader's positive-id
     // check but fails the gameplay preflight (UNAVAILABLE_BATTLE_PRIZE).
     let mut invalid = file.clone();
-    invalid["battles"]
-        .as_array_mut()
-        .unwrap()
-        .iter_mut()
+    let row = (invalid["battles"].as_array_mut().unwrap().iter_mut())
         .find(|row| row["id"] == json!(BIXIE_HIVE))
-        .unwrap()["prizes"][0]["item_id"] = json!(2_147_483_647_i64);
+        .unwrap();
+    let first = first_prize_of(row, 0);
+    row["prizes"][first]["item_id"] = json!(2_147_483_647_i64);
     let path = fixture.root.join("unresolvable-prize.json");
     fs::write(&path, serde_json::to_vec(&invalid).unwrap()).unwrap();
     let mut engine = EncounterEngine::load(&fixture.content, None).unwrap();

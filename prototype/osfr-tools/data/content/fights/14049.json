@@ -242,8 +242,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76242,
+        "name_id": 133250,
+        "icon_id": 2500,
+        "job": 2
+      },
+      {
+        "item_id": 75103,
+        "name_id": 131987,
+        "icon_id": 3100,
+        "job": 2
+      },
+      {
+        "item_id": 75383,
+        "name_id": 131127,
+        "icon_id": 1196,
+        "job": 2
+      },
+      {
+        "item_id": 75411,
+        "name_id": 131155,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 76112,
+        "name_id": 133120,
+        "icon_id": 2366,
+        "job": 11
+      },
+      {
+        "item_id": 75073,
+        "name_id": 131957,
+        "icon_id": 3149,
+        "job": 11
+      },
+      {
+        "item_id": 75318,
+        "name_id": 131062,
+        "icon_id": 1196,
+        "job": 11
+      },
+      {
+        "item_id": 75346,
+        "name_id": 131090,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 76431,
+        "name_id": 133439,
+        "icon_id": 2457,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 75163,
+        "name_id": 132047,
+        "icon_id": 3162,
+        "job": 12
+      },
+      {
+        "item_id": 75513,
+        "name_id": 131257,
+        "icon_id": 1196,
+        "job": 12
+      },
+      {
+        "item_id": 75541,
+        "name_id": 131285,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76352,
+        "name_id": 133360,
+        "icon_id": 2529,
+        "job": 32
+      },
+      {
+        "item_id": 75133,
+        "name_id": 132017,
+        "icon_id": 3127,
+        "job": 32
+      },
+      {
+        "item_id": 75448,
+        "name_id": 131192,
+        "icon_id": 1196,
+        "job": 32
+      },
+      {
+        "item_id": 75476,
+        "name_id": 131220,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75188,
+        "name_id": 130932,
+        "icon_id": 1196,
+        "job": 35
+      },
+      {
+        "item_id": 75216,
+        "name_id": 130960,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75013,
+        "name_id": 131897,
+        "icon_id": 3105,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75766,
+        "name_id": 132774,
+        "icon_id": 2398,
+        "job": 35
+      },
+      {
+        "item_id": 75887,
+        "name_id": 132895,
+        "icon_id": 5004,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75043,
+        "name_id": 131927,
+        "icon_id": 3128,
+        "job": 43
+      },
+      {
+        "item_id": 75253,
+        "name_id": 130997,
+        "icon_id": 1196,
+        "job": 43
+      },
+      {
+        "item_id": 75281,
+        "name_id": 131025,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 32
   },
   "source": [
     {
@@ -269,6 +456,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Stealthy Despoilers' (revision 15161) lists one prize wheel per combat job and a 32-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

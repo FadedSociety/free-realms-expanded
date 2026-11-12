@@ -188,7 +188,8 @@ fn kill_wolf(game: &mut Gameplay, position: [f32; 3], guid: u64, now: &mut u64) 
         "wolf {guid} exposes the field interaction menu"
     );
     let before = count(game, FIGHTING_THE_PACK, 0);
-    for _ in 0..8 {
+    // Twice the swings since the owner doubled enemy health (rc-0137).
+    for _ in 0..16 {
         *now += 700;
         let attack = send(game, &character, &npc_select(guid, ATTACK_CHOICE), *now);
         if attack.replies.iter().any(|packet| {

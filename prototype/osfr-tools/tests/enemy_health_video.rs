@@ -222,15 +222,26 @@ fn observed_rows_die_in_the_videos_basic_hit_ranges() {
             fight.hits,
             fight.source
         );
+        // The 2014 videos, times the owner's x2 enemy health (rc-0137): twice the swings.
+        let health_x = owner_health_multiplier();
+        let hits = ((*fight.hits.start() as f64 * health_x).floor() as u32)
+            ..=((*fight.hits.end() as f64 * health_x).ceil() as u32);
         assert!(
-            fight.hits.contains(&swings),
-            "{}: {} swings is outside the video's {:?}; {}",
+            hits.contains(&swings),
+            "{}: {} swings is outside the video's {:?} x{health_x}; {}",
             def["kind"],
             swings,
             fight.hits,
             fight.source
         );
     }
+}
+
+/// `combat_scale.json` `enemy_health_multiplier` (rc-0137), 1 when absent.
+fn owner_health_multiplier() -> f64 {
+    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/data/content/combat_scale.json");
+    let scale: Value = serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+    scale["enemy_health_multiplier"].as_f64().unwrap_or(1.0)
 }
 
 #[test]

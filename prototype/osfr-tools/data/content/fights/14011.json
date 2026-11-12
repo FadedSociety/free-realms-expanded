@@ -269,8 +269,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75107,
+        "name_id": 131991,
+        "icon_id": 3100,
+        "job": 2
+      },
+      {
+        "item_id": 75383,
+        "name_id": 131127,
+        "icon_id": 1196,
+        "job": 2
+      },
+      {
+        "item_id": 75411,
+        "name_id": 131155,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 76249,
+        "name_id": 133257,
+        "icon_id": 5403,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75077,
+        "name_id": 131961,
+        "icon_id": 3149,
+        "job": 11
+      },
+      {
+        "item_id": 75318,
+        "name_id": 131062,
+        "icon_id": 1196,
+        "job": 11
+      },
+      {
+        "item_id": 75346,
+        "name_id": 131090,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 76119,
+        "name_id": 133127,
+        "icon_id": 5352,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76441,
+        "name_id": 133449,
+        "icon_id": 5668,
+        "job": 12
+      },
+      {
+        "item_id": 75167,
+        "name_id": 132051,
+        "icon_id": 3162,
+        "job": 12
+      },
+      {
+        "item_id": 75513,
+        "name_id": 131257,
+        "icon_id": 1196,
+        "job": 12
+      },
+      {
+        "item_id": 75541,
+        "name_id": 131285,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 75137,
+        "name_id": 132021,
+        "icon_id": 3127,
+        "job": 32
+      },
+      {
+        "item_id": 75448,
+        "name_id": 131192,
+        "icon_id": 1196,
+        "job": 32
+      },
+      {
+        "item_id": 75476,
+        "name_id": 131220,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 76359,
+        "name_id": 133367,
+        "icon_id": 5459,
+        "job": 32
+      },
+      {
+        "item_id": 75188,
+        "name_id": 130932,
+        "icon_id": 1196,
+        "job": 35
+      },
+      {
+        "item_id": 75216,
+        "name_id": 130960,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75017,
+        "name_id": 131901,
+        "icon_id": 3105,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75773,
+        "name_id": 132781,
+        "icon_id": 2405,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75047,
+        "name_id": 131931,
+        "icon_id": 3128,
+        "job": 43
+      },
+      {
+        "item_id": 75253,
+        "name_id": 130997,
+        "icon_id": 1196,
+        "job": 43
+      },
+      {
+        "item_id": 75281,
+        "name_id": 131025,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75894,
+        "name_id": 132902,
+        "icon_id": 5663,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 16
   },
   "source": [
     {
@@ -304,6 +491,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/shady_smugglers.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Shady Smugglers!' (revision 49847) lists one prize wheel per combat job and a 16-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

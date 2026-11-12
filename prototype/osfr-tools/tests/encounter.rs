@@ -34,9 +34,10 @@ impl Fixture {
         t[224] = 1;
         t[250] = 0x5a;
         fs::write(dir.join("npc.bin"), &t).unwrap();
-        let actor = |guid, def, hp, damage, stages: Vec<u32>| {
+        // Half the authored health: the owner's x2 enemy health (rc-0137) keeps the old hit counts.
+        let actor = |guid, def, hp: u32, damage, stages: Vec<u32>| {
             json!({"guid":guid,"definition_id":def,"model_id":3,"name_id":100,
-            "name":"Synthetic actor","texture_alias":"","position":[2.0,0.0,0.0],"max_health":hp,"damage":damage,"boss":def==500,"stages":stages})
+            "name":"Synthetic actor","texture_alias":"","position":[2.0,0.0,0.0],"max_health":hp / 2,"damage":damage,"boss":def==500,"stages":stages})
         };
         let zone = |id, name| json!({"zone_id":id,"name":name,"sky":"","geometry_id":214,"position":[0.0,0.0,0.0],"rotation":[0.0,0.0,0.0],"tutorial":id!=0});
         let c = json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(t)),
@@ -387,7 +388,7 @@ fn native_bar_one_self_centered_basic_resolves_only_a_live_enemy_in_reach() {
     );
     assert_eq!(
         e.state().active.as_ref().unwrap().enemies[0].health,
-        combat_scale::enemy_health(100) - combat_scale::basic(43)
+        combat_scale::enemy_health(50) - combat_scale::basic(43)
     );
     assert!(
         !e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2749)

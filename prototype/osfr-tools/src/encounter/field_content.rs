@@ -257,14 +257,7 @@ impl EncounterEngine {
                 return Err(invalid("invalid field battle"));
             }
             validate_zone(&b.zone)?;
-            if b.prizes.len() > 4
-                || b.prizes.iter().any(|p| {
-                    p.item_id <= 0
-                        || p.name_id <= 0
-                        || p.icon_id <= 0
-                        || !(1..=MAX_PRIZE_QUANTITY).contains(&p.quantity)
-                })
-            {
+            if !card::wheel_ok(&b.prizes) {
                 return Err(invalid("invalid field battle prizes"));
             }
             battle_drops::validate(&b.drops, self.field_rewards.loot_tables())?;
@@ -284,6 +277,11 @@ impl EncounterEngine {
             let difficulty = b.difficulty;
             for a in &mut b.enemies {
                 self.scale.scale_battle_enemy(a, difficulty);
+                // A row's enemy drops by its rank too; a summoned minion does not.
+                if a.power_up_table.is_none() && a.summon_below_percent.is_none() {
+                    let rank = a.rank.unwrap_or(if a.boss { Rank::Boss } else { Rank::Normal });
+                    a.power_up_table = super::pickups::rank_table(rank);
+                }
             }
             b.marker = b
                 .combat_marker
@@ -302,6 +300,7 @@ impl EncounterEngine {
                 reward_coins: b.reward_coins,
                 reward_items: Vec::new(),
                 prizes: b.prizes.clone(),
+                wheel_coins: b.wheel_coins,
             });
         }
         self.battles = battles;

@@ -191,25 +191,191 @@
       {
         "item_id": 10482,
         "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75094,
+        "name_id": 131978,
+        "icon_id": 3153,
+        "job": 2
+      },
+      {
+        "item_id": 75381,
+        "name_id": 131125,
+        "icon_id": 1194,
+        "job": 2
+      },
+      {
+        "item_id": 75409,
+        "name_id": 131153,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 76219,
+        "name_id": 133227,
+        "icon_id": 5411,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75316,
+        "name_id": 131060,
+        "icon_id": 1194,
+        "job": 11
+      },
+      {
+        "item_id": 75344,
+        "name_id": 131088,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 75064,
+        "name_id": 131948,
+        "icon_id": 3221,
+        "job": 11
+      },
+      {
+        "item_id": 76089,
+        "name_id": 133097,
+        "icon_id": 5351,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76401,
+        "name_id": 133409,
+        "icon_id": 5070,
+        "job": 12
+      },
+      {
+        "item_id": 75511,
+        "name_id": 131255,
+        "icon_id": 1194,
+        "job": 12
+      },
+      {
+        "item_id": 75539,
+        "name_id": 131283,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 75154,
+        "name_id": 132038,
+        "icon_id": 3157,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76329,
+        "name_id": 133337,
+        "icon_id": 2534,
+        "job": 32
+      },
+      {
+        "item_id": 75124,
+        "name_id": 132008,
+        "icon_id": 3099,
+        "job": 32
+      },
+      {
+        "item_id": 75446,
+        "name_id": 131190,
+        "icon_id": 1194,
+        "job": 32
+      },
+      {
+        "item_id": 75474,
+        "name_id": 131218,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75004,
+        "name_id": 131888,
+        "icon_id": 3110,
+        "job": 35
+      },
+      {
+        "item_id": 75186,
+        "name_id": 130930,
+        "icon_id": 1194,
+        "job": 35
+      },
+      {
+        "item_id": 75214,
+        "name_id": 130958,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75743,
+        "name_id": 132751,
+        "icon_id": 2401,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75034,
+        "name_id": 131918,
+        "icon_id": 3130,
+        "job": 43
+      },
+      {
+        "item_id": 75251,
+        "name_id": 130995,
+        "icon_id": 1194,
+        "job": 43
+      },
+      {
+        "item_id": 75279,
+        "name_id": 131023,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75864,
+        "name_id": 132872,
+        "icon_id": 5660,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
         "icon_id": 973
-      },
-      {
-        "item_id": 3023,
-        "name_id": 422907,
-        "icon_id": 544
-      },
-      {
-        "item_id": 75354,
-        "name_id": 131098,
-        "icon_id": 3721
-      },
-      {
-        "item_id": 11002,
-        "name_id": 422909,
-        "icon_id": 730
       }
     ],
-    "drops": []
+    "drops": [],
+    "wheel_coins": 8
   },
   "source": [
     {
@@ -235,6 +401,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/petty_yetis.json, its notes page and the fork battle; the entrance counts as battle 12310 for quests."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Petty Yetis!' (revision 49161) lists one prize wheel per combat job and a 8-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

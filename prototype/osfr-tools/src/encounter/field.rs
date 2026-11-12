@@ -111,12 +111,15 @@ impl EncounterEngine {
                 heading: None,
                 kind: "enemy".into(),
             })
-            .chain(self.battles.iter().map(|b| crate::dev_teleport::Target {
+            .chain(self.field_sim.homes.iter().cloned())
+            // An entrance arrives on its own heading's side: without one the arrival followed the
+            // player's facing, and from the north it put him in the Bixie Hive (rc-0137).
+            .chain(self.drawn_battles().map(|b| crate::dev_teleport::Target {
                 guid: b.spawner.guid,
                 name: b.spawner.name.clone(),
                 zone_id: 0,
                 position: b.spawner.position,
-                heading: None,
+                heading: self.fight_state.doors.pose(b.spawner.guid).map(|(h, _)| h),
                 kind: "battle".into(),
             }))
             .chain(self.dungeon().into_iter().flat_map(|d| {
@@ -156,8 +159,7 @@ impl EncounterEngine {
     }
 
     fn starters(&self, entrances: bool) -> Vec<(u64, String, i32, i32, [f32; 3], i32)> {
-        self.battles
-            .iter()
+        self.drawn_battles()
             .filter(|b| self.entrance(b.spawner.guid).is_some() == entrances)
             .map(|b| {
                 (
@@ -175,13 +177,17 @@ impl EncounterEngine {
     /// T879: each battle spawner with its combat marker, for the non-shared view
     /// (`NpcVisibility::add_battle_spawners`); the shared view sends it in `initialization`.
     pub fn battle_markers(&self) -> Vec<(u64, Notification)> {
-        self.battles
-            .iter()
+        self.drawn_battles()
             .filter_map(|b| Some((b.spawner.guid, b.marker?)))
             .collect()
     }
 
-    /// A field battle is playable only when every previewed prize can be
+    /// The battles whose own spawner stands in the world (`Doors::drawn`).
+    pub(super) fn drawn_battles(&self) -> impl Iterator<Item = &FieldBattle> {
+        self.fight_state.doors.drawn(&self.battles)
+    }
+
+    /// A field battle is playable only when every prize of the wheel its card showed can be
     /// granted: the definition resolves and its quantity fits one stack.
     /// Cave encounters have no `battles` row and are not subject to this check.
     pub fn battle_prizes_available(&self, id: u32, accepts: impl Fn(i32, u32) -> bool) -> bool {
@@ -189,8 +195,7 @@ impl EncounterEngine {
             .iter()
             .find(|battle| battle.id == id)
             .is_none_or(|battle| {
-                battle
-                    .prizes
+                wheel_rows(&battle.prizes, self.player_profile)
                     .iter()
                     .all(|prize| accepts(prize.item_id, prize.quantity))
             })
@@ -208,7 +213,7 @@ impl EncounterEngine {
 
     /// Show a battle's start screen again (e.g. after Go was refused: the
     /// screen hid the HUD, so the player needs it back to use Switch Jobs).
-    pub fn reopen_battle_screen(&mut self, battle: u32, _profile: i32) -> Vec<Vec<u8>> {
+    pub fn reopen_battle_screen(&mut self, battle: u32, profile: i32) -> Vec<Vec<u8>> {
         let Some(b) = self.battles.iter().find(|b| b.id == battle) else {
             return Vec::new();
         };
@@ -218,10 +223,9 @@ impl EncounterEngine {
                 b.id,
                 instance,
                 [b.title_id, b.icon_id, b.description_id, b.difficulty],
-                b.enemies.len(),
                 false,
-                &b.prizes,
-                &self.card_goals(b.id, b.objective_id),
+                &prize_bundle(&wheel_rows(&b.prizes, profile), b.wheel_coins),
+                &self.card_goals(b.id, b.objective_id, b.enemies.len()),
             ),
             encounter_header(107, b.id, instance),
         ];
@@ -302,7 +306,7 @@ impl EncounterEngine {
         &mut self,
         guid: u64,
         position: [f32; 3],
-        _profile: i32,
+        profile: i32,
     ) -> EncounterOutcome {
         if self.active() {
             return EncounterOutcome::default();
@@ -322,7 +326,7 @@ impl EncounterEngine {
             return EncounterOutcome::default();
         };
         let instance = self.state.next_instance_id;
-        let prizes = b.prizes.clone();
+        let preview = prize_bundle(&wheel_rows(&b.prizes, profile), b.wheel_coins);
         let (id, icon, title, description, objective, difficulty, count) = (
             b.id,
             b.icon_id,
@@ -339,10 +343,9 @@ impl EncounterEngine {
                     id,
                     instance,
                     [title, icon, description, difficulty],
-                    count,
                     false,
-                    &prizes,
-                    &self.card_goals(id, objective),
+                    &preview,
+                    &self.card_goals(id, objective, count),
                 ),
                 // 41/107 ZoneIsReady: the battle is in place, nothing to load.
                 // DispatchEncounterPacket case 107 calls SetMiniGameReady
@@ -446,7 +449,8 @@ impl EncounterEngine {
     ) {
         let ground = self.ground();
         for b in &self.battles {
-            if self.fight_state.doors.fixed(b.spawner.guid) {
+            let doors = &self.fight_state.doors;
+            if doors.fixed(b.spawner.guid) || doors.replaces(b.id) {
                 continue;
             }
             let home = b.spawner.position;

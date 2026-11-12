@@ -408,8 +408,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75382,
+        "name_id": 131126,
+        "icon_id": 1195,
+        "job": 2
+      },
+      {
+        "item_id": 75421,
+        "name_id": 131165,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75097,
+        "name_id": 131981,
+        "icon_id": 3217,
+        "job": 2
+      },
+      {
+        "item_id": 76235,
+        "name_id": 133243,
+        "icon_id": 5389,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75067,
+        "name_id": 131951,
+        "icon_id": 3145,
+        "job": 11
+      },
+      {
+        "item_id": 75317,
+        "name_id": 131061,
+        "icon_id": 1195,
+        "job": 11
+      },
+      {
+        "item_id": 75356,
+        "name_id": 131100,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 76105,
+        "name_id": 133113,
+        "icon_id": 3560,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76422,
+        "name_id": 133430,
+        "icon_id": 5052,
+        "job": 12
+      },
+      {
+        "item_id": 75157,
+        "name_id": 132041,
+        "icon_id": 3253,
+        "job": 12
+      },
+      {
+        "item_id": 75512,
+        "name_id": 131256,
+        "icon_id": 1195,
+        "job": 12
+      },
+      {
+        "item_id": 75551,
+        "name_id": 131295,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76345,
+        "name_id": 133353,
+        "icon_id": 5443,
+        "job": 32
+      },
+      {
+        "item_id": 75127,
+        "name_id": 132011,
+        "icon_id": 3129,
+        "job": 32
+      },
+      {
+        "item_id": 75447,
+        "name_id": 131191,
+        "icon_id": 1195,
+        "job": 32
+      },
+      {
+        "item_id": 75486,
+        "name_id": 131230,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75007,
+        "name_id": 131891,
+        "icon_id": 3111,
+        "job": 35
+      },
+      {
+        "item_id": 75187,
+        "name_id": 130931,
+        "icon_id": 1195,
+        "job": 35
+      },
+      {
+        "item_id": 75226,
+        "name_id": 130970,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75759,
+        "name_id": 132767,
+        "icon_id": 4949,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75037,
+        "name_id": 131921,
+        "icon_id": 3123,
+        "job": 43
+      },
+      {
+        "item_id": 75252,
+        "name_id": 130996,
+        "icon_id": 1195,
+        "job": 43
+      },
+      {
+        "item_id": 75291,
+        "name_id": 131035,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75880,
+        "name_id": 132888,
+        "icon_id": 4995,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 343
   },
   "source": [
     {
@@ -443,6 +630,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/howling_hills.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Howling Hills' (revision 49138) lists one prize wheel per combat job and a 343-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

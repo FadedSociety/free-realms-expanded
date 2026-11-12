@@ -59,6 +59,8 @@ mod combat_scale;
 mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/encounter_card.rs"]
+mod encounter_card;
 #[path = "support/terrain.rs"]
 mod terrain;
 
@@ -109,7 +111,6 @@ const BRAWLER: i32 = 43;
 const BATTLE_JOB_XP: u32 = 50;
 const ARENA_ZONE: u32 = 9600;
 const ARENA_ARRIVAL: [f32; 3] = [136.0, -0.5, 155.0];
-const PRIZE_IDS: [i32; 4] = [10482, 3023, 75354, 11002];
 /// The designated five-battle roster from `field_battle_roster`; the new row
 /// is deliberately not part of it.
 const TASK_ROSTER: [u32; 5] = [96, 12301, 12302, 12310, 12311];
@@ -121,13 +122,6 @@ const REFUSAL_PRIZE: &str = "one of its rewards cannot be granted";
 /// which the byte-equal economy assertion also proves.
 const REWARD_REFUSED: &str = "not granted";
 
-/// The 41/114 prize preview and roster fields this test decodes: the prize
-/// bundle at 210 (count at +61, then 38-byte entries); the roster count sits
-/// at 525 after the two i32 bundles and 69 zero bytes.
-const DETAILS_PRIZE_BUNDLE: usize = 210;
-const DETAILS_PRIZE_COUNT: usize = DETAILS_PRIZE_BUNDLE + 61;
-const DETAILS_PRIZE_ENTRY: usize = 38;
-const DETAILS_ROSTER: usize = 525;
 
 // ---------------------------------------------------------------------------
 // Local fixture seams: the combat-job bag, the capped wallet and the mining
@@ -252,23 +246,6 @@ fn count_definition(gateway: &Gateway, definition_id: i32) -> u32 {
         .sum()
 }
 
-/// Decode the start screen's prize preview through the 41/114 layout:
-/// (icon id, name id, quantity, item id) per bundle entry.
-fn prize_preview(details: &[u8]) -> Vec<(i32, i32, i32, i32)> {
-    let count = i32_at(details, DETAILS_PRIZE_COUNT);
-    assert!(count >= 0 && count <= 4);
-    (0..count as usize)
-        .map(|index| {
-            let entry = DETAILS_PRIZE_COUNT + 4 + index * DETAILS_PRIZE_ENTRY;
-            (
-                i32_at(details, entry + 5),
-                i32_at(details, entry + 13),
-                i32_at(details, entry + 17),
-                i32_at(details, entry + 21),
-            )
-        })
-        .collect()
-}
 
 // ---------------------------------------------------------------------------
 // Tests.
@@ -392,7 +369,7 @@ fn level_nine_starts_the_battle() {
 }
 
 /// The 41/114 start screen carries this row's instance, roster count, title,
-/// icon, description and difficulty, and the four previewed prizes.
+/// icon, description and difficulty, and the job's previewed prizes.
 #[test]
 fn the_start_screen_carries_the_instance_and_roster_count() {
     let fixture = Fixture::new();
@@ -409,28 +386,19 @@ fn the_start_screen_carries_the_instance_and_roster_count() {
         before,
         "the screen carries the instance"
     );
+    // The card read the client's way (0x00aa3430 to its last byte).
+    let card = encounter_card::read_card(&screen);
     assert_eq!(
-        i32_at(&screen, DETAILS_ROSTER),
+        card.goals[0].counters[2],
         row["enemies"].as_array().unwrap().len() as i32,
         "the screen carries the roster count"
     );
-    let preview = prize_preview(&screen);
-    assert_eq!(preview.len(), 4);
-    for (entry, prize) in preview.iter().zip(row["prizes"].as_array().unwrap()) {
-        assert_eq!(
-            *entry,
-            (
-                i32_field(prize, "icon_id"),
-                i32_field(prize, "name_id"),
-                1,
-                i32_field(prize, "item_id"),
-            ),
-            "the prize preview matches the row"
-        );
-    }
+    let wheel: Vec<(i32, i32, i32)> = (job_prizes(row, BRAWLER).iter())
+        .map(|p| (i32_field(p, "item_id"), i32_field(p, "name_id"), 1))
+        .collect();
+    assert_eq!(card.preview.items, wheel, "the prize preview is the Brawler's wheel");
     // The client start screen has no level field: the level floor is enforced
     // server-side at 41/108 and reported in chat.
-    assert!(screen.len() > DETAILS_ROSTER);
 
     let started = send(&mut gateway, &go(&screen), 600);
     assert!(started.began_zoning);
@@ -599,8 +567,8 @@ fn the_portal_row_applies_the_same_level_and_prize_gates() {
             .is_none()
     );
 
-    let (mut fitting, bag) = fixture.gateway_with_bag(MARKER, 1007, MAX_ITEMS - 4);
-    assert_eq!(bag.items.len(), MAX_ITEMS - 4);
+    let (mut fitting, bag) = fixture.gateway_with_bag(MARKER, 1007, MAX_ITEMS - job_prizes(battle(&battles(), BANDIT_HIDEOUT), BRAWLER).len());
+    assert_eq!(bag.items.len(), MAX_ITEMS - job_prizes(battle(&battles(), BANDIT_HIDEOUT), BRAWLER).len());
     let started = send(&mut fitting, &portal_play(BANDIT_HIDEOUT), 900);
     assert!(started.began_zoning, "the fitting bundle starts the battle");
     assert_eq!(fitting.state().zone_id, ARENA_ZONE);
@@ -732,7 +700,7 @@ fn refusals_leave_state_and_pending_battle_unchanged() {
     );
 
     // Already consumed: once the arena is live, the old Go is inert.
-    let (mut fitting, _) = fixture.gateway_with_bag(MARKER, 2005, MAX_ITEMS - 4);
+    let (mut fitting, _) = fixture.gateway_with_bag(MARKER, 2005, MAX_ITEMS - job_prizes(battle(&battles(), BANDIT_HIDEOUT), BRAWLER).len());
     let screen = open_battle(&mut fitting, MARKER_GUID, row, 800);
     assert!(send(&mut fitting, &go(&screen), 900).began_zoning);
     arena_spawned(&mut fitting, 950);
@@ -892,11 +860,10 @@ fn every_previewed_prize_resolves_for_the_shipped_catalogue() {
     let row = battle(&file, BANDIT_HIDEOUT);
     let inventory = runtime_inventory();
     let prizes = row["prizes"].as_array().unwrap();
-    assert_eq!(prizes.len(), 4);
-    assert_eq!(
-        prize_ids(row),
-        PRIZE_IDS.into_iter().collect::<BTreeSet<_>>()
-    );
+    // rc-0137: one wheel per combat job from the battle's wiki page, each at most eight.
+    for job in [0, 2, 11, 12, 32, 35, 43] {
+        assert!((1..=8).contains(&job_prizes(row, job).len()), "job {job}");
+    }
     for prize in prizes {
         let item = i32_field(prize, "item_id");
         let quantity = prize["quantity"].as_u64().unwrap_or(1) as u32;
@@ -915,12 +882,12 @@ fn every_previewed_prize_resolves_for_the_shipped_catalogue() {
         engine.battle_prizes_available(BANDIT_HIDEOUT, |item, quantity| {
             inventory.accepts_reward(item, quantity)
         }),
-        "T243's whole-bundle preflight accepts the four prizes"
+        "T243's whole-bundle preflight accepts the job's prizes"
     );
-    assert_eq!(
-        engine.battle_spawners().len(),
-        file["battles"].as_array().unwrap().len(),
-        "every published battle row supplies its marker spawner"
+    assert_markers(
+        file["battles"].as_array().unwrap(),
+        &engine.battle_spawners(),
+        "every published battle row supplies its marker spawner",
     );
 }
 

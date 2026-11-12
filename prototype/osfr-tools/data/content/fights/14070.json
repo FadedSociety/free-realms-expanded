@@ -268,8 +268,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75109,
+        "name_id": 131993,
+        "icon_id": 3100,
+        "job": 2
+      },
+      {
+        "item_id": 75411,
+        "name_id": 131155,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 75378,
+        "name_id": 131122,
+        "icon_id": 550,
+        "job": 2
+      },
+      {
+        "item_id": 76244,
+        "name_id": 133252,
+        "icon_id": 5358,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75079,
+        "name_id": 131963,
+        "icon_id": 3149,
+        "job": 11
+      },
+      {
+        "item_id": 75346,
+        "name_id": 131090,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 75313,
+        "name_id": 131057,
+        "icon_id": 550,
+        "job": 11
+      },
+      {
+        "item_id": 76114,
+        "name_id": 133122,
+        "icon_id": 3555,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76434,
+        "name_id": 133442,
+        "icon_id": 5031,
+        "job": 12
+      },
+      {
+        "item_id": 75169,
+        "name_id": 132053,
+        "icon_id": 3162,
+        "job": 12
+      },
+      {
+        "item_id": 75541,
+        "name_id": 131285,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 75508,
+        "name_id": 131252,
+        "icon_id": 550,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 75139,
+        "name_id": 132023,
+        "icon_id": 3127,
+        "job": 32
+      },
+      {
+        "item_id": 75476,
+        "name_id": 131220,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75443,
+        "name_id": 131187,
+        "icon_id": 550,
+        "job": 32
+      },
+      {
+        "item_id": 76354,
+        "name_id": 133362,
+        "icon_id": 5415,
+        "job": 32
+      },
+      {
+        "item_id": 75216,
+        "name_id": 130960,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75019,
+        "name_id": 131903,
+        "icon_id": 3105,
+        "job": 35
+      },
+      {
+        "item_id": 75183,
+        "name_id": 130927,
+        "icon_id": 550,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75768,
+        "name_id": 132776,
+        "icon_id": 2376,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75049,
+        "name_id": 131933,
+        "icon_id": 3128,
+        "job": 43
+      },
+      {
+        "item_id": 75281,
+        "name_id": 131025,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75248,
+        "name_id": 130992,
+        "icon_id": 550,
+        "job": 43
+      },
+      {
+        "item_id": 75889,
+        "name_id": 132897,
+        "icon_id": 4965,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 68
   },
   "source": [
     {
@@ -303,6 +490,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/moldy_shamblers.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Moldy Shamblers!' (revision 49820) lists one prize wheel per combat job and a 68-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

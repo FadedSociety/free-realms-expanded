@@ -231,8 +231,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75094,
+        "name_id": 131978,
+        "icon_id": 3153,
+        "job": 2
+      },
+      {
+        "item_id": 75386,
+        "name_id": 131130,
+        "icon_id": 1199,
+        "job": 2
+      },
+      {
+        "item_id": 75420,
+        "name_id": 131164,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 76214,
+        "name_id": 133222,
+        "icon_id": 5366,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75321,
+        "name_id": 131065,
+        "icon_id": 1199,
+        "job": 11
+      },
+      {
+        "item_id": 75355,
+        "name_id": 131099,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75064,
+        "name_id": 131948,
+        "icon_id": 3221,
+        "job": 11
+      },
+      {
+        "item_id": 76084,
+        "name_id": 133092,
+        "icon_id": 2348,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76394,
+        "name_id": 133402,
+        "icon_id": 2433,
+        "job": 12
+      },
+      {
+        "item_id": 75516,
+        "name_id": 131260,
+        "icon_id": 1199,
+        "job": 12
+      },
+      {
+        "item_id": 75550,
+        "name_id": 131294,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75154,
+        "name_id": 132038,
+        "icon_id": 3157,
+        "job": 12
+      },
+      {
+        "item_id": 76324,
+        "name_id": 133332,
+        "icon_id": 2510,
+        "job": 32
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 75124,
+        "name_id": 132008,
+        "icon_id": 3099,
+        "job": 32
+      },
+      {
+        "item_id": 75451,
+        "name_id": 131195,
+        "icon_id": 1199,
+        "job": 32
+      },
+      {
+        "item_id": 75485,
+        "name_id": 131229,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75004,
+        "name_id": 131888,
+        "icon_id": 3110,
+        "job": 35
+      },
+      {
+        "item_id": 75191,
+        "name_id": 130935,
+        "icon_id": 1199,
+        "job": 35
+      },
+      {
+        "item_id": 75225,
+        "name_id": 130969,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75738,
+        "name_id": 132746,
+        "icon_id": 2380,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75034,
+        "name_id": 131918,
+        "icon_id": 3130,
+        "job": 43
+      },
+      {
+        "item_id": 75256,
+        "name_id": 131000,
+        "icon_id": 1199,
+        "job": 43
+      },
+      {
+        "item_id": 75290,
+        "name_id": 131034,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75859,
+        "name_id": 132867,
+        "icon_id": 4969,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 99
   },
   "source": [
     {
@@ -254,6 +441,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Robgoblin Adept Trouble!' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Arachnia's Lair' (Ninja's Blade of Shuriken Storm; Warrior’s Axe of Earthquake; Wizard's Wand of Firestorm; Medic's Scalpel of Alarm), so it spins that wheel, from fandom 'Arachnia's Lair' (revision 49334), one per combat job, and 99 coins. The same pages also name Highroad Hijinx, Petty Yetis!, Robgoblin Creek!, arachnia_s_lair."
     }
   ]
 }

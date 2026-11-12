@@ -58,7 +58,8 @@ const GATE: u64 = 1;
 const TIER_FIVE_MARKER: u64 = 100_000_004_750;
 const TIER_FIVE_AT: [f32; 3] = [-950.582, -34.42554, -651.9259];
 const SUMMONER_MARKER: u64 = 100_000_096_000;
-const SUMMONER_AT: [f32; 3] = [-440.0, 0.8, 1290.0];
+/// Battle 96's marker, at the captured Troll Summoner starter (rc-0137).
+const SUMMONER_AT: [f32; 3] = [-793.26, -1.97, 1016.19];
 const STONE_HEART: u64 = 100_001_230_301;
 const SUMMONER: u64 = 100_000_096_001;
 const SUMMONER_MINION: u64 = 100_000_096_002;
@@ -673,9 +674,11 @@ fn a_shielded_summoner_is_not_stunned_by_earth_shard() {
         ..arena
     };
     // Four basics cross the summoner's 75 % threshold (and never its 50 %
-    // threshold), so exactly the first minion pair stands.
+    // threshold), so exactly the first minion pair stands; twice that since the owner's
+    // x2 enemy health (rc-0137).
+    let swings = (4.0 * combat_scale::multipliers().0).round() as usize;
     let mut now = kill + 500;
-    for _ in 0..4 {
+    for _ in 0..swings {
         now += 700;
         game.handle_in_world(&basic(SUMMONER), &in_arena, now)
             .unwrap();
@@ -723,9 +726,11 @@ fn a_shielded_summoner_is_not_burned_by_flame_wave() {
         ..arena
     };
     // Three basics bring the summoner below 75 % (and never below 50 %), so
-    // exactly its first minion pair stands and shields it.
+    // exactly its first minion pair stands and shields it; twice that since the owner's x2
+    // enemy health (rc-0137), and twice the swings on each minion.
+    let health_x = combat_scale::multipliers().0;
     let mut now = kill + 500;
-    for _ in 0..3 {
+    for _ in 0..(3.0 * health_x).round() as usize {
         now += 700;
         game.handle_in_world(&basic(SUMMONER), &in_arena, now)
             .unwrap();
@@ -741,7 +746,7 @@ fn a_shielded_summoner_is_not_burned_by_flame_wave() {
         (SUMMONER_MINION, [134.5, -0.6, 174.0]),
         (SUMMONER_MINION_B, [137.5, -0.6, 174.0]),
     ] {
-        for _ in 0..2 {
+        for _ in 0..(2.0 * health_x).round() as usize {
             exposed_at += 700;
             let here = CharacterState {
                 position: spot,

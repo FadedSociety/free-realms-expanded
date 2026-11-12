@@ -25,14 +25,23 @@ pub fn basic(profile: i32) -> u32 {
         .unwrap() as u32
 }
 
+/// The owner's multipliers on every enemy's final health and hit (rc-0137).
+pub fn multipliers() -> (f64, f64) {
+    let d = data();
+    let get = |key: &str| d[key].as_f64().unwrap_or(1.0);
+    (get("enemy_health_multiplier"), get("enemy_damage_multiplier"))
+}
+
 /// An authored (old-scale) enemy health as the loader scales it at level one.
 pub fn enemy_health(authored: u32) -> u32 {
-    (authored as f64 * data()["enemy_health_scale"].as_f64().unwrap()).round() as u32
+    let scale = data()["enemy_health_scale"].as_f64().unwrap();
+    (authored as f64 * scale * multipliers().0).round() as u32
 }
 
 /// An authored (old-scale) enemy damage as the loader scales it at level one.
 pub fn enemy_damage(authored: u32) -> u32 {
-    (authored as f64 * data()["enemy_damage_scale"].as_f64().unwrap()).round() as u32
+    let scale = data()["enemy_damage_scale"].as_f64().unwrap();
+    (authored as f64 * scale * multipliers().1).round() as u32
 }
 
 /// Damage and heal multiplier of the weapon tier a job level wields.
@@ -60,7 +69,7 @@ pub fn tier_ratio() -> f64 {
 /// A field enemy's authored damage at its level: the tier factor, then the enemy scale.
 pub fn enemy_hit(authored: u32, level: u32) -> u32 {
     let scale = data()["enemy_damage_scale"].as_f64().unwrap();
-    (authored as f64 * tier_factor(level) * scale).round() as u32
+    (authored as f64 * tier_factor(level) * scale * multipliers().1).round() as u32
 }
 
 /// An authored enemy health at a level or difficulty level: the health growth
@@ -71,7 +80,8 @@ pub fn enemy_health_at(authored: u32, level: u32) -> u32 {
         .as_f64()
         .unwrap()
         .powf((level - 1) as f64 / 4.0);
-    (authored as f64 * growth * d["enemy_health_scale"].as_f64().unwrap()).round() as u32
+    let scale = d["enemy_health_scale"].as_f64().unwrap();
+    (authored as f64 * growth * scale * multipliers().0).round() as u32
 }
 
 /// The first authored enemy health whose loader-scaled value reaches the middle of the

@@ -34715,19 +34715,12 @@
         ],
         "model_id": [
           {
-            "kind": "legacy-data",
-            "evidence": "data/content/npcs/seaside.json npc_id=9500000613 (same name)"
-          }
-        ],
-        "model_file_name": [
-          {
-            "kind": "legacy-data",
-            "evidence": "data/content/npcs/seaside.json npc_id=9500000613 (same name)"
+            "kind": "reconstructed",
+            "evidence": "(R) No body, so not drawn (rc-0137): the owner met two Petals 18 m apart. She is the seaside row 9500000613 the Kart Driver quests name; this POI copy had borrowed her body (model 36, fairy_f_valinda.adr)."
           }
         ]
       },
-      "model_id": 36,
-      "model_file_name": "fairy_f_valinda.adr"
+      "model_id": null
     },
     {
       "npc_id": 9500000931,

@@ -498,11 +498,20 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
     let before_fight = economy(&gateway);
 
     let player_guid = gateway.state().guid;
+    let full = player_health(&gateway);
     let mut now = 1_000;
     let mut target = None;
     let mut enemy_took_turns = false;
     for _ in 0..200 {
         let Some(((guid, _, position), phase)) = active_enemy(&gateway, target) else {
+            // Between the paced rounds (`instance_pacing.json`) nobody stands for a while.
+            let fighting = (gateway.snapshot().gameplay.and_then(|g| g.encounter))
+                .and_then(|e| e.active)
+                .is_some_and(|a| a.phase == EncounterPhase::Fighting);
+            if fighting {
+                tick_for(&mut gateway, &mut now, 1_000);
+                continue;
+            }
             break;
         };
         if phase != EncounterPhase::Fighting {
@@ -522,6 +531,11 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
             let before_swing = player_health(&gateway);
             tick_for(&mut gateway, &mut now, 700);
             enemy_took_turns |= player_health(&gateway) < before_swing;
+            // Basic swings alone lose to the owner's x2 health and x1.5 hits (rc-0137); the
+            // route is what this pins, so the player is healed at half health.
+            if player_health(&gateway) < full / 2 {
+                send(&mut gateway, &chat::local_request("realm heal"), now);
+            }
         }
     }
     assert!(

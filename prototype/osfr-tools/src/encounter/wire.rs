@@ -100,7 +100,8 @@ pub(super) fn enemy_hp(guid: u64, hp: u32, max: u32) -> Vec<u8> {
 /// `008ba940` writes +0x160 / +0x15c), and those two fields are what the boss bar reads
 /// (`BaseClient.Bosses` cell getter `00a79eb0`, columns 2 and 3); the 35/5 handler (dispatch
 /// `0092f460` case 5) only moves the nameplate bar. 32/7 alone subtracts its damage from the
-/// client's copy (`00a2ba40`), which is zero until a statement sets it.
+/// client's copy (`00a2ba40`), which is zero until a statement sets it: every spawn, heal and
+/// regen sends one; a hit sends its 32/7 (`player_hit`).
 pub(super) fn enemy_health(guid: u64, hp: u32, max: u32) -> [Vec<u8>; 2] {
     let wire = |v: u32| i32::try_from(v).unwrap_or(i32::MAX);
     [
@@ -231,6 +232,21 @@ pub fn zone_begin_packet(zone: &ZoneTransition) -> Vec<u8> {
     b
 }
 
+/// AddNpc `interact_range` (+133) for an engine actor: the guide 12 m, a hostile that hits 0, the
+/// rest (doors, captives, talkers, pickups) 3 m. The client's press-X prompt picks the nearest
+/// interactive actor whose range covers the player (`sub_BAF6E0` 00baf6e0 reads it at actor
+/// +0x1818); the Kaboomers' 3 m drew it over them (owner, rc-0137). (R) Live sent 100 to its
+/// hostiles (p12: all 52 Bixie Soldier, Battlemage and wave-wolf AddNpc rows, with 35/12 cursor
+/// 11), so 0 is the owner's rule, not the capture's. The enemy stays interactable (+224) with its
+/// 35/12 cursor, so a click still targets it.
+fn reach(a: &Actor, disposition: i32) -> i32 {
+    match disposition {
+        2 => 12,
+        0 if a.damage > 0 => 0,
+        _ => 3,
+    }
+}
+
 pub(super) fn spawn_actor(
     template: &[u8],
     a: &Actor,
@@ -251,7 +267,7 @@ pub(super) fn spawn_actor(
     b[69..73].copy_from_slice(&0_i32.to_le_bytes());
     b[77..81].copy_from_slice(&disposition.to_le_bytes());
     b[128..132].copy_from_slice(&3.0_f32.to_le_bytes());
-    b[133..137].copy_from_slice(&(if disposition == 2 { 12_i32 } else { 3_i32 }).to_le_bytes());
+    b[133..137].copy_from_slice(&reach(a, disposition).to_le_bytes());
     b[137..141].copy_from_slice(&2_i32.to_le_bytes());
     b[141..145].copy_from_slice(&3_i32.to_le_bytes());
     b[145..149].copy_from_slice(&1_i32.to_le_bytes());
@@ -353,7 +369,11 @@ pub fn player_hit(h: &PlayerHit) -> Vec<Vec<u8>> {
         h.effect.unwrap_or(0),
         [h.critical, false],
     ));
-    packets.extend(enemy_health(h.target, h.health, h.max_health));
+    // The 32/7 itself moves the boss bar, in step with the swing (`00a2ba40` takes its damage
+    // off the copy the spawn's statement set). A 35/35 here as well came on the enemy's own
+    // animation clock (`008d3020` delays the event by its attacker's actor, `008ba940` keeps
+    // only a newer one) and made the bar tick sporadically (owner, rc-0136 recheck).
+    packets.push(enemy_hp(h.target, h.health, h.max_health));
     packets
 }
 

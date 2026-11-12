@@ -103,6 +103,7 @@ pub fn load_dir(directory: &Path) -> io::Result<Vec<Fight>> {
         return Ok(Vec::new());
     }
     let catalogue = Catalogue::load(directory)?;
+    let pacing = super::pacing::PacingTable::load(directory)?;
     let mut paths: Vec<_> = fs::read_dir(&folder)?
         .filter_map(|entry| entry.ok().map(|e| e.path()))
         .filter(|path| path.extension().is_some_and(|e| e == "json"))
@@ -120,7 +121,7 @@ pub fn load_dir(directory: &Path) -> io::Result<Vec<Fight>> {
         if fs::metadata(&path)?.len() > fight::MAX_FILE_BYTES {
             return Err(invalid(&format!("{name}: file too large")));
         }
-        let fight = Fight::parse(&fs::read(&path)?, &catalogue, &name)?;
+        let fight = Fight::parse_paced(&fs::read(&path)?, &catalogue, &name, &pacing)?;
         if path.file_stem().and_then(|s| s.to_str()) != Some(fight.id.to_string().as_str()) {
             return Err(invalid(&format!("{name}: the file is named after its id")));
         }
@@ -171,4 +172,6 @@ pub struct FightState {
     pub(super) down_since: Option<u64>,
     /// The run as last written to the save.
     pub(super) saved: Option<run::Saved>,
+    /// The overworld instance fights' pacing (`instance_pacing.json`, `pacing.rs`).
+    pub(super) pacing: Arc<super::pacing::PacingTable>,
 }

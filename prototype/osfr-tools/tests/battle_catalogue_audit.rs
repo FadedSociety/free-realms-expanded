@@ -268,14 +268,21 @@ fn row_violations(
         )),
     }
 
-    // The loader caps the wheel at 4 rows but admits an empty one; a shipped
-    // battle with no prize is a content defect, so the audit requires one.
+    // rc-0137: one wheel per combat job (`job`, 0 = any other job). The loader caps each at 8
+    // rows but admits an empty one; a shipped battle with no prize is a content defect, so the
+    // audit requires one.
     let prizes = row["prizes"].as_array().cloned().unwrap_or_default();
-    if prizes.is_empty() || prizes.len() > 4 {
-        out.push(format!(
-            "battle {id}: the prize wheel has {} rows; the audit requires 1..=4",
-            prizes.len()
-        ));
+    let jobs: BTreeSet<i64> = (prizes.iter()).map(|p| p["job"].as_i64().unwrap_or(0)).collect();
+    for job in &jobs {
+        let rows = (prizes.iter()).filter(|p| p["job"].as_i64().unwrap_or(0) == *job).count();
+        if rows > 8 {
+            out.push(format!(
+                "battle {id}: job {job}'s prize wheel has {rows} rows; the audit allows 8"
+            ));
+        }
+    }
+    if prizes.is_empty() {
+        out.push(format!("battle {id}: the prize wheel has 0 rows; the audit requires one"));
     }
     for (index, prize) in prizes.iter().enumerate() {
         for field in ["item_id", "name_id", "icon_id"] {
@@ -389,11 +396,7 @@ fn every_shipped_field_battle_loads_with_a_unique_drawable_marker() {
     // battles, so the loader's cross-file GUID rules run for every actor.
     let engine = loaded_engine(&fixture);
     let spawners = engine.battle_spawners();
-    assert_eq!(
-        spawners.len(),
-        rows.len(),
-        "every shipped row publishes exactly one marker"
-    );
+    assert_markers(&rows, &spawners, "every shipped row publishes exactly one marker");
     let field_guids: BTreeSet<u64> = engine.field_guids().into_iter().collect();
 
     let mut violations: Vec<String> = Vec::new();
@@ -438,36 +441,40 @@ fn every_shipped_field_battle_loads_with_a_unique_drawable_marker() {
         let id = unsigned(row, "id");
         let spawner = &row["spawner"];
         let guid = u64_field(spawner, "guid");
-        let loaded = spawners
-            .iter()
-            .find(|entry| entry.0 == guid)
-            .unwrap_or_else(|| panic!("battle {id}: battle_spawners has no marker {guid}"));
-        assert_eq!(
-            loaded.1,
-            spawner["name"].as_str().unwrap(),
-            "battle {id}: the marker tool name"
-        );
-        assert_eq!(
-            loaded.2,
-            number(spawner, "name_id") as i32,
-            "battle {id}: the marker client name id"
-        );
-        assert_eq!(
-            loaded.3,
-            number(spawner, "model_id") as i32,
-            "battle {id}: the marker model"
-        );
-        assert_eq!(
-            loaded.4,
-            position(&spawner["position"]),
-            "battle {id}: the marker position"
-        );
-        assert_eq!(
-            loaded.5,
-            number(row, "nameplate_image_id") as i32,
-            "battle {id}: the crossed-swords nameplate"
-        );
-        assert!(loaded.5 > 0, "battle {id}: the marker is not drawable");
+        // A row an entrance stands for has no marker of its own (rc-0137); it still runs.
+        let loaded = spawners.iter().find(|entry| entry.0 == guid);
+        if loaded.is_none() {
+            let claimed = entrance_rows().contains(&u64::from(id));
+            assert!(claimed, "battle {id}: battle_spawners has no marker {guid}");
+        }
+        if let Some(loaded) = loaded {
+            assert_eq!(
+                loaded.1,
+                spawner["name"].as_str().unwrap(),
+                "battle {id}: the marker tool name"
+            );
+            assert_eq!(
+                loaded.2,
+                number(spawner, "name_id") as i32,
+                "battle {id}: the marker client name id"
+            );
+            assert_eq!(
+                loaded.3,
+                number(spawner, "model_id") as i32,
+                "battle {id}: the marker model"
+            );
+            assert_eq!(
+                loaded.4,
+                position(&spawner["position"]),
+                "battle {id}: the marker position"
+            );
+            assert_eq!(
+                loaded.5,
+                number(row, "nameplate_image_id") as i32,
+                "battle {id}: the crossed-swords nameplate"
+            );
+            assert!(loaded.5 > 0, "battle {id}: the marker is not drawable");
+        }
         assert!(
             engine.is_battle_spawner(guid),
             "battle {id}: the marker is not the engine's battle spawner"
@@ -1262,12 +1269,11 @@ fn a_malformed_battle_row_is_refused_atomically() {
     // preflight is the refusal layer (T243). The row loads and the preflight
     // refuses it before any encounter or payout can start.
     let mut doc: Value = serde_json::from_slice(&shipped).unwrap();
-    doc["battles"]
-        .as_array_mut()
-        .unwrap()
-        .iter_mut()
+    let row = (doc["battles"].as_array_mut().unwrap().iter_mut())
         .find(|row| row["id"] == 12_350)
-        .unwrap()["prizes"][0]["item_id"] = json!(i32::MAX);
+        .unwrap();
+    let first = first_prize_of(row, 0);
+    row["prizes"][first]["item_id"] = json!(i32::MAX);
     let path = write(&doc);
     engine
         .reload_field_battles(&path)
@@ -1308,11 +1314,13 @@ fn a_malformed_battle_row_is_refused_atomically() {
     engine
         .reload_field_battles(&scratch)
         .expect("the restored catalogue loads again");
-    assert_eq!(
-        engine.battle_spawners(),
-        spawners,
-        "the restored catalogue is the shipped one"
-    );
+    // The scratch folder holds no `entrances.json`, so the restored load draws every row; the
+    // ones the shipped load drew are the same markers.
+    let drawn: BTreeSet<u64> = spawners.iter().map(|s| s.0).collect();
+    let restored: Vec<_> = (engine.battle_spawners().into_iter())
+        .filter(|s| drawn.contains(&s.0))
+        .collect();
+    assert_eq!(restored, spawners, "the restored catalogue is the shipped one");
     assert_eq!(engine.state(), &state);
 }
 
@@ -1334,11 +1342,7 @@ fn the_audit_uses_the_shipped_content_and_no_dev_commands() {
 
     let fixture = Fixture::new();
     let engine = loaded_engine(&fixture);
-    assert_eq!(
-        engine.battle_spawners().len(),
-        rows.len(),
-        "the engine loads exactly the shipped rows"
-    );
+    assert_markers(&rows, &engine.battle_spawners(), "the engine loads exactly the shipped rows");
 
     // The route's packet builders are ordinary client messages. A realm order
     // or the developer teleport would ride the local-chat family (15/1); none

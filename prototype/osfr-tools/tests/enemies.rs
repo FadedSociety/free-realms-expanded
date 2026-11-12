@@ -395,6 +395,9 @@ fn opening_wolf_messages_match_encounter_engine_byte_for_byte() {
     scale["player_base_health"] = json!(1000);
     scale["enemy_health_scale"] = json!(1.0);
     scale["enemy_damage_scale"] = json!(1.0);
+    // And the owner's multipliers (rc-0137): the reference engine knows no scale at all.
+    scale["enemy_health_multiplier"] = json!(1.0);
+    scale["enemy_damage_multiplier"] = json!(1.0);
     fs::write(
         scratch.join("combat_scale.json"),
         serde_json::to_vec(&scale).unwrap(),

@@ -6,9 +6,9 @@
 //! finished or abandoned run stay apart.
 //!
 //! Combat: every player is a Brawler (3 m reach: the rig walks up to the enemy, then hits) at
-//! level 4 (one hit is 444, so the 70% crossing is two hits), level 12 (1,357: against battle
-//! 96's 1,726-health summoner, rc-0136, one hit calls every helper in and the next wins) or
-//! level 16 (2,372, which fells the summoner in one hit). Client layouts: 36/10 writer `00a342e0`, 35/5 enemy health, 35/2 AddNpc `00921a10`,
+//! level 4 (one hit is 444), level 12 (1,357: against battle
+//! 96's 3,453-health summoner at the owner's x2, rc-0137, each hit calls a tier of helpers in
+//! and a few more win) or level 16 (2,372). Client layouts: 36/10 writer `00a342e0`, 35/5 enemy health, 35/2 AddNpc `00921a10`,
 //! 32/7 attack processed, 39/18 game over, 39/45 prize wheel (see `encounter.rs`).
 #[path = "../src/bin/osfr-bot.rs"]
 #[allow(dead_code)]
@@ -73,6 +73,38 @@ fn awake(arena: &SharedArena) -> Vec<u64> {
         .filter(|e| e.guid != SUMMONER && !e.dormant && e.health > 0)
         .map(|e| e.guid)
         .collect()
+}
+
+/// A's hits call the minions in, a tier at a time, and B clears each wave, until every minion
+/// is down (rc-0137: at the owner's x2 health a level-12 hit no longer calls them all at once).
+fn call_and_clear_minions(rig: &mut Rig) {
+    for _ in 0..MINIONS.len() {
+        let (_, arena) = arena_of(rig, A).unwrap();
+        let left = (arena.enemies().iter()).any(|e| e.guid != SUMMONER && e.health > 0);
+        if !left {
+            return;
+        }
+        if awake(&arena).is_empty() {
+            rig.land(A, SUMMONER);
+        }
+        for _ in 0..MINIONS.len() {
+            let (_, arena) = arena_of(rig, B).unwrap();
+            let Some(target) = awake(&arena).first().copied() else {
+                break;
+            };
+            rig.land(B, target);
+        }
+    }
+}
+
+/// A hits the summoner until the run is won.
+fn finish(rig: &mut Rig) {
+    for _ in 0..8 {
+        if rig.host(move |s| s.test_arena(A).is_some_and(|(_, arena)| arena.won())) {
+            return;
+        }
+        rig.land(A, SUMMONER);
+    }
 }
 
 fn guid_at(message: &[u8], at: usize) -> u64 {
@@ -271,20 +303,13 @@ fn a_win_pays_every_member_once_and_a_close_returns_only_that_member() {
     let run = join(&mut rig, A, B);
     let (before_a, before_b) = (econ(&rig, A, &prizes), econ(&rig, B, &prizes));
 
-    // A's first hit calls every minion in; B clears them; A lands the last hit. B never acts
-    // after the minions fall.
-    rig.land(A, SUMMONER);
-    for _ in 0..MINIONS.len() {
-        let (_, arena) = arena_of(&rig, B).unwrap();
-        let Some(target) = awake(&arena).first().copied() else {
-            break;
-        };
-        rig.land(B, target);
-    }
+    // A's hits call the minions in; B clears them; A lands the last hits. B never acts after
+    // the minions fall.
+    call_and_clear_minions(&mut rig);
     let (_, arena) = arena_of(&rig, A).unwrap();
     assert!(awake(&arena).is_empty() && health(&arena, SUMMONER) > 0);
     clear_inboxes(&mut rig);
-    rig.land(A, SUMMONER);
+    finish(&mut rig);
     rig.until("the win", |rig| {
         rig.host(move |s| s.test_arena(A).is_some_and(|(_, arena)| arena.won()))
     });
@@ -337,14 +362,7 @@ fn a_member_whose_win_save_fails_is_paid_once_on_a_later_tick() {
     let row = field_battle_fixture::battle(&battles, BATTLE).clone();
     let prizes = prize_ids(&row);
     join(&mut rig, A, B);
-    rig.land(A, SUMMONER);
-    for _ in 0..MINIONS.len() {
-        let (_, arena) = arena_of(&rig, B).unwrap();
-        let Some(target) = awake(&arena).first().copied() else {
-            break;
-        };
-        rig.land(B, target);
-    }
+    call_and_clear_minions(&mut rig);
     let before_b = econ(&rig, B, &prizes);
     let real = rig.host(|s| {
         let path = s.test_state_path(B);
@@ -353,7 +371,7 @@ fn a_member_whose_win_save_fails_is_paid_once_on_a_later_tick() {
         real
     });
     clear_inboxes(&mut rig);
-    rig.land(A, SUMMONER);
+    finish(&mut rig);
     rig.until("A's results", |rig| game_overs(&rig.inbox[0]) > 0);
     rig.pump(Duration::from_millis(500)); // several ticks; B's fan-out fails on each
     assert_eq!(game_overs(&rig.take(1)), 0, "B was shown a win it could not keep");

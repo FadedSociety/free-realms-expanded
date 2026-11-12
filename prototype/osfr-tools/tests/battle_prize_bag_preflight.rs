@@ -190,6 +190,8 @@ fn synthetic_battles(bundle: Bundle) -> Value {
         .expect("battle 12310 is shipped");
     let name_id = row["prizes"][0]["name_id"].clone();
     let icon_id = row["prizes"][0]["icon_id"].clone();
+    // Only these rows: no job's own wheel and no coin slot (rc-0137), so the win pays one of them.
+    row["wheel_coins"] = json!(0);
     row["prizes"] = Value::Array(
         quantities
             .iter()
@@ -657,7 +659,8 @@ fn a_bundle_that_fits_still_starts_and_pays() {
     let screen = open_start_screen(&mut gateway, 900);
     let started = send(&mut gateway, &go(&screen), 1_000);
     assert!(started.began_zoning, "the fitting bundle starts the battle");
-    assert_eq!(gateway.state().zone_id, 9600);
+    let arena = battle_row()["zone"]["zone_id"].as_u64().unwrap();
+    assert_eq!(u64::from(gateway.state().zone_id), arena);
     arena_spawned(&mut gateway, 1_100);
 
     let reward_coins = u64::from(battle_row()["reward_coins"].as_u64().unwrap()) as u32;

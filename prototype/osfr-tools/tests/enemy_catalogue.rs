@@ -163,7 +163,9 @@ fn the_captured_kinds_carry_their_exact_numbers() {
         let (kind, numbers) = engine
             .catalogue_kind(id, None, 1)
             .unwrap_or_else(|| panic!("{id} is a ranked kind of the shipped catalogue"));
-        assert_eq!(numbers, (health, hit), "{id} ({:?})", kind.rank);
+        // As captured, times the owner's enemy multipliers (rc-0137: health x2, hits x1.5).
+        let live = (scale::live_health(health), scale::live_hit(hit));
+        assert_eq!(numbers, live, "{id} ({:?})", kind.rank);
         assert!(kind.health.is_none(), "{id}: the rank table gives the health");
         assert!(kind.speeds.is_some() && !kind.tags.is_empty(), "{id}");
     }
@@ -172,7 +174,7 @@ fn the_captured_kinds_carry_their_exact_numbers() {
     // Somewhere else the same kind follows the tier it is placed at, and a group adds half.
     let at = |id: &str, tier, group| engine.catalogue_kind(id, Some(tier), group).unwrap().1.0;
     assert_eq!(at("bixie_soldier", 3, 1), scale::enemy_health(Rank::Minion, 3, 1));
-    assert_eq!(at("frostfang_growler", 1, 3), 1_520);
+    assert_eq!(at("frostfang_growler", 1, 3), scale::live_health(1_520));
     // An unranked kind is in the catalogue but has no rank numbers.
     assert!(engine.catalogue_kind("hooligan_wolf", None, 1).is_none());
     assert!(engine.catalogue_kinds().iter().any(|k| k.id == "hooligan_wolf"));
@@ -220,17 +222,21 @@ fn rows_inherit_from_their_definition_and_unranked_rows_keep_the_old_rule() {
     let mut engine = scratch.load();
     // The world wolf wrote 100 health at level 8: a normal enemy of tier 3.
     assert_eq!(world_health(&engine, WORLD_WOLF), scale::enemy_health(Rank::Normal, 3, 1));
-    assert_eq!(world_health(&engine, WORLD_WOLF), 2_324);
+    assert_eq!(world_health(&engine, WORLD_WOLF), 4_647, "2,324 times the owner's x2 (rc-0137)");
     let out = engine.on_zone_ready(MEDIC, 0).unwrap();
-    assert_eq!(max_health(&out, FIELD_KING), Some(5_000), "health stated outright");
+    let stated = Some(scale::live_health(5_000));
+    assert_eq!(max_health(&out, FIELD_KING), stated, "health stated outright, times the owner's x2");
     // The unranked field row: 100 authored at level 20 on the player curve and enemy scale.
     let scale_file = shipped_json("combat_scale.json");
     let ratio = scale_file["tier_ratio"].as_f64().unwrap();
-    let legacy = 100.0 * ratio.powf(19.0 / 4.0) * scale_file["enemy_health_scale"].as_f64().unwrap();
+    let legacy = 100.0
+        * ratio.powf(19.0 / 4.0)
+        * scale_file["enemy_health_scale"].as_f64().unwrap()
+        * scale_file["enemy_health_multiplier"].as_f64().unwrap_or(1.0);
     assert_eq!(max_health(&out, FIELD_PLAIN), Some(legacy.round() as u32));
     engine.set_player_job(MEDIC, 20);
     let out = engine.tick([0.0; 3], MEDIC, 100).unwrap();
-    assert_eq!(hits_from(&out, FIELD_KING), [77], "raw hit stated outright");
+    assert_eq!(hits_from(&out, FIELD_KING), [scale::live_hit(77)], "raw hit stated outright, x1.5");
 }
 
 #[test]

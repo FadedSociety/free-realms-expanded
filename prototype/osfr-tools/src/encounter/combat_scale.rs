@@ -8,7 +8,9 @@
 //! takes its health and hit from the rank tables: plain basics of the tier times the rank's
 //! count, the way the three captured kinds measure out. Every other row keeps the older
 //! rule: its authored numbers are level-one baselines, grown on the player curve and by the
-//! two global enemy scales. Ranking a kind is one key in its definition.
+//! two global enemy scales (the T639 conversion). Ranking a kind is one key in its definition.
+//! On every path the owner's two enemy multipliers (`enemy_health_multiplier`,
+//! `enemy_damage_multiplier`, rc-0136) come last, once.
 use super::scale::{Catalogue, Definition};
 use super::*;
 use std::sync::OnceLock;
@@ -18,13 +20,15 @@ const FILE: &str = "combat_scale.json";
 const BUNDLED: &str = include_str!("../../data/content/combat_scale.json");
 /// Every value carries a source row naming it; `ranks` and `enemy_hit` carry two, what was
 /// captured and what was filled in.
-const FIELDS: [&str; 20] = [
+const FIELDS: [&str; 22] = [
     "basic_damage",
     "tier_min_levels",
     "tier_ratio",
     "player_base_health",
     "enemy_health_scale",
     "enemy_damage_scale",
+    "enemy_health_multiplier",
+    "enemy_damage_multiplier",
     "max_level",
     "health_step_levels",
     "ability_damage",
@@ -142,6 +146,9 @@ pub(super) struct CombatScale {
     player_base_health: u32,
     enemy_health_scale: f32,
     enemy_damage_scale: f32,
+    /// The owner's multipliers on every enemy's final health and hit (rc-0136: x2, x1.5).
+    enemy_health_multiplier: f32,
+    enemy_damage_multiplier: f32,
     max_level: u32,
     /// Levels per `tier_ratio` step of player health.
     health_step_levels: u32,
@@ -199,7 +206,12 @@ impl CombatScale {
 
     fn valid(&self) -> bool {
         let scale = self;
-        let scales = [scale.enemy_health_scale, scale.enemy_damage_scale];
+        let scales = [
+            scale.enemy_health_scale,
+            scale.enemy_damage_scale,
+            scale.enemy_health_multiplier,
+            scale.enemy_damage_multiplier,
+        ];
         let tiers = &scale.tier_min_levels;
         let count = tiers.len();
         let positive = |v: f32, most: f32| v.is_finite() && v > 0.0 && v <= most;
@@ -311,12 +323,23 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
 
     /// Scale an authored enemy row (level-one baselines) onto the live scale:
     /// its own level or difficulty factors first, then the global enemy
-    /// scales, rounded once at the end.
+    /// scales and the owner's multipliers, rounded once at the end.
     pub(super) fn scale_enemy(&self, a: &mut Actor, health_factor: f32, damage_factor: f32) {
         let health = a.max_health as f32 * health_factor * self.enemy_health_scale;
         let damage = a.damage as f32 * damage_factor * self.enemy_damage_scale;
-        a.max_health = health.round() as u32;
-        a.damage = damage.round() as u32;
+        a.max_health = self.live_health(health);
+        a.damage = self.live_hit(damage);
+    }
+
+    /// An enemy's final health from its number before the owner's multiplier (a rank's, a
+    /// kind's or row's own, or a converted authored row's).
+    pub(super) fn live_health(&self, health: f32) -> u32 {
+        (health * self.enemy_health_multiplier).round() as u32
+    }
+
+    /// An enemy's final raw hit, as [`Self::live_health`] for health.
+    pub(super) fn live_hit(&self, hit: f32) -> u32 {
+        (hit * self.enemy_damage_multiplier).round() as u32
     }
 
     /// A loaded world or dungeon row (R, T737): its authored health is a
@@ -337,13 +360,15 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
         }
     }
 
-    /// A battle's enemy: a ranked kind fights at the battle's difficulty as its tier (battles
-    /// are not scaled to the player); the rest scale like a player at the difficulty's level
-    /// gate, so each fight keeps the same share of danger (R).
+    /// A battle's enemy: a ranked kind fights at the tier of the battle's level gate (the
+    /// difficulty's level, as a fight file's roster does; battles are not scaled to the
+    /// player); the rest scale like a player at that gate, so each fight keeps the same share
+    /// of danger (R). rc-0136: the difficulty itself as the tier set a difficulty-3 battle at
+    /// tier 3 behind its level-5 gate (tier 2), out of reach of the level it asks for.
     pub(super) fn scale_battle_enemy(&self, a: &mut Actor, difficulty: i32) {
-        let tier = difficulty.clamp(1, i32::from(self.tiers())) as u8;
-        if !self.rank_enemy(a, tier) {
-            let factor = self.health_factor(difficulty_level(difficulty));
+        let level = difficulty_level(difficulty);
+        if !self.rank_enemy(a, self.tier(level) as u8) {
+            let factor = self.health_factor(level);
             self.scale_enemy(a, factor, factor);
         }
     }
@@ -378,10 +403,10 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
         let rank = definition.rank?;
         let tier = tier.or(definition.tier).unwrap_or(1);
         let health = match definition.health {
-            Some(own) => (own as f32 * self.group_factor(group)).round() as u32,
+            Some(own) => self.live_health(own as f32 * self.group_factor(group)),
             None => self.enemy_health(rank, tier, group),
         };
-        let hit = definition.hit;
+        let hit = definition.hit.map(|own| self.live_hit(own as f32));
         Some((health, hit.unwrap_or_else(|| self.enemy_hit(rank, tier))))
     }
 
@@ -398,7 +423,7 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
     pub(super) fn enemy_health(&self, rank: Rank, tier: u8, group: u8) -> u32 {
         let plain = self.ability_damage(&self.plain_basic, tier) as f32;
         let basics = self.ranks.get(&rank).map_or(0.0, |row| row.hp_basics);
-        (plain * basics * self.group_factor(group)).round() as u32
+        self.live_health(plain * basics * self.group_factor(group))
     }
 
     /// A normal hit of the tier before the rank's multiplier: the share of a player's base
@@ -411,7 +436,7 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
     /// An enemy's normal hit, raw (before the target's Defense).
     pub(super) fn enemy_hit(&self, rank: Rank, tier: u8) -> u32 {
         let by_rank = self.ranks.get(&rank).map_or(0.0, |row| row.hit);
-        (self.tier_hit(tier) * by_rank).round() as u32
+        self.live_hit(self.tier_hit(tier) * by_rank)
     }
 
     /// A special hit made from a normal one (the wire marks it with its own effect).
@@ -431,9 +456,11 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
         (max_health as f32 * self.enemy_regen_percent / 100.0).round() as u32
     }
 
-    /// The seconds one player should need for a rank at his own tier, lowest and highest.
+    /// The seconds one player should need for a rank at his own tier, lowest and highest: the
+    /// file's band is the 2014 pace, stretched by the owner's health multiplier.
     pub(super) fn solo_seconds(&self, rank: Rank) -> [f32; 2] {
-        (self.ranks.get(&rank)).map_or([0.0; 2], |row| row.solo_seconds)
+        let band = (self.ranks.get(&rank)).map_or([0.0; 2], |row| row.solo_seconds);
+        band.map(|s| s * self.enemy_health_multiplier)
     }
 
     /// Damage of a kit ability class at a weapon tier; 0 for a class the table does not hold.

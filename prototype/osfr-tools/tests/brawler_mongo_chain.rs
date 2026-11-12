@@ -387,6 +387,23 @@ fn prize_total(economy: &Economy) -> u32 {
     economy.gloves + economy.packs + economy.potions
 }
 
+/// One win pays the battle's coins and one spin of the wheel: a prize, or (rc-0137) the wiki's
+/// coin slot King of the Ring! has beside its items ("19 Coins" on every job's wheel).
+fn assert_one_win(before: &Economy, after: &Economy) {
+    let slot = battle_row(BATTLE)["wheel_coins"].as_u64().unwrap_or(0) as u32;
+    let (coins, prizes) = (after.coins - before.coins, prize_total(after) - prize_total(before));
+    assert!(
+        (coins == BATTLE_COINS && prizes == 1) || (slot > 0 && coins == BATTLE_COINS + slot && prizes == 0),
+        "the battle's {BATTLE_COINS} coins once and one wheel slot: {coins} coins, {prizes} prizes"
+    );
+}
+
+/// The wheel's coins a win paid: the coin slot when the spin gave no prize.
+fn wheel_extra(before: &Economy, after: &Economy) -> u32 {
+    let slot = battle_row(BATTLE)["wheel_coins"].as_u64().unwrap_or(0) as u32;
+    if prize_total(after) == prize_total(before) { slot } else { 0 }
+}
+
 /// Gate -> Go -> Mongo -> results Close -> world. The won run is paid and closed once.
 fn finish_battle(game: &mut Gameplay, character: &mut CharacterState, at: &mut u64) {
     let details = open_gate(game, character, *at);
@@ -492,13 +509,12 @@ fn carlos_offers_bringing_back_brazenfist_only_to_brawlers() {
     finish_battle(&mut game, &mut character, &mut at);
     let after_run = economy(&game);
     assert_eq!(counts(&game, FIRST), vec![1, 1]);
-    assert_eq!(after_run.coins, initial.coins + BATTLE_COINS);
+    assert_one_win(&initial, &after_run);
     assert_eq!(after_run.brawler_xp, initial.brawler_xp + BATTLE_XP);
-    assert_eq!(prize_total(&after_run), prize_total(&initial) + 1);
     pay_first(&mut game, &character, &mut at);
     assert_eq!(
         economy(&game).coins,
-        initial.coins + BATTLE_COINS + QUEST_COINS
+        initial.coins + BATTLE_COINS + wheel_extra(&initial, &after_run) + QUEST_COINS
     );
     assert_eq!(
         economy(&game).brawler_xp,
@@ -708,13 +724,8 @@ fn the_mongo_win_completes_bringing_back_brazenfist_once() {
     at += 100;
     win_mongo(&mut game, &mut character, &mut at);
     let won = economy(&game);
-    assert_eq!(won.coins, initial.coins + BATTLE_COINS, "19 coins once");
+    assert_one_win(&initial, &won);
     assert_eq!(won.brawler_xp, initial.brawler_xp + BATTLE_XP, "50 XP once");
-    assert_eq!(
-        prize_total(&won),
-        prize_total(&initial) + 1,
-        "the wheel pays once"
-    );
     assert_eq!(
         counts(&game, FIRST),
         vec![1, 1],
@@ -873,7 +884,7 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
         vec![1, 0],
         "the repeat fight advances C2 once"
     );
-    assert_eq!(coins(&game), before_second_run.coins + BATTLE_COINS);
+    assert_one_win(&before_second_run, &after_second_run);
     assert_eq!(
         profile_xp(&game, BRAWLER),
         before_second_run.brawler_xp + BATTLE_XP
@@ -903,7 +914,10 @@ fn honor_lost_requires_the_first_quest_and_reuses_the_fight() {
     );
     assert_eq!(
         coins(&game),
-        before_second_run.coins + BATTLE_COINS + SECOND_COINS
+        before_second_run.coins
+            + BATTLE_COINS
+            + wheel_extra(&before_second_run, &after_second_run)
+            + SECOND_COINS
     );
     assert_eq!(
         profile_xp(&game, BRAWLER),
@@ -1415,9 +1429,8 @@ fn the_fight_survives_a_reconnect_mid_battle() {
     let before = economy(&game);
     finish_battle(&mut game, &mut character, &mut at);
     let won = economy(&game);
-    assert_eq!(won.coins, before.coins + BATTLE_COINS);
+    assert_one_win(&before, &won);
     assert_eq!(won.brawler_xp, before.brawler_xp + BATTLE_XP);
-    assert_eq!(prize_total(&won), prize_total(&before) + 1);
     assert_eq!(counts(&game, FIRST), vec![1, 1]);
 
     // Reconnect: the production loader rebuilds the session from the saved gameplay state.
@@ -1468,7 +1481,7 @@ fn the_fight_survives_a_reconnect_mid_battle() {
     at += 100;
     win_mongo(&mut game, &mut character, &mut at);
     let paid = economy(&game);
-    assert_eq!(paid.coins, before.coins + BATTLE_COINS);
+    assert_one_win(&before, &paid);
     assert_eq!(
         counts(&game, FIRST),
         vec![1, 1],
@@ -1750,7 +1763,7 @@ fn a_loss_or_retry_does_not_credit_the_completion() {
         "the retried win credits the objective once"
     );
     let paid = economy(&game);
-    assert_eq!(paid.coins, before.coins + BATTLE_COINS, "the win pays once");
+    assert_one_win(&before, &paid);
 
     at += 100;
     assert!(
@@ -1791,11 +1804,7 @@ fn two_players_win_separately_and_credit_only_themselves() {
     assert_eq!(counts(&b, FIRST), vec![1, 0], "A's win credits B");
     assert_eq!(saved(&b), b_before, "A's win changed B's session");
     let a_paid = economy(&a);
-    assert_eq!(
-        a_paid.coins,
-        a_before_win.coins + BATTLE_COINS,
-        "A's win pays A once"
-    );
+    assert_one_win(&a_before_win, &a_paid);
     a_at += 100;
     assert!(
         send(&mut a, &a_character, &[26, 0, 42, 0], a_at)
@@ -1814,11 +1823,7 @@ fn two_players_win_separately_and_credit_only_themselves() {
     assert_eq!(counts(&a, FIRST), vec![1, 1], "B's win changed A's credit");
     assert_eq!(saved(&a), a_after_win, "B's win changed A's session");
     assert_eq!(economy(&a), a_paid, "A's battle was paid by A's win only");
-    assert_eq!(
-        economy(&b).coins,
-        b_before_run.coins + BATTLE_COINS,
-        "B's own win pays B once"
-    );
+    assert_one_win(&b_before_run, &economy(&b));
 }
 
 #[test]

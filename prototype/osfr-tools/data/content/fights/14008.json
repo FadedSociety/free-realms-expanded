@@ -439,8 +439,231 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76265,
+        "name_id": 133273,
+        "icon_id": 5383,
+        "job": 2
+      },
+      {
+        "item_id": 75423,
+        "name_id": 131167,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75379,
+        "name_id": 131123,
+        "icon_id": 551,
+        "job": 2
+      },
+      {
+        "item_id": 75116,
+        "name_id": 132000,
+        "icon_id": 3152,
+        "job": 2
+      },
+      {
+        "item_id": 76250,
+        "name_id": 133258,
+        "icon_id": 2478,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75358,
+        "name_id": 131102,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75314,
+        "name_id": 131058,
+        "icon_id": 551,
+        "job": 11
+      },
+      {
+        "item_id": 75086,
+        "name_id": 131970,
+        "icon_id": 3122,
+        "job": 11
+      },
+      {
+        "item_id": 76135,
+        "name_id": 133143,
+        "icon_id": 5734,
+        "job": 11
+      },
+      {
+        "item_id": 76120,
+        "name_id": 133128,
+        "icon_id": 2345,
+        "job": 11
+      },
+      {
+        "item_id": 76442,
+        "name_id": 133450,
+        "icon_id": 2422,
+        "job": 12
+      },
+      {
+        "item_id": 76457,
+        "name_id": 133465,
+        "icon_id": 5667,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 75553,
+        "name_id": 131297,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75176,
+        "name_id": 132060,
+        "icon_id": 3160,
+        "job": 12
+      },
+      {
+        "item_id": 75509,
+        "name_id": 131253,
+        "icon_id": 551,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76360,
+        "name_id": 133368,
+        "icon_id": 2507,
+        "job": 32
+      },
+      {
+        "item_id": 76375,
+        "name_id": 133383,
+        "icon_id": 5798,
+        "job": 32
+      },
+      {
+        "item_id": 75488,
+        "name_id": 131232,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75444,
+        "name_id": 131188,
+        "icon_id": 551,
+        "job": 32
+      },
+      {
+        "item_id": 75146,
+        "name_id": 132030,
+        "icon_id": 3219,
+        "job": 32
+      },
+      {
+        "item_id": 75228,
+        "name_id": 130972,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 75026,
+        "name_id": 131910,
+        "icon_id": 3106,
+        "job": 35
+      },
+      {
+        "item_id": 75184,
+        "name_id": 130928,
+        "icon_id": 551,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75789,
+        "name_id": 132797,
+        "icon_id": 4950,
+        "job": 35
+      },
+      {
+        "item_id": 75774,
+        "name_id": 132782,
+        "icon_id": 2377,
+        "job": 35
+      },
+      {
+        "item_id": 75895,
+        "name_id": 132903,
+        "icon_id": 4963,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75056,
+        "name_id": 131940,
+        "icon_id": 3126,
+        "job": 43
+      },
+      {
+        "item_id": 75293,
+        "name_id": 131037,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75249,
+        "name_id": 130993,
+        "icon_id": 551,
+        "job": 43
+      },
+      {
+        "item_id": 75910,
+        "name_id": 132918,
+        "icon_id": 5632,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 214
   },
   "source": [
     {
@@ -466,6 +689,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/forest_troll_fort.json, its notes page and the fork battle; under the id (14008) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Forest Troll Fort' (revision 49339) lists one prize wheel per combat job and a 214-coin slot; any other job spins the items every job's wheel holds. Wizard: the wiki's 'Adept Wizard Long Cloak' is 'Adept Wizard Robe' in our record dungeons/forest_troll_fort.json."
     }
   ]
 }

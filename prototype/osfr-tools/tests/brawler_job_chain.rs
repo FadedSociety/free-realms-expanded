@@ -638,7 +638,8 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
             "field enemy {guid} did not expose its Attack menu"
         );
         let before = quest_count(game, HOOLIGAN_FIGHT);
-        for _ in 0..5 {
+        // Twice the swings since the owner doubled enemy health (rc-0137).
+        for _ in 0..10 {
             *now += 700;
             game.handle_in_world(&npc_select(guid, ATTACK_CHOICE), &character, *now)
                 .expect("field basic attack is valid");
@@ -688,7 +689,8 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
     interact_npc(game, &observer, respawned, *now);
     let before_live_kill = saved(game);
     let mut killed = false;
-    for _ in 0..5 {
+    // Twice the swings since the owner doubled enemy health (rc-0137).
+    for _ in 0..10 {
         *now += 700;
         let out = game
             .handle_in_world(&npc_select(respawned, ATTACK_CHOICE), &observer, *now)

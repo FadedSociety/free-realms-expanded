@@ -26,6 +26,21 @@ pub fn hard_link_or_copy(from: &std::path::Path, to: &std::path::Path) {
     }
 }
 
+/// The opening reference (`lab/references/rust-opening-cooking-original-assets`) copied to
+/// `CARGO_TARGET_TMPDIR/<name>`, with the release item table beside it as a release ships one:
+/// the reference's own `inventory.json` lacks one of the Brawler's battle-96 prizes (rc-0137).
+#[allow(dead_code)] // only the suites that start battle 96 on the opening reference
+pub fn opening_with_release_items(name: &str) -> std::path::PathBuf {
+    let manifest = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    let reference = manifest.join("../../../lab/references/rust-opening-cooking-original-assets");
+    let root = std::path::Path::new(env!("CARGO_TARGET_TMPDIR")).join(name);
+    let _ = fs::remove_dir_all(&root);
+    copy_tree(&reference, &root);
+    let table = manifest.join("data/release/item-table.json");
+    hard_link_or_copy(&table, &root.join("item-table.json"));
+    root
+}
+
 /// Copy every entry in `from` that `to` does not already supply, recursively.
 /// The destination's existing files win, so a fixture's own profile/inventory
 /// files survive an overlay of the repository content.

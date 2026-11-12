@@ -444,8 +444,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75107,
+        "name_id": 131991,
+        "icon_id": 3100,
+        "job": 2
+      },
+      {
+        "item_id": 75388,
+        "name_id": 131132,
+        "icon_id": 1201,
+        "job": 2
+      },
+      {
+        "item_id": 75411,
+        "name_id": 131155,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 76245,
+        "name_id": 133253,
+        "icon_id": 5373,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75077,
+        "name_id": 131961,
+        "icon_id": 3149,
+        "job": 11
+      },
+      {
+        "item_id": 75323,
+        "name_id": 131067,
+        "icon_id": 1201,
+        "job": 11
+      },
+      {
+        "item_id": 75346,
+        "name_id": 131090,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 76115,
+        "name_id": 133123,
+        "icon_id": 5333,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76435,
+        "name_id": 133443,
+        "icon_id": 5074,
+        "job": 12
+      },
+      {
+        "item_id": 75167,
+        "name_id": 132051,
+        "icon_id": 3162,
+        "job": 12
+      },
+      {
+        "item_id": 75518,
+        "name_id": 131262,
+        "icon_id": 1201,
+        "job": 12
+      },
+      {
+        "item_id": 75541,
+        "name_id": 131285,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76355,
+        "name_id": 133363,
+        "icon_id": 5426,
+        "job": 32
+      },
+      {
+        "item_id": 75137,
+        "name_id": 132021,
+        "icon_id": 3127,
+        "job": 32
+      },
+      {
+        "item_id": 75453,
+        "name_id": 131197,
+        "icon_id": 1201,
+        "job": 32
+      },
+      {
+        "item_id": 75476,
+        "name_id": 131220,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75193,
+        "name_id": 130937,
+        "icon_id": 1201,
+        "job": 35
+      },
+      {
+        "item_id": 75216,
+        "name_id": 130960,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75017,
+        "name_id": 131901,
+        "icon_id": 3105,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75769,
+        "name_id": 132777,
+        "icon_id": 5622,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75047,
+        "name_id": 131931,
+        "icon_id": 3128,
+        "job": 43
+      },
+      {
+        "item_id": 75258,
+        "name_id": 131002,
+        "icon_id": 1201,
+        "job": 43
+      },
+      {
+        "item_id": 75281,
+        "name_id": 131025,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75890,
+        "name_id": 132898,
+        "icon_id": 4980,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 162
   },
   "source": [
     {
@@ -487,6 +674,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/grexan_s_camp.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Grexan's Camp' (revision 49849) lists one prize wheel per combat job and a 162-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

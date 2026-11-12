@@ -17,6 +17,8 @@
 mod fight_kit;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/encounter_card.rs"]
+mod encounter_card;
 
 use field_battle_fixture::{content_dir, unframe};
 use fight_kit::{score_rows, spawned};
@@ -63,22 +65,11 @@ fn guards(fight: &Fight) -> Vec<u64> {
         .collect()
 }
 
-/// The card's goal rows (41/114) as (key, category): the count and its 82-byte rows end 58
-/// bytes before the card does (the roster count and the closing flags follow them).
+/// The card's goal rows (41/114) as (key, category), read the way the client reads the card.
 fn goal_rows(card: &[u8]) -> Vec<(i32, i32)> {
-    let int = |at: usize| i32::from_le_bytes(card[at..at + 4].try_into().unwrap());
-    for n in 1..=8_usize {
-        let start = card.len() - 58 - 82 * n;
-        if int(start - 4) == n as i32 {
-            let rows: Vec<(i32, i32, i32, i32)> = (0..n)
-                .map(|r| start + 82 * r)
-                .map(|at| (int(at), int(at + 4), int(at + 8), int(at + 78)))
-                .collect();
-            assert!(rows.iter().all(|r| r.0 == r.1 && r.1 == r.2), "{rows:?}");
-            return rows.into_iter().map(|r| (r.0, r.3)).collect();
-        }
-    }
-    panic!("no goal rows on the card")
+    let card = encounter_card::read_card(card);
+    assert!(card.goals.iter().all(|g| g.key == g.name && g.name == g.description), "{card:?}");
+    card.goals.iter().map(|g| (g.key, g.category)).collect()
 }
 
 /// A 15/4 line said by `speaker` with client text `text`.
@@ -147,7 +138,14 @@ fn every_dungeon_record_runs_its_fight_or_says_why() {
             let name = goal["goal"].as_str().unwrap();
             let row = (fight.objectives.iter().find(|o| o.id == name))
                 .unwrap_or_else(|| panic!("{id}: fight {fight_id} has no goal {name}"));
-            let size = row.count.unwrap_or(fight.targets(&row.target).len() as u32);
+            // A paced fight (`instance_pacing.json`) brings its waves again after its own last
+            // one; the record maps the fight as authored, its own waves.
+            let cycled = |id: &str| (fight.waves.iter()).any(|o| id.starts_with(&format!("{}_", o.id)));
+            let own = (fight.waves.iter().position(|w| cycled(&w.id))).unwrap_or(fight.waves.len());
+            let authored = (fight.targets(&row.target).into_iter())
+                .filter(|&i| fight.roster[i].wave.is_none_or(|(w, _)| w < own))
+                .count();
+            let size = row.count.unwrap_or(authored as u32);
             assert_eq!(goal["count"].as_u64(), Some(u64::from(size)), "{id} {name}");
             if row.bonus {
                 bonus.push(id.clone());
@@ -337,4 +335,29 @@ fn royal_honey_drops_from_the_hives_fauzz_only() {
     let hive = fights().remove(&HIVE_FIGHT).unwrap();
     let boss = &hive.resolved[&hive.actors["boss"].definition];
     assert_eq!((boss.definition_id, boss.name_id, boss.model_id), (FAUZZ as i32, 38510, 218));
+}
+
+/// rc-0137 recheck: the native client drops a 41/114 it cannot read to the last byte, and then
+/// Go does nothing (the Bixie Hive's two goal rows were 21 bytes short each). Every open
+/// entrance's card and every battle marker's card reads whole and opens the start screen.
+#[test]
+fn every_start_card_reads_to_its_last_byte() {
+    let table = Table::load(&content_dir()).unwrap().unwrap();
+    let engine = shipped_engine();
+    let file = read(&content_dir().join("field_battles.json"));
+    let markers = (file["battles"].as_array().unwrap().iter()).map(|b| {
+        let at = &b["spawner"]["position"];
+        let at = [0, 1, 2].map(|i| at[i].as_f64().unwrap() as f32);
+        (b["spawner"]["guid"].as_u64().unwrap(), at, b["id"].to_string())
+    });
+    let doors = (table.entrances.iter()).map(|e| (e.guid, e.at, e.id.clone()));
+    for (guid, at, name) in doors.chain(markers) {
+        let mut engine = engine.clone();
+        if engine.entrance(guid).is_some_and(|(_, open)| !open) {
+            continue;
+        }
+        let out = engine.handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
+        let card = encounter_card::read_card(&out.replies[0]);
+        assert!(!card.launch && !card.goals.is_empty(), "{name}");
+    }
 }

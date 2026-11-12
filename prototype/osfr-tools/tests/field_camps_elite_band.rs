@@ -755,7 +755,11 @@ fn a_level_fifteen_kill_pays_the_same_band_and_a_level_fourteen_control_still_pa
 #[test]
 fn two_players_share_an_elite_kill_and_each_is_paid_once() {
     let elite = ELITE[5];
-    let fixture = RewardFixture::new(vec![shipped_field_actor(elite.guid).0]);
+    // Half its authored health keeps A's kill inside B's 30 s participation window, as before
+    // the owner's x2 enemy health (rc-0137).
+    let mut row = shipped_field_actor(elite.guid).0;
+    row["max_health"] = serde_json::json!(row["max_health"].as_u64().unwrap() / 2);
+    let fixture = RewardFixture::new(vec![row]);
     let a_at = [elite.centre[0] + 1.0, elite.centre[1], elite.centre[2]];
     let b_at = [elite.centre[0] - 1.0, elite.centre[1], elite.centre[2]];
     let a_character = character_at(101, a_at);

@@ -34,6 +34,10 @@ pub(super) struct FieldSim {
     /// of shared credit; the host sets both each tick (`SharedFieldState::set_parties`).
     pub(super) parties: BTreeMap<u64, (u32, [f32; 3])>,
     pub(super) party_reach_m: f32,
+    /// `realm goto` rows for the enemies this session handed to the shared field, where
+    /// each stood then (its camp), quest-gated ones too: the session no longer holds them
+    /// (rc-0137: `realm goto list kaboomer` found nothing).
+    pub(super) homes: Vec<crate::dev_teleport::Target>,
 }
 
 impl FieldSim {
@@ -302,7 +306,11 @@ impl SharedFieldState {
                 position: f.state.position,
                 engaged: f.motion == FieldMotion::Chasing,
             })
-            .chain(self.open_battles().map(|b| crate::world::NpcInterest {
+            // L1187 (lead): F2's rule (a battle row an entrance stands for is not drawn) and EV's
+            // (a battle runs only during its event) together.
+            .chain((self.doors.drawn(&self.battles))
+                .filter(|b| in_event(&b.spawner, &self.events))
+                .map(|b| crate::world::NpcInterest {
                 guid: b.spawner.guid,
                 position: self.position(b.spawner.guid).unwrap_or(b.spawner.position),
                 engaged: false,
@@ -389,6 +397,16 @@ impl EncounterEngine {
         if self.shared_fields.is_some() {
             return None;
         }
+        self.field_sim.homes = (self.field_sim.enemies.iter())
+            .map(|f| crate::dev_teleport::Target {
+                guid: f.actor.guid,
+                name: f.actor.name.clone(),
+                zone_id: self.content.world.zone_id,
+                position: f.actor.position,
+                heading: None,
+                kind: "enemy".into(),
+            })
+            .collect();
         self.shared_fields = Some(
             self.field_sim
                 .enemies

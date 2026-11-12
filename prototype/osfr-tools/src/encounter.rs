@@ -36,11 +36,14 @@ mod field;
 mod field_marker;
 pub mod field_rewards;
 pub mod kits;
+pub mod pacing;
+mod pickups;
 mod power_up_use;
 mod restore;
 mod revive;
 pub mod scale;
 mod shared;
+pub mod sim;
 mod skills;
 mod threat;
 pub mod wire;
@@ -51,7 +54,9 @@ use self::combat_rules::CombatRules;
 use self::combat_scale::CombatScale;
 pub use self::facts::{FightFact, KillFact, Rank};
 pub(crate) use self::field::level_refusal;
-use self::{card::details_packet, field_marker::MarkerSetting};
+pub use self::card::MAX_PRIZE_QUANTITY;
+use self::card::{Prize, details_packet, prize_bundle, wheel_rows};
+use self::field_marker::MarkerSetting;
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
@@ -262,6 +267,9 @@ struct Dungeon {
     reward_items: Vec<(i32, u32)>,
     #[serde(default)]
     prizes: Vec<Prize>,
+    /// The wheel's coin slot (the wiki's "N Coins").
+    #[serde(default)]
+    wheel_coins: u32,
 }
 #[derive(Clone, Deserialize)]
 struct Content {
@@ -417,6 +425,8 @@ struct FieldBattle {
     icon_id: i32,
     #[serde(default)]
     prizes: Vec<Prize>,
+    #[serde(default)]
+    wheel_coins: u32,
     /// Chance items on a win, beside the prize wheel (`battle_drops.rs`).
     #[serde(default)]
     drops: Vec<battle_drops::BattleDrop>,
@@ -434,55 +444,8 @@ struct FieldBattle {
     source: serde_json::Value,
 }
 
-/// The largest quantity one battle prize row may preview. The content validator
-/// enforces it; the stack preflight additionally caps each row at the item's
-/// own `max_stack`.
-pub const MAX_PRIZE_QUANTITY: u32 = 100;
-
-/// A prize shown on the battle start screen and won at random on victory
-/// (the battle's "prize wheel"; the owner: prizes spin like a loot box). Item
-/// definition, name and icon ids come from the client item catalogue.
-#[derive(Clone, Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct Prize {
-    item_id: i32,
-    name_id: i32,
-    icon_id: i32,
-    #[serde(default = "one")]
-    quantity: u32,
-}
-
 fn one() -> u32 {
     1
-}
-
-/// A MiniGameInfo reward bundle (native reader 008e7930): flag, coin/xp and
-/// other scalars (52 bytes, zero), bundle icon and name, the entries, a
-/// trailing i32. Each prize is a type-1 Item entry (base reader 0103c460):
-/// hidden, icon, tint, name, quantity, item id, param, empty string, text
-/// colour, members-only. Empty, the bundle is 69 bytes.
-fn prize_bundle(prizes: &[Prize]) -> Vec<u8> {
-    let mut b = vec![0_u8; 61];
-    b.extend((prizes.len() as i32).to_le_bytes());
-    for p in prizes {
-        b.extend(1_i32.to_le_bytes()); // entry type: Item
-        b.push(0); // hidden
-        for v in [
-            p.icon_id,
-            0,
-            p.name_id,
-            p.quantity as i32,
-            p.item_id,
-            0,
-            0,
-            0,
-        ] {
-            b.extend(v.to_le_bytes());
-        }
-        b.push(0); // members only
-    }
-    b.extend(0_i32.to_le_bytes());
-    b
 }
 
 fn no_icon() -> i32 {
@@ -1144,10 +1107,21 @@ impl EncounterEngine {
             total.feedback = Some("No encounter is active.".into());
             return Ok(total);
         }
-        for _ in 0..64 {
+        for _ in 0..256 {
             let mut standing = self.standing_enemies();
             if standing.is_empty() {
-                break;
+                // L1187 (lead): a paced battle row brings its roster back after a gap (F2's
+                // pacing); the debug win plays the waiting rounds out now instead of stopping.
+                let Some(due) = self.round_due() else {
+                    break;
+                };
+                let mut round = EncounterOutcome::default();
+                self.tick_rounds(due, &mut round);
+                skills::merge_skill_outcome(&mut total, round);
+                if self.round_due().is_some() {
+                    break;
+                }
+                continue;
             }
             standing.sort_by_key(|(_, _, shielded)| *shielded);
             let (guid, position, _) = standing[0];
@@ -1391,11 +1365,11 @@ impl EncounterEngine {
         out.replies.push(relevance(&guids, true));
         if !self.run_goals(&mut out) {
             let (count, goal) = goal_progress(d, active);
-            out.replies.push(objective(1, d.objective_id, goal));
-            out.replies.push(objective(2, d.objective_id, count));
+            out.replies.extend(card::goal_opened(&card::goal_row(d.objective_id, false, goal)));
+            out.replies.extend(card::goal_counted(d.objective_id, count));
         }
         if active.phase == EncounterPhase::Won {
-            out.replies.push(objective_complete(d.objective_id));
+            out.replies.extend(card::goal_met(d.objective_id));
             out.replies.push(game_over(true, active.instance_id, d.id));
         } else if active.phase == EncounterPhase::Lost {
             out.replies.push(game_over(false, active.instance_id, d.id));
@@ -1490,7 +1464,7 @@ impl EncounterEngine {
                     if (encounter == Some(0) || encounter == Some(a.encounter_id))
                         && crate::le::i32(inner, 8) == Some(a.instance_id)
                     {
-                        return self.exit();
+                        return self.leave(now_ms);
                     }
                 }
                 if self.state.active.is_none() {
@@ -1831,9 +1805,9 @@ impl EncounterEngine {
             } else if let (Some(active), Some(d)) = (&self.state.active, self.dungeon()) {
                 let (count, goal) = goal_progress(d, active);
                 if !directed {
-                    out.replies.push(objective(2, d.objective_id, count));
+                    out.replies.extend(card::goal_counted(d.objective_id, count));
                 }
-                if !directed && count >= goal {
+                if !directed && count >= goal && !self.next_round(now_ms) {
                     self.win_run(now_ms, &mut out);
                 }
             } else if !self.world_stage_fighting() && !self.field_combat {
@@ -1856,6 +1830,7 @@ impl EncounterEngine {
                 let reward =
                     field_index.and_then(|_| self.field_rewards.reward_for(definition, level));
                 let engaged = field_index.and_then(|i| self.field_sim.enemies[i].target);
+                self.pace_heal_drop(guid, killed_at, now_ms, &mut out);
                 self.credit_field_kill(
                     drop_table.as_deref(),
                     reward,
@@ -1909,76 +1884,6 @@ impl EncounterEngine {
     /// How many ground pickups this session still holds (tests and diagnostics).
     pub fn pickup_count(&self) -> usize {
         self.pickups.len()
-    }
-
-    /// Roll `table` for one participant of the kill and spawn each drop as a
-    /// pickup actor. An unknown table, no loaded file or a full ground drops
-    /// nothing. With several participants every chance is scaled by the file's
-    /// group multiplier.
-    fn drop_power_ups(
-        &mut self,
-        table: &str,
-        kill: (u64, u64),
-        at: [f32; 3],
-        now_ms: u64,
-        participants: usize,
-        out: &mut EncounterOutcome,
-    ) {
-        let ground = self.ground();
-        let Some(power_ups) = self.power_ups.clone() else {
-            return;
-        };
-        let (Some(table), Some(rng)) = (power_ups.table(table), self.power_up_rng.as_mut()) else {
-            return;
-        };
-        let scale = if participants > 1 {
-            power_ups.group_chance_multiplier()
-        } else {
-            1.0
-        };
-        let kinds = power_ups::roll_scaled(table, rng, scale);
-        for (i, kind_id) in kinds.into_iter().enumerate() {
-            let Some(kind) = power_ups.kind(kind_id) else {
-                continue;
-            };
-            if self.pickups.len() >= power_ups.pickup.max_alive_per_instance as usize {
-                break;
-            }
-            self.next_pickup += 1;
-            let guid = PICKUP_GUID_BASE | self.next_pickup;
-            // (R) Several drops from one kill sit side by side, not stacked.
-            let position = ground.snapped([at[0] + i as f32 * 0.8, at[1], at[2]]);
-            let actor = Actor {
-                guid,
-                definition_id: 0,
-                model_id: kind.model_id as i32,
-                name_id: 0,
-                name: String::new(),
-                texture_alias: String::new(),
-                position,
-                max_health: 1,
-                damage: 0,
-                level: 1,
-                boss: false,
-                stages: Vec::new(),
-                summon_below_percent: None,
-                skittish: false,
-                scale: kind.scale.map(|s| s as f32),
-                behaviour: None,
-                power_up_table: None,
-                ..Default::default()
-            };
-            // Disposition 1 (neutral): 0 is hostile and would be Tab-targeted.
-            out.replies.push(self.spawn(&actor, position, 1));
-            self.pickups.push(PowerUpDrop {
-                guid,
-                kind: kind_id.to_owned(),
-                kill,
-                position,
-                expires_ms: now_ms.saturating_add(u64::from(power_ups.pickup.ttl_ms)),
-                told: false,
-            });
-        }
     }
 
     /// Despawn expired pickups and collect the ones the player stands on. The
@@ -2057,6 +1962,7 @@ impl EncounterEngine {
         now_ms: u64,
     ) -> io::Result<EncounterOutcome> {
         let mut out = self.tick_encounter(position, profile_id, now_ms)?;
+        self.tick_rounds(now_ms, &mut out);
         self.tick_power_ups(position, now_ms, &mut out);
         Ok(out)
     }

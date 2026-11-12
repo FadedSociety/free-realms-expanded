@@ -59,10 +59,46 @@
     {"id": "wolves", "kind": "defeat", "text_id": 104177, "text": "Defeat all of the Frostfang Growlers.", "target": {"all": true}, "primary": true}
   ],
   "script": [],
-  "rewards": {"coins": 25, "job_xp": 50, "wheel": [], "drops": []},
+  "rewards": {
+    "coins": 25, "job_xp": 50, "wheel_coins": 2, "drops": [],
+    "wheel": [
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 76210, "name_id": 133218, "icon_id": 2489, "job": 2},
+      {"item_id": 75091, "name_id": 131975, "icon_id": 3229, "job": 2},
+      {"item_id": 75419, "name_id": 131163, "icon_id": 3721, "job": 2},
+      {"item_id": 75390, "name_id": 131134, "icon_id": 552, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 75354, "name_id": 131098, "icon_id": 3721, "job": 11},
+      {"item_id": 75061, "name_id": 131945, "icon_id": 3133, "job": 11},
+      {"item_id": 75325, "name_id": 131069, "icon_id": 552, "job": 11},
+      {"item_id": 76080, "name_id": 133088, "icon_id": 5337, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 76389, "name_id": 133397, "icon_id": 5047, "job": 12},
+      {"item_id": 75549, "name_id": 131293, "icon_id": 3721, "job": 12},
+      {"item_id": 75520, "name_id": 131264, "icon_id": 552, "job": 12},
+      {"item_id": 75151, "name_id": 132035, "icon_id": 3158, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 76320, "name_id": 133328, "icon_id": 5439, "job": 32},
+      {"item_id": 75121, "name_id": 132005, "icon_id": 3120, "job": 32},
+      {"item_id": 75484, "name_id": 131228, "icon_id": 3721, "job": 32},
+      {"item_id": 75455, "name_id": 131199, "icon_id": 552, "job": 32},
+      {"item_id": 75001, "name_id": 131885, "icon_id": 3104, "job": 35},
+      {"item_id": 75224, "name_id": 130968, "icon_id": 3721, "job": 35},
+      {"item_id": 75195, "name_id": 130939, "icon_id": 552, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75734, "name_id": 132742, "icon_id": 4946, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 75031, "name_id": 131915, "icon_id": 3131, "job": 43},
+      {"item_id": 75289, "name_id": 131033, "icon_id": 3721, "job": 43},
+      {"item_id": 75260, "name_id": 131004, "icon_id": 552, "job": 43},
+      {"item_id": 75855, "name_id": 132863, "icon_id": 4988, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
+    ]
+  },
   "source": [
     {"kind": "capture", "evidence": "p12.pcap t=546232..546321 (2014-03-31), battle 'Frostfang Growlers': one Howler on arrival, then waves of 6, 9, 10 and 11 (the last with the Frostfang Alpha) 7.4 s after arrival and 15.4, 15.9 and 16.9 s apart; every Growler, Prowler and Howler 760 health, the Alpha 3,800 at scale 1.7; names 104067, 116023, 115837, 423045 and models 176 and 177; the Exit door (name 4826, model 846) right after the last kill; packet 62 at t=546240.0 with 500.0, 1, 100000, 500, 300, 25000, 5000."},
     {"kind": "client", "evidence": "Global.Text 104170 'Frostfang Growlers', 104171 'Dangerous wolves from Frostfang Caverns are in the woods! Defeat them before someone gets bitten!', 104177 'Defeat all of the Frostfang Growlers.'; packet 62 field names in the list at 0x01050DB0; enemies.json frostfang_growler is definition 2529."},
-    {"kind": "reconstructed", "evidence": "(R) The arena (the clearing every battle uses today, not the captured one), the arrival, ring and door positions, the wave trigger (one left, or 16 to 17 s after the wave before), the 10 knockouts, the reward, and definition 0 for the Prowler, Howler and Alpha, which no quest names. Health and damage follow rank and tier, which give the captured 760 and 3,800. The starter is not placed: `entry.starter` is the design's unverified Snowhill spot and `battle_row` stays false until a row with a checked position exists in field_battles.json."}
+    {"kind": "reconstructed", "evidence": "(R) The arena (the clearing every battle uses today, not the captured one), the arrival, ring and door positions, the wave trigger (one left, or 16 to 17 s after the wave before), the 10 knockouts, the reward, and definition 0 for the Prowler, Howler and Alpha, which no quest names. Health and damage follow rank and tier, which give the captured 760 and 3,800. The starter is not placed: `entry.starter` is the design's unverified Snowhill spot and `battle_row` stays false until a row with a checked position exists in field_battles.json."},
+    {"kind": "reconstructed", "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Frostfang Growlers' has no wheel on the wiki, no shipped dungeon record and no item page that names its prize wheel, so it spins the wheel of 'Frostfang Snarlers!' (fandom revision 48736), the battle of difficulty 1 nearest its own 1, and 2 coins."}
   ]
 }

@@ -403,8 +403,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75387,
+        "name_id": 131131,
+        "icon_id": 1200,
+        "job": 2
+      },
+      {
+        "item_id": 75410,
+        "name_id": 131154,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 75098,
+        "name_id": 131982,
+        "icon_id": 3217,
+        "job": 2
+      },
+      {
+        "item_id": 76237,
+        "name_id": 133245,
+        "icon_id": 5404,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75068,
+        "name_id": 131952,
+        "icon_id": 3145,
+        "job": 11
+      },
+      {
+        "item_id": 75322,
+        "name_id": 131066,
+        "icon_id": 1200,
+        "job": 11
+      },
+      {
+        "item_id": 75345,
+        "name_id": 131089,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 76107,
+        "name_id": 133115,
+        "icon_id": 5357,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76425,
+        "name_id": 133433,
+        "icon_id": 5669,
+        "job": 12
+      },
+      {
+        "item_id": 75158,
+        "name_id": 132042,
+        "icon_id": 3253,
+        "job": 12
+      },
+      {
+        "item_id": 75517,
+        "name_id": 131261,
+        "icon_id": 1200,
+        "job": 12
+      },
+      {
+        "item_id": 75540,
+        "name_id": 131284,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76347,
+        "name_id": 133355,
+        "icon_id": 5458,
+        "job": 32
+      },
+      {
+        "item_id": 75128,
+        "name_id": 132012,
+        "icon_id": 3129,
+        "job": 32
+      },
+      {
+        "item_id": 75452,
+        "name_id": 131196,
+        "icon_id": 1200,
+        "job": 32
+      },
+      {
+        "item_id": 75475,
+        "name_id": 131219,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75008,
+        "name_id": 131892,
+        "icon_id": 3111,
+        "job": 35
+      },
+      {
+        "item_id": 75192,
+        "name_id": 130936,
+        "icon_id": 1200,
+        "job": 35
+      },
+      {
+        "item_id": 75215,
+        "name_id": 130959,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75761,
+        "name_id": 132769,
+        "icon_id": 2403,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75038,
+        "name_id": 131922,
+        "icon_id": 3123,
+        "job": 43
+      },
+      {
+        "item_id": 75257,
+        "name_id": 131001,
+        "icon_id": 1200,
+        "job": 43
+      },
+      {
+        "item_id": 75280,
+        "name_id": 131024,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75882,
+        "name_id": 132890,
+        "icon_id": 5656,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 80
   },
   "source": [
     {
@@ -430,6 +617,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/deep_mines.json, its notes page and the fork battle; under the id (14045) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Deep Mines' (revision 49135) lists one prize wheel per combat job and a 80-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

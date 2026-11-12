@@ -19,6 +19,10 @@ use std::{
     },
 };
 
+#[path = "common/field_battle_fixture.rs"]
+mod field_battle_fixture;
+use field_battle_fixture::{first_prize_of, job_prizes, u32_field};
+
 const TASK_ROSTER: [u32; 5] = [96, 12301, 12302, 12310, 12311];
 const NEW_ROSTER: [u32; 2] = [12310, 12311];
 const STONE_HEART: u32 = 12303;
@@ -571,7 +575,9 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
         .filter(|row| TASK_ROSTER.contains(&(row["id"].as_u64().unwrap() as u32)))
         .collect();
     assert_eq!(task_spawners.len(), 5);
-    for row in &task_spawners {
+    // A row an entrance runs stands as the entrance (rc-0137: the Troll Summoner stood twice).
+    let claimed = field_battle_fixture::entrance_rows();
+    for row in task_spawners.iter().filter(|row| !claimed.contains(&row["id"].as_u64().unwrap())) {
         let marker = &row["spawner"];
         let guid = u64_field(marker, "guid");
         let loaded = spawners
@@ -584,7 +590,7 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
         assert_eq!(loaded.4, position(&marker["position"]));
         assert!(loaded.5 > 0, "the crossed-swords nameplate must be visible");
     }
-    assert_eq!(spawners.len(), rows.len());
+    field_battle_fixture::assert_markers(rows, &spawners, "every row publishes its marker");
 
     for row in rows
         .iter()
@@ -596,7 +602,10 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
             "battle {} has no usable prize",
             row["id"]
         );
-        assert!(prizes.len() <= 4);
+        // rc-0137: one wheel per combat job, each at most eight prizes (the wiki's wheels).
+        for job in [0, 2, 11, 12, 32, 35, 43] {
+            assert!(job_prizes(row, job).len() <= 8, "battle {} job {job}", row["id"]);
+        }
         assert!(prizes.iter().all(|prize| {
             i32_field(prize, "item_id") > 0
                 && i32_field(prize, "name_id") > 0
@@ -609,8 +618,13 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
         let row = battle(&file, id);
         assert_eq!(row["difficulty"], 2);
         assert_eq!(row["required_combat_level"], 0);
-        assert_eq!(row["zone"]["zone_id"], 9600);
-        assert_eq!(row["zone"]["name"], "sg_random_encounter_clearing");
+        // rc-0137: Petty Yetis runs in Snow Hill's arena (its wiki type is "Snowy forest").
+        let (zone, scene) = match id {
+            12310 => (1240, "sh_random_encounter_01"),
+            _ => (9600, "sg_random_encounter_clearing"),
+        };
+        assert_eq!(row["zone"]["zone_id"], zone);
+        assert_eq!(row["zone"]["name"], scene);
         assert_eq!(row["enemies"].as_array().unwrap().len(), 3);
     }
 }
@@ -782,7 +796,7 @@ fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: u64)
     // native 41/108 frames.
     let entered = send(gateway, &go(details), now_ms);
     assert!(entered.began_zoning, "Go enters the arena");
-    assert_eq!(gateway.state().zone_id, 9600);
+    assert_eq!(gateway.state().zone_id, u32_field(&row["zone"], "zone_id"));
 
     let enemy_guids: Vec<u64> = row["enemies"]
         .as_array()
@@ -1083,7 +1097,8 @@ fn unavailable_field_battle_prize_is_refused_through_gameplay() {
         .iter_mut()
         .find(|battle| battle["id"] == 12310)
         .unwrap();
-    invalid_row["prizes"][0]["item_id"] = json!(2_147_483_647_i64);
+    let first = first_prize_of(invalid_row, BRAWLER);
+    invalid_row["prizes"][first]["item_id"] = json!(2_147_483_647_i64);
     let content = fixture.content_copy();
     fs::write(
         content.join("field_battles.json"),
@@ -1229,8 +1244,9 @@ fn an_ungrantable_prize_quantity_is_refused_through_gameplay() {
         .iter_mut()
         .find(|battle| battle["id"] == 12310)
         .unwrap();
-    invalid_row["prizes"][0]["item_id"] = json!(item_id);
-    invalid_row["prizes"][0]["quantity"] = json!(max_stack + 1);
+    let first = first_prize_of(invalid_row, BRAWLER);
+    invalid_row["prizes"][first]["item_id"] = json!(item_id);
+    invalid_row["prizes"][first]["quantity"] = json!(max_stack + 1);
     let content = fixture.content_copy();
     let path = content.join("field_battles.json");
     fs::write(&path, serde_json::to_vec(&invalid).unwrap()).unwrap();

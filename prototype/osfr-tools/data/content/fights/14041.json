@@ -365,8 +365,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75092,
+        "name_id": 131976,
+        "icon_id": 3153,
+        "job": 2
+      },
+      {
+        "item_id": 75420,
+        "name_id": 131164,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75376,
+        "name_id": 131120,
+        "icon_id": 548,
+        "job": 2
+      },
+      {
+        "item_id": 76220,
+        "name_id": 133228,
+        "icon_id": 5365,
+        "job": 2
+      },
+      {
+        "item_id": 76090,
+        "name_id": 133098,
+        "icon_id": 5786,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75355,
+        "name_id": 131099,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75311,
+        "name_id": 131055,
+        "icon_id": 548,
+        "job": 11
+      },
+      {
+        "item_id": 75062,
+        "name_id": 131946,
+        "icon_id": 3221,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 75550,
+        "name_id": 131294,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75506,
+        "name_id": 131250,
+        "icon_id": 548,
+        "job": 12
+      },
+      {
+        "item_id": 75152,
+        "name_id": 132036,
+        "icon_id": 3157,
+        "job": 12
+      },
+      {
+        "item_id": 76402,
+        "name_id": 133410,
+        "icon_id": 5039,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76330,
+        "name_id": 133338,
+        "icon_id": 5420,
+        "job": 32
+      },
+      {
+        "item_id": 75122,
+        "name_id": 132006,
+        "icon_id": 3099,
+        "job": 32
+      },
+      {
+        "item_id": 75485,
+        "name_id": 131229,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75441,
+        "name_id": 131185,
+        "icon_id": 548,
+        "job": 32
+      },
+      {
+        "item_id": 75002,
+        "name_id": 131886,
+        "icon_id": 3110,
+        "job": 35
+      },
+      {
+        "item_id": 75225,
+        "name_id": 130969,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 75181,
+        "name_id": 130925,
+        "icon_id": 548,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75744,
+        "name_id": 132752,
+        "icon_id": 2381,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75032,
+        "name_id": 131916,
+        "icon_id": 3130,
+        "job": 43
+      },
+      {
+        "item_id": 75290,
+        "name_id": 131034,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75246,
+        "name_id": 130990,
+        "icon_id": 548,
+        "job": 43
+      },
+      {
+        "item_id": 75865,
+        "name_id": 132873,
+        "icon_id": 4967,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 49
   },
   "source": [
     {
@@ -400,6 +587,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/robgoblin_treasure_trove.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Robgoblin Treasure Trove' (revision 49335) lists one prize wheel per combat job and a 49-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }

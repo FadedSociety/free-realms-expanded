@@ -214,8 +214,87 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76210,
+        "name_id": 133218,
+        "icon_id": 2489,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 76080,
+        "name_id": 133088,
+        "icon_id": 5337,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76389,
+        "name_id": 133397,
+        "icon_id": 5047,
+        "job": 12
+      },
+      {
+        "item_id": 76324,
+        "name_id": 133332,
+        "icon_id": 2510,
+        "job": 32
+      },
+      {
+        "item_id": 76320,
+        "name_id": 133328,
+        "icon_id": 5439,
+        "job": 32
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75734,
+        "name_id": 132742,
+        "icon_id": 4946,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75855,
+        "name_id": 132863,
+        "icon_id": 4988,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 19
   },
   "source": [
     {
@@ -249,6 +328,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/cursed_graveyard.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Cursed Graveyard!' (revision 48677) lists one prize wheel per combat job and a 19-coin slot; any other job spins the items every job's wheel holds. Brawler: the wiki's 'Bell Brawler Gloves' is 'Saved by the Bell Brawler Gloves' in our record dungeons/cursed_graveyard.json."
     }
   ]
 }

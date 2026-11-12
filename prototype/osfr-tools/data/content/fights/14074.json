@@ -299,8 +299,225 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76255,
+        "name_id": 133263,
+        "icon_id": 2503,
+        "job": 2
+      },
+      {
+        "item_id": 75416,
+        "name_id": 131160,
+        "icon_id": 3719,
+        "job": 2
+      },
+      {
+        "item_id": 75412,
+        "name_id": 131156,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 75379,
+        "name_id": 131123,
+        "icon_id": 551,
+        "job": 2
+      },
+      {
+        "item_id": 75118,
+        "name_id": 132002,
+        "icon_id": 3152,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 76125,
+        "name_id": 133133,
+        "icon_id": 2370,
+        "job": 11
+      },
+      {
+        "item_id": 75351,
+        "name_id": 131095,
+        "icon_id": 3719,
+        "job": 11
+      },
+      {
+        "item_id": 75347,
+        "name_id": 131091,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 75314,
+        "name_id": 131058,
+        "icon_id": 551,
+        "job": 11
+      },
+      {
+        "item_id": 75088,
+        "name_id": 131972,
+        "icon_id": 3122,
+        "job": 11
+      },
+      {
+        "item_id": 76449,
+        "name_id": 133457,
+        "icon_id": 5064,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 75178,
+        "name_id": 132062,
+        "icon_id": 3160,
+        "job": 12
+      },
+      {
+        "item_id": 75546,
+        "name_id": 131290,
+        "icon_id": 3719,
+        "job": 12
+      },
+      {
+        "item_id": 75542,
+        "name_id": 131286,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 75509,
+        "name_id": 131253,
+        "icon_id": 551,
+        "job": 12
+      },
+      {
+        "item_id": 76365,
+        "name_id": 133373,
+        "icon_id": 2533,
+        "job": 32
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 75481,
+        "name_id": 131225,
+        "icon_id": 3719,
+        "job": 32
+      },
+      {
+        "item_id": 75477,
+        "name_id": 131221,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75444,
+        "name_id": 131188,
+        "icon_id": 551,
+        "job": 32
+      },
+      {
+        "item_id": 75148,
+        "name_id": 132032,
+        "icon_id": 3219,
+        "job": 32
+      },
+      {
+        "item_id": 75221,
+        "name_id": 130965,
+        "icon_id": 3719,
+        "job": 35
+      },
+      {
+        "item_id": 75217,
+        "name_id": 130961,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75028,
+        "name_id": 131912,
+        "icon_id": 3106,
+        "job": 35
+      },
+      {
+        "item_id": 75184,
+        "name_id": 130928,
+        "icon_id": 551,
+        "job": 35
+      },
+      {
+        "item_id": 75779,
+        "name_id": 132787,
+        "icon_id": 2406,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75900,
+        "name_id": 132908,
+        "icon_id": 5662,
+        "job": 43
+      },
+      {
+        "item_id": 75058,
+        "name_id": 131942,
+        "icon_id": 3126,
+        "job": 43
+      },
+      {
+        "item_id": 75286,
+        "name_id": 131030,
+        "icon_id": 3719,
+        "job": 43
+      },
+      {
+        "item_id": 75282,
+        "name_id": 131026,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75249,
+        "name_id": 130993,
+        "icon_id": 551,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 10
   },
   "source": [
     {
@@ -326,6 +543,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Mudshell' (revision 30403) lists one prize wheel per combat job and a 10-coin slot; any other job spins the items every job's wheel holds. Brawler: the wiki's 'Bare-Knuckle Brawler Shoulder Pads' is 'Bare-Knuckle Brawler Shoulderpads' in our record dungeons/mudshell.json; Brawler: the wiki's 'Brawer's Atlas Hammer of Rage' is 'Brawler's Atlas Hammer of Rage' in our record dungeons/mudshell.json."
     }
   ]
 }

@@ -1034,6 +1034,11 @@ fn the_shipped_pondblaster_quest_completes_end_to_end() {
         .find(|row| row["definition_id"].as_u64() == Some(u64::from(POND_BLASTER)))
         .expect("the shipped field content carries the Pondblaster")
         .clone();
+    // Half its authored health keeps the one-arrow kill this route walks: since the owner's x2
+    // enemy health (rc-0137) the shipped Pondblaster survives the Explosive Arrow, and this
+    // ordered quest credits the arrow only once a Pondblaster is down.
+    let mut field_row = field_row;
+    field_row["max_health"] = serde_json::json!(field_row["max_health"].as_u64().unwrap() / 2);
     let enemy_guid = field_row["guid"].as_u64().unwrap();
     let enemy_at: [f32; 3] = serde_json::from_value(field_row["position"].clone()).unwrap();
     let fixture = Fixture::for_character(A).with_field_enemies(&[field_row]);

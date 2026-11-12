@@ -238,8 +238,8 @@ pub fn attack_one(
 }
 
 /// One shared-field kill through the production attack path. The loop is
-/// bounded; the strongest shipped field actor (a level-20 elite, 2569 HP) dies
-/// in twenty-six 100-damage hits, inside the 30 s participation window.
+/// bounded; the strongest shipped field actor (a level-20 elite, 2569 HP before the
+/// owner's x2 health, rc-0137) dies in twenty-six 100-damage hits, fifty-two now.
 pub fn kill(
     game: &mut Gameplay,
     field: &mut SharedFieldState,
@@ -248,7 +248,7 @@ pub fn kill(
     target: u64,
     mut now_ms: u64,
 ) -> (Outcome, u64) {
-    for _ in 0..40 {
+    for _ in 0..80 {
         let out = attack(game, field, character, known, target, now_ms).unwrap();
         if field.health(target) == Some(0) {
             return (out, now_ms);

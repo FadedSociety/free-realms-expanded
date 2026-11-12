@@ -544,8 +544,8 @@ fn the_battle_prize_preflight_and_full_bag_refuse() {
     );
 
     // Four free stacks: the whole previewed bundle fits and the battle starts.
-    let (mut fitting, bag) = fixture.gateway_with_bag(marker, 1004, MAX_ITEMS - 4);
-    assert_eq!(bag.items.len(), MAX_ITEMS - 4);
+    let (mut fitting, bag) = fixture.gateway_with_bag(marker, 1004, MAX_ITEMS - job_prizes(battle(&battles(), THUGAMUG), BRAWLER).len());
+    assert_eq!(bag.items.len(), MAX_ITEMS - job_prizes(battle(&battles(), THUGAMUG), BRAWLER).len());
     assert!(
         !bag.items
             .iter()

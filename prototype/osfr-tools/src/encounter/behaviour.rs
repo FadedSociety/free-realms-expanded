@@ -488,10 +488,23 @@ impl EncounterEngine {
             .flat_map(|d| d.enemies.iter())
             .chain(self.content.world_enemies.iter())
             .chain(self.field_sim.enemies.iter().map(|f| &f.actor));
+        let arena: BTreeSet<u64> = (self.content.dungeons.iter())
+            .flat_map(|d| d.enemies.iter().map(|a| a.guid))
+            .collect();
         let mut resolved = BTreeMap::new();
         for actor in actors {
-            let behaviour =
+            let mut behaviour =
                 resolve_behaviour(actor, &self.behaviour_presets).map_err(|e| invalid(&e))?;
+            // rc-0136 (owner: the hut battle's hooligans "walk slowly"): an arena enemy left at
+            // the default pace chases at its kind's run speed (`enemies.json` `speeds`).
+            let run = (self.scale.catalogue().by_kind(actor.definition_id))
+                .and_then(|d| d.speeds.as_ref())
+                .map(|s| s.run);
+            if let Some(run) = run.filter(|_| arena.contains(&actor.guid)) {
+                if behaviour.move_speed == Behaviour::default().move_speed {
+                    behaviour.move_speed = run;
+                }
+            }
             resolved.insert(actor.guid, behaviour);
         }
         // Old summoner battles (`summon_below_percent` on the helpers): each helper gets its

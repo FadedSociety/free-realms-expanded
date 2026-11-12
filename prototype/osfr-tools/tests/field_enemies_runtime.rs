@@ -20,8 +20,9 @@ mod job_playtest;
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 const GUID: u64 = 100;
 /// The fixture wolf's authored 100 health on the live scale.
+/// Authored 50: the old 100's hit counts under the owner's x2 enemy health (rc-0137).
 fn full() -> u32 {
-    combat_scale::enemy_health(100)
+    combat_scale::enemy_health(50)
 }
 struct Fixture(PathBuf);
 impl Drop for Fixture {
@@ -45,7 +46,7 @@ impl Fixture {
         let zone = json!({"zone_id":0,"name":"SyntheticWorld","sky":"","geometry_id":214,"position":[0,0,0],"rotation":[0,0,0],"tutorial":false});
         let mut cave = zone.clone();
         cave["zone_id"] = json!(411);
-        let actor = json!({"guid":GUID,"definition_id":400,"model_id":3,"name_id":100,"name":"Synthetic wolf","texture_alias":"","position":[0,0,0],"max_health":100,"damage":7,"boss":false,"level":level,"level_band":[1,20],"zone_id":0,"region":"Synthetic region","spawn_area":{"id":"test","centre":[0,0,0],"radius":radius,"count":1},"leash_radius":12,"respawn_seconds":1,"aggro_range":8});
+        let actor = json!({"guid":GUID,"definition_id":400,"model_id":3,"name_id":100,"name":"Synthetic wolf","texture_alias":"","position":[0,0,0],"max_health":50,"damage":7,"boss":false,"level":level,"level_band":[1,20],"zone_id":0,"region":"Synthetic region","spawn_area":{"id":"test","centre":[0,0,0],"radius":radius,"count":1},"leash_radius":12,"respawn_seconds":1,"aggro_range":8});
         let mut other = actor.clone();
         other["guid"] = json!(200);
         fs::write(dir.join("encounters.json"), json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(template)),"world":zone,"world_enemies":[],"dungeons":[{"id":411,"title_id":12,"description_id":13,"objective_id":14,"zone":cave,"guide":null,"enemies":[other],"reward_coins":0,"reward_items":[]}]}).to_string()).unwrap();

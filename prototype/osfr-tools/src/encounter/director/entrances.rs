@@ -103,7 +103,7 @@ pub struct Entrance {
     pub scale: f32,
     pub at: [f32; 3],
     pub heading: f32,
-    /// 0 stands still (a door).
+    /// 0 stands still: a door, and a starter drawn as its den or hut (the owner, rc-0137).
     pub roam: f32,
     pub fight: Option<u32>,
     /// The battle a fight file's run still counts as for quests, kills and results (a door
@@ -277,6 +277,22 @@ impl Doors {
     /// The fight an encounter id is for quests, kills and results.
     pub(in crate::encounter) fn fight(&self, encounter: u32) -> u32 {
         self.counts_as.get(&encounter).copied().unwrap_or(encounter)
+    }
+
+    /// A `field_battles.json` row an entrance runs under its own id or counts as: the entrance
+    /// stands for it in the world (rc-0136: the Troll Summoner stood twice, the row's own
+    /// marker beside the captured entrance).
+    pub(in crate::encounter) fn replaces(&self, row: u32) -> bool {
+        self.counts_as.values().any(|&old| old == row)
+    }
+
+    /// The battles whose own spawner the world draws: all but a row an entrance stands for. A
+    /// hidden row still runs (its entrance, quest pins and old clicks reach it).
+    pub(in crate::encounter) fn drawn<'a>(
+        &'a self,
+        battles: &'a [FieldBattle],
+    ) -> impl Iterator<Item = &'a FieldBattle> + 'a {
+        battles.iter().filter(|b| !self.replaces(b.id))
     }
 
     /// An actor that never walks (a door).
@@ -489,6 +505,7 @@ impl EncounterEngine {
                     zone: dungeon.map_or_else(|| self.content.world.clone(), |d| d.zone.clone()),
                     icon_id: dungeon.map_or(-1, |d| d.icon_id),
                     prizes: dungeon.map_or_else(Vec::new, |d| d.prizes.clone()),
+                    wheel_coins: dungeon.map_or(0, |d| d.wheel_coins),
                     drops: (self.fight_state.drops.get(&id).cloned()).unwrap_or_default(),
                     nameplate_image_id: default_battle_icon(),
                     enemies: dungeon.map_or_else(Vec::new, |d| d.enemies.clone()),
@@ -517,6 +534,39 @@ impl EncounterEngine {
     /// those).
     pub fn entrances(&self) -> Option<&Table> {
         self.fight_state.doors.table.as_ref()
+    }
+
+    /// The battles the Games window may start (`activity_portal`, its Battles rows): every open
+    /// door first, under the door's own name (the window names a dungeon as its point of
+    /// interest does), then every `field_battles.json` row. A door comes first, so a window row
+    /// both could run starts the fight the door runs (Bixie Hive: the hive's own fight, not the
+    /// clearing row it counts as). Play then starts it through the same gates as the door's Go.
+    pub fn portal_battles(&self) -> Vec<crate::activity_portal::Activity> {
+        let doors = &self.fight_state.doors;
+        let entrances = doors.table.as_ref().map_or(&[][..], |t| &t.entrances[..]);
+        let door_rows = (entrances.iter())
+            .filter(|row| row.kind == EntranceKind::Door)
+            .filter_map(|row| {
+                let door = doors.rows.get(&row.guid).filter(|door| door.open)?;
+                let battle = self.battles.iter().find(|b| b.id == door.encounter)?;
+                Some((battle, u32::try_from(row.name_id).ok()?))
+            });
+        let field_rows = (self.battles.iter())
+            .filter(|b| self.entrance(b.spawner.guid).is_none())
+            .map(|b| (b, u32::try_from(b.title_id).unwrap_or(0)));
+        door_rows
+            .chain(field_rows)
+            .map(|(b, name_id)| crate::activity_portal::Activity {
+                id: b.id,
+                name_id,
+                description_id: u32::try_from(b.description_id).unwrap_or(0),
+                // -1 is "no icon" in the battle data; the portal shows image set 0 then.
+                icon_id: u32::try_from(b.icon_id).unwrap_or(0),
+                difficulty: u32::try_from(b.difficulty).unwrap_or(1),
+                required_level: b.required_combat_level,
+                kind: crate::activity_portal::Kind::Battle,
+            })
+            .collect()
     }
 
     /// The encounter an entrance's actor starts and whether it is open; `None` for any other

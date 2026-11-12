@@ -76,9 +76,10 @@ pub fn reference_content() -> PathBuf {
         })
 }
 
-/// The release item table cut down to the rows quest rewards name. The reference content has
-/// no table, and a turn-in refuses a reward item it cannot define; the whole table would be
-/// parsed again for every fixture, because the content cache is per directory.
+/// The release item table cut down to the rows quest rewards and battle wheels name. The
+/// reference content has no table, and a turn-in (or a battle's Go) refuses a reward item it
+/// cannot define; the whole table would be parsed again for every fixture, because the
+/// content cache is per directory.
 fn reward_item_table() -> &'static str {
     static TABLE: OnceLock<String> = OnceLock::new();
     TABLE.get_or_init(|| {
@@ -92,6 +93,12 @@ fn reward_item_table() -> &'static str {
                     }
                 }
             }
+        }
+        // rc-0137: a battle's Go also needs every prize of its wheels defined.
+        let battles = read_json(&content_dir().join("field_battles.json"));
+        let rows = battles["battles"].as_array().into_iter().flatten();
+        for prize in rows.flat_map(|row| row["prizes"].as_array().into_iter().flatten()) {
+            wanted.extend(prize["item_id"].as_i64());
         }
         // QF: what a reward's Mystery Gift opens into (`release/mystery_chests.json` gifts).
         let chests = read_json(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/mystery_chests.json"));

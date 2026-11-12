@@ -212,6 +212,35 @@ pub fn battles() -> Value {
     read_json(&battle_path())
 }
 
+/// Every row no entrance claims (`entrances.json` `fight` or `counts_as`) publishes its own
+/// marker; a claimed row stands as its entrance instead (rc-0137: the Troll Summoner stood
+/// twice). Panics unless `spawners` is exactly the unclaimed rows plus claimed rows an
+/// entrance did not take.
+pub fn assert_markers(rows: &[Value], spawners: &[(u64, String, i32, i32, [f32; 3], i32)], what: &str) {
+    let claimed = entrance_rows();
+    let drawn: BTreeSet<u64> = spawners.iter().map(|s| s.0).collect();
+    let marker = |row: &Value| row["spawner"]["guid"].as_u64().unwrap();
+    for row in rows {
+        let claimed = claimed.contains(&row["id"].as_u64().unwrap());
+        assert!(claimed || drawn.contains(&marker(row)), "{what}: battle {} has no marker", row["id"]);
+    }
+    assert!(
+        drawn.iter().all(|guid| rows.iter().any(|row| marker(row) == *guid)),
+        "{what}: a marker belongs to no row"
+    );
+}
+
+/// The `field_battles.json` rows an entrance runs or counts as (`entrances.json` `fight` and
+/// `counts_as`): such a row stands in the world as that entrance, not as its own marker
+/// (rc-0137: the Troll Summoner stood twice).
+pub fn entrance_rows() -> BTreeSet<u64> {
+    let table = read_json(&content_dir().join("entrances.json"));
+    (table["entrances"].as_array().unwrap().iter())
+        .flat_map(|e| [e["fight"].as_u64(), e["counts_as"].as_u64()])
+        .flatten()
+        .collect()
+}
+
 pub fn battle<'a>(file: &'a Value, id: u32) -> &'a Value {
     file["battles"]
         .as_array()
@@ -249,6 +278,29 @@ pub fn prize_ids(row: &Value) -> std::collections::BTreeSet<i32> {
         .iter()
         .map(|prize| i32_field(prize, "item_id"))
         .collect()
+}
+
+/// The prizes a player in `job` sees on the card and spins: the rows of that job's wheel, else
+/// the rows any job spins (rc-0137: one wheel per combat job, from the battle's wiki page).
+pub fn job_prizes(row: &Value, job: i32) -> Vec<Value> {
+    let rows = row["prizes"].as_array().cloned().unwrap_or_default();
+    let of = |j: i64| -> Vec<Value> {
+        (rows.iter().filter(|p| p["job"].as_i64().unwrap_or(0) == j)).cloned().collect()
+    };
+    let own = of(i64::from(job));
+    if own.is_empty() {
+        of(0)
+    } else {
+        own
+    }
+}
+
+/// Where in `row["prizes"]` the first prize a player in `job` spins sits (see [`job_prizes`]); an
+/// engine with no job set spins job 0's.
+pub fn first_prize_of(row: &Value, job: i32) -> usize {
+    let rows = row["prizes"].as_array().unwrap();
+    let at = |j: i64| rows.iter().position(|p| p["job"].as_i64().unwrap_or(0) == j);
+    at(i64::from(job)).or_else(|| at(0)).unwrap_or(0)
 }
 
 // ---------------------------------------------------------------------------
@@ -650,13 +702,17 @@ pub fn fight_to_win(gateway: &mut Gateway, now_ms: &mut u64, row: &Value) -> Vec
     let player_guid = gateway.state().guid;
     let arrival = position(&row["zone"]["position"]);
     let mut replies = Vec::new();
-    for _ in 0..200 {
-        let Some((guid, at, _)) = active_enemy(gateway) else {
-            break;
+    for _ in 0..400 {
+        let fighting = encounter_phase(gateway) == Some(EncounterPhase::Fighting);
+        let Some((guid, at, _)) = active_enemy(gateway).filter(|_| fighting) else {
+            if !fighting {
+                break;
+            }
+            // Between a paced battle's rounds (`instance_pacing.json`) nobody stands.
+            *now_ms += 1_000;
+            replies.extend(gateway.tick_at(*now_ms).unwrap().replies);
+            continue;
         };
-        if encounter_phase(gateway) != Some(EncounterPhase::Fighting) {
-            break;
-        }
         walk(gateway, player_guid, [at[0] + 1.5, at[1], at[2]], now_ms);
         *now_ms += 700;
         // 36/10 writer 0x00a342e0: bar 1, slot 0, target mode 0, target GUID.
@@ -705,7 +761,13 @@ pub fn assert_payout(
     prize_ids: &BTreeSet<i32>,
     job_xp: u32,
 ) {
-    assert_eq!(after.coins, before.coins + u32_field(row, "reward_coins"));
+    // rc-0137: the wheel may stop on its coin slot (the wiki's "N Coins") instead of a prize.
+    let slot = row["wheel_coins"].as_u64().unwrap_or(0) as u32;
+    let paid = after.coins - before.coins;
+    let on_coins = slot > 0 && paid == u32_field(row, "reward_coins") + slot;
+    if !on_coins {
+        assert_eq!(paid, u32_field(row, "reward_coins"));
+    }
     for (profile, experience) in &after.experience {
         let prior = before.experience.get(profile).copied().unwrap_or(0);
         let delta = experience - prior;
@@ -723,6 +785,10 @@ pub fn assert_payout(
             (count > &prior).then_some((*id, count - prior))
         })
         .collect();
+    if on_coins {
+        assert!(gains.is_empty(), "the coin slot grants no prize");
+        return;
+    }
     assert_eq!(gains.len(), 1, "exactly one prize was granted");
     assert!(prize_ids.contains(&gains[0].0));
     assert_eq!(gains[0].1, 1);

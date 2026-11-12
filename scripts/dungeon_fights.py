@@ -589,6 +589,11 @@ class Mapper:
         how = f"the entrance counts as battle {fid} for quests" if row else f"under the id ({fid}) quests name"
         fight["source"].append(r(f"Built by {TOOL} from data/content/dungeons/{rid}.json, its notes page and "
                                  f"the fork battle; {how}."))
+        # The prize wheel is the battle's own wiki table (rc-0137), set in the file: a rebuild keeps it.
+        kept = self.fights.get(fight["id"])
+        if kept:
+            fight["rewards"] = kept[0].get("rewards", fight["rewards"])
+            fight["source"] += [s for s in kept[0].get("source", []) if "prize wheel" in s.get("evidence", "")]
         out["fight"] = fight["id"]
         out["files"][f"fights/{fight['id']}.json"] = (fight, False)
         if row:

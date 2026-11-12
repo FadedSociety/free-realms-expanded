@@ -196,7 +196,7 @@ impl EncounterEngine {
         };
         if self.fight_run().is_none() {
             let (count, _) = goal_progress(d, active);
-            out.replies.push(objective(2, d.objective_id, count));
+            out.replies.extend(card::goal_counted(d.objective_id, count));
         }
         out.changed = true;
         self.win_run(now_ms, &mut out);
@@ -219,10 +219,14 @@ impl EncounterEngine {
                 out.replies.push(remove(a.guid));
             }
         }
-        // One prize from the battle's wheel (R: uniform pick), granted
-        // and shown as the loot wheel's landing slot.
-        let prize = (!d.prizes.is_empty())
-            .then(|| d.prizes[(now_ms % d.prizes.len() as u64) as usize].clone());
+        // One slot of this job's wheel (R: uniform pick), granted and shown as the loot
+        // wheel's landing slot.
+        let landing = card::spin(&d.prizes, self.player_profile, d.wheel_coins, now_ms);
+        let (prize, wheel_coins) = match &landing {
+            Some(card::Landing::Item(prize)) => (Some(prize.clone()), 0),
+            Some(card::Landing::Coins(coins)) => (None, *coins),
+            None => (None, 0),
+        };
         let (id, instance, objective_id, mut reward) = (
             d.id,
             active.instance_id,
@@ -236,7 +240,8 @@ impl EncounterEngine {
                     None if d.guide.is_none() => BATTLE_JOB_XP,
                     None => 0,
                 },
-                coins: d.reward_coins + pay.as_ref().map_or(0, |(_, bonus)| bonus.coins),
+                coins: (d.reward_coins.saturating_add(wheel_coins))
+                    .saturating_add(pay.as_ref().map_or(0, |(_, bonus)| bonus.coins)),
                 items: d
                     .reward_items
                     .iter()
@@ -267,16 +272,12 @@ impl EncounterEngine {
         }
         if pay.is_none() {
             // A fight file's goals completed as they were done.
-            out.replies.push(objective_complete(objective_id));
+            out.replies.extend(card::goal_met(objective_id));
         }
         out.replies.push(game_over(true, instance, id));
-        if let Some(prize) = &prize {
-            // 39/45 MiniGameLootWheelSetItemToLandOn: the wheel lands
-            // on the preview entry with this name id (native
-            // StopMiniGameLootWheelAt 009b6da0); the client answers
-            // 39/46 when the spin stops, then shows the scores.
+        if let Some(landing) = &landing {
             let mut wheel = minigame(45, instance, id);
-            wheel.extend(prize_bundle(std::slice::from_ref(prize)));
+            wheel.extend(card::landing_bundle(landing));
             out.replies.push(wheel);
         }
         out.replies.push(rules(false));

@@ -28,6 +28,16 @@ pub fn enemy_hit(rank: Rank, tier: u8) -> u32 {
     tables().map_or(0, |t| t.enemy_hit(rank, tier))
 }
 
+/// An enemy's own stated health (a fight row's or kind's), with the owner's health multiplier.
+pub fn live_health(health: u32) -> u32 {
+    tables().map_or(health, |t| t.live_health(health as f32))
+}
+
+/// An enemy's own stated raw hit, with the owner's damage multiplier.
+pub fn live_hit(hit: u32) -> u32 {
+    tables().map_or(hit, |t| t.live_hit(hit as f32))
+}
+
 /// Damage of a kit ability class (`combat_scale.json` `ability_damage`) at a weapon tier; 0
 /// for a class the table does not hold.
 pub fn ability_damage(class: &str, tier: u8) -> u32 {

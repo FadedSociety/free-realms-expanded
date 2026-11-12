@@ -44,13 +44,10 @@ fn numbers(fight: &Fight, kind: &KindRow, row: Option<&ActorRow>, group: u8) -> 
     };
     let level = level.clamp(1, 20);
     let tier = scale::tier_of_level(level as u8);
-    let health = row
-        .and_then(|r| r.max_health)
-        .or(kind.max_health)
-        .unwrap_or_else(|| scale::enemy_health(kind.rank, tier, group));
-    let damage = kind
-        .damage
-        .unwrap_or_else(|| scale::enemy_hit(kind.rank, tier));
+    // A stated number takes the owner's multiplier here; a rank's has it already.
+    let health = (row.and_then(|r| r.max_health).or(kind.max_health))
+        .map_or_else(|| scale::enemy_health(kind.rank, tier, group), scale::live_health);
+    let damage = (kind.damage).map_or_else(|| scale::enemy_hit(kind.rank, tier), scale::live_hit);
     (health.max(1), damage, level)
 }
 
@@ -79,7 +76,8 @@ fn actor_of(fight: &Fight, i: usize, group: u8) -> Option<Actor> {
         "tags": slot.tags,
         "scale": row.and_then(|r| r.scale).or(kind.scale),
         "behaviour": row.and_then(|r| r.behaviour.clone()).or(kind.behaviour.clone()),
-        "power_up_table": kind.power_up_table,
+        "power_up_table": (kind.power_up_table.clone())
+            .or_else(|| crate::encounter::pickups::rank_table(slot.rank)),
     }))
     .ok()
 }
@@ -180,6 +178,7 @@ impl EncounterEngine {
     /// takes that row over when a run begins (`prepare_fights`), because the battle file
     /// loads after the engine.
     pub(in crate::encounter) fn load_fights(&mut self, directory: &Path) -> io::Result<()> {
+        self.fight_state.pacing = Arc::new(super::super::pacing::PacingTable::load(directory)?);
         let fights = load_dir(directory)?;
         if fights.is_empty() {
             return Ok(());
@@ -197,15 +196,8 @@ impl EncounterEngine {
                 serde_json::from_value(json!(fight.rewards.drops))
                     .map_err(|e| refuse(&format!("/rewards/drops: {e}")))?;
             battle_drops::validate(&rows, self.field_rewards.loot_tables())?;
-            if wheel.len() > 4
-                || wheel.iter().any(|p| {
-                    p.item_id <= 0
-                        || p.name_id <= 0
-                        || p.icon_id <= 0
-                        || !(1..=MAX_PRIZE_QUANTITY).contains(&p.quantity)
-                })
-            {
-                return Err(refuse("/rewards/wheel: at most four well-formed prizes"));
+            if !card::wheel_ok(&wheel) {
+                return Err(refuse("/rewards/wheel: at most eight well-formed prizes a job"));
             }
             if compile(&fight).len()
                 != fight
@@ -238,6 +230,7 @@ impl EncounterEngine {
                     reward_coins: fight.rewards.coins,
                     reward_items: Vec::new(),
                     prizes: wheel,
+                    wheel_coins: fight.rewards.wheel_coins,
                 });
                 drops.insert(fight.id, rows);
             }
@@ -384,11 +377,12 @@ impl EncounterEngine {
         }
         for (row, goal) in run.def.objectives.iter().zip(&run.goals) {
             if row.text_id > 0 && goal.state != GoalState::Waiting {
-                out.replies.push(objective(1, row.text_id, goal.of as i32));
+                let opened = card::goal_row(row.text_id, row.bonus, goal.of as i32);
+                out.replies.extend(card::goal_opened(&opened));
                 out.replies
-                    .push(objective(2, row.text_id, goal.done as i32));
+                    .extend(card::goal_counted(row.text_id, goal.done as i32));
                 if goal.state == GoalState::Done {
-                    out.replies.push(objective_complete(row.text_id));
+                    out.replies.extend(card::goal_met(row.text_id));
                 }
             }
         }
@@ -931,12 +925,13 @@ impl EncounterEngine {
             });
             if row.text_id > 0 {
                 if was.0 == GoalState::Waiting {
-                    out.replies.push(objective(1, row.text_id, goal.of as i32));
+                    let opened = card::goal_row(row.text_id, row.bonus, goal.of as i32);
+                    out.replies.extend(card::goal_opened(&opened));
                 }
                 out.replies
-                    .push(objective(2, row.text_id, goal.done as i32));
+                    .extend(card::goal_counted(row.text_id, goal.done as i32));
                 if goal.state == GoalState::Done {
-                    out.replies.push(objective_complete(row.text_id));
+                    out.replies.extend(card::goal_met(row.text_id));
                 }
             }
         }
@@ -953,6 +948,27 @@ impl EncounterEngine {
             .as_ref()
             .is_some_and(|a| a.phase == EncounterPhase::Fighting);
         run.outcome().filter(|_| fighting)
+    }
+
+    /// The client's leave (41/109). With the exit door open the fight is won and only the walk
+    /// to the door is left, so leaving is going out through it (R): the win is paid and
+    /// counted before the player goes home, never lost to the menu. The client has already
+    /// closed its minigame when it sends the leave (native log "MiniGame:LeaveMiniGame"), so
+    /// the results card it would answer is not shown.
+    pub(in crate::encounter) fn leave(&mut self, now_ms: u64) -> io::Result<EncounterOutcome> {
+        let mut out = EncounterOutcome::default();
+        if self.fight_run().is_some_and(Run::exit_is_open) {
+            let exit = Signal::Reached {
+                place: "exit".to_owned(),
+            };
+            self.run_fact(&exit, now_ms, &mut out);
+        }
+        let left = self.exit()?;
+        out.replies.extend(left.replies);
+        out.changed |= left.changed;
+        out.zoning = left.zoning;
+        out.completed = left.completed;
+        Ok(out)
     }
 
     /// A player talked to (clicked) an actor of the fight: the open exit door ends the run,

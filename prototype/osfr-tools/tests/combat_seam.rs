@@ -14,16 +14,20 @@ use osfr_tools::{
 };
 use std::{collections::BTreeMap, path::PathBuf};
 
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 const BRAWLER: i32 = 43;
 
+/// The opening reference with the release item table beside it: battle 96's wheel holds a prize
+/// the reference's own inventory lacks, and the simulator refuses a battle it cannot pay.
 fn content() -> PathBuf {
-    std::env::var_os("OSFR_ACTIVITY_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/rust-opening-cooking-original-assets")
-        })
+    if let Some(dir) = std::env::var_os("OSFR_ACTIVITY_CONTENT") {
+        return PathBuf::from(dir);
+    }
+    static DIR: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    (DIR.get_or_init(|| content_copy::opening_with_release_items("combat-seam-content"))).clone()
 }
 
 fn character() -> CharacterState {
@@ -62,15 +66,16 @@ fn brawler() -> Gameplay {
 }
 
 /// `realm sim 96` (the Troll Summoner battle) before the move, captured at base `75e3d982`;
-/// rc-0136 retuned the battle to its tier's 2014 numbers (the level 1 bot now loses half its
-/// health where it lost 80).
+/// rc-0136 retuned the battle to its tier's 2014 numbers. rc-0137: the simulator plays the job's
+/// real bar (`EncounterEngine::simulate_clear`) against the owner's x2 health and x1.5 hits, and
+/// says more; this content has no pacing row or power-ups, so the level-1 bot loses.
 const SIM_96: [&str; 6] = [
     "Battle 96, job 43 (scripted bot):",
-    "  level  1: won in 7s, lowest health 250/500, dealt 3266 (0 crits)",
-    "  level  5: won in 7s, lowest health 525/875, dealt 4786 (0 crits)",
-    "  level 10: won in 0s, lowest health 1761/1761, dealt 1726 (0 crits)",
-    "  level 15: won in 0s, lowest health 3545/3545, dealt 1726 (0 crits)",
-    "  level 20: won in 0s, lowest health 7135/7135, dealt 1726 (0 crits)",
+    "  level  1: lost in 10s, health left 0/500, lowest 0, dealt 4354 (0 crits), 0 hearts, 1 knockouts",
+    "  level  5: won in 7s, health left 533/875, lowest 533, dealt 6533 (0 crits), 0 hearts, 0 knockouts",
+    "  level 10: won in 7s, health left 1229/1761, lowest 1229, dealt 9573 (0 crits), 0 hearts, 0 knockouts",
+    "  level 15: won in 0s, health left 3545/3545, lowest 3545, dealt 3453 (0 crits), 0 hearts, 0 knockouts",
+    "  level 20: won in 0s, health left 7135/7135, lowest 7135, dealt 3453 (0 crits), 0 hearts, 0 knockouts",
 ];
 
 #[test]
@@ -230,12 +235,13 @@ fn a_dormant_row_stays_out_of_the_fight_and_still_counts_toward_the_goal() {
 /// numbers into data; a later change of signature breaks this test at compile time.
 #[test]
 fn the_frozen_scale_interface_holds_the_captured_anchors() {
-    assert_eq!(scale::enemy_health(Rank::Minion, 1, 1), 260);
-    assert_eq!(scale::enemy_health(Rank::Normal, 1, 1), 760);
-    assert_eq!(scale::enemy_health(Rank::Boss, 1, 1), 3_800);
-    assert_eq!(scale::enemy_health(Rank::Tough, 5, 1), 16_143);
-    assert_eq!(scale::enemy_health(Rank::Normal, 1, 3), 1_520);
-    assert_eq!(scale::enemy_hit(Rank::Minion, 1), 25);
+    // The anchors times the owner's x2 health and x1.5 hits (rc-0137).
+    assert_eq!(scale::enemy_health(Rank::Minion, 1, 1), scale::live_health(260));
+    assert_eq!(scale::enemy_health(Rank::Normal, 1, 1), scale::live_health(760));
+    assert_eq!(scale::enemy_health(Rank::Boss, 1, 1), scale::live_health(3_800));
+    assert_eq!(scale::enemy_health(Rank::Tough, 5, 1), scale::live_health(16_143));
+    assert_eq!(scale::enemy_health(Rank::Normal, 1, 3), scale::live_health(1_520));
+    assert_eq!(scale::enemy_hit(Rank::Minion, 1), scale::live_hit(25));
     assert_eq!(scale::ability_damage("super_heavy", 5), 10_674);
     assert_eq!(scale::ability_damage("no_such_class", 1), 0);
     assert_eq!(scale::mitigate(206, 348, 0, 5), 113);
@@ -264,9 +270,9 @@ fn the_frozen_wire_interface_keeps_the_bytes_the_engine_sent_before() {
         ..Default::default()
     });
     let heads: Vec<&[u8]> = hit.iter().map(|p| &p[..4]).collect();
-    // rc-0136: the 35/35 health statement the boss bar reads follows the nameplate bar.
-    assert_eq!(heads, [[35, 0, 8, 0], [32, 0, 7, 0], [35, 0, 5, 0], [35, 0, 35, 0]]);
-    assert_eq!(hit[3], wire::hitpoints(9, 9, false, 100, 70, 0, false));
+    // rc-0137: no 35/35 per hit; the 32/7 moves the boss bar in step with the swing (rc-0136
+    // sent the statement too, and the client applied it late).
+    assert_eq!(heads, [[35, 0, 8, 0], [32, 0, 7, 0], [35, 0, 5, 0]]);
     assert_eq!(hit[1].len(), 4 + 24 + 12 + 2 + 8);
     assert_eq!(hit[1][28..32], 30_i32.to_le_bytes());
     assert_eq!(hit[1][40], 1, "the critical flag");
@@ -281,7 +287,7 @@ fn the_frozen_wire_interface_keeps_the_bytes_the_engine_sent_before() {
         swing: false,
         ..Default::default()
     });
-    assert_eq!(quiet.len(), 3, "an ability hit plays no swing");
+    assert_eq!(quiet.len(), 2, "an ability hit plays no swing (32/7 and 35/5, rc-0137)");
     // The classic hit carries the kit's impact effect in 32/7 and nothing else new.
     let named = wire::player_hit(&wire::PlayerHit {
         attacker: 1,

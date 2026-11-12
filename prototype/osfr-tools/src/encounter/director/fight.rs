@@ -713,6 +713,8 @@ pub struct Rewards {
     pub coins: u32,
     pub job_xp: Option<u32>,
     pub wheel: Vec<Value>,
+    /// The wheel's coin slot (the wiki's "N Coins").
+    pub wheel_coins: u32,
     pub drops: Vec<Value>,
     /// Paid on top when every bonus goal is done.
     pub bonus: Purse,
@@ -782,6 +784,9 @@ pub struct Fight {
     /// Kinds the roster uses, local rows and catalogue rows alike.
     #[serde(skip)]
     pub resolved: BTreeMap<String, KindRow>,
+    /// Its row of `instance_pacing.json`, when it has one (`Fight::pace`).
+    #[serde(skip)]
+    pub pacing: Option<crate::encounter::pacing::Pacing>,
 }
 
 /// `enemies.json` definitions by id, read leniently: only the fields a fight needs, so the
@@ -863,12 +868,75 @@ impl Fight {
     /// Parse and check one file. `name` is what a refusal calls it; every refusal is
     /// `<name>: <json pointer>: <reason>`.
     pub fn parse(bytes: &[u8], catalogue: &Catalogue, name: &str) -> io::Result<Self> {
+        Self::parse_paced(bytes, catalogue, name, &Default::default())
+    }
+
+    /// [`Self::parse`] with the fight's pacing row applied before the checks.
+    pub fn parse_paced(
+        bytes: &[u8],
+        catalogue: &Catalogue,
+        name: &str,
+        pacing: &crate::encounter::pacing::PacingTable,
+    ) -> io::Result<Self> {
         let mut fight: Fight =
             serde_json::from_slice(bytes).map_err(|e| invalid(&format!("{name}: {e}")))?;
+        if let Some(row) = pacing.get(fight.id) {
+            fight
+                .pace(row)
+                .map_err(|e| invalid(&format!("{name}: {e}")))?;
+        }
         fight
             .check(catalogue)
             .map_err(|e| invalid(&format!("{name}: {e}")))?;
         Ok(fight)
+    }
+
+    /// The pacing row's waves (the owner, rc-0136): after the fight's own last wave its waves
+    /// come again in order, each once the one before has cleared, until `waves` have come. A
+    /// rule that waited on the own last wave (the boss's wake) now waits on the new last one,
+    /// and a goal over the own waves counts the new ones too.
+    pub fn pace(&mut self, row: &crate::encounter::pacing::Pacing) -> Result<(), String> {
+        self.pacing = Some(row.clone());
+        let (own, total) = (self.waves.len(), row.waves as usize);
+        if own == 0 || total <= own {
+            return Ok(());
+        }
+        if total > MAX_WAVES {
+            return Err(format!("pacing: at most {MAX_WAVES} waves"));
+        }
+        let last = self.waves[own - 1].id.clone();
+        let mut previous = last.clone();
+        let mut added = Vec::new();
+        for n in own..total {
+            let mut wave = self.waves[n % own].clone();
+            wave.id = format!("{}_{}", wave.id, n / own + 1);
+            if self.waves.iter().chain(&added).any(|w: &Wave| w.id == wave.id) {
+                return Err(format!("pacing: wave id {} is taken", wave.id));
+            }
+            wave.when = Trigger::WaveLeft {
+                wave: previous.clone(),
+                left: 0,
+            };
+            (wave.or_after_ms, wave.repeat) = (None, None);
+            previous.clone_from(&wave.id);
+            added.push(wave);
+        }
+        let own_ids: Vec<String> = self.waves.iter().map(|w| w.id.clone()).collect();
+        let new_ids: Vec<String> = added.iter().map(|w| w.id.clone()).collect();
+        self.waves.extend(added);
+        for rule in &mut self.script {
+            if let Trigger::WaveLeft { wave, .. } = &mut rule.when {
+                if *wave == last {
+                    wave.clone_from(&previous);
+                }
+            }
+        }
+        for goal in &mut self.objectives {
+            if goal.target.waves.iter().any(|w| own_ids.contains(w)) {
+                goal.target.waves.extend(new_ids.iter().cloned());
+            }
+        }
+        Ok(())
     }
 
     pub fn is_enabled(&self) -> bool {

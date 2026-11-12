@@ -240,15 +240,18 @@ fn a_field_enemy_keeps_its_hits_to_kill_and_hits_to_die() {
         kills += 1;
         assert!(kills < 20);
     }
-    assert!(kills.abs_diff(3) <= 1, "hits to kill {kills}");
-    assert!(hits_to_die.abs_diff(39) <= 1, "hits to die {hits_to_die}");
+    // 3 and 39 before the owner's x2 health and x1.5 hits (rc-0137).
+    let (health_x, hit_x) = combat_scale::multipliers();
+    let (to_kill, to_die) = ((3.0 * health_x).round() as u64, (39.0 / hit_x).round() as u32);
+    assert!(kills.abs_diff(to_kill) <= 1, "hits to kill {kills}");
+    assert!(hits_to_die.abs_diff(to_die) <= 1, "hits to die {hits_to_die}");
 }
 
 #[test]
 fn enemy_rows_are_scaled_once_where_they_load() {
     let f = Fixture::new(180, 25);
     let mut e = f.load();
-    assert_eq!(combat_scale::enemy_health(180), 670);
+    assert_eq!(combat_scale::enemy_health(180), 1_339, "670 times the owner's x2 (rc-0137)");
     e.set_player_job(MEDIC, 1);
     let first = damages(&e.attack(GUID, [0.0; 3], MEDIC, 0, 0).unwrap());
     assert_eq!(first, [combat_scale::basic(MEDIC)]);
@@ -376,7 +379,7 @@ fn saved_enemy_health_survives_a_scale_retune_in_both_directions() {
     assert_eq!(saved.active.as_ref().unwrap().enemies[0].health, old_max);
     for (scale, label) in [(2.0_f64, "down"), (8.0, "up")] {
         f.scale(|v| v["enemy_health_scale"] = json!(scale));
-        let max = (180.0 * scale).round() as u32;
+        let max = (180.0 * scale * combat_scale::multipliers().0).round() as u32;
         let loaded = EncounterEngine::load(&f.0, Some(saved.clone()))
             .unwrap_or_else(|e| panic!("retune {label}: {e}"));
         let state = loaded.state();
@@ -420,7 +423,9 @@ fn the_rank_table_reproduces_the_three_captured_anchors() {
         (Rank::Tough, 5, 16_143),
     ];
     let engine = Fixture::new(100, 0).load();
-    for (rank, tier, health) in anchors {
+    for (rank, tier, captured) in anchors {
+        // As captured, times the owner's x2 (rc-0137).
+        let health = scale::live_health(captured);
         assert_eq!(scale::enemy_health(rank, tier, 1), health, "{rank:?}");
         let line = &engine.kill_table(WARRIOR, rank, Some(tier), (None, None), &[1])[0];
         assert_eq!(line.enemy_health, health, "{rank:?} through the engine");
@@ -433,13 +438,14 @@ fn the_rank_table_reproduces_the_three_captured_anchors() {
     // Each further group member adds the group step.
     let step = shipped_scale()["group_step"].as_f64().unwrap();
     for group in 1..=4_u8 {
-        let expected = 279.0 * 2.724 * (1.0 + step * f64::from(group - 1));
+        // Times the owner's x2 (rc-0137).
+        let expected = 279.0 * 2.724 * (1.0 + step * f64::from(group - 1)) * combat_scale::multipliers().0;
         assert_eq!(
             scale::enemy_health(Rank::Normal, 1, group),
             expected.round() as u32
         );
     }
-    assert_eq!(scale::enemy_health(Rank::Normal, 1, 0), 760, "no group is one player");
+    assert_eq!(scale::enemy_health(Rank::Normal, 1, 0), scale::live_health(760), "no group is one player");
     // Health rises with rank at every tier and with tier at every rank.
     let ranks = [
         Rank::Object,
@@ -460,8 +466,8 @@ fn the_rank_table_reproduces_the_three_captured_anchors() {
         assert!(row.windows(2).all(|w| w[0] < w[1]), "{rank:?}: {row:?}");
     }
     // A tier outside the table is the nearest end, never a panic.
-    assert_eq!(scale::enemy_health(Rank::Minion, 0, 1), 260);
-    assert_eq!(scale::enemy_health(Rank::Tough, 9, 1), 16_143);
+    assert_eq!(scale::enemy_health(Rank::Minion, 0, 1), scale::live_health(260));
+    assert_eq!(scale::enemy_health(Rank::Tough, 9, 1), scale::live_health(16_143));
 }
 
 /// The ability ladder is the file's, and each class steps by the tier ratio.
@@ -500,16 +506,17 @@ fn an_enemy_hit_is_five_percent_of_health_at_the_tier_floor() {
         .map(|v| v.as_u64().unwrap() as u8)
         .collect();
     let hits = [1, 2, 3, 4, 5].map(|tier| scale::enemy_hit(Rank::Normal, tier));
-    assert_eq!(hits, [25, 38, 67, 117, 204]);
+    // The rule's hits times the owner's x1.5 (rc-0137).
+    assert_eq!(hits, [25, 38, 67, 117, 204].map(scale::live_hit));
     for (tier, floor) in floors.iter().enumerate() {
         assert_eq!(scale::tier_of_level(*floor), tier as u8 + 1);
         let expected = (f64::from(scale::player_health(*floor)) * share).round() as u32;
-        assert_eq!(hits[tier], expected, "tier {} from level {floor}", tier + 1);
+        assert_eq!(hits[tier], scale::live_hit(expected), "tier {} from level {floor}", tier + 1);
     }
-    assert_eq!(scale::enemy_hit(Rank::Minion, 1), 25);
-    assert_eq!(scale::enemy_hit(Rank::Tough, 5), 204);
-    assert_eq!(scale::enemy_hit(Rank::Elite, 1), 38, "x1.5, 37.5 rounds up");
-    assert_eq!(scale::enemy_hit(Rank::Boss, 5), 408);
+    assert_eq!(scale::enemy_hit(Rank::Minion, 1), scale::live_hit(25));
+    assert_eq!(scale::enemy_hit(Rank::Tough, 5), scale::live_hit(204));
+    assert_eq!(scale::enemy_hit(Rank::Elite, 1), 56, "25 x1.5 x the owner's 1.5, 56.25");
+    assert_eq!(scale::enemy_hit(Rank::Boss, 5), scale::live_hit(408));
     assert_eq!(scale::special_hit(206), 309, "the captured special bite");
     assert_eq!(scale::enemy_hit_interval_ms(), 2_300);
     // A Bixie Soldier ticked +2 a second; a crate does not heal.
@@ -611,16 +618,19 @@ fn the_kill_table_sits_in_each_ranks_band_at_every_level() {
         }
     }
     let line = &engine.kill_table(WARRIOR, Rank::Normal, None, (None, None), &[1])[0];
-    assert_eq!((line.enemy_hit, line.hits_to_fall), (25, 20));
-    assert!((line.seconds_to_fall - 46.0).abs() < 0.01);
-    // A kind's own numbers replace the rank's.
+    // 25 a hit and 20 to fall (46 s) before the owner's x1.5 (rc-0137).
+    assert_eq!((line.enemy_hit, line.hits_to_fall), (scale::live_hit(25), 14));
+    assert!((line.seconds_to_fall - 32.2).abs() < 0.01);
+    // A kind's own numbers replace the rank's, as given.
     let own = &engine.kill_table(WARRIOR, Rank::Tough, Some(5), (Some(16_143), Some(206)), &[20])[0];
     assert_eq!((own.enemy_health, own.enemy_hit, own.hits), (16_143, 206, 7));
     // A retuned file moves the table.
     let f = Fixture::new(100, 0);
     f.scale(|v| v["ranks"]["tough"]["hp_basics"] = json!(12.375));
     let tuned = &f.load().kill_table(WARRIOR, Rank::Tough, Some(5), (None, None), &[20])[0];
-    assert_eq!(tuned.enemy_health, 32_286);
+    // 32_286 raw; the owner's x2 applies before the one rounding, so it can sit one above.
+    let doubled = scale::live_health(32_286);
+    assert!(tuned.enemy_health.abs_diff(doubled) <= 1, "{} vs {doubled}", tuned.enemy_health);
 }
 
 /// No combat number is a literal in the code that owns the scale: the numbers of design

@@ -34,6 +34,8 @@ struct WaveRun {
     last: u64,
     /// The trigger held on the last look (it fires on the change).
     held: bool,
+    /// A paced fight: since when its clearing trigger has held (the wave gap runs from it).
+    since: Option<u64>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -315,6 +317,7 @@ impl Run {
         let def = run.def.clone();
         for (w, wave) in def.waves.iter().enumerate() {
             run.waves[w].held = run.holds(&wave.when);
+            run.waves[w].since = run.waves[w].held.then_some(run.now);
         }
         for (r, rule) in def.script.iter().enumerate() {
             run.rules[r].fired = saved.rules[r];
@@ -665,6 +668,7 @@ impl Run {
 
     fn waves_step(&mut self, out: &mut Vec<DirectorAct>) {
         let def = self.def.clone();
+        let gap = def.pacing.as_ref().map_or(0, |p| p.wave_gap_ms);
         for (w, wave) in def.waves.iter().enumerate() {
             let firings = wave.repeat.as_ref().map_or(1, |r| r.times);
             if self.waves[w].fired >= firings {
@@ -679,8 +683,14 @@ impl Run {
                 continue;
             }
             let held = self.holds(&wave.when);
-            let edge = held && !self.waves[w].held;
+            let mut edge = held && !self.waves[w].held;
             self.waves[w].held = held;
+            // A paced fight's wave that waits on a clearing comes the wave gap after it.
+            if gap > 0 && matches!(wave.when, Trigger::WaveLeft { .. }) {
+                let since = &mut self.waves[w].since;
+                *since = if held { since.or(Some(self.now)) } else { None };
+                edge = since.is_some_and(|at| self.now >= at.saturating_add(gap));
+            }
             // "Or after": counted from the wave it waits on, else from the start.
             let armed = match &wave.when {
                 Trigger::WaveLeft { wave: on, .. } => def

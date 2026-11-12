@@ -752,15 +752,18 @@ fn start_battle(
 /// another player is paid.
 #[test]
 fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
-    // Overworld battle 12310: 25 coins, one prize row and no combat-level
-    // requirement, started through the production dev route.
+    // Overworld battle 12311: 25 coins, no coin slot and no combat-level requirement, started
+    // through the production dev route. (rc-0137: its Brawler wheel holds an item this opening
+    // catalogue lacks, so the release item table sits beside the fixture, as a release ships.)
     let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
+    let table = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table.json");
+    fs::copy(&table, fixture.dir().join("item-table.json")).unwrap();
     let at = [1.0, 0.0, 0.0];
     let character = character_at(101, at);
     let mut capped = player(&fixture, 101, 43, at, i32::MAX as u32, None);
     capped.set_dev_tools(true);
     capped.set_role(AccountRole::Admin);
-    let arena = start_battle(&mut capped, &character, 12310, 100);
+    let arena = start_battle(&mut capped, &character, 12311, 100);
     let before = bank(&capped);
     let items_before = capped.state().inventory.items.len();
     let won = capped
@@ -799,12 +802,12 @@ fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     let mut paid = player(&fixture, 202, 43, at, 0, None);
     paid.set_dev_tools(true);
     paid.set_role(AccountRole::Admin);
-    let paid_arena = start_battle(&mut paid, &paid_character, 12310, 100);
+    let paid_arena = start_battle(&mut paid, &paid_character, 12311, 100);
     let paid_items_before = paid.state().inventory.items.len();
     paid.handle_in_world(&chat::local_request("realm win"), &paid_arena, 400)
         .unwrap();
     let state = paid.state();
-    assert_eq!(state.inventory.coins, 25, "battle 12310 pays its 25 coins");
+    assert_eq!(state.inventory.coins, 25, "battle 12311 pays its 25 coins");
     assert_eq!(
         state.inventory.items.len(),
         paid_items_before + 1,

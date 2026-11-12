@@ -119,9 +119,12 @@ fn play(file: &Value) -> BTreeSet<u32> {
         .unwrap();
     assert_eq!(engine.run_phase(), Some(EncounterPhase::Won), "fight {id}");
     assert!(won.facts.contains(&FightFact::Won { fight: id }), "fight {id}");
-    assert_eq!(
-        u64::from(won.rewards[0].coins),
-        file["rewards"]["coins"].as_u64().unwrap_or(0),
+    // The file's coins, and the wheel's coin slot when the wheel stops on it (rc-0137).
+    let coins = file["rewards"]["coins"].as_u64().unwrap_or(0);
+    let slot = file["rewards"]["wheel_coins"].as_u64().unwrap_or(0);
+    let paid = u64::from(won.rewards[0].coins);
+    assert!(
+        paid == coins || (slot > 0 && paid == coins + slot),
         "fight {id}: the file's coins are paid"
     );
     let _ = fs::remove_dir_all(dir);

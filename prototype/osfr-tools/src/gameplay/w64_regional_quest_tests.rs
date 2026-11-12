@@ -1112,7 +1112,7 @@ fn a_battle_only_kill_objective_pins_its_battle_marker() {
     let pins = tracked_pins(&out);
     assert_eq!(pins.len(), 1);
     assert_eq!(pins[0][16..24], 100_000_096_000u64.to_le_bytes());
-    for (axis, value) in [-440.0f32, 0.8, 1290.0].iter().enumerate() {
+    for (axis, value) in [-793.26f32, -1.97, 1016.19].iter().enumerate() {
         assert_eq!(pins[0][28 + 4 * axis..32 + 4 * axis], value.to_le_bytes());
     }
     assert_eq!(
@@ -1530,7 +1530,8 @@ fn battle_go_requires_a_combat_job_and_zones_into_the_arena() {
     let character = CharacterState {
         guid: 1,
         zone_id: 0,
-        position: [-440.0, 0.8, 1292.0],
+        // Beside battle 96's marker, at the captured starter spot (rc-0137).
+        position: [-793.26, -1.97, 1018.19],
         rotation: [1.0, 0.0, 0.0],
     };
     let mut click = vec![26, 0, 8, 0];
@@ -1545,13 +1546,12 @@ fn battle_go_requires_a_combat_job_and_zones_into_the_arena() {
         .iter()
         .find(|p| p.starts_with(&[41, 0, 114, 0]))
         .expect("start screen");
-    // The preview bundle lists the four prizes (Item entries).
-    for item in [10_482_i32, 3_023, 75_354, 11_002] {
-        assert!(
-            details.windows(4).any(|w| w == item.to_le_bytes()),
-            "prize {item} on the start screen"
-        );
-    }
+    // The preview bundle lists the wheel a job with none of its own spins (rc-0137: one wheel
+    // per combat job, and the Battle Item Mystery Pack every job's wheel holds).
+    assert!(
+        details.windows(4).any(|w| w == 10_482_i32.to_le_bytes()),
+        "the Battle Item Mystery Pack on the start screen"
+    );
     assert!(
         screen
             .replies
@@ -1569,11 +1569,12 @@ fn battle_go_requires_a_combat_job_and_zones_into_the_arena() {
     );
 
     let inventory = game.inventory.clone();
-    game.profiles
-        .as_mut()
-        .unwrap()
-        .select(43, &inventory)
-        .unwrap();
+    // A Medic: this reference's catalogue holds every prize of the Medic's wheel for battle 96
+    // (one of the Brawler's is missing from it, so its Go would be refused for the prize). The
+    // reference unlocks only the Brawler, so the Medic is learned first.
+    let profiles = game.profiles.as_mut().unwrap();
+    profiles.unlock(11).unwrap();
+    profiles.select(11, &inventory).unwrap();
     game.handle_in_world(&click, &character, 3_000).unwrap();
     let entered = game.handle_in_world(&go, &character, 4_000).unwrap();
     let zone = entered.zoning.expect("Go zones into the battle arena");
@@ -1615,7 +1616,8 @@ fn troll_summoner_battle_summons_waves_and_is_won_on_the_summoner() {
     let mut waves = Vec::new();
     let mut defeated = Vec::new();
     let mut won = false;
-    for _ in 0..40 {
+    // Twice the swings since the owner doubled enemy health (rc-0137).
+    for _ in 0..80 {
         now += 700;
         let out = encounter.attack(SUMMONER, at, 43, 0, now).unwrap();
         defeated.extend(out.defeated.iter().copied());
@@ -1678,7 +1680,7 @@ fn troll_summoner_battle_summons_waves_and_is_won_on_the_summoner() {
             "no damage while shielded"
         );
         for (guid, position) in called {
-            for _ in 0..4 {
+            for _ in 0..8 {
                 now += 700;
                 let out = encounter.attack(guid, position, 43, 0, now).unwrap();
                 defeated.extend(out.defeated.iter().copied());
@@ -1900,8 +1902,10 @@ fn medic_job_abilities_strike_heal_and_refuse() {
 /// a player is near enough to see it, and stays put otherwise.
 #[test]
 fn battle_marker_wanders_only_when_seen() {
-    const SPAWNER: u64 = 100_000_096_000;
-    let home = [-440.0_f32, 0.8, 1290.0];
+    // Any standing marker: the Robgoblin row 12302's (rc-0137 moved battle 96's to the
+    // captured Troll Summoner spot).
+    const SPAWNER: u64 = 100_001_230_200;
+    let home = [-540.0_f32, 0.5, 1010.0];
     let reference = reference();
     let mut game = Gameplay::load(&reference, None).unwrap();
     let encounter = game.encounter.as_mut().unwrap();
@@ -1946,8 +1950,10 @@ fn battle_marker_wanders_only_when_seen() {
 /// every waypoint (its goals are snapped to the ground too).
 #[test]
 fn battle_marker_follows_the_terrain() {
-    const SPAWNER: u64 = 100_000_096_000;
-    let home = [-440.0_f32, 0.8, 1290.0];
+    // Any standing marker: the Robgoblin row 12302's (rc-0137 moved battle 96's to the
+    // captured Troll Summoner spot).
+    const SPAWNER: u64 = 100_001_230_200;
+    let home = [-540.0_f32, 0.5, 1010.0];
     let slope = |x: f32| 0.8 + (x - home[0]) * 0.5;
     let mut grid = crate::terrain::HeightGrid::new(
         [home[0] - 50.0, home[2] - 50.0],
@@ -2672,11 +2678,12 @@ fn developer_cheat_console_drives_a_battle() {
     game.set_dev_tools(true);
     game.set_role(crate::account_store::AccountRole::Admin);
     let inventory = game.inventory.clone();
-    game.profiles
-        .as_mut()
-        .unwrap()
-        .select(43, &inventory)
-        .unwrap();
+    // A Medic: this reference's catalogue holds every prize of the Medic's wheel for battle 96
+    // (one of the Brawler's is missing from it, so its Go would be refused for the prize). The
+    // reference unlocks only the Brawler, so the Medic is learned first.
+    let profiles = game.profiles.as_mut().unwrap();
+    profiles.unlock(11).unwrap();
+    profiles.select(11, &inventory).unwrap();
     let character = CharacterState {
         guid: 1,
         zone_id: 0,
@@ -2792,7 +2799,9 @@ fn realm_exit_and_retry_without_an_encounter_engine_are_refusals() {
 /// actors sent by proximity, so the client keeps and renders them.
 #[test]
 fn battle_spawner_spawns_at_zone_ready() {
-    const SPAWNER: u64 = 100_000_096_000;
+    // Any standing marker: the Robgoblin row 12302's (rc-0137 moved battle 96's to the
+    // captured Troll Summoner spot).
+    const SPAWNER: u64 = 100_001_230_200;
     let reference = reference();
     let mut game = Gameplay::load(&reference, None).unwrap();
     let encounter = game.encounter.as_mut().unwrap();
@@ -2813,7 +2822,7 @@ fn battle_spawner_spawns_at_zone_ready() {
         "not sent from afar"
     );
     let near = CharacterState {
-        position: [-435.0, 0.7, 1289.6],
+        position: [-535.0, 0.4, 1009.6],
         ..far
     };
     let near_packets = game.update_npc_visibility(&near).unwrap();
@@ -2978,7 +2987,9 @@ fn quest_gated_field_enemies_spawn_fight_and_respawn() {
         .unwrap(),
     )
     .unwrap();
-    let health = (220.0 * scale["enemy_health_scale"].as_f64().unwrap()).round() as u64;
+    // The owner's health multiplier applies on top (rc-0137).
+    let multiplier = scale["enemy_health_multiplier"].as_f64().unwrap_or(1.0);
+    let health = (220.0 * scale["enemy_health_scale"].as_f64().unwrap() * multiplier).round() as u64;
     let swings = health.div_ceil(scale["basic_damage"]["2"].as_u64().unwrap());
     let near = [-1971.408, -34.51335, 541.0];
     let mut defeated = Vec::new();

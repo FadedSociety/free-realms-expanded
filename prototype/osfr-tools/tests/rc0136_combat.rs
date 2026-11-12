@@ -149,73 +149,73 @@ fn every_hit_sends_the_health_statement_the_boss_bar_reads() {
     let hit = engine.attack(SUMMONER, spot, BRAWLER, 0, 1_000).unwrap();
     let now = enemies(&engine)[0].health as i32;
     assert!(now < max, "the hit landed");
-    // 32/7, then 35/5 and the statement with the exact health the boss bar must show.
+    // rc-0137: the 32/7 alone moves the boss bar, in step with the swing: it takes its damage
+    // off the copy the spawn's statement set (`00a2ba40`) and carries the health left (+46).
+    // A statement per hit as well came on the summoner's own animation clock (`008d3020`) and
+    // made the bar tick sporadically (owner), so the hit sends none; the 35/5 moves the plate.
     let swing = (hit.replies.iter())
-        .position(|p| p.starts_with(&[32, 0, 7, 0]))
+        .find(|p| p.starts_with(&[32, 0, 7, 0]) && u64_at(p, 20) == SUMMONER)
         .unwrap();
-    let shown = (hit.replies.iter())
-        .position(|p| p.starts_with(&[35, 0, 35, 0]) && u64_at(p, 12) == SUMMONER)
-        .unwrap();
-    assert!(swing < shown);
-    assert_eq!(statement(&hit.replies, SUMMONER), Some((max, now, 0)));
-    let show = hit.replies[shown][20];
-    assert_eq!(
-        show, 0,
-        "the 32/7 prints the number; the statement does not repeat it"
-    );
+    assert_eq!(i32_at(swing, 46), now, "the 32/7 carries the health the bar shows");
+    assert!(packets(&hit.replies, 35, 5).any(|p| u64_at(p, 4) == SUMMONER));
+    assert_eq!(statement(&hit.replies, SUMMONER), None, "no statement per hit");
 }
 
 #[test]
 fn battle_96_fights_at_the_numbers_of_its_tier() {
+    // The tier's numbers times the owner's multipliers (`combat_scale.json`: enemy health x2,
+    // enemy hits x1.5, rc-0137): the Summoner rank tough, its helpers rank minion.
     let (mut engine, ready) = battle_96(0);
-    assert_eq!(
-        statement(&ready, SUMMONER),
-        Some((1_726, 1_726, 0)),
-        "rank tough, tier 1"
-    );
+    let summoner = statement(&ready, SUMMONER);
     let spot = enemies(&engine)[0].position;
-    // Below 70 % the first pair of helpers rises (three 254 basics: 1726 -> 964).
-    let mut hit = None;
-    for n in 0..3 {
+    // Below 70 % the first pair of helpers rises.
+    let (mut hit, mut raised) = (None, Vec::new());
+    for n in 0..12 {
         hit = Some(engine.attack(SUMMONER, spot, BRAWLER, 0, 1_000 + n * 700).unwrap());
+        raised = (enemies(&engine).iter())
+            .filter(|e| e.guid != SUMMONER && !e.dormant && e.health > 0)
+            .map(|e| e.guid)
+            .collect();
+        if !raised.is_empty() {
+            break;
+        }
     }
     let hit = hit.unwrap();
-    let raised: Vec<u64> = (enemies(&engine).iter())
-        .filter(|e| e.guid != SUMMONER && !e.dormant && e.health > 0)
-        .map(|e| e.guid)
-        .collect();
     assert_eq!(
         raised,
         [100_000_096_002, 100_000_096_003],
         "two Scoutlings at once"
     );
-    for guid in raised {
-        assert_eq!(
-            statement(&hit.replies, guid),
-            Some((260, 260, 0)),
-            "rank minion"
-        );
-    }
-    // Every one of them bites for the tier's 25 raw, once every 2.3 s.
+    let helpers: Vec<_> = raised.iter().map(|&g| statement(&hit.replies, g)).collect();
+    // Every one of them bites for the tier's raw hit, once every 2.3 s.
     let mut bites = Vec::new();
-    let mut now = 2_400;
-    while now < 20_000 {
+    let mut now = 1_000 + 12 * 700;
+    while now < 30_000 {
         now += 250;
         let out = engine.tick(spot, BRAWLER, now).unwrap();
         for p in packets(&out.replies, 32, 7) {
             bites.push((u64_at(p, 4), i32_at(p, 28), now));
         }
     }
-    assert!(bites.iter().any(|b| b.0 != SUMMONER), "the helpers fight");
-    assert!(bites.iter().all(|b| b.1 == 25), "{bites:?}");
-    let first = bites
-        .iter()
-        .filter(|b| b.0 == 100_000_096_002)
-        .collect::<Vec<_>>();
-    assert!(
-        first.windows(2).all(|w| w[1].2 - w[0].2 >= 2_250),
-        "{first:?}"
+    let raw: BTreeSet<i32> = bites.iter().map(|b| b.1).collect();
+    assert_eq!(
+        (summoner, helpers, raw),
+        (
+            Some((3_453, 3_453, 0)),
+            vec![Some((520, 520, 0)); 2],
+            BTreeSet::from([38])
+        ),
+        "rank tough and rank minion at tier 1, x2 health and x1.5 hits"
     );
+    // Paced (`instance_pacing.json` 96): one enemy swings at a time, each at most every 2.3 s.
+    assert!(!bites.is_empty(), "they fight");
+    for w in bites.windows(2) {
+        assert!(w[0].2 != w[1].2, "two swings in one tick: {w:?}");
+    }
+    for guid in bites.iter().map(|b| b.0).collect::<BTreeSet<_>>() {
+        let mine: Vec<_> = bites.iter().filter(|b| b.0 == guid).collect();
+        assert!(mine.windows(2).all(|w| w[1].2 - w[0].2 >= 2_250), "{mine:?}");
+    }
 }
 
 #[test]
@@ -223,7 +223,15 @@ fn the_results_card_is_the_runs_own() {
     let (mut engine, _) = battle_96(10_000);
     let mut now = 11_000;
     let mut last = None;
-    for _ in 0..200 {
+    // The paced rounds (`instance_pacing.json`) come back on the engine's tick; the player is
+    // kept standing so the card is the win's.
+    for _ in 0..3_000 {
+        engine.heal_player_percent(100);
+        let tick = engine.tick(enemies(&engine)[0].position, BRAWLER, now).unwrap();
+        if engine.state().active.as_ref().unwrap().phase == EncounterPhase::Won {
+            last = Some((tick, now));
+            break;
+        }
         let alive: Vec<_> = (enemies(&engine).into_iter())
             .filter(|e| e.health > 0 && !e.dormant)
             .collect();
@@ -231,7 +239,8 @@ fn the_results_card_is_the_runs_own() {
         let Some(target) = (alive.iter().find(|e| e.guid != SUMMONER))
             .or_else(|| alive.iter().find(|e| e.guid == SUMMONER))
         else {
-            break;
+            now += 700; // the gap before the next round
+            continue;
         };
         let out = engine
             .attack(target.guid, target.position, BRAWLER, 0, now)
@@ -242,7 +251,10 @@ fn the_results_card_is_the_runs_own() {
         }
         now += 700;
     }
-    let (won, at) = last.expect("battle 96 is won through the attack path");
+    let (won, at) = last.unwrap_or_else(|| {
+        let phase = &engine.state().active.as_ref().unwrap().phase;
+        panic!("battle 96 is not won through the attack path: {phase:?}")
+    });
     // 39/47: a one-byte sub-opcode (`wire::minigame`).
     let card = (won.replies.iter()).filter(|p| p.starts_with(&[39, 0, 47]))
         .next()

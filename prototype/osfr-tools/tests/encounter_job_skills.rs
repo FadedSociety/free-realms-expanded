@@ -55,7 +55,8 @@ impl Fixture {
         let mut cave = zone.clone();
         cave["zone_id"] = json!(411);
         cave["name"] = json!("SyntheticCave");
-        let content = json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(template)),"world":zone,"world_enemies":[],"dungeons":[{"id":411,"title_id":12,"description_id":13,"objective_id":14,"zone":cave,"guide":null,"enemies":[{"guid":200,"definition_id":401,"model_id":3,"name_id":100,"name":"Synthetic cave enemy","texture_alias":"","position":[0,0,0],"max_health":50,"damage":1,"boss":false}],"reward_coins":0,"reward_items":[]}]});
+        // The cave enemy's 25 is the old 50 under the owner's x2 enemy health (rc-0137).
+        let content = json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(template)),"world":zone,"world_enemies":[],"dungeons":[{"id":411,"title_id":12,"description_id":13,"objective_id":14,"zone":cave,"guide":null,"enemies":[{"guid":200,"definition_id":401,"model_id":3,"name_id":100,"name":"Synthetic cave enemy","texture_alias":"","position":[0,0,0],"max_health":25,"damage":1,"boss":false}],"reward_coins":0,"reward_items":[]}]});
         fs::write(
             dir.join("encounters.json"),
             serde_json::to_vec(&content).unwrap(),
@@ -412,7 +413,13 @@ fn job_wins(profile: i32) {
     // the skills the bar shows there (T421: an upgrade replaces its row).
     for level in [1_u32, 5, 10, 15, 20] {
         let scale = combat_scale::tier_factor(level) as f32;
-        let f = Fixture::new((230.0 * scale) as u32, (12.0 * scale) as u32);
+        // The skills under test, at the pack's pre-rc-0137 numbers: the owner's enemy multipliers
+        // (x2 health, x1.5 hits) are divided back out; the balance itself is `instance_pacing.rs`'s.
+        let (health, hit) = combat_scale::multipliers();
+        let f = Fixture::new(
+            (230.0 * scale / health as f32) as u32,
+            (12.0 * scale / hit as f32) as u32,
+        );
         let mut e = f.load(profile, level);
         let mut defeated = 0;
         let mut casts = 0;

@@ -158,8 +158,12 @@ pub(super) fn inventory(
 /// The activity portal publishes battle rows only when the encounter engine that runs them
 /// loaded: a row without its engine offers a Play the server must refuse (the rule chess,
 /// soccer and cards already follow). A content set without `opening.json` builds no engine.
-pub(super) fn battle_rows<'a>(file: &'a Path, engine_loaded: bool) -> Option<&'a Path> {
-    (file.is_file() && engine_loaded).then_some(file)
+/// The rows are the engine's own (`portal_battles`), so a dungeon door's fight is one too.
+pub(super) fn battle_rows(
+    file: &Path,
+    engine: Option<&crate::encounter::EncounterEngine>,
+) -> Option<Vec<crate::activity_portal::Activity>> {
+    engine.filter(|_| file.is_file()).map(crate::encounter::EncounterEngine::portal_battles)
 }
 
 /// Record a skip found outside `Gameplay::load`: the regional quest catalogue binds after

@@ -1,9 +1,11 @@
 //! The developer balance tools `realm sim` and `realm fightlog`, moved out of `gameplay.rs`
 //! by the combat seam. Piece P4 (`combat-scale`) owns this file and extends the simulator.
 use super::*;
+use crate::encounter::sim::{SimClear, SimEnd};
 
 impl Gameplay {
-    /// `realm sim [battle]`: one line per simulated job level (battle 96 when none is named).
+    /// `realm sim [battle] [level]`: one line per simulated job level (battle 96 when none is
+    /// named; levels 1, 5, 10, 15 and 20 when no level is).
     /// `realm sim rank <rank> [tier]` and `realm sim kind <enemies.json id> [tier]` print the
     /// kill table instead: hits and seconds per job level against one enemy of that rank or
     /// kind, at the given tier or at the player's own.
@@ -25,7 +27,8 @@ impl Gameplay {
             .first()
             .and_then(|n| n.parse::<u32>().ok())
             .unwrap_or(96);
-        for line in self.simulate_battle(battle, character)? {
+        let level = rest.get(1).and_then(|n| n.parse::<u32>().ok());
+        for line in self.simulate_battle(battle, level, character)? {
             say(out, line);
         }
         Ok(())
@@ -110,102 +113,81 @@ impl Gameplay {
         Ok(lines)
     }
 
-    /// Balance simulator: a scripted player of the active job fights `battle`
-    /// at several job levels on a copy of the engine (nothing is changed).
-    /// The bot stands next to its target, swings on cooldown, uses First Aid
-    /// below 60% health and Triage-like strikes when energy allows.
-    fn simulate_battle(&self, battle: u32, character: &CharacterState) -> io::Result<Vec<String>> {
-        let profile = self.profiles()?.active();
-        let Some(base) = self.encounter.as_ref() else {
+    /// Balance simulator: a scripted player of the active job fights `battle` at several job
+    /// levels (or at `only`) through [`EncounterEngine::simulate_clear`], on a copy of the
+    /// engine (nothing is changed).
+    fn simulate_battle(
+        &self,
+        battle: u32,
+        only: Option<u32>,
+        character: &CharacterState,
+    ) -> io::Result<Vec<String>> {
+        // A realm without the opening content has neither: say so, not nothing.
+        let (Some(_), Some(profiles)) = (&self.encounter, &self.profiles) else {
             return Ok(vec!["No encounter engine.".into()]);
         };
-        if base.active() {
-            return Ok(vec!["Finish or exit the current encounter first.".into()]);
-        }
-        if !self.battle_prizes_available(battle) {
-            return Ok(vec![field_battle::UNAVAILABLE_BATTLE_PRIZE.into()]);
-        }
+        let profile = profiles.active();
         let mut lines = vec![format!("Battle {battle}, job {profile} (scripted bot):")];
-        for level in [1_u32, 5, 10, 15, 20] {
-            let mut engine = base.clone();
-            // The scripted bot must not be helped by power-up hearts.
-            engine.unload_power_ups();
-            engine.set_player_job(profile, level);
-            // Eligibility is per level; the eligible levels still run through
-            // the same production `begin` guard.
-            if let Some(required) = engine.battle_level_refusal(battle, level) {
-                lines.push(format!(
-                    "  level {level:>2}: needs level {required}; skipped"
-                ));
-                continue;
-            }
-            if let Err(error) = engine.begin(battle, character.clone(), profile) {
-                return Ok(vec![format!("Cannot simulate battle {battle}: {error}")]);
-            }
-            engine.on_zone_ready(profile, 0)?;
-            let abilities = self.abilities.as_ref();
-            let slots: Vec<_> = (1..=7)
-                .filter_map(|slot| {
-                    abilities
-                        .and_then(|a| a.job_slot(profile, slot, level))
-                        .cloned()
-                })
-                .collect();
-            let mut result = "timeout";
-            let mut t = 0_u64;
-            let mut lowest = engine.player_health().0;
-            while t < 600_000 {
-                t += 100;
-                let standing = engine.standing_enemies();
-                let Some(&(target, at, _)) =
-                    standing.iter().min_by_key(|(_, _, shielded)| *shielded)
-                else {
-                    break;
-                };
-                let me = [at[0] + 1.5, at[1], at[2]];
-                engine.tick(me, profile, t)?;
-                let (hp, max) = engine.player_health();
-                lowest = lowest.min(hp);
-                if hp == 0 {
-                    result = "lost";
-                    break;
+        for level in only.map_or_else(|| vec![1_u32, 5, 10, 15, 20], |level| vec![level]) {
+            let line = match self.simulate_fight(battle, profile, level, character)? {
+                Err(why) if why.starts_with("needs level") => {
+                    format!("  level {level:>2}: {why}; skipped")
                 }
-                let heal = slots
-                    .iter()
-                    .find(|a| a.heal > 0 && a.damage_multiplier == 0.0);
-                let strike = slots.iter().find(|a| a.damage_multiplier > 0.0);
-                if hp * 10 < max * 6 {
-                    if let Some(heal) = heal {
-                        engine.job_ability(heal, 1, me, profile, t)?;
-                    }
-                }
-                if let Some(strike) = strike {
-                    engine.job_ability(strike, target, me, profile, t)?;
-                }
-                engine.attack(target, me, profile, 0, t)?;
-                if engine
-                    .state()
-                    .active
-                    .as_ref()
-                    .is_some_and(|a| a.phase == crate::encounter::EncounterPhase::Won)
-                {
-                    result = "won";
-                    break;
-                }
-            }
-            let log = engine.fight_log();
-            let dealt: i64 = log
-                .iter()
-                .filter(|e| matches!(e.kind, "hit" | "crit"))
-                .map(|e| e.amount)
-                .sum();
-            let crits = log.iter().filter(|e| e.kind == "crit").count();
-            let max = engine.player_health().1;
-            lines.push(format!(
-                "  level {level:>2}: {result} in {:.0}s, lowest health {lowest}/{max}, dealt {dealt} ({crits} crits)",
-                t as f64 / 1000.0
-            ));
+                Err(why) => return Ok(vec![why]),
+                Ok(sim) => format!(
+                    "  level {level:>2}: {} in {:.0}s, health left {}/{}, lowest {}, dealt {} ({} crits), {} hearts, {} knockouts",
+                    match sim.end {
+                        SimEnd::Won => "won",
+                        SimEnd::Lost => "lost",
+                        SimEnd::Timeout => "timeout",
+                    },
+                    sim.seconds,
+                    sim.health,
+                    sim.max_health,
+                    sim.lowest,
+                    sim.dealt,
+                    sim.crits,
+                    sim.hearts,
+                    sim.knockouts
+                ),
+            };
+            lines.push(line);
         }
         Ok(lines)
+    }
+
+    /// One simulated solo clear of `battle` by job `profile` at `level`, with its real
+    /// rotation (its bar's strike ability and First Aid). `Err` says why it cannot run: no
+    /// engine, a fight in progress, a prize that cannot be granted, or the level gate.
+    pub fn simulate_fight(
+        &self,
+        battle: u32,
+        profile: i32,
+        level: u32,
+        character: &CharacterState,
+    ) -> io::Result<Result<SimClear, String>> {
+        let Some(engine) = self.encounter.as_ref() else {
+            return Ok(Err("No encounter engine.".into()));
+        };
+        if engine.active() {
+            return Ok(Err("Finish or exit the current encounter first.".into()));
+        }
+        if !self.battle_prizes_available(battle) {
+            return Ok(Err(field_battle::UNAVAILABLE_BATTLE_PRIZE.into()));
+        }
+        if let Some(required) = engine.battle_level_refusal(battle, level) {
+            return Ok(Err(format!("needs level {required}")));
+        }
+        let slots: Vec<_> = (1..=7)
+            .filter_map(|slot| {
+                (self.abilities.as_ref())
+                    .and_then(|a| a.job_slot(profile, slot, level))
+                    .cloned()
+            })
+            .collect();
+        match engine.simulate_clear(battle, level, profile, &slots, character.clone()) {
+            Ok(sim) => Ok(Ok(sim)),
+            Err(error) => Ok(Err(format!("Cannot simulate battle {battle}: {error}"))),
+        }
     }
 }

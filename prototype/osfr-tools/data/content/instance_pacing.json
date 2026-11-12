@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "source": [
+    {
+      "kind": "owner",
+      "evidence": "The owner, 2026-11-11: 'Instance Battles need to last at least 2 minutes', then the decision: overworld-entered instance fights (field battles, battle starters) take 60-150 s solo at the recommended level with the real rotation, through more waves with gaps, an attacker cap and capped heal drops; dungeons keep their pace."
+    },
+    {
+      "kind": "client",
+      "evidence": "The client holds no combat power-up drop chances (ida.py: its one pickup chance table, PickupSpawnChanceLoad 01066cf0, belongs to the pirate ship battles' ShipZoneConfigLoad 010680f0); it draws the heart pickup (model 736 powerup_health_buff.adr) the server drops, so the hearts are power_ups.json's own health kinds, drawn from its standard table's health pool."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Wave counts, gaps, attacker caps and heal chances, budgets and cooldowns are local balance, held by the simulator test; none was recovered."
+    }
+  ],
+  "fights": {
+    "96": {
+      "waves": 3,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Troll Summoner Madness!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12301": {
+      "waves": 3,
+      "wave_gap_ms": 18000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for battle 12301: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12302": {
+      "waves": 3,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for battle 12302: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12303": {
+      "waves": 2,
+      "wave_gap_ms": 20000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 1.0,
+        "budget_pct": 500,
+        "cooldown_ms": 2000
+      },
+      "source": "(R) rc-0136 pacing for Stone Heart's Hideaway: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12311": {
+      "waves": 3,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for battle 12311: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12340": {
+      "waves": 2,
+      "wave_gap_ms": 20000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Thugamug!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12365": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 1.0,
+        "budget_pct": 500,
+        "cooldown_ms": 2000
+      },
+      "source": "(R) rc-0136 pacing for Frostfang Growler!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "12400": {
+      "waves": 3,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Mongo: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "13035": {
+      "waves": 5,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Petty Yetis: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14006": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Cray Marauders: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14011": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Shady Smugglers: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14021": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 1.0,
+        "budget_pct": 500,
+        "cooldown_ms": 2000
+      },
+      "source": "(R) rc-0136 pacing for Hooligan Bullies: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14022": {
+      "wave_gap_ms": 20000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Robgoblin Troublemakers: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14025": {
+      "waves": 4,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Tormented Spirits!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14033": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Ice Troll Scout: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14038": {
+      "waves": 4,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Snakes in a Maze: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14055": {
+      "waves": 4,
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Frostfang Snarlers: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14059": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Vulture Watch!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14061": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Robgoblin Adept Trouble: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14069": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Explosive Robgoblins: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14070": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Moldy Shamblers: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    },
+    "14078": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 0.8,
+        "budget_pct": 400,
+        "cooldown_ms": 3000
+      },
+      "source": "(R) rc-0136 pacing for Robgoblin Geomancer: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+    }
+  }
+}

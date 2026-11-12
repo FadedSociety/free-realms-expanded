@@ -468,7 +468,7 @@ fn the_battle_kind_fallback_takes_the_lowest_battle_id() {
     );
     assert_eq!(
         engine.battle_marker(96),
-        Some((100_000_096_000, [-440.0, 0.8, 1290.0]))
+        Some((100_000_096_000, [-793.26, -1.97, 1016.19]))
     );
     // A battle that is not loaded, and a kind no battle fields: nothing, not a guess.
     assert_eq!(engine.battle_marker(12_350), None);

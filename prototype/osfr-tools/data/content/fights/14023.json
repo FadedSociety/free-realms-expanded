@@ -492,8 +492,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75105,
+        "name_id": 131989,
+        "icon_id": 3100,
+        "job": 2
+      },
+      {
+        "item_id": 75422,
+        "name_id": 131166,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75378,
+        "name_id": 131122,
+        "icon_id": 550,
+        "job": 2
+      },
+      {
+        "item_id": 76248,
+        "name_id": 133256,
+        "icon_id": 5394,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75075,
+        "name_id": 131959,
+        "icon_id": 3149,
+        "job": 11
+      },
+      {
+        "item_id": 75357,
+        "name_id": 131101,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75313,
+        "name_id": 131057,
+        "icon_id": 550,
+        "job": 11
+      },
+      {
+        "item_id": 76118,
+        "name_id": 133126,
+        "icon_id": 5349,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76439,
+        "name_id": 133447,
+        "icon_id": 5085,
+        "job": 12
+      },
+      {
+        "item_id": 75165,
+        "name_id": 132049,
+        "icon_id": 3162,
+        "job": 12
+      },
+      {
+        "item_id": 75552,
+        "name_id": 131296,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75508,
+        "name_id": 131252,
+        "icon_id": 550,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76358,
+        "name_id": 133366,
+        "icon_id": 5457,
+        "job": 32
+      },
+      {
+        "item_id": 75135,
+        "name_id": 132019,
+        "icon_id": 3127,
+        "job": 32
+      },
+      {
+        "item_id": 75487,
+        "name_id": 131231,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75443,
+        "name_id": 131187,
+        "icon_id": 550,
+        "job": 32
+      },
+      {
+        "item_id": 75227,
+        "name_id": 130971,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 75015,
+        "name_id": 131899,
+        "icon_id": 3105,
+        "job": 35
+      },
+      {
+        "item_id": 75183,
+        "name_id": 130927,
+        "icon_id": 550,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75772,
+        "name_id": 132780,
+        "icon_id": 5627,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75045,
+        "name_id": 131929,
+        "icon_id": 3128,
+        "job": 43
+      },
+      {
+        "item_id": 75292,
+        "name_id": 131036,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75248,
+        "name_id": 130992,
+        "icon_id": 550,
+        "job": 43
+      },
+      {
+        "item_id": 75893,
+        "name_id": 132901,
+        "icon_id": 5006,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 97
   },
   "source": [
     {
@@ -531,6 +718,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/mugwort_s_hollow.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Mugwort's Hollow' (revision 49142) lists one prize wheel per combat job and a 97-coin slot; any other job spins the items every job's wheel holds. Medic: the wiki's 'Pressure Wave Medic Pants' is 'Pressure Wave Medic Fatigues' in our record dungeons/mugwort_s_hollow.json; Warrior: the wiki's 'Threat Range Warrior Greaves' is 'Threat Range Warrior Breeches' in our record dungeons/mugwort_s_hollow.json."
     }
   ]
 }

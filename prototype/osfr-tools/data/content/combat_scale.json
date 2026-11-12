@@ -14,6 +14,8 @@
   "player_base_health": 500,
   "enemy_health_scale": 3.72,
   "enemy_damage_scale": 0.5,
+  "enemy_health_multiplier": 2.0,
+  "enemy_damage_multiplier": 1.5,
   "max_level": 20,
   "health_step_levels": 4,
   "ability_damage": {
@@ -217,6 +219,16 @@
       "field": "enemy_damage_scale",
       "kind": "reconstructed",
       "evidence": "(R) T639: player health halved (1000 -> 500), so enemy damage is halved and each hit takes the same share of health"
+    },
+    {
+      "field": "enemy_health_multiplier",
+      "kind": "owner",
+      "evidence": "The owner, 2026-11-11 (rc-0136): 'increase every enemy in the games damage by 1.5x and enemy health by 2x'. Applied once to every enemy's final health: authored rows after the T639 conversion, rank rows, fight kinds and rows, catalogue kinds; the rank solo_seconds bands are the 2014 pace at x1 and stretch by it"
+    },
+    {
+      "field": "enemy_damage_multiplier",
+      "kind": "owner",
+      "evidence": "The owner, 2026-11-11 (rc-0136): x1.5 enemy damage, applied once to every enemy's final hit on every path, as enemy_health_multiplier is to health"
     },
     {
       "field": "max_level",

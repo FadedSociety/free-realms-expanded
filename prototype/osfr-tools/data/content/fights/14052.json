@@ -225,8 +225,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76249,
+        "name_id": 133257,
+        "icon_id": 5403,
+        "job": 2
+      },
+      {
+        "item_id": 75104,
+        "name_id": 131988,
+        "icon_id": 3100,
+        "job": 2
+      },
+      {
+        "item_id": 75411,
+        "name_id": 131155,
+        "icon_id": 3717,
+        "job": 2
+      },
+      {
+        "item_id": 75393,
+        "name_id": 131137,
+        "icon_id": 555,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75074,
+        "name_id": 131958,
+        "icon_id": 3149,
+        "job": 11
+      },
+      {
+        "item_id": 75346,
+        "name_id": 131090,
+        "icon_id": 3717,
+        "job": 11
+      },
+      {
+        "item_id": 75328,
+        "name_id": 131072,
+        "icon_id": 555,
+        "job": 11
+      },
+      {
+        "item_id": 76119,
+        "name_id": 133127,
+        "icon_id": 5352,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76441,
+        "name_id": 133449,
+        "icon_id": 5668,
+        "job": 12
+      },
+      {
+        "item_id": 75541,
+        "name_id": 131285,
+        "icon_id": 3717,
+        "job": 12
+      },
+      {
+        "item_id": 75523,
+        "name_id": 131267,
+        "icon_id": 555,
+        "job": 12
+      },
+      {
+        "item_id": 75164,
+        "name_id": 132048,
+        "icon_id": 3162,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76359,
+        "name_id": 133367,
+        "icon_id": 5459,
+        "job": 32
+      },
+      {
+        "item_id": 75134,
+        "name_id": 132018,
+        "icon_id": 3127,
+        "job": 32
+      },
+      {
+        "item_id": 75476,
+        "name_id": 131220,
+        "icon_id": 3717,
+        "job": 32
+      },
+      {
+        "item_id": 75458,
+        "name_id": 131202,
+        "icon_id": 555,
+        "job": 32
+      },
+      {
+        "item_id": 75216,
+        "name_id": 130960,
+        "icon_id": 3717,
+        "job": 35
+      },
+      {
+        "item_id": 75014,
+        "name_id": 131898,
+        "icon_id": 3105,
+        "job": 35
+      },
+      {
+        "item_id": 75198,
+        "name_id": 130942,
+        "icon_id": 555,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75773,
+        "name_id": 132781,
+        "icon_id": 2405,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75044,
+        "name_id": 131928,
+        "icon_id": 3128,
+        "job": 43
+      },
+      {
+        "item_id": 75281,
+        "name_id": 131025,
+        "icon_id": 3717,
+        "job": 43
+      },
+      {
+        "item_id": 75263,
+        "name_id": 131007,
+        "icon_id": 555,
+        "job": 43
+      },
+      {
+        "item_id": 75894,
+        "name_id": 132902,
+        "icon_id": 5663,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 97
   },
   "source": [
     {
@@ -248,6 +435,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter or door of `entry` is drawn by the entrances work, not by this file. Each kind's rank here decides its health and hit at the fight's tier."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) rc-0137 prize wheel (2026-11-12): 'Brugo's Fishing Spot' has no wheel of its own on the wiki; the wiki's item pages put its prize wheel with 'Frostfang Caverns' (Ninja's Jagged Scythe of Shuriken Storm; Wizard's Jewel Wand of Firestorm; Warrior’s Double Axe of Earthquake; Medic's Megasaw of Alarm), so it spins that wheel, from fandom 'Frostfang Caverns' (revision 49145), one per combat job, and 97 coins. The same pages also name Prince of Low Tide!, frostfang_caverns, prince_of_low_tide."
     }
   ]
 }

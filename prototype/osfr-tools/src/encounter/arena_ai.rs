@@ -52,6 +52,8 @@ pub(super) struct ArenaSim {
     pub(super) fallen: BTreeMap<u64, u64>,
     /// (R) Generator for special hits and relocation spots.
     pub(super) rolls: u64,
+    /// What a paced run spent of its hearts, and its rounds (`pacing.rs`).
+    pub(super) pace: super::pacing::PaceRun,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -87,6 +89,14 @@ pub(super) struct ArenaTick<'a> {
     pub(super) elapsed: u64,
     /// Living, woken actors per tag, over the whole roster.
     pub(super) tags_alive: &'a BTreeMap<String, u32>,
+    /// A paced fight's cap on enemies swinging at this player at once (`pacing.rs`).
+    pub(super) max_attackers: Option<u32>,
+    /// A paced fight's floor on the time between one enemy's swings (0: none).
+    pub(super) attack_ms: u64,
+    /// A paced fight (one entered from the overworld) has no notice radius: as captured in the
+    /// Frostfang Growlers battle (p12), every enemy goes for the player from wherever it spawned
+    /// (owner, rc-0137: the hooligans "don't all come at the player").
+    pub(super) battle: bool,
 }
 
 /// Health as the whole percent the rules compare (the old summon ladder's arithmetic).
@@ -180,6 +190,16 @@ impl ArenaSim {
                 total_damage = total_damage.saturating_add(dealt);
             }
         }
+        // A paced fight lets only the enemies nearest the player swing; the rest hold.
+        let front: Option<BTreeSet<u64>> = t.max_attackers.map(|most| {
+            let mut near: Vec<(f32, u64)> = (actors.iter())
+                .filter_map(|a| states.iter().find(|s| s.guid == a.guid))
+                .filter(|s| s.health > 0 && !s.dormant)
+                .map(|s| (distance(position, s.position), s.guid))
+                .collect();
+            near.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
+            near.into_iter().take(most as usize).map(|(_, guid)| guid).collect()
+        });
         let plain = Behaviour::default();
         for actor in actors {
             let guid = actor.guid;
@@ -225,7 +245,8 @@ impl ArenaSim {
             // before the brain did: a far party leaves it idle, and its `every` rules do not
             // start (lead 2026-11-10: they cast at players standing at the entry and flooded
             // every member of a shared run with packets).
-            if delta > b.chase_limit && !memory.is_engaged() {
+            let chase_limit = if t.battle { f32::INFINITY } else { b.chase_limit };
+            if delta > chase_limit && !memory.is_engaged() {
                 if self.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }
@@ -269,7 +290,7 @@ impl ArenaSim {
                 continue;
             }
             self.kiting.remove(&guid);
-            if delta > b.chase_limit {
+            if delta > chase_limit {
                 if self.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }
@@ -364,11 +385,16 @@ impl ArenaSim {
             if stands {
                 self.stop(guid, out);
             }
+            if front.as_ref().is_some_and(|front| !front.contains(&guid)) {
+                continue;
+            }
             if ordered.is_none()
                 && self
                     .attacks
                     .get(&guid)
-                    .is_some_and(|last| now_ms.saturating_sub(*last) < attack.interval_ms)
+                    .is_some_and(|last| {
+                        now_ms.saturating_sub(*last) < attack.interval_ms.max(t.attack_ms)
+                    })
             {
                 continue;
             }
@@ -641,6 +667,8 @@ impl EncounterEngine {
         let mut upkeep = EncounterOutcome::default();
         self.arena_upkeep(now_ms, &mut upkeep);
         let ground = self.ground();
+        let (max_attackers, attack_ms) = (self.max_attackers(), self.paced_attack_ms());
+        let battle = self.pacing().is_some();
         let Some(active) = &mut self.state.active else {
             return Vec::new();
         };
@@ -680,6 +708,9 @@ impl EncounterEngine {
                 now_ms,
                 elapsed,
                 tags_alive: &alive,
+                max_attackers,
+                attack_ms,
+                battle,
             };
             let mut out = EncounterOutcome::default();
             let damage = self.arena.tick_enemies(mine, states, &tick, &mut out);
@@ -717,6 +748,8 @@ impl EncounterEngine {
         self.arena_upkeep(now_ms, out);
         let mitigation = self.skills.mitigation();
         let ground = self.ground();
+        let (max_attackers, attack_ms) = (self.max_attackers(), self.paced_attack_ms());
+        let battle = self.pacing().is_some();
         let actors: Vec<Actor> = if let Some(d) = self.dungeon() {
             d.enemies.clone()
         } else {
@@ -745,6 +778,9 @@ impl EncounterEngine {
             now_ms,
             elapsed,
             tags_alive: &alive,
+            max_attackers,
+            attack_ms,
+            battle,
         };
         let damage = self.arena.tick_enemies(actors, states, &tick, out);
         self.apply_decided(now_ms, out);

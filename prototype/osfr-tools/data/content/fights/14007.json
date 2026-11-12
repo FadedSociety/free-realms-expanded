@@ -256,8 +256,195 @@
   "rewards": {
     "coins": 25,
     "job_xp": 50,
-    "wheel": [],
-    "drops": []
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 76208,
+        "name_id": 133216,
+        "icon_id": 2481,
+        "job": 2
+      },
+      {
+        "item_id": 75091,
+        "name_id": 131975,
+        "icon_id": 3229,
+        "job": 2
+      },
+      {
+        "item_id": 75419,
+        "name_id": 131163,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75375,
+        "name_id": 131119,
+        "icon_id": 547,
+        "job": 2
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75354,
+        "name_id": 131098,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75061,
+        "name_id": 131945,
+        "icon_id": 3133,
+        "job": 11
+      },
+      {
+        "item_id": 75310,
+        "name_id": 131054,
+        "icon_id": 547,
+        "job": 11
+      },
+      {
+        "item_id": 76078,
+        "name_id": 133086,
+        "icon_id": 3558,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76386,
+        "name_id": 133394,
+        "icon_id": 5037,
+        "job": 12
+      },
+      {
+        "item_id": 75549,
+        "name_id": 131293,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75505,
+        "name_id": 131249,
+        "icon_id": 547,
+        "job": 12
+      },
+      {
+        "item_id": 75151,
+        "name_id": 132035,
+        "icon_id": 3158,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76318,
+        "name_id": 133326,
+        "icon_id": 5421,
+        "job": 32
+      },
+      {
+        "item_id": 75121,
+        "name_id": 132005,
+        "icon_id": 3120,
+        "job": 32
+      },
+      {
+        "item_id": 75484,
+        "name_id": 131228,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75440,
+        "name_id": 131184,
+        "icon_id": 547,
+        "job": 32
+      },
+      {
+        "item_id": 75001,
+        "name_id": 131885,
+        "icon_id": 3104,
+        "job": 35
+      },
+      {
+        "item_id": 75224,
+        "name_id": 130968,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 75180,
+        "name_id": 130924,
+        "icon_id": 547,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75732,
+        "name_id": 132740,
+        "icon_id": 2371,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75031,
+        "name_id": 131915,
+        "icon_id": 3131,
+        "job": 43
+      },
+      {
+        "item_id": 75289,
+        "name_id": 131033,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75245,
+        "name_id": 130989,
+        "icon_id": 547,
+        "job": 43
+      },
+      {
+        "item_id": 75853,
+        "name_id": 132861,
+        "icon_id": 4968,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "drops": [],
+    "wheel_coins": 26
   },
   "source": [
     {
@@ -295,6 +482,10 @@
     {
       "kind": "reconstructed",
       "evidence": "(R) Guide overlay by scripts/dungeon_fights.py from data/content/dungeons/cracked_claw_caverns.json."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "rc-0137 prize wheel: fandom 'Cracked Claw Caverns' (revision 49120) lists one prize wheel per combat job and a 26-coin slot; any other job spins the items every job's wheel holds."
     }
   ]
 }
