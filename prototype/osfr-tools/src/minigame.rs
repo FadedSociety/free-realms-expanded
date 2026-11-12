@@ -1112,13 +1112,36 @@ pub(crate) fn state_remove_packet(instance_id: i32, game_id: i32) -> Vec<u8> {
     family39_header(19, instance_id, game_id)
 }
 
-/// Prize-wheel landing entry 39/45; the client compares it to RewardPreview
-/// in `StopMiniGameLootWheelAt` (`009b6da0`). The caller supplies the exact
-/// entry body decoded by the applicable client reward-entry reader.
+/// A RewardBundleBase (reader `008e7930`), the one writer every prize wheel uses: flag 0, so an
+/// Item entry carries no trailing word (`0103c5c0` reads it only when the flag is set); coins,
+/// stars and four words; the multiplier 1.0 (the client scales the coins by it); two words, two
+/// guids, icon and name; the entry count, each entry's type and body; a trailing word. Empty, it
+/// is the 69 bytes the reader needs before any entry.
+pub(crate) fn reward_bundle(coins: u32, rows: &[RewardBundleRow]) -> Vec<u8> {
+    let mut bytes = vec![0];
+    let coins = i32::try_from(coins).unwrap_or(0);
+    for value in [coins, 0, 0, 0, 0, 0] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.extend(1.0f32.to_le_bytes());
+    bytes.extend([0; 32]);
+    bytes.extend(i32::try_from(rows.len()).unwrap_or(0).to_le_bytes());
+    for row in rows {
+        bytes.extend(row.type_id.to_le_bytes());
+        bytes.extend(&row.body);
+    }
+    bytes.extend(0_i32.to_le_bytes());
+    bytes
+}
+
+/// Prize-wheel landing 39/45: the header, then one whole RewardBundleBase holding `entry`
+/// (`009b9700` reads it through `008e7930`, which needs the bundle's 69 bytes before any entry;
+/// a bare entry ran the reader out, so `StopMiniGameLootWheelAt` `009b6da0` never ran and the
+/// wheel never turned). The client matches the entry against the preview's entries. The caller
+/// supplies the entry's type and the body its client reader takes (34 bytes for an Item).
 fn wheel_prize_packet(instance_id: i32, game_id: i32, entry: &RewardBundleRow) -> Vec<u8> {
     let mut bytes = family39_header(45, instance_id, game_id);
-    bytes.extend(entry.type_id.to_le_bytes());
-    bytes.extend(&entry.body);
+    bytes.extend(reward_bundle(0, std::slice::from_ref(entry)));
     bytes
 }
 

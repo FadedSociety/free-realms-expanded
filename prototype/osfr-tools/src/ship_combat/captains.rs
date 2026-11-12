@@ -5,9 +5,9 @@
 //! videos: "they collect, bank, ram and sink like players".
 use super::battle::{self, Aim, Battery, Hull, Mark, Shot};
 use super::{
-    Arena, Content, Decal, Deserialize, Ship, Treasure, UPDATE_SHIP_PHYSICS, VecDeque,
-    WHIRLPOOL_HOLD_MS, destroy_pickup, distance, packet, player_gold, player_state, refresh_ui,
-    reset_ship, ship_state,
+    Arena, Content, Decal, Deserialize, Ship, Tally, Treasure, UPDATE_SHIP_PHYSICS, VecDeque,
+    WHIRLPOOL_HOLD_MS, collected, destroy_pickup, distance, packet, player_gold, player_state,
+    refresh_ui, reset_ship, ship_state,
 };
 
 /// How often a captain's ship reports: the client flies it on between reports.
@@ -51,6 +51,8 @@ pub struct Bot {
     battery: Battery,
     hull: Hull,
     down: Option<Down>,
+    /// Its kills, streak and pad visit, as the player's.
+    pub(super) tally: Tally,
 }
 
 /// A captain out of the fight: going down, then back on its pad and held, each until a time.
@@ -88,6 +90,7 @@ impl Content {
                     battery: Battery::default(),
                     hull: Hull::default(),
                     down: None,
+                    tally: Tally::default(),
                 })
             })
             .collect()
@@ -141,7 +144,7 @@ impl Bot {
             {
                 *until = Some(now_ms.saturating_add(u64::from(treasure.respawn_seconds) * 1000));
                 self.hold += 1;
-                out.push(destroy_pickup(id, true));
+                out.extend([destroy_pickup(id, true), collected(self.guid, treasure.value)]);
             }
         }
         let unload = 1000 / u64::try_from(self.ship.hold_unload_per_second.max(1)).unwrap_or(1);
@@ -150,7 +153,9 @@ impl Bot {
             self.hold -= 1;
             self.unloaded_ms = now_ms;
             self.gold = self.gold.saturating_add(treasure.value);
-            out.extend([player_gold(self.guid, self.gold), refresh_ui()]);
+            let row = player_gold(self.guid, self.gold, self.tally.kills, treasure.value);
+            out.extend([row, refresh_ui()]);
+            out.extend(self.tally.bank(self.guid, treasure.value, self.hold));
         }
         // The home pad repairs, as the player's does.
         let healed = self.hull.damage > 0 && distance(home, self.at) <= treasure.bank_radius;
@@ -184,6 +189,11 @@ impl Bot {
             }
             _ => Vec::new(),
         }
+    }
+
+    /// Whether it is out of the fight.
+    pub(super) fn down(&self) -> bool {
+        self.down.is_some()
     }
 
     /// Whether a ball can strike it now.
@@ -330,11 +340,6 @@ impl Bot {
     /// Puts it somewhere and stops it, for a test.
     pub(super) fn moor(&mut self, at: [f32; 3]) {
         self.at = at;
-    }
-
-    /// Whether it is out of the fight.
-    pub(super) fn down(&self) -> bool {
-        self.down.is_some()
     }
 }
 

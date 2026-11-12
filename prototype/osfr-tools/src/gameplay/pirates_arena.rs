@@ -10,10 +10,12 @@ use std::sync::atomic::{AtomicI32, Ordering};
 /// The run ids a match's offer takes, out of the other games' ranges.
 static NEXT_RUN: AtomicI32 = AtomicI32::new(63_000_001);
 
-/// What a match reports to its run: first place is a win.
+/// What a finished match reports to its run. Any place reports the win (R): the client shows
+/// the wheel only after status 1 (`ScoreScreen:PopulateLootWheel` needs `lastStatus > 0`), and
+/// "completing the entire game, regardless of ranking at the end, will give you a chance to spin
+/// the prize wheel" (the maps' fan wiki pages). The quest credit keeps first place.
 struct Round {
     gold: u32,
-    won: bool,
 }
 
 impl Activity for Round {
@@ -23,7 +25,7 @@ impl Activity for Round {
 
     fn finish(&self) -> Option<ActivityFinish> {
         Some(ActivityFinish {
-            won: self.won,
+            won: true,
             stars: 0,
             elapsed_seconds: 0,
         })
@@ -55,6 +57,63 @@ pub(super) struct PirateArena {
     /// L966: which of the content's arenas, and its treasure round.
     arena: usize,
     plunder: ship_combat::Plunder,
+    /// The items this match's offer shows (the player's gender's), its coin slot, and where its
+    /// wheel stops once the match is settled.
+    wheel: Vec<ship_combat::Prize>,
+    coins: u32,
+    landing: Option<ship_combat::Landing>,
+    /// The run's end screen is up (the offer keeps it whenever the map has a wheel): the arena
+    /// stays behind it until the player's own results Close (26/42), or this time for a client
+    /// that never answers (`end_screen_timeout_seconds`, R). Nothing the server sends closes it:
+    /// `ScoreScreen:ExitScreen` runs only on the movie's events (its close, or
+    /// `LootWheelCompleted` once the spin stops), and a zone back under it leaves the chat log
+    /// hidden, the GameDock off and `isActive` set (`HUD:showMain` only calls `Hide2`).
+    end_screen_until: Option<u64>,
+}
+
+impl PirateArena {
+    /// The run's end: its result packets, with the wheel's landing (39/45) between the scores and
+    /// the closing 39/19 once the match was settled, as a battle's wheel follows its 39/18; the
+    /// arena then waits for the end screen's close. `None` when the run had already ended.
+    fn finish_run(&mut self, now_ms: u64, hold_ms: u64) -> io::Result<Option<Vec<Vec<u8>>>> {
+        let round = Round {
+            gold: self.plunder.gold(),
+        };
+        // Taken while the run still plays, as `choose_wheel_prize` needs.
+        let wheel = match &self.landing {
+            Some(ship_combat::Landing::Item(prize)) => {
+                (self.runs).choose_wheel_prize(self.run_id, prize.row())?.replies
+            }
+            Some(ship_combat::Landing::Coins(coins)) => {
+                vec![ship_combat::coin_landing(self.run_id, self.game_id, *coins)]
+            }
+            None => Vec::new(),
+        };
+        let ended = self.runs.finish_win_without_reward(self.run_id, &round)?;
+        if !ended.accepted {
+            return Ok(None);
+        }
+        let mut replies = ended.replies;
+        self.hold_for_results(now_ms, hold_ms);
+        let close = replies.len().saturating_sub(1);
+        replies.splice(close..close, wheel);
+        Ok(Some(replies))
+    }
+}
+
+impl PirateArena {
+    /// A run with a wheel ends on its end screen (flag +616, `009bf190`), so the arena waits.
+    fn hold_for_results(&mut self, now_ms: u64, hold_ms: u64) {
+        if !self.wheel.is_empty() {
+            self.end_screen_until = Some(now_ms.saturating_add(hold_ms));
+        }
+    }
+}
+
+/// (R) A spread of the run ids, so the map and the wheel look random: the live Play picked one
+/// of the three maps at random (Fandom: "three different maps that randomly generate").
+fn spread(run_id: i32, guid: u64) -> u64 {
+    (u64::from(run_id.unsigned_abs())).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ guid
 }
 
 impl Gameplay {
@@ -63,8 +122,9 @@ impl Gameplay {
         self.character_name = name;
     }
 
-    /// Developer `realm pirates [arena]`: a solo match in arena 1-3 (the entry until the Games row
-    /// is wired; R). One line answers.
+    /// A solo match in arena 1-3; 0, as the Games row and the dock's stands ask, picks one of
+    /// the content's maps (R: the live Play's random map). Developer `realm pirates [arena]` names
+    /// one. One line answers.
     pub(super) fn begin_pirates(
         &mut self,
         arena: usize,
@@ -81,6 +141,13 @@ impl Gameplay {
         }
         let Some(content) = self.ship_combat.as_deref() else {
             return Ok("Pirate's Plunder is not available.".into());
+        };
+        let run_id = NEXT_RUN.fetch_add(1, Ordering::Relaxed);
+        let seed = spread(run_id, character.guid);
+        let arena = match arena {
+            // Below the list's length, so the cast is exact.
+            0 => (seed % content.arenas.len().max(1) as u64) as usize + 1,
+            named => named,
         };
         let Some((index, arena)) =
             (arena.checked_sub(1)).and_then(|i| Some((i, content.arenas.get(i)?)))
@@ -153,9 +220,17 @@ impl Gameplay {
         spec.name_id = arena.name_id;
         spec.icon_id = ship_combat::OFFER_ICON;
         spec.description_id = ship_combat::OFFER_DESCRIPTION;
-        // The game's own board ends it; 39/19 then only gives the world HUD back.
-        spec.flags[4] = 0;
-        let run_id = NEXT_RUN.fetch_add(1, Ordering::Relaxed);
+        // The offer's Prizes and the wheel after the board: this map's own, the rows the player
+        // may wear (a boys' or girls' piece only to that gender, `reward_fits_gender`).
+        let wheel = arena.wheel(seed, |prize| {
+            self.inventory.reward_fits_gender(prize.item_id, self.gender)
+        });
+        let coins = if wheel.is_empty() { 0 } else { arena.wheel_coins };
+        spec.reward_bundles = ship_combat::wheel_bundles(&wheel, coins);
+        // The game's own board comes first. With a wheel, 39/19 then opens the end screen that
+        // spins it ("YOU WIN!" and the map's name, `tL5gtHPAa5g_1932.00`); without one it only
+        // gives the world HUD back.
+        spec.flags[4] = u8::from(!wheel.is_empty());
         let mut runs = MinigameRuns::new(run_id)?;
         let offer = runs.offer(spec)?.replies;
         out.changed = true;
@@ -175,6 +250,10 @@ impl Gameplay {
             scene,
             arena: index,
             plunder,
+            wheel,
+            coins,
+            landing: None,
+            end_screen_until: None,
         }));
         Ok(text)
     }
@@ -200,6 +279,7 @@ impl Gameplay {
     /// Go starts the match; the X or a cancel leaves it, a quit in play unpaid as a loss.
     fn pirates_run_packet(&mut self, inner: &[u8], now_ms: u64) -> io::Result<Outcome> {
         let mut out = Outcome::default();
+        let hold_ms = self.end_screen_hold_ms();
         let Some(arena) = self.pirates.as_mut() else {
             return Ok(out);
         };
@@ -213,25 +293,33 @@ impl Gameplay {
         } else if arena.game.state() != ship_combat::EXITING {
             // On the results board the match is over and paid; only before that is it a loss.
             let quit = if arena.game.state() == ship_combat::GAME_OVER {
-                let round = Round {
-                    gold: arena.plunder.gold(),
-                    won: arena.plunder.placement() == 1,
-                };
-                (arena.runs).finish_win_without_reward(arena.run_id, &round)?
+                arena.finish_run(now_ms, hold_ms)?
             } else {
-                arena.runs.forfeit(arena.run_id)?
+                let lost = arena.runs.forfeit(arena.run_id)?;
+                if lost.accepted {
+                    // A quit in play ends on the end screen too (the loss), as soccer's does.
+                    arena.hold_for_results(now_ms, hold_ms);
+                }
+                lost.accepted.then_some(lost.replies)
             };
             // Still on the offer, 39/19 alone closes it, as for a derby.
-            out.replies = if quit.accepted {
-                quit.replies
-            } else {
+            out.replies = quit.unwrap_or_else(|| {
                 vec![crate::minigame::state_remove_packet(arena.run_id, arena.game_id)]
-            };
+            });
             arena.pending = None;
             arena.game.quit(now_ms);
             out.replies.push(ship_combat::game_state(ship_combat::EXITING));
+        } else if inner == [26, 0, 42, 0] && arena.end_screen_until.is_some() {
+            // The end screen's Close: the wheel is done with, so the world comes back.
+            arena.end_screen_until = None;
         }
         Ok(out)
+    }
+
+    /// How long the end screen may hold the arena before the fallback zones the player back.
+    fn end_screen_hold_ms(&self) -> u64 {
+        let content = self.ship_combat.as_deref();
+        content.map_or(0, |content| u64::from(content.end_screen_timeout_seconds) * 1000)
     }
 
     /// A match is open, so the gateway's tick runs (`supervise_pirates`) whatever else is loaded.
@@ -381,6 +469,7 @@ impl Gameplay {
     /// The states' packets. Game Over also opens the results board and settles the match; the
     /// state machine reaches it once.
     fn send_states(&mut self, moved: Vec<u32>, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        let hold_ms = self.end_screen_hold_ms();
         for state in moved {
             out.replies.push(ship_combat::game_state(state));
             if state == ship_combat::GAME_OVER {
@@ -390,31 +479,30 @@ impl Gameplay {
             if state == ship_combat::EXITING
                 && let Some(arena) = self.pirates.as_mut()
             {
-                let round = Round {
-                    gold: arena.plunder.gold(),
-                    won: arena.plunder.placement() == 1,
-                };
-                let ended = (arena.runs).finish_win_without_reward(arena.run_id, &round)?;
-                out.replies.extend(ended.replies);
+                out.replies.extend(arena.finish_run(now_ms, hold_ms)?.into_iter().flatten());
             }
         }
         Ok(())
     }
 
     /// The match's credit and pay, for the arena's own row. First place is the win, and finishing
-    /// pays whatever the place (R). The score is the gold banked; nothing else is measured.
+    /// pays whatever the place (R), the wheel's prize with it: "completing the entire game,
+    /// regardless of ranking at the end, will give you a chance to spin the prize wheel" (the
+    /// maps' fan wiki pages). The score is the gold banked. The wheel always stops somewhere: a
+    /// prize the bag cannot take turns into the coin slot, and the player is told.
     fn settle_pirates(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
         let Some(arena) = self.pirates.as_ref() else {
             return Ok(());
         };
+        let spun = ship_combat::spin(&arena.wheel, arena.coins, spread(arena.run_id, now_ms));
+        let (gold, guid, coins) = (arena.plunder.gold(), arena.return_to.guid, arena.coins);
+        let placement = arena.plunder.placement();
         let Some(content) = self.ship_combat.clone() else {
             return Ok(());
         };
         let Some(place) = content.arenas.get(arena.arena) else {
             return Ok(());
         };
-        let (gold, guid) = (arena.plunder.gold(), arena.return_to.guid);
-        let placement = arena.plunder.placement();
         let result = crate::quest_engine::MinigameResult {
             won: placement == 1,
             elapsed_seconds: None,
@@ -423,23 +511,54 @@ impl Gameplay {
             knocked_out: false,
         };
         self.credit_minigame(place.minigame_id, result, out)?;
-        let grant = crate::rewards::RewardGrant {
-            coins: content.win_coins,
-            items: Vec::new(),
-            job_xp: BTreeMap::new(),
-            sc: 0,
-            display: crate::rewards::RewardDisplay {
-                source_guid: guid,
-                player_guid: guid,
-                reward_kind: 0,
-                icon_id: 0,
-                name_id: 0,
-                rows: Vec::new(),
-            },
+        let pay = |landing: &Option<ship_combat::Landing>| {
+            let (extra, items) = match landing {
+                Some(ship_combat::Landing::Coins(coins)) => (*coins, Vec::new()),
+                Some(ship_combat::Landing::Item(prize)) => {
+                    let item = crate::rewards::ItemGrant {
+                        definition_id: prize.item_id,
+                        count: prize.quantity,
+                    };
+                    (0, vec![item])
+                }
+                None => (0, Vec::new()),
+            };
+            crate::rewards::RewardGrant {
+                coins: content.win_coins.saturating_add(extra),
+                items,
+                job_xp: BTreeMap::new(),
+                sc: 0,
+                display: crate::rewards::RewardDisplay {
+                    source_guid: guid,
+                    player_guid: guid,
+                    reward_kind: 0,
+                    icon_id: 0,
+                    name_id: 0,
+                    rows: Vec::new(),
+                },
+            }
         };
-        let rewards = self.reward_snapshot();
+        // The player's own gender, so the grant pays only what the wheel showed them.
+        let rewards = self.reward_snapshot().with_gender(self.gender);
         let key = format!("pirates-match-{now_ms}");
-        match crate::rewards::apply_grant(&rewards, &grant, &key) {
+        let mut landing = spun;
+        let mut paid = crate::rewards::apply_grant(&rewards, &pay(&landing), &key);
+        if let (Err(error), Some(ship_combat::Landing::Item(_))) = (&paid, &landing) {
+            eprintln!("pirates prize refused: {error}");
+            let why = match error {
+                crate::rewards::GrantFailure::BagFull => "Your bag is full",
+                _ => "That prize can't be given",
+            };
+            out.replies.push(chat::system(&format!(
+                "{why}, so the wheel stops on the {coins} coins instead."
+            )));
+            landing = Some(ship_combat::Landing::Coins(coins));
+            paid = crate::rewards::apply_grant(&rewards, &pay(&landing), &key);
+        }
+        if let Some(arena) = self.pirates.as_mut() {
+            arena.landing = landing;
+        }
+        match paid {
             Ok((next, replies)) => {
                 out.replies.extend(replies);
                 self.adopt_reward_state(next, out)
@@ -490,7 +609,8 @@ impl Gameplay {
             let guns = arena.plunder.gunnery(guid, now_ms, &arena.ship, content);
             out.replies.extend(guns);
         }
-        if arena.game.finished(now_ms) {
+        let held = arena.end_screen_until.is_some_and(|until| now_ms < until);
+        if arena.game.finished(now_ms) && !held {
             let back = arena.return_to.clone();
             let normal = ship_combat::STATUS_NORMAL;
             out.replies

@@ -604,21 +604,47 @@ fn prize_wheel_landing_is_server_selected_and_stop_report_cannot_pay() {
     runs.offer(spec()).unwrap();
     runs.handle_client(&request(5, 130)).unwrap();
     runs.started(130);
+    // A type-1 Item entry body, in the base reader's order (`0103c460`): hidden, icon, tint,
+    // name, quantity, item id, parameter, an empty string, text colour, members-only.
+    let mut item = vec![0];
+    for value in [973_i32, 0, 6666, 1, 10482, 0, 0, 0] {
+        item.extend(value.to_le_bytes());
+    }
+    item.push(0);
     let selected = runs
         .choose_wheel_prize(
             130,
             RewardBundleRow {
-                type_id: 3,
-                body: vec![0xaa, 0xbb, 0xcc],
+                type_id: 1,
+                body: item.clone(),
             },
         )
         .unwrap();
+    // 39/45 carries one whole RewardBundleBase (`009b9700` reads it through `008e7930`), in the
+    // reader's order: the flag byte; coins, XP and four more words; the coin multiplier; two
+    // words, two guids, the icon and name; the entry count; each entry's type and body; a
+    // trailing word. A bare entry ran that reader out of bytes and the wheel never turned.
     let mut expected = vec![39, 0, 45];
     for id in [130_i32, -1, 46] {
         expected.extend(id.to_le_bytes());
     }
-    expected.extend(3_u32.to_le_bytes());
-    expected.extend([0xaa, 0xbb, 0xcc]);
+    expected.push(0);
+    for word in [0_i32, 0, 0, 0, 0, 0] {
+        expected.extend(word.to_le_bytes());
+    }
+    expected.extend(1.0f32.to_le_bytes());
+    for word in [0_i32, 0] {
+        expected.extend(word.to_le_bytes());
+    }
+    expected.extend(0_u64.to_le_bytes());
+    expected.extend(0_u64.to_le_bytes());
+    for word in [0_i32, 0, 1] {
+        expected.extend(word.to_le_bytes());
+    }
+    expected.extend(1_u32.to_le_bytes());
+    expected.extend(&item);
+    expected.extend(0_i32.to_le_bytes());
+    assert_eq!(expected.len(), 15 + 69 + 4 + 34, "the bundle's 69 bytes plus one Item entry");
     assert_eq!(selected.replies, vec![expected]);
 
     let activity = TestActivity {

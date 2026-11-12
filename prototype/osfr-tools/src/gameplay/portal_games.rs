@@ -252,11 +252,11 @@ impl Gameplay {
             Kind::Spot => self.begin_spot(id),
             // L962: Tower Defense game `id` (it stages itself).
             Kind::TowerDefense => self.begin_tower_defense(id),
-            // L963: a solo match in the first arena (R: the live game matched one to five players
+            // L963: a solo match on any of the maps (R: the live game matched one to five players
             // through queue 5). A refusal answers with its line.
             Kind::Pirates => self.commit_if_changed(|staged| {
                 let mut out = Outcome::default();
-                let text = staged.begin_pirates(1, character, &mut out)?;
+                let text = staged.begin_pirates(0, character, &mut out)?;
                 if !out.changed {
                     out.replies.push(chat::system(&text));
                 }

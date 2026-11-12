@@ -1,9 +1,27 @@
 {
   "schema_version": 1,
-  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, Shipwreck Cove's chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Shipwreck Cove's chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). WaterLevel 53.6 and the chests at 53.5 sit on the drawn sea, the height the client's own ship reset uses (DAT_0187c6cc); the X marks lie at WaterLevel, so the constructor's 50 hid them under it. Treasure Isle's one whirlpool (R): the vortex on open water sailed in a native run, the exit off the far dock. Shipwreck Cove's and Arctic Bay's (R): the vortex between chests, which lie on deep water, the exit on a far dock's pad. Ships: the client's locale names four with stats (417574-417587: size, turning, cargo, cannons); the guide starts players on the Cutlass; health and handling are (R), the larger the tougher and slower. Effect ids are composite ids from the client's ActorCompositeEffectDefinitions.xml, by name (BBE_PFX_pir_*); the client's own default ProjectileLightEffectId 16401 is one. Ship defaults follow the constructor 0106b680. X spots (L967): Treasure Isle's and Arctic Bay's chests lie at the X marks of their loading-screen maps (three each), fitted to the dock bells by least squares and snapped to deep water; the 'Treasure N m' marker points at their centre (Treasure Isle: 509 m from red's pad, the game showed 537). Shipwreck Cove keeps terrain-picked points until its map turns up.",
+  "source": "L963 (R): Pirate's Plunder arenas. Docks are each arena's Port/PortBell areas (client ss_pirate_arenaAreas.xml, ss_pir_arena3Areas.xml, ss_pir_arena4Areas.xml). The live per-zone ZoneConfig never shipped (field names: the server loader ShipZoneConfigLoad 010680f0 compiled into the client). The camera values are the client's compiled defaults (constructor 0106b090; Pitch, MinPitch and MaxPitch in degrees as the loader 0106b1e0 reads them). The ship physics values are the client's compiled defaults (constructor 0106ae50) except the speeds (MinSpeed, MaxSpeed, TurboSpeed), which are (R) as is the one gear; angles in degrees as the loaders 0106a560 and 0106a3a0 read them. Colours are the client's PirateColorFromName names (R slot order); the flag and the damage states' mast aliases are the mast actors' texture aliases (skullx01, dmg00-dmg03; R thresholds). These ZoneConfig values follow the client constructor 01067ac0: Gravity 9.81, PhysicsSimulationRate 60, ZoneBubble 12/12/2, parking 2/4/20/20/1/15, repulsor 10/30/100, shove-out 10/30, AllowablePhysicsDelta 12, PickupEmptyTime 3, FlyingTreasureHeight 1.2, ShipPickupCount 12. Every other ZoneConfig value is (R), MaxPlayers, MaxScore, PlayTime, ZoneReadyWaitTime and MaxDrawDistance included (the constructor's 1/1/0/0/0 are per-zone placeholders). Treasure (L966): every value is (R); pickup points lie between each arena's docks and their middle (60% of the way in, plus the middle), on the water level; chest models from the client's Models.txt. Spawns and pickups (L966) come from the arenas' terrain heights (osfr-terrain grids of the arena chunks): spawns 35 m off each dock where a 15 m disc lies at least 6 m under WaterLevel, Shipwreck Cove's chests on a 20 m grid of such water, at least 40 m from docks and 60 m apart. The chest value 3250 follows live gameplay video ('COLLECTED 3250 GOLD'); PlayTime 540 the 2010 player guide (nine minutes; the video's timer reads 8:45 a minute in). Docks (L966 rework): each bank is the arena's Port/PortBell area (the pad, where every ship starts and banks), each enter its base's shipwash cave prop from the 2014 chunks (steering in opens Ship Selection); Treasure Isle's slots follow its loading-screen map colours (Port_1 red, the shark cave). Shipwreck Cove's chests stay over 70 m from every pad. EnterRadius 20 and HoldUnloadPerSecond 1 are (R); max_speed 40 is 1.33x TurboSpeed 30 (R). WaterLevel 53.6 and the chests at 53.5 sit on the drawn sea, the height the client's own ship reset uses (DAT_0187c6cc); the X marks lie at WaterLevel, so the constructor's 50 hid them under it. Treasure Isle's one whirlpool (R): the vortex on open water sailed in a native run, the exit off the far dock. Shipwreck Cove's and Arctic Bay's (R): the vortex between chests, which lie on deep water, the exit on a far dock's pad. Ships: the client's locale names four with stats (417574-417587: size, turning, cargo, cannons); the guide starts players on the Cutlass; health and handling are (R), the larger the tougher and slower. Effect ids are composite ids from the client's ActorCompositeEffectDefinitions.xml, by name (BBE_PFX_pir_*); the client's own default ProjectileLightEffectId 16401 is one. Ship defaults follow the constructor 0106b680. X spots (L967): Treasure Isle's and Arctic Bay's chests lie at the X marks of their loading-screen maps (three each), fitted to the dock bells by least squares and snapped to deep water; the 'Treasure N m' marker points at their centre (Treasure Isle: 509 m from red's pad, the game showed 537). Shipwreck Cove keeps terrain-picked points until its map turns up. Prizes: each map's wheel from its fan wiki page (fr.fanbyte.com FR_Minigame Arctic Bay, Shipwreck Cove, Treasure Isle). The ring holds the Coins slot and eight items (tL5gtHPAa5g_1932.00); wheel_coins, what the Coins slot pays, is (R), and the match's win_coins are paid beside it. Item ids (R): each name's no-trade row, the reward copy, NoTrade and NoSale where the name has one (the clothing 8162-8169, rarity 3, not MembersOnly, so a non-member can wear it; 8152-8161 are the MembersOnly store rows), the lowest id where several share it, and the members-only row where the name has no other (the Flag Wall Hanging, the Treasure Map Rug, the treasure piles and the chest). The clothing lists the boys' and the girls' row of each piece (item-table GenderUsage); each player's wheel shows only the rows their gender wears. Unsettled: the prize card's tip in tL5gtHPAa5g_1944.00 reads Resell Value 150, which a NoSale row may not show; no client source shows whether NoSale hides that line.",
   "arenas": [
     {
       "scene": "ss_pirate_arena",
+      "prizes": [
+        {"item_id": 8162, "name_id": 30158, "icon_id": 6327},
+        {"item_id": 8166, "name_id": 30164, "icon_id": 6331},
+        {"item_id": 8164, "name_id": 30160, "icon_id": 6329},
+        {"item_id": 8168, "name_id": 30160, "icon_id": 6333},
+        {"item_id": 8163, "name_id": 30159, "icon_id": 6328},
+        {"item_id": 8167, "name_id": 30159, "icon_id": 6332},
+        {"item_id": 8165, "name_id": 30161, "icon_id": 6330},
+        {"item_id": 8169, "name_id": 30161, "icon_id": 6334},
+        {"item_id": 9044, "name_id": 16141, "icon_id": 6338},
+        {"item_id": 26602, "name_id": 81342, "icon_id": 2973},
+        {"item_id": 5961, "name_id": 12529, "icon_id": 3069},
+        {"item_id": 5450, "name_id": 12004, "icon_id": 3027},
+        {"item_id": 9048, "name_id": 16145, "icon_id": 6343},
+        {"item_id": 9047, "name_id": 16147, "icon_id": 6342},
+        {"item_id": 3016, "name_id": 5091, "icon_id": 6347}
+      ],
+      "wheel_coins": 25,
       "whirlpools": [{"vortex": [905.0, 53.5, 911.0], "radius": 18.0, "teleport": [539.0, 52.0, 830.0], "angle": 0.0, "speed": 10.0}],
       "name_id": 426861,
       "zone_id": 9401,
@@ -108,6 +126,21 @@
     },
     {
       "scene": "ss_pir_arena3",
+      "prizes": [
+        {"item_id": 8162, "name_id": 30158, "icon_id": 6327},
+        {"item_id": 8166, "name_id": 30164, "icon_id": 6331},
+        {"item_id": 8164, "name_id": 30160, "icon_id": 6329},
+        {"item_id": 8168, "name_id": 30160, "icon_id": 6333},
+        {"item_id": 8163, "name_id": 30159, "icon_id": 6328},
+        {"item_id": 8167, "name_id": 30159, "icon_id": 6332},
+        {"item_id": 8165, "name_id": 30161, "icon_id": 6330},
+        {"item_id": 8169, "name_id": 30161, "icon_id": 6334},
+        {"item_id": 3055, "name_id": 7913, "icon_id": 6305},
+        {"item_id": 9048, "name_id": 16145, "icon_id": 6343},
+        {"item_id": 9047, "name_id": 16147, "icon_id": 6342},
+        {"item_id": 3016, "name_id": 5091, "icon_id": 6347}
+      ],
+      "wheel_coins": 25,
       "whirlpools": [{"vortex": [1089.0, 53.5, 931.0], "radius": 18.0, "teleport": [689.0, 53.0, 856.0], "angle": 0.0, "speed": 10.0}],
       "name_id": 420997,
       "zone_id": 9402,
@@ -237,6 +270,23 @@
     },
     {
       "scene": "ss_pir_arena4",
+      "prizes": [
+        {"item_id": 8162, "name_id": 30158, "icon_id": 6327},
+        {"item_id": 8166, "name_id": 30164, "icon_id": 6331},
+        {"item_id": 8164, "name_id": 30160, "icon_id": 6329},
+        {"item_id": 8168, "name_id": 30160, "icon_id": 6333},
+        {"item_id": 8163, "name_id": 30159, "icon_id": 6328},
+        {"item_id": 8167, "name_id": 30159, "icon_id": 6332},
+        {"item_id": 8165, "name_id": 30161, "icon_id": 6330},
+        {"item_id": 8169, "name_id": 30161, "icon_id": 6334},
+        {"item_id": 3019, "name_id": 7915, "icon_id": 6341},
+        {"item_id": 24747, "name_id": 79697, "icon_id": 2906},
+        {"item_id": 8868, "name_id": 12810, "icon_id": 3088},
+        {"item_id": 9048, "name_id": 16145, "icon_id": 6343},
+        {"item_id": 9047, "name_id": 16147, "icon_id": 6342},
+        {"item_id": 3016, "name_id": 5091, "icon_id": 6347}
+      ],
+      "wheel_coins": 25,
       "whirlpools": [{"vortex": [985.0, 53.5, 1135.0], "radius": 18.0, "teleport": [801.0, 53.0, 697.0], "angle": 0.0, "speed": 10.0}],
       "name_id": 426862,
       "zone_id": 9403,
@@ -342,11 +392,12 @@
   ],
   "countdown_seconds": 5,
   "stands": [
-    {"npc": 100000001910, "name": "Pirates Plunder", "label_id": 31028, "position": [-468.5345, -44.96833, -1295.797], "arena": 1},
-    {"npc": 100000001911, "name": "Pirates Plunder", "label_id": 31028, "position": [-477.7754, -44.96833, -1311.275], "arena": 1}
+    {"npc": 100000001910, "name": "Pirates Plunder", "label_id": 31028, "position": [-468.5345, -44.96833, -1295.797], "arena": 0},
+    {"npc": 100000001911, "name": "Pirates Plunder", "label_id": 31028, "position": [-477.7754, -44.96833, -1311.275], "arena": 0}
   ],
   "report_timeout_seconds": 20,
   "results_timeout_seconds": 60,
+  "end_screen_timeout_seconds": 900,
   "win_coins": 10,
   "zone_config": {
     "MaxPlayers": 6,

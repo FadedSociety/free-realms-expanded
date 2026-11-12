@@ -118,6 +118,10 @@ pub struct Content {
     pub report_timeout_seconds: u32,
     /// (R) Seconds the results board stays up if the player never closes it.
     pub results_timeout_seconds: u32,
+    /// (R) Seconds the end screen (the wheel) may hold the arena before the player is sent back
+    /// to the world anyway. The player's own Close comes first: nothing the server sends closes
+    /// that screen, so this is only for a client that never answers.
+    pub end_screen_timeout_seconds: u32,
     /// (R) What finishing a match pays; no source gives an amount.
     pub win_coins: u32,
     /// ZoneConfig values by the loader's field names (`ZONE_FIELDS`); a missing key is 0.
@@ -147,7 +151,7 @@ pub struct Content {
     pub stands: Vec<Stand>,
 }
 
-/// One stand: its spawn, and the arena its menu sails (R: arena 1 until the others load natively).
+/// One stand: its spawn, and the arena its menu sails (1-3; 0 any of them, as the Games row).
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Stand {
@@ -452,6 +456,126 @@ pub struct Arena {
     /// Whirlpools; each drops a ship on the far side of the map.
     #[serde(default)]
     pub whirlpools: Vec<Whirlpool>,
+    /// The map's own prize wheel (its fan wiki page): a finish, at any place, spins it once. Each
+    /// offer shows up to `WHEEL_ITEMS` of the ones the player may wear, a different run of the
+    /// list each match, beside the coin slot; the wheel lands on one of those.
+    #[serde(default)]
+    pub prizes: Vec<Prize>,
+    /// The wheel's coin slot (the wiki's "Coins" prize): what landing on it pays. A map with prizes
+    /// needs one, as a full bag's wheel lands there.
+    #[serde(default)]
+    pub wheel_coins: u32,
+}
+
+/// One item on a map's wheel. The ids are the client item catalogue's: the definition the wheel
+/// pays, its name and icon, which the offer and the wheel show.
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct Prize {
+    pub item_id: i32,
+    pub name_id: i32,
+    pub icon_id: i32,
+    #[serde(default = "one")]
+    pub quantity: u32,
+}
+
+fn one() -> u32 {
+    1
+}
+
+/// (R) The most one prize row pays, as a battle's prize row.
+pub const MAX_PRIZE_QUANTITY: u32 = 100;
+/// (R) The most a wheel's coin slot pays.
+const MAX_WHEEL_COINS: u32 = 100_000;
+
+impl Prize {
+    /// Ids from the item catalogue and a quantity the preview may show.
+    pub fn valid(&self) -> bool {
+        self.item_id > 0
+            && self.name_id > 0
+            && self.icon_id > 0
+            && (1..=MAX_PRIZE_QUANTITY).contains(&self.quantity)
+    }
+
+    /// The prize as a type-1 Item entry (base reader `0103c460`, 34 bytes): hidden, icon, tint,
+    /// name, quantity, item id, param, an empty string, text colour, members-only. The preview
+    /// lists it; 39/45 lands the wheel on it.
+    pub fn row(&self) -> crate::rewards::RewardBundleRow {
+        let mut body = vec![0]; // hidden
+        let quantity = i32::try_from(self.quantity).unwrap_or(i32::MAX);
+        for v in [self.icon_id, 0, self.name_id, quantity, self.item_id, 0, 0, 0] {
+            body.extend(v.to_le_bytes());
+        }
+        body.push(0); // members only
+        crate::rewards::RewardBundleRow { type_id: 1, body }
+    }
+}
+
+/// Where a wheel stops: one of the items it shows, or its coin slot.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Landing {
+    Item(Prize),
+    Coins(u32),
+}
+
+/// The wheel's ring: nine slots, as the 2014-era Arctic Bay wheel shows (`tL5gtHPAa5g_1932.00`:
+/// the Coins slot and eight of the twelve items on the map's page).
+pub const WHEEL_SLOTS: usize = 9;
+/// The items a ring shows: every slot but the coin slot, which the client adds itself after the
+/// preview's entries when the preview carries coins (`ScoreScreen:PopulateLootWheel`).
+pub const WHEEL_ITEMS: usize = WHEEL_SLOTS - 1;
+/// (R) The most prizes one map's list holds (both genders' rows of each piece count).
+const MAX_PRIZES: usize = 24;
+
+impl Arena {
+    /// The items one match's offer shows and its wheel spins: the prizes `fits` keeps (the
+    /// player's gender's rows), up to `WHEEL_ITEMS`, starting `seed` places into that list, so
+    /// every prize on a longer list comes round in turn.
+    pub fn wheel(&self, seed: u64, fits: impl Fn(&Prize) -> bool) -> Vec<Prize> {
+        let kept: Vec<&Prize> = self.prizes.iter().filter(|prize| fits(prize)).collect();
+        let len = kept.len();
+        if len == 0 {
+            return Vec::new();
+        }
+        // Below `len`, so the cast is exact.
+        let start = (seed % len as u64) as usize;
+        let ring = kept.into_iter().cycle().skip(start);
+        ring.take(len.min(WHEEL_ITEMS)).cloned().collect()
+    }
+}
+
+/// (R) A uniform pick over the ring's slots, the items `shown` and the coin slot after them, as a
+/// battle's wheel picks; `None` when nothing is shown.
+pub fn spin(shown: &[Prize], coins: u32, seed: u64) -> Option<Landing> {
+    if shown.is_empty() {
+        return None;
+    }
+    let slots = shown.len() + usize::from(coins > 0);
+    // Below `slots`, so the cast is exact.
+    let slot = (seed % slots as u64) as usize;
+    Some(match shown.get(slot) {
+        Some(prize) => Landing::Item(prize.clone()),
+        None => Landing::Coins(coins),
+    })
+}
+
+/// The offer's three reward bundles (39/16): base and member empty (69 bytes each), then the
+/// preview, which lists `shown` on the start screen and fills the wheel, its coin field the coin
+/// slot (`RewardBundleBase::GetCoinRewardAmount` `0091c2e0`, +0x50; the preview's column 3).
+pub fn wheel_bundles(shown: &[Prize], coins: u32) -> Vec<u8> {
+    let rows: Vec<_> = shown.iter().map(Prize::row).collect();
+    let mut bytes = vec![0; 2 * 69];
+    bytes.extend(crate::minigame::reward_bundle(coins, &rows));
+    bytes
+}
+
+/// 39/45 on the coin slot: the header and a whole bundle with coins and no entry.
+/// `StopMiniGameLootWheelAt` (`009b6da0`) finds no entry to match, sees the coins and stops on the
+/// slot after the preview's entries, the one `PopulateLootWheel` added for the preview's coins.
+pub fn coin_landing(run_id: i32, game_id: i32, coins: u32) -> Vec<u8> {
+    let mut packet = crate::minigame::family39_header(45, run_id, game_id);
+    packet.extend(crate::minigame::reward_bundle(coins, &[]));
+    packet
 }
 
 /// One whirlpool (ZoneConfig's +416 list, record `sub_A59140`; loader 01064f80's names). The client
@@ -527,6 +651,9 @@ impl Content {
                         && (a.docks.iter())
                             .all(|d| distance(d.bank, *p) > t.bank_radius + t.pickup_radius)
                 })
+                && a.prizes.len() <= MAX_PRIZES
+                && a.prizes.iter().all(Prize::valid)
+                && (a.prizes.is_empty() || (1..=MAX_WHEEL_COINS).contains(&a.wheel_coins))
         };
         let treasure_ok = t.chest_model > 0
             && text_ok(&t.chest_alias)
@@ -622,6 +749,7 @@ impl Content {
             || content.colours.is_empty()
             || !(content.colours.iter()).all(|colour| COLOURS.contains(&colour.as_str()))
             || !timings.iter().all(|s| (0.0..=MAX_SECONDS).contains(s))
+            || !(1.0..=MAX_SECONDS).contains(&f64::from(content.end_screen_timeout_seconds))
         {
             return Err(invalid("invalid ship combat content"));
         }
@@ -1034,12 +1162,75 @@ pub fn open_ship_selection(guid: u64) -> Vec<u8> {
 /// AnnouncerMessage (34): `kind` 5 opens Ship Selection; 0 is a pickup line, by `sub` (2 speed,
 /// 3 rapid fire).
 fn announce(guid: u64, kind: u32, sub: u32) -> Vec<u8> {
+    announce_line(kind, sub, (guid, guid), [0; 3])
+}
+
+/// AnnouncerMessage (34) in full (reader `sub_A5A9B0`): kind, sub, the two ships (each must be one
+/// the client holds: 00a62280 drops the line otherwise), then six u32, of which the handler reads
+/// the first three (+0x28, +0x2c, +0x30).
+fn announce_line(kind: u32, sub: u32, (first, second): (u64, u64), values: [u32; 3]) -> Vec<u8> {
     let mut body = kind.to_le_bytes().to_vec();
     body.extend(sub.to_le_bytes());
-    body.extend(guid.to_le_bytes());
-    body.extend(guid.to_le_bytes());
-    body.extend([0; 24]);
+    body.extend(first.to_le_bytes());
+    body.extend(second.to_le_bytes());
+    for value in values {
+        body.extend(value.to_le_bytes());
+    }
+    body.extend([0; 12]);
     packet(ANNOUNCER_MESSAGE, &body)
+}
+
+/// "`guid` has COLLECTED `gold` GOLD!" (kind 2, `bbe_pirates_goldcollectedstring`; +0x2c, left 0,
+/// would make it STOLEN).
+fn collected(guid: u64, gold: u32) -> Vec<u8> {
+    announce_line(2, 0, (guid, guid), [gold, 0, 0])
+}
+
+/// "`guid` has SCORED `gold` GOLD!" (kind 3, `bbe_pirates_goldscoredstring`).
+fn scored(guid: u64, gold: u32) -> Vec<u8> {
+    announce_line(3, 0, (guid, guid), [gold, 0, 0])
+}
+
+/// "`sinker` has SUNK `victim` (`streak` STREAK)!" (kind 1, `bbe_pirates_sunkstring`), or the
+/// revenge line (`bbe_pirates_revengestring`) when the victim had last sunk the sinker.
+fn sunk(sinker: u64, victim: u64, streak: u32, revenge: bool) -> Vec<u8> {
+    announce_line(1, 0, (sinker, victim), [0, streak, u32::from(revenge)])
+}
+
+/// What a ship has done in the match, beyond its gold: its kills, its run of them since it last
+/// went down, who last sank it (a revenge line answers them), and the gold of the pad visit under
+/// way, which one SCORED line reports once the hold is empty.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub(crate) struct Tally {
+    pub(crate) kills: u32,
+    streak: u32,
+    nemesis: Option<u64>,
+    banking: u32,
+}
+
+impl Tally {
+    /// This ship sank `victim`: the kill, and the streak and revenge its line shows.
+    fn sank(&mut self, victim: u64) -> (u32, bool) {
+        self.kills = self.kills.saturating_add(1);
+        self.streak = self.streak.saturating_add(1);
+        let revenge = self.nemesis == Some(victim);
+        if revenge {
+            self.nemesis = None;
+        }
+        (self.streak, revenge)
+    }
+
+    /// This ship went down to `sinker`: its streak ends.
+    fn sunk_by(&mut self, sinker: u64) {
+        self.streak = 0;
+        self.nemesis = Some(sinker);
+    }
+
+    /// One chest banked for `value`: the SCORED line once the hold it came from is empty.
+    fn bank(&mut self, guid: u64, value: u32, hold: u32) -> Option<Vec<u8>> {
+        self.banking = self.banking.saturating_add(value);
+        (hold == 0).then(|| scored(guid, std::mem::take(&mut self.banking)))
+    }
 }
 
 /// DestroyProxiedShip (10), handler 00a5f120: the ship `guid`.
@@ -1106,14 +1297,21 @@ pub fn player_awards() -> Vec<u8> {
     packet
 }
 
-/// UpdatePlayer (8), handler 00a67110: `guid`, then the record `sub_A665E0` with bit 0 only: the
-/// player's gold (+0x10, which the standings sort and show, `PiratesStandings:SetPlayerGold`) and
-/// two values (+0x14/+0x18, R 0).
-pub fn player_gold(guid: u64, gold: u32) -> Vec<u8> {
+/// UpdatePlayer (8), handler 00a67110: `guid`, then the record `sub_A665E0` with bits 0 and 1. Bit
+/// 0: the gold (+0x10, which the standings sort and show, `PiratesStandings:SetPlayerGold`), the
+/// score (+0x14, the results board's Score column, its tie-break after gold: `00a4f7d0`) and a
+/// third value (+0x18, R 0). Bit 1 (`009b0660`): a u32 count, then i32 values, the first the
+/// board's Kills column (`00cb0080`). (R) The score is the gold plus a chest's worth per kill:
+/// the live scores (`ueexejuOOSo_558.00`) follow no formula found.
+pub fn player_gold(guid: u64, gold: u32, kills: u32, chest: u32) -> Vec<u8> {
+    let score = gold.saturating_add(kills.saturating_mul(chest));
     let mut body = guid.to_le_bytes().to_vec();
-    body.extend(1_u32.to_le_bytes());
+    body.extend(3_u32.to_le_bytes());
     body.extend(gold.to_le_bytes());
-    body.extend([0; 8]);
+    body.extend(score.to_le_bytes());
+    body.extend(0_u32.to_le_bytes());
+    body.extend(1_u32.to_le_bytes());
+    body.extend(kills.to_le_bytes());
     packet(UPDATE_PLAYER, &body)
 }
 
@@ -1325,6 +1523,8 @@ pub struct Plunder {
     rapid_until: u64,
     /// The power flags the client last heard.
     flags_told: u32,
+    /// The player's kills, streak and pad visit.
+    tally: Tally,
 }
 
 /// The ship flag that gives it the Turbo speed (`sub_FEEB80` reads it as vehicle +0x2c) with its
@@ -1375,7 +1575,43 @@ impl Plunder {
             speed_until: 0,
             rapid_until: 0,
             flags_told: 0,
+            tally: Tally::default(),
         }
+    }
+
+    /// The player's kills so far.
+    pub fn kills(&self) -> u32 {
+        self.tally.kills
+    }
+
+    /// The ship `guid`'s tally: the player's, or a captain's.
+    fn tally_of(&mut self, guid: u64) -> Option<&mut Tally> {
+        if guid == self.guid {
+            return Some(&mut self.tally);
+        }
+        (self.crew.iter_mut()).find(|bot| bot.guid == guid).map(|bot| &mut bot.tally)
+    }
+
+    /// `sinker` sank `victim`: the sinker's kill and its line, then its row on the board.
+    fn sank(&mut self, sinker: u64, victim: u64, chest: u32) -> Vec<Vec<u8>> {
+        if let Some(tally) = self.tally_of(victim) {
+            tally.sunk_by(sinker);
+        }
+        let Some(tally) = self.tally_of(sinker) else {
+            return Vec::new();
+        };
+        let (streak, revenge) = tally.sank(victim);
+        let kills = tally.kills;
+        let gold = if sinker == self.guid {
+            self.gold
+        } else {
+            (self.crew.iter()).find(|bot| bot.guid == sinker).map_or(0, Bot::gold)
+        };
+        vec![
+            sunk(sinker, victim, streak, revenge),
+            player_gold(sinker, gold, kills, chest),
+            refresh_ui(),
+        ]
     }
 
     /// The power flags at `now_ms`.
@@ -1572,9 +1808,13 @@ impl Plunder {
         let damage = content.gunnery.damage;
         let sink = battle::sinking_ms(content).0;
         let mut out = Vec::new();
+        // Who sank whom, for the lines and the kills once every ball is through.
+        let mut sinks = Vec::new();
+        let player = self.guid;
         let mut shots = std::mem::take(&mut self.shots);
         shots.retain_mut(|shot| {
             let (from, to) = shot.flown(now_ms);
+            let owner = if shot.owner == battle::PLAYER { player } else { shot.owner };
             let mine = (shot.owner != battle::PLAYER && self.held_until.is_none())
                 .then_some(self.position)
                 .flatten()
@@ -1584,7 +1824,11 @@ impl Plunder {
                 out.push(despawn_projectile(shot.id, impact, to));
                 let forward = self.motion.map_or([0.0, 0.0, 1.0], |(forward, _)| forward);
                 out.push(battle::ship_hit(self.guid, damage, battle::side_of(at, forward, to)));
+                let afloat = !self.hull.sunk;
                 out.push(self.take_hit(ship, damage, now_ms, sink));
+                if afloat && self.hull.sunk {
+                    sinks.push((owner, player));
+                }
                 return false;
             }
             let target = (self.crew.iter_mut()).find(|bot| {
@@ -1594,11 +1838,17 @@ impl Plunder {
             if let Some(bot) = target {
                 out.push(despawn_projectile(shot.id, impact, to));
                 out.extend(bot.strike(damage, to, now_ms, sink));
+                if bot.down() {
+                    sinks.push((owner, bot.guid));
+                }
                 return false;
             }
             true
         });
         self.shots = shots;
+        for (sinker, victim) in sinks {
+            out.extend(self.sank(sinker, victim, content.treasure.value));
+        }
         out
     }
 
@@ -1718,7 +1968,10 @@ impl Plunder {
                     out.extend(self.power(guid, power.kind, now_ms, treasure.power_seconds));
                     powered = true;
                 }
-                None => self.hold += 1,
+                None => {
+                    self.hold += 1;
+                    out.push(collected(guid, treasure.value));
+                }
             }
         }
         let due = (self.unloaded_ms).is_none_or(|last| now_ms.saturating_sub(last) >= unload_ms);
@@ -1726,7 +1979,9 @@ impl Plunder {
             self.hold -= 1;
             self.unloaded_ms = Some(now_ms);
             self.gold = self.gold.saturating_add(treasure.value);
-            out.extend([player_gold(guid, self.gold), refresh_ui()]);
+            let row = player_gold(guid, self.gold, self.tally.kills, treasure.value);
+            out.extend([row, refresh_ui()]);
+            out.extend(self.tally.bank(guid, treasure.value, self.hold));
         }
         // The home pad repairs (HomeHealingPerSecond outruns any hull).
         let healed = self.hull.damage > 0 && distance(home, at) <= treasure.bank_radius;
@@ -2465,6 +2720,109 @@ mod tests {
         assert!(bot.exposed(later + sink.1), "then fair game");
     }
 
+    /// A sinking is announced with the sinker's streak and counted on the board; sinking the ship
+    /// that last sank you is the revenge line (`00a62280` kind 1).
+    #[test]
+    fn a_sinking_is_announced_and_counted() {
+        let content = content();
+        let ship = content.fleet_ship("Eel").unwrap();
+        let place = content.arenas[0].clone();
+        let mut round = Plunder::new(place.pickups.len());
+        let mut crew = content.crew(&place);
+        crew.truncate(1);
+        let at = [100.0, 53.6, 200.0];
+        crew[0].moor([at[0] + 30.0, at[1], at[2]]);
+        let guid = crew[0].guid;
+        round.man(crew);
+        round.position = Some(at);
+        round.steer(at, ([0.0, 0.0, 1.0], [0.0; 3]), 40.0);
+        round.gunnery(7, 0, &ship, &content);
+        let mut now = 0;
+        let mut out = Vec::new();
+        while !round.crew[0].down() {
+            round.fire(1, now, &ship, &content);
+            out.extend(round.gunnery(7, now, &ship, &content));
+            now += 50;
+            assert!(now < 120_000, "sunk by now");
+        }
+        let chest = content.treasure.value;
+        assert!(out.contains(&sunk(7, guid, 1, false)), "the first of a streak");
+        assert!(out.contains(&player_gold(7, 0, 1, chest)), "the kill on the board");
+        assert_eq!(round.kills(), 1);
+        assert_eq!(round.sank(guid, 7, chest)[0], sunk(guid, 7, 1, true), "the captain answers");
+        assert_eq!(round.sank(7, guid, chest)[0], sunk(7, guid, 1, true), "a fresh streak");
+        assert_eq!(round.sank(7, guid, chest)[0], sunk(7, guid, 2, false));
+        assert_eq!(round.kills(), 3);
+        let line = sunk(1, 2, 3, true);
+        assert_eq!(line.len(), open_ship_selection(1).len(), "the reader's whole body");
+        assert_eq!(line[4..8], 1_u32.to_le_bytes(), "kind");
+        assert_eq!(line[12..28], [1_u64.to_le_bytes(), 2_u64.to_le_bytes()].concat(), "who, whom");
+        assert_eq!(line[32..40], [3_u32.to_le_bytes(), 1_u32.to_le_bytes()].concat(), "+0x2c, +0x30");
+        assert_eq!(collected(1, 3250)[28..32], 3250_u32.to_le_bytes(), "+0x28");
+        assert_eq!(scored(1, 6500)[4..8], 3_u32.to_le_bytes());
+    }
+
+    /// A wheel shows eight of the items the player may wear beside the coin slot, a different run
+    /// of a longer list each match. The offer's preview lists them in the reader's layout
+    /// (`008e7930`: the coin field at +1 (+0x50), the entry count after the 61-byte head, each Item
+    /// entry a type word and the 34 bytes `0103c460` reads, a trailing word), and a spin can stop
+    /// on any of the nine slots.
+    #[test]
+    fn a_wheel_shows_eight_items_and_the_coins_and_comes_round() {
+        let content = content();
+        let prize = |id: i32| Prize { item_id: id, name_id: 1000 + id, icon_id: 2000 + id, quantity: 1 };
+        let place = Arena {
+            prizes: (1..=12).map(prize).collect(),
+            wheel_coins: 25,
+            ..content.arenas[0].clone()
+        };
+        let any = |_: &Prize| true;
+        let first = place.wheel(0, any);
+        assert_eq!(first, place.prizes[..WHEEL_ITEMS]);
+        let turned = place.wheel(3, any);
+        assert_eq!(turned.len(), WHEEL_ITEMS);
+        assert_eq!(turned[0], place.prizes[3]);
+        assert_eq!(turned[WHEEL_ITEMS - 1], place.prizes[(3 + WHEEL_ITEMS - 1) % 12]);
+        // One gender's rows: the odd ids stand for the other gender's.
+        let even = place.wheel(1, |p| p.item_id % 2 == 0);
+        assert_eq!(even.len(), 6, "every kept row: the list is shorter than the ring");
+        assert!(even.iter().all(|p| p.item_id % 2 == 0));
+        assert_eq!(even[0].item_id, 4, "the run starts one place into the kept rows");
+        let few = Arena { prizes: place.prizes[..2].to_vec(), ..place.clone() };
+        assert_eq!(few.wheel(5, any).len(), 2, "a short list shows whole");
+        assert!(Arena { prizes: Vec::new(), ..place.clone() }.wheel(1, any).is_empty());
+        let bundles = wheel_bundles(&first, 25);
+        assert!(bundles[..2 * 69].iter().all(|byte| *byte == 0), "base and member stay empty");
+        let preview = &bundles[2 * 69..];
+        assert_eq!(preview[1..5], 25_i32.to_le_bytes(), "+0x50: the coin slot");
+        assert_eq!(preview[61..65], (WHEEL_ITEMS as i32).to_le_bytes(), "the entry count");
+        let entry = &preview[65..65 + 4 + 34];
+        assert_eq!(entry[..4], 1_u32.to_le_bytes(), "an Item entry");
+        let body = &entry[4..];
+        assert_eq!(body[1..5], first[0].icon_id.to_le_bytes(), "the icon after the hidden byte");
+        assert_eq!(body[9..13], first[0].name_id.to_le_bytes(), "the name after the tint");
+        assert_eq!(body[13..17], 1_i32.to_le_bytes(), "the quantity");
+        assert_eq!(body[17..21], first[0].item_id.to_le_bytes(), "the item");
+        let whole = 61 + 4 + WHEEL_ITEMS * (4 + 34) + 4;
+        assert_eq!(preview.len(), whole, "head, count, entries, trailing word");
+        // Every slot comes up: the eight items in order, then the coins.
+        let slots: Vec<Landing> =
+            (0..WHEEL_SLOTS as u64).map(|seed| spin(&first, 25, seed).unwrap()).collect();
+        let items: Vec<Landing> = first.iter().cloned().map(Landing::Item).collect();
+        assert_eq!(slots[..WHEEL_ITEMS], items[..]);
+        assert_eq!(slots[WHEEL_ITEMS], Landing::Coins(25));
+        assert_eq!(spin(&[], 25, 0), None, "no wheel, no spin");
+        // The coin slot's 39/45: the header (family, sub, run, -1, game), then a bundle with the
+        // coins at +1 and no entry, read as `009b9700` reads it.
+        let landing = coin_landing(7, 1032, 25);
+        assert_eq!(landing[..3], [39, 0, 45]);
+        assert_eq!(landing[3..15], [7_i32.to_le_bytes(), (-1_i32).to_le_bytes(), 1032_i32.to_le_bytes()].concat());
+        let bundle = &landing[15..];
+        assert_eq!(bundle[1..5], 25_i32.to_le_bytes(), "the coins");
+        assert_eq!(bundle[61..65], 0_i32.to_le_bytes(), "no entry");
+        assert_eq!(bundle.len(), 61 + 4 + 4, "the head, the count and the trailing word");
+    }
+
     /// A captain's ball sinks the player: its hold goes, it is held, and it comes back on its pad.
     #[test]
     fn a_sunk_player_loses_the_hold_and_comes_back() {
@@ -2625,10 +2983,11 @@ mod tests {
         assert_eq!(&state[..4], &[94, 0, 17, 0]);
         assert_eq!(&state[16..20], &100_i32.to_le_bytes(), "health");
         assert_eq!(&state[24..28], &3_u32.to_le_bytes(), "the hold");
-        assert_eq!(
-            player_gold(7, 30)[4 + 8 + 4..4 + 8 + 8],
-            30_u32.to_le_bytes()
-        );
+        let row = player_gold(7, 30, 2, 100);
+        assert_eq!(row[4 + 8..4 + 8 + 4], 3_u32.to_le_bytes(), "bits 0 and 1");
+        assert_eq!(row[4 + 8 + 4..4 + 8 + 8], 30_u32.to_le_bytes(), "gold");
+        assert_eq!(row[4 + 8 + 8..4 + 8 + 12], 230_u32.to_le_bytes(), "score");
+        assert_eq!(row[4 + 8 + 16..], [1, 0, 0, 0, 2, 0, 0, 0], "one value: the kills");
     }
 
     fn pad(bank: [f32; 3]) -> Dock {
@@ -2672,10 +3031,12 @@ mod tests {
         );
         let taken = sail(&mut round, [100.0, 50.0, 0.0], 1_000 + hops);
         let health = ship.health;
-        assert_eq!(taken, [destroy_pickup(1, true), player_state(7, health, 1)]);
+        let line = collected(7, treasure.value);
+        assert_eq!(taken, [destroy_pickup(1, true), line, player_state(7, health, 1)]);
         let banked = sail(&mut round, dock, 1_000 + 2 * hops);
-        let gold = player_gold(7, treasure.value);
-        assert_eq!(banked, [gold, refresh_ui(), player_state(7, health, 0)]);
+        let gold = player_gold(7, treasure.value, 0, treasure.value);
+        let line = scored(7, treasure.value);
+        assert_eq!(banked, [gold, refresh_ui(), line, player_state(7, health, 0)]);
         let back = 1_000 + hops + u64::from(treasure.respawn_seconds) * 1000;
         assert!(round.respawn(back - 1, &points, treasure).is_empty());
         assert_eq!(
@@ -2710,26 +3071,29 @@ mod tests {
         assert!(sail(home, 0, &one).is_empty());
         let first_chest = sail(points[0], 10_000, &one);
         let state = |hold| player_state(7, content.ship.health, hold);
+        let line = collected(7, treasure.value);
         assert_eq!(
             first_chest,
-            [destroy_pickup(1, true), state(1)],
+            [destroy_pickup(1, true), line.clone(), state(1)],
             "a full hold takes no more"
         );
         let second_chest = sail(points[1], 11_000, &two);
-        assert_eq!(second_chest, [destroy_pickup(2, true), state(2)]);
+        assert_eq!(second_chest, [destroy_pickup(2, true), line, state(2)]);
         assert!(
             sail(other, 20_000, &two).is_empty(),
             "another base's pad banks nothing"
         );
         let first = sail(home, 30_000, &two);
+        let row = |gold| player_gold(7, gold, 0, treasure.value);
         assert_eq!(
             first,
-            [player_gold(7, treasure.value), refresh_ui(), state(1)]
+            [row(treasure.value), refresh_ui(), state(1)],
+            "the SCORED line waits for the hold to empty"
         );
         assert!(sail(home, 30_999, &two).is_empty(), "one chest a second");
         let second = sail(home, 31_000, &two);
-        let gold = player_gold(7, 2 * treasure.value);
-        assert_eq!(second, [gold, refresh_ui(), state(0)]);
+        let line = scored(7, 2 * treasure.value);
+        assert_eq!(second, [row(2 * treasure.value), refresh_ui(), line, state(0)]);
 
         // Twenty reports 50 ms apart, each 12 m on, reach a chest 240 m out within a second: past
         // the bound (50 m), so the chest stays; a fresh slack per report would have let it go.
@@ -2778,7 +3142,7 @@ mod tests {
         };
         assert!(loads(&|_| {}), "the shipped content");
         let long = "x".repeat(MAX_TEXT + 1);
-        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 24] = [
+        let refused: [(&str, &dyn Fn(&mut serde_json::Value)); 28] = [
             ("power-ups past a hundred in a hundred", &|c| {
                 c["treasure"]["power_ups"][0]["chance"] = 101.into()
             }),
@@ -2835,6 +3199,15 @@ mod tests {
             ("an endless match", &|c| {
                 c["zone_config"]["PlayTime"] = 1e300.into()
             }),
+            ("a prize with no item", &|c| c["arenas"][0]["prizes"][0]["item_id"] = 0.into()),
+            ("a wheel past its list's bound", &|c| {
+                let prize = c["arenas"][0]["prizes"][0].clone();
+                c["arenas"][0]["prizes"] = serde_json::json!(vec![prize; MAX_PRIZES + 1]);
+            }),
+            ("a wheel with no coin slot", &|c| c["arenas"][0]["wheel_coins"] = 0.into()),
+            ("a coin slot past its bound", &|c| {
+                c["arenas"][0]["wheel_coins"] = (MAX_WHEEL_COINS + 1).into()
+            }),
         ];
         for (case, edit) in refused {
             assert!(!loads(edit), "{case}");
@@ -2843,6 +3216,9 @@ mod tests {
             !loads(&|c| c["report_timeout_seconds"] = 3601.into()),
             "a stalled phase"
         );
+        assert!(!loads(&|c| c["end_screen_timeout_seconds"] = 0.into()), "an end screen with no hold");
+        assert!(!loads(&|c| c["end_screen_timeout_seconds"] = 3601.into()), "an end screen held past the bound");
+        assert!(loads(&|c| c["end_screen_timeout_seconds"] = 1.into()), "a one-second hold");
         fs::remove_dir_all(&temp).ok();
     }
 }

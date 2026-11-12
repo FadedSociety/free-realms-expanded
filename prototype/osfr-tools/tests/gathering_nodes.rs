@@ -1957,6 +1957,16 @@ fn ship_report(guid: u64, at: [f32; 3]) -> Vec<u8> {
     packet
 }
 
+/// The map a Pirate's Plunder Play or stand zoned into: either picks one of the content's maps.
+fn pirates_arena<'a>(
+    content: &'a osfr_tools::ship_combat::Content,
+    entered: &GatewayOutcome,
+) -> &'a osfr_tools::ship_combat::Arena {
+    (content.arenas.iter())
+        .find(|arena| said(entered, &arena.scene))
+        .expect("zoned into one of the maps")
+}
+
 /// L966: in a Pirate's Plunder match the client's ship reports take a chest within reach and bank
 /// it at the player's dock: the chest goes (DestroyProxiedPickup), then the gold shows (UpdatePlayer
 /// and RefreshUI).
@@ -1965,7 +1975,7 @@ fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
     let fixture = Fixture::new(PLOT);
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
-    play(&mut gateway, 1059, 2_000);
+    let entered = play(&mut gateway, 1059, 2_000);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
     let go = press_go(&mut gateway, &loaded, 2_150);
     let start: Vec<_> = inners(&go).into_iter().map(<[u8]>::to_vec).collect();
@@ -1981,7 +1991,7 @@ fn a_pirates_ship_takes_a_chest_and_banks_it_at_its_dock() {
     let content = osfr_tools::ship_combat::Content::load(&content_dir)
         .unwrap()
         .unwrap();
-    let arena = &content.arenas[0];
+    let arena = pirates_arena(&content, &entered);
     let chest = arena.pickups[1];
     let gone: &[u8] = &[94, 0, 29, 0, 2, 0, 0, 0];
     let took = |out: &GatewayOutcome| inners(out).iter().any(|p| p.starts_with(gone));
@@ -2050,7 +2060,7 @@ fn a_dock_book_stand_sails_a_pirates_match() {
     choose.extend(STAND.to_le_bytes());
     choose.extend(1_i32.to_le_bytes());
     let entered = send(&mut gateway, &choose, 2_100);
-    assert!(said(&entered, "ss_pirate_arena"), "the arena zone");
+    pirates_arena(&content, &entered);
 }
 
 /// A game table lists chess and checkers, and each choice offers that game.
@@ -2291,7 +2301,7 @@ fn the_caves_window_swaps_the_ship() {
     let fixture = Fixture::new(PLOT);
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
-    play(&mut gateway, 1059, 2_000);
+    let entered = play(&mut gateway, 1059, 2_000);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
     let go = press_go(&mut gateway, &loaded, 2_150);
     let ship = (inners(&go).into_iter())
@@ -2307,7 +2317,7 @@ fn the_caves_window_swaps_the_ship() {
     }
     let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
-    let dock = &content.arenas[0].docks[0];
+    let dock = &pirates_arena(&content, &entered).docks[0];
     send(&mut gateway, &ship_report(guid, dock.bank), now + 100);
     let mut select = vec![94, 0, 21, 0];
     select.extend(3_u32.to_le_bytes());
@@ -2340,7 +2350,7 @@ fn a_broadside_flies_and_splashes() {
     let fixture = Fixture::new(PLOT);
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
-    play(&mut gateway, 1059, 2_000);
+    let entered = play(&mut gateway, 1059, 2_000);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
     let go = press_go(&mut gateway, &loaded, 2_150);
     let ship = (inners(&go).into_iter())
@@ -2369,7 +2379,7 @@ fn a_broadside_flies_and_splashes() {
     }
     let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
-    let dock = content.arenas[0].docks[0].bank;
+    let dock = pirates_arena(&content, &entered).docks[0].bank;
     send(&mut gateway, &ship_report(guid, dock), now + 100);
     assert_eq!(bars + count(&tick(&mut gateway, now + 150), 19), 1, "the bars start full");
     let cannons = content.opening_ship().cannons.len();
@@ -2387,12 +2397,12 @@ fn the_captains_sail_beside_the_player() {
     let fixture = Fixture::new(PLOT);
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
-    play(&mut gateway, 1059, 2_000);
+    let entered = play(&mut gateway, 1059, 2_000);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
     let go = press_go(&mut gateway, &loaded, 2_150);
     let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
-    let seats = content.crew(&content.arenas[0]).len();
+    let seats = content.crew(pirates_arena(&content, &entered)).len();
     assert!(seats > 0);
     let ships: Vec<_> = (inners(&go).into_iter())
         .filter(|p| p.starts_with(&[94, 0, 9, 0]))
@@ -2413,7 +2423,7 @@ fn the_captains_sail_beside_the_player() {
         inners(out).iter().filter(|p| p.starts_with(&[94, 0, 16, 0])).count()
     };
     assert_eq!(sailing(&tick(&mut gateway, now + 50)), 0, "held until the round begins");
-    let dock = content.arenas[0].docks[0].bank;
+    let dock = pirates_arena(&content, &entered).docks[0].bank;
     let begun = send(&mut gateway, &ship_report(guid, dock), now + 100);
     let states = inners(&begun).iter().filter(|p| p.starts_with(&[94, 0, 17, 0])).count();
     assert_eq!(states, 1 + seats, "every ship is let go");
@@ -2427,7 +2437,7 @@ fn a_forged_report_opens_no_ship_selection() {
     let fixture = Fixture::new(PLOT);
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
-    play(&mut gateway, 1059, 2_000);
+    let entered = play(&mut gateway, 1059, 2_000);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
     let go = press_go(&mut gateway, &loaded, 2_150);
     let ship = (inners(&go).into_iter())
@@ -2443,7 +2453,7 @@ fn a_forged_report_opens_no_ship_selection() {
     }
     let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
-    let dock = &content.arenas[0].docks[0];
+    let dock = &pirates_arena(&content, &entered).docks[0];
     send(&mut gateway, &ship_report(guid, dock.bank), now + 100);
     // Sail far away over time, then claim the cave in one hop.
     let far = [dock.bank[0] + 2_000.0, dock.bank[1], dock.bank[2]];
@@ -2489,20 +2499,27 @@ fn quitting_a_pirates_match_zones_back_unpaid() {
     let left = send(&mut gateway, &quit, 3_000);
     assert!(inners(&left).iter().any(|p| p.starts_with(&[39, 0, 19])), "the run closed");
     assert!(inners(&left).iter().any(|p| *p == [94, 0, 2, 0, 13, 0, 0, 0]), "Exiting");
-    assert!(tick(&mut gateway, 5_500).began_zoning, "the zone back");
+    // The loss's end screen holds the arena until its Close (the map has a wheel).
+    assert!(!tick(&mut gateway, 5_500).began_zoning, "behind the end screen");
+    send(&mut gateway, &[26, 0, 42, 0], 6_000);
+    assert!(tick(&mut gateway, 6_500).began_zoning, "the zone back");
     assert_eq!(coins(&gateway), before, "a quit pays nothing");
 }
 
-/// L963: Play on the Pirate's Plunder row (1059) zones into the first arena; once it loads the start
+/// L963: Play on the Pirate's Plunder row (1059) zones into one of the maps; once it loads the start
 /// packets go out (the player's own ship among them) and Play again is the busy refusal. The match
-/// then runs on its timeouts and clock alone (a silent client) to Exiting and zones back.
+/// then runs on its timeouts and clock alone (a silent client) to Exiting. Its end screen, with
+/// the wheel, holds the arena however long the player leaves it up (nothing the server sends
+/// closes it), and the player's own Close zones back.
 #[test]
 fn games_window_play_zones_into_a_pirates_arena() {
     let fixture = Fixture::new(PLOT);
     let mut gateway = fixture.gateway_at(fixture.state(false, true), &fixture.node, 60.0);
     tick(&mut gateway, 1_500);
     let entered = play(&mut gateway, 1059, 2_000);
-    assert!(said(&entered, "ss_pirate_arena"), "the arena zone");
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    pirates_arena(&content, &entered);
     let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
     let is_ship = |p: &[u8]| p.starts_with(&[94, 0, 9, 0]);
     assert!(!loaded.iter().flat_map(inners).any(is_ship), "no ship before Go");
@@ -2515,21 +2532,339 @@ fn games_window_play_zones_into_a_pirates_arena() {
         "Finish what you are doing before starting an activity."
     );
     let exiting: &[u8] = &[94, 0, 2, 0, 13, 0, 0, 0];
-    let (mut exited, mut back, mut board) = (false, false, 0);
+    let (mut exited, mut board, mut landing) = (None, 0, None);
     let before = coins(&gateway);
     // Three report timeouts, the countdown, PlayTime (540 s), Game Over's timeout and the exit beat.
     for second in 3..=900 {
         let out = tick(&mut gateway, second * 1_000);
-        exited |= inners(&out).iter().any(|p| *p == exiting);
+        assert!(!out.began_zoning, "no zone back under the end screen");
         board += inners(&out).iter().filter(|p| p.starts_with(&[94, 0, 24, 0])).count();
-        if out.began_zoning {
-            back = true;
+        if let Some(p) = inners(&out).into_iter().find(|p| p.starts_with(&[39, 0, 45])) {
+            landing = Some(wheel_stop(p));
+        }
+        if inners(&out).iter().any(|p| *p == exiting) {
+            exited = Some(second * 1_000);
             break;
         }
     }
-    assert!(exited && back, "Exiting, then the zone back");
+    let exit_ms = exited.expect("Exiting");
     assert_eq!(board, 1, "PlayerAwards opens the results board, once");
-    assert_eq!(coins(&gateway), before + 10, "the content's win_coins, once");
+    // A player who leaves the wheel up for ten minutes is still behind it.
+    for later in (exit_ms + 1_000..=exit_ms + 600_000).step_by(30_000) {
+        assert!(!tick(&mut gateway, later).began_zoning, "the end screen holds the arena");
+    }
+    send(&mut gateway, &[26, 0, 42, 0], exit_ms + 601_000);
+    assert!(tick(&mut gateway, exit_ms + 601_500).began_zoning, "the player's Close zones back");
+    let wheel = match landing.expect("the wheel's landing") {
+        WheelStop::Coins(coins) => i64::from(coins),
+        WheelStop::Item { .. } => 0,
+    };
+    assert_eq!(coins(&gateway), before + 10 + wheel, "the content's win_coins once, and a coin slot's");
+}
+
+/// An end screen the client never closes holds the arena for the content's
+/// `end_screen_timeout_seconds`, then the fallback sends the player back to the world (a client that
+/// never answers still gets home).
+#[test]
+fn an_end_screen_never_closed_falls_back_to_the_world() {
+    let fixture = pirates_fixture();
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let hold = u64::from(content.end_screen_timeout_seconds) * 1000;
+    let mut run = finish_pirates_match(&fixture, fixture.state(false, true), 2);
+    assert!(!tick(&mut run.gateway, run.exit_ms + hold - 1_000).began_zoning, "held to the last second");
+    assert!(tick(&mut run.gateway, run.exit_ms + hold).began_zoning, "then the world");
+}
+
+/// A Pirate's Plunder fixture with the shipped item tables, so the wheel knows each prize's
+/// gender and the prize pays as a released server pays it.
+fn pirates_fixture() -> Fixture {
+    let fixture = Fixture::new(PLOT);
+    let release = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    for file in ["item-table.json", "item-table-supplement.json"] {
+        fs::copy(release.join(file), fixture.directory.join(file)).expect(file);
+    }
+    fixture
+}
+
+/// The client item table's rows: each item's (GenderUsage, MembersOnly), read from the shipped
+/// `item-table.json` by its own column and flag names (GenderUsage 0 anyone, 1 boys, 2 girls).
+fn item_rows() -> std::collections::HashMap<i32, (i64, bool)> {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/release/item-table.json");
+    let table: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    let column = |name: &str| (table["columns"].as_array().unwrap().iter()).position(|c| c == name);
+    let (gender, flags) = (column("GenderUsage").unwrap(), column("Flags").unwrap());
+    let members = (table["flags"].as_array().unwrap().iter())
+        .position(|f| f == "MembersOnly")
+        .unwrap();
+    (table["rows"].as_array().unwrap().iter())
+        .map(|row| {
+            let id = i32::try_from(row[0].as_i64().unwrap()).unwrap();
+            let flags = row[1][flags].as_i64().unwrap();
+            (id, (row[1][gender].as_i64().unwrap(), flags >> members & 1 == 1))
+        })
+        .collect()
+}
+
+/// Where a 39/45 stops the wheel, read in the order `009b9700` reads it: the 15-byte header (the
+/// family, sub, run, -1, game), then one RewardBundleBase through `008e7930`: the flag byte,
+/// coins (+0x50) and five more words, the multiplier, two words, two guids, icon and name (61
+/// bytes in all), the entry count, each entry's type word and body, a trailing word. One Item
+/// entry (`0103c460`, 34 bytes: hidden, icon, tint, name, quantity, item id, ...) is the item the
+/// wheel stops on (`StopMiniGameLootWheelAt` `009b6da0` matches it against the preview's
+/// entries); no entry and coins stops it on the coin slot after them.
+#[derive(Debug, PartialEq)]
+enum WheelStop {
+    Item { icon_id: i32, name_id: i32, item_id: i32, quantity: i32 },
+    Coins(i32),
+}
+
+fn wheel_stop(packet: &[u8]) -> WheelStop {
+    assert_eq!(packet[..3], [39, 0, 45]);
+    let bundle = &packet[15..];
+    let word = |bytes: &[u8], at: usize| i32::from_le_bytes(bytes[at..at + 4].try_into().unwrap());
+    match word(bundle, 61) {
+        0 => {
+            assert_eq!(bundle.len(), 61 + 4 + 4, "the head, the count and the trailing word");
+            WheelStop::Coins(word(bundle, 1))
+        }
+        1 => {
+            assert_eq!(word(bundle, 65), 1, "an Item entry");
+            assert_eq!(bundle.len(), 61 + 4 + 4 + 34 + 4, "one Item entry, then the trailing word");
+            let body = &bundle[69..69 + 34];
+            WheelStop::Item {
+                icon_id: word(body, 1),
+                name_id: word(body, 9),
+                quantity: word(body, 13),
+                item_id: word(body, 17),
+            }
+        }
+        count => panic!("a landing with {count} entries"),
+    }
+}
+
+/// A boy (1) or a girl (2), as the client sends the identity.
+fn pirate_identity(fixture: &Fixture, gender: i32) -> osfr_tools::identity::CharacterIdentity {
+    use osfr_tools::identity::{CharacterIdentity, NativeCreation};
+    CharacterIdentity {
+        guid: Gateway::reference_state(&fixture.reference).unwrap().guid,
+        first_name: "Ari".into(),
+        last_name: "Vale".into(),
+        model: 1,
+        head: "head.adr".into(),
+        hair: "hair.adr".into(),
+        model_customization: String::new(),
+        face_paint: "none".into(),
+        skin_tone: "skin".into(),
+        eye_color: 262,
+        hair_color: 116,
+        gender,
+        creation: NativeCreation {
+            first_name: "Ari".into(),
+            last_name: "Vale".into(),
+            temporary_first_name: String::new(),
+            temporary_last_name: String::new(),
+            choices: [0; 21],
+        },
+        attachments: Vec::new(),
+    }
+}
+
+/// A silent client's whole Pirate's Plunder match, as `gender` on `state`, from Play to the run's
+/// end at Exiting.
+struct PiratesFinish {
+    gateway: Gateway,
+    /// The map Play picked, by its index in the shipped content.
+    arena: usize,
+    offer: Vec<u8>,
+    /// The packets of the tick that sent Exiting: the run's end.
+    end: Vec<Vec<u8>>,
+    /// Every chat line on the way.
+    chat: String,
+    exit_ms: u64,
+    coins_before: i64,
+}
+
+fn finish_pirates_match(fixture: &Fixture, state: GameplayState, gender: i32) -> PiratesFinish {
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let mut gateway = fixture.gateway_at(state, &fixture.node, 60.0);
+    gateway.set_identity(pirate_identity(fixture, gender)).unwrap();
+    tick(&mut gateway, 1_500);
+    let entered = play(&mut gateway, 1059, 2_000);
+    let map = pirates_arena(&content, &entered);
+    let arena = content.arenas.iter().position(|a| a.scene == map.scene).unwrap();
+    let loaded = [13_u16, 10].map(|op| send(&mut gateway, &op.to_le_bytes(), 2_100));
+    let offer: Vec<u8> = (loaded.iter().flat_map(inners))
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("the offer")
+        .to_vec();
+    let coins_before = coins(&gateway);
+    press_go(&mut gateway, &loaded, 2_150);
+    let mut chat = String::new();
+    for second in 3..=900 {
+        let out = tick(&mut gateway, second * 1_000);
+        chat.push_str(&chat_text(&out));
+        if inners(&out).iter().any(|p| *p == [94, 0, 2, 0, 13, 0, 0, 0]) {
+            let end = inners(&out).into_iter().map(<[u8]>::to_vec).collect();
+            let exit_ms = second * 1_000;
+            return PiratesFinish { gateway, arena, offer, end, chat, exit_ms, coins_before };
+        }
+    }
+    panic!("no Exiting");
+}
+
+impl PiratesFinish {
+    fn packet(&self, sub: u8) -> Option<usize> {
+        self.end.iter().position(|p| p.starts_with(&[39, 0, sub]))
+    }
+
+    /// The map's prizes the offer's preview lists (each found as its Item entry's type word and
+    /// first fields, the `0103c460` order), and the preview's coin field: the bundle's head starts
+    /// 65 bytes before its first entry (61 head bytes, then the count).
+    fn shown(&self, map: &osfr_tools::ship_combat::Arena) -> (Vec<i32>, i32) {
+        let mut found = Vec::new();
+        for prize in &map.prizes {
+            let mut entry = 1_u32.to_le_bytes().to_vec();
+            entry.push(0);
+            for word in [prize.icon_id, 0, prize.name_id, 1, prize.item_id] {
+                entry.extend(word.to_le_bytes());
+            }
+            if let Some(at) = self.offer.windows(entry.len()).position(|w| w == entry.as_slice()) {
+                found.push((at, prize.item_id));
+            }
+        }
+        found.sort();
+        let first = found.first().expect("the preview lists prizes").0;
+        let head = first - 65;
+        let count = i32::from_le_bytes(self.offer[first - 4..first].try_into().unwrap());
+        assert_eq!(count as usize, found.len(), "the preview's entry count");
+        let coins = i32::from_le_bytes(self.offer[head + 1..head + 5].try_into().unwrap());
+        (found.into_iter().map(|(_, id)| id).collect(), coins)
+    }
+
+    fn owned(&self, item_id: i32) -> u64 {
+        (gameplay_json(&self.gateway)["inventory"]["items"].as_array().unwrap().iter())
+            .filter(|item| item["definition_id"].as_i64() == Some(i64::from(item_id)))
+            .map(|item| item["count"].as_u64().unwrap())
+            .sum()
+    }
+}
+
+/// A finished match spins its own map's wheel, for a boy and for a girl. The offer's preview
+/// shows eight of the map's items, only those the player's gender wears (the client table's
+/// GenderUsage), none of them members-only clothing, and the Coins slot (the preview's coin
+/// field). Any place reports the win (39/18 status 1, which the wheel needs), and the run's end
+/// lands the wheel (39/45) between the scores (39/47) and the close (39/19), on one of the items
+/// shown, which is in the bag, or on the coin slot, which pays its coins beside the match's.
+/// The client's 39/46 after the spin pays nothing more.
+#[test]
+fn a_finished_pirates_match_spins_its_maps_wheel_for_a_boy_and_a_girl() {
+    let fixture = pirates_fixture();
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let rows = item_rows();
+    let row = |id: i32| *rows.get(&id).unwrap_or_else(|| panic!("item {id} in the client table"));
+    for gender in [1, 2] {
+        let mut run = finish_pirates_match(&fixture, fixture.state(false, true), gender);
+        let map = &content.arenas[run.arena];
+        let (shown, coins) = run.shown(map);
+        let wears = |id: &i32| row(*id).0 == 0 || row(*id).0 == i64::from(gender);
+        let fitting: Vec<i32> = map.prizes.iter().map(|p| p.item_id).filter(wears).collect();
+        assert_eq!(shown.len(), fitting.len().min(8), "gender {gender}: eight of the rows they wear");
+        assert!(shown.iter().all(wears), "gender {gender}: only their own rows: {shown:?}");
+        assert_eq!(coins, map.wheel_coins as i32, "gender {gender}: the Coins slot");
+        for id in &shown {
+            let (usage, members) = row(*id);
+            assert!(usage == 0 || !members, "gender {gender}: {id} is a wearable a non-member can wear");
+        }
+        let (result, scores, wheel, close) = (run.packet(18), run.packet(47), run.packet(45), run.packet(19));
+        assert_eq!(run.end[result.unwrap()][15], 1, "gender {gender}: status 1 at any place");
+        assert!(scores < wheel && wheel < close, "39/47, 39/45, 39/19: {scores:?} {wheel:?} {close:?}");
+        let paid = coins_paid(&run);
+        match wheel_stop(&run.end[wheel.unwrap()]) {
+            WheelStop::Item { icon_id, name_id, item_id, quantity } => {
+                assert!(shown.contains(&item_id), "gender {gender}: one of the items shown");
+                let prize = map.prizes.iter().find(|p| p.item_id == item_id).unwrap();
+                assert_eq!((icon_id, name_id, quantity), (prize.icon_id, prize.name_id, 1));
+                assert_eq!(run.owned(item_id), 1, "gender {gender}: the prize is in the bag");
+                assert_eq!(paid, i64::from(content.win_coins), "the match's coins alone");
+            }
+            WheelStop::Coins(landed) => {
+                assert!(landed > 0, "the coin slot");
+                assert_eq!(paid, i64::from(content.win_coins + map.wheel_coins), "and its coins");
+            }
+        }
+        let mut stopped = vec![39, 0, 46];
+        stopped.extend(&run.offer[3..7]);
+        stopped.extend([255; 8]);
+        send(&mut run.gateway, &stopped, run.exit_ms + 3_000);
+        assert_eq!(coins_paid(&run), paid, "the spin's stop pays nothing");
+    }
+}
+
+fn coins_paid(run: &PiratesFinish) -> i64 {
+    coins(&run.gateway) - run.coins_before
+}
+
+/// `stacks` stacks in the bag, filler added to the save's own.
+fn bag_of(fixture: &Fixture, stacks: usize) -> GameplayState {
+    let mut state = fixture.state(false, true);
+    let items = &mut state.inventory.items;
+    let mut next = items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
+    while state.inventory.bag_stacks() < stacks {
+        state.inventory.items.push(osfr_tools::inventory::InventoryItem {
+            id: next,
+            definition_id: FILLER,
+            tint: 0,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        next += 1;
+    }
+    assert_eq!(state.inventory.bag_stacks(), stacks);
+    state.inventory.next_instance_id = Some(i64::from(next));
+    state
+}
+
+/// The wheel always stops somewhere. With room for the prize (99 of the 100 stacks) it pays the
+/// item it stops on; with the bag at its 100 stacks, or past them (a save from before the cap), a
+/// spin that picks an item stops on the coin slot instead, pays its coins, and says why. Matches
+/// run until one picks an item on a full bag (eight of the nine slots are items).
+#[test]
+fn a_full_bag_stops_a_pirates_wheel_on_its_coins() {
+    let fixture = pirates_fixture();
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let content = osfr_tools::ship_combat::Content::load(&content_dir).unwrap().unwrap();
+    let room = finish_pirates_match(&fixture, bag_of(&fixture, 99), 2);
+    if let WheelStop::Item { item_id, .. } = wheel_stop(&room.end[room.packet(45).unwrap()]) {
+        assert_eq!(room.owned(item_id), 1, "the last stack takes the prize");
+    }
+    assert!(!room.chat.contains("bag is full"), "{}", room.chat);
+    for stacks in [100, 101] {
+        let mut told = false;
+        for _ in 0..20 {
+            let bag = bag_of(&fixture, stacks);
+            let records = bag.inventory.items.len();
+            let run = finish_pirates_match(&fixture, bag, 2);
+            let map = &content.arenas[run.arena];
+            let stop = wheel_stop(&run.end[run.packet(45).expect("a landing")]);
+            assert_eq!(stop, WheelStop::Coins(map.wheel_coins as i32), "{stacks} stacks: the coin slot");
+            assert_eq!(coins_paid(&run), i64::from(content.win_coins + map.wheel_coins));
+            let held: usize = gameplay_json(&run.gateway)["inventory"]["items"].as_array().unwrap().len();
+            assert_eq!(held, records, "{stacks} stacks: nothing added");
+            if run.chat.contains("Your bag is full, so the wheel stops on the") {
+                told = true;
+                break;
+            }
+        }
+        assert!(told, "{stacks} stacks: a refused prize is said");
+    }
 }
 
 /// L962: Play on the Easy "Penguin Produce" row (532) offers Tower Defense game 350 with the movie's
