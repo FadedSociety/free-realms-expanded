@@ -700,3 +700,34 @@ fn spending_from_an_unvalidated_oversized_wallet_is_refused() {
         "spending nothing stays a no-op"
     );
 }
+
+/// Owner 2026-11-13: "costumes and flair shards don't work". The captured profile lists gave the
+/// rune (flair shard) and costume slots to one job only; every job has them (the client's
+/// `EquipmentSlotDefinitions.txt` 8-17), and class 0 (costumes) fits any job. Brawler (43) wears
+/// the costume (17244, slot 17) and the shard (17254, slot 13) the owner tried, and still not
+/// Freestyle Gear (4831, the balloon hat: class 1, "Freestyle Jobs").
+#[test]
+fn every_job_wears_costumes_and_flair_shards_but_not_another_jobs_gear() {
+    let release = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
+    let mut inventory = Inventory::load(&release, None).unwrap();
+    let owned = |inventory: &mut Inventory, definition: i32| {
+        inventory.grant(0, definition, 1).unwrap();
+        (inventory.state().items.iter().rev())
+            .find(|item| item.definition_id == definition)
+            .unwrap()
+            .id
+    };
+    for (definition, slot) in [(17244, 17), (17254, 13)] {
+        let id = owned(&mut inventory, definition);
+        let outcome = inventory.handle(&command(42, 3, &[id, 43, slot])).unwrap();
+        assert!(outcome.changed, "Brawler wears {definition} in slot {slot}");
+    }
+    // The new costume and rune rows survive a save and reload.
+    let worn = inventory.state().clone();
+    let reloaded = Inventory::load(&release, Some(worn.clone())).unwrap();
+    assert_eq!(reloaded.state(), &worn);
+    let hat = owned(&mut inventory, 4831);
+    let before = inventory.state().clone();
+    assert!(inventory.handle(&command(42, 3, &[hat, 43, 1])).is_err());
+    assert_eq!(inventory.state(), &before, "the refusal changes nothing");
+}
