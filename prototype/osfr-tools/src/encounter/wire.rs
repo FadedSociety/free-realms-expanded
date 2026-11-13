@@ -37,6 +37,13 @@ pub(super) fn minigame(sub: u8, _instance: i32, id: u32) -> Vec<u8> {
     }
     b
 }
+/// A run left before its results still ends on the client: its game over (39/18), then the
+/// remove (39/19, exact header only), as a finished run's end does. 39/19 alone left the client's
+/// minigame manager open (it logged `LeaveMiniGame` with no `OnGameOver`) and every menu locked
+/// (A36, owner 2026-11-13: leaving the hooligans mid-fight locked housing and the rest).
+pub(super) fn left_unfinished(instance: i32, id: u32) -> [Vec<u8>; 2] {
+    [game_over(false, instance, id), minigame(19, instance, id)]
+}
 pub(super) fn game_over(won: bool, instance: i32, id: u32) -> Vec<u8> {
     let mut b = minigame(18, instance, id);
     b.push(u8::from(won));

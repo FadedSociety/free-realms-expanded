@@ -67,7 +67,7 @@ use self::wire::{
     attack_processed, boss_display, combat_flag, encounter_header, encounter_state,
     enemy_health, enemy_hp, game_over, header, menu, minigame, movement, objective,
     objective_complete, player_hp, relevance, remove, replace_string, respawn_hide, rules,
-    spawn_actor,
+    left_unfinished, spawn_actor,
 };
 use crate::abilities::effect_packets::encode_play_composite_effect as composite_effect;
 
@@ -2111,7 +2111,7 @@ impl EncounterEngine {
         zone.zone_id = a.return_location.zone_id;
         zone.position = a.return_location.position;
         zone.rotation = a.return_location.rotation;
-        let remove_state = minigame(19, a.instance_id, a.encounter_id); // exact header only
+        let remove_state = left_unfinished(a.instance_id, a.encounter_id);
         let results_presented = self.results_presented;
         let mut replies = vec![
             rules(false),
@@ -2119,7 +2119,7 @@ impl EncounterEngine {
             combat_flag(133, a.encounter_id, a.instance_id, false),
         ];
         if !results_presented {
-            replies.push(remove_state);
+            replies.extend(remove_state);
         }
         replies.push(player_hp(self.max_health, self.max_health));
         self.state.player_health = self.max_health;
