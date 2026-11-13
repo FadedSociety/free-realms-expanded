@@ -597,6 +597,38 @@ fn a_player_who_stands_up_takes_no_damage_for_the_fight_grace() {
     let _ = std::fs::remove_dir_all(dir);
 }
 
+/// A26 (native, 2026-11-13): the Bixie Hive's first guards stood 32-34 m from the arrival,
+/// inside the 40 m chase limit, and charged the player before they could act. In a dungeon (an
+/// unpaced fight) an enemy standing there from the start waits until the player comes within
+/// its `notice` (`behaviours.json`, 15 m unless a preset says otherwise) or hits it.
+#[test]
+fn a_dungeon_guard_waits_until_the_player_comes_close() {
+    let (dir, mut engine) = engine_with(&[fight(
+        624,
+        json!({
+            "kind": "dungeon",
+            "actors": {"guard": {"definition": "grunt", "at": [0, 0, 30]}},
+            "objectives": [{"id": "guard", "kind": "defeat", "text_id": 14, "target": {"actor": "guard"}}]
+        }),
+    )]);
+    let guard = spawned(&enter(&mut engine, 624, 1_000))[0];
+    let moved = |replies: &[Vec<u8>]| {
+        (replies.iter()).any(|r| r.starts_with(&[125, 0]) && r[2..10] == guard.to_le_bytes())
+    };
+    let mut now = 1_000;
+    for _ in 0..40 {
+        now += 250;
+        let out = engine.tick([0.0; 3], BRAWLER, now).unwrap();
+        assert!(!moved(&out.replies), "30 m away the guard stands at {now} ms");
+    }
+    let came = (0..20).any(|_| {
+        now += 250;
+        moved(&engine.tick([0.0, 0.0, 18.0], BRAWLER, now).unwrap().replies)
+    });
+    assert!(came, "12 m away the guard notices the player");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
 /// The score is built from the fight's own values (packet 62's names).
 #[test]
 fn the_score_is_built_from_the_fights_values() {

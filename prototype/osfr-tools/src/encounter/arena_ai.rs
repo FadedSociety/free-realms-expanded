@@ -247,9 +247,15 @@ impl ArenaSim {
             // An enemy engages only once its target is inside its chase limit, as the engine
             // before the brain did: a far party leaves it idle, and its `every` rules do not
             // start (lead 2026-11-10: they cast at players standing at the entry and flooded
-            // every member of a shared run with packets).
+            // every member of a shared run with packets). A dungeon's guards standing there
+            // from the start wait for the closer `notice` (A26: they charged the arrival).
             let chase_limit = if t.battle { f32::INFINITY } else { b.chase_limit };
-            if delta > chase_limit && !memory.is_engaged() {
+            let notice = if t.battle || memory.alert {
+                chase_limit
+            } else {
+                b.notice.min(chase_limit)
+            };
+            if delta > notice && !memory.is_engaged() {
                 if self.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }

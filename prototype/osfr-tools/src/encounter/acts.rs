@@ -198,7 +198,9 @@ impl EncounterEngine {
         out: &mut EncounterOutcome,
     ) {
         let field = self.brain_in_field(guid);
-        self.memory(guid, field).hit();
+        let memory = self.memory(guid, field);
+        memory.hit();
+        memory.alert |= !field;
         if hp > 0 && !field {
             self.think(guid, now_ms, out);
         }
