@@ -1,0 +1,467 @@
+{
+  "schema_version": 1,
+  "id": 13007,
+  "kind": "dungeon",
+  "title_id": 5701,
+  "description_id": 72164,
+  "icon_id": 311,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5
+  },
+  "place": {
+    "zone": 1221,
+    "arena": "bw_bristlewood_glade",
+    "arrive": [
+      188.37,
+      -13.53,
+      193.21
+    ],
+    "exit_door": [
+      89.15,
+      -33.0,
+      434.98
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "floren_leafling": {
+      "definition_id": 1300701,
+      "name": "Floren Leafling",
+      "name_id": 442606,
+      "model_id": 134,
+      "rank": "normal"
+    },
+    "floren_defender": {
+      "definition_id": 1300702,
+      "name": "Floren Defender",
+      "name_id": 442607,
+      "model_id": 134,
+      "rank": "normal"
+    },
+    "vile_floren": {
+      "definition_id": 1300703,
+      "name": "Vile Floren",
+      "name_id": 15801,
+      "model_id": 134,
+      "rank": "normal"
+    },
+    "grumpy_amaranthus": {
+      "definition_id": 1300722,
+      "name": "Grumpy Amaranthus",
+      "name_id": 72007,
+      "model_id": 134,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "floren_leafling",
+      "at": [
+        175.85,
+        -15.96,
+        225.97
+      ],
+      "heading": 2.426,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "floren_defender",
+      "at": [
+        173.75,
+        -15.39,
+        227.62
+      ],
+      "heading": 2.398,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "vile_floren",
+      "at": [
+        176.27,
+        -16.16,
+        221.64
+      ],
+      "heading": 2.214,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "floren_defender",
+      "at": [
+        143.81,
+        -6.86,
+        287.1
+      ],
+      "heading": 3.043,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "vile_floren",
+      "at": [
+        141.86,
+        -6.81,
+        289.07
+      ],
+      "heading": 2.431,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "floren_leafling",
+      "at": [
+        143.1,
+        -6.75,
+        283.96
+      ],
+      "heading": 0.26,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "vile_floren",
+      "at": [
+        222.4,
+        -9.99,
+        285.22
+      ],
+      "heading": -1.789,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "floren_leafling",
+      "at": [
+        223.29,
+        -10.0,
+        282.6
+      ],
+      "heading": -1.588,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "floren_defender",
+      "at": [
+        221.8,
+        -9.99,
+        288.14
+      ],
+      "heading": -2.011,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "floren_leafling",
+      "at": [
+        274.62,
+        -14.15,
+        330.5
+      ],
+      "heading": 2.437,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "floren_defender",
+      "at": [
+        274.73,
+        -14.42,
+        333.38
+      ],
+      "heading": 2.667,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "vile_floren",
+      "at": [
+        278.28,
+        -14.62,
+        331.13
+      ],
+      "heading": 3.073,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "floren_defender",
+      "at": [
+        235.65,
+        -22.03,
+        380.16
+      ],
+      "heading": 1.525,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "vile_floren",
+      "at": [
+        232.61,
+        -23.83,
+        382.57
+      ],
+      "heading": 1.858,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "floren_leafling",
+      "at": [
+        230.08,
+        -24.84,
+        384.47
+      ],
+      "heading": 1.962,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "vile_floren",
+      "at": [
+        168.62,
+        -33.77,
+        399.79
+      ],
+      "heading": -2.843,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "floren_leafling",
+      "at": [
+        169.4,
+        -34.26,
+        403.08
+      ],
+      "heading": -2.892,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "floren_defender",
+      "at": [
+        164.8,
+        -33.16,
+        394.33
+      ],
+      "heading": 0.683,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "floren_leafling",
+      "at": [
+        111.25,
+        -33.0,
+        412.97
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "floren_defender",
+      "at": [
+        114.54,
+        -33.0,
+        413.26
+      ],
+      "heading": -1.659,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "vile_floren",
+      "at": [
+        107.87,
+        -33.0,
+        411.76
+      ],
+      "heading": 1.227,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "grumpy_amaranthus",
+      "at": [
+        90.25,
+        -32.5,
+        424.97
+      ],
+      "heading": 1.504,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.8
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        86.79,
+        -32.9,
+        424.57
+      ],
+      [
+        86.77,
+        -32.97,
+        420.51
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "floren_defender",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "vile_floren",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 7371,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75099, "name_id": 131983, "icon_id": 3217, "job": 2},
+      {"item_id": 75421, "name_id": 131165, "icon_id": 3721, "job": 2},
+      {"item_id": 75387, "name_id": 131131, "icon_id": 1200, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 2},
+      {"item_id": 75069, "name_id": 131953, "icon_id": 3145, "job": 11},
+      {"item_id": 75356, "name_id": 131100, "icon_id": 3721, "job": 11},
+      {"item_id": 75322, "name_id": 131066, "icon_id": 1200, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 11},
+      {"item_id": 75551, "name_id": 131295, "icon_id": 3721, "job": 12},
+      {"item_id": 75517, "name_id": 131261, "icon_id": 1200, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 12},
+      {"item_id": 75129, "name_id": 132013, "icon_id": 3129, "job": 32},
+      {"item_id": 75486, "name_id": 131230, "icon_id": 3721, "job": 32},
+      {"item_id": 75452, "name_id": 131196, "icon_id": 1200, "job": 32},
+      {"item_id": 76341, "name_id": 133349, "icon_id": 2531, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 32},
+      {"item_id": 75009, "name_id": 131893, "icon_id": 3111, "job": 35},
+      {"item_id": 75226, "name_id": 130970, "icon_id": 3721, "job": 35},
+      {"item_id": 75192, "name_id": 130936, "icon_id": 1200, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 35},
+      {"item_id": 75039, "name_id": 131923, "icon_id": 3123, "job": 43},
+      {"item_id": 75291, "name_id": 131035, "icon_id": 3721, "job": 43},
+      {"item_id": 75257, "name_id": 131001, "icon_id": 1200, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3}
+    ],
+    "wheel_coins": 1,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 22 ('Bristlewood Glade (the live dungeon: the floren Amaranthus set on guard along th'): scene bw_bristlewood_glade, 7 groups standing at the start, 1 coming later, the boss Grumpy Amaranthus last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5701, 72164, icon 311 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_bristlewood_glade needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13007*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/bristlewood_glade.json, its notes page and the fork battle; under the id (13007) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_bristlewood_glade_c85355.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Bristlewood Glade' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Bristlewood_Glade.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "id": 14064,
+  "kind": "dungeon",
+  "title_id": 71694,
+  "description_id": 76456,
+  "icon_id": 9555,
+  "difficulty": 2,
+  "entry": {
+    "min_combat_level": 3
+  },
+  "place": {
+    "zone": 1209,
+    "arena": "ss_cray_caves",
+    "arrive": [
+      387.7,
+      84.9,
+      122.57
+    ],
+    "exit_door": [
+      419.48,
+      79.18,
+      358.99
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "w58_cray_snapper_l5_enemy": {
+      "definition_id": 930008,
+      "name": "Cray Snapper",
+      "name_id": 91930,
+      "model_id": 470,
+      "rank": "normal"
+    },
+    "swamp_cray": {
+      "definition_id": 930075,
+      "name": "Cray",
+      "name_id": 90007,
+      "model_id": 471,
+      "rank": "normal"
+    },
+    "tideweaver_oceana": {
+      "definition_id": 1406419,
+      "name": "Tideweaver Oceana",
+      "name_id": 76366,
+      "model_id": 676,
+      "rank": "elite"
+    },
+    "kelp_knight_oseidon": {
+      "definition_id": 1406420,
+      "name": "Kelp Knight Oseidon",
+      "name_id": 76369,
+      "model_id": 4446,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        355.26,
+        79.53,
+        118.33
+      ],
+      "heading": 0.407,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "swamp_cray",
+      "at": [
+        352.08,
+        79.49,
+        117.31
+      ],
+      "heading": 0.54,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        357.66,
+        79.71,
+        120.82
+      ],
+      "heading": 0.316,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "swamp_cray",
+      "at": [
+        357.42,
+        71.24,
+        151.57
+      ],
+      "heading": 2.75,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        358.83,
+        71.14,
+        148.91
+      ],
+      "heading": 2.768,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "swamp_cray",
+      "at": [
+        358.16,
+        71.42,
+        155.98
+      ],
+      "heading": 2.852,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        381.42,
+        69.94,
+        178.25
+      ],
+      "heading": -2.225,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "swamp_cray",
+      "at": [
+        383.74,
+        69.83,
+        181.01
+      ],
+      "heading": -2.26,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        377.81,
+        69.99,
+        180.39
+      ],
+      "heading": -2.452,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "swamp_cray",
+      "at": [
+        407.64,
+        70.02,
+        203.43
+      ],
+      "heading": -1.756,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        404.98,
+        69.99,
+        202.84
+      ],
+      "heading": 1.257,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "swamp_cray",
+      "at": [
+        403.32,
+        70.08,
+        206.82
+      ],
+      "heading": 2.595,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        385.85,
+        72.95,
+        261.22
+      ],
+      "heading": -2.629,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "swamp_cray",
+      "at": [
+        384.92,
+        72.8,
+        257.34
+      ],
+      "heading": 0.16,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        382.59,
+        72.77,
+        261.68
+      ],
+      "heading": 1.981,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "swamp_cray",
+      "at": [
+        370.32,
+        73.32,
+        311.5
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "w58_cray_snapper_l5_enemy",
+      "at": [
+        371.35,
+        72.98,
+        308.08
+      ],
+      "heading": -0.293,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "swamp_cray",
+      "at": [
+        373.88,
+        73.04,
+        310.81
+      ],
+      "heading": -1.379,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "kelp_knight_oseidon",
+      "at": [
+        412.87,
+        79.54,
+        358.53
+      ],
+      "heading": -2.04,
+      "boss": true,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        409.82,
+        79.36,
+        357.26
+      ],
+      [
+        416.21,
+        79.24,
+        359.35
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "tideweaver_oceana",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "w58_cray_snapper_l5_enemy",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 76459,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 76263, "name_id": 133271, "icon_id": 5367, "job": 2},
+      {"item_id": 76256, "name_id": 133264, "icon_id": 5359, "job": 2},
+      {"item_id": 75423, "name_id": 131167, "icon_id": 3721, "job": 2},
+      {"item_id": 75384, "name_id": 131128, "icon_id": 1197, "job": 2},
+      {"item_id": 75110, "name_id": 131994, "icon_id": 3152, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 76133, "name_id": 133141, "icon_id": 5732, "job": 11},
+      {"item_id": 76126, "name_id": 133134, "icon_id": 3554, "job": 11},
+      {"item_id": 75358, "name_id": 131102, "icon_id": 3721, "job": 11},
+      {"item_id": 75319, "name_id": 131063, "icon_id": 1197, "job": 11},
+      {"item_id": 75080, "name_id": 131964, "icon_id": 3122, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 76459, "name_id": 133467, "icon_id": 5040, "job": 12},
+      {"item_id": 76450, "name_id": 133458, "icon_id": 5030, "job": 12},
+      {"item_id": 75553, "name_id": 131297, "icon_id": 3721, "job": 12},
+      {"item_id": 75514, "name_id": 131258, "icon_id": 1197, "job": 12},
+      {"item_id": 75170, "name_id": 132054, "icon_id": 3160, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 76373, "name_id": 133381, "icon_id": 5795, "job": 32},
+      {"item_id": 76366, "name_id": 133374, "icon_id": 5413, "job": 32},
+      {"item_id": 75488, "name_id": 131232, "icon_id": 3721, "job": 32},
+      {"item_id": 75449, "name_id": 131193, "icon_id": 1197, "job": 32},
+      {"item_id": 75140, "name_id": 132024, "icon_id": 3219, "job": 32},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 75787, "name_id": 132795, "icon_id": 4940, "job": 35},
+      {"item_id": 75780, "name_id": 132788, "icon_id": 2375, "job": 35},
+      {"item_id": 75228, "name_id": 130972, "icon_id": 3721, "job": 35},
+      {"item_id": 75189, "name_id": 130933, "icon_id": 1197, "job": 35},
+      {"item_id": 75020, "name_id": 131904, "icon_id": 3106, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75908, "name_id": 132916, "icon_id": 5630, "job": 43},
+      {"item_id": 75901, "name_id": 132909, "icon_id": 4964, "job": 43},
+      {"item_id": 75293, "name_id": 131037, "icon_id": 3721, "job": 43},
+      {"item_id": 75254, "name_id": 130998, "icon_id": 1197, "job": 43},
+      {"item_id": 75050, "name_id": 131934, "icon_id": 3126, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
+    ],
+    "wheel_coins": 214,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Kelp Knight Oseidon: the fork's model 11122 is its own id for cray_king_lowtide.adr; the 2014 client's Models.txt names that file 4446"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 10 ('Cray Caves (the live dungeon: cray from the beached boats up through the caves, '): scene ss_cray_caves, 6 groups standing at the start, 1 coming later, the boss Tideweaver Oceana last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 71694, 76456, icon 9555 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene ss_cray_caves needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14064*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/cray_caves.json, its notes page and the fork battle; under the id (14064) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_cray_caves_b205d3.html); the generator's default was 15"
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: Kelp Knight Oseidon is the boss the main goal names (Global.Text 76459 'Defeat Kelp Knight Oseidon!'; the page: 'Primary: Defeat Kelp Knight Oseidon! Secondary: Defeat Tideweaver Oceania!'); the fork had Tideweaver Oceana last and Oseidon in the first wave, so they trade places"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Tideweaver Oceana keeps the fork's wave spot as an elite (a secondary boss, no goal row of its own: the engine shows one primary goal)"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Cray Caves' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Cray_Caves.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Pinhole Archer Hoodie' as 'Pin Hole Archer Hoodie'; 'Wizard Power Shard of Vitality V' as 'Wizard's Power Shard of Vitality V'."}
+  ]
+}

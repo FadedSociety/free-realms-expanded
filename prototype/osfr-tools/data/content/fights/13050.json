@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "id": 13050,
+  "kind": "dungeon",
+  "title_id": 5706,
+  "description_id": 91641,
+  "icon_id": 680,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13
+  },
+  "place": {
+    "zone": 1224,
+    "arena": "bw_trail_of_betrayal",
+    "arrive": [
+      283.97,
+      28.19,
+      225.34
+    ],
+    "exit_door": [
+      -30.57,
+      66.48,
+      116.6
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "forest_troll": {
+      "definition_id": 1305001,
+      "name": "Forest Troll",
+      "name_id": 4171,
+      "model_id": 77,
+      "rank": "normal"
+    },
+    "troll_pathfinder": {
+      "definition_id": 1305002,
+      "name": "Troll Pathfinder",
+      "name_id": 5356,
+      "model_id": 182,
+      "rank": "normal"
+    },
+    "troll_hedge_wizard": {
+      "definition_id": 1305003,
+      "name": "Troll Hedge Wizard",
+      "name_id": 5237,
+      "model_id": 168,
+      "rank": "normal"
+    },
+    "sampson_idlefist": {
+      "definition_id": 1305025,
+      "name": "Sampson Idlefist",
+      "name_id": 22804,
+      "model_id": 836,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "forest_troll",
+      "at": [
+        250.91,
+        29.41,
+        196.43
+      ],
+      "heading": 1.184,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "troll_pathfinder",
+      "at": [
+        253.39,
+        29.49,
+        194.61
+      ],
+      "heading": 1.011,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        251.77,
+        29.75,
+        199.21
+      ],
+      "heading": 1.335,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "forest_troll",
+      "at": [
+        250.53,
+        30.07,
+        190.5
+      ],
+      "heading": 0.913,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "troll_pathfinder",
+      "at": [
+        188.3,
+        32.28,
+        151.0
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        187.14,
+        32.52,
+        154.32
+      ],
+      "heading": 2.806,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "forest_troll",
+      "at": [
+        191.95,
+        31.87,
+        151.33
+      ],
+      "heading": -1.661,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "troll_pathfinder",
+      "at": [
+        189.34,
+        31.85,
+        148.19
+      ],
+      "heading": -0.354,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        180.45,
+        41.0,
+        191.21
+      ],
+      "heading": -1.572,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "forest_troll",
+      "at": [
+        177.62,
+        40.31,
+        192.38
+      ],
+      "heading": -1.742,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "troll_pathfinder",
+      "at": [
+        178.05,
+        41.84,
+        187.64
+      ],
+      "heading": -1.114,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        181.67,
+        42.34,
+        187.81
+      ],
+      "heading": -1.268,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "forest_troll",
+      "at": [
+        195.2,
+        44.89,
+        246.7
+      ],
+      "heading": -3.091,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "troll_pathfinder",
+      "at": [
+        195.96,
+        45.19,
+        249.42
+      ],
+      "heading": -3.033,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        197.75,
+        44.87,
+        245.33
+      ],
+      "heading": -2.717,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "forest_troll",
+      "at": [
+        195.55,
+        44.36,
+        243.6
+      ],
+      "heading": -2.986,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "troll_pathfinder",
+      "at": [
+        103.8,
+        55.14,
+        221.4
+      ],
+      "heading": 1.183,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        101.44,
+        55.98,
+        219.71
+      ],
+      "heading": 1.141,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "forest_troll",
+      "at": [
+        106.42,
+        54.45,
+        221.53
+      ],
+      "heading": 1.1,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "troll_pathfinder",
+      "at": [
+        101.96,
+        55.15,
+        224.01
+      ],
+      "heading": 1.407,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        38.47,
+        65.63,
+        174.01
+      ],
+      "heading": 1.105,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g22": {
+      "definition": "forest_troll",
+      "at": [
+        37.15,
+        65.62,
+        176.71
+      ],
+      "heading": 1.335,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g23": {
+      "definition": "troll_pathfinder",
+      "at": [
+        35.74,
+        65.63,
+        173.58
+      ],
+      "heading": 1.16,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g24": {
+      "definition": "troll_hedge_wizard",
+      "at": [
+        39.6,
+        65.71,
+        177.68
+      ],
+      "heading": 1.37,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "sampson_idlefist",
+      "at": [
+        -39.74,
+        65.95,
+        118.56
+      ],
+      "heading": 0.573,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.15
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        -39.13,
+        66.24,
+        121.9
+      ],
+      [
+        -36.95,
+        65.87,
+        117.4
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "forest_troll",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "troll_hedge_wizard",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 15520,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75414, "name_id": 131158, "icon_id": 3718, "job": 2},
+      {"item_id": 75114, "name_id": 131998, "icon_id": 3152, "job": 2},
+      {"item_id": 76258, "name_id": 133266, "icon_id": 5382, "job": 2},
+      {"item_id": 75389, "name_id": 131133, "icon_id": 1202, "job": 2},
+      {"item_id": 75423, "name_id": 131167, "icon_id": 3721, "job": 2},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 2},
+      {"item_id": 75024, "name_id": 131908, "icon_id": 3106, "job": 35},
+      {"item_id": 75194, "name_id": 130938, "icon_id": 1202, "job": 35},
+      {"item_id": 75219, "name_id": 130963, "icon_id": 3718, "job": 35},
+      {"item_id": 75228, "name_id": 130972, "icon_id": 3721, "job": 35},
+      {"item_id": 75782, "name_id": 132790, "icon_id": 4942, "job": 35},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 35},
+      {"item_id": 75284, "name_id": 131028, "icon_id": 3718, "job": 43},
+      {"item_id": 75054, "name_id": 131938, "icon_id": 3126, "job": 43},
+      {"item_id": 75903, "name_id": 132911, "icon_id": 4986, "job": 43},
+      {"item_id": 75259, "name_id": 131003, "icon_id": 1202, "job": 43},
+      {"item_id": 75293, "name_id": 131037, "icon_id": 3721, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730}
+    ],
+    "wheel_coins": 307,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 25 ('Trail of Betrayal (the live dungeon: the trolls who drove the chugawugs out, alo'): scene bw_trail_of_betrayal, 6 groups standing at the start, 1 coming later, the boss Sampson Idlefist last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5706, 91641, icon 680 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_trail_of_betrayal needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13050*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/trail_of_betrayal.json, its notes page and the fork battle; under the id (13050) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 15, the page's own \"Don't get knocked out 15 times\" (fr_place_trail_of_betrayal_d28877.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Trail of Betrayal' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Trail_of_Betrayal.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Pin Hole Archer Glove' as 'Pin Hole Archer Gloves'."}
+  ]
+}
