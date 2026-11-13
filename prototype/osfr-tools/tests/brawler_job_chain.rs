@@ -634,15 +634,30 @@ fn assert_pending_screen_recovery(
 
 /// L1192: a Hooligan Delinquent is a battle starter (wiki FR_Mob Hooligan Delinquent, "Battles:
 /// Hooligan Brawling Club!"). Its click opens fight 14017's card; every Delinquent defeated inside
-/// counts for C4. One win holds eight (3 + 2 + 3; the Brawlers and the Scrapper are other kinds),
-/// so two wins reach the wiki's 15 and the ninth of the second run must not raise it. Returns the
-/// coins the two wins paid, so the chapter's own quest rewards stay countable.
+/// counts for C4. One win holds every Delinquent of its waves (3 + 2 + 3; the Brawlers and the
+/// Scrapper are other kinds), cycled to the fight's paced wave count (`instance_pacing.json`),
+/// so two wins reach the wiki's 15 and the second run's extra kills must not raise it. Returns
+/// the coins the two wins paid, so the chapter's own quest rewards stay countable.
 fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64) -> u32 {
     const ARRIVE: [f32; 3] = [239.42, 3.31, 186.49];
     let wallet = game.state().inventory.coins;
     let mut character = character.clone();
     let home = character.position;
-    for (run, expected) in [(0, 8), (1, 15)] {
+    let read = |file: &str| -> serde_json::Value {
+        serde_json::from_slice(&fs::read(content_dir().join(file)).unwrap()).unwrap()
+    };
+    let (fight, pacing) = (read("fights/14017.json"), read("instance_pacing.json"));
+    let waves = fight["waves"].as_array().unwrap();
+    let delinquents = |wave: &serde_json::Value| -> u32 {
+        (wave["spawn"].as_array().unwrap().iter())
+            .filter(|s| s["definition"].as_str().is_some_and(|d| d.starts_with("hooligan_delinquent")))
+            .map(|s| s["count"].as_u64().unwrap() as u32)
+            .sum()
+    };
+    let paced = (pacing["fights"]["14017"]["waves"].as_u64()).map_or(0, |n| n as usize);
+    let per_win: u32 = (0..paced.max(waves.len())).map(|i| delinquents(&waves[i % waves.len()])).sum();
+    assert!((1..15).contains(&per_win), "one win does not finish C4 alone ({per_win})");
+    for (run, expected) in [(0, per_win), (1, (2 * per_win).min(15))] {
         // A far-away location lets the production tick publish quest-gated spawns.
         character.zone_id = 0;
         character.position = [10_000.0, 0.0, 10_000.0];
@@ -677,6 +692,11 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
 
         // A fight file does not end by itself: after the last wave and the Scrapper its exit
         // opens, and the win waits for the player's leave (41/109), as in the Snarlers' den.
+        // A paced fight pauses between its waves (`instance_pacing.json`): the arena must stay
+        // quiet longer than that before the win is taken for over.
+        let pacing: serde_json::Value =
+            serde_json::from_slice(&fs::read(content_dir().join("instance_pacing.json")).unwrap()).unwrap();
+        let calm = 12 + pacing["fights"]["14017"]["wave_gap_ms"].as_u64().unwrap_or(0) / 700;
         let (mut target, mut quiet, mut killed) = (None, 0, None);
         for _ in 0..3_000 {
             let Some(active) = game.state().encounter.and_then(|state| state.active) else {
@@ -696,7 +716,7 @@ fn kill_hooligans(game: &mut Gameplay, character: &CharacterState, now: &mut u64
                 killed = Some(enemy.guid);
             } else {
                 quiet += 1;
-                if quiet >= 12 {
+                if quiet >= calm {
                     break;
                 }
             }
