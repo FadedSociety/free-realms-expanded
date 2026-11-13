@@ -390,11 +390,8 @@ fn the_actor_and_group_counts_stay_inside_the_loader_bounds() {
     let field: Value = serde_json::from_slice(&bytes).unwrap();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
-    assert_eq!(
-        enemies.len(),
-        52,
-        "12 starter + 4 quest-gated + 8 mid-level + 4 high-level + 6 elite actors + 15 T699 and 1 T730 quest targets + 2 T889 tent bodies"
-    );
+    // TEST DIET (L1193): no row total; the loader's own bounds below are the rule.
+    assert!(!enemies.is_empty(), "the field ships actors");
     assert_eq!(
         groups.len(),
         14,

@@ -183,6 +183,8 @@ fn every_named_enemy_body_is_routed_unless_it_belongs_elsewhere() {
         "Stone Heart's Hideaway",
         // rc-0136: the Snarler den is the Frostfang Snarlers battle's starter (entrances.json).
         "Frostfang Snarler",
+        // L1193: the Legacy body 4115 is the Thugawug Thug! battle's starter (entrances.json).
+        "Thugawug Thug!",
         "Ninja Apprentice",
         "Robgoblin Tinkerer",
         "Robgoblin Mechanic",
@@ -221,7 +223,6 @@ fn every_named_enemy_body_is_routed_unless_it_belongs_elsewhere() {
         "Troll Guard",
         "Evil Postman",
         "Brutus the Brute",
-        "Thugawug Thug!",
         "Snake",
         // Has its definition since the combat quests went on (Ka-Boom or Not To Boom).
         "Robgoblin Kaboomer",

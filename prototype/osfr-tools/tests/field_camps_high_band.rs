@@ -318,11 +318,7 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
     let field = shipped_field();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
-    assert_eq!(
-        enemies.len(),
-        52,
-        "24 pre-T296 + 4 HIGH + 6 elite T332 actors + 15 T699 and 1 T730 quest targets + 2 T889 tent bodies"
-    );
+    // TEST DIET (L1193): no row total; every row is checked by what it is, not by how many.
     assert_eq!(
         groups.len(),
         14,
@@ -346,7 +342,7 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
         }
     }
     assert_eq!(areas.len(), 32, "32 actors carry a spawn area");
-    assert_eq!(guids.len(), 52);
+    assert_eq!(guids.len(), enemies.len(), "every field actor has its own GUID");
 
     for (index, (guid, level, area, reference_guid)) in HIGH.into_iter().enumerate() {
         let row = actor(&field, guid);
@@ -486,11 +482,7 @@ fn the_existing_camps_and_rewards_are_unchanged() {
     let field = shipped_field();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
-    assert_eq!(
-        enemies.len(),
-        52,
-        "24 pre-T296 + 4 HIGH + 6 elite T332 actors + 15 T699 and 1 T730 quest targets + 2 T889 tent bodies"
-    );
+    // TEST DIET (L1193): no row total; every row is checked by what it is, not by how many.
     assert_eq!(
         groups.len(),
         14,
@@ -567,11 +559,20 @@ fn the_existing_camps_and_rewards_are_unchanged() {
         );
     }
     let overrides = rewards["definition_overrides"].as_array().unwrap();
-    assert_eq!(
-        overrides.len(),
-        17,
-        "the wolf definition override plus one 0/0 override per T699 and T730 quest target"
+    // TEST DIET (L1193): no total. The wolf override stands, and every 0/0 override belongs to a
+    // quest-gated field target (its defeat reports to its quest and pays nothing).
+    assert!(
+        overrides.iter().any(|row| row["definition_id"] == 3156),
+        "the wolf definition override"
     );
+    for row in overrides.iter().filter(|row| row["coins"] == 0 && row["job_xp"] == 0) {
+        let id = &row["definition_id"];
+        assert!(
+            enemies.iter().any(|enemy| &enemy["definition_id"] == id
+                && enemy["quest_ids"].as_array().is_some_and(|quests| !quests.is_empty())),
+            "the 0/0 override for definition {id} has a quest-gated field target"
+        );
+    }
     assert_eq!(
         digest(&overrides[0]),
         EXISTING_OVERRIDE,

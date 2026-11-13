@@ -427,34 +427,6 @@
       "attacks_in_overworld": false
     },
     {
-      "id": "thugawug-thug-thugawug-thug",
-      "definition": "thugawug_thug",
-      "level": 5,
-      "respawn_seconds": 60,
-      "aggro_range": 8.0,
-      "leash_radius": 12.0,
-      "behaviour": "field_roamer",
-      "power_up_table": "standard",
-      "members": [
-        100000004115
-      ],
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "npc_spawns_extra.json: 1 drawn bodies on model 199 (spawn_guid 100000004115..100000004115); npc-interactivity census 2026-10-29 section 7, record def:199:75450:, tier enemy, rule E1, confidence medium. Today they stand as friendly NPC actors."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) Stats and kill-credit definition id come from enemies.json thugawug_thug; level 5 is that definition; respawn 60 s, aggro 8 m and leash 12 m are local balance, no 2014 overworld spawn table was recovered."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) L1191: no overworld aggro (owner 2026-11-12; DONT-DO 14); still fights back when hit. No placed battle names it as its starter yet."
-        }
-      ],
-      "attacks_in_overworld": false
-    },
-    {
       "id": "anon-bear-vinegolem-fungus-fungus-golem",
       "definition": "fungus_golem",
       "level": 20,

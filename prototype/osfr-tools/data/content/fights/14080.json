@@ -1,0 +1,581 @@
+{
+  "schema_version": 1,
+  "id": 14080,
+  "kind": "battle",
+  "title_id": 75450,
+  "description_id": 77891,
+  "icon_id": 310,
+  "difficulty": 2,
+  "entry": {
+    "starter": {
+      "definition": "bandit_patrolman",
+      "at": [
+        -2018.592,
+        -36.7976,
+        -540.6624
+      ],
+      "roam": 0
+    }
+  },
+  "place": {
+    "zone": 1242,
+    "arena": "sg_random_encounter_02",
+    "arrive": [
+      139.68,
+      1.12,
+      147.24
+    ],
+    "exit_door": [
+      147.11,
+      0.3,
+      158.98
+    ]
+  },
+  "rules": {
+    "knockouts": 10,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "bandit_patrolman": {
+      "definition_id": 3460,
+      "name": "Bandit Patrolman",
+      "name_id": 440716,
+      "model_id": 199,
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38069,
+                    38072,
+                    38073,
+                    38074,
+                    38075,
+                    38076,
+                    38077,
+                    38078
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38069,
+                    38072,
+                    38073,
+                    38074,
+                    38075,
+                    38076,
+                    38077,
+                    38078
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    },
+    "thugawug_stomper": {
+      "definition_id": 950013,
+      "name": "Thugawug Stomper",
+      "name_id": 440717,
+      "model_id": 200,
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38079,
+                    38080,
+                    38081
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38079,
+                    38080,
+                    38081
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    },
+    "thugawug_ambusher": {
+      "definition_id": 1408001,
+      "name": "Thugawug Ambusher",
+      "name_id": 100883,
+      "model_id": 199,
+      "rank": "normal",
+      "behaviour": {
+        "rules": [
+          {
+            "id": "l1189_bark",
+            "when": {
+              "engaged": {}
+            },
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38069,
+                    38072,
+                    38073,
+                    38074,
+                    38075,
+                    38076,
+                    38077,
+                    38078
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "once": true
+          },
+          {
+            "id": "l1189_taunt",
+            "when": {
+              "every": {
+                "ms": 9000,
+                "first_ms": 7000
+              }
+            },
+            "if": [
+              {
+                "chance": 0.35
+              }
+            ],
+            "do": [
+              {
+                "say": {
+                  "text_ids": [
+                    38069,
+                    38072,
+                    38073,
+                    38074,
+                    38075,
+                    38076,
+                    38077,
+                    38078
+                  ],
+                  "how": "bubble"
+                }
+              }
+            ],
+            "cooldown_ms": 15000
+          }
+        ]
+      }
+    }
+  },
+  "points": {
+    "w1_patrolman": [
+      [
+        112.88,
+        0.74,
+        144.99
+      ],
+      [
+        115.44,
+        1.35,
+        133.2
+      ],
+      [
+        115.55,
+        0.26,
+        148.23
+      ]
+    ],
+    "w2_stomper": [
+      [
+        114.48,
+        -0.3,
+        181.6
+      ],
+      [
+        139.47,
+        -0.76,
+        175.29
+      ],
+      [
+        123.8,
+        0.13,
+        153.98
+      ]
+    ],
+    "w3_ambusher": [
+      [
+        180.27,
+        0.91,
+        167.74
+      ],
+      [
+        162.06,
+        0.16,
+        167.19
+      ],
+      [
+        173.8,
+        1.16,
+        163.53
+      ]
+    ],
+    "w3_patrolman": [
+      [
+        159.99,
+        1.49,
+        140.93
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "fight_started": {
+          "after_ms": 1500
+        }
+      },
+      "spawn": [
+        {
+          "definition": "bandit_patrolman",
+          "count": 3,
+          "at": "w1_patrolman"
+        }
+      ]
+    },
+    {
+      "id": "w2",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "thugawug_stomper",
+          "count": 3,
+          "at": "w2_stomper"
+        }
+      ]
+    },
+    {
+      "id": "w3",
+      "when": {
+        "wave_left": {
+          "wave": "w2",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "thugawug_ambusher",
+          "count": 3,
+          "at": "w3_ambusher"
+        },
+        {
+          "definition": "bandit_patrolman",
+          "count": 1,
+          "at": "w3_patrolman"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "waves",
+      "kind": "defeat",
+      "text_id": 77893,
+      "target": {
+        "waves": [
+          "w1",
+          "w2",
+          "w3"
+        ]
+      },
+      "primary": true
+    }
+  ],
+  "rewards": {
+    "coins": 30,
+    "job_xp": 50,
+    "wheel": [
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 2
+      },
+      {
+        "item_id": 75095,
+        "name_id": 131979,
+        "icon_id": 3153,
+        "job": 2
+      },
+      {
+        "item_id": 75420,
+        "name_id": 131164,
+        "icon_id": 3721,
+        "job": 2
+      },
+      {
+        "item_id": 75391,
+        "name_id": 131135,
+        "icon_id": 553,
+        "job": 2
+      },
+      {
+        "item_id": 76224,
+        "name_id": 133232,
+        "icon_id": 5397,
+        "job": 2
+      },
+      {
+        "item_id": 76094,
+        "name_id": 133102,
+        "icon_id": 5789,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 11
+      },
+      {
+        "item_id": 75355,
+        "name_id": 131099,
+        "icon_id": 3721,
+        "job": 11
+      },
+      {
+        "item_id": 75326,
+        "name_id": 131070,
+        "icon_id": 553,
+        "job": 11
+      },
+      {
+        "item_id": 75065,
+        "name_id": 131949,
+        "icon_id": 3221,
+        "job": 11
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 12
+      },
+      {
+        "item_id": 76407,
+        "name_id": 133415,
+        "icon_id": 5091,
+        "job": 12
+      },
+      {
+        "item_id": 75550,
+        "name_id": 131294,
+        "icon_id": 3721,
+        "job": 12
+      },
+      {
+        "item_id": 75521,
+        "name_id": 131265,
+        "icon_id": 553,
+        "job": 12
+      },
+      {
+        "item_id": 75155,
+        "name_id": 132039,
+        "icon_id": 3157,
+        "job": 12
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 32
+      },
+      {
+        "item_id": 76334,
+        "name_id": 133342,
+        "icon_id": 5454,
+        "job": 32
+      },
+      {
+        "item_id": 75125,
+        "name_id": 132009,
+        "icon_id": 3099,
+        "job": 32
+      },
+      {
+        "item_id": 75485,
+        "name_id": 131229,
+        "icon_id": 3721,
+        "job": 32
+      },
+      {
+        "item_id": 75456,
+        "name_id": 131200,
+        "icon_id": 553,
+        "job": 32
+      },
+      {
+        "item_id": 75005,
+        "name_id": 131889,
+        "icon_id": 3110,
+        "job": 35
+      },
+      {
+        "item_id": 75225,
+        "name_id": 130969,
+        "icon_id": 3721,
+        "job": 35
+      },
+      {
+        "item_id": 75196,
+        "name_id": 130940,
+        "icon_id": 553,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 35
+      },
+      {
+        "item_id": 75748,
+        "name_id": 132756,
+        "icon_id": 2395,
+        "job": 35
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973,
+        "job": 43
+      },
+      {
+        "item_id": 75035,
+        "name_id": 131919,
+        "icon_id": 3130,
+        "job": 43
+      },
+      {
+        "item_id": 75290,
+        "name_id": 131034,
+        "icon_id": 3721,
+        "job": 43
+      },
+      {
+        "item_id": 75261,
+        "name_id": 131005,
+        "icon_id": 553,
+        "job": 43
+      },
+      {
+        "item_id": 75869,
+        "name_id": 132877,
+        "icon_id": 5007,
+        "job": 43
+      },
+      {
+        "item_id": 10482,
+        "name_id": 6666,
+        "icon_id": 973
+      }
+    ],
+    "wheel_coins": 26,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "client",
+      "evidence": "Global.Text 75450 'Thugawug Thug!' (title, the starter's own name), 77891 (card), 77893 (goal); icon 310. Local Hero's own block: 389186 'These thugawugs stole my bag!', 389192 'Defeat the Thugawug Thug in south Greenwood Forest', 389194 'He's the leader of these unruly thugawugs'."
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 60 ('Thugawug Thug! (the live random encounter: a band of thugawug thugs)'): starter Npc 4115, scene sg_random_encounter_02 (zone 1242), difficulty 2, 30 coins, no boss. Waves: 3x Npc 3460 Bandit Patrolman; 3x 3491 (the fork's Npcs.json names it Thugawug Stomper, name 440717); 3x 46144 Thugawug Ambusher (name 100883, model 199) and 1x 3460. Every spot here is the fork's."
+    },
+    {
+      "kind": "legacy-data",
+      "evidence": "FreeRealms-Legacy FabledRealms.lua:2781 spawns Npc 4115 'Thugawug Thug!' (Npcs.json: name 75450, model 199 chugawug_m_bandit_01.adr) at (-2018.592, -36.7976, -540.6624)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) L1193: Npc 3460 is the shipped bandit_patrolman (3460) and the fork's 3491 Stomper the shipped thugawug_stomper (950013), with their barks; the Ambusher has no definition, so it is fight-local 1408001 (as 1404301 is the Tavern Cellar's brawler) with the Patrolman's barks. Rules copy Hooligan Brawling Club! (14017); the job XP and wheel copy Robgoblin Troublemakers! (14022), a difficulty-2 random encounter, as the wiki gives this battle no wheel of its own. Not proven in the client yet."
+    },
+    {"kind": "reconstructed", "evidence": "(R) Not proven in the client: this scene needs one native load, and the starter of `entry` is drawn by the entrances work (`thugawug_thug`, the Legacy body 100000004115), not by this file. Each kind's rank here decides its health and hit at the fight's tier."}
+  ]
+}

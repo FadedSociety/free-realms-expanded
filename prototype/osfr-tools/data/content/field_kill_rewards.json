@@ -87,17 +87,6 @@
       ]
     },
     {
-      "definition_id": 4115,
-      "coins": 0,
-      "job_xp": 0,
-      "source": [
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) Thugawug Thug! (definition 4115) is a quest-gated kill target (F722, review of T699): its defeat reports to the quest and pays no field coins or job XP, so the quest actor cannot be farmed on its respawn. Local policy, not recovered 2014 reward data."
-        }
-      ]
-    },
-    {
       "definition_id": 1638,
       "coins": 0,
       "job_xp": 0,

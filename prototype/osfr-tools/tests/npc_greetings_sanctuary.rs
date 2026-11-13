@@ -385,7 +385,13 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
 
     // Dispatch path: gateway -> Gameplay -> gameplay/npc.rs -> dialogue_packet_with.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
-    for row in &NEW_GREETINGS {
+    // A seasonal NPC (`live_event`, such as Halloween Harry) is not in the world out of season,
+    // so only the year-round rows are clicked here; the service path above checked every body.
+    // (L1193: this failed on main from 11-13 00:00Z, when the Halloween season closed.)
+    let year_round = NEW_GREETINGS
+        .iter()
+        .filter(|row| npc_record("sanctuary.json", row.npc_id).get("live_event").is_none());
+    for row in year_round {
         assert_eq!(
             gameplay_talk_body(&mut game, "sanctuary.json", row.npc_id),
             row.greeting,

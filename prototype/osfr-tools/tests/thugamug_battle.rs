@@ -860,8 +860,6 @@ const MISSING_SISTERS_END_TEXT: u32 = 90_624;
 const MISSING_SISTERS_COINS: u32 = 30;
 const MISSING_SISTERS_XP: u32 = 225; // L926: wiki stars (3000029)
 const GEOFFREY: u64 = 9_000_000_330;
-/// A drawable `legacy_data` Sanctuary quest giver who offers no enabled quest.
-const HARRY: u64 = 9_500_000_493;
 const GEOFFREY_MODEL: i32 = 415;
 const GEOFFREY_NAME_ID: u32 = 70_318;
 const ADVENTURER: i32 = 1;
@@ -882,6 +880,34 @@ fn npc_position(file: &str, npc_id: u64) -> [f32; 3] {
         .find(|row| row["npc_id"].as_u64() == Some(npc_id))
         .unwrap_or_else(|| panic!("NPC {npc_id} is defined in {file}"));
     position(&row["position"])
+}
+
+/// A drawable, year-round `legacy_data` Sanctuary quest giver whose every quest is switched
+/// off, read from the data. It was Halloween Harry, a `live_event: halloween` NPC who leaves the
+/// world when the season closes on November 12 (L1193 found the test failing from 11-13 00:00Z).
+fn wrong_npc() -> u64 {
+    let mut enabled = BTreeMap::new();
+    for entry in fs::read_dir(content_dir().join("quests")).unwrap() {
+        let file = read_json(&entry.unwrap().path());
+        for quest in file["records"].as_array().unwrap() {
+            let on = quest["enabled"].as_bool().unwrap_or(true) && quest.get("live_event").is_none();
+            enabled.insert(quest["id"].as_u64().unwrap(), on);
+        }
+    }
+    let document = read_json(&content_dir().join("npcs").join("sanctuary.json"));
+    let row = document["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|row| row.get("live_event").is_none() && row["placement"] == "legacy_data")
+        .filter(|row| row["model_id"].as_i64().unwrap_or(0) > 0)
+        .find(|row| {
+            let given = row["quest_ids_given"].as_array().map(Vec::as_slice).unwrap_or(&[]);
+            !given.is_empty()
+                && given.iter().all(|id| !enabled.get(&id.as_u64().unwrap()).copied().unwrap_or(false))
+        })
+        .expect("a year-round Sanctuary giver with no enabled quest");
+    row["npc_id"].as_u64().unwrap()
 }
 
 fn geoffrey_position() -> [f32; 3] {
@@ -1539,15 +1565,16 @@ fn a_premature_wrong_or_forged_turn_in_changes_nothing() {
 
     // A wrong NPC: a drawable quest giver who offers no enabled quest. Its own
     // menu is allowed; the chapter is not offered and the save stays equal.
-    session.walk(npc_position("sanctuary.json", HARRY));
+    let wrong = wrong_npc();
+    session.walk(npc_position("sanctuary.json", wrong));
     let before = session.capture();
-    let menu = session.send(&interact(HARRY));
+    let menu = session.send(&interact(wrong));
     assert!(
         replies(&menu).any(|packet| packet_family(packet, 26, 9)),
         "the wrong NPC opens its own menu"
     );
     if let Some(choice) = menu_option(&menu, TALK_LABEL) {
-        let dialogue = session.send(&npc_select(HARRY, choice));
+        let dialogue = session.send(&npc_select(wrong, choice));
         assert!(
             replies(&dialogue).all(|packet| !packet_family(packet, 49, 1)),
             "the wrong NPC offers no quest"

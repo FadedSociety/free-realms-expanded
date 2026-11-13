@@ -247,8 +247,9 @@ const LEVEL_TWENTY_ACTOR: u64 = 131000110020;
 const LEVEL_TWENTY_WOLF: u64 = 131000110156;
 /// The elite camp's shared 180 s respawn.
 const ELITE_RESPAWN_MS: u64 = 180_000;
-/// T699 appended this many quest-gated quest-target actors after the elite six.
-const T699_ACTORS: usize = 15;
+/// T699 appended this many quest-gated quest-target actors after the elite six. L1193 dropped
+/// the Thugawug Thug's (it stood stacked on its battle's starter body), leaving 14.
+const T699_ACTORS: usize = 14;
 /// T730 appended one more (the Gloam Creature of One More Gloam).
 const T730_ACTORS: usize = 1;
 /// T889 appended the hostile Hooligan and Hooligan Archer of the Highroad tent (one group).
@@ -411,8 +412,8 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
 
     assert_eq!(
         enemies.len(),
-        49 + T730_ACTORS + T889_ACTORS,
-        "28 pre-T332 + 6 elite actors + 15 T699 and 1 T730 quest targets + 2 T889 tent bodies"
+        34 + T699_ACTORS + T730_ACTORS + T889_ACTORS,
+        "28 pre-T332 + 6 elite actors + the T699 and T730 quest targets + 2 T889 tent bodies"
     );
     assert_eq!(
         groups.len(),
@@ -421,8 +422,8 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
     );
     assert_eq!(
         engine.field_guids().len(),
-        49 + T730_ACTORS + T889_ACTORS,
-        "the live field vector grows from 28 to 34 + 15 T699, 1 T730 quest targets and 2 T889 tent bodies"
+        34 + T699_ACTORS + T730_ACTORS + T889_ACTORS,
+        "the live field vector grows from 28 to 34 + the T699 and T730 quest targets and 2 T889 tent bodies"
     );
     assert_eq!(
         &engine.field_guids()[..EXISTING_ACTORS.len()],

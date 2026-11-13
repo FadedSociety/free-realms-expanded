@@ -2036,10 +2036,9 @@
       "prerequisite_quest_ids": [],
       "objectives": [
         {
-          "kind": "defeat",
+          "kind": "complete_dungeon",
           "id": 1,
-          "model_id": 930050,
-          "count": 5,
+          "encounter_id": 14080,
           "text_string_id": 389193,
           "source": [
             {
@@ -2048,11 +2047,11 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T277: the live level-3 field Hooligan definition 930050 (data/content/field_enemies.json, starting_highroad_hooligans) is the only counted kill kind; neither the guide's exact thugawug variant nor the video's ten-kill Hooligan Bullies is proven to be 930050. Five kills is the playtest count for the three live actors plus one 60 s respawn cycle; the per-kill 6/3 coin popups are the field enemies' own T240 payout, not this quest's."
+              "evidence": "(R) T403 goal text Global.Text 389193 'Defeat the Thugawug Thug': goal line in this quest's own locale block (title 389187), matching this step."
             },
             {
-              "kind": "reconstructed",
-              "evidence": "(R) T403 goal text Global.Text 389193 'Defeat the Thugawug Thug': goal line in this quest's own locale block (title 389187), matching this step."
+              "kind": "client",
+              "evidence": "L1193: the quest's own 2014 block names one enemy, 'Defeat the Thugawug Thug in south Greenwood Forest' (389192; goal 389193), the leader who 'has them cornered' (389188, 389194): the Thugawug Thug! battle (fight 14080, BJX fork battle 60, starter Npc 4115 on the spot). The wiki and video 3jLPsxADZ1w show a different version, 'Defeat the Hooligan Bullies - (0/10)'; the client's own text wins. The (R) T277 binding to 930050 (the Alpha Wolf's id) is gone."
             }
           ]
         },
@@ -2158,7 +2157,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T277: re-enabled. The W110 blocker is resolved without inventing content: the live 930050 field Hooligan is the only proven field kind in the region, and the guide's final Talk to the Courier is the hand-in, so no stolen-message item is required. No NPC, spawn, packet, save-schema or production Rust change."
+          "evidence": "(R) T277: re-enabled. The W110 blocker is resolved without inventing content: the live 930050 field Hooligan is the only proven field kind in the region, and the guide's final Talk to the Courier is the hand-in, so no stolen-message item is required. No NPC, spawn, packet, save-schema or production Rust change. Superseded for goal 1 by L1193: the quest's own 2014 text names the Thugawug Thug, so the goal is the Thugawug Thug! battle (fight 14080), not 930050 kills."
         }
       ],
       "description_string_id": 389188,

@@ -537,18 +537,19 @@ fn kill_of(kind: u32) -> QuestEvent {
     }
 }
 
-/// The shipped quests this piece must leave working: seven `defeat` steps and four
-/// `complete_dungeon` steps (`data/content/quests`), as (quest, step index, target).
-const SHIPPED_DEFEATS: [(u32, usize, u32); 7] = [
+/// The shipped quests this piece must leave working: `defeat` steps and `complete_dungeon`
+/// steps (`data/content/quests`), as (quest, step index, target). Slices, so a quest that
+/// moves between them (L1193: Local Hero is won in fight 14080) changes no length pin.
+const SHIPPED_DEFEATS: &[(u32, usize, u32)] = &[
     (3_000_009, 0, 3_156),
     (3_000_010, 0, 920_001),
-    (3_000_024, 0, 930_050),
     (3_000_029, 1, 3_156),
     (3_010_011, 0, 1_294),
     (3_030_007, 0, 4_154), // L1192: the Hooligan Delinquent (930050 is the Alpha Wolf)
     (3_110_002, 0, 930_096),
 ];
-const SHIPPED_DUNGEONS: [(u32, usize, u32); 4] = [
+const SHIPPED_DUNGEONS: &[(u32, usize, u32)] = &[
+    (3_000_024, 0, 14_080),
     (3_000_032, 0, 12_340),
     (3_000_061, 0, 12_350),
     (3_030_004, 1, 12_400),
@@ -605,7 +606,7 @@ fn engine_required(engine: &QuestEngine, quest: u32) -> Vec<u32> {
 
 #[test]
 fn the_shipped_defeat_and_dungeon_quests_still_count_from_facts() {
-    for (quest, step, kind) in SHIPPED_DEFEATS {
+    for &(quest, step, kind) in SHIPPED_DEFEATS {
         let mut engine = shipped_engine_at(quest, step);
         // A plain one-kind defeat keeps the kind every save was built on.
         assert_eq!(
@@ -625,7 +626,7 @@ fn the_shipped_defeat_and_dungeon_quests_still_count_from_facts() {
         );
         assert_eq!(engine.progress(quest).unwrap().counts[step], 1);
     }
-    for (quest, step, fight) in SHIPPED_DUNGEONS {
+    for &(quest, step, fight) in SHIPPED_DUNGEONS {
         let mut engine = shipped_engine_at(quest, step);
         let won = engine
             .on_event(QuestEvent::CompleteDungeon {

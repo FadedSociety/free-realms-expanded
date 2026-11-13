@@ -71,9 +71,9 @@ const FRESH_GUID: u64 = 0x4649_454c_0000_0000;
 /// Every field spawn T699 appended: GUID, definition id, authored level and the
 /// quests that make it present. Willow Slamdash (q3060010, a derby knock-out) and
 /// the Frostfang Growler (inside the opening wolf walk's clearance) keep a
-/// catalogue row but no spawn.
-const SPAWNS: [(u64, i64, u32, &[u32]); 15] = [
-    (FRESH_GUID + 3, 4115, 5, &[3000024]),
+/// catalogue row but no spawn. L1193 dropped the Thugawug Thug's (FRESH_GUID + 3):
+/// Local Hero is won in its battle, whose starter is the Legacy body on that spot.
+const SPAWNS: &[(u64, i64, u32, &[u32])] = &[
     (FRESH_GUID + 4, 1638, 5, &[3010005]),
     (FRESH_GUID + 5, 1639, 5, &[3010018, 3150012]),
     (FRESH_GUID + 6, 3491, 9, &[3150012]),
@@ -90,8 +90,9 @@ const SPAWNS: [(u64, i64, u32, &[u32]); 15] = [
     (FRESH_GUID + 17, 4857, 13, &[3160031]),
 ];
 
-/// Catalogue rows that never spawn in the field.
-const NO_FIELD_SPAWN: [&str; 2] = ["frostfang_growler", "willow_slamdash"];
+/// Catalogue rows that never spawn in the field (L1193: the Thugawug Thug stands as its
+/// battle's starter, not as a field enemy).
+const NO_FIELD_SPAWN: &[&str] = &["frostfang_growler", "willow_slamdash", "thugawug_thug"];
 
 fn quest_ids() -> BTreeSet<u32> {
     SPAWNS
@@ -216,7 +217,7 @@ fn every_new_field_spawn_is_present_only_with_its_quest_and_live_in_the_field() 
         .iter()
         .map(|record| record["spawn_guid"].as_u64().unwrap())
         .collect();
-    for (guid, definition_id, level, quest_ids) in SPAWNS {
+    for &(guid, definition_id, level, quest_ids) in SPAWNS {
         let row = rows
             .iter()
             .find(|row| row["guid"].as_u64() == Some(guid))
@@ -272,7 +273,7 @@ fn every_new_field_spawn_is_present_only_with_its_quest_and_live_in_the_field() 
     live.on_zone_ready(WIZARD, 0).unwrap();
     let out = live.set_active_quests(&quests);
     let present = spawned(&out);
-    for (guid, _, level, _) in SPAWNS {
+    for &(guid, _, level, _) in SPAWNS {
         assert!(!quiet.contains(&guid), "{guid} must stay quest-gated");
         assert!(present.contains(&guid), "{guid} must spawn with its quest");
         assert_eq!(live.field_level(guid), Some(level), "{guid}");
@@ -299,7 +300,7 @@ fn a_defeat_of_a_new_spawn_reports_its_actor_kind_and_pays_nothing() {
     engine.set_active_quests(&quest_ids());
     // One monotonic clock: `strike` refuses a second swing within 600 ms.
     let mut now = 10_000_u64;
-    for (guid, definition_id, _, _) in SPAWNS {
+    for &(guid, definition_id, _, _) in SPAWNS {
         let at = engine
             .field_teleport_targets()
             .into_iter()

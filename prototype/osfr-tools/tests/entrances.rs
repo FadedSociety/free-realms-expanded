@@ -92,11 +92,11 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
         .count();
     assert_eq!(
         (table.entrances.len(), doors, table.scenes.len()),
-        (56, 35, 46),
-        "35 dungeon doors and 21 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
+        (57, 35, 46),
+        "35 dungeon doors and 22 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
          Legacy spawner huts, two of them in scenes of their own; rc-0137 holds the Troll \
          Summoner starter, where battle 96's own marker now stands; L1192 places the Hooligan \
-         Brawling Club hut for fight 14017)"
+         Brawling Club hut for fight 14017; L1193 the Thugawug Thug for fight 14080)"
     );
     for row in &table.entrances {
         let actor = spawners.iter().find(|actor| actor.0 == row.guid);
@@ -314,6 +314,7 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
             "sweetwater_climb",
             "tanglewood_fort",
             "tavern_cellar",
+            "thugawug_thug",
             "tormented_spirits",
             "vulture_watch"
         ],
