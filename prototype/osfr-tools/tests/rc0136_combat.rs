@@ -24,6 +24,7 @@ use osfr_tools::{
     dev_teleport,
     encounter::EncounterEngine,
     encounter::EncounterPhase,
+    encounter::{Rank, scale},
     npc_life::SETTLED_M,
     terrain::{MAX_SNAP, Terrain},
 };
@@ -163,8 +164,8 @@ fn every_hit_sends_the_health_statement_the_boss_bar_reads() {
 
 #[test]
 fn battle_96_fights_at_the_numbers_of_its_tier() {
-    // The tier's numbers times the owner's multipliers (`combat_scale.json`: enemy health x2,
-    // enemy hits x1.5, rc-0137): the Summoner rank tough, its helpers rank minion.
+    // The tier's numbers times the owner's multipliers (`combat_scale.json`, 1.0 since
+    // 2026-11-13): the Summoner rank tough, its helpers rank minion.
     let (mut engine, ready) = battle_96(0);
     let summoner = statement(&ready, SUMMONER);
     let spot = enemies(&engine)[0].position;
@@ -198,14 +199,16 @@ fn battle_96_fights_at_the_numbers_of_its_tier() {
         }
     }
     let raw: BTreeSet<i32> = bites.iter().map(|b| b.1).collect();
+    let health = |rank| scale::enemy_health(rank, 1, 1) as i32;
+    let (tough, minion) = (health(Rank::Tough), health(Rank::Minion));
     assert_eq!(
         (summoner, helpers, raw),
         (
-            Some((3_453, 3_453, 0)),
-            vec![Some((520, 520, 0)); 2],
-            BTreeSet::from([38])
+            Some((tough, tough, 0)),
+            vec![Some((minion, minion, 0)); 2],
+            BTreeSet::from([scale::enemy_hit(Rank::Minion, 1) as i32])
         ),
-        "rank tough and rank minion at tier 1, x2 health and x1.5 hits"
+        "rank tough and rank minion at tier 1"
     );
     // Paced (`instance_pacing.json` 96): one enemy swings at a time, each at most every 2.3 s.
     assert!(!bites.is_empty(), "they fight");

@@ -67,7 +67,7 @@ impl EncounterEngine {
         if self.down_in_fight() {
             // (R) A fight with knockouts left: stand up where you fell.
             let mut out = EncounterOutcome::default();
-            self.stand_up(&mut out);
+            self.stand_up(now_ms, &mut out);
             return Ok(out);
         }
         if let Some(a) = &self.state.active {

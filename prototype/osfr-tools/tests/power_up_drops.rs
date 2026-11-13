@@ -544,9 +544,11 @@ fn shared(f: &Fixture) -> Shared {
     c.take_shared_fields();
     Shared { a, b, c, field }
 }
-/// Authored health two basic hits kill (372 at the shipped scale: 50 x 3.72 x the owner's health
-/// multiplier 2, rc-0137; it was 100 before the multiplier).
-const TWO_HITS: u32 = 50;
+/// Authored health two basic hits kill (372 at the shipped scale: 100 x 3.72), whatever the
+/// owner's health multiplier.
+fn two_hits() -> u32 {
+    combat_scale::unmultiplied(100)
+}
 fn hit(
     e: &mut EncounterEngine,
     field: &mut osfr_tools::encounter::SharedFieldState,
@@ -559,7 +561,7 @@ fn hit(
 
 #[test]
 fn every_participant_gets_their_own_pickup_and_nobody_sees_anothers() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     let first = hit(&mut s.a, &mut s.field, A, FIRST, 0);
     assert!(spawned(&first).is_empty(), "no kill yet");
@@ -600,7 +602,7 @@ fn pickups_in(p: &[u8]) -> bool {
 
 #[test]
 fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -612,7 +614,7 @@ fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
 
 #[test]
 fn only_recent_damage_counts_as_taking_part() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     // The shipped window is 30 s; B's kill lands at 31 s.
@@ -625,7 +627,7 @@ fn only_recent_damage_counts_as_taking_part() {
 
 #[test]
 fn a_participant_who_left_the_field_loses_the_drop() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -639,7 +641,7 @@ fn a_participant_who_left_the_field_loses_the_drop() {
 
 #[test]
 fn an_unclaimed_drop_lapses() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -651,7 +653,7 @@ fn an_unclaimed_drop_lapses() {
 fn the_group_multiplier_thins_shared_rolls_but_not_solo_ones_or_guaranteed_ones() {
     const N: usize = 60;
     let tables = vec![Some("t_roll"); N];
-    let f = Fixture::sized(&tables, TWO_HITS);
+    let f = Fixture::sized(&tables, two_hits());
     f.edit_power_ups(|file| {
         file["participation"]["group_chance_multiplier"] = json!(0.05);
     });
@@ -685,7 +687,7 @@ fn the_group_multiplier_thins_shared_rolls_but_not_solo_ones_or_guaranteed_ones(
         "two participants thin the chance: {shared_drops} of 120 rolls"
     );
     // Guaranteed drops are not scaled.
-    let g = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let g = Fixture::sized(&[Some("boss")], two_hits());
     g.edit_power_ups(|file| file["participation"]["group_chance_multiplier"] = json!(0.05));
     let mut s = shared(&g);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
@@ -766,7 +768,7 @@ fn pickups_do_not_follow_the_player_into_another_zone() {
 
 #[test]
 fn big_hearts_from_one_kill_share_a_kill_key_so_the_group_heals_once() {
-    let f = Fixture::sized(&[Some("boss"), Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss"), Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);

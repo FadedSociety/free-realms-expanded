@@ -170,6 +170,9 @@ pub struct FightState {
     pub(super) seen: Seen,
     /// When this player went down inside the fight.
     pub(super) down_since: Option<u64>,
+    /// Enemies cannot hurt this player before then: they stood up from a knockout (the fight
+    /// grace of `combat_rules.json` `revive.fight_grace_ms`).
+    pub(super) guarded_until: u64,
     /// The run as last written to the save.
     pub(super) saved: Option<run::Saved>,
     /// The overworld instance fights' pacing (`instance_pacing.json`, `pacing.rs`).

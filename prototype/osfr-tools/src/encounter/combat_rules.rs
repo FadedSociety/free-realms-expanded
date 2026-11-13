@@ -48,6 +48,11 @@ pub struct Revive {
     pub timer_ms: i32,
     /// (R) Field enemies ignore a freshly revived or recovered player this long.
     pub field_grace_ms: u64,
+    /// Inside a fight, enemies cannot hurt a player who stood up from a knockout this long
+    /// (owner 2026-11-13: "3-4 seconds of invincibility after a combat knockout"). A `revive`
+    /// block without it (an older content file) has none.
+    #[serde(default)]
+    pub fight_grace_ms: u64,
     /// (R) Server fallback: an overworld knockout with no 41/122 by then is revived at the
     /// safe location anyway, so a client that never shows the window (its 41/125 field order
     /// is inferred, not captured) cannot leave a player down.
@@ -120,6 +125,7 @@ impl CombatRules {
                 .any(|job| !(0.1..=10.0).contains(&job.health) || job.crit_percent > 100)
             || !(0..=600_000).contains(&rules.revive.timer_ms)
             || rules.revive.field_grace_ms > 10 * minute
+            || rules.revive.fight_grace_ms > minute
             || !(1_000..=10 * minute).contains(&rules.revive.auto_ms)
             || u64::from(rules.death_delay_ms.field.max(rules.death_delay_ms.battle)) > minute
         {
@@ -200,6 +206,7 @@ mod tests {
             revive: Revive {
                 timer_ms: 10_000,
                 field_grace_ms: 8_000,
+                fight_grace_ms: 3_500,
                 auto_ms: 15_000,
             },
             death_delay_ms: DeathDelay {

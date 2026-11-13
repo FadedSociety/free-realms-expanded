@@ -440,8 +440,9 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
     )]);
     enter(&mut engine, 620, 1_000);
     let mut now = 1_000;
+    // Each knockout lands after the last stand-up's fight grace (at most a minute) is over.
     for taken in 1..=10_u32 {
-        now += 1_000;
+        now += 61_000;
         let down = engine.receive_arena_damage(u32::MAX, now);
         assert_eq!(
             engine.run_phase(),
@@ -481,7 +482,7 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
         );
         assert!(up.zoning.is_none(), "where they fell, not at the safe spot");
     }
-    let last = engine.receive_arena_damage(u32::MAX, now + 2_000);
+    let last = engine.receive_arena_damage(u32::MAX, now + 61_000);
     assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
     assert!(last.facts.contains(&FightFact::Lost { fight: 620 }));
     assert!(
@@ -495,6 +496,39 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
         "none left of ten, and no points"
     );
     assert_eq!(rows["scoreTotalScore"].2, 0);
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "3-4 seconds of invincibility after a combat knockout". A player who
+/// stands up takes no enemy damage for the fight grace (`combat_rules.json`
+/// `revive.fight_grace_ms`, at most a minute), and is hit again once it is over.
+#[test]
+fn a_player_who_stands_up_takes_no_damage_for_the_fight_grace() {
+    let (dir, mut engine) = engine_with(&[fight(
+        621,
+        json!({
+            "actors": {"boss": {"definition": "chief", "at": [0, 0, 10]}},
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    enter(&mut engine, 621, 1_000);
+    engine.receive_arena_damage(u32::MAX, 2_000);
+    assert_eq!(engine.player_health().0, 0, "knocked out");
+    engine
+        .handle(&stand_up(), 1, [0.0; 3], BRAWLER, 2_500)
+        .unwrap();
+    let full = engine.player_health();
+    assert_eq!(full.0, full.1, "stands up at full health");
+    let guarded = engine.receive_arena_damage(u32::MAX, 2_501);
+    assert_eq!(engine.player_health(), full, "no damage right after standing up");
+    assert!(
+        guarded.replies.iter().all(|r| !r.starts_with(&[41, 0, 125, 0])),
+        "and no knockout"
+    );
+    assert_eq!(engine.fight_run().unwrap().knockouts_left(), 9);
+    engine.receive_arena_damage(full.1 / 2, 2_500 + 60_001);
+    assert!(engine.player_health().0 < full.1, "hit again after the grace");
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Fighting));
     let _ = std::fs::remove_dir_all(dir);
 }
 

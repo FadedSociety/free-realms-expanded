@@ -97,6 +97,9 @@ pub(super) struct ArenaTick<'a> {
     /// Frostfang Growlers battle (p12), every enemy goes for the player from wherever it spawned
     /// (owner, rc-0137: the hooligans "don't all come at the player").
     pub(super) battle: bool,
+    /// The player stood up from a knockout moments ago: nothing swings at them or lands on
+    /// them yet (`combat_rules.json` `revive.fight_grace_ms`, owner 2026-11-13).
+    pub(super) guarded: bool,
 }
 
 /// Health as the whole percent the rules compare (the old summon ladder's arithmetic).
@@ -185,7 +188,7 @@ impl ArenaSim {
                 out.replies
                     .push(composite_effect(l.guid, l.attack.land_effect, l.point));
             }
-            if within {
+            if within && !t.guarded {
                 let dealt = self.land(l.guid, &l.attack, l.base, t, total_damage, out);
                 total_damage = total_damage.saturating_add(dealt);
             }
@@ -385,7 +388,7 @@ impl ArenaSim {
             if stands {
                 self.stop(guid, out);
             }
-            if front.as_ref().is_some_and(|front| !front.contains(&guid)) {
+            if t.guarded || front.as_ref().is_some_and(|front| !front.contains(&guid)) {
                 continue;
             }
             if ordered.is_none()
@@ -711,6 +714,7 @@ impl EncounterEngine {
                 max_attackers,
                 attack_ms,
                 battle,
+                guarded: now_ms < p.grace_until,
             };
             let mut out = EncounterOutcome::default();
             let damage = self.arena.tick_enemies(mine, states, &tick, &mut out);
@@ -781,6 +785,7 @@ impl EncounterEngine {
             max_attackers,
             attack_ms,
             battle,
+            guarded: now_ms < self.fight_state.guarded_until,
         };
         let damage = self.arena.tick_enemies(actors, states, &tick, out);
         self.apply_decided(now_ms, out);

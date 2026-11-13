@@ -387,7 +387,9 @@ fn every_hit_on_the_troll_summoner_moves_its_bar_with_the_swing_alone() {
         assert_eq!(statements, 0, "a hit sends no statement of its own");
         hits += swings;
     }
-    assert!(hits >= 3, "{hits} hits landed");
+    // More than one swing, each moving the bar alone (two at the natural curve since the owner's
+    // multipliers went back to 1.0, 2026-11-13; three under rc-0137's x2 health).
+    assert!(hits >= 2, "{hits} hits landed");
 }
 
 /// No fight dropped a power-up (owner). The Hooligan Bullies' pacing drops a heart on a kill
