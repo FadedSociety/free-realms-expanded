@@ -179,6 +179,15 @@ pub(super) fn movement(guid: u64, p: [f32; 3], heading: [f32; 3]) -> Vec<u8> {
     b.extend([1, 0]); // Community NPC movement state; position/heading are authoritative.
     b
 }
+/// 35/12 for one actor: its hover cursor, which is what lets the client click it or press X
+/// (`npc_presentation.rs` has the reader). Flag byte 0, as `relevance` sends (R).
+pub(super) fn hover(guid: u64, cursor: u8) -> Vec<u8> {
+    let mut b = header(35, 12);
+    b.extend(1_i32.to_le_bytes());
+    b.extend(guid.to_le_bytes());
+    b.extend([1, cursor, 0]);
+    b
+}
 pub(super) fn relevance(guids: &[u64], guide: bool) -> Vec<u8> {
     let mut b = header(35, 12);
     b.extend((guids.len() as i32).to_le_bytes());

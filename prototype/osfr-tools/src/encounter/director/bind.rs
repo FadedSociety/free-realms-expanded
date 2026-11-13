@@ -811,6 +811,9 @@ impl EncounterEngine {
             if let Some(ally) = actor_of(def, i, 1) {
                 out.replies
                     .push(self.spawn(&ally, ground.snapped(ally.position), 1));
+                if let Some(interact) = def.interact(i) {
+                    out.replies.push(wire::hover(guid, interact.cursor));
+                }
             }
         }
     }
@@ -994,6 +997,11 @@ impl EncounterEngine {
         } else {
             run.slot_of(guid).map(|i| def.roster[i].spot)
         };
+        // An actor whose `interact` is switched off answers no click.
+        let off = |i: usize| def.roster[i].interact.as_ref().is_some_and(|x| !x.enabled);
+        if run.slot_of(guid).is_some_and(off) {
+            return;
+        }
         // The door and the captives stand still: the click must come from beside them.
         let present = run.bind.shown.contains(&guid) || run.life(guid) == Some(Life::Alive);
         if !present || !at.is_some_and(|at| near(position, at, 12.0)) {
