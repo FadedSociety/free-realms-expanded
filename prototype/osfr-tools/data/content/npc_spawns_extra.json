@@ -17600,7 +17600,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1170; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2427 (ModelId=13, ModelFileName=chugawug_f_01.adr, NameId=7591)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004865
     },
     {
       "spawn_guid": 100000002428,

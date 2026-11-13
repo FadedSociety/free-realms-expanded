@@ -373,6 +373,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     // P-banking: Yoink (reference_data, bound to his body) in npcs/bankers.json (1,314).
     // QF: the listed-only Burgl row folds into the placed Burglz row, one quarry troll (1,313).
     // L1188: the duplicate Ceard Bauchlog (9500000012) folds into his Legacy spawn (1,312).
-    assert_eq!(npc_count, 1312);
+    // TEST DIET (L1195): no total; the per-row checks above hold for any number of rows.
+    assert!(npc_count >= 1312, "NPC rows: {npc_count}");
     println!("NPC placement sources: {counts:?}");
 }

@@ -2074,6 +2074,64 @@
               "evidence": "T403 goal text Global.Text 389199 'Talk to the Royal Courier': exact locale match for the guide objective cell 'Talk to the Royal Courier' this objective cites."
             }
           ]
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 389201,
+          "zone_id": 0,
+          "position": [
+            -1223.0,
+            2.767,
+            301.7
+          ],
+          "radius": 30.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "389201 is this step; the family's shared tail is 390297 'Find the Royal Palace', 390299 'Speak to the palace guard', 391023 'Speak to Quills'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest:Local_Hero (2013-02-21) (live eq2.fanbyte.com page): the goals end 'Find the Royal Palace', 'Speak to the palace guard', 'Speak to Quills'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The palace approach Bravery is in Demand's step uses, by the Royal Guard spawns. The palace is an enterable door in video 8Mo5c_FKQJg (live era, 2011-10-07, 'Free Realms: Royal Palace'); we have no interior yet."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 390299,
+          "npc_id": 9500003915,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "390299 'Speak to the palace guard'; his reply 390352/391025: no entry without a pass, 'Quills at town hall provides passes'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Royal Palace Guard: 'In front of the Royal Palace'."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 391023,
+          "npc_id": 9500000520,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "391023 'Speak to Quills'. The family's end line 'Yes, what is it? I'm really quite busy...' (389189, 390257) is the busy town-hall clerk's, so the quest turns in at Quills."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Quills: 'stands on the porch of the Sanctuary Town Hall'; related quests list Local Hero, Sal's Suggestion, Sharing Your Talents, Farnum's Free Advice, Bravery is in Demand."
+            }
+          ]
         }
       ],
       "rewards": [
@@ -2158,6 +2216,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T277: re-enabled. The W110 blocker is resolved without inventing content: the live 930050 field Hooligan is the only proven field kind in the region, and the guide's final Talk to the Courier is the hand-in, so no stolen-message item is required. No NPC, spawn, packet, save-schema or production Rust change. Superseded for goal 1 by L1193: the quest's own 2014 text names the Thugawug Thug, so the goal is the Thugawug Thug! battle (fight 14080), not 930050 kills."
+        },
+        {
+          "kind": "client",
+          "evidence": "L1195 (owner 2026-11-09: finish the quests in quest-line order): Local Hero's own block holds 389201 'Find the Royal Palace in Sanctuary', and the Courier's line 389195 sends the player to the Royal Palace; the end text 389189 is Quills's. Goals 3-5 are the family's palace tail."
         }
       ],
       "description_string_id": 389188,
@@ -2172,17 +2234,60 @@
       "prerequisite_quest_ids": [],
       "objectives": [
         {
-          "kind": "talk_to_npc",
+          "kind": "visit_position",
           "id": 1,
-          "npc_id": 9500000519,
+          "text_string_id": 390297,
+          "zone_id": 0,
+          "position": [
+            -1223.0,
+            2.767,
+            301.7
+          ],
+          "radius": 30.0,
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:113; see exact objective wording in the chain table."
+              "evidence": "390297 is this step; the family's shared tail is 390297 'Find the Royal Palace', 390299 'Speak to the palace guard', 391023 'Speak to Quills'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest:Sal's_Suggestion (no live page; Quills's page lists it) (live eq2.fanbyte.com page): the goals end 'Find the Royal Palace', 'Speak to the palace guard', 'Speak to Quills'."
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+              "evidence": "(R) The palace approach Bravery is in Demand's step uses, by the Royal Guard spawns. The palace is an enterable door in video 8Mo5c_FKQJg (live era, 2011-10-07, 'Free Realms: Royal Palace'); we have no interior yet."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390299,
+          "npc_id": 9500003915,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "390299 'Speak to the palace guard'; his reply 390352/391025: no entry without a pass, 'Quills at town hall provides passes'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Royal Palace Guard: 'In front of the Royal Palace'."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 391023,
+          "npc_id": 9500000520,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "391023 'Speak to Quills'. The family's end line 'Yes, what is it? I'm really quite busy...' (389189, 390257) is the busy town-hall clerk's, so the quest turns in at Quills."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Quills: 'stands on the porch of the Sanctuary Town Hall'; related quests list Local Hero, Sal's Suggestion, Sharing Your Talents, Farnum's Free Advice, Bravery is in Demand."
             }
           ]
         }
@@ -2190,7 +2295,18 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3992,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "fr_quest:Sal's_Suggestion (quest_wiki_facts.json): 5 Queen's Firecrackers."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -2231,13 +2347,13 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Sal Monella giver 9000000450 and regional Queen do not spawn; Wugachug Sal is a different NPC."
+          "evidence": "(R) L1195 (owner 2026-11-09: finish the quests in quest-line order): switched on. W110's blocker ('Regional Queen does not spawn') is gone: the tail ends at Quills, who is placed. Sal Monella 9000000450 is placed (video index); his line 390254 sends the player to the Queen. With no end line in its own block, it uses the family's Quills line 390257."
         }
       ],
       "description_string_id": 390256,
       "intro_text_string_id": 390254,
       "end_text_string_id": 390257,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000026,
@@ -2306,6 +2422,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110: DISABLED: Giver 9000000346 absent; Henry alias not proven to be Henry Farnum. Regional Queen does not spawn."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1195 (owner 2026-11-09: finish the quests in quest-line order): stays disabled. Henry Farnum is in no npcs file or spawn (only Cleetus, Mae and Pappy Farnum are placed), so the quest has no giver yet."
         }
       ],
       "description_string_id": 391031,
@@ -2319,17 +2439,60 @@
       "prerequisite_quest_ids": [],
       "objectives": [
         {
-          "kind": "talk_to_npc",
+          "kind": "visit_position",
           "id": 1,
-          "npc_id": 9500000519,
+          "text_string_id": 390297,
+          "zone_id": 0,
+          "position": [
+            -1223.0,
+            2.767,
+            301.7
+          ],
+          "radius": 30.0,
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:115; see exact objective wording in the chain table."
+              "evidence": "390297 is this step; the family's shared tail is 390297 'Find the Royal Palace', 390299 'Speak to the palace guard', 391023 'Speak to Quills'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest:Sharing_Your_Talents (2013-02-21) (live eq2.fanbyte.com page): the goals end 'Find the Royal Palace', 'Speak to the palace guard', 'Speak to Quills'."
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+              "evidence": "(R) The palace approach Bravery is in Demand's step uses, by the Royal Guard spawns. The palace is an enterable door in video 8Mo5c_FKQJg (live era, 2011-10-07, 'Free Realms: Royal Palace'); we have no interior yet."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390299,
+          "npc_id": 9500003915,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "390299 'Speak to the palace guard'; his reply 390352/391025: no entry without a pass, 'Quills at town hall provides passes'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Royal Palace Guard: 'In front of the Royal Palace'."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 391023,
+          "npc_id": 9500000520,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "391023 'Speak to Quills'. The family's end line 'Yes, what is it? I'm really quite busy...' (389189, 390257) is the busy town-hall clerk's, so the quest turns in at Quills."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Quills: 'stands on the porch of the Sanctuary Town Hall'; related quests list Local Hero, Sal's Suggestion, Sharing Your Talents, Farnum's Free Advice, Bravery is in Demand."
             }
           ]
         }
@@ -2337,12 +2500,23 @@
       "rewards": [
         {
           "coins": 5,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3992,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "fr_quest:Sharing_Your_Talents (2013): 5 Queen's Firecrackers and 5 coins."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
-              "kind": "reconstructed",
-              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+              "kind": "wiki",
+              "evidence": "fr_quest:Sharing_Your_Talents (2013): 5 Queen's Firecrackers and 5 coins."
             }
           ]
         }
@@ -2378,44 +2552,126 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Regional Queen does not spawn. Starshine does spawn."
+          "evidence": "(R) L1195 (owner 2026-11-09: finish the quests in quest-line order): switched on. W110's blocker ('Regional Queen does not spawn') is gone: the tail ends at Quills, who is placed. Starshine 9000000477 is placed (Legacy); her line 391043 sends the player to the Queen. With no end line in its own block, it uses the family's Quills line 390257."
         }
       ],
       "description_string_id": 391045,
       "intro_text_string_id": 391043,
-      "enabled": false
+      "enabled": true,
+      "end_text_string_id": 390257
     },
     {
       "id": 3000028,
       "title_string_id": 140648,
-      "giver_npc_id": 9000000175,
+      "giver_npc_id": 9500000520,
       "prerequisite_quest_ids": [],
       "objectives": [
         {
           "kind": "talk_to_npc",
           "id": 1,
+          "text_string_id": 140669,
           "npc_id": 9500000517,
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md:116; see exact objective wording in the chain table."
+              "evidence": "140669 'Speak to Pux Frillwillow'; 140659 'See if Pux Frillwillow in Sanctuary's inner circle will let you have his appointment slip'; Pux's line 140667 (a chugawug hiding behind Jacque's cafe)."
+            },
+            {
+              "kind": "video",
+              "evidence": "video 8Mo5c_FKQJg (live era, 2011-10-07, 'Free Realms: Royal Palace'): the tracker shows 'Speak to Pux Frillwillow' done."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 140672,
+          "npc_id": 9500004865,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "140672 'Confront the Chugawug by Jacque's cafe'; 140671 'Papers'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Bertaboo: 'at Jacque's Cafe in the far eastern end of Pixiewood Hills'; Take a Number's page links her."
+            },
+            {
+              "kind": "video",
+              "evidence": "video 8Mo5c_FKQJg (live era, 2011-10-07, 'Free Realms: Royal Palace'): 'Confront the Chugawug by Jacque's' done."
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+              "evidence": "(R) A talk: 140674 'Combat Results' sits in the block, but no source shows a fight, and Bertaboo is an Ecology mob on the wiki, not a battle starter."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 140685,
+          "npc_id": 9500000517,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "140685 'Return to Pux'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest:Take_a_Number: 'Return to Pux'."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 391023,
+          "npc_id": 9500000520,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Quills's pass line 140675/393183: 'You have the next appointment slip? ... Take this pass with you to the palace entrance.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest:Take_a_Number: 'Give your new number to Quills'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No goal line for this step is in the block; 391023 'Speak to Quills' is the family's."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 391034,
+          "npc_id": 9500000519,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "The end text 140650 is the Queen's ('...perhaps you have come to offer your services to the crown?'); 140654 '[*Player*] has offered their services to Queen Valerian of Sanctuary!'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "fr_quest:Take_a_Number: 'Talk to Queen Valerian inside the Royal Palace'; FR_Mob Queen Valerian: 'In front of the throne'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 391034 'Seek out Queen Valerian at the Royal Palace in Sanctuary' is the nearest client goal line. The Queen stands at her Legacy spot in the Sanctuary map: we have no palace interior yet."
             }
           ]
         }
       ],
       "rewards": [
         {
-          "coins": 5,
+          "coins": 30,
           "items": [],
           "job_xp": {},
           "source": [
             {
-              "kind": "reconstructed",
-              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+              "kind": "wiki",
+              "evidence": "fr_quest:Take_a_Number (2009): 30 coins."
             }
           ]
         }
@@ -2455,13 +2711,20 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Giver 9000000175 absent; Pux 9500000517 does not spawn; appointment-slip transfer/consumption lacks exact item id and route. Talk is partial only."
+          "evidence": "(R) L1195 (owner 2026-11-09: finish the quests in quest-line order): built from the 2014 block, the 2009 page and the 2011 video; switched on. Its giver is Quills (the page and the intro 140647), not the absent 9000000175. It follows any one of the entry quests that end at Quills."
         }
       ],
       "description_string_id": 140649,
       "intro_text_string_id": 140647,
       "end_text_string_id": 140650,
-      "enabled": false
+      "enabled": true,
+      "prerequisite_any_quest_ids": [
+        3000024,
+        3000025,
+        3000027,
+        3955536,
+        3000062
+      ]
     },
     {
       "id": 3000029,
@@ -5376,6 +5639,110 @@
         }
       ],
       "enabled": true
+    },
+    {
+      "id": 3000062,
+      "title_string_id": 391072,
+      "giver_npc_id": 9500000658,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 390297,
+          "zone_id": 0,
+          "position": [
+            -1223.0,
+            2.767,
+            301.7
+          ],
+          "radius": 30.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "390297 is this step; the family's shared tail is 390297 'Find the Royal Palace', 390299 'Speak to the palace guard', 391023 'Speak to Quills'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "no live page fetched (live eq2.fanbyte.com page): the goals end 'Find the Royal Palace', 'Speak to the palace guard', 'Speak to Quills'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The palace approach Bravery is in Demand's step uses, by the Royal Guard spawns. The palace is an enterable door in video 8Mo5c_FKQJg (live era, 2011-10-07, 'Free Realms: Royal Palace'); we have no interior yet."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390299,
+          "npc_id": 9500003915,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "390299 'Speak to the palace guard'; his reply 390352/391025: no entry without a pass, 'Quills at town hall provides passes'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Royal Palace Guard: 'In front of the Royal Palace'."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 391023,
+          "npc_id": 9500000520,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "391023 'Speak to Quills'. The family's end line 'Yes, what is it? I'm really quite busy...' (389189, 390257) is the busy town-hall clerk's, so the quest turns in at Quills."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob Quills: 'stands on the porch of the Sanctuary Town Hall'; related quests list Local Hero, Sal's Suggestion, Sharing Your Talents, Farnum's Free Advice, Bravery is in Demand."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [
+            {
+              "definition_id": 3992,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) Its siblings' reward: Sharing Your Talents and Local Hero pay 5 Queen's Firecrackers and 5 coins."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The siblings' 5 coins."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "391072 'Druidic Direction'; 391073 'Ceard Bauchlog recognizes your potential, and recommends that you offer your services to Queen Valerian.'; Ceard's lines 391071 and 391069."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1195 (owner 2026-11-09: finish the quests in quest-line order): a new record (none existed). Giver Ceard Bauchlog 9500000658 (Legacy, Shrouded Glade). Goals are the family's palace tail; no prerequisite is recovered; the end line is the family's 390257."
+        }
+      ],
+      "description_string_id": 391073,
+      "intro_text_string_id": 391071,
+      "enabled": true,
+      "end_text_string_id": 390257
     }
   ]
 }

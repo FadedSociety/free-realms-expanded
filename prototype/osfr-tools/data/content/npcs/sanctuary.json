@@ -46330,10 +46330,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/fr_mob:Pux_Frillwillow"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for Pux Frillwillow; Take a Number's own lines carry the talk (140667, his chugawug tip). L1195."
+          }
         ]
       },
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000518,
@@ -47351,6 +47358,7 @@
         }
       ],
       "quest_ids_given": [
+        3000028,
         3951154
       ],
       "quests_given_text": [

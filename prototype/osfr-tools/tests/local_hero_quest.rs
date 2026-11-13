@@ -3,8 +3,9 @@
 //! The quest's own 2014 locale block names one enemy: "Defeat the Thugawug Thug in south
 //! Greenwood Forest" (389192, goal 389193). L1193 binds goal 1 to winning the Thugawug Thug!
 //! battle (fight 14080, BJX fork battle 60, started from the Legacy body 4115 that
-//! `entrances.json` row `thugawug_thug` places), then a final Talk to the Courier, then
-//! 13 coins and 25 Adventurer (profile 1) XP. Before L1193 the goal was five kills of the
+//! `entrances.json` row `thugawug_thug` places), then a Talk to the Courier, then (L1195) the
+//! palace tail: find the Royal Palace, speak to the palace guard, and turn in at Quills for 13
+//! coins and 25 Adventurer (profile 1) XP. Before L1193 the goal was five kills of the
 //! field Hooligan 930050, the Alpha Wolf's borrowed id (KNOWN-BUGS A25).
 //!
 //! These tests drive the production in-world router (`Gameplay::handle_in_world` ->
@@ -28,9 +29,13 @@
 //! The shared fixture, packet builders and shared-field/objective helpers live in
 //! `tests/support/npc_quest_chain.rs`.
 
+#[allow(dead_code)] // Only `recruit_spawn`: a content key's drawn spawn (guid, spot).
+#[path = "support/archer_entry.rs"]
+mod archer_entry;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
+use archer_entry::recruit_spawn;
 use npc_quest_chain::*;
 use osfr_tools::{
     character_store::CharacterState,
@@ -43,6 +48,9 @@ use std::collections::BTreeSet;
 
 const QUEST: u32 = 3_000_024;
 const COURIER: u64 = 9_000_000_444;
+/// L1195: the quest ends at Quills (town hall), after the palace guard (quest_spawned.json).
+const QUILLS: u64 = 9_500_000_520;
+const PALACE_GUARD: u64 = 9_500_003_915;
 /// `title_string_id`, `intro_text_string_id`, `description_string_id` and
 /// `end_text_string_id` of 3000024.
 const TITLE_ID: u32 = 389_187;
@@ -254,6 +262,52 @@ fn win_thug_battle(game: &mut Gameplay, home: &CharacterState, now: &mut u64) ->
     all
 }
 
+/// Local Hero's first two goals: the battle and the Courier Talk.
+fn first_two(game: &Gameplay) -> [u32; 2] {
+    let all = counts(game, QUEST);
+    [all[0], all[1]]
+}
+
+/// A goal's visit spot, read from the shipped record.
+fn goal_position(goal: u64) -> [f32; 3] {
+    let file = read_json(&content_dir().join("quests").join("adventurer.json"));
+    let record = file["records"]
+        .as_array()
+        .and_then(|rows| rows.iter().find(|row| row["id"] == QUEST))
+        .expect("Local Hero is in adventurer.json");
+    let objective = record["objectives"]
+        .as_array()
+        .and_then(|rows| rows.iter().find(|row| row["id"] == goal))
+        .expect("the goal exists");
+    serde_json::from_value(objective["position"].clone()).expect("a visit spot")
+}
+
+/// Goals 3-5 (L1195): find the Royal Palace, speak to the palace guard, then Quills. Returns the
+/// character beside Quills, where the quest turns in.
+fn palace_tail(game: &mut Gameplay, guid: u64, now: &mut u64) -> CharacterState {
+    *now += 10;
+    let visited = game
+        .on_location(&character_at_for(guid, 0, goal_position(3)), *now)
+        .expect("the palace visit is valid");
+    assert!(visited.changed, "reaching the palace advances goal 3");
+    // The guard is bound to a drawn spawn: the client clicks that spawn.
+    let (guard, spot) = recruit_spawn(PALACE_GUARD);
+    *now += 10;
+    assert!(
+        talk(game, &character_at_for(guid, 0, spot), guard, *now).changed,
+        "the palace guard advances goal 4"
+    );
+    let quills = character_at_for(guid, 0, content_position("sanctuary.json", QUILLS));
+    *now += 10;
+    assert!(talk(game, &quills, QUILLS, *now).changed, "Quills completes goal 5");
+    *now += 10;
+    assert!(
+        counts(game, QUEST).iter().all(|&count| count == 1),
+        "every goal is done at Quills"
+    );
+    quills
+}
+
 fn reward_packets(outcome: &Outcome, subtype: u16) -> usize {
     outcome
         .replies
@@ -288,7 +342,7 @@ fn the_royal_courier_offers_local_hero_to_every_job() {
             &mut now,
             &format!("active Local Hero talk as job {job}"),
         );
-        assert_eq!(counts(&game, QUEST), [0, 0]);
+        assert_eq!(first_two(&game), [0, 0]);
         assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     }
 }
@@ -319,7 +373,7 @@ fn five_hooligan_kills_advance_the_hunt_once() {
         );
     }
     assert_eq!(
-        counts(&hunter, QUEST),
+        first_two(&hunter),
         [0, 0],
         "field Hooligans no longer count"
     );
@@ -327,7 +381,7 @@ fn five_hooligan_kills_advance_the_hunt_once() {
     let (mut game, mut now) = start_local_hero(&fixture, A);
     let courier = courier_character(A);
     let won = win_thug_battle(&mut game, &courier, &mut now);
-    assert_eq!(counts(&game, QUEST), [1, 0], "one win is the goal");
+    assert_eq!(first_two(&game), [1, 0], "one win is the goal");
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     assert!(
         objective_complete(&won, QUEST, DEFEAT_OBJECTIVE),
@@ -340,7 +394,7 @@ fn five_hooligan_kills_advance_the_hunt_once() {
 
     // A second win of the repeatable battle does not advance or re-complete the goal.
     let again = win_thug_battle(&mut game, &courier, &mut now);
-    assert_eq!(counts(&game, QUEST), [1, 0]);
+    assert_eq!(first_two(&game), [1, 0]);
     assert!(
         !objective_complete(&again, QUEST, DEFEAT_OBJECTIVE),
         "a second win sends no second GoalComplete"
@@ -353,14 +407,15 @@ fn the_courier_turn_in_pays_thirteen_coins_and_adventurer_xp_once() {
     let (mut game, mut now) = start_local_hero(&fixture, A);
     let courier = courier_character(A);
     win_thug_battle(&mut game, &courier, &mut now);
-    assert_eq!(counts(&game, QUEST), [1, 0]);
+    assert_eq!(first_two(&game), [1, 0]);
 
     let talked = talk(&mut game, &courier, COURIER, now);
     now += 10;
-    assert!(talked.changed, "the final Talk advances the objective");
-    assert_eq!(counts(&game, QUEST), [1, 1]);
+    assert!(talked.changed, "the Courier Talk advances the objective");
+    assert_eq!(first_two(&game), [1, 1]);
+    let quills = palace_tail(&mut game, A, &mut now);
     assert_eq!(pending_turnin(&game), Some(QUEST));
-    release_end_screen(&mut game, &courier, QUEST, COURIER, END_TEXT, now);
+    release_end_screen(&mut game, &quills, QUEST, QUILLS, END_TEXT, now);
     now += 10;
 
     let coins_before = coins(&game);
@@ -373,7 +428,7 @@ fn the_courier_turn_in_pays_thirteen_coins_and_adventurer_xp_once() {
     );
     let completed = finish_quest(
         &mut game,
-        &courier,
+        &quills,
         QUEST,
         ADVENTURER,
         REWARD_COINS,
@@ -398,7 +453,7 @@ fn the_courier_turn_in_pays_thirteen_coins_and_adventurer_xp_once() {
     // Paid once: a replayed 49/14 changes neither state nor save.
     assert_packet_changes_nothing(
         &mut game,
-        &courier,
+        &quills,
         &quest_end_reply(QUEST),
         now,
         "replayed Local Hero turn-in",
@@ -533,14 +588,14 @@ fn progress_survives_a_reconnect() {
 
     // Disconnect with the quest just accepted, then reconnect.
     let mut game = reload(&fixture, &game, &character, "reconnect-accepted.json");
-    assert_eq!(counts(&game, QUEST), [0, 0]);
+    assert_eq!(first_two(&game), [0, 0]);
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
 
     // Win, then disconnect with the goal done: it survives the reload.
     win_thug_battle(&mut game, &character, &mut now);
-    assert_eq!(counts(&game, QUEST), [1, 0]);
+    assert_eq!(first_two(&game), [1, 0]);
     let mut game = reload(&fixture, &game, &character, "reconnect-won.json");
-    assert_eq!(counts(&game, QUEST), [1, 0], "the won goal survives reload");
+    assert_eq!(first_two(&game), [1, 0], "the won goal survives reload");
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     // After the battle's own payout: the quest's reward is counted from here.
     let coins_before = coins(&game);
@@ -549,11 +604,12 @@ fn progress_survives_a_reconnect() {
     let talked = talk(&mut game, &character, COURIER, now);
     now += 10;
     assert!(talked.changed);
-    release_end_screen(&mut game, &character, QUEST, COURIER, END_TEXT, now);
+    let quills = palace_tail(&mut game, A, &mut now);
+    release_end_screen(&mut game, &quills, QUEST, QUILLS, END_TEXT, now);
     now += 10;
     finish_quest(
         &mut game,
-        &character,
+        &quills,
         QUEST,
         ADVENTURER,
         REWARD_COINS,
@@ -569,7 +625,7 @@ fn progress_survives_a_reconnect() {
         expected_bytes,
         "the reload changed the save"
     );
-    assert_eq!(counts(&game, QUEST), [1, 1]);
+    assert!(counts(&game, QUEST).iter().all(|&count| count == 1));
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + REWARD_COINS);
     assert_eq!(profile_xp(&game, ADVENTURER), adventurer_before + REWARD_XP);
@@ -595,13 +651,13 @@ fn a_second_player_killing_the_same_hooligans_does_not_advance_the_first() {
 
     let a_before = a.state();
     win_thug_battle(&mut b, &b_character, &mut now);
-    assert_eq!(counts(&b, QUEST), [1, 0], "the winner is credited");
-    assert_eq!(counts(&a, QUEST), [0, 0], "the other player is not credited");
+    assert_eq!(first_two(&b), [1, 0], "the winner is credited");
+    assert_eq!(first_two(&a), [0, 0], "the other player is not credited");
     assert_eq!(a.state(), a_before, "B's win changed A's saved state");
 
     let b_after = b.state();
     win_thug_battle(&mut a, &a_character, &mut now);
-    assert_eq!(counts(&a, QUEST), [1, 0], "A's own win credits A");
+    assert_eq!(first_two(&a), [1, 0], "A's own win credits A");
     assert_eq!(b.state(), b_after, "A's win changed B's saved state");
 }
 
@@ -629,11 +685,11 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
 
     // A's win is played but cannot credit the unbound stale state.
     win_thug_battle(&mut a, &courier_character(A), &mut now);
-    assert_eq!(counts(&a, QUEST), [0, 0], "the stale save is not credited");
+    assert_eq!(first_two(&a), [0, 0], "the stale save is not credited");
 
     // B's engine still advances normally.
     let out = win_thug_battle(&mut b, &b_character, &mut now);
-    assert_eq!(counts(&b, QUEST), [1, 0]);
+    assert_eq!(first_two(&b), [1, 0]);
     assert!(
         objective_complete(&out, QUEST, DEFEAT_OBJECTIVE),
         "B's win still completes B's goal"
@@ -647,15 +703,16 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     let talked = talk(&mut capped, &a_character, COURIER, now_c);
     now_c += 10;
     assert!(talked.changed);
+    let quills = palace_tail(&mut capped, A, &mut now_c);
     assert_eq!(pending_turnin(&capped), Some(QUEST));
-    release_end_screen(&mut capped, &a_character, QUEST, COURIER, END_TEXT, now_c);
+    release_end_screen(&mut capped, &quills, QUEST, QUILLS, END_TEXT, now_c);
     now_c += 10;
     let mut state = capped.state();
     state.inventory.coins = i32::MAX as u32;
     let mut capped = fixture.game_as(A, Some(state));
     let before = saved(&capped);
     let refused = capped
-        .handle_in_world(&quest_end_reply(QUEST), &a_character, now_c)
+        .handle_in_world(&quest_end_reply(QUEST), &quills, now_c)
         .expect("a coin grant past i32::MAX is a refusal, not an error (T382)");
     assert!(
         !refused.changed,
@@ -671,5 +728,5 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     // B still finishes its own goal at the Courier.
     let talked = talk(&mut b, &b_character, COURIER, now);
     assert!(talked.changed);
-    assert_eq!(counts(&b, QUEST), [1, 1]);
+    assert_eq!(first_two(&b), [1, 1]);
 }
