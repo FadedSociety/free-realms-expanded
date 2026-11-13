@@ -52530,27 +52530,8 @@
         "\"Speak to Farmer Chug in Wilds Farm.\" (wiki start line of Be a Star and Make a Mint, Birds of a Feather, Farming: Away with Weeds, Farming: It's What Plants Crave, Farming: My Cousin Wug, Farming: Toil Over Soil and the other Wilds Farm Quests)",
         "[video: V3xStzxf-IU 'Freerealms with Luke Tomahawk' (2013-06-07), quest card 'Farming: Meet Farmer Chug!' with goal 'Talk to Chug' at 0:00-2:40]"
       ],
-      "quests_given": [
-        {
-          "quest_id": 3957883,
-          "title": "Be a Star and Make a Mint",
-          "title_string_id": 434458,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "Be a Star and Make a Mint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
-            }
-          ]
-        }
-      ],
-      "quest_ids_given": [
-        3957883
-      ],
+      "quests_given": [],
+      "quest_ids_given": [],
       "quests_given_text": [
         "Farming: Meet Farmer Chug! (wiki; client 435268 'Click the Wilds Farm option in your Houses Browser to meet Farmer Chug.')",
         "Farming: Away with Weeds (wiki; return 434738)",
@@ -52591,8 +52572,8 @@
       "placement_candidates": [],
       "capture_match": null,
       "position_reason": "(R) Inside the Wilds Farm lot's build box (houses.json property 34: x 1356..1406, z 723.4..778.2), 11.5 m west of the lot spawn (1409, 0, 750.8) and facing it, so the player sees him on arrival as the tutorial quest says; y 0 is the lot spawn's height (the farm scene's ground is unread).",
-      "model_id": 488,
-      "model_file_name": "chugawug_farmer_m.adr",
+      "model_id": 1788,
+      "model_file_name": "evnt_world_party_luau_chug_drum_01.adr",
       "greeting_string_id": 134934,
       "greeting_reason": "Client text 134934 'Howdy neighbor! The name is Farmer Chug. I live over on the farm next door...' is his introduction (wiki Farming: Meet Farmer Chug! quotes the same line).",
       "source": [

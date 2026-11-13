@@ -33421,67 +33421,6 @@
       "enabled": true
     },
     {
-      "id": 3957883,
-      "title_string_id": 434458,
-      "giver_npc_id": 9500004355,
-      "prerequisite_quest_ids": [],
-      "objectives": [
-        {
-          "kind": "gather_resource",
-          "id": 1,
-          "text_string_id": 434460,
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "Harvest 25 Starmints. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) the client has no Starmint item; 2877 Bundle of Spiralmint (harvesting.json) is the one mint a harvest yields"
-            }
-          ],
-          "resource_id": 2877,
-          "quantity": 25
-        },
-        {
-          "kind": "talk_to_npc",
-          "id": 2,
-          "text_string_id": 434546,
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "Return to Farmer Chug. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
-            }
-          ],
-          "npc_id": 9500004355
-        }
-      ],
-      "rewards": [
-        {
-          "coins": 0,
-          "items": [],
-          "job_xp": {},
-          "source": [
-            {
-              "kind": "wiki",
-              "evidence": "Be a Star and Make a Mint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
-            }
-          ]
-        }
-      ],
-      "source": [
-        {
-          "kind": "wiki",
-          "evidence": "Be a Star and Make a Mint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
-        }
-      ],
-      "enabled": true
-    },
-    {
       "id": 3957912,
       "title_string_id": 390570,
       "giver_npc_id": 9500000076,
