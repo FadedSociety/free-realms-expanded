@@ -2010,18 +2010,8 @@ impl EncounterEngine {
                 return Ok(self.revive_at_safe_location(now_ms));
             }
         }
-        // A lost run whose results card is never closed still returns the player to the world
-        // (owner 2026-11-13: "running out of knockouts doesn't send you back to the over world").
-        let lost = (self.state.active.as_ref()).is_some_and(|a| a.phase == EncounterPhase::Lost);
-        if lost && self.results_presented && self.rules.revive.lost_exit_ms > 0 {
-            // The first tick that sees it starts the clock; a later one ends the wait.
-            match self.fight_state.lost_since {
-                None => self.fight_state.lost_since = Some(now_ms),
-                Some(at) if now_ms >= at.saturating_add(self.rules.revive.lost_exit_ms) => {
-                    return self.exit();
-                }
-                Some(_) => {}
-            }
+        if let Some(exit) = self.lost_run_exit(now_ms) {
+            return exit;
         }
         // The run's own clock goes first, on every call: a run keeps time while the player is
         // down, the fight is not armed yet, or less than a tick has passed.
