@@ -804,7 +804,7 @@ impl EncounterEngine {
             if let Some(door) = exit_door(def) {
                 // As captured: added hostile, then made friendly at once.
                 out.replies
-                    .push(self.spawn(&door, ground.snapped(door.position), 0));
+                    .push(self.spawn_object(&door, ground.snapped(door.position), 0));
                 out.replies.push(wire::disposition(guid, 1));
             }
         } else if let Some(i) = (0..def.roster.len()).find(|&i| def.guid(Some(i)) == guid) {

@@ -266,6 +266,31 @@ fn an_open_world_enemy_is_clickable_but_draws_no_press_x() {
     assert!(enemies > 0 && starters > 0, "{enemies} enemies, {starters} starters");
 }
 
+/// Owner 2026-11-13: "enemies in the dungeons still hold the ui press x to interact". A fight
+/// file's kinds hit by their rank, with no `damage` of their own, so the old "a hostile that
+/// hits" rule gave the Bixie Hive's guards a 3 m reach. Every enemy the engine spawns inside an
+/// instance is marked as one and draws no prompt; it can still be clicked.
+#[test]
+fn an_instance_enemy_is_clickable_but_draws_no_press_x() {
+    let door = entrance("bixie_hive");
+    let door_at = at(&door["at"]);
+    let mut player = Player::enter([door_at[0] - 3.0, door_at[1], door_at[2]], [1.0, 0.0, 0.0]);
+    let arena = player.battle(door["guid"].as_u64().unwrap());
+    let drawn: Vec<_> = (arena.iter())
+        .filter(|p| p.starts_with(&[35, 0, 2, 0]))
+        .filter_map(|p| parse_add_npc(p).ok())
+        .collect();
+    let enemies: Vec<_> = drawn.iter().filter(|npc| npc.disposition == 0).collect();
+    assert!(!enemies.is_empty(), "the hive's guards are drawn on arrival");
+    for npc in &enemies {
+        assert_eq!(npc.interact_range, 0, "{} ({}) draws a press-X", npc.npc_name, npc.actor_id);
+        assert_eq!(npc.is_interactable, 1, "{} cannot be clicked", npc.actor_id);
+    }
+    for npc in drawn.iter().filter(|npc| npc.disposition != 0) {
+        assert!(npc.interact_range > 0, "{} lost its press-X", npc.npc_name);
+    }
+}
+
 #[test]
 fn goto_bixie_hive_lands_outside_the_hive_whichever_way_the_player_faces() {
     let door = entrance("bixie_hive");

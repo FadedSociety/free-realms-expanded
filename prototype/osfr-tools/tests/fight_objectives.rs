@@ -499,6 +499,71 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
     let _ = std::fs::remove_dir_all(dir);
 }
 
+/// Owner 2026-11-13: "add an identifier for enemies spawned in dungeons and inside instances
+/// that they don't get the ui interact menu pop up". Every hostile the engine spawns in an
+/// instance draws no press-X reach, whatever its numbers: a kind that states no hit (a prop to
+/// destroy, a dummy) had a 3 m reach under the old "a hostile that hits" rule.
+#[test]
+fn an_instance_enemy_draws_no_press_x_even_without_a_hit() {
+    let (dir, mut engine) = engine_with(&[fight(
+        622,
+        json!({
+            "kinds": {
+                "chief": {"definition_id": 7003, "name": "Chief", "name_id": 1, "model_id": 3, "rank": "boss", "boss": true},
+                "post": {"definition_id": 7004, "name": "Post", "name_id": 2, "model_id": 3, "rank": "object", "damage": 0}
+            },
+            "actors": {
+                "boss": {"definition": "chief", "at": [0, 0, 10]},
+                "post": {"definition": "post", "at": [3, 0, 10]}
+            },
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    let replies = enter(&mut engine, 622, 1_000);
+    let hostile: Vec<_> = (replies.iter())
+        .filter(|r| r.starts_with(&[35, 0, 2, 0]))
+        .map(|r| osfr_tools::startup_world::parse_add_npc(r).unwrap())
+        .filter(|npc| npc.disposition == 0)
+        .collect();
+    assert_eq!(hostile.len(), 2, "the chief and the post are drawn hostile");
+    for npc in hostile {
+        assert_eq!(npc.interact_range, 0, "{}: no press-X reach", npc.npc_name);
+        assert_eq!(npc.is_interactable, 1, "{}: still clickable", npc.npc_name);
+    }
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "when running out of knockouts it doesn't send you back to the over world".
+/// A lost run waits on its results card; when the card is never closed, the tick sends the player
+/// back to the world after `combat_rules.json` `revive.lost_exit_ms` (at most ten minutes).
+#[test]
+fn a_lost_run_returns_to_the_world_when_its_card_is_never_closed() {
+    let (dir, mut engine) = engine_with(&[fight(
+        623,
+        json!({
+            "rules": {"knockouts": 1},
+            "actors": {"boss": {"definition": "chief", "at": [0, 0, 10]}},
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    enter(&mut engine, 623, 1_000);
+    engine.receive_arena_damage(u32::MAX, 2_000);
+    engine
+        .handle(&stand_up(), 1, [0.0; 3], BRAWLER, 2_500)
+        .unwrap();
+    // Past any fight grace (at most a minute): the second knockout loses the run.
+    let lost = engine.receive_arena_damage(u32::MAX, 70_000);
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
+    assert!(lost.replies.iter().any(|r| r.starts_with(&[39, 0, 18])), "game over");
+    let waiting = engine.tick([0.0; 3], BRAWLER, 70_001).unwrap();
+    assert!(waiting.zoning.is_none(), "the card stays up a while");
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
+    let back = engine.tick([0.0; 3], BRAWLER, 70_001 + 600_001).unwrap();
+    assert!(back.zoning.is_some(), "back to the world");
+    assert_eq!(engine.run_phase(), None, "the run is closed");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
 /// Owner 2026-11-13: "3-4 seconds of invincibility after a combat knockout". A player who
 /// stands up takes no enemy damage for the fight grace (`combat_rules.json`
 /// `revive.fight_grace_ms`, at most a minute), and is hit again once it is over.

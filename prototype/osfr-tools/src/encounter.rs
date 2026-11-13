@@ -2010,6 +2010,19 @@ impl EncounterEngine {
                 return Ok(self.revive_at_safe_location(now_ms));
             }
         }
+        // A lost run whose results card is never closed still returns the player to the world
+        // (owner 2026-11-13: "running out of knockouts doesn't send you back to the over world").
+        let lost = (self.state.active.as_ref()).is_some_and(|a| a.phase == EncounterPhase::Lost);
+        if lost && self.results_presented && self.rules.revive.lost_exit_ms > 0 {
+            // The first tick that sees it starts the clock; a later one ends the wait.
+            match self.fight_state.lost_since {
+                None => self.fight_state.lost_since = Some(now_ms),
+                Some(at) if now_ms >= at.saturating_add(self.rules.revive.lost_exit_ms) => {
+                    return self.exit();
+                }
+                Some(_) => {}
+            }
+        }
         // The run's own clock goes first, on every call: a run keeps time while the player is
         // down, the fight is not armed yet, or less than a tick has passed.
         let mut energy = EncounterOutcome::default();
@@ -2103,6 +2116,7 @@ impl EncounterEngine {
         let Some(a) = self.state.active.take() else {
             return Ok(EncounterOutcome::default());
         };
+        self.fight_state.lost_since = None;
         let mut zone = self.content.world.clone();
         zone.zone_id = a.return_location.zone_id;
         zone.position = a.return_location.position;
@@ -2142,6 +2156,7 @@ impl EncounterEngine {
         };
         a.enemies = enemies;
         a.phase = EncounterPhase::Loading;
+        self.fight_state.lost_since = None;
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
@@ -2152,8 +2167,16 @@ impl EncounterEngine {
         })
     }
 
+    /// An engine actor; a hostile one (disposition 0) is an enemy, in the open world or an
+    /// instance, and draws no press-X prompt.
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-        spawn_actor(&self.content.template, a, position, disposition)
+        spawn_actor(&self.content.template, a, position, disposition, disposition == 0)
+    }
+
+    /// A hostile-flagged actor that is not an enemy (the exit door, made friendly at once): it
+    /// keeps its press-X prompt.
+    fn spawn_object(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
+        spawn_actor(&self.content.template, a, position, disposition, false)
     }
 }
 

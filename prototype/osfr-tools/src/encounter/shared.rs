@@ -331,6 +331,7 @@ impl SharedFieldState {
                     &f.actor,
                     f.state.position,
                     0,
+                    true,
                 )),
                 field_marker::enemy(guid, f.marker),
                 Some(bar),

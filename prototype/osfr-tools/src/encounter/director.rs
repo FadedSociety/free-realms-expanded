@@ -173,6 +173,9 @@ pub struct FightState {
     /// Enemies cannot hurt this player before then: they stood up from a knockout (the fight
     /// grace of `combat_rules.json` `revive.fight_grace_ms`).
     pub(super) guarded_until: u64,
+    /// When the tick first saw this player's run lost with its results card up (the fallback
+    /// return of `revive.lost_exit_ms` counts from it).
+    pub(super) lost_since: Option<u64>,
     /// The run as last written to the save.
     pub(super) saved: Option<run::Saved>,
     /// The overworld instance fights' pacing (`instance_pacing.json`, `pacing.rs`).
