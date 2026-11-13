@@ -146,7 +146,8 @@ pub(super) struct CombatScale {
     player_base_health: u32,
     enemy_health_scale: f32,
     enemy_damage_scale: f32,
-    /// The owner's multipliers on every enemy's final health and hit (rc-0136: x2, x1.5).
+    /// The owner's multipliers on every enemy's final health and hit (1.0 since the owner's
+    /// 2026-11-13 "keep the natural curve"; rc-0136 had x2, x1.5).
     enemy_health_multiplier: f32,
     enemy_damage_multiplier: f32,
     max_level: u32,
