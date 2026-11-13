@@ -4591,7 +4591,7 @@ impl Gameplay {
             None => self.inventory.handle(inner),
         };
         result.inspect_err(|error| {
-            let head: String = inner.iter().take(24).map(|b| format!("{b:02x}")).collect();
+            let head = crate::trace::hex_prefix_len(inner, false, 24);
             let reason = error.to_string();
             npc_event(serde_json::json!({
                 "event": "inventory_refused", "reason": reason, "request": head
