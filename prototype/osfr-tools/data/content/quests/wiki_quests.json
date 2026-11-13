@@ -33494,12 +33494,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Burial_Service)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 390571,
       "intro_text_string_id": 390569,
       "enabled": true,
-      "end_text_string_id": 390572
+      "end_text_string_id": 390572,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957924,
@@ -33656,12 +33666,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 429076 '<font size='20'>Don't call me Bob!</font><BR>Oh, that little treeble... I'm goin'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event summer_camp runs; the wiki files it under 'Summer Camp' (https://fr.fanbyte.com/wiki/FR_Quest%3AConfronting_Bigfoot) (scripts/quest_fidelity.py)."
         }
       ],
       "description_string_id": 429075,
       "intro_text_string_id": 429073,
       "enabled": true,
-      "end_text_string_id": 429076
+      "end_text_string_id": 429076,
+      "live_event": "summer_camp"
     },
     {
       "id": 3957934,
@@ -33752,12 +33767,31 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event seaside_summer_splash runs; the wiki files it under 'Seaside Summer Splash' (https://fr.fanbyte.com/wiki/fr_quest%3ACook-off_Catastrophe) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3ACook-off_Catastrophe)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "Stays disabled (L1202, 2026-11-13): the wiki's goal is 'Knock out some Cray Royal Servants! (0/8)' in the battle 'Prince of the Low Tide!', but that door's fight (fights/14052.json) holds Bandit Patrolmen, Thugawug Stompers and Brugo, no cray, and enemy 930075 is placed nowhere. On again once the fight has its Cray Royal Servants."
         }
       ],
       "description_string_id": 400103,
       "intro_text_string_id": 400084,
-      "enabled": true,
-      "end_text_string_id": 416261
+      "enabled": false,
+      "end_text_string_id": 416261,
+      "live_event": "seaside_summer_splash",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957935,
@@ -33832,13 +33866,23 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Craving_Something_Tasty)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "job": 45,
       "description_string_id": 101061,
       "intro_text_string_id": 101061,
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 416261,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957936,
@@ -33961,11 +34005,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it). The block's title + 2 slot holds a goal line, not a turn-in line (read by the lead, L1202)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Disarm_the_Pests)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 7385,
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 416261,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3957980,
@@ -34140,10 +34194,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest%3AHigh_Performance_Parts)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 416261,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3958018,
@@ -34673,12 +34737,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest%3APie_Underground)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 23734,
       "intro_text_string_id": 25002,
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 416261,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3958071,
@@ -35288,12 +35362,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:To_the_Bat_Cave)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
         }
       ],
       "description_string_id": 5678,
       "intro_text_string_id": 24777,
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 416261,
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3958177,
@@ -35624,12 +35708,27 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 427167 'You finished the box? Great! Only 6,487 to go!'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Event quest: offered only while event festival_of_hearts runs; the wiki files it under 'Festival of Hearts' (https://fr.fanbyte.com/wiki/FR_Quest:Truffle_Shuffle) (scripts/quest_fidelity.py)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Truffle_Shuffle)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "repeat_hours 24: the wiki: once a day (https://fr.fanbyte.com/wiki/FR_Quest:Truffle_Shuffle)."
         }
       ],
       "description_string_id": 427166,
       "intro_text_string_id": 427164,
       "enabled": true,
-      "end_text_string_id": 427167
+      "end_text_string_id": 427167,
+      "live_event": "festival_of_hearts",
+      "repeatable": true,
+      "repeat_hours": 24
     },
     {
       "id": 3958194,
