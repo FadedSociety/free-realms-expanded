@@ -274,9 +274,9 @@ impl EncounterEngine {
     }
 
     /// The battle whose start screen is open, consumed by Go (41/108). The
-    /// player must still stand within `BATTLE_SCREEN_RADIUS` of the marker:
-    /// an out-of-reach screen is dropped so Go cannot start a battle after
-    /// walking away. `None` covers no open screen and a dropped one.
+    /// player must still stand within `BATTLE_SCREEN_RADIUS` of the marker (or near
+    /// where the click opened the card): an out-of-reach Go starts nothing, and the
+    /// caller reopens the card with the reason (A33). `None` covers both cases.
     pub fn take_pending_battle(&mut self, position: [f32; 3]) -> Option<u32> {
         let (id, _) = self.pending_battle.take()?;
         // Owner 2026-11-13: Go from a hooligan's card "didn't send me into an instance": the
