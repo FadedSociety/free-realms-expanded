@@ -70,6 +70,9 @@ fn gameplay_dir() -> PathBuf {
     DIRECTORY
         .get_or_init(|| {
             let path = Path::new(env!("CARGO_TARGET_TMPDIR")).join("brawler-chain-content");
+            // A shared build folder keeps another branch's copy: its fight files clashed with these
+            // doors (PC2 slot r1 after L1197, 2026-11-13). Start empty.
+            let _ = fs::remove_dir_all(&path);
             npc_quest_chain::copy_tree(npc_quest_chain::reference_with_reward_items(), &path);
             npc_quest_chain::copy_tree(&content_dir().join("fights"), &path.join("fights"));
             for file in ["enemies.json", "instance_pacing.json"] {
