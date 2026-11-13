@@ -5,12 +5,37 @@
 <h3 align="center">An open-source revival of Free Realms, with tools to build new content in the running game.</h3>
 
 <p align="center">
+  <a href="#hello-free-realmers">Hello, Free Realmers!</a> ·
+  <a href="#heres-how-you-can-help">How you can help</a> ·
   <a href="#whats-new">What's new</a> ·
   <a href="ROADMAP.md">What still needs doing</a> ·
   <a href="#what-this-repository-contains">What's in this repo</a> ·
   <a href="#getting-started">Getting started</a> ·
   <a href="#credits">Credits</a>
 </p>
+
+---
+
+## Hello, Free Realmers!
+
+Welcome back to the Realms! Free Realms closed its doors in 2014, and we've been bringing it back ever since: a brand-new server that the original game client talks to, plus tools to build new adventures right inside the running game.
+
+### Here's where we're at (13 November 2026)
+
+- **You can play today.** Install through the [launcher](https://github.com/FadedSociety/free-realms-launcher), host your own realm and invite your friends. The latest server is [v0.1.37](https://github.com/FadedSociety/free-realms-expanded/releases) and the latest launcher is [v0.3.13](https://github.com/FadedSociety/free-realms-launcher/releases).
+- **798 quests are switched on.** That includes the opening chapter, from the Royal Courier and Quills all the way to Queen Valerian, the Brawler chain, and the Demo Derby quests at Thunder Falls.
+- **Your class picks your prize.** Most battles and dungeons (54 of 62) spin their own prize wheel for your class, straight from the original reward lists.
+- **Combat is getting a big pass right now.** In testing: enemies back on the original 2014 numbers, a few seconds of safety after you're knocked out, and 13 more dungeons the Games window can start.
+- **It's still rough in places.** Some dungeons can't be entered yet, some minigames are only partly there, and you will find bugs. That's where you come in!
+
+### Here's how you can help
+
+- **Play, and tell us what breaks.** Open an [issue](https://github.com/FadedSociety/free-realms-expanded/issues) with what you did, what you expected and what happened. A screenshot or your client's `Logs` folder helps a lot.
+- **Share what you remember.** Old screenshots, videos, quest text, even "this NPC stood by the fountain" all help us put things back where they belong.
+- **Pick something from the [roadmap](ROADMAP.md)** if you write code or build content. It lists every unfinished area and the bugs we know about.
+- **Bring your friends.** Free Realms was always better together.
+
+Thanks for being here. See you in Sacred Grove!
 
 ---
 
