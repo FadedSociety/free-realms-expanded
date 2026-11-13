@@ -512,3 +512,21 @@ fn private_opening_every_stage_is_completable_through_typed_events_and_reward_on
     let mut reloaded = OpeningEngine::load(&directory, Some(engine.state().clone())).unwrap();
     assert!(reloaded.handle_command("opening turnin").rewards.is_empty());
 }
+
+/// KNOWN-BUGS A30 (native run, 2026-11-13): every login printed the reconstruction notice, the
+/// step counter and the guide's coordinates in red chat. They are lab scaffolding: only a session
+/// with dev tools reads them, and the login batch changes nothing else.
+#[test]
+fn the_login_batch_is_lab_text_for_dev_tools_only() {
+    let reference = Reference::new();
+    let engine = reference.engine();
+    let player = engine.initialization(false);
+    assert!(player.messages.is_empty(), "a player sees none: {:?}", player.messages);
+    let dev = engine.initialization(true);
+    assert_eq!(dev.messages.first().map(String::as_str), Some("synthetic fixture"));
+    assert!(dev.messages.iter().any(|m| m.starts_with("Opening: ")), "{:?}", dev.messages);
+    assert_eq!(
+        (player.changed, player.rewards.len(), player.unlock_profiles.clone()),
+        (dev.changed, dev.rewards.len(), dev.unlock_profiles.clone())
+    );
+}
