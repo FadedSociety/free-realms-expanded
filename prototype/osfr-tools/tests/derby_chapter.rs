@@ -25,6 +25,9 @@
 //! content, not a state insert, so learning the job and switching to it stay on the production
 //! paths.
 
+#[allow(dead_code)] // Only `recruit_spawn`: a content key's drawn spawn (guid, spot).
+#[path = "support/archer_entry.rs"]
+mod archer_entry;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 #[path = "support/quest_records.rs"]
@@ -62,6 +65,9 @@ use std::{
 const MAD_JACK: u64 = 9_000_000_391;
 const CRASH: u64 = 9_000_000_289;
 const DALTON: u64 = 9_000_000_295;
+/// L1196: License to Drive's first three goals talk to the pros (client 394058, 394065, 395513).
+const WILLOW: u64 = 9_500_000_961;
+const JET: u64 = 9_500_004_866;
 /// `job_trainers.json` row 49 (Mad Jack teaches Demo Derby Driver).
 const TRAINER_LABEL: u32 = 412_342;
 /// `derby_gates.json` menu label.
@@ -96,7 +102,8 @@ struct Fixture {
 impl Fixture {
     fn new(guid: u64) -> Self {
         let inner = npc_quest_chain::Fixture::for_character(guid);
-        for file in ["derby_entry.json", "derby_gates.json"] {
+        // L1196: the rows too, so a gate NPC enters the quest's own row (605, 611).
+        for file in ["derby_entry.json", "derby_gates.json", "derby_rows.json", "derby_minigames.json"] {
             fs::copy(content_dir().join(file), inner.path().join(file)).unwrap();
         }
         add_profile_49_outfit(inner.path());
@@ -275,7 +282,24 @@ fn accept_license(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) {
     offer(game, &crash, CRASH, LICENSE_TO_DRIVE, *now);
     *now += 10;
     accept(game, &crash, LICENSE_TO_DRIVE, *now);
-    assert_eq!(counts(game, LICENSE_TO_DRIVE), vec![0, 0]);
+    talk_pros(fixture, game, now);
+    assert_eq!(counts(game, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
+}
+
+/// L1196: the license's first three goals, "chat with the pros": Tucker, Jet (bound to his drawn
+/// spawn, which the client clicks) and Willow, before Crash's test.
+fn talk_pros(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) {
+    for npc in [TUCKER, JET, WILLOW] {
+        *now += 10;
+        let (target, character) = if npc == JET {
+            let (spawn, spot) = archer_entry::recruit_spawn(JET);
+            let zone_id = fixture.character(TUCKER).zone_id;
+            (spawn, CharacterState { guid: fixture.guid, zone_id, position: spot, rotation: [0.0, 0.0, 1.0] })
+        } else {
+            (npc, fixture.character(npc))
+        };
+        assert!(talk(game, &character, target, *now).changed, "the license talk to {npc}");
+    }
 }
 
 /// T787: give the license quest's finish objective a result requirement (and a count)
@@ -487,6 +511,19 @@ fn finish_match(
         send(game, &character, &pose_for(key, beside), at - 1);
         let out = send(game, &character, &hit_for(key, *npc, 10_000.0), at);
         if index + 1 == KNOCKOUTS_TO_WIN {
+            if game.derby_phase() == Some(DerbyPhase::Running) {
+                // L1196: a `derby_rows.json` row (a quest's own row, 605 or 611) has no score
+                // target; its 240 s clock ends the match, with this driver well ahead.
+                let end = at + 241_000;
+                let out = game.tick(&character, end).unwrap();
+                assert_eq!(
+                    game.derby_phase(),
+                    Some(DerbyPhase::Results),
+                    "the row's time limit ends the match"
+                );
+                *now = end;
+                return out;
+            }
             assert_eq!(
                 game.derby_phase(),
                 Some(DerbyPhase::Results),
@@ -564,7 +601,7 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
     let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
 
     // The finish objective advanced exactly once, in order, and opened the return Talk.
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     assert_eq!(
         count_quest_packets(&finished.results, LICENSE_TO_DRIVE, 9),
         1,
@@ -575,10 +612,10 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
         count_quest_packets(&finished.results, LICENSE_TO_DRIVE, 10),
         1
     );
-    assert!(objective_update(&finished.results, LICENSE_TO_DRIVE, 1, 1));
-    assert!(objective_complete(&finished.results, LICENSE_TO_DRIVE, 1));
+    assert!(objective_update(&finished.results, LICENSE_TO_DRIVE, 4, 1));
+    assert!(objective_complete(&finished.results, LICENSE_TO_DRIVE, 4));
     assert!(
-        objective_activated(&finished.results, LICENSE_TO_DRIVE, 2),
+        objective_activated(&finished.results, LICENSE_TO_DRIVE, 5),
         "the ordered second objective opens: {}",
         replies_text(&finished.results)
     );
@@ -622,7 +659,7 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
     );
     assert_eq!(
         counts(&game, LICENSE_TO_DRIVE),
-        vec![1, 0],
+        vec![1, 1, 1, 1, 0],
         "a second finished match cannot re-credit the completed objective"
     );
     let live_coins = coins(&game);
@@ -647,7 +684,7 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
     let experience_before = experience(&game);
     now += 10;
     let talked = talk(&mut game, &crash, CRASH, now);
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 1]);
     assert_eq!(pending_turnin(&game), Some(LICENSE_TO_DRIVE));
     assert!(
         !talked
@@ -736,7 +773,7 @@ fn second_settlement_of_same_instance_credits_once() {
     let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
     assert_eq!(
         counts(&game, LICENSE_TO_DRIVE),
-        vec![1, 0],
+        vec![1, 1, 1, 1, 0],
         "one finished match credits the two-completion objective once"
     );
     assert_eq!(
@@ -745,9 +782,9 @@ fn second_settlement_of_same_instance_credits_once() {
         "one 49/9 objective update: {}",
         replies_text(&finished.results)
     );
-    assert!(objective_update(&finished.results, LICENSE_TO_DRIVE, 1, 1));
+    assert!(objective_update(&finished.results, LICENSE_TO_DRIVE, 4, 1));
     assert!(
-        !objective_complete(&finished.results, LICENSE_TO_DRIVE, 1),
+        !objective_complete(&finished.results, LICENSE_TO_DRIVE, 4),
         "the objective still needs a second match"
     );
     let credited = game.state().npc_quests.clone();
@@ -762,7 +799,7 @@ fn second_settlement_of_same_instance_credits_once() {
     assert!(!replay.changed);
     assert!(replay.replies.is_empty());
     assert_eq!(game.state().npc_quests, credited);
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
 
     // The counters are saved quest progress; the result facts are not saved at all.
     let bytes = serde_json::to_vec(&game.state()).unwrap();
@@ -773,7 +810,7 @@ fn second_settlement_of_same_instance_credits_once() {
         "the derby result facts were written into the save"
     );
     let reloaded = save_and_reload(&fixture, &game);
-    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     assert_eq!(
         quest_status(&reloaded, LICENSE_TO_DRIVE),
         QuestStatus::Active
@@ -792,7 +829,7 @@ fn result_below_threshold_changes_nothing() {
     learn_and_activate(&fixture, &mut game, &mut now);
     rules_of_the_road(&fixture, &mut game, &mut now);
     accept_license(&fixture, &mut game, &mut now);
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     let before = game.state().npc_quests.clone();
 
     let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
@@ -861,7 +898,7 @@ fn a_cancelled_license_match_credits_and_pays_nothing() {
         "L958: the quit shows the results first"
     );
     close_forfeit(&mut game, &character, instance, &mut now);
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     assert_eq!(pending_turnin(&game), None);
     assert!(
         !quit
@@ -889,7 +926,7 @@ fn a_cancelled_license_match_credits_and_pays_nothing() {
     let cancelled = send(&mut game, &character, &pending_cancel, now);
     assert!(cancelled.changed);
     assert!(!game.derby_active());
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     assert_eq!(coins(&game), before_coins);
 }
 
@@ -944,8 +981,8 @@ fn a_refused_completion_payout_still_credits_the_finish_and_keeps_the_session() 
         game.state().derby.as_ref().unwrap().paid_matches,
         vec![finished.instance]
     );
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 0]);
-    assert!(objective_complete(&finished.results, LICENSE_TO_DRIVE, 1));
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
+    assert!(objective_complete(&finished.results, LICENSE_TO_DRIVE, 4));
 
     // The session keeps running: Close is accepted and the next NPC packet is answered.
     close_match(&fixture, &mut game, now);
@@ -976,7 +1013,7 @@ fn a_zero_reward_package_still_credits_the_finish_once() {
     let (before_coins, before_xp) = (coins(&game), experience(&game));
 
     let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     assert_eq!(
         count_quest_packets(&finished.results, LICENSE_TO_DRIVE, 10),
         1
@@ -1030,7 +1067,7 @@ fn the_chapter_survives_the_three_reload_points() {
         quest_status(&reloaded, LICENSE_TO_DRIVE),
         QuestStatus::Active
     );
-    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     assert!(reloaded.state().derby.is_none());
 
     // 2. After the finish: the credited objective and the paid ledger survive.
@@ -1038,9 +1075,9 @@ fn the_chapter_survives_the_three_reload_points() {
     let before_coins = coins(&game);
     let before_xp = profile_xp(&game, DEMO_DERBY_DRIVER_PROFILE);
     let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
-    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     reloaded = save_and_reload(&fixture, &game);
-    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     assert_eq!(
         reloaded.state().derby.as_ref().unwrap().paid_matches,
         vec![finished.instance],
@@ -1059,7 +1096,7 @@ fn the_chapter_survives_the_three_reload_points() {
     talk(&mut game, &crash, CRASH, now);
     assert_eq!(pending_turnin(&game), Some(LICENSE_TO_DRIVE));
     reloaded = save_and_reload(&fixture, &game);
-    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 1]);
+    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 1]);
     assert_eq!(
         pending_turnin(&reloaded),
         Some(LICENSE_TO_DRIVE),
@@ -1131,26 +1168,26 @@ fn two_players_finish_their_own_matches_independently() {
     );
     assert!(quit.changed);
     close_forfeit(&mut a, &first.character(MAD_JACK), instance, &mut now);
-    assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     assert_eq!(coins(&a), a_coins);
-    assert_eq!(counts(&b, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&b, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     assert_eq!(coins(&b), b_coins);
 
     // Player B finishes and credits its own quest and ledger only.
     let b_finished = play_to_results(&second, &mut b, MAD_JACK, &mut now);
-    assert_eq!(counts(&b, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&b, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     assert_eq!(
         b.state().derby.as_ref().unwrap().paid_matches,
         vec![b_finished.instance]
     );
     assert_eq!(coins(&b), b_coins + COMPLETION_COINS);
-    assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![0, 0]);
+    assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![1, 1, 1, 0, 0]);
     assert_eq!(coins(&a), a_coins);
     assert!(a.state().derby.is_none());
 
     // Player A can still finish its own match later; it gets exactly one credit and payout.
     let a_finished = play_to_results(&first, &mut a, MAD_JACK, &mut now);
-    assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(counts(&a, LICENSE_TO_DRIVE), vec![1, 1, 1, 1, 0]);
     assert_eq!(
         a.state().derby.as_ref().unwrap().paid_matches,
         vec![a_finished.instance]
@@ -1223,7 +1260,7 @@ fn two_players_finish_their_own_matches_independently() {
     let results = finish_match(&first, &mut a, &npcs, &mut now);
     assert_eq!(
         counts(&a, LICENSE_TO_DRIVE),
-        vec![1, 0],
+        vec![1, 1, 1, 1, 0],
         "the finish objective stays at one credit"
     );
     assert_eq!(

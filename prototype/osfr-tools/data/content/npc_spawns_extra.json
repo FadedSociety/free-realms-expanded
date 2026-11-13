@@ -28818,7 +28818,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1837; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3094 (ModelId=1319, ModelFileName=human_m_claudio_demarco.agr, NameId=19368)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500004866
     },
     {
       "spawn_guid": 100000003096,

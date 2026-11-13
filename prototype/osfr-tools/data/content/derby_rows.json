@@ -1105,11 +1105,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
+        },
+        {
+          "kind": "client",
+          "evidence": "L1196 (owner 2026-11-09: finish the quests; the live wiki pages and the client's derby goal lines): client goal line 395058 'Knock out 3 drivers' and the live quest page FR_Quest:Demo_Derby:_Routine_Maintenance (2010-02-07) 'Knockout 3 cars' agree; the older minigame page's 10 knock-outs without being knocked out is replaced."
         }
       ],
       "goal": {
-        "min_knockouts": 10,
-        "max_knockouts_taken": 0
+        "min_knockouts": 3
       }
     },
     {
@@ -1386,6 +1389,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) The goal is server-owned (DerbyGoal): the finished match credits the quest only when every bound is met; the match pays its completion either way and the player may replay it."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "L1196 (owner 2026-11-09: finish the quests; the live wiki pages and the client's derby goal lines): the live quest page FR_Quest:Demo_Derby:_Defeating_Diggs (2010-04-11) says 'Place in the Top 3'; it is newer than the minigame page (2009-07-30, '1st place') and the client line 395066 names only the three knock-outs of Erica Diggs."
         }
       ],
       "scene": {
@@ -1447,7 +1454,7 @@
         "named_knockouts": {
           "19355": 3
         },
-        "max_placement": 1
+        "max_placement": 3
       }
     },
     {
