@@ -104,6 +104,8 @@ impl Fixture {
             ("t_energy", json!(["energy"])),
             ("t_flame", json!(["flame_wave"])),
             ("t_shield", json!(["super_shield"])),
+            ("t_coins", json!(["coins_small"])),
+            ("t_coins_heart", json!(["coins_small", "health_small"])),
             (
                 "t_triple",
                 json!(["health_big", "health_big", "health_big"]),
@@ -208,6 +210,19 @@ fn energy(out: &EncounterOutcome) -> Option<i32> {
         .rfind(|p| p.starts_with(&[38, 0, 13, 0]))
         .map(|p| i32::from_le_bytes(p[4..8].try_into().unwrap()))
 }
+/// Composite effect ids an outcome plays (35/16).
+fn effects(out: &EncounterOutcome) -> Vec<i32> {
+    out.replies
+        .iter()
+        .filter(|p| p.starts_with(&[35, 0, 16, 0]))
+        .map(|p| i32::from_le_bytes(p[20..24].try_into().unwrap()))
+        .collect()
+}
+/// The shipped coins a pile of `kind` pays at battle tier 1 (the field is tier 1).
+fn tier_one_coins(kind: &str) -> u32 {
+    let shipped: Value = serde_json::from_str(SHIPPED).unwrap();
+    shipped["kinds"][kind]["coins_by_tier"][0].as_u64().unwrap() as u32
+}
 const FAR: [f32; 3] = [900.0, 0.0, 900.0];
 /// Where every fixture enemy stands (and so where its pickups land).
 const SPOT: [f32; 3] = [0.0; 3];
@@ -310,6 +325,47 @@ fn walking_onto_the_big_heart_heals_from_the_server_position_and_asks_for_the_gr
     assert_eq!(e.player_health().0, healed(50));
     let again = e.tick(SPOT, 11, 1_600).unwrap();
     assert!(removed(&again).is_empty() && again.group_heal.is_none());
+}
+
+/// A40 (owner 2026-11-13: "when killing enemies they have a chance to drop gold stacks, but our
+/// enemies don't"): a coin pile lands with the client's coin model and burst, and walking onto it
+/// pays its coins once, through the reward path, with the coin pickup effect.
+#[test]
+fn a_coin_pile_lands_on_the_kill_and_pays_its_coins_once() {
+    let f = Fixture::new(&[Some("t_coins")]);
+    let mut e = f.load();
+    let out = kill(&mut e, FIRST, 1_000);
+    let drops = spawned(&out);
+    assert_eq!(drops.len(), 1);
+    assert_eq!(drops[0].1, 841, "loot_coins_01.adr");
+    assert!(effects(&out).contains(&15093), "the coins burst where they land");
+    assert!(out.rewards.is_empty(), "nothing is paid before the pickup");
+    assert!(e.tick(FAR, 11, 1_200).unwrap().rewards.is_empty());
+    let near = e.tick(SPOT, 11, 1_400).unwrap();
+    assert_eq!(removed(&near), [drops[0].0]);
+    let coins: Vec<u32> = near.rewards.iter().map(|r| r.coins).collect();
+    assert_eq!(coins, [tier_one_coins("coins_small")]);
+    assert!(near.rewards.iter().all(|r| r.job_xp == 0 && r.items.is_empty()));
+    assert!(effects(&near).contains(&15094), "the coin pickup effect");
+    let again = e.tick(SPOT, 11, 1_600).unwrap();
+    assert!(again.rewards.is_empty(), "a pile pays once");
+}
+
+/// A40: a field kill whose level band already paid its coins to the wallet drops no coin pile;
+/// the rest of its table still drops.
+#[test]
+fn a_field_kill_that_pays_its_coins_drops_no_coin_pile() {
+    let f = Fixture::new(&[Some("t_coins_heart")]);
+    let band = json!({"min_level": 1, "max_level": 20, "coins": 3, "job_xp": 0,
+                      "source": [{"kind": "reconstructed", "evidence": "(R) test band"}]});
+    let rewards = json!({"schema_version": 1, "level_rewards": [band], "definition_overrides": []});
+    fs::write(f.0.join("field_kill_rewards.json"), rewards.to_string()).unwrap();
+    let mut e = f.load();
+    let out = kill(&mut e, FIRST, 1_000);
+    let models: Vec<i32> = spawned(&out).into_iter().map(|(_, model)| model).collect();
+    assert_eq!(models, [736], "the heart drops, the coin pile does not");
+    let paid: u32 = out.rewards.iter().map(|r| r.coins).sum();
+    assert_eq!(paid, 3, "the band paid its coins straight away");
 }
 
 #[test]

@@ -57,6 +57,10 @@ fn every_bound_rejects_a_bad_file() {
         ("/kinds/super_shield/duration_ms", json!(30_001)),
         ("/kinds/super_shield/speed_pct", json!(101)),
         ("/kinds/super_shield/source", json!("  ")),
+        ("/kinds/coins_small/coins_by_tier", json!([1, 2])),
+        ("/kinds/coins_small/coins_by_tier/0", json!(0)),
+        ("/kinds/coins_small/coins_by_tier/4", json!(10_001)),
+        ("/tables/standard/coin_roll/chance", json!(0.51)),
         ("/tables/standard/health_roll/chance", json!(0.51)),
         ("/tables/standard/health_roll/chance", json!(-0.1)),
         (
@@ -165,6 +169,7 @@ fn zero_chance_never_drops() {
     let mut doc = shipped();
     doc["tables"]["standard"]["health_roll"]["chance"] = json!(0.0);
     doc["tables"]["standard"]["other_roll"]["chance"] = json!(0.0);
+    doc["tables"]["standard"]["coin_roll"]["chance"] = json!(0.0);
     let p = parse(&doc).unwrap();
     let mut rng = Rng::seeded(3);
     assert!((0..10_000).all(|_| roll(p.table("standard").unwrap(), &mut rng).is_empty()));

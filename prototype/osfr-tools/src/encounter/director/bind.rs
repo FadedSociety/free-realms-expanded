@@ -777,7 +777,8 @@ impl EncounterEngine {
                     Act::Signal(name) => self.run.signals.push(name),
                     Act::Drop(table) => {
                         let at = def.place.arrive;
-                        self.drop_power_ups(&table, (def.guid(None), now_ms), at, now_ms, 1, out);
+                        let kill = (def.guid(None), now_ms);
+                        self.drop_power_ups(&table, kill, at, now_ms, 1, true, out);
                     }
                     // A wake by tag shows below; the rest need an actor.
                     _ => {}
