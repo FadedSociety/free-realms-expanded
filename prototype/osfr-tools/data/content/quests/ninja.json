@@ -1278,7 +1278,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10830,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Ninja Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_shadows_in_the_snow_822b6f)."
+                }
+              ]
+            },
+            {
+              "definition_id": 19496,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Ninja Wristguards (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_shadows_in_the_snow_822b6f)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "2": 282
           },

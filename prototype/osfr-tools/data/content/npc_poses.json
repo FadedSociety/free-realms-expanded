@@ -4420,6 +4420,12 @@
     },
     {
       "model_ids": [
+        1788
+      ],
+      "source": "evnt_world_party_luau_chug_drum_01.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
         1789
       ],
       "source": "evnt_world_party_luau_chug_drum_02.adr: no walk, run, emote, fidget or combat clip"
@@ -4567,6 +4573,12 @@
         2184
       ],
       "source": "hsg_tents_small_02.adr: no walk, run, emote, fidget or combat clip"
+    },
+    {
+      "model_ids": [
+        3082
+      ],
+      "source": "hsg_crystal_pile_02.adr: no walk, run, emote, fidget or combat clip"
     },
     {
       "model_ids": [

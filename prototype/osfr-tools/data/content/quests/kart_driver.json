@@ -4586,7 +4586,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76300,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Crankshaft Kart Driver Jacket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_the_right_stuff_aee86d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 183
           },
@@ -4638,11 +4649,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 395474
+      "description_string_id": 395474,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080040,
@@ -5006,11 +5022,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 395655
+      "description_string_id": 395655,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080044,
@@ -5203,7 +5224,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76305,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leadfoot Kart Driver Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_wildwood_497032)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 150
           },
@@ -5251,10 +5283,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
-      "job": 48
+      "job": 48,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080046,
@@ -5435,11 +5472,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 398088
+      "description_string_id": 398088,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080048,
@@ -5551,11 +5593,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it). The block's title + 2 slot holds an item-trade error, not a turn-in line (read by the lead, L1202)."
         }
       ],
       "enabled": true,
       "job": 48,
-      "description_string_id": 398215
+      "description_string_id": 398215,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080049,

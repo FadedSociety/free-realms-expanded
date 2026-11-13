@@ -33341,11 +33341,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 20567,
       "intro_text_string_id": 24817,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957869,
@@ -33414,11 +33419,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 40232,
       "intro_text_string_id": 40301,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957912,
@@ -33455,7 +33465,18 @@
       "rewards": [
         {
           "coins": 24,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 11011,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Sleep Orb (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_burial_service_b31d3d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -33532,10 +33553,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 16934,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957927,
@@ -33597,7 +33623,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 9052,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Camp Chatty Hat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -33615,11 +33652,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 429076 '<font size='20'>Don't call me Bob!</font><BR>Oh, that little treeble... I'm goin'."
         }
       ],
       "description_string_id": 429075,
       "intro_text_string_id": 429073,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 429076
     },
     {
       "id": 3957934,
@@ -33663,7 +33705,32 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 15921,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Star Shot Candle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows (colours); the lowest id is used."
+                }
+              ]
+            },
+            {
+              "definition_id": 60255,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Seaside Sticker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -33681,11 +33748,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 400103,
       "intro_text_string_id": 400084,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957935,
@@ -33756,12 +33828,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "job": 45,
       "description_string_id": 101061,
       "intro_text_string_id": 101061,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957936,
@@ -33816,11 +33893,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 76055 'Bah! These crystals are standard fare, they wouldn't power a glow worm! <BR><BR>'."
         }
       ],
       "description_string_id": 76052,
       "intro_text_string_id": 76052,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 76055
     },
     {
       "id": 3957951,
@@ -33875,10 +33957,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it). The block's title + 2 slot holds a goal line, not a turn-in line (read by the lead, L1202)."
         }
       ],
       "description_string_id": 7385,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957980,
@@ -33933,10 +34020,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it). The block's title + 2 slot holds the quest's own offer text, not a turn-in line (read by the lead, L1202)."
         }
       ],
       "description_string_id": 6418,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3957994,
@@ -33980,11 +34072,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 17275,
       "intro_text_string_id": 17263,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958006,
@@ -34039,9 +34136,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958018,
@@ -34110,10 +34212,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 40232,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958027,
@@ -34170,9 +34277,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958033,
@@ -34223,9 +34335,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958043,
@@ -34271,12 +34388,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 78887 'I'm so glad to hear that Ty is still teaching after that awful business at the d'."
         }
       ],
       "job": 2,
       "description_string_id": 78886,
       "intro_text_string_id": 78884,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 78887
     },
     {
       "id": 3958053,
@@ -34335,11 +34457,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 91792 'Hmm, not much silver. It looks like there's some crystal fragments in here thoug'."
         }
       ],
       "description_string_id": 91791,
       "intro_text_string_id": 91789,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 91792
     },
     {
       "id": 3958063,
@@ -34404,10 +34531,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 92513 'The penguins defended the fish from monsters in the game?<BR><BR>I don't know ab'."
         }
       ],
       "description_string_id": 92512,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92513
     },
     {
       "id": 3958064,
@@ -34462,11 +34594,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 14904,
       "intro_text_string_id": 24782,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958070,
@@ -34503,7 +34640,18 @@
       "rewards": [
         {
           "coins": 51,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 3023,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Energy Potion (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pie_underground_f8724d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -34521,11 +34669,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 23734,
       "intro_text_string_id": 25002,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958071,
@@ -34573,10 +34726,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 116849,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958100,
@@ -34649,11 +34807,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 74306,
       "intro_text_string_id": 74306,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958110,
@@ -34756,11 +34919,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 93215 'Perfect, hopefully now we'll get an even bigger crowd!<BR><BR>Good work!'."
         }
       ],
       "description_string_id": 93214,
       "intro_text_string_id": 93212,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 93215
     },
     {
       "id": 3958130,
@@ -34827,7 +34995,22 @@
       "rewards": [
         {
           "coins": 2,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 55991,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Conductor's Wand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -34845,10 +35028,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 392132,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958139,
@@ -34907,10 +35095,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 17249,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958158,
@@ -34967,11 +35160,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 74323 'You're kidding! Those bixies must be the cause!<BR><BR>There's no pollen being a'."
         }
       ],
       "description_string_id": 74320,
       "intro_text_string_id": 74320,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 74323
     },
     {
       "id": 3958164,
@@ -35086,11 +35284,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 5678,
       "intro_text_string_id": 24777,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958177,
@@ -35262,11 +35465,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 92539 'I hope you enjoyed your self-guided tour. Feel free to stay as long as you'd lik'."
         }
       ],
       "description_string_id": 92538,
       "intro_text_string_id": 92536,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 92539
     },
     {
       "id": 3958181,
@@ -35379,7 +35587,22 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 7892,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Festival of Hearts Mystery Gift (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 14 rows (colours); the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {},
           "source": [
             {
@@ -35397,11 +35620,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 427167 'You finished the box? Great! Only 6,487 to go!'."
         }
       ],
       "description_string_id": 427166,
       "intro_text_string_id": 427164,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 427167
     },
     {
       "id": 3958194,
@@ -35468,11 +35696,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
       "description_string_id": 116019,
       "intro_text_string_id": 16897,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 416261
     },
     {
       "id": 3958198,
@@ -35606,11 +35839,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 73425 'That... that's Lugunwump's scarf!<BR><BR>She must be inside that cave!'."
         }
       ],
       "description_string_id": 73422,
       "intro_text_string_id": 73422,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 73425
     },
     {
       "id": 3958202,
@@ -35734,11 +35972,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules): 77575 'Wow! Great job! I wish I could have been there to see the looks on those robgobl'."
         }
       ],
       "description_string_id": 77574,
       "intro_text_string_id": 77572,
-      "enabled": true
+      "enabled": true,
+      "end_text_string_id": 77575
     }
   ]
 }
