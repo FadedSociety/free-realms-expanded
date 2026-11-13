@@ -1288,6 +1288,14 @@ fn an_instance_enemy_opens_its_entrance_card() {
         go.handle(&click(guid), 77, at, BRAWLER, 1_000).unwrap();
         let walked = [at[0] + 40.0, at[1], at[2]];
         assert_eq!(go.take_pending_battle(walked), None, "Go after walking away starts nothing");
+        // Owner 2026-11-13: a hooligan's card opened, but Go "didn't send me into an instance":
+        // the enemy wanders while the card is read. Go counts from where the click opened it,
+        // here 11 m from the marauder and 8 m from the click spot, 13.6 m from the marauder.
+        let mut drift = base.clone();
+        let from = [at[0] + 11.0, at[1], at[2]];
+        drift.handle(&click(guid), 77, from, BRAWLER, 1_000).unwrap();
+        let beside = [at[0] + 11.0, at[1], at[2] + 8.0];
+        assert!(drift.take_pending_battle(beside).is_some(), "Go beside the click spot starts {guid}");
         let far = [at[0] + 40.0, at[1], at[2]];
         let missed = base.clone().handle(&click(guid), 77, far, BRAWLER, 1_000).unwrap();
         assert_ne!(subs(&missed), subs(&at_door), "out of reach, {guid} opens nothing");
