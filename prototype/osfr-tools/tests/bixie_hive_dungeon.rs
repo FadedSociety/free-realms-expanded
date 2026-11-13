@@ -682,12 +682,10 @@ fn refusals_leave_everything_unchanged() {
     );
 
     // Out-of-range Go: the screen opens at the marker, the player walks 50 m
-    // away and Go is inert. This is an expiry, not a refusal: Go revalidates
-    // the marker distance (F176) and deliberately drops the session-only
-    // pending screen so the walked-away screen cannot start later. The pending
-    // battle is not saved, so the snapshot/save stay byte-equal either way;
-    // the drop is proved below by returning to the marker and replaying the
-    // old Go, which stays inert only because the pending screen is gone.
+    // away and Go is refused. Go revalidates the marker distance (F176); the
+    // refusal says why and puts the card back (A33, owner 2026-11-13: dropping
+    // it silently left the HUD hidden). The pending battle is not saved, so the
+    // snapshot/save stay byte-equal; back at the marker the card's Go starts it.
     let mut gateway = fixture.gateway(MARKER, 4002);
     assert!(send(&mut gateway, &switch_job(BRAWLER), 300).state_changed);
     let screen = open_battle(&mut gateway, MARKER_GUID, row, 500);
@@ -702,19 +700,14 @@ fn refusals_leave_everything_unchanged() {
     let before = (gateway.snapshot(), saved_bytes(&gateway));
     let refused = send(&mut gateway, &go(&screen), now + 100);
     assert!(!refused.began_zoning && !refused.state_changed);
+    assert!(details(&refused).is_some(), "the refusal puts the card back");
     assert_eq!(
         (gateway.snapshot(), saved_bytes(&gateway)),
         before,
         "an out-of-range Go changes no state"
     );
+    assert_eq!(gateway.state().zone_id, 0, "the refused Go entered no arena");
     walk(&mut gateway, player, MARKER, &mut now);
-    let replayed = send(&mut gateway, &go(&screen), now + 50);
-    assert!(
-        !replayed.began_zoning && !replayed.state_changed,
-        "the out-of-range Go dropped the pending screen"
-    );
-    assert_eq!(gateway.state().zone_id, 0, "the replay entered no arena");
-    let screen = open_battle(&mut gateway, MARKER_GUID, row, now + 100);
     assert!(send(&mut gateway, &go(&screen), now + 200).began_zoning);
     assert_eq!(gateway.state().zone_id, ARENA_ZONE);
     arena_spawned(&mut gateway, now + 250);
