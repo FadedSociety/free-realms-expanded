@@ -1245,7 +1245,36 @@
       "prerequisite_quest_ids": [
         3110013
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "complete_dungeon",
+          "id": 1,
+          "text_string_id": 90551,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Tavil in Deep Mines (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_shadows_in_the_snow_822b6f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'deep mine' is fight 14045"
+            }
+          ],
+          "encounter_id": 14045
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90402,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ty in Lakeshore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_shadows_in_the_snow_822b6f)."
+            }
+          ],
+          "npc_id": 9000000223
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1297,12 +1326,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 78878,
       "intro_text_string_id": 78876,
       "end_text_string_id": 78879,
-      "enabled": false
+      "enabled": true,
+      "job": 2
     },
     {
       "id": 3110016,
@@ -1311,7 +1345,33 @@
       "prerequisite_quest_ids": [
         3110015
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 90563,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the challenge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_burst_of_speed_445574)."
+            }
+          ],
+          "minigame_id": 235,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90402,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ty in Lakeshore (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_burst_of_speed_445574)."
+            }
+          ],
+          "npc_id": 9000000223
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1363,12 +1423,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 78882,
       "intro_text_string_id": 78880,
       "end_text_string_id": 78883,
-      "enabled": false
+      "enabled": true,
+      "job": 2
     },
     {
       "id": 3110017,

@@ -33285,6 +33285,2521 @@
       ],
       "enabled": true,
       "end_text_string_id": 416261
+    },
+    {
+      "id": 3957859,
+      "title_string_id": 20566,
+      "giver_npc_id": 9500000291,
+      "prerequisite_quest_ids": [
+        3950199
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 22245,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Recover eggs from within Danger Peaks! - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_fancy_meal_for_glugmort_64e290)."
+            }
+          ],
+          "node_type": "quest-eggs-q3957859",
+          "quantity": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 22262,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Burnetta at the Greenwood Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_fancy_meal_for_glugmort_64e290)."
+            }
+          ],
+          "npc_id": 9500000291
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Fancy Meal for Glugmort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_fancy_meal_for_glugmort_64e290)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Fancy Meal for Glugmort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_fancy_meal_for_glugmort_64e290)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 20567,
+      "intro_text_string_id": 24817,
+      "enabled": true
+    },
+    {
+      "id": 3957869,
+      "title_string_id": 40302,
+      "giver_npc_id": 9500002249,
+      "prerequisite_quest_ids": [
+        3958018
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 40236,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the weapon testing minigame. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_advanced_bully_repelling_c1bf46)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) same target-dummy game as Bully Defense 101 (79 Hack 'n' Slash)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 79 \"Hack 'n' Slash\" (type 9) is in the server's pinned producer set; objective client text 'Play the weapon testing minigame'."
+            }
+          ],
+          "minigame_id": 79,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 40238,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Raine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_advanced_bully_repelling_c1bf46)."
+            }
+          ],
+          "npc_id": 9500002249
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Advanced Bully Repelling (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_advanced_bully_repelling_c1bf46)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Advanced Bully Repelling (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_advanced_bully_repelling_c1bf46)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 40232,
+      "intro_text_string_id": 40301,
+      "enabled": true
+    },
+    {
+      "id": 3957883,
+      "title_string_id": 434458,
+      "giver_npc_id": 9500004355,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 434460,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest 25 Starmints. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the client has no Starmint item; 2877 Bundle of Spiralmint (harvesting.json) is the one mint a harvest yields"
+            }
+          ],
+          "resource_id": 2877,
+          "quantity": 25
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 434546,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Farmer Chug. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
+            }
+          ],
+          "npc_id": 9500004355
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Be a Star and Make a Mint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Be a Star and Make a Mint (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_be_a_star_and_make_a_mint_6fa7cb)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3957912,
+      "title_string_id": 390570,
+      "giver_npc_id": 9500000076,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 390239,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect lost explorer bones - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_burial_service_b31d3d)."
+            }
+          ],
+          "node_type": "quest-lost-explorer-bones-q3957912",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 390575,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Vasher (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_burial_service_b31d3d)."
+            }
+          ],
+          "npc_id": 9500000076
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Burial Service (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_burial_service_b31d3d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Burial Service (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_burial_service_b31d3d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 390571,
+      "intro_text_string_id": 390569,
+      "enabled": true,
+      "end_text_string_id": 390572
+    },
+    {
+      "id": 3957924,
+      "title_string_id": 16933,
+      "giver_npc_id": 9000000470,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 2287,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Wuumba (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chugawugs_are_not_spider_food_15796e)."
+            }
+          ],
+          "npc_id": 9500000237
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 37622,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Snorg (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chugawugs_are_not_spider_food_15796e)."
+            }
+          ],
+          "npc_id": 9000000470
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 113,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chugawugs are Not Spider Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chugawugs_are_not_spider_food_15796e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Chugawugs are Not Spider Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chugawugs_are_not_spider_food_15796e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 16934,
+      "enabled": true
+    },
+    {
+      "id": 3957927,
+      "title_string_id": 429074,
+      "giver_npc_id": 9500000297,
+      "prerequisite_quest_ids": [
+        3955105
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 429172,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Confront Bigfoot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+            }
+          ],
+          "npc_id": 9500000287
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 429053,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Counselor Edmond (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+            }
+          ],
+          "npc_id": 9500000297
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 429059,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Chatty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+            }
+          ],
+          "npc_id": 9500000294
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 429089,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to \"Bob\" (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+            }
+          ],
+          "npc_id": 9500000318
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Confronting Bigfoot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Confronting Bigfoot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 429075,
+      "intro_text_string_id": 429073,
+      "enabled": true
+    },
+    {
+      "id": 3957934,
+      "title_string_id": 400105,
+      "giver_npc_id": 9000000213,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 400108,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Knock out some Cray Royal Servants! - (0/8) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'cray' is definition [930074, 930075]"
+            }
+          ],
+          "kinds": [
+            930074,
+            930075
+          ],
+          "count": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 400110,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Teaspoon Tarisayeah (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+            }
+          ],
+          "npc_id": 9000000213
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook-off Catastrophe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Cook-off Catastrophe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 400103,
+      "intro_text_string_id": 400084,
+      "enabled": true
+    },
+    {
+      "id": 3957935,
+      "title_string_id": 101053,
+      "giver_npc_id": 9500000623,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 101055,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Diggy in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_craving_something_tasty_ed8610)."
+            }
+          ],
+          "npc_id": 9000000070
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 101057,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete Diggy's cooking minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_craving_something_tasty_ed8610)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the wiki's next goal names the dish: recipes.json 168 Three Leaf Omelette (chef)"
+            }
+          ],
+          "recipe_id": 168,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 101059,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Seaspray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_craving_something_tasty_ed8610)."
+            }
+          ],
+          "npc_id": 9500000623
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Craving Something Tasty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_craving_something_tasty_ed8610)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Craving Something Tasty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_craving_something_tasty_ed8610)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "job": 45,
+      "description_string_id": 101061,
+      "intro_text_string_id": 101061,
+      "enabled": true
+    },
+    {
+      "id": 3957936,
+      "title_string_id": 76053,
+      "giver_npc_id": 9500000056,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 76095,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find fragments of crystal - (0/8) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_crystals_are_forever_1e948b)."
+            }
+          ],
+          "node_type": "quest-fragments-of-crystal-q3957936",
+          "quantity": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 76103,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Oswald in Mire's Edge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_crystals_are_forever_1e948b)."
+            }
+          ],
+          "npc_id": 9500000056
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 17,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Crystals are Forever (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_crystals_are_forever_1e948b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Crystals are Forever (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_crystals_are_forever_1e948b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 76052,
+      "intro_text_string_id": 76052,
+      "enabled": true
+    },
+    {
+      "id": 3957951,
+      "title_string_id": 7384,
+      "giver_npc_id": 9500000730,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 14855,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat robgoblins - 0/30 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_disarm_the_pests_b17afc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin' is definition [1230201, 1230202, 1230203]"
+            }
+          ],
+          "kinds": [
+            1230201,
+            1230202,
+            1230203
+          ],
+          "count": 30
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Disarm the Pests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_disarm_the_pests_b17afc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Disarm the Pests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_disarm_the_pests_b17afc)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 7385,
+      "enabled": true
+    },
+    {
+      "id": 3957980,
+      "title_string_id": 6417,
+      "giver_npc_id": 9500000734,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 18643,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Retrieve mineral water - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fetch_some_mineral_water_77b7be)."
+            }
+          ],
+          "node_type": "quest-mineral-water-q3957980",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 18645,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the water to Carrie at the Snowhill Hot Springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fetch_some_mineral_water_77b7be)."
+            }
+          ],
+          "npc_id": 9500000734
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 61,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fetch Some Mineral Water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fetch_some_mineral_water_77b7be)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fetch Some Mineral Water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fetch_some_mineral_water_77b7be)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 6418,
+      "enabled": true
+    },
+    {
+      "id": 3957994,
+      "title_string_id": 17271,
+      "giver_npc_id": 9500000104,
+      "prerequisite_quest_ids": [
+        3958139
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 17272,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the socks to Private Driple (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fuzzy_socks_0a5908)."
+            }
+          ],
+          "npc_id": 9500000194
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fuzzy Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fuzzy_socks_0a5908)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Fuzzy Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fuzzy_socks_0a5908)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 17275,
+      "intro_text_string_id": 17263,
+      "enabled": true
+    },
+    {
+      "id": 3958006,
+      "title_string_id": 10160,
+      "giver_npc_id": 9500000535,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 116721,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get the car parts - (0/4) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_high_performance_parts_112559)."
+            }
+          ],
+          "node_type": "quest-car-parts-q3958006",
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 22223,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Speedy in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_high_performance_parts_112559)."
+            }
+          ],
+          "npc_id": 9500000535
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "High Performance Parts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_high_performance_parts_112559)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "High Performance Parts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_high_performance_parts_112559)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3958018,
+      "title_string_id": 40245,
+      "giver_npc_id": 9500002249,
+      "prerequisite_quest_ids": [
+        3953070
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 40251,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Play the weapons minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_intermediate_defense_be6caa)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 40251 'Click on the dummy next to Raine to start the weapon testing minigame.' is this quest's own line (title 40245)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Bully Defense 101 (3953070), the quest before, finishes the same game 79 (Hack 'n' Slash) at the same dummy"
+            }
+          ],
+          "minigame_id": 79,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 40238,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Raine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_intermediate_defense_be6caa)."
+            }
+          ],
+          "npc_id": 9500002249
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Intermediate Defense (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_intermediate_defense_be6caa)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Intermediate Defense (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_intermediate_defense_be6caa)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 40232,
+      "enabled": true
+    },
+    {
+      "id": 3958027,
+      "title_string_id": 72051,
+      "giver_npc_id": 9500000178,
+      "prerequisite_quest_ids": [
+        3954923
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 72566,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Retrieve the bowl of curds and whey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_like_mother_like_daughter_3fc52a)."
+            }
+          ],
+          "node_type": "quest-bowl-of-curds-q3958027",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 72412,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Miffit (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_like_mother_like_daughter_3fc52a)."
+            }
+          ],
+          "npc_id": 9500000178
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 135,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Like Mother, Like Daughter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_like_mother_like_daughter_3fc52a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Like Mother, Like Daughter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_like_mother_like_daughter_3fc52a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3958033,
+      "title_string_id": 384001,
+      "giver_npc_id": 9500000911,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 5100902,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the Gloam Racers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_margin_of_victory_5114b6)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 5100777 'help Johnny Thunder pull off an upset against the Gloam Racers at Wildwood Speedway'; 5100797 'Win the Margin of Victory race'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) MiniGameData has no Margin of Victory row: a finish of Wildwood Kart Racing (28) stands for it"
+            }
+          ],
+          "minigame_id": 28,
+          "count": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 25,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Margin of Victory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_margin_of_victory_5114b6)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Margin of Victory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_margin_of_victory_5114b6)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": 3958043,
+      "title_string_id": 78885,
+      "giver_npc_id": 9000000223,
+      "prerequisite_quest_ids": [
+        3110016
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 91083,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Sakka (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_walking_the_path_a8ef78)."
+            }
+          ],
+          "npc_id": 9500000766
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {
+            "2": 175
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ninja: Walking the Path (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_walking_the_path_a8ef78)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Ninja: Walking the Path (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ninja_walking_the_path_a8ef78)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "job": 2,
+      "description_string_id": 78886,
+      "intro_text_string_id": 78884,
+      "enabled": true
+    },
+    {
+      "id": 3958053,
+      "title_string_id": 91790,
+      "giver_npc_id": 9500000078,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 91802,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect ore deposits - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ore_survey_fb3d40)."
+            }
+          ],
+          "node_type": "quest-ore-deposits-q3958053",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 91804,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Vrock at Quagmire Quarry. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ore_survey_fb3d40)."
+            }
+          ],
+          "npc_id": 9500000078
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ore Survey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ore_survey_fb3d40)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Ore Survey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ore_survey_fb3d40)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 91791,
+      "intro_text_string_id": 91789,
+      "enabled": true
+    },
+    {
+      "id": 3958063,
+      "title_string_id": 92511,
+      "giver_npc_id": 9500001591,
+      "prerequisite_quest_ids": [
+        3950836
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 92516,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat Penguin Produce (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_power_b9bd87)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "MiniGameData 350 is Penguin Produce - Easy, a tower_defense.json producer (also 250 Medium, 150 Hard, 451)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the Easy row: the quest names no difficulty and a finish of one row is one event"
+            }
+          ],
+          "minigame_id": 350,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92518,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Frani Frostflinger (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_power_b9bd87)."
+            }
+          ],
+          "npc_id": 9500001591
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Penguin Power! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_power_b9bd87)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Penguin Power! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_power_b9bd87)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 92512,
+      "enabled": true
+    },
+    {
+      "id": 3958064,
+      "title_string_id": 14903,
+      "giver_npc_id": 9500000779,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 10191,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find penguins - (0/3) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_rescue_brigade_1e4b57)."
+            }
+          ],
+          "node_type": "quest-penguins-q3958064",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 14953,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Valinda in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_rescue_brigade_1e4b57)."
+            }
+          ],
+          "npc_id": 9500000779
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Penguin Rescue Brigade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_rescue_brigade_1e4b57)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Penguin Rescue Brigade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_rescue_brigade_1e4b57)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 14904,
+      "intro_text_string_id": 24782,
+      "enabled": true
+    },
+    {
+      "id": 3958070,
+      "title_string_id": 23733,
+      "giver_npc_id": 9500005657,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 5497,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find those pies! 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pie_underground_f8724d)."
+            }
+          ],
+          "node_type": "quest-those-pies-0-3-q3958070",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 23735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Jenny (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pie_underground_f8724d)."
+            }
+          ],
+          "npc_id": 9500005657
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 51,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pie Underground (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pie_underground_f8724d)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Pie Underground (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_pie_underground_f8724d)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 23734,
+      "intro_text_string_id": 25002,
+      "enabled": true
+    },
+    {
+      "id": 3958071,
+      "title_string_id": 46042,
+      "giver_npc_id": 9500005657,
+      "prerequisite_quest_ids": [
+        3958070
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46048,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver the pies to Helga (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_piping_hot_pie_8785d6)."
+            }
+          ],
+          "npc_id": 9500000495
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Piping Hot Pie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_piping_hot_pie_8785d6)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) The wiki lists no coins for this quest; it pays the usual few coins (5) so the end screen has a reward."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Piping Hot Pie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_piping_hot_pie_8785d6)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 116849,
+      "enabled": true
+    },
+    {
+      "id": 3958100,
+      "title_string_id": 74258,
+      "giver_npc_id": 9500000968,
+      "prerequisite_quest_ids": [
+        3958158
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 74260,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Sasparilla Brewmaster Wugawump in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_save_the_sasparilla_7aad85)."
+            }
+          ],
+          "npc_id": 9000000191
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 74316,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Bixie Rebels in Sweetwater Climb - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_save_the_sasparilla_7aad85)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'sweetwater climb' is fight 14029"
+            }
+          ],
+          "in_fight": 14029,
+          "count": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 74304,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Wugawump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_save_the_sasparilla_7aad85)."
+            }
+          ],
+          "npc_id": 9000000191
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 90,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Save the Sasparilla! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_save_the_sasparilla_7aad85)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Save the Sasparilla! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_save_the_sasparilla_7aad85)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 74306,
+      "intro_text_string_id": 74306,
+      "enabled": true
+    },
+    {
+      "id": 3958110,
+      "title_string_id": 93213,
+      "giver_npc_id": 9500000770,
+      "prerequisite_quest_ids": [
+        3955024
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 141297,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up some fliers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_show_promoter_dc8c4a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one pile of fliers by Snowi; the checked paper model 584 (objects.json 'flier', listed for Show Promoter)"
+            }
+          ],
+          "node_type": "quest-fliers-q3958110",
+          "quantity": 1
+        },
+        {
+          "kind": "any_of",
+          "id": 2,
+          "text_string_id": 93238,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hand out the fliers (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_show_promoter_dc8c4a)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "MiniGameData has no Show Promoter row"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) three Talks with the five drawn Snowhill people nearest Snowi hand the fliers out (any_of does not refuse one person twice)"
+            }
+          ],
+          "count": 3,
+          "alternatives": [
+            {
+              "kind": "talk_to_npc",
+              "npc_id": 9500000774
+            },
+            {
+              "kind": "talk_to_npc",
+              "npc_id": 9500000747
+            },
+            {
+              "kind": "talk_to_npc",
+              "npc_id": 9000000208
+            },
+            {
+              "kind": "talk_to_npc",
+              "npc_id": 9500000779
+            },
+            {
+              "kind": "talk_to_npc",
+              "npc_id": 9000000076
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 93240,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Snowi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_show_promoter_dc8c4a)."
+            }
+          ],
+          "npc_id": 9500000770
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Show Promoter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_show_promoter_dc8c4a)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Show Promoter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_show_promoter_dc8c4a)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 93214,
+      "intro_text_string_id": 93212,
+      "enabled": true
+    },
+    {
+      "id": 3958130,
+      "title_string_id": 10395,
+      "giver_npc_id": 9500000770,
+      "prerequisite_quest_ids": [
+        3958110
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 94539,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the music stand (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Feeling the Beat!' spawn_guid 100000003570 model 316 sh_musicstand_01.adr, 7 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2313; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.jso"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: open music book on a carved wooden stand (sheets/a_world_click1.png r0c2, tile of sh_musicstand_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_super_star_3e4bd7)."
+            }
+          ],
+          "npc_id": 9500005843
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 392142,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the Feeling the Beat! minigame on Maestro difficulty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Any finish of this game counts: the goal's difficulty is not modelled."
+            }
+          ],
+          "minigame_id": 201,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 392144,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Snowi (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+            }
+          ],
+          "npc_id": 9500000770
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Super Star! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Super Star! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 392132,
+      "enabled": true
+    },
+    {
+      "id": 3958139,
+      "title_string_id": 17248,
+      "giver_npc_id": 9500000194,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 18087,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat cursed bears - (0/20) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_warm_fuzzy_feeling_a53e14)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'bear' is definition [930051]"
+            }
+          ],
+          "model_id": 930051,
+          "count": 20
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Chugilda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_warm_fuzzy_feeling_a53e14)."
+            }
+          ],
+          "npc_id": 9500000104
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "That Warm Fuzzy Feeling (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_warm_fuzzy_feeling_a53e14)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "That Warm Fuzzy Feeling (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_warm_fuzzy_feeling_a53e14)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 17249,
+      "enabled": true
+    },
+    {
+      "id": 3958158,
+      "title_string_id": 74321,
+      "giver_npc_id": 9500000968,
+      "prerequisite_quest_ids": [
+        3954982
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 74326,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect a flower sample (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_secret_ingredient_783d1e)."
+            }
+          ],
+          "node_type": "quest-flower-sample-q3958158",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 74328,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Brockoom in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_secret_ingredient_783d1e)."
+            }
+          ],
+          "npc_id": 9500000968
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 90,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Secret Ingredient (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_secret_ingredient_783d1e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Secret Ingredient (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_secret_ingredient_783d1e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 74320,
+      "intro_text_string_id": 74320,
+      "enabled": true
+    },
+    {
+      "id": 3958164,
+      "title_string_id": 16914,
+      "giver_npc_id": 9500000206,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 17969,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect animated plant parts - 0/25 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_vegetarian_shambler_8382bf)."
+            }
+          ],
+          "node_type": "quest-animated-plant-parts-q3958164",
+          "quantity": 25
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 17980,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Reginald (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_vegetarian_shambler_8382bf)."
+            }
+          ],
+          "npc_id": 9500000206
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Vegetarian Shambler (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_vegetarian_shambler_8382bf)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Vegetarian Shambler (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_vegetarian_shambler_8382bf)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 16915,
+      "intro_text_string_id": 24914,
+      "enabled": true,
+      "end_text_string_id": 9629
+    },
+    {
+      "id": 3958174,
+      "title_string_id": 5677,
+      "giver_npc_id": 9000000472,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 6609,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect ore samples - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_the_bat_cave_616574)."
+            }
+          ],
+          "node_type": "quest-ore-samples-q3958174",
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 14919,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the samples to Sorin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_the_bat_cave_616574)."
+            }
+          ],
+          "npc_id": 9000000472
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "To the Bat Cave (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_the_bat_cave_616574)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "To the Bat Cave (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_the_bat_cave_616574)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 5678,
+      "intro_text_string_id": 24777,
+      "enabled": true
+    },
+    {
+      "id": 3958177,
+      "title_string_id": 92537,
+      "giver_npc_id": 9500000649,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 92542,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Gardener's Hutch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki quest research: Edvard Leafsnipper stands at the Gardener's Hutch"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on Edvard's row (shrouded_glade.json 9500000674)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            126.082,
+            37.785,
+            1035.708
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 92544,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Pet Park (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob:Jack: 'usually next to Halle Belleflower at the pet Adoption Center' (the wiki's Shrouded Glade Adoption Center)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on Halle's row (shrouded_glade.json 9500000689)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            20.94,
+            38.867,
+            1022.161
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 92546,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit The Wishing Well (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob:Leeli Luckvine: 'This silent guardian of wishes stands beside the Wishing Well.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on Leeli's spawn (npc_spawns_extra.json 100000001366)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            70.284,
+            40.282,
+            1048.467
+          ],
+          "radius": 12
+        },
+        {
+          "kind": "visit_position",
+          "id": 4,
+          "text_string_id": 92550,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Shrouded Glade Warpstone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "collection_places.json 899 Shrouded Glade Warpstone: Sanctuary PointOfInterests.json Id=8 SpawnPosition, where the warpstone lands a traveller"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) a visit: the warpstone's click is the travel menu, not a quest Talk"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            1.167,
+            41.038,
+            1114.959
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "visit_position",
+          "id": 5,
+          "text_string_id": 92552,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit the Druid Academy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "FR_Mob:Arestol: 'He stands to the left of the front staircase at the Northern wing of the Druid Academy'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) anchored on Arestol's row (shrouded_glade.json 9500000651)"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            134.933,
+            69.003,
+            1211.768
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 92554,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Amaryllia (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            }
+          ],
+          "npc_id": 9500000649
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touring the Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Touring the Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 92538,
+      "intro_text_string_id": 92536,
+      "enabled": true
+    },
+    {
+      "id": 3958181,
+      "title_string_id": 427165,
+      "giver_npc_id": 9500000385,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 5727,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Raspberry Truffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 5727 is the item's name and item-table has item 5727; wiki: trade with players for each flavour"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "collect_item is a loader kind that no live record uses yet"
+            }
+          ],
+          "item_id": 5727,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 5728,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Lemon Truffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 5728 is the item's name and item-table has item 5728"
+            }
+          ],
+          "item_id": 5728,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 3,
+          "text_string_id": 5731,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chocolate Truffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 5731 is the item's name and item-table has item 5731"
+            }
+          ],
+          "item_id": 5731,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 4,
+          "text_string_id": 5730,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Mint Truffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 5730 is the item's name and item-table has item 5730"
+            }
+          ],
+          "item_id": 5730,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_item",
+          "id": 5,
+          "text_string_id": 5729,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Vanilla Truffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 5729 is the item's name and item-table has item 5729"
+            }
+          ],
+          "item_id": 5729,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 427300,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Fenwink (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            }
+          ],
+          "npc_id": 9500000385
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Truffle Shuffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Truffle Shuffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 427166,
+      "intro_text_string_id": 427164,
+      "enabled": true
+    },
+    {
+      "id": 3958194,
+      "title_string_id": 16893,
+      "giver_npc_id": 9500000217,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 22606,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Chicory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_a_slacker_cf2608)."
+            }
+          ],
+          "npc_id": 9500000101
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 100910,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Collect spotted mushrooms - 0/4 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_a_slacker_cf2608)."
+            }
+          ],
+          "node_type": "quest-spotted-mushrooms-q3958194",
+          "quantity": 4
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 18260,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sperry (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_a_slacker_cf2608)."
+            }
+          ],
+          "npc_id": 9500000217
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "What a Slacker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_a_slacker_cf2608)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "What a Slacker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_a_slacker_cf2608)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 116019,
+      "intro_text_string_id": 16897,
+      "enabled": true
+    },
+    {
+      "id": 3958198,
+      "title_string_id": 73423,
+      "giver_npc_id": 9500000432,
+      "prerequisite_quest_ids": [
+        3000371
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 74118,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search past the south bridge leading out of Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "road_graph.json node 877, where a client road (FabledRealms.map) leaves the Merry Vale warpstone's 200 m ring"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) which exit is the south bridge is a guess from the map's road ends"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -992.0,
+            -40.2,
+            -524.6
+          ],
+          "radius": 25
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 74120,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search past the north bridge leading out of Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "road_graph.json node 1582, a client road leaving the Merry Vale warpstone's 200 m ring"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) which exit is the north bridge is a guess from the map's road ends"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1020.5,
+            -34.2,
+            -270.5
+          ],
+          "radius": 25
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 387003,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Search past the west bridge leading out of Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "road_graph.json node 1907, the westmost client road leaving the Merry Vale warpstone's 200 m ring"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) which exit is the west bridge is a guess from the map's road ends"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1382.5,
+            -44.8,
+            -448.6
+          ],
+          "radius": 25
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 387007,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Liana (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            }
+          ],
+          "npc_id": 9500000390
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 387010,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Wugunbump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            }
+          ],
+          "npc_id": 9500000432
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Where is Lugunwump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Where is Lugunwump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 73422,
+      "intro_text_string_id": 73422,
+      "enabled": true
+    },
+    {
+      "id": 3958202,
+      "title_string_id": 77573,
+      "giver_npc_id": 9500000351,
+      "prerequisite_quest_ids": [
+        3955726
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 384778,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Miles Sourpetal near the Robgoblin Camp (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            }
+          ],
+          "npc_id": 9500000356
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 77581,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Bry's stolen game table (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the stolen things lie about the Robgoblin Camp the first step names; the checked game-table model 309 (objects.json 'table')"
+            }
+          ],
+          "node_type": "quest-stolen-game-table-2-q3958202",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 3,
+          "text_string_id": 78454,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Mister Nookling's shovel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the checked shovel model 197 (objects.json 'shovel'), placed by the tool"
+            }
+          ],
+          "node_type": "quest-shovel-3-q3958202",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 4,
+          "text_string_id": 78471,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Dori Tendersole's jewelry chest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the checked chest model 151 (objects.json 'chest'), placed by the tool"
+            }
+          ],
+          "node_type": "quest-jewelry-chest-4-q3958202",
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 5,
+          "text_string_id": 78474,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Selvi Slowreel's prized fish (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fishing.json's fish model 1670 is the prized fish's body, placed by the tool"
+            }
+          ],
+          "node_type": "quest-prized-fish-5-q3958202",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 78491,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lan Spryleaf (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            }
+          ],
+          "npc_id": 9500000351
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 90,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "You Can't Steal What's Already Yours (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "You Can't Steal What's Already Yours (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_you_can_t_steal_what_s_already_yours_4221ef)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        }
+      ],
+      "description_string_id": 77574,
+      "intro_text_string_id": 77572,
+      "enabled": true
     }
   ]
 }

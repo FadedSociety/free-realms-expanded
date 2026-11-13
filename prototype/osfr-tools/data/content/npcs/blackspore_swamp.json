@@ -25994,8 +25994,27 @@
       "location_evidence": [
         "Mire's Edge"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957936,
+          "title": "Crystals are Forever",
+          "title_string_id": 76053,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Crystals are Forever (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_crystals_are_forever_1e948b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957936
+      ],
       "quests_given_text": [
         "\"Search the Cracked Claw Caverns for any crystal samples. Oswald in Mire's Edge can determine their value.\" (1250819232); \"Return to Oswald in Mire's Edge\" (1468578823); title unknown"
       ],
@@ -26373,11 +26392,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:320; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1553 (ModelId=730, ModelFileName=dwarf_blackspore_thief_m.adr, NameId=78534)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.72082,
       "model_id": 730,
-      "model_file_name": "dwarf_blackspore_thief_m.adr"
+      "model_file_name": "dwarf_blackspore_thief_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000428,
@@ -32568,7 +32594,7 @@
       "reference_ids": [],
       "name": "Sirdo \"Squirrel Chaser\" / \"King of Squirrels\"",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 390721,
       "name_string_ids": [],
       "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
       "zone": "Blackspore Swamp",
@@ -32602,9 +32628,9 @@
       ],
       "services_reason": null,
       "position": [
-        -2146.8,
-        -32.829,
-        1034.91
+        -2259.518,
+        -31.38256,
+        1063.637
       ],
       "position_w": null,
       "rotation": [
@@ -32910,12 +32936,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=16 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=16 NameId=3500 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "Spawn 100000001585 in npc_spawns_extra.json draws this NPC, so its record stands on it (quest-research/npcs.json, 2026-11-08: client: locale 390381 is the quest name 'Sirdo \"Squirrel Chaser\"', locale 390721 the nameplate 'Sirdo \"King of Squirrels\"'; both are the record 9500000064 'Sirdo Squirrel Chaser King of Squirrels'.)"
           }
         ],
         "position_reason": [
@@ -38436,8 +38458,27 @@
       "location_evidence": [
         "\"Outside of Cracked Claw Caverns, in Blackspore\" (3613074255)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957912,
+          "title": "Burial Service",
+          "title_string_id": 390570,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Burial Service (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_burial_service_b31d3d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957912
+      ],
       "quests_given_text": [
         "Burial Service (title 2725790777/165850984; collect lost explorer bones, return to Vasher; video 0egOV5hzmjI/00038) (Cracked Claw Caverns)"
       ],
@@ -38815,11 +38856,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:331; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1564 (ModelId=669, ModelFileName=human_blackspore_thief_m.adr, NameId=390565)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 1.846462,
       "model_id": 669,
-      "model_file_name": "human_blackspore_thief_m.adr"
+      "model_file_name": "human_blackspore_thief_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000077,
@@ -39814,8 +39862,27 @@
       "location_evidence": [
         "Quagmire Quarry / \"Blackspore Blacksmith Furnace\" (wiki); video nameplate 57 m away with the Haunted Mines marker 55 m"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958053,
+          "title": "Ore Survey",
+          "title_string_id": 91790,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Ore Survey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_ore_survey_fb3d40)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958053
+      ],
       "quests_given_text": [
         "Block Loblog's Bog Log (3658867434); Ore Survey (title 895558724/220237431: \"ore samples from the Haunted Mines\" 4001717865, 1092605653); Dwarven Expertise hand-off (Iliya sends the player to ask him about a large crystal, 1480136506, 1509407713); \"Speak with Vrock at the Quagmire Quarry\" (3951189232)"
       ],
@@ -40275,11 +40342,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:271; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1504 (ModelId=684, ModelFileName=dwarf_blackspore_miner_m.adr, NameId=45557)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.108798,
       "model_id": 684,
-      "model_file_name": "dwarf_blackspore_miner_m.adr"
+      "model_file_name": "dwarf_blackspore_miner_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000079,

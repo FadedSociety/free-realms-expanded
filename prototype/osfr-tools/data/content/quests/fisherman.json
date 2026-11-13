@@ -1793,8 +1793,59 @@
       "prerequisite_quest_ids": [
         3070021
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "any_of",
+          "id": 1,
+          "text_string_id": 409363,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in some small fish (lab/references/quest-table-20261102/quests.merged.json client:3070022)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 409367 'If you cast your line in Darklit Lagoon, you should find plenty': the small-grade items of the Darklit Lagoon roster (Ink Cod, Old Sole, Thorny Trout, Roach Loach)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 'some' is one catch, as the tool reads every 'Reel in some' goal"
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68072
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68086
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68089
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68098
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Restocking the Stream pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1827,12 +1878,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 409359,
       "intro_text_string_id": 409357,
       "end_text_string_id": 409360,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070023,
@@ -2054,10 +2110,56 @@
     {
       "id": 3070026,
       "title_string_id": 409226,
-      "giver_npc_id": 9000000127,
+      "giver_npc_id": 9500003148,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 409235,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the \"Live Bait\" minigame (lab/references/quest-table-20261102/quests.merged.json client:3070026)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 409234 'Click on the bucket when you are ready to start collecting nettletrout.', 409241 'The waters here are too shallow to fish in, so you have to use your hands'; MiniGameData has no Live Bait row"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) a nettletrout to pick up by hand stands for the game; fishing.json's small-fish model 1670 is their body"
+            }
+          ],
+          "node_type": "quest-nettletrout-q3070026",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409237,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409237 'Return to Dooba', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000308
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Dooba's Secret pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2090,12 +2192,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 409227,
       "intro_text_string_id": 409225,
       "end_text_string_id": 409228,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070027,
@@ -2246,8 +2353,65 @@
       "title_string_id": 409746,
       "giver_npc_id": 9000000146,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 409751,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409751 'Speak to Bluerose', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000027
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 409753,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the quest \"Worms\" (lab/references/quest-table-20261102/quests.merged.json client:3070030)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "MiniGameData 73 'NOT LIVE - Worms' ('Bluerose is running out of bait... Find ten worms'): the client marks the game it names as never live"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) a second Talk with Bluerose (lakeshore.json 9000000027) stands for finishing Worms"
+            }
+          ],
+          "npc_id": 9000000027
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 409755,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409755 'Return to Merri De'Flor', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000146
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Bluerose's Best Bait pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2280,12 +2444,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 409747,
       "intro_text_string_id": 409745,
       "end_text_string_id": 409748,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070031,
@@ -2972,8 +3141,92 @@
       "title_string_id": 410500,
       "giver_npc_id": 9000000024,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 410508,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410508 'Talk to Cap'n Sigmundr', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500005569
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 410513,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in some dynamite (lab/references/quest-table-20261102/quests.merged.json client:3070038)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 410514 'Fish up some dynamite, and make sure it's not soggy!'; the client's fishing items hold 68003 Stick of Dynamite and 68002 Soggy Stick of Dynamite, but no roster catches them"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one catch at Wintery Basin (fishing_spots.json game 600) stands for reeling the dynamite in, until a roster row for 68003 exists"
+            }
+          ],
+          "minigame_id": 600,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 410515,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410515 'Return to Ernest McScuttle', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000319
+        },
+        {
+          "kind": "visit_position",
+          "id": 4,
+          "text_string_id": 410517,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blast the ice (lab/references/quest-table-20261102/quests.merged.json client:3070038)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 410518 'Use the dynamite to blast through some of the thick ice around the lake.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the ice patches are not placed: reaching the frozen lake at Big J (snowhill.json 9000000024, the Wintery Basin's fishing spot) counts as blasting them"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            51.624,
+            30.987,
+            360.502
+          ],
+          "radius": 12
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Joining Big J's Crew pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3006,12 +3259,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 410501,
       "intro_text_string_id": 410499,
       "end_text_string_id": 410502,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070039,
@@ -3020,8 +3278,71 @@
       "prerequisite_quest_ids": [
         3070038
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 412149,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412149 'Talk to Hilbert', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500005644
+        },
+        {
+          "kind": "any_of",
+          "id": 2,
+          "text_string_id": 412154,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412154 'Reel in some Blubracuda', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68035
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68036
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68037
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 412159,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412159 'Return to Hilbert', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9500005644
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Partner Up pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3054,22 +3375,131 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 412145,
       "intro_text_string_id": 412143,
       "end_text_string_id": 412146,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070040,
       "title_string_id": 409040,
-      "giver_npc_id": 9000000103,
+      "giver_npc_id": 9000000010,
       "prerequisite_quest_ids": [
         3070039
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 409045,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in some local fish (lab/references/quest-table-20261102/quests.merged.json client:3070040)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the quest's other three goals (slugmud skipper, chipsen fish, cheery salmon) are all Sacred Grove Shallows fish"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) any catch at Sacred Grove Shallows (fishing_spots.json game 599) is a local fish"
+            }
+          ],
+          "minigame_id": 599,
+          "count": 1
+        },
+        {
+          "kind": "any_of",
+          "id": 2,
+          "text_string_id": 409047,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409047 'Reel in a slugmud skipper', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68048
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68049
+            }
+          ]
+        },
+        {
+          "kind": "any_of",
+          "id": 3,
+          "text_string_id": 409049,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409049 'Reel in a chipsen fish', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68067
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68068
+            }
+          ]
+        },
+        {
+          "kind": "any_of",
+          "id": 4,
+          "text_string_id": 409051,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409051 'Catch a cheery salmon', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "count": 1,
+          "alternatives": [
+            {
+              "kind": "collect_item",
+              "item_id": 68062
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68063
+            },
+            {
+              "kind": "collect_item",
+              "item_id": 68064
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Plenty of Fish pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3102,12 +3532,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 409041,
       "intro_text_string_id": 409039,
       "end_text_string_id": 409042,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070041,
@@ -3323,8 +3758,50 @@
       "title_string_id": 412262,
       "giver_npc_id": 9000000103,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 412267,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reel in the icy beast (lab/references/quest-table-20261102/quests.merged.json client:3070043)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 412270 'You caught the Ferocious Fangler that swallowed Ernest McScuttle!': the icy beast is the Ferocious Fangler, a Wintery Basin fish (fishing_spots.json item 68008 at every size)"
+            }
+          ],
+          "item_id": 68008,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 412271,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412271 'Talk to Ernest', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "npc_id": 9000000319
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: To the Rescue! pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3357,12 +3834,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 412263,
       "intro_text_string_id": 412261,
       "end_text_string_id": 412264,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070044,

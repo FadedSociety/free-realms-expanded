@@ -5189,6 +5189,486 @@
         "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
       },
       "name_id": 117096
+    },
+    {
+      "key": "quest-animated-plant-parts-q3958164",
+      "name": "Animated Plant Parts",
+      "model_id": 333,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 16914
+    },
+    {
+      "key": "quest-barrel-2-q3080044",
+      "name": "Barrel",
+      "model_id": 83,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 18919
+    },
+    {
+      "key": "quest-bowl-of-curds-q3958027",
+      "name": "Bowl Of Curds",
+      "model_id": 349,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 72051
+    },
+    {
+      "key": "quest-car-parts-q3958006",
+      "name": "Car Parts",
+      "model_id": 333,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 22192
+    },
+    {
+      "key": "quest-eggs-q3957859",
+      "name": "Eggs",
+      "model_id": 4203,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 435967
+    },
+    {
+      "key": "quest-fliers-q3958110",
+      "name": "Fliers",
+      "model_id": 584,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 93217
+    },
+    {
+      "key": "quest-flower-sample-q3958158",
+      "name": "Flower Sample",
+      "model_id": 3832,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 74321
+    },
+    {
+      "key": "quest-fragments-of-crystal-q3957936",
+      "name": "Fragments Of Crystal",
+      "model_id": 3082,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 76053
+    },
+    {
+      "key": "quest-jewelry-chest-4-q3958202",
+      "name": "Jewelry Chest",
+      "model_id": 151,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 77573
+    },
+    {
+      "key": "quest-lost-explorer-bones-q3957912",
+      "name": "Lost Explorer Bones",
+      "model_id": 319,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 139359
+    },
+    {
+      "key": "quest-mineral-water-q3957980",
+      "name": "Mineral Water",
+      "model_id": 521,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 24610
+    },
+    {
+      "key": "quest-nettletrout-q3070026",
+      "name": "Nettletrout",
+      "model_id": 1670,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 409188
+    },
+    {
+      "key": "quest-ore-deposits-q3958053",
+      "name": "Ore Deposits",
+      "model_id": 587,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 91790
+    },
+    {
+      "key": "quest-ore-samples-q3958174",
+      "name": "Ore Samples",
+      "model_id": 3832,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 5677
+    },
+    {
+      "key": "quest-penguins-q3958064",
+      "name": "Penguins",
+      "model_id": 16,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 6442
+    },
+    {
+      "key": "quest-prized-fish-5-q3958202",
+      "name": "Prized Fish",
+      "model_id": 1670,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 77573
+    },
+    {
+      "key": "quest-shovel-3-q3958202",
+      "name": "Shovel",
+      "model_id": 197,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 2149
+    },
+    {
+      "key": "quest-spotted-mushrooms-q3958194",
+      "name": "Spotted Mushrooms",
+      "model_id": 249,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 38897
+    },
+    {
+      "key": "quest-stolen-game-table-2-q3958202",
+      "name": "Stolen Game Table",
+      "model_id": 309,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 77573
+    },
+    {
+      "key": "quest-those-pies-0-3-q3958070",
+      "name": "Those Pies! 0/3",
+      "model_id": 269,
+      "scale": 1.0,
+      "composite_effect_id": 5386,
+      "interact_range": 12,
+      "cursor_id": 17,
+      "placement_y_offset": 0.0,
+      "drop_table": [],
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "name": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "model_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "scale": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "composite_effect_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "interact_range": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "cursor_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "placement_y_offset": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "drop_table": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      },
+      "name_id": 23733
     }
   ],
   "pools": [
@@ -8422,6 +8902,306 @@
       "zone_definition_id": 1,
       "node_type": "quest-purr-fect-secret-cat-bowl-4",
       "max_active_nodes": 1,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "node_type": "quest-animated-plant-parts-q3958164",
+      "max_active_nodes": 7,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-barrel-2-q3080044",
+      "zone_definition_id": 1,
+      "node_type": "quest-barrel-2-q3080044",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-bowl-of-curds-q3958027",
+      "zone_definition_id": 1,
+      "node_type": "quest-bowl-of-curds-q3958027",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "node_type": "quest-car-parts-q3958006",
+      "max_active_nodes": 6,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "node_type": "quest-eggs-q3957859",
+      "max_active_nodes": 7,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-fliers-q3958110",
+      "zone_definition_id": 1,
+      "node_type": "quest-fliers-q3958110",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-flower-sample-q3958158",
+      "zone_definition_id": 1,
+      "node_type": "quest-flower-sample-q3958158",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-fragments-of-crystal-q3957936",
+      "zone_definition_id": 1,
+      "node_type": "quest-fragments-of-crystal-q3957936",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-jewelry-chest-4-q3958202",
+      "zone_definition_id": 1,
+      "node_type": "quest-jewelry-chest-4-q3958202",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "node_type": "quest-lost-explorer-bones-q3957912",
+      "max_active_nodes": 6,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-mineral-water-q3957980",
+      "zone_definition_id": 1,
+      "node_type": "quest-mineral-water-q3957980",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-nettletrout-q3070026",
+      "zone_definition_id": 1,
+      "node_type": "quest-nettletrout-q3070026",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "node_type": "quest-ore-deposits-q3958053",
+      "max_active_nodes": 8,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-ore-samples-q3958174",
+      "zone_definition_id": 1,
+      "node_type": "quest-ore-samples-q3958174",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-penguins-q3958064",
+      "zone_definition_id": 1,
+      "node_type": "quest-penguins-q3958064",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-prized-fish-5-q3958202",
+      "zone_definition_id": 1,
+      "node_type": "quest-prized-fish-5-q3958202",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-shovel-3-q3958202",
+      "zone_definition_id": 1,
+      "node_type": "quest-shovel-3-q3958202",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-spotted-mushrooms-q3958194",
+      "zone_definition_id": 1,
+      "node_type": "quest-spotted-mushrooms-q3958194",
+      "max_active_nodes": 5,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-stolen-game-table-2-q3958202",
+      "zone_definition_id": 1,
+      "node_type": "quest-stolen-game-table-2-q3958202",
+      "max_active_nodes": 3,
+      "respawn_seconds": 30,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "key": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "zone_definition_id": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "node_type": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "max_active_nodes": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "respawn_seconds": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "key": "quest-those-pies-0-3-q3958070",
+      "zone_definition_id": 1,
+      "node_type": "quest-those-pies-0-3-q3958070",
+      "max_active_nodes": 5,
       "respawn_seconds": 30,
       "source_tag": "reconstructed",
       "source_tags": {
@@ -22380,6 +23160,1462 @@
         -361.49,
         -4.423,
         -751.68
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100041,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -512.79,
+        -83.96,
+        2373.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100042,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -514.79,
+        -84.6,
+        2383.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100043,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -518.79,
+        -85.12,
+        2387.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100044,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -528.79,
+        -81.79,
+        2389.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100045,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -534.79,
+        -81.0,
+        2387.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100046,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -538.79,
+        -80.9,
+        2383.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100047,
+      "pool_key": "quest-animated-plant-parts-q3958164",
+      "zone_definition_id": 1,
+      "position": [
+        -540.79,
+        -81.11,
+        2377.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100048,
+      "pool_key": "quest-barrel-2-q3080044",
+      "zone_definition_id": 1,
+      "position": [
+        -263.97,
+        -58.8,
+        1956.26
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100049,
+      "pool_key": "quest-barrel-2-q3080044",
+      "zone_definition_id": 1,
+      "position": [
+        -265.97,
+        -58.9,
+        1962.26
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100050,
+      "pool_key": "quest-barrel-2-q3080044",
+      "zone_definition_id": 1,
+      "position": [
+        -271.97,
+        -59.0,
+        1962.26
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100051,
+      "pool_key": "quest-bowl-of-curds-q3958027",
+      "zone_definition_id": 1,
+      "position": [
+        -697.0,
+        -67.06,
+        2201.53
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100052,
+      "pool_key": "quest-bowl-of-curds-q3958027",
+      "zone_definition_id": 1,
+      "position": [
+        -689.0,
+        -67.2,
+        2203.53
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100053,
+      "pool_key": "quest-bowl-of-curds-q3958027",
+      "zone_definition_id": 1,
+      "position": [
+        -685.0,
+        -67.3,
+        2207.53
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100054,
+      "pool_key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "position": [
+        -1408.16,
+        -30.64,
+        287.13
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100055,
+      "pool_key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "position": [
+        -1411.86,
+        -30.64,
+        292.67
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100056,
+      "pool_key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "position": [
+        -1418.4,
+        -30.64,
+        291.37
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100057,
+      "pool_key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "position": [
+        -1419.7,
+        -30.64,
+        284.84
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100058,
+      "pool_key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "position": [
+        -1414.16,
+        -30.64,
+        281.13
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100059,
+      "pool_key": "quest-car-parts-q3958006",
+      "zone_definition_id": 1,
+      "position": [
+        -1407.79,
+        -30.64,
+        280.77
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100060,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1935.67,
+        -39.92,
+        -605.43
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100061,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1929.14,
+        -39.8,
+        -615.21
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100062,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1941.69,
+        -39.95,
+        -607.53
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100063,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1924.89,
+        -39.26,
+        -602.49
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100064,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1937.97,
+        -39.95,
+        -599.89
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100065,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1945.38,
+        -39.85,
+        -610.97
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100066,
+      "pool_key": "quest-eggs-q3957859",
+      "zone_definition_id": 1,
+      "position": [
+        -1941.86,
+        -39.86,
+        -619.46
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100067,
+      "pool_key": "quest-fliers-q3958110",
+      "zone_definition_id": 1,
+      "position": [
+        328.75,
+        27.47,
+        478.97
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100068,
+      "pool_key": "quest-fliers-q3958110",
+      "zone_definition_id": 1,
+      "position": [
+        330.75,
+        28.29,
+        472.97
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100069,
+      "pool_key": "quest-fliers-q3958110",
+      "zone_definition_id": 1,
+      "position": [
+        336.75,
+        27.36,
+        470.97
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100070,
+      "pool_key": "quest-flower-sample-q3958158",
+      "zone_definition_id": 1,
+      "position": [
+        40.35,
+        24.76,
+        -382.74
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100071,
+      "pool_key": "quest-flower-sample-q3958158",
+      "zone_definition_id": 1,
+      "position": [
+        38.35,
+        24.7,
+        -402.74
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100072,
+      "pool_key": "quest-flower-sample-q3958158",
+      "zone_definition_id": 1,
+      "position": [
+        52.35,
+        24.7,
+        -380.74
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100073,
+      "pool_key": "quest-fragments-of-crystal-q3957936",
+      "zone_definition_id": 1,
+      "position": [
+        -2086.08,
+        -29.9,
+        1116.29
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100074,
+      "pool_key": "quest-fragments-of-crystal-q3957936",
+      "zone_definition_id": 1,
+      "position": [
+        -2083.98,
+        -29.98,
+        1110.27
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100075,
+      "pool_key": "quest-fragments-of-crystal-q3957936",
+      "zone_definition_id": 1,
+      "position": [
+        -2072.05,
+        -29.98,
+        1110.1
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100076,
+      "pool_key": "quest-fragments-of-crystal-q3957936",
+      "zone_definition_id": 1,
+      "position": [
+        -2065.54,
+        -30.1,
+        1118.59
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100077,
+      "pool_key": "quest-fragments-of-crystal-q3957936",
+      "zone_definition_id": 1,
+      "position": [
+        -2066.68,
+        -30.1,
+        1124.33
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100078,
+      "pool_key": "quest-jewelry-chest-4-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -766.41,
+        8.94,
+        893.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100079,
+      "pool_key": "quest-jewelry-chest-4-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -768.41,
+        1.32,
+        873.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100080,
+      "pool_key": "quest-jewelry-chest-4-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -756.41,
+        7.08,
+        897.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100081,
+      "pool_key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "position": [
+        -2269.47,
+        -30.64,
+        915.44
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100082,
+      "pool_key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "position": [
+        -2273.17,
+        -30.64,
+        920.98
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100083,
+      "pool_key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "position": [
+        -2279.71,
+        -30.64,
+        919.68
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100084,
+      "pool_key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "position": [
+        -2281.01,
+        -30.64,
+        913.14
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100085,
+      "pool_key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "position": [
+        -2275.47,
+        -30.64,
+        909.44
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100086,
+      "pool_key": "quest-lost-explorer-bones-q3957912",
+      "zone_definition_id": 1,
+      "position": [
+        -2269.11,
+        -30.64,
+        909.07
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100087,
+      "pool_key": "quest-mineral-water-q3957980",
+      "zone_definition_id": 1,
+      "position": [
+        315.05,
+        26.03,
+        244.16
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100088,
+      "pool_key": "quest-mineral-water-q3957980",
+      "zone_definition_id": 1,
+      "position": [
+        316.35,
+        26.03,
+        237.62
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100089,
+      "pool_key": "quest-mineral-water-q3957980",
+      "zone_definition_id": 1,
+      "position": [
+        322.88,
+        26.03,
+        236.32
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100090,
+      "pool_key": "quest-mineral-water-q3957980",
+      "zone_definition_id": 1,
+      "position": [
+        329.59,
+        26.19,
+        241.87
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100091,
+      "pool_key": "quest-mineral-water-q3957980",
+      "zone_definition_id": 1,
+      "position": [
+        326.95,
+        26.19,
+        248.23
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100092,
+      "pool_key": "quest-nettletrout-q3070026",
+      "zone_definition_id": 1,
+      "position": [
+        -704.6,
+        -69.66,
+        2401.3
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100093,
+      "pool_key": "quest-nettletrout-q3070026",
+      "zone_definition_id": 1,
+      "position": [
+        -716.14,
+        -69.66,
+        2403.6
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100094,
+      "pool_key": "quest-nettletrout-q3070026",
+      "zone_definition_id": 1,
+      "position": [
+        -704.24,
+        -69.66,
+        2407.66
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100095,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2491.04,
+        -24.06,
+        1088.1
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100096,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2494.74,
+        -24.06,
+        1093.64
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100097,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2497.04,
+        -23.96,
+        1079.1
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100098,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2490.68,
+        -23.96,
+        1081.73
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100099,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2497.04,
+        -24.6,
+        1100.1
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100100,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2492.45,
+        -23.96,
+        1077.01
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100101,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2512.04,
+        -24.61,
+        1088.1
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100102,
+      "pool_key": "quest-ore-deposits-q3958053",
+      "zone_definition_id": 1,
+      "position": [
+        -2510.9,
+        -25.01,
+        1082.35
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100103,
+      "pool_key": "quest-ore-samples-q3958174",
+      "zone_definition_id": 1,
+      "position": [
+        474.02,
+        47.11,
+        341.21
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100104,
+      "pool_key": "quest-ore-samples-q3958174",
+      "zone_definition_id": 1,
+      "position": [
+        468.02,
+        47.11,
+        347.21
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100105,
+      "pool_key": "quest-ore-samples-q3958174",
+      "zone_definition_id": 1,
+      "position": [
+        462.48,
+        47.11,
+        343.5
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100106,
+      "pool_key": "quest-ore-samples-q3958174",
+      "zone_definition_id": 1,
+      "position": [
+        463.78,
+        47.11,
+        336.96
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100107,
+      "pool_key": "quest-ore-samples-q3958174",
+      "zone_definition_id": 1,
+      "position": [
+        470.32,
+        47.11,
+        335.66
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100108,
+      "pool_key": "quest-penguins-q3958064",
+      "zone_definition_id": 1,
+      "position": [
+        369.46,
+        56.26,
+        531.75
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100109,
+      "pool_key": "quest-penguins-q3958064",
+      "zone_definition_id": 1,
+      "position": [
+        365.76,
+        56.26,
+        537.3
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100110,
+      "pool_key": "quest-penguins-q3958064",
+      "zone_definition_id": 1,
+      "position": [
+        359.22,
+        56.26,
+        536.0
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100111,
+      "pool_key": "quest-penguins-q3958064",
+      "zone_definition_id": 1,
+      "position": [
+        357.92,
+        56.26,
+        529.46
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100112,
+      "pool_key": "quest-penguins-q3958064",
+      "zone_definition_id": 1,
+      "position": [
+        363.46,
+        56.26,
+        525.75
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100113,
+      "pool_key": "quest-prized-fish-5-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -772.41,
+        6.4,
+        893.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100114,
+      "pool_key": "quest-prized-fish-5-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -776.41,
+        5.36,
+        883.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100115,
+      "pool_key": "quest-prized-fish-5-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -762.41,
+        1.4,
+        871.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100116,
+      "pool_key": "quest-shovel-3-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -758.41,
+        2.56,
+        877.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100117,
+      "pool_key": "quest-shovel-3-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -754.41,
+        3.3,
+        881.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100118,
+      "pool_key": "quest-shovel-3-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -754.41,
+        4.16,
+        891.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100119,
+      "pool_key": "quest-spotted-mushrooms-q3958194",
+      "zone_definition_id": 1,
+      "position": [
+        -561.62,
+        -53.09,
+        2555.2
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100120,
+      "pool_key": "quest-spotted-mushrooms-q3958194",
+      "zone_definition_id": 1,
+      "position": [
+        -565.33,
+        -53.09,
+        2560.74
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100121,
+      "pool_key": "quest-spotted-mushrooms-q3958194",
+      "zone_definition_id": 1,
+      "position": [
+        -571.87,
+        -53.09,
+        2559.44
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100122,
+      "pool_key": "quest-spotted-mushrooms-q3958194",
+      "zone_definition_id": 1,
+      "position": [
+        -573.17,
+        -53.09,
+        2552.9
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100123,
+      "pool_key": "quest-spotted-mushrooms-q3958194",
+      "zone_definition_id": 1,
+      "position": [
+        -564.18,
+        -53.09,
+        2546.88
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100124,
+      "pool_key": "quest-stolen-game-table-2-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -770.41,
+        5.16,
+        885.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100125,
+      "pool_key": "quest-stolen-game-table-2-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -770.41,
+        3.65,
+        879.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100126,
+      "pool_key": "quest-stolen-game-table-2-q3958202",
+      "zone_definition_id": 1,
+      "position": [
+        -764.41,
+        1.98,
+        877.15
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100127,
+      "pool_key": "quest-those-pies-0-3-q3958070",
+      "zone_definition_id": 1,
+      "position": [
+        -380.79,
+        16.62,
+        -239.33
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100128,
+      "pool_key": "quest-those-pies-0-3-q3958070",
+      "zone_definition_id": 1,
+      "position": [
+        -384.49,
+        16.62,
+        -233.78
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100129,
+      "pool_key": "quest-those-pies-0-3-q3958070",
+      "zone_definition_id": 1,
+      "position": [
+        -391.03,
+        16.62,
+        -235.08
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100130,
+      "pool_key": "quest-those-pies-0-3-q3958070",
+      "zone_definition_id": 1,
+      "position": [
+        -392.33,
+        16.62,
+        -241.62
+      ],
+      "heading": 0.0,
+      "source_tag": "reconstructed",
+      "source_tags": {
+        "position": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it",
+        "heading": "(R) quest pick-up from lab/tools/quest_wire.py: the wiki step names it, and no capture places it"
+      }
+    },
+    {
+      "id": 100131,
+      "pool_key": "quest-those-pies-0-3-q3958070",
+      "zone_definition_id": 1,
+      "position": [
+        -386.79,
+        16.62,
+        -245.33
       ],
       "heading": 0.0,
       "source_tag": "reconstructed",

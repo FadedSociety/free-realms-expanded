@@ -3172,8 +3172,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
-      }
+      },
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000728,
@@ -5117,14 +5124,34 @@
         "Mine foreman figure; trapped miners \"haven't reported in to Buren\" (client 938425949)."
       ],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Singing Crystal Mines (wiki); Deep Mines and Bat Caves quests (client)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957951,
+          "title": "Disarm the Pests",
+          "title_string_id": 7384,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Disarm the Pests (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_disarm_the_pests_b17afc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957951
+      ],
       "quests_given_text": [
         "No quest titles known. Appears in the Deep Mines and The Bat Cave rescue/tool texts."
       ],
@@ -5502,11 +5529,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2347; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3605 (ModelId=341, ModelFileName=dwarf_buren_m.adr, NameId=5457)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.115568,
       "model_id": 341,
-      "model_file_name": "dwarf_buren_m.adr"
+      "model_file_name": "dwarf_buren_m.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000731,
@@ -7224,8 +7258,27 @@
       "location_evidence": [
         "\"At the refreshment stand\" (client 985700222); \"Snowhill hot springs\" (733797519, 2021017915)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957980,
+          "title": "Fetch Some Mineral Water",
+          "title_string_id": 6417,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fetch Some Mineral Water (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fetch_some_mineral_water_77b7be)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957980
+      ],
       "quests_given_text": [
         "The smoothie recipe job: \"She'll whip one up if you find her the ingredients\" (client 1029274002, 1177135919, 1339074182) and the Woe is Willie deliveries."
       ],
@@ -34020,11 +34073,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.555055,
       "model_id": 428,
-      "model_file_name": "fairy_m_sakka.agr"
+      "model_file_name": "fairy_m_sakka.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000767,
@@ -37555,10 +37615,44 @@
               "evidence": "The Next Big Star (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_next_big_star_b23c2a)."
             }
           ]
+        },
+        {
+          "quest_id": 3958110,
+          "title": "Show Promoter",
+          "title_string_id": 93213,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Show Promoter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_show_promoter_dc8c4a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958130,
+          "title": "Super Star!",
+          "title_string_id": 10395,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Super Star! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_super_star_3e4bd7)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3955024
+        3955024,
+        3958110,
+        3958130
       ],
       "quests_given_text": [
         "The letters from Sandi and from a film director are addressed to her (client 929955078, 642623430). She sets the \"Feeling the Beat!\" Maestro-difficulty challenge (\"Click on the music stand next to the stage in Snowhill\", client 675351909, 1036196908). Quest titles unknown."
@@ -38508,12 +38602,29 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3958174,
+          "title": "To the Bat Cave",
+          "title_string_id": 5677,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "To the Bat Cave (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_to_the_bat_cave_616574)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3100006,
         3100007,
-        3955536
+        3955536,
+        3958174
       ],
       "quests_given_text": [
         "Miner: Reach Level 5, Miner: Dartmoor Mining Camp (wiki). Gem task in Miner: Gem Appraisal (client text puts it with Sorin; wiki says Trixi; the video first goal is \"Speak with Sorin\", NemdyF6pHTs/00000). Client no-job gate: \"Visit Sorin in Snowhill to become a Miner!\" (705975744)."
@@ -46432,8 +46543,27 @@
       "location_evidence": [
         "\"At the Penguin Training Institute in Snowhill\" (client 2011185997)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958064,
+          "title": "Penguin Rescue Brigade",
+          "title_string_id": 14903,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Penguin Rescue Brigade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_penguin_rescue_brigade_1e4b57)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958064
+      ],
       "quests_given_text": [
         "Penguin errands: rescue her penguins in Howling Hills (client 2955920251); feed her penguins (Fisherman: Feed the Penguins); take Aedon to her (client 3790402017, 553022046)."
       ],

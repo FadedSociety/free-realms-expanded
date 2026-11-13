@@ -929,11 +929,45 @@
               "evidence": "Root of the Problem (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_root_of_the_problem_52a24c)."
             }
           ]
+        },
+        {
+          "quest_id": 3958158,
+          "title": "The Secret Ingredient",
+          "title_string_id": 74321,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Secret Ingredient (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_secret_ingredient_783d1e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958100,
+          "title": "Save the Sasparilla!",
+          "title_string_id": 74258,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Save the Sasparilla! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_save_the_sasparilla_7aad85)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3954882,
-        3954982
+        3954982,
+        3958158,
+        3958100
       ],
       "quests_given_text": [
         "Drinks on the House (client title 1647480589, by wording): \"Ask Brockoom in Wugachug for your free mug of sasparilla.\" (2038130101); \"Brockoom handles the finished sasparilla, go ask him for a mug on the house\" (2121570718, 277320658). The flavour chain: \"Brockoom needs to pinpoint what is wrong with the flavor of the sasparilla\" (2411928607; chugaroot 3300909015, 2439817213; \"Find some ingredients to sweeten the sasparilla\", 1502291556; \"Brockoom said the mountain spring water is missing an ingredient!\", 4290753224; samples 3180083845, 3850122351). Quest titles for the chain not found."

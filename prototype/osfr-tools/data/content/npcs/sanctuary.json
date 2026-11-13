@@ -57036,14 +57036,34 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "ambient",
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Sanctuary"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958006,
+          "title": "High Performance Parts",
+          "title_string_id": 10160,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "High Performance Parts (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_high_performance_parts_112559)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958006
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",

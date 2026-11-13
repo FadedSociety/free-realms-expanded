@@ -9047,9 +9047,27 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part A. Town hosts and the welcome tour, row 33; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3958181,
+          "title": "Truffle Shuffle",
+          "title_string_id": 427165,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Truffle Shuffle (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_truffle_shuffle_d66268)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3958181
+      ],
       "quests_given_text": [
         "Welcome-tour stop (\"Speak with Fenwink about the wonderful food of Merry Vale\", 4222849783); sweet bun for Yvelle (294647113, 1633295905); Truffle Shuffle (wiki: repeatable once a day; \"Fenwink could use some help filling up his chocolate boxes. Trade with friends and try to get one of each type of truffle!\", 1486159336; \"Take the full box of truffles back to Fenwink\", 4252256619); cotton-candy hand-in (965372313)."
       ],
@@ -11264,9 +11282,9 @@
       ],
       "services_reason": null,
       "position": [
-        -1182.736098,
-        -34.7537,
-        -435.465544
+        -962.2204,
+        -39.54591,
+        -406.7828
       ],
       "position_w": null,
       "rotation": [
@@ -11648,12 +11666,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 14 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "Spawn 100000004356 in npc_spawns_extra.json draws this NPC, so its record stands on it (quest-research/npcs.json, 2026-11-08: record 9500000390 'Illusionist Liana': role quotes client text 'Mayor McFairy and his assistant Liana were involved?'; same model as the spawn (458 sprite_basic_f.adr))"
           }
         ],
         "position_reason": [
@@ -11719,10 +11733,17 @@
             "kind": "reconstructed",
             "evidence": "(R) body from lab/references/Sanctuary-BubbaJoeX-20261031/src/Resources/Npcs.json Id=46009 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000391,
@@ -32326,10 +32347,27 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 77; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3958198,
+          "title": "Where is Lugunwump",
+          "title_string_id": 73423,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Where is Lugunwump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_where_is_lugunwump_a7522c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3000371
+        3000371,
+        3958198
       ],
       "quests_given_text": [
         "Suspicious Serenity (wiki giver; \"Wugunbump thinks that something strange is going on around Merry Vale ... talk to the family members of the missing children\", 1729137906, 1472403084); Where is Lugunwump? (wiki giver; search the three bridges, 3112934980, 3841763330); At the End of the Rainbow (wiki giver); The Party Pooper (wiki: he appears; \"Try cheering Wugunbump up with the famous Merry Vale cotton candy!\", 1500338333)."

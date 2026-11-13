@@ -3182,8 +3182,53 @@
       "id": 3020034,
       "title_string_id": 439710,
       "giver_npc_id": 9000000179,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3020033
+      ],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 439755,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Smelt Copper Bars. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_a_sweat_027fd4)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Smelt Copper Bars.' names recipe 4 'Copper Bar' (output item 21785; recipes.json key miner.copper_bar.sample, rank 1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: cooking, forging and smelting raise CraftRecipe for the recipe's id on each completion (gameplay/crafting.rs:659); quest_wire RECIPES holds this id, the report's blockers() just never consults it, so this row is only misfiled."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: recipe 4 is in the default learned set (gameplay.rs:920)."
+            }
+          ],
+          "recipe_id": 4,
+          "quantity": 1
+        },
+        {
+          "kind": "craft_recipe",
+          "id": 2,
+          "text_string_id": 439757,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge the Chrome Cactoid Device. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_a_sweat_027fd4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the client has no Chrome Cactoid Device item; recipes.json 171 Chrome Drakeling is the closest chrome device a Blacksmith forges"
+            }
+          ],
+          "recipe_id": 171,
+          "quantity": 1
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -3235,12 +3280,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 439711,
       "intro_text_string_id": 439709,
       "end_text_string_id": 439712,
-      "enabled": false
+      "enabled": true,
+      "job": 16
     },
     {
       "id": 3020035,
