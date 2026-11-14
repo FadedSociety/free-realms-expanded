@@ -56,6 +56,8 @@ pub struct OpeningOutcome {
     pub rewards: Vec<OpeningReward>,
     pub unlock_profiles: Vec<i32>,
     pub completed_opening: bool,
+    /// Client title of each stage this event completed; its regional quest twin is settled.
+    pub completed_title_ids: Vec<u32>,
     /// True only when [`OpeningEngine::on_interaction`] passed its range and job gates and
     /// dispatched the actor's trigger. A refusal leaves it false, so callers withhold the
     /// quest progress an accepted interaction emits.
@@ -943,6 +945,7 @@ impl OpeningEngine {
             if stage.reward.coins != 0 || !stage.reward.items.is_empty() {
                 outcome.rewards.push(stage.reward);
             }
+            outcome.completed_title_ids.push(stage.title_id);
             outcome
                 .messages
                 .push(format!("Completed: {}.", stage.title));

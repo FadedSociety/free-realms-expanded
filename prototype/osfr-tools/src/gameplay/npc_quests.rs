@@ -52,6 +52,14 @@ impl Gameplay {
         self.quest_markers.content = markers.map(Arc::new);
         self.npc_quests = Some(engine);
         self.saved_npc_quests = None;
+        // L1208: a save that finished opening stages before their twins were settled.
+        let finished: Vec<u32> = self.opening.as_ref().map_or_else(Vec::new, |opening| {
+            (opening.stages().iter())
+                .filter(|s| opening.state().stages.get(&s.id).is_some_and(|p| p.completed))
+                .map(|s| s.title_id)
+                .collect()
+        });
+        self.settle_opening_twins(finished);
         self.load_live_events(); // T418: before any Talk, not on the first tick
         self.register_breadcrumb_crosswalk(crosswalk);
         self.job_browser_packet = job_browser.packet;
@@ -187,6 +195,15 @@ impl Gameplay {
     pub(super) fn npc_quest_profiles_changed(&mut self, out: &mut Outcome) -> io::Result<()> {
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         self.sync_job_level_objectives(out)
+    }
+
+    /// L1208: settle the regional quest twins of these opening stage titles
+    /// (`QuestEngine::settle_twins`). Returns whether a quest changed.
+    pub(super) fn settle_opening_twins(&mut self, titles: impl IntoIterator<Item = u32>) -> bool {
+        let Some(engine) = self.npc_quests.as_mut() else {
+            return false;
+        };
+        titles.into_iter().fold(false, |changed, title| engine.settle_twins(title) | changed)
     }
 
     /// Emit one authoritative `QuestEvent::JobLevel` for every open job-level goal

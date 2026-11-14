@@ -4323,6 +4323,7 @@ impl Gameplay {
             out.replies.extend(profiles.experience_packets(previous_xp));
             self.npc_quest_profiles_changed(out)?;
         }
+        out.changed |= self.settle_opening_twins(result.completed_title_ids);
         Ok(())
     }
 
@@ -4823,3 +4824,6 @@ mod s15_npc_transactions;
 
 #[cfg(test)]
 mod style_card_use_tests;
+
+#[cfg(test)]
+mod l1208_opening_twins;

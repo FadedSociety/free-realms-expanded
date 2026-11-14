@@ -1823,6 +1823,36 @@ impl QuestEngine {
             .map(|id| id as u32)
     }
 
+    /// (R) L1208: an opening stage and a regional record can be the same client quest (one
+    /// title id, e.g. Fighting off the Pack 4420074 = 3000009). When the stage completes, mark
+    /// every enabled record with that title that is not in the journal (not Active) and not
+    /// done Completed without paying it (the stage paid), so its giver never offers it again.
+    /// An Active twin the player took first stays theirs to finish. Returns whether anything
+    /// changed.
+    pub fn settle_twins(&mut self, title_string_id: u32) -> bool {
+        let open = |p: &QuestProgress| {
+            !matches!(p.status, QuestStatus::Active | QuestStatus::Completed)
+        };
+        let twins: Vec<(u32, Vec<u32>)> = (self.definitions.iter())
+            .filter(|(id, _)| self.is_enabled(**id))
+            .filter(|(id, _)| self.title_string_id(**id) == Some(title_string_id))
+            .filter(|(id, _)| self.state.quests.get(id).is_none_or(open))
+            .map(|(id, d)| (*id, d.objectives.iter().map(|goal| goal.required).collect()))
+            .collect();
+        let changed = !twins.is_empty();
+        for (quest_id, counts) in twins {
+            let status = QuestStatus::Completed;
+            self.state.quests.insert(quest_id, QuestProgress { status, counts });
+            if self.state.pending_offer == Some(quest_id) {
+                self.state.pending_offer = None;
+            }
+        }
+        if changed {
+            self.bump();
+        }
+        changed
+    }
+
     pub fn intro_text_string_id(&self, quest_id: u32) -> Option<u32> {
         self.split_locale_fields
             .get(&quest_id)
