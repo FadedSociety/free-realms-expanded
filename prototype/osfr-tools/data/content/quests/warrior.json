@@ -1606,11 +1606,78 @@
       "prerequisite_quest_ids": [
         3150016
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 71441,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click on the Tower Defense table (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_legend_of_fastvi_frostflutter_9b969c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: world spawn(s) in data/content/npc_spawns_extra.json: 'Tower Defense' spawn_guid 100000004627 model 325 sh_table_wartable01.adr, 1120 m from the quest's giver; ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3261; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.j"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: round war table with a map and carved pieces on it (sheets/a_world_click1.png r2c1, tile of sh_table_wartable01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_warrior_legend_of_fastvi_frostflutter_9b969c)."
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1566.94,
+            -40.18036,
+            -628.3112
+          ],
+          "radius": 8.0
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 141748,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Beat the \"Weed Killing! - Easy\" minigame. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_legend_of_fastvi_frostflutter_9b969c)."
+            }
+          ],
+          "minigame_id": 353,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 75020,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sir Whittington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_legend_of_fastvi_frostflutter_9b969c)."
+            }
+          ],
+          "npc_id": 9000000205
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 4216,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Warrior Axe (lab/references/quest-table-20261102/quests.json wiki:fr_quest_warrior_legend_of_fastvi_frostflutter_9b969c)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 282
           },
@@ -1658,12 +1725,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 71437,
       "intro_text_string_id": 71435,
       "end_text_string_id": 71438,
-      "enabled": false
+      "enabled": true,
+      "job": 32
     },
     {
       "id": 3150019,

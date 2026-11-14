@@ -31929,6 +31929,50 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3070019,
+          "title": "Fisherman: Hungry Chugs",
+          "title_string_id": 409370,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 15; name 'Fisherman: Hungry Chugs'; title id cell 31742645 / 1875532559"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070019 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -31936,7 +31980,8 @@
         3070020,
         3070025,
         3070033,
-        3070022
+        3070022,
+        3070019
       ],
       "quests_given_text": [
         "Fisherman: Hungry Chugs, Fisherman: Fishy Fungus, Fisherman: Ink Cod Ink, Fisherman: Restocking the Stream, Fisherman: Undercover, Fisherman: VIP Fish, Fisherman: Say Cheese!."

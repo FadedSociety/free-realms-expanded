@@ -1536,8 +1536,55 @@
       "title_string_id": 409370,
       "giver_npc_id": 9000000339,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 409375,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 409375 'Reel in some large Fanged Grouper', the goal line after this quest's title in the client's string table."
+            }
+          ],
+          "item_id": 68092,
+          "quantity": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 409380,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the spices (lab/references/quest-table-20261102/quests.merged.json client:3070019)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 409381 'Gunther thinks he may have dropped the bags of spices somewhere outside the Bayou in Briarwood.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) one bag of spices by the giver; the checked sack model 80 (objects.json 'bag')"
+            }
+          ],
+          "node_type": "quest-bag-of-spices-2-q3070019",
+          "quantity": 1
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Fisherman: Hungry Chugs pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1570,12 +1617,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 409371,
       "intro_text_string_id": 409369,
       "end_text_string_id": 409372,
-      "enabled": false
+      "enabled": true,
+      "job": 137
     },
     {
       "id": 3070020,

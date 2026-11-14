@@ -36104,6 +36104,339 @@
       "intro_text_string_id": 77572,
       "enabled": true,
       "end_text_string_id": 77575
+    },
+    {
+      "id": 3958213,
+      "title_string_id": 386248,
+      "giver_npc_id": 9000000191,
+      "prerequisite_quest_ids": [
+        3958100
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 386253,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Brockoom in Wugachug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_refreshing_reward_782965)."
+            }
+          ],
+          "npc_id": 9500000968
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 2265,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Sweetwater Sasparilla (lab/references/quest-table-20261102/quests.json wiki:fr_quest_a_refreshing_reward_782965)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Refreshing Reward (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_refreshing_reward_782965)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "A Refreshing Reward (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_refreshing_reward_782965)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules), read by the lead (L1207): 386250 'Great work!<BR><BR>I hope now you can start enjoying the party with everyone els'."
+        }
+      ],
+      "description_string_id": 386249,
+      "enabled": true,
+      "end_text_string_id": 386250
+    },
+    {
+      "id": 3958389,
+      "title_string_id": 45756,
+      "giver_npc_id": 9000000191,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "text_string_id": 70442,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout the field near the Sanctuary warpstone (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 70442 'Field near the Sanctuary warpstone' is the client's goal line (the quest table had none); 45757 'Scout out locations for future parties around Free Realms'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn 100000033167 'Sanctuary Warpstone' model 280 at (-1418.3, -27.0, 347.8); Sanctuary POI 5 is 4 m away"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) r20 around the stone covers the field beside it; probe: raised deck at the stone, terrain 1 m off"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1418.3,
+            -27.0,
+            347.8
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 70444,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout near the Forest Troll Fort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 70444 'Near the Forest Troll Fort' is the client's goal line; 5708 'Forest Troll Fort' names the place"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "POI 65 'Forest Troll Fort' (pois.json) at (-433.5, -0.1, 1345.5)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the fort interior is a dungeon; the visit is its POI outside, terrain 1 m from the marker"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -433.5,
+            -0.1,
+            1345.5
+          ],
+          "radius": 20
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "text_string_id": 70446,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout the field south of the clocktower in Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 70446 'Field south of the clocktower in Snowhill' is the client's goal line; 6805 'Mayor Crystalline can be found by the clock tower in town.'; 72651 'Report to Mayor Crystalline near the clocktower'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Mayor Crystalline 9000000143 (npc_spawns_extra content_key, model 34) at (299.4, 27.4, 409.0); no clocktower prop or POI exists in our data"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) r25 around the Mayor covers the field on the clocktower's south side whichever way the map's south runs; probe: terrain"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            299.4,
+            27.4,
+            409.0
+          ],
+          "radius": 25
+        },
+        {
+          "kind": "visit_position",
+          "id": 4,
+          "text_string_id": 70448,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout the chugawug camp in Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 70448 'Chugawug camp in Merry Vale' is the client's goal line; 385601 'Cheer up Wugunbump at the Chugawug camp.'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Wugunbump 9500000432 (-1016.5, -38.1, -302.4), Rimpadun 9500000419 (-1010.2, -38.4, -304.7) and Sugaboo 9500001010 (-1007.7, -39.0, -312.4) are Merry Vale's chugawugs (merry_vale.json), Dubawug 9500000381 is 50 m off"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) their cluster is the camp; no camp prop or area carries the name; probe: terrain"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -1012.0,
+            -38.5,
+            -305.0
+          ],
+          "radius": 15
+        },
+        {
+          "kind": "visit_position",
+          "id": 5,
+          "text_string_id": 70450,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Scout the overlook near the gazebo in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 70450 'Overlook near the gazebo in Seaside' is the client's goal line; 93295 'Check out the view from the Gazebo to the west of Spritzy.'; 93338 (Spritzy) 'the gazebo behind me to the west'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Spritzy 9500000629 seaside.json, model 766, at (-682.9, 19.7, -991.8); no gazebo prop is in our spawn data (the two bodies 11 m north-west of her are human_f_sanctuary / human_seaside_f)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) centre 18 m west (-x) of Spritzy with r25, so the visit covers her and the gazebo side; probe: terrain"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            -700.9,
+            19.44,
+            -991.8
+          ],
+          "radius": 25
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Party Scout (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Party Scout (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        }
+      ],
+      "description_string_id": 70268,
+      "enabled": true,
+      "end_text_string_id": 416261
+    },
+    {
+      "id": 3958491,
+      "title_string_id": 74311,
+      "giver_npc_id": 9000000191,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 74316,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat 10 Bixie Rebels in Sweetwater Climb (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_those_darn_rebels_00b489)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'sweetwater climb' is fight 14029"
+            }
+          ],
+          "in_fight": 14029,
+          "count": 10
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 74304,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Wugawump (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_those_darn_rebels_00b489)."
+            }
+          ],
+          "npc_id": 9000000191
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 49,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Those Darn Rebels! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_those_darn_rebels_00b489)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Those Darn Rebels! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_those_darn_rebels_00b489)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/fr_quest:Those_Darn_Rebels!)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Turn-in text from the client's own quest block (title + 2, scripts/quest_text_backfill.py rules), read by the lead (L1207): 74313 'Great work!<BR><BR>We can always count on you, [*player*]!'."
+        }
+      ],
+      "description_string_id": 74312,
+      "intro_text_string_id": 74310,
+      "enabled": true,
+      "repeatable": true,
+      "repeat_hours": 24,
+      "end_text_string_id": 74313
     }
   ]
 }
