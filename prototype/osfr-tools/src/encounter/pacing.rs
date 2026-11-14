@@ -267,7 +267,7 @@ impl EncounterEngine {
                 .extend(enemy_health(a.guid, health, a.max_health));
             guids.push(a.guid);
         }
-        out.replies.push(relevance(&guids, false));
+        out.replies.push(instance_relevance(&guids, false));
         out.replies.push(objective(2, d.objective_id, 0));
         out.changed = true;
     }

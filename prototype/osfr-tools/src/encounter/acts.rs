@@ -635,7 +635,7 @@ impl EncounterEngine {
                 .push(animation(a.guid, visuals.spawn_animation, false));
             guids.push(a.guid);
         }
-        out.replies.push(relevance(&guids, false));
+        out.replies.push(instance_relevance(&guids, false));
     }
 
     /// `summon`: raise `count` helpers of `kind` from the fight's sleeping actors, or from
@@ -781,7 +781,7 @@ impl EncounterEngine {
         if next.boss {
             out.replies.push(boss_display(next.guid, true));
         }
-        out.replies.push(relevance(&[next.guid], false));
+        out.replies.push(instance_relevance(&[next.guid], false));
         true
     }
 
@@ -948,7 +948,10 @@ impl EncounterEngine {
                 if shown.boss {
                     out.replies.push(boss_display(guid, true));
                 }
-                out.replies.push(relevance(&[guid], false));
+                out.replies.push(match flags.disposition.unwrap_or(0) {
+                    0 => instance_relevance(&[guid], false),
+                    _ => relevance(&[guid], false),
+                });
             }
         } else if let Some(value) = set.disposition {
             out.replies.push(wire::disposition(guid, value));

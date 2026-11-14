@@ -503,6 +503,8 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
 /// that they don't get the ui interact menu pop up". Every hostile the engine spawns in an
 /// instance draws no press-X reach, whatever its numbers: a kind that states no hit (a prop to
 /// destroy, a dummy) had a 3 m reach under the old "a hostile that hits" rule.
+/// L1213 (A43): the instance values are live's reach 100 with the fight cursor (Cursors.txt 11),
+/// which keeps press-X off (native, 2026-11-14); reach 0 made the enemy unclickable.
 #[test]
 fn an_instance_enemy_draws_no_press_x_even_without_a_hit() {
     let (dir, mut engine) = engine_with(&[fight(
@@ -526,9 +528,15 @@ fn an_instance_enemy_draws_no_press_x_even_without_a_hit() {
         .filter(|npc| npc.disposition == 0)
         .collect();
     assert_eq!(hostile.len(), 2, "the chief and the post are drawn hostile");
+    let cursor = |guid: u64| {
+        (replies.iter().filter(|r| r.starts_with(&[35, 0, 12, 0]))).find_map(|r| {
+            (r[8..].chunks_exact(11)).find(|e| e[..8] == guid.to_le_bytes()).map(|e| e[9])
+        })
+    };
     for npc in hostile {
-        assert_eq!(npc.interact_range, 0, "{}: no press-X reach", npc.npc_name);
+        assert_eq!(npc.interact_range, 100, "{}: live's instance reach", npc.npc_name);
         assert_eq!(npc.is_interactable, 1, "{}: still clickable", npc.npc_name);
+        assert_eq!(cursor(npc.actor_id), Some(11), "{}: the fight cursor", npc.npc_name);
     }
     let _ = std::fs::remove_dir_all(dir);
 }
