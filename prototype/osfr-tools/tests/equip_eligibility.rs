@@ -25,6 +25,8 @@ const STAR_RUNE: i32 = 204;
 const RENTAL: i32 = 205;
 const BOYS: i32 = 206;
 const GARBAGE: i32 = 207;
+/// Slot 4: on no fixture profile, and not one of the slots every job has (8-17, L1204).
+const SLOT_4: i32 = 208;
 
 /// A 147-byte definition row with the recovered layout: 11 dwords and two
 /// flags, empty model and texture strings, gender usage, type, category,
@@ -123,6 +125,7 @@ impl Fixture {
                 rental,
                 item(16, BOYS),
                 item(17, GARBAGE),
+                item(18, SLOT_4),
             ],
             equipment: [(1, 3, 0), (1, 14, 0), (2, 3, 0), (3, 3, 10)]
                 .map(|(profile_id, slot, item_id)| EquippedItem {
@@ -171,6 +174,7 @@ impl Fixture {
             row(STAR_RUNE, 14, 0, false, 1),
             row(RENTAL, 3, 0, false, 1),
             row(BOYS, 3, 1, false, 1),
+            row(SLOT_4, 4, 0, false, 1),
             garbage,
         ];
         let definitions: Vec<_> = rows.iter().map(|bytes| {
@@ -438,7 +442,7 @@ fn forged_requests_still_fail_and_leave_state_unchanged() {
         equip_by_id(999, 1, 3),     // not owned
         equip_by_id(10, 99, 3),     // unknown profile
         equip_by_id(10, 1, 14),     // slot differs from the definition
-        equip_by_id(14, 2, 14),     // slot is not on this profile
+        equip_by_id(18, 2, 4),      // slot is not on this profile (nor shared by every job)
         equip_by_record(999, 1, 3), // no such record
         request(2, &[9, 1]),        // unknown equipment slot
         request(3, &[10, 1]),       // truncated

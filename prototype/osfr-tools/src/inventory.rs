@@ -360,6 +360,36 @@ struct Profile {
     slots: Vec<i32>,
 }
 
+/// Slots every job has, whatever one captured character's rows held: Accessory 1-3 (8-10), the
+/// six rune (flair shard) slots (11-16) and the whole-body costume (17), from the client's
+/// `EquipmentSlotDefinitions.txt`. Rune ranks stay in `slot_min_rank`. Owner 2026-11-13:
+/// "costumes and flair shards don't work" (the captured lists gave 13 and 17 to one job only).
+const SHARED_SLOTS: std::ops::RangeInclusive<i32> = 8..=17;
+
+/// Item classes the client's `ItemClasses.txt` gives to "Any Job" or "All Jobs" (shards,
+/// Werewolf, Yo-Yo, Parachute, the All Jobs rows, all-job Freestyle Gear); 9 (Consumable) is
+/// never worn. Class 0 names no class (costumes) and fits any job too.
+const ANY_JOB_CLASSES: [i32; 8] = [0, 69, 144, 157, 158, 161, 162, 173];
+
+impl Profile {
+    /// Whether this job may wear `definition` in `slot`: the item's own slot, a slot the job
+    /// has, and a class the job (or every job) allows.
+    fn fits(&self, definition: &Definition, slot: i32) -> bool {
+        definition.slot == slot && self.has_slot(slot) && self.allows(definition)
+    }
+
+    /// A slot the job's captured rows name, or one every job has.
+    fn has_slot(&self, slot: i32) -> bool {
+        self.slots.contains(&slot) || SHARED_SLOTS.contains(&slot)
+    }
+
+    /// A class this job, or every job, may wear.
+    fn allows(&self, definition: &Definition) -> bool {
+        ANY_JOB_CLASSES.contains(&definition.class_id)
+            || self.allowed_classes.contains(&definition.class_id)
+    }
+}
+
 #[derive(Deserialize)]
 struct Span {
     kind: String,
@@ -1098,21 +1128,21 @@ impl Inventory {
             }
         }
         for equipment in &self.state.equipment {
-            let initial = self
-                .content
-                .supported_equipment
-                .iter()
-                .find(|entry| {
-                    entry.profile_id == equipment.profile_id && entry.slot == equipment.slot
-                })
-                .ok_or_else(|| invalid("unknown saved equipment slot"))?;
+            let initial = (self.content.supported_equipment.iter()).find(|entry| {
+                entry.profile_id == equipment.profile_id && entry.slot == equipment.slot
+            });
+            // A shared slot (costume, runes, accessories) has a row only once something is worn.
+            if initial.is_none() && !SHARED_SLOTS.contains(&equipment.slot) {
+                return Err(invalid("unknown saved equipment slot"));
+            }
             let profile = self
                 .content
                 .profiles
                 .get(&equipment.profile_id)
                 .ok_or_else(|| invalid("unknown saved equipment profile"))?;
-            if !profile.slots.contains(&equipment.slot)
-                || (equipment.category != equipment.slot && equipment.category != initial.category)
+            if !profile.has_slot(equipment.slot)
+                || (equipment.category != equipment.slot
+                    && initial.is_none_or(|initial| equipment.category != initial.category))
             {
                 return Err(invalid("invalid saved equipment layout"));
             }
@@ -1136,9 +1166,7 @@ impl Inventory {
                     }
                     return Err(invalid("unknown saved equipment definition"));
                 };
-                if definition.slot != equipment.slot
-                    || !profile.allowed_classes.contains(&definition.class_id)
-                {
+                if definition.slot != equipment.slot || !profile.allows(definition) {
                     return Err(invalid("saved equipment does not match profile or slot"));
                 }
             }
@@ -1607,10 +1635,7 @@ impl Inventory {
             .profiles
             .get(&profile_id)
             .ok_or_else(|| invalid("unknown profile"))?;
-        if definition.slot != slot
-            || !profile.slots.contains(&slot)
-            || !profile.allowed_classes.contains(&definition.class_id)
-        {
+        if !profile.fits(definition, slot) {
             return Err(invalid("equipment does not match profile or slot"));
         }
         if let Some(reason) = player.and_then(|p| ineligible(p, item, definition, profile_id, slot))
