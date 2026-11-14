@@ -2018,7 +2018,7 @@ impl EncounterEngine {
                 &mut Vec::new(),
             );
             self.tick_wanderers_for(
-                &[self.field_participant(1, position, true)],
+                &[self.field_participant(self.solo_guid(), position, true)],
                 now_ms,
                 elapsed,
                 &mut out,

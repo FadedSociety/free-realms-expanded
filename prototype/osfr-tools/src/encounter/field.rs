@@ -77,8 +77,9 @@ impl FieldEnemy {
 }
 
 impl EncounterEngine {
-    /// L083: a landed hit on a field enemy puts its attacker on the threat table (the shared sender, or 1 on
-    /// a solo field, as kill credit counts them). Not an evading enemy: `strike_damage` refuses those first.
+    /// L083: a landed hit on a field enemy puts its attacker on the threat table (the shared sender, or the
+    /// solo player's guid, which the solo tick names too since L1214). Not an evading enemy:
+    /// `strike_damage` refuses those first.
     pub(super) fn add_threat(&mut self, guid: u64, amount: u32) {
         let attacker = self.me();
         if let Some(f) = self
@@ -611,7 +612,7 @@ impl EncounterEngine {
         hits: &mut Vec<(u64, u32)>,
     ) {
         let ground = self.ground();
-        let solo = [self.field_participant(1, position, true)];
+        let solo = [self.field_participant(self.solo_guid(), position, true)];
         let players = participants.unwrap_or(&solo);
         let shared = participants.is_some();
         let mut engaged = false;
