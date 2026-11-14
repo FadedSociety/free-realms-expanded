@@ -440,8 +440,9 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
     )]);
     enter(&mut engine, 620, 1_000);
     let mut now = 1_000;
+    // Each knockout lands after the last stand-up's fight grace (at most a minute) is over.
     for taken in 1..=10_u32 {
-        now += 1_000;
+        now += 61_000;
         let down = engine.receive_arena_damage(u32::MAX, now);
         assert_eq!(
             engine.run_phase(),
@@ -481,7 +482,7 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
         );
         assert!(up.zoning.is_none(), "where they fell, not at the safe spot");
     }
-    let last = engine.receive_arena_damage(u32::MAX, now + 2_000);
+    let last = engine.receive_arena_damage(u32::MAX, now + 61_000);
     assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
     assert!(last.facts.contains(&FightFact::Lost { fight: 620 }));
     assert!(
@@ -495,6 +496,234 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
         "none left of ten, and no points"
     );
     assert_eq!(rows["scoreTotalScore"].2, 0);
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "add an identifier for enemies spawned in dungeons and inside instances
+/// that they don't get the ui interact menu pop up". Every hostile the engine spawns in an
+/// instance draws no press-X reach, whatever its numbers: a kind that states no hit (a prop to
+/// destroy, a dummy) had a 3 m reach under the old "a hostile that hits" rule.
+#[test]
+fn an_instance_enemy_draws_no_press_x_even_without_a_hit() {
+    let (dir, mut engine) = engine_with(&[fight(
+        622,
+        json!({
+            "kinds": {
+                "chief": {"definition_id": 7003, "name": "Chief", "name_id": 1, "model_id": 3, "rank": "boss", "boss": true},
+                "post": {"definition_id": 7004, "name": "Post", "name_id": 2, "model_id": 3, "rank": "object", "damage": 0}
+            },
+            "actors": {
+                "boss": {"definition": "chief", "at": [0, 0, 10]},
+                "post": {"definition": "post", "at": [3, 0, 10]}
+            },
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    let replies = enter(&mut engine, 622, 1_000);
+    let hostile: Vec<_> = (replies.iter())
+        .filter(|r| r.starts_with(&[35, 0, 2, 0]))
+        .map(|r| osfr_tools::startup_world::parse_add_npc(r).unwrap())
+        .filter(|npc| npc.disposition == 0)
+        .collect();
+    assert_eq!(hostile.len(), 2, "the chief and the post are drawn hostile");
+    for npc in hostile {
+        assert_eq!(npc.interact_range, 0, "{}: no press-X reach", npc.npc_name);
+        assert_eq!(npc.is_interactable, 1, "{}: still clickable", npc.npc_name);
+    }
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "when running out of knockouts it doesn't send you back to the over world".
+/// A lost run waits on its results card; when the card is never closed, the tick sends the player
+/// back to the world after `combat_rules.json` `revive.lost_exit_ms` (at most ten minutes).
+#[test]
+fn a_lost_run_returns_to_the_world_when_its_card_is_never_closed() {
+    let (dir, mut engine) = engine_with(&[fight(
+        623,
+        json!({
+            "rules": {"knockouts": 1},
+            "actors": {"boss": {"definition": "chief", "at": [0, 0, 10]}},
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    enter(&mut engine, 623, 1_000);
+    engine.receive_arena_damage(u32::MAX, 2_000);
+    engine
+        .handle(&stand_up(), 1, [0.0; 3], BRAWLER, 2_500)
+        .unwrap();
+    // Past any fight grace (at most a minute): the second knockout loses the run.
+    let lost = engine.receive_arena_damage(u32::MAX, 70_000);
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
+    assert!(lost.replies.iter().any(|r| r.starts_with(&[39, 0, 18])), "game over");
+    let waiting = engine.tick([0.0; 3], BRAWLER, 70_001).unwrap();
+    assert!(waiting.zoning.is_none(), "the card stays up a while");
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
+    let back = engine.tick([0.0; 3], BRAWLER, 70_001 + 600_001).unwrap();
+    assert!(back.zoning.is_some(), "back to the world");
+    assert_eq!(engine.run_phase(), None, "the run is closed");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "3-4 seconds of invincibility after a combat knockout". A player who
+/// stands up takes no enemy damage for the fight grace (`combat_rules.json`
+/// `revive.fight_grace_ms`, at most a minute), and is hit again once it is over.
+#[test]
+fn a_player_who_stands_up_takes_no_damage_for_the_fight_grace() {
+    let (dir, mut engine) = engine_with(&[fight(
+        621,
+        json!({
+            "actors": {"boss": {"definition": "chief", "at": [0, 0, 10]}},
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    enter(&mut engine, 621, 1_000);
+    engine.receive_arena_damage(u32::MAX, 2_000);
+    assert_eq!(engine.player_health().0, 0, "knocked out");
+    engine
+        .handle(&stand_up(), 1, [0.0; 3], BRAWLER, 2_500)
+        .unwrap();
+    let full = engine.player_health();
+    assert_eq!(full.0, full.1, "stands up at full health");
+    let guarded = engine.receive_arena_damage(u32::MAX, 2_501);
+    assert_eq!(engine.player_health(), full, "no damage right after standing up");
+    assert!(
+        guarded.replies.iter().all(|r| !r.starts_with(&[41, 0, 125, 0])),
+        "and no knockout"
+    );
+    assert_eq!(engine.fight_run().unwrap().knockouts_left(), 9);
+    engine.receive_arena_damage(full.1 / 2, 2_500 + 60_001);
+    assert!(engine.player_health().0 < full.1, "hit again after the grace");
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Fighting));
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// A39 (owner 2026-11-13): the Bixie Workers could not be freed. The client makes an actor
+/// clickable only through its 35/12 hover cursor, and no ally ever got one. A captive a `free`
+/// goal targets now gets the talk cursor (5) when it appears and a click frees it; its
+/// `interact` toggle switches that off, and then a click frees nobody.
+#[test]
+fn a_captive_gets_the_talk_cursor_and_its_toggle_switches_it_off() {
+    let captive_fight = |id: u32, interact: Value| {
+        fight(
+            id,
+            json!({
+                "kind": "dungeon",
+                "actors": {
+                    "boss": {"definition": "chief", "at": [0, 0, 40]},
+                    "worker": {"definition": "captive", "at": [0, 0, 5], "tags": ["captive"],
+                               "interact": interact}
+                },
+                "objectives": [
+                    {"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"},
+                     "primary": true},
+                    {"id": "bonus", "kind": "free", "text_id": 15, "target": {"tag": "captive"},
+                     "count": 1, "bonus": true}
+                ]
+            }),
+        )
+    };
+    for (id, interact, cursor) in [(625, Value::Null, true), (626, json!({"enabled": false}), false)] {
+        let (dir, mut engine) = engine_with(&[captive_fight(id, interact)]);
+        let replies = enter(&mut engine, id, 1_000);
+        let worker = (replies.iter())
+            .filter(|r| r.starts_with(&[35, 0, 2, 0]))
+            .map(|r| osfr_tools::startup_world::parse_add_npc(r).unwrap())
+            .find(|npc| npc.npc_name == "Captive")
+            .expect("the captive is drawn")
+            .actor_id;
+        let mut hover = vec![35, 0, 12, 0, 1, 0, 0, 0];
+        hover.extend(worker.to_le_bytes());
+        hover.extend([1, 5, 0]);
+        assert_eq!(replies.contains(&hover), cursor, "fight {id}: the talk cursor");
+        engine.handle(&click(worker), 1, [0.0, 0.0, 5.0], BRAWLER, 2_000).unwrap();
+        let freed = engine.fight_run().unwrap().goal("bonus").unwrap().1;
+        assert_eq!(freed, u32::from(cursor), "fight {id}: the click frees the captive");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+}
+
+/// A40 (owner 2026-11-13: "when killing enemies they have a chance to drop gold stacks, but our
+/// enemies don't"): an instance enemy's coin pile pays the coins of its fight's tier, and a fight
+/// with no difficulty counts as tier 1.
+#[test]
+fn an_instance_coin_pile_pays_the_coins_of_the_fights_tier() {
+    let shipped: Value =
+        serde_json::from_str(include_str!("../data/content/power_ups.json")).unwrap();
+    for (id, difficulty) in [(627_u32, 0_u64), (628, 3)] {
+        let mut kinds = kinds();
+        kinds["grunt"]["power_up_table"] = json!("t_coins");
+        kinds["grunt"]["max_health"] = json!(1);
+        let coin_fight = fight(
+            id,
+            json!({
+                "kind": "dungeon", "difficulty": difficulty, "kinds": kinds,
+                "actors": {
+                    "boss": {"definition": "chief", "at": [0, 0, 40]},
+                    "grunt": {"definition": "grunt", "at": [0, 0, 3]}
+                },
+                "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14,
+                                "target": {"actor": "boss"}, "primary": true}]
+            }),
+        );
+        let (dir, mut engine) = engine_with(&[coin_fight]);
+        let mut power_ups = shipped.clone();
+        power_ups["tables"]["t_coins"] =
+            json!({"guaranteed": ["coins_small"], "source": "test table"});
+        let path = dir.join("power_ups.json");
+        std::fs::write(&path, power_ups.to_string()).unwrap();
+        engine.load_power_ups(&path).unwrap();
+        enter(&mut engine, id, 1_000);
+        let nearest = |engine: &osfr_tools::encounter::EncounterEngine| {
+            (engine.standing_enemies().into_iter())
+                .filter(|e| e.1[2] < 20.0)
+                .map(|e| (e.0, e.1))
+                .next()
+        };
+        let (mut now, mut spot) = (2_000, [0.0; 3]);
+        while let Some((grunt, at)) = nearest(&engine) {
+            assert!(now < 60_000, "fight {id}: the grunt falls");
+            spot = at;
+            engine.attack(grunt, at, BRAWLER, 0, now).unwrap();
+            now += 700;
+        }
+        let picked = engine.tick(spot, BRAWLER, now).unwrap();
+        let tier = difficulty.max(1) as usize - 1;
+        let coins = shipped["kinds"]["coins_small"]["coins_by_tier"][tier].as_u64().unwrap();
+        let paid: Vec<u64> = picked.rewards.iter().map(|r| u64::from(r.coins)).collect();
+        assert_eq!(paid, [coins], "fight {id}: tier {}", tier + 1);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+}
+
+/// A26 (native, 2026-11-13): the Bixie Hive's first guards stood 32-34 m from the arrival,
+/// inside the 40 m chase limit, and charged the player before they could act. In a dungeon (an
+/// unpaced fight) an enemy standing there from the start waits until the player comes within
+/// its `notice` (`behaviours.json`, 15 m unless a preset says otherwise) or hits it.
+#[test]
+fn a_dungeon_guard_waits_until_the_player_comes_close() {
+    let (dir, mut engine) = engine_with(&[fight(
+        624,
+        json!({
+            "kind": "dungeon",
+            "actors": {"guard": {"definition": "grunt", "at": [0, 0, 30]}},
+            "objectives": [{"id": "guard", "kind": "defeat", "text_id": 14, "target": {"actor": "guard"}}]
+        }),
+    )]);
+    let guard = spawned(&enter(&mut engine, 624, 1_000))[0];
+    let moved = |replies: &[Vec<u8>]| {
+        (replies.iter()).any(|r| r.starts_with(&[125, 0]) && r[2..10] == guard.to_le_bytes())
+    };
+    let mut now = 1_000;
+    for _ in 0..40 {
+        now += 250;
+        let out = engine.tick([0.0; 3], BRAWLER, now).unwrap();
+        assert!(!moved(&out.replies), "30 m away the guard stands at {now} ms");
+    }
+    let came = (0..20).any(|_| {
+        now += 250;
+        moved(&engine.tick([0.0, 0.0, 18.0], BRAWLER, now).unwrap().replies)
+    });
+    assert!(came, "12 m away the guard notices the player");
     let _ = std::fs::remove_dir_all(dir);
 }
 

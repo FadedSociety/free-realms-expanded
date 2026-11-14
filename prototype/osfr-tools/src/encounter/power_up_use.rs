@@ -29,13 +29,16 @@ impl EncounterEngine {
             .slot(self.held_power_up.as_deref()?)
     }
 
-    /// The active fight's battle tier, 1..5: a field battle's authored
-    /// `difficulty`. The overworld and the opening cave carry no battle tier,
+    /// The active fight's battle tier, 1..5: a director fight's authored `difficulty` (0 is
+    /// unset), else a field battle's. The overworld and the opening cave carry no battle tier,
     /// so they count as tier 1.
-    fn battle_tier(&self) -> usize {
-        self.dungeon()
+    pub(super) fn battle_tier(&self) -> usize {
+        let fight = (self.run.run.as_ref()).map(|run| run.def.difficulty);
+        let fight = fight.filter(|&d| d > 0);
+        let battle = (self.dungeon())
             .and_then(|d| self.battles.iter().find(|b| b.id == d.id))
-            .map_or(1, |b| b.difficulty.clamp(1, 5) as usize)
+            .map(|b| b.difficulty);
+        fight.or(battle).map_or(1, |d| d.clamp(1, 5) as usize)
     }
 
     /// Use the held power-up at the server's position. `None` means nothing is

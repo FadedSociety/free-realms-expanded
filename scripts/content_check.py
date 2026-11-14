@@ -939,6 +939,9 @@ class Checker:
             t = k.get("damage_by_tier")
             if t is not None and not (isinstance(t, list) and len(t) == 5 and all(num(x, .01, 1000) for x in t)):
                 bad(f"{where}.damage_by_tier", t, "damage_by_tier needs exactly 5 numbers in 0.01..1000")
+            c = k.get("coins_by_tier")
+            if c is not None and not (k["auto"] and isinstance(c, list) and len(c) == 5 and all(num(x, 1, 10000, True) for x in c)):
+                bad(f"{where}.coins_by_tier", c, "coins_by_tier needs an automatic kind and exactly 5 integers in 1..10000")
         for name, t in (data.get("tables") or {}).items():
             where = f"tables.{name}"
             if not isinstance(t, dict) or not isinstance(t.get("source"), str) or not t["source"].strip():
@@ -947,7 +950,7 @@ class Checker:
             g = t.get("guaranteed", [])
             if not isinstance(g, list) or len(g) > 8 or any(x not in kinds for x in g):
                 bad(f"{where}.guaranteed", g, "guaranteed must list at most 8 existing kinds")
-            for roll in ("health_roll", "other_roll"):
+            for roll in ("health_roll", "other_roll", "coin_roll"):
                 r = t.get(roll)
                 if r is None:
                     continue

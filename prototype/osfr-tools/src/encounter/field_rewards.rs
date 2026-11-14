@@ -341,9 +341,11 @@ impl EncounterEngine {
             return;
         }
         let kill = (enemy, now_ms);
+        // A40: a kill whose field band paid coins straight to the wallet drops no coin pile.
+        let coin_piles = reward.as_ref().is_none_or(|r| r.coins == 0);
         let Some(killer) = self.shared_sender else {
             if let Some(table) = table {
-                self.drop_power_ups(table, kill, at, now_ms, 1, out);
+                self.drop_power_ups(table, kill, at, now_ms, 1, coin_piles, out);
             }
             self.pay_field_reward(reward.as_ref(), out);
             return;
@@ -362,7 +364,7 @@ impl EncounterEngine {
         who.extend(self.field_sim.party_near(&who, at)); // PB2: group members in reach
         let participants = who.len();
         if let Some(table) = table {
-            self.drop_power_ups(table, kill, at, now_ms, participants, out);
+            self.drop_power_ups(table, kill, at, now_ms, participants, coin_piles, out);
         }
         self.pay_field_reward(reward.as_ref(), out);
         for player in who.into_iter().filter(|&p| p != killer) {
@@ -402,12 +404,14 @@ impl EncounterEngine {
         {
             if now_ms < credit.expires_ms {
                 if let Some(table) = &credit.table {
+                    let coin_piles = credit.reward.as_ref().is_none_or(|r| r.coins == 0);
                     self.drop_power_ups(
                         table,
                         credit.kill,
                         credit.at,
                         now_ms,
                         credit.participants,
+                        coin_piles,
                         out,
                     );
                 }

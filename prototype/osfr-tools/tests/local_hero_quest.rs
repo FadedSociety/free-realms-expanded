@@ -208,6 +208,13 @@ fn win_thug_battle(game: &mut Gameplay, home: &CharacterState, now: &mut u64) ->
 
     // A fight file does not end by itself: after the last wave its exit opens, and the win
     // waits for the player's leave (41/109).
+    // A paced fight pauses between its waves (`instance_pacing.json`): the arena must stay quiet
+    // longer than that before the win is taken for over.
+    let gap = read_json(&content_dir().join("instance_pacing.json"))["fights"][battle.fight.to_string()]
+        ["wave_gap_ms"]
+        .as_u64()
+        .unwrap_or(0);
+    let calm = 12 + gap / 700;
     let (mut target, mut quiet) = (None, 0);
     for _ in 0..3_000 {
         let Some(active) = game.state().encounter.and_then(|state| state.active) else {
@@ -237,7 +244,7 @@ fn win_thug_battle(game: &mut Gameplay, home: &CharacterState, now: &mut u64) ->
             }
         } else {
             quiet += 1;
-            if quiet >= 12 {
+            if quiet >= calm {
                 break;
             }
         }

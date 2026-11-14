@@ -53,6 +53,9 @@ pub struct Memory {
     pub yielded: bool,
     /// `revive`: it lies down until then, deciding nothing and taking no damage.
     pub down_until: u64,
+    /// It came in mid-fight (a wave, a woken sleeper) or was hit, so it goes for the player
+    /// anywhere inside its chase limit, not only inside its notice radius.
+    pub alert: bool,
 }
 
 impl Memory {

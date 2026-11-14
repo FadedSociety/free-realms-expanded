@@ -104,6 +104,8 @@ impl Fixture {
             ("t_energy", json!(["energy"])),
             ("t_flame", json!(["flame_wave"])),
             ("t_shield", json!(["super_shield"])),
+            ("t_coins", json!(["coins_small"])),
+            ("t_coins_heart", json!(["coins_small", "health_small"])),
             (
                 "t_triple",
                 json!(["health_big", "health_big", "health_big"]),
@@ -208,6 +210,19 @@ fn energy(out: &EncounterOutcome) -> Option<i32> {
         .rfind(|p| p.starts_with(&[38, 0, 13, 0]))
         .map(|p| i32::from_le_bytes(p[4..8].try_into().unwrap()))
 }
+/// Composite effect ids an outcome plays (35/16).
+fn effects(out: &EncounterOutcome) -> Vec<i32> {
+    out.replies
+        .iter()
+        .filter(|p| p.starts_with(&[35, 0, 16, 0]))
+        .map(|p| i32::from_le_bytes(p[20..24].try_into().unwrap()))
+        .collect()
+}
+/// The shipped coins a pile of `kind` pays at battle tier 1 (the field is tier 1).
+fn tier_one_coins(kind: &str) -> u32 {
+    let shipped: Value = serde_json::from_str(SHIPPED).unwrap();
+    shipped["kinds"][kind]["coins_by_tier"][0].as_u64().unwrap() as u32
+}
 const FAR: [f32; 3] = [900.0, 0.0, 900.0];
 /// Where every fixture enemy stands (and so where its pickups land).
 const SPOT: [f32; 3] = [0.0; 3];
@@ -310,6 +325,47 @@ fn walking_onto_the_big_heart_heals_from_the_server_position_and_asks_for_the_gr
     assert_eq!(e.player_health().0, healed(50));
     let again = e.tick(SPOT, 11, 1_600).unwrap();
     assert!(removed(&again).is_empty() && again.group_heal.is_none());
+}
+
+/// A40 (owner 2026-11-13: "when killing enemies they have a chance to drop gold stacks, but our
+/// enemies don't"): a coin pile lands with the client's coin model and burst, and walking onto it
+/// pays its coins once, through the reward path, with the coin pickup effect.
+#[test]
+fn a_coin_pile_lands_on_the_kill_and_pays_its_coins_once() {
+    let f = Fixture::new(&[Some("t_coins")]);
+    let mut e = f.load();
+    let out = kill(&mut e, FIRST, 1_000);
+    let drops = spawned(&out);
+    assert_eq!(drops.len(), 1);
+    assert_eq!(drops[0].1, 841, "loot_coins_01.adr");
+    assert!(effects(&out).contains(&15093), "the coins burst where they land");
+    assert!(out.rewards.is_empty(), "nothing is paid before the pickup");
+    assert!(e.tick(FAR, 11, 1_200).unwrap().rewards.is_empty());
+    let near = e.tick(SPOT, 11, 1_400).unwrap();
+    assert_eq!(removed(&near), [drops[0].0]);
+    let coins: Vec<u32> = near.rewards.iter().map(|r| r.coins).collect();
+    assert_eq!(coins, [tier_one_coins("coins_small")]);
+    assert!(near.rewards.iter().all(|r| r.job_xp == 0 && r.items.is_empty()));
+    assert!(effects(&near).contains(&15094), "the coin pickup effect");
+    let again = e.tick(SPOT, 11, 1_600).unwrap();
+    assert!(again.rewards.is_empty(), "a pile pays once");
+}
+
+/// A40: a field kill whose level band already paid its coins to the wallet drops no coin pile;
+/// the rest of its table still drops.
+#[test]
+fn a_field_kill_that_pays_its_coins_drops_no_coin_pile() {
+    let f = Fixture::new(&[Some("t_coins_heart")]);
+    let band = json!({"min_level": 1, "max_level": 20, "coins": 3, "job_xp": 0,
+                      "source": [{"kind": "reconstructed", "evidence": "(R) test band"}]});
+    let rewards = json!({"schema_version": 1, "level_rewards": [band], "definition_overrides": []});
+    fs::write(f.0.join("field_kill_rewards.json"), rewards.to_string()).unwrap();
+    let mut e = f.load();
+    let out = kill(&mut e, FIRST, 1_000);
+    let models: Vec<i32> = spawned(&out).into_iter().map(|(_, model)| model).collect();
+    assert_eq!(models, [736], "the heart drops, the coin pile does not");
+    let paid: u32 = out.rewards.iter().map(|r| r.coins).sum();
+    assert_eq!(paid, 3, "the band paid its coins straight away");
 }
 
 #[test]
@@ -544,9 +600,11 @@ fn shared(f: &Fixture) -> Shared {
     c.take_shared_fields();
     Shared { a, b, c, field }
 }
-/// Authored health two basic hits kill (372 at the shipped scale: 50 x 3.72 x the owner's health
-/// multiplier 2, rc-0137; it was 100 before the multiplier).
-const TWO_HITS: u32 = 50;
+/// Authored health two basic hits kill (372 at the shipped scale: 100 x 3.72), whatever the
+/// owner's health multiplier.
+fn two_hits() -> u32 {
+    combat_scale::unmultiplied(100)
+}
 fn hit(
     e: &mut EncounterEngine,
     field: &mut osfr_tools::encounter::SharedFieldState,
@@ -559,7 +617,7 @@ fn hit(
 
 #[test]
 fn every_participant_gets_their_own_pickup_and_nobody_sees_anothers() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     let first = hit(&mut s.a, &mut s.field, A, FIRST, 0);
     assert!(spawned(&first).is_empty(), "no kill yet");
@@ -600,7 +658,7 @@ fn pickups_in(p: &[u8]) -> bool {
 
 #[test]
 fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -612,7 +670,7 @@ fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
 
 #[test]
 fn only_recent_damage_counts_as_taking_part() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     // The shipped window is 30 s; B's kill lands at 31 s.
@@ -625,7 +683,7 @@ fn only_recent_damage_counts_as_taking_part() {
 
 #[test]
 fn a_participant_who_left_the_field_loses_the_drop() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -639,7 +697,7 @@ fn a_participant_who_left_the_field_loses_the_drop() {
 
 #[test]
 fn an_unclaimed_drop_lapses() {
-    let f = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -651,7 +709,7 @@ fn an_unclaimed_drop_lapses() {
 fn the_group_multiplier_thins_shared_rolls_but_not_solo_ones_or_guaranteed_ones() {
     const N: usize = 60;
     let tables = vec![Some("t_roll"); N];
-    let f = Fixture::sized(&tables, TWO_HITS);
+    let f = Fixture::sized(&tables, two_hits());
     f.edit_power_ups(|file| {
         file["participation"]["group_chance_multiplier"] = json!(0.05);
     });
@@ -685,7 +743,7 @@ fn the_group_multiplier_thins_shared_rolls_but_not_solo_ones_or_guaranteed_ones(
         "two participants thin the chance: {shared_drops} of 120 rolls"
     );
     // Guaranteed drops are not scaled.
-    let g = Fixture::sized(&[Some("boss")], TWO_HITS);
+    let g = Fixture::sized(&[Some("boss")], two_hits());
     g.edit_power_ups(|file| file["participation"]["group_chance_multiplier"] = json!(0.05));
     let mut s = shared(&g);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
@@ -766,7 +824,7 @@ fn pickups_do_not_follow_the_player_into_another_zone() {
 
 #[test]
 fn big_hearts_from_one_kill_share_a_kill_key_so_the_group_heals_once() {
-    let f = Fixture::sized(&[Some("boss"), Some("boss")], TWO_HITS);
+    let f = Fixture::sized(&[Some("boss"), Some("boss")], two_hits());
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);

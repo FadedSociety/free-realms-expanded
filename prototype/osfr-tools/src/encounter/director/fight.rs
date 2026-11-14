@@ -203,6 +203,28 @@ impl Default for Rules {
     }
 }
 
+/// What a click or press-X on an actor does, in data (owner 2026-11-13: "Npcs should have a
+/// json toggle for interactions for objectives ... so you can hotswap everything"). On a kind or
+/// an actor row (the actor's wins). Absent, an ally a `free` goal targets is interactive with
+/// the talk cursor; nothing else changes. The client makes an actor clickable only through its
+/// 35/12 hover cursor (`npc_presentation.rs`), which the captives never had (A39).
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[serde(default, deny_unknown_fields)]
+pub struct ActorInteract {
+    /// Off: no hover cursor, so the client offers no click or press-X, and a click is ignored.
+    pub enabled: bool,
+    /// The client's hover cursor (`Resources/Cursors.txt`: 5 talk, 11 fight, 17 use).
+    pub cursor: u8,
+    /// The objective (its `id`) this click serves; checked at load.
+    pub goal: Option<String>,
+}
+
+impl Default for ActorInteract {
+    fn default() -> Self {
+        Self { enabled: true, cursor: 5, goal: None }
+    }
+}
+
 /// An enemy kind written in the fight file itself. A name not found here is looked up in
 /// `enemies.json`.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq)]
@@ -225,6 +247,7 @@ pub struct KindRow {
     pub tags: Vec<String>,
     pub side: Side,
     pub boss: bool,
+    pub interact: Option<ActorInteract>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq)]
@@ -243,6 +266,7 @@ pub struct ActorRow {
     /// A captive: it cannot be freed while an actor with this tag lives.
     pub guarded_by: Option<String>,
     pub side: Option<Side>,
+    pub interact: Option<ActorInteract>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq)]
@@ -756,6 +780,8 @@ pub struct Slot {
     pub side: Side,
     pub rank: Rank,
     pub guarded_by: Option<String>,
+    /// The actor row's `interact`, else its kind's.
+    pub interact: Option<ActorInteract>,
 }
 
 /// One loaded fight file.
@@ -994,6 +1020,17 @@ impl Fight {
             .collect()
     }
 
+    /// What a click on roster slot `i` does: its own `interact` (`None` when switched off), else
+    /// the talk cursor for an ally a `free` goal targets (the captives, A39); `None` otherwise.
+    pub fn interact(&self, i: usize) -> Option<ActorInteract> {
+        let slot = self.roster.get(i)?;
+        if let Some(interact) = &slot.interact {
+            return interact.enabled.then(|| interact.clone());
+        }
+        let freed = |o: &Objective| o.kind == GoalKind::Free && self.targets(&o.target).contains(&i);
+        (slot.side == Side::Ally && self.objectives.iter().any(freed)).then(ActorInteract::default)
+    }
+
     /// Roster slots a goal target names.
     pub fn targets(&self, target: &Target) -> Vec<usize> {
         self.roster
@@ -1182,6 +1219,7 @@ impl Fight {
                 side,
                 rank: kind.rank,
                 guarded_by: row.guarded_by.clone(),
+                interact: row.interact.clone().or_else(|| kind.interact.clone()),
             });
         }
         let mut ids = BTreeSet::new();
@@ -1246,6 +1284,7 @@ impl Fight {
                                     side: kind.side,
                                     rank: kind.rank,
                                     guarded_by: None,
+                                    interact: kind.interact.clone(),
                                 });
                             }
                         }
@@ -1492,6 +1531,17 @@ impl Fight {
                         }
                     }
                 }
+            }
+        }
+        for slot in &self.roster {
+            let Some(interact) = &slot.interact else {
+                continue;
+            };
+            if interact.cursor > 127 {
+                return Err(format!("{}: interact cursor above the client's 127", slot.key));
+            }
+            if let Some(goal) = interact.goal.as_ref().filter(|goal| !ids.contains(goal.as_str())) {
+                return Err(format!("{}: interact goal '{goal}' is no objective", slot.key));
             }
         }
         Ok(())

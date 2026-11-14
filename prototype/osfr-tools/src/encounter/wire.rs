@@ -37,6 +37,13 @@ pub(super) fn minigame(sub: u8, _instance: i32, id: u32) -> Vec<u8> {
     }
     b
 }
+/// A run left before its results still ends on the client: its game over (39/18), then the
+/// remove (39/19, exact header only), as a finished run's end does. 39/19 alone left the client's
+/// minigame manager open (it logged `LeaveMiniGame` with no `OnGameOver`) and every menu locked
+/// (A36, owner 2026-11-13: leaving the hooligans mid-fight locked housing and the rest).
+pub(super) fn left_unfinished(instance: i32, id: u32) -> [Vec<u8>; 2] {
+    [game_over(false, instance, id), minigame(19, instance, id)]
+}
 pub(super) fn game_over(won: bool, instance: i32, id: u32) -> Vec<u8> {
     let mut b = minigame(18, instance, id);
     b.push(u8::from(won));
@@ -172,6 +179,15 @@ pub(super) fn movement(guid: u64, p: [f32; 3], heading: [f32; 3]) -> Vec<u8> {
     b.extend([1, 0]); // Community NPC movement state; position/heading are authoritative.
     b
 }
+/// 35/12 for one actor: its hover cursor, which is what lets the client click it or press X
+/// (`npc_presentation.rs` has the reader). Flag byte 0, as `relevance` sends (R).
+pub(super) fn hover(guid: u64, cursor: u8) -> Vec<u8> {
+    let mut b = header(35, 12);
+    b.extend(1_i32.to_le_bytes());
+    b.extend(guid.to_le_bytes());
+    b.extend([1, cursor, 0]);
+    b
+}
 pub(super) fn relevance(guids: &[u64], guide: bool) -> Vec<u8> {
     let mut b = header(35, 12);
     b.extend((guids.len() as i32).to_le_bytes());
@@ -232,17 +248,20 @@ pub fn zone_begin_packet(zone: &ZoneTransition) -> Vec<u8> {
     b
 }
 
-/// AddNpc `interact_range` (+133) for an engine actor: the guide 12 m, a hostile that hits 0, the
-/// rest (doors, captives, talkers, pickups) 3 m. The client's press-X prompt picks the nearest
+/// AddNpc `interact_range` (+133) for an engine actor: the guide 12 m, an enemy 0, the rest
+/// (the exit door, captives, talkers, pickups) 3 m. The client's press-X prompt picks the nearest
 /// interactive actor whose range covers the player (`sub_BAF6E0` 00baf6e0 reads it at actor
-/// +0x1818); the Kaboomers' 3 m drew it over them (owner, rc-0137). (R) Live sent 100 to its
-/// hostiles (p12: all 52 Bixie Soldier, Battlemage and wave-wolf AddNpc rows, with 35/12 cursor
-/// 11), so 0 is the owner's rule, not the capture's. The enemy stays interactable (+224) with its
-/// 35/12 cursor, so a click still targets it.
-fn reach(a: &Actor, disposition: i32) -> i32 {
+/// +0x1818); the Kaboomers' 3 m drew it over them (owner, rc-0137), and so did every dungeon
+/// enemy whose hit comes from its rank, not a `damage` of its own (owner 2026-11-13: "add an
+/// identifier for enemies spawned in dungeons and inside instances"). `enemy` is that marker:
+/// the caller knows what it spawns. (R) Live sent 100 to its hostiles (p12: all 52 Bixie
+/// Soldier, Battlemage and wave-wolf AddNpc rows, with 35/12 cursor 11), so 0 is the owner's
+/// rule, not the capture's. The enemy stays interactable (+224) with its 35/12 cursor, so a
+/// click still targets it.
+fn reach(disposition: i32, enemy: bool) -> i32 {
     match disposition {
         2 => 12,
-        0 if a.damage > 0 => 0,
+        0 if enemy => 0,
         _ => 3,
     }
 }
@@ -252,6 +271,7 @@ pub(super) fn spawn_actor(
     a: &Actor,
     position: [f32; 3],
     disposition: i32,
+    enemy: bool,
 ) -> Vec<u8> {
     let mut b = template.to_vec();
     b[4..12].copy_from_slice(&a.guid.to_le_bytes());
@@ -267,7 +287,7 @@ pub(super) fn spawn_actor(
     b[69..73].copy_from_slice(&0_i32.to_le_bytes());
     b[77..81].copy_from_slice(&disposition.to_le_bytes());
     b[128..132].copy_from_slice(&3.0_f32.to_le_bytes());
-    b[133..137].copy_from_slice(&reach(a, disposition).to_le_bytes());
+    b[133..137].copy_from_slice(&reach(disposition, enemy).to_le_bytes());
     b[137..141].copy_from_slice(&2_i32.to_le_bytes());
     b[141..145].copy_from_slice(&3_i32.to_le_bytes());
     b[145..149].copy_from_slice(&1_i32.to_le_bytes());

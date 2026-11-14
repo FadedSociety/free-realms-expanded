@@ -163,7 +163,12 @@ impl EncounterEngine {
                 .active
                 .as_ref()
                 .is_some_and(|a| a.phase == EncounterPhase::Fighting);
-        fighting.then(|| self.field_participant(guid, position, false))
+        fighting.then(|| {
+            let mut me = self.field_participant(guid, position, false);
+            // The shared run's enemies hold their swings while this member is guarded.
+            me.grace_until = me.grace_until.max(self.fight_state.guarded_until);
+            me
+        })
     }
 
     /// The phase of this player's own run.
@@ -322,6 +327,12 @@ impl EncounterEngine {
         now_ms: u64,
         out: &mut EncounterOutcome,
     ) {
+        // Owner 2026-11-13: a few seconds of invincibility after standing up from a knockout.
+        if total_damage > 0 && now_ms < self.fight_state.guarded_until {
+            total_damage = 0;
+            out.replies
+                .push(player_hp(self.state.player_health, self.max_health));
+        }
         if total_damage > 0 {
             self.log_fight(now_ms, "taken", "enemies", "you", i64::from(total_damage));
         }

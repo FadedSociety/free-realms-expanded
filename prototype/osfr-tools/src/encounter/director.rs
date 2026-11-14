@@ -170,8 +170,19 @@ pub struct FightState {
     pub(super) seen: Seen,
     /// When this player went down inside the fight.
     pub(super) down_since: Option<u64>,
+    /// Enemies cannot hurt this player before then: they stood up from a knockout (the fight
+    /// grace of `combat_rules.json` `revive.fight_grace_ms`).
+    pub(super) guarded_until: u64,
+    /// When the tick first saw this player's run lost with its results card up (the fallback
+    /// return of `revive.lost_exit_ms` counts from it).
+    pub(super) lost_since: Option<u64>,
+    /// Where the player stood when a linked enemy's click opened the waiting card: Go is
+    /// measured from here, since the enemy wanders while the card is read.
+    pub(super) card_from: Option<[f32; 3]>,
     /// The run as last written to the save.
     pub(super) saved: Option<run::Saved>,
     /// The overworld instance fights' pacing (`instance_pacing.json`, `pacing.rs`).
     pub(super) pacing: Arc<super::pacing::PacingTable>,
+    /// A40: coins this player picked up from coin piles this session, before any booster.
+    pub(super) pile_coins: u32,
 }

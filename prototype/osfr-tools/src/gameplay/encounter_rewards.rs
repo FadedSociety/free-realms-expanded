@@ -34,6 +34,12 @@ impl Gameplay {
         self.encounter.as_mut()
     }
 
+    /// A40: coins this session picked up from enemies' coin piles (random, so a check of what a
+    /// fight or quest pays subtracts them).
+    pub fn pile_coins(&self) -> u32 {
+        self.encounter.as_ref().map_or(0, EncounterEngine::pile_coins)
+    }
+
     /// Apply the developer `realm win` route to the active encounter. A content
     /// set without an encounter engine refuses with feedback, never a panic.
     pub(super) fn developer_win(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {

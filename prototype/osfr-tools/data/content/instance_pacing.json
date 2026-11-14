@@ -28,7 +28,7 @@
       "source": "(R) rc-0136 pacing for Troll Summoner Madness!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
     },
     "12301": {
-      "waves": 3,
+      "waves": 4,
       "wave_gap_ms": 18000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -37,10 +37,10 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for battle 12301: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for battle 12301: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 18 s apart"
     },
     "12302": {
-      "waves": 3,
+      "waves": 4,
       "wave_gap_ms": 15000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -49,10 +49,10 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for battle 12302: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for battle 12302: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart"
     },
     "12303": {
-      "waves": 2,
+      "waves": 3,
       "wave_gap_ms": 20000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -61,10 +61,10 @@
         "budget_pct": 500,
         "cooldown_ms": 2000
       },
-      "source": "(R) rc-0136 pacing for Stone Heart's Hideaway: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Stone Heart's Hideaway: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 3 waves 20 s apart"
     },
     "12311": {
-      "waves": 3,
+      "waves": 4,
       "wave_gap_ms": 15000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -73,10 +73,10 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for battle 12311: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for battle 12311: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart"
     },
     "12340": {
-      "waves": 2,
+      "waves": 3,
       "wave_gap_ms": 20000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -85,7 +85,7 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Thugamug!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Thugamug!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 3 waves 20 s apart"
     },
     "12365": {
       "wave_gap_ms": 15000,
@@ -99,7 +99,7 @@
       "source": "(R) rc-0136 pacing for Frostfang Growler!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
     },
     "12400": {
-      "waves": 3,
+      "waves": 4,
       "wave_gap_ms": 15000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -108,7 +108,7 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Mongo: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Mongo: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart"
     },
     "13035": {
       "waves": 5,
@@ -153,7 +153,8 @@
         "budget_pct": 500,
         "cooldown_ms": 2000
       },
-      "source": "(R) rc-0136 pacing for Hooligan Bullies: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Hooligan Bullies: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart",
+      "waves": 4
     },
     "14022": {
       "wave_gap_ms": 20000,
@@ -164,10 +165,11 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Robgoblin Troublemakers: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Robgoblin Troublemakers: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 20 s apart",
+      "waves": 4
     },
     "14025": {
-      "waves": 4,
+      "waves": 5,
       "wave_gap_ms": 15000,
       "max_attackers": 1,
       "attack_ms": 2300,
@@ -176,7 +178,7 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Tormented Spirits!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Tormented Spirits!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 5 waves 15 s apart"
     },
     "14033": {
       "wave_gap_ms": 15000,
@@ -187,7 +189,8 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Ice Troll Scout: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Ice Troll Scout: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart",
+      "waves": 4
     },
     "14038": {
       "waves": 4,
@@ -222,7 +225,8 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Vulture Watch!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Vulture Watch!: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart",
+      "waves": 4
     },
     "14061": {
       "wave_gap_ms": 15000,
@@ -233,7 +237,8 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Robgoblin Adept Trouble: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Robgoblin Adept Trouble: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart",
+      "waves": 4
     },
     "14069": {
       "wave_gap_ms": 15000,
@@ -266,7 +271,32 @@
         "budget_pct": 400,
         "cooldown_ms": 3000
       },
-      "source": "(R) rc-0136 pacing for Robgoblin Geomancer: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance"
+      "source": "(R) rc-0136 pacing for Robgoblin Geomancer: tuned so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); every value is local balance; L1198: the owner kept the natural enemy curve (2026-11-13: 'Remove the damage and 2x hp'), so this fight's 60-150 s solo pace comes from 4 waves 15 s apart",
+      "waves": 4
+    },
+    "14017": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 1.0,
+        "budget_pct": 500,
+        "cooldown_ms": 2000
+      },
+      "source": "(R) L1198 pacing for Hooligan Brawling Club (L1192): Hooligan Bullies' row (the same hooligan fight shape) with 4 waves 15 s apart, so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); the owner kept the natural enemy curve (2026-11-13), so pace comes from waves; every value is local balance",
+      "waves": 4
+    },
+    "14080": {
+      "wave_gap_ms": 15000,
+      "max_attackers": 1,
+      "attack_ms": 2300,
+      "heals": {
+        "chance": 1.0,
+        "budget_pct": 500,
+        "cooldown_ms": 2000
+      },
+      "source": "(R) L1198 pacing for Thugawug Thug! (L1193): Hooligan Bullies' row (the same hooligan fight shape) with 4 waves 15 s apart, so a solo Brawler at its recommended level wins it in 60-150 s in the simulator (tests/instance_pacing.rs); the owner kept the natural enemy curve (2026-11-13), so pace comes from waves; every value is local balance",
+      "waves": 4
     }
   }
 }

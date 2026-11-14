@@ -283,7 +283,9 @@ fn economy(gateway: &Gateway) -> (u32, u32, u32) {
         .get(&BRAWLER)
         .copied()
         .unwrap_or(0);
-    (state.inventory.coins, item_count, experience)
+    // A40: coin piles enemies drop are random; what the fight pays leaves them out.
+    let piles = gateway.gameplay().map_or(0, |game| game.pile_coins());
+    (state.inventory.coins.saturating_sub(piles), item_count, experience)
 }
 
 fn active_enemy(

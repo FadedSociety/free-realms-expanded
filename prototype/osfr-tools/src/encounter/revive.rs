@@ -67,7 +67,7 @@ impl EncounterEngine {
         if self.down_in_fight() {
             // (R) A fight with knockouts left: stand up where you fell.
             let mut out = EncounterOutcome::default();
-            self.stand_up(&mut out);
+            self.stand_up(now_ms, &mut out);
             return Ok(out);
         }
         if let Some(a) = &self.state.active {
@@ -128,6 +128,24 @@ impl EncounterEngine {
     }
 
     /// (R) Safe location: the world checkpoint the opening already uses.
+    /// A lost run whose results card is never closed still returns the player to the world
+    /// (owner 2026-11-13: "running out of knockouts doesn't send you back to the over world").
+    /// The first tick that sees it starts the clock; a later one ends the wait.
+    pub(super) fn lost_run_exit(&mut self, now_ms: u64) -> Option<io::Result<EncounterOutcome>> {
+        let lost = (self.state.active.as_ref()).is_some_and(|a| a.phase == EncounterPhase::Lost);
+        if !lost || !self.results_presented || self.rules.revive.lost_exit_ms == 0 {
+            return None;
+        }
+        match self.fight_state.lost_since {
+            None => self.fight_state.lost_since = Some(now_ms),
+            Some(at) if now_ms >= at.saturating_add(self.rules.revive.lost_exit_ms) => {
+                return Some(self.exit());
+            }
+            Some(_) => {}
+        }
+        None
+    }
+
     pub(super) fn revive_at_safe_location(&mut self, now_ms: u64) -> EncounterOutcome {
         EncounterOutcome {
             zoning: Some(self.content.world.clone()),

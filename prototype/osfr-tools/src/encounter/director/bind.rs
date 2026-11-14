@@ -473,7 +473,7 @@ impl EncounterEngine {
                 // The client's own timer asks to stand up; this is the fallback.
                 let down = self.fight_state.down_since;
                 if down.is_some_and(|at| now_ms >= at + recover + 2000) {
-                    self.stand_up(out);
+                    self.stand_up(now_ms, out);
                 }
             }
         }
@@ -777,7 +777,8 @@ impl EncounterEngine {
                     Act::Signal(name) => self.run.signals.push(name),
                     Act::Drop(table) => {
                         let at = def.place.arrive;
-                        self.drop_power_ups(&table, (def.guid(None), now_ms), at, now_ms, 1, out);
+                        let kill = (def.guid(None), now_ms);
+                        self.drop_power_ups(&table, kill, at, now_ms, 1, true, out);
                     }
                     // A wake by tag shows below; the rest need an actor.
                     _ => {}
@@ -804,13 +805,16 @@ impl EncounterEngine {
             if let Some(door) = exit_door(def) {
                 // As captured: added hostile, then made friendly at once.
                 out.replies
-                    .push(self.spawn(&door, ground.snapped(door.position), 0));
+                    .push(self.spawn_object(&door, ground.snapped(door.position), 0));
                 out.replies.push(wire::disposition(guid, 1));
             }
         } else if let Some(i) = (0..def.roster.len()).find(|&i| def.guid(Some(i)) == guid) {
             if let Some(ally) = actor_of(def, i, 1) {
                 out.replies
                     .push(self.spawn(&ally, ground.snapped(ally.position), 1));
+                if let Some(interact) = def.interact(i) {
+                    out.replies.push(wire::hover(guid, interact.cursor));
+                }
             }
         }
     }
@@ -857,6 +861,11 @@ impl EncounterEngine {
             out.replies.push(relevance(&wake, false));
             out.changed = true;
             self.enemies_spawned(&wake, now_ms, out);
+            for guid in &wake {
+                if let Some(memory) = self.arena.brains.get_mut(guid) {
+                    memory.alert = true;
+                }
+            }
         }
         if run.exit_is_open() && run.bind.shown.insert(def.guid(None)) {
             self.send_extra(&def, def.guid(None), out);
@@ -989,6 +998,11 @@ impl EncounterEngine {
         } else {
             run.slot_of(guid).map(|i| def.roster[i].spot)
         };
+        // An actor whose `interact` is switched off answers no click.
+        let off = |i: usize| def.roster[i].interact.as_ref().is_some_and(|x| !x.enabled);
+        if run.slot_of(guid).is_some_and(off) {
+            return;
+        }
         // The door and the captives stand still: the click must come from beside them.
         let present = run.bind.shown.contains(&guid) || run.life(guid) == Some(Life::Alive);
         if !present || !at.is_some_and(|at| near(position, at, 12.0)) {
@@ -1072,12 +1086,14 @@ impl EncounterEngine {
                 .is_some_and(|a| a.phase == EncounterPhase::Fighting)
     }
 
-    /// Back on their feet where they fell, at full health (wiki combat guide; R: no grace).
-    pub(in crate::encounter) fn stand_up(&mut self, out: &mut EncounterOutcome) {
+    /// Back on their feet where they fell, at full health (wiki combat guide), and out of the
+    /// enemies' reach for the fight grace (owner 2026-11-13).
+    pub(in crate::encounter) fn stand_up(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
         if !self.down_in_fight() {
             return;
         }
         self.fight_state.down_since = None;
+        self.fight_state.guarded_until = now_ms.saturating_add(self.rules.revive.fight_grace_ms);
         self.state.player_health = self.max_health;
         out.changed = true;
         out.replies

@@ -375,7 +375,8 @@ fn count_item(game: &Gameplay, definition_id: i32) -> u32 {
 
 fn economy(game: &Gameplay) -> Economy {
     Economy {
-        coins: game.state().inventory.coins,
+        // A40: the random coin piles enemies drop are left out.
+        coins: game.state().inventory.coins.saturating_sub(game.pile_coins()),
         gloves: count_item(game, GLOVES),
         packs: count_item(game, MYSTERY_PACK),
         potions: count_item(game, POTION),
@@ -666,7 +667,7 @@ fn the_brawling_ring_gate_starts_the_mongo_battle() {
     at += 100;
     game.initialize_world(&character, at).expect("world return");
 
-    // A Go from outside the marker radius is inert and drops the open screen.
+    // A Go from outside the marker radius is refused (the card comes back) and starts nothing.
     at += 100;
     let details = open_gate(&mut game, &character, at);
     let mut far = character.clone();

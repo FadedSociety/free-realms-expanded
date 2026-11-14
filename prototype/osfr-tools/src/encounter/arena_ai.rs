@@ -97,6 +97,12 @@ pub(super) struct ArenaTick<'a> {
     /// Frostfang Growlers battle (p12), every enemy goes for the player from wherever it spawned
     /// (owner, rc-0137: the hooligans "don't all come at the player").
     pub(super) battle: bool,
+    /// The run is a dungeon (`Kind::Dungeon`): its standing guards wait for `Behaviour::notice`.
+    /// The open-world stages (the opening's wolves) keep the chase limit.
+    pub(super) dungeon: bool,
+    /// The player stood up from a knockout moments ago: nothing swings at them or lands on
+    /// them yet (`combat_rules.json` `revive.fight_grace_ms`, owner 2026-11-13).
+    pub(super) guarded: bool,
 }
 
 /// Health as the whole percent the rules compare (the old summon ladder's arithmetic).
@@ -185,7 +191,7 @@ impl ArenaSim {
                 out.replies
                     .push(composite_effect(l.guid, l.attack.land_effect, l.point));
             }
-            if within {
+            if within && !t.guarded {
                 let dealt = self.land(l.guid, &l.attack, l.base, t, total_damage, out);
                 total_damage = total_damage.saturating_add(dealt);
             }
@@ -244,9 +250,15 @@ impl ArenaSim {
             // An enemy engages only once its target is inside its chase limit, as the engine
             // before the brain did: a far party leaves it idle, and its `every` rules do not
             // start (lead 2026-11-10: they cast at players standing at the entry and flooded
-            // every member of a shared run with packets).
+            // every member of a shared run with packets). A dungeon's guards standing there
+            // from the start wait for the closer `notice` (A26: they charged the arrival).
             let chase_limit = if t.battle { f32::INFINITY } else { b.chase_limit };
-            if delta > chase_limit && !memory.is_engaged() {
+            let notice = if t.dungeon && !t.battle && !memory.alert {
+                b.notice.min(chase_limit)
+            } else {
+                chase_limit
+            };
+            if delta > notice && !memory.is_engaged() {
                 if self.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }
@@ -385,7 +397,7 @@ impl ArenaSim {
             if stands {
                 self.stop(guid, out);
             }
-            if front.as_ref().is_some_and(|front| !front.contains(&guid)) {
+            if t.guarded || front.as_ref().is_some_and(|front| !front.contains(&guid)) {
                 continue;
             }
             if ordered.is_none()
@@ -651,6 +663,11 @@ pub(super) fn target_by(
 }
 
 impl EncounterEngine {
+    fn in_dungeon(&self) -> bool {
+        (self.run.run.as_ref())
+            .is_some_and(|run| matches!(run.def.kind, director::fight::Kind::Dungeon))
+    }
+
     /// One tick of a shared run's enemies, on the arena's enemies (call it between `enter_arena`
     /// and `leave_arena`). Each enemy moves and swings once, at its own target; returns, per
     /// member hit, the damage it takes and the packets that tick made (a member's own damage
@@ -669,6 +686,7 @@ impl EncounterEngine {
         let ground = self.ground();
         let (max_attackers, attack_ms) = (self.max_attackers(), self.paced_attack_ms());
         let battle = self.pacing().is_some();
+        let dungeon = self.in_dungeon();
         let Some(active) = &mut self.state.active else {
             return Vec::new();
         };
@@ -711,6 +729,8 @@ impl EncounterEngine {
                 max_attackers,
                 attack_ms,
                 battle,
+                dungeon,
+                guarded: now_ms < p.grace_until,
             };
             let mut out = EncounterOutcome::default();
             let damage = self.arena.tick_enemies(mine, states, &tick, &mut out);
@@ -750,6 +770,7 @@ impl EncounterEngine {
         let ground = self.ground();
         let (max_attackers, attack_ms) = (self.max_attackers(), self.paced_attack_ms());
         let battle = self.pacing().is_some();
+        let dungeon = self.in_dungeon();
         let actors: Vec<Actor> = if let Some(d) = self.dungeon() {
             d.enemies.clone()
         } else {
@@ -781,6 +802,8 @@ impl EncounterEngine {
             max_attackers,
             attack_ms,
             battle,
+            dungeon,
+            guarded: now_ms < self.fight_state.guarded_until,
         };
         let damage = self.arena.tick_enemies(actors, states, &tick, out);
         self.apply_decided(now_ms, out);

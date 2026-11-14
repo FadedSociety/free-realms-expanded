@@ -67,7 +67,7 @@ use self::wire::{
     attack_processed, boss_display, combat_flag, encounter_header, encounter_state,
     enemy_health, enemy_hp, game_over, header, menu, minigame, movement, objective,
     objective_complete, player_hp, relevance, remove, replace_string, respawn_hide, rules,
-    spawn_actor,
+    left_unfinished, spawn_actor,
 };
 use crate::abilities::effect_packets::encode_play_composite_effect as composite_effect;
 
@@ -1912,75 +1912,6 @@ impl EncounterEngine {
         self.pickups.len()
     }
 
-    /// Despawn expired pickups and collect the ones the player stands on. The
-    /// position is the server's own (never a client claim).
-    fn tick_power_ups(&mut self, position: [f32; 3], now_ms: u64, out: &mut EncounterOutcome) {
-        let Some(power_ups) = self.power_ups.clone() else {
-            return;
-        };
-        let radius = power_ups.pickup.radius as f32;
-        for mut drop in std::mem::take(&mut self.pickups) {
-            let collected = now_ms < drop.expires_ms
-                && self.state.player_health > 0
-                && horizontal_distance(position, drop.position) <= radius
-                && self.collect_power_up(&mut drop, &power_ups, out);
-            if collected || now_ms >= drop.expires_ms {
-                out.replies.push(remove(drop.guid));
-            } else {
-                self.pickups.push(drop);
-            }
-        }
-    }
-
-    /// Apply one pickup. `false` leaves it on the ground (the player already
-    /// holds a power-up and this kind is stored, not automatic).
-    fn collect_power_up(
-        &mut self,
-        drop: &mut PowerUpDrop,
-        power_ups: &PowerUps,
-        out: &mut EncounterOutcome,
-    ) -> bool {
-        // A reload that removed the kind just clears the stale pickup.
-        let Some(kind) = power_ups.kind(&drop.kind) else {
-            return true;
-        };
-        if !kind.auto {
-            if self.held_power_up.is_some() {
-                if !drop.told && out.feedback.is_none() {
-                    out.feedback = Some(ONE_POWER_UP_TEXT.into());
-                    drop.told = true;
-                }
-                return false;
-            }
-            self.held_power_up = Some(drop.kind.clone());
-        }
-        if let Some(percent) = kind.heal_pct_max {
-            self.heal_with_number(percent, out);
-            if kind.group {
-                out.group_heal = Some(GroupHeal {
-                    percent: percent.min(100),
-                    kill: drop.kill,
-                });
-            }
-        }
-        if let Some(energy) = kind.energy {
-            self.energy = self
-                .energy
-                .saturating_add(energy as i32)
-                .min(self.rules.energy.max);
-            out.replies.push(crate::abilities::build_energy(
-                self.energy,
-                self.rules.energy.max,
-            ));
-        }
-        out.replies.push(composite_effect(
-            self.shared_sender.unwrap_or(1),
-            POWER_UP_PICKUP_EFFECT,
-            drop.position,
-        ));
-        true
-    }
-
     pub fn tick(
         &mut self,
         position: [f32; 3],
@@ -2009,6 +1940,9 @@ impl EncounterEngine {
             if now_ms >= at.saturating_add(self.rules.revive.auto_ms) {
                 return Ok(self.revive_at_safe_location(now_ms));
             }
+        }
+        if let Some(exit) = self.lost_run_exit(now_ms) {
+            return exit;
         }
         // The run's own clock goes first, on every call: a run keeps time while the player is
         // down, the fight is not armed yet, or less than a tick has passed.
@@ -2103,11 +2037,12 @@ impl EncounterEngine {
         let Some(a) = self.state.active.take() else {
             return Ok(EncounterOutcome::default());
         };
+        self.fight_state.lost_since = None;
         let mut zone = self.content.world.clone();
         zone.zone_id = a.return_location.zone_id;
         zone.position = a.return_location.position;
         zone.rotation = a.return_location.rotation;
-        let remove_state = minigame(19, a.instance_id, a.encounter_id); // exact header only
+        let remove_state = left_unfinished(a.instance_id, a.encounter_id);
         let results_presented = self.results_presented;
         let mut replies = vec![
             rules(false),
@@ -2115,7 +2050,7 @@ impl EncounterEngine {
             combat_flag(133, a.encounter_id, a.instance_id, false),
         ];
         if !results_presented {
-            replies.push(remove_state);
+            replies.extend(remove_state);
         }
         replies.push(player_hp(self.max_health, self.max_health));
         self.state.player_health = self.max_health;
@@ -2142,6 +2077,7 @@ impl EncounterEngine {
         };
         a.enemies = enemies;
         a.phase = EncounterPhase::Loading;
+        self.fight_state.lost_since = None;
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
@@ -2152,8 +2088,16 @@ impl EncounterEngine {
         })
     }
 
+    /// An engine actor; a hostile one (disposition 0) is an enemy, in the open world or an
+    /// instance, and draws no press-X prompt.
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-        spawn_actor(&self.content.template, a, position, disposition)
+        spawn_actor(&self.content.template, a, position, disposition, disposition == 0)
+    }
+
+    /// A hostile-flagged actor that is not an enemy (the exit door, made friendly at once): it
+    /// keeps its press-X prompt.
+    fn spawn_object(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
+        spawn_actor(&self.content.template, a, position, disposition, false)
     }
 }
 
