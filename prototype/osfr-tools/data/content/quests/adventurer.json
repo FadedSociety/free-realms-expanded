@@ -4179,15 +4179,69 @@
     {
       "id": 3000041,
       "title_string_id": 90887,
-      "giver_npc_id": 9000000511,
+      "giver_npc_id": 9500000163,
       "prerequisite_quest_ids": [
         3000040
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "complete_dungeon",
+          "id": 1,
+          "text_string_id": 7371,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Amaranthus! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_it_s_business_time_3e475e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'Amaranthus' is the boss of fight 13007; winning the fight is the step"
+            }
+          ],
+          "encounter_id": 13007
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 90882,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lieutenant Snibug at the Tanglewood Fort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_it_s_business_time_3e475e)."
+            }
+          ],
+          "npc_id": 9500000163
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 3023,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Energy Potion (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_it_s_business_time_3e475e)."
+                }
+              ]
+            },
+            {
+              "definition_id": 7294,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Board Shorts (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_it_s_business_time_3e475e)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 36 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -4195,6 +4249,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000041)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_it_s_business_time_3e475e)."
             }
           ]
         }
@@ -4239,25 +4297,167 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 90888,
       "intro_text_string_id": 90886,
       "end_text_string_id": 90889,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000042,
       "title_string_id": 91464,
-      "giver_npc_id": 9000000512,
+      "giver_npc_id": 9500000163,
       "prerequisite_quest_ids": [
         3000041
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 91469,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up a gift from Florina in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Florina', 'Sanctuary']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the gift comes from the named NPC, a talk rather than a ground object"
+            }
+          ],
+          "npc_id": 9500000482
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 91471,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up a gift from Jennifer in Crossroads (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Jennifer', 'Crossroads']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the gift comes from the named NPC, a talk rather than a ground object"
+            }
+          ],
+          "npc_id": 9500000247
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91473,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up a gift from Bowawow at Highroad Junction (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Bowawow', 'Highroad Junction']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the gift comes from the named NPC, a talk rather than a ground object"
+            }
+          ],
+          "npc_id": 9500000328
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 91475,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick up a gift from Twiggi Truespirit in Shrouded Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Twiggi Truespirit', 'Shrouded Glade']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the gift comes from the named NPC, a talk rather than a ground object"
+            }
+          ],
+          "npc_id": 9500000720
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 90882,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Lieutenant Snibug at the Tanglewood Fort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+            }
+          ],
+          "npc_id": 9500000163
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 3084,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medium Replenishment Potion (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used."
+                }
+              ]
+            },
+            {
+              "definition_id": 421,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Boot-Cut Pants (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 135 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -4265,6 +4465,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000042)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "9 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_pampered_pets_3e828f)."
             }
           ]
         }
@@ -4309,24 +4513,41 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 91465,
       "intro_text_string_id": 91463,
       "end_text_string_id": 91466,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000043,
       "title_string_id": 90904,
-      "giver_npc_id": 9000000268,
+      "giver_npc_id": 9500000163,
       "prerequisite_quest_ids": [
         3000042
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90910,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Captain Chugug (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_report_to_captain_chugug_1da5af)."
+            }
+          ],
+          "npc_id": 9000000268
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 7,
           "items": [],
           "job_xp": {
             "1": 225
@@ -4335,6 +4556,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000043)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1209: coins 7 = the fanbyte wiki reward (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_report_to_captain_chugug_1da5af)."
             }
           ]
         }
@@ -4379,12 +4604,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 90905,
       "intro_text_string_id": 90903,
       "end_text_string_id": 90906,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000044,
@@ -4393,11 +4622,49 @@
       "prerequisite_quest_ids": [
         3000043
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90847,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Vittorio at the broken down caravan in Briarwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_empty_box_77037c)."
+            }
+          ],
+          "npc_id": 9000000232
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 11008,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Frag Orb (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_the_empty_box_77037c)."
+                }
+              ]
+            },
+            {
+              "definition_id": 203,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Small Stitched Pants (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_the_empty_box_77037c)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 69 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -4405,6 +4672,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000044)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1209: coins 9 = the fanbyte wiki reward (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_the_empty_box_77037c)."
             }
           ]
         }
@@ -4445,12 +4716,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 93896,
       "intro_text_string_id": 93894,
       "end_text_string_id": 93897,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000045,
@@ -4459,11 +4734,49 @@
       "prerequisite_quest_ids": [
         3000044
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90636,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Geoffrey in the Royal Palace (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_bearer_of_bad_news_e7cbfe)."
+            }
+          ],
+          "npc_id": 9000000330
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
-          "items": [],
+          "coins": 9,
+          "items": [
+            {
+              "definition_id": 3072,
+              "count": 5,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Blast Orb (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_bearer_of_bad_news_e7cbfe)."
+                }
+              ]
+            },
+            {
+              "definition_id": 427,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Bermuda Shorts (lab/references/quest-table-20261102/quests.json wiki:fr_quest_chapter_1_bearer_of_bad_news_e7cbfe)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 68 rows; the lowest id is used."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "1": 225
           },
@@ -4471,6 +4784,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 225 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/adventurer.json, record 3000045)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1209: coins 9 = the fanbyte wiki reward (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chapter_1_bearer_of_bad_news_e7cbfe)."
             }
           ]
         }
@@ -4511,12 +4828,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 90914,
       "intro_text_string_id": 90912,
       "end_text_string_id": 90915,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000046,

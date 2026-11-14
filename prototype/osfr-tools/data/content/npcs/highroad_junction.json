@@ -2592,11 +2592,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1652; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2909 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=45972)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.89909,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000329,

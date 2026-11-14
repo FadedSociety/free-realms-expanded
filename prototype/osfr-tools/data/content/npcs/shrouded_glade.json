@@ -34968,11 +34968,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:134; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1357 (ModelId=570, ModelFileName=fairy_f_freestyle_08.agr, NameId=90241)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.030775,
       "model_id": 570,
-      "model_file_name": "fairy_f_freestyle_08.agr"
+      "model_file_name": "fairy_f_freestyle_08.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000721,

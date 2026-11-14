@@ -40479,10 +40479,169 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3000041,
+          "title": "Chapter 1: It's Business Time",
+          "title_string_id": 90887,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E13; name \"Chapter 1: It's Business Time\"; title id cell ucdt 1908825225 / ugdt 2722726271"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E13; name \"Chapter 1: It's Business Time\"; title id cell ucdt 1908825225 / ugdt 2722726271"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3000041 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row E12; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3000042,
+          "title": "Chapter 1: Pampered Pets",
+          "title_string_id": 91464,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E14; name 'Chapter 1: Pampered Pets'; title id cell ucdt 440377 / ugdt 177047924"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E14; name 'Chapter 1: Pampered Pets'; title id cell ucdt 440377 / ugdt 177047924"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3000042 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row E13; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3000043,
+          "title": "Chapter 1: Report to Captain Chugug",
+          "title_string_id": 90904,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E15; name 'Chapter 1: Report to Captain Chugug'; title id cell ucdt 2159868802 / ugdt 3977301603"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E15; name 'Chapter 1: Report to Captain Chugug'; title id cell ucdt 2159868802 / ugdt 3977301603"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3000043 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row E14; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3000040
+        3000040,
+        3000041,
+        3000042,
+        3000043
       ],
       "quests_given_text": [
         "Chapter 1: The Small Wooden Box (holds the box, client 1708418077); greets the player (\"Lieutenant Snibug?! That's me!\", client 3299356165)."

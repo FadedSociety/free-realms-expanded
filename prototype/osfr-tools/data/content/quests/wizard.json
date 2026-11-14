@@ -1173,7 +1173,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 15,
           "items": [],
           "job_xp": {
             "12": 63
@@ -1182,6 +1182,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/wizard.json, record 3160011)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "15 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_troll_magic_1f97ce)."
             }
           ]
         }

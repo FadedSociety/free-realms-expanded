@@ -1526,7 +1526,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 15,
           "items": [
             {
               "definition_id": 75855,
@@ -1546,6 +1546,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 63 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030018)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "15 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_rightful_owner_cdee3b)."
             }
           ]
         }
@@ -1621,7 +1625,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 31,
           "items": [
             {
               "definition_id": 10817,
@@ -1641,6 +1645,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 32 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030019)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "31 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_cemetery_security_70e96c)."
             }
           ]
         }
@@ -2702,7 +2710,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 15,
           "items": [],
           "job_xp": {
             "43": 275
@@ -2711,6 +2719,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 275 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030031)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "15 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_colder_weather_f91291)."
             }
           ]
         }

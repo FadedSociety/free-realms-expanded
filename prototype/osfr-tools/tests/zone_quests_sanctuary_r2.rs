@@ -162,16 +162,11 @@ fn the_pattern_scan_sees_every_item_shape() {
 #[test]
 fn the_other_rows_stay_off_behind_their_blocker() {
     // (quest, prerequisite that is itself disabled, why the row is not wired)
-    let gated: [(u32, u32, &str); 3] = [
+    let gated: [(u32, u32, &str); 2] = [
         (
             3_000_031,
             3_000_030,
             "Find Guard Glibbin, Forbi and Nibbs have no NPC row; Verbi is an unplaced anchor",
-        ),
-        (
-            3_000_046,
-            3_000_045,
-            "the box recovery has no mechanic and Darkthorne is an unplaced anchor",
         ),
         (
             3_090_025,
@@ -195,6 +190,12 @@ fn the_other_rows_stay_off_behind_their_blocker() {
     for id in [3_150_012, 3_150_013] {
         assert!(shipped_quest(id).enabled, "{id} went live in combat quests wave 2");
     }
+    // L1209: Failure is Not an Option is reachable (Bearer of Bad News 3000045 went live) but its
+    // second step is "Enter Briarheart Palace and speak with Darkthorne" (90930). The wiki puts her
+    // on the throne inside the palace (FR_Place:Briarheart_Palace, "who rules from within"); our
+    // Darkthorne 9000000067 stands at ground level outside it, 10 m from Captain Chugug.
+    assert!(shipped_quest(3_000_045).enabled, "Bearer of Bad News went live in L1209");
+    assert!(!shipped_quest(3_000_046).enabled, "Darkthorne in Briarheart Palace: re-check the row");
     // Medic: Operation: Revival is reachable (prerequisite 3090001 is on) but has no mechanic:
     // reviving twelve wounded bixies is a counted ability use the server cannot count yet.
     let revival = shipped_quest(3_090_002);

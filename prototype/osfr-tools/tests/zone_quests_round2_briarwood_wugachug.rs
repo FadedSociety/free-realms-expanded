@@ -347,14 +347,17 @@ fn the_loader_binds_each_giver_and_turn_in() {
 /// ("55 more quests", 2026-11-09), and Miner: Biggest is Best 3100025 in the round-4 batch
 /// (one finish of Gold Mining 99 stands for the tile chain, (R)).
 #[test]
-// Named when ten rows were off; two have since gone live.
+// Named when ten rows were off; five have since gone live.
 fn the_other_ten_stay_off_until_their_blocker_lifts() {
     // L1207: Fisherman: Hungry Chugs (3070019) went live; its Bag of Spices is a quest node beside
     // Gunther (R) and its Fanged Grouper is item 68092, the fanged_grouper catch.
     assert!(shipped_quest(3_070_019).enabled, "Hungry Chugs went live in L1207");
-    const OFF: [(u32, Option<u32>); 7] = [
-        (3_000_043, None),
-        (3_000_044, None),
+    // L1209: Report to Captain Chugug (3000043, Snibug's offer 90903 sends the player to Chugug)
+    // and The Empty Box (3000044) went live once It's Business Time opened the line before them.
+    for id in [3_000_043, 3_000_044] {
+        assert!(shipped_quest(id).enabled, "{id} went live in L1209");
+    }
+    const OFF: [(u32, Option<u32>); 5] = [
         (3_090_019, None),
         (3_090_020, Some(77_549)),
         (3_090_023, None),
