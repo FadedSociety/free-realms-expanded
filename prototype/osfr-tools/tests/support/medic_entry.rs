@@ -75,17 +75,15 @@ pub fn assert_enabled_medic_chapter_records() {
         .iter()
         .map(|record| record["id"].as_u64().unwrap())
         .collect();
-    assert_eq!(
-        enabled_ids,
-        vec![
-            u64::from(EXAM),
-            u64::from(HOUSE_CALL),
-            u64::from(PILLS),
-            u64::from(VITAMINS),
-            u64::from(LEVEL_FIVE),
-            u64::from(LEVEL_TWENTY)
-        ]
-    );
+    // The chapter quests stay on; more medic quests may join them (L1202: 3090029),
+    // so this checks the chapter, not the total (DONT-DO 4). Every enabled record, new ones
+    // included, still has to pass the giver binding below.
+    for id in [EXAM, HOUSE_CALL, PILLS, VITAMINS, LEVEL_FIVE, LEVEL_TWENTY] {
+        assert!(
+            enabled_ids.contains(&u64::from(id)),
+            "medic chapter quest {id} is off: {enabled_ids:?}"
+        );
+    }
 
     // Every enabled record has a spawned giver whose authored NPC row names the
     // quest in both arrays and carries the record's client title id, the value
@@ -200,6 +198,8 @@ pub fn assert_enabled_medic_chapter_records() {
             HOUSE_CALL => vec![(2_239, 1), (18_754, 1)],
             PILLS => vec![(10_823, 1), (10_826, 1)],
             VITAMINS => vec![(4_613, 1), (524, 1)],
+            // L1202: No Pain, No Gain, the All-Star Medic Square Shard (the wiki's cell).
+            3_090_029 => vec![(10_828, 1)],
             _ => vec![],
         };
         assert_eq!(rewards.len(), 1, "quest {quest_id}: one reward bundle");
@@ -398,8 +398,12 @@ pub fn assert_enabled_medic_chapter_records() {
         let id = record["id"].as_u64().unwrap();
         // T743 enables Callahan's Seaside level-20 gate (3090027); its own suite covers it.
         // T542 enables the Jobs-window Become a Medic (3090034).
+        // L1202 enables No Pain, No Gain (3090029), the quest after the level-20 gate.
         if id == u64::from(3_090_002_u32)
-            || (id >= 3_090_007 && id != u64::from(LEVEL_TWENTY) && id != u64::from(BECOME_A_MEDIC))
+            || (id >= 3_090_007
+                && id != u64::from(LEVEL_TWENTY)
+                && id != u64::from(BECOME_A_MEDIC)
+                && id != 3_090_029)
         {
             assert_eq!(
                 record["enabled"].as_bool(),

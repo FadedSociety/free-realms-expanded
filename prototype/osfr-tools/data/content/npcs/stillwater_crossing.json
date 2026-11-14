@@ -82,10 +82,55 @@
               "evidence": "title_string_id corrected from raw locale hash 1766915747 to Global.Text id 408684 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3070040,
+          "title": "Fisherman: Plenty of Fish",
+          "title_string_id": 409040,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster G - Big J's crew at Wintery Basin (Snowhill), row 36; name 'Fisherman: Plenty of Fish'; title id cell 3182666508 / 1419650360"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070040 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 35; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070008
+        3070008,
+        3070040
       ],
       "quests_given_text": [
         "Scouting variants, Fisherman: Stronger Equipment (retrieve her best gear from Muggup, 1534748619), a butter flyfish report (1791022783)."
@@ -448,10 +493,17 @@
             "kind": "client",
             "evidence": "Resources/Models.txt and the client locale: the file and line named after this NPC."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 1595,
-      "model_file_name": "human_f_anna_mudskipper.agr"
+      "model_file_name": "human_f_anna_mudskipper.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000038,
@@ -5603,46 +5655,6 @@
           ]
         },
         {
-          "quest_id": 3070040,
-          "title": "Fisherman: Plenty of Fish",
-          "title_string_id": 409040,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster G - Big J's crew at Wintery Basin (Snowhill), row 36; name 'Fisherman: Plenty of Fish'; title id cell 3182666508 / 1419650360"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3070040 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) source explicitly says after row 35; mapped that page label to the preceding batch content key"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 3182666508 to Global.Text id 409040 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3070043,
           "title": "Fisherman: To the Rescue!",
           "title_string_id": 412262,
@@ -5738,7 +5750,6 @@
       "quest_ids_given": [
         3050015,
         3050016,
-        3070040,
         3070043,
         3070045,
         3953730

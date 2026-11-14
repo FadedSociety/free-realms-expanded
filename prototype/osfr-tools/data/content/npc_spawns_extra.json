@@ -5153,7 +5153,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:352; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1585 (ModelId=669, ModelFileName=human_blackspore_thief_m.adr, NameId=390721)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500000064
     },
     {
       "spawn_guid": 100000001586,
@@ -33160,7 +33161,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2078; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3335 (ModelId=339, ModelFileName=human_f_freestyle_01.agr, NameId=23732)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005657
     },
     {
       "spawn_guid": 100000003336,
@@ -37366,7 +37368,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2313; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3570 (ModelId=316, ModelFileName=sh_musicstand_01.adr, NameId=38766)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005843
     },
     {
       "spawn_guid": 100000003571,
@@ -38313,7 +38316,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2377; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3697 (ModelId=1589, ModelFileName=human_m_capn_sigmundr.agr, NameId=408621)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005569
     },
     {
       "spawn_guid": 100000003699,
@@ -50208,7 +50212,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3022; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4356 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=41232)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500000390
     },
     {
       "spawn_guid": 100000004358,
@@ -78633,7 +78638,8 @@
           "evidence": "(R) No wiki page; the one video hit (Wv6rlcSc-CY t70) is the quest line only. Race unknown, so body human_m_fisherman_01.agr as a generic fisherman, not checked by eye. Stands at the Wintery Basin POI 3.3 m from Cap'n Sigmundr, y copied from him (terrain grid 98.14)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005644
     },
     {
       "spawn_guid": 100000090005,

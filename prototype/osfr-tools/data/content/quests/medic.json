@@ -2109,8 +2109,63 @@
       "prerequisite_quest_ids": [
         3090027
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 74804,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "As a medic, complete the run before time expires! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_no_pain_no_gain_9a3249)."
+            }
+          ],
+          "minigame_id": 551,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 74788,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Doctor Callahan (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_no_pain_no_gain_9a3249)."
+            }
+          ],
+          "npc_id": 9000000072
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 10828,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Medic Square Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_no_pain_no_gain_9a3249)."
+                }
+              ]
+            }
+          ],
+          "job_xp": {
+            "11": 360
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Medic: No Pain, No Gain (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_no_pain_no_gain_9a3249)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Medic XP 360: the wiki names this quest's item but no stars; the band-4 Medic quests before the level-20 gate pay 350-360 (3090024-3090026 360, 3090028 350), so the band-5 quest after it pays 360 (L1202, 2026-11-13)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2147,12 +2202,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 74800,
       "intro_text_string_id": 74798,
       "end_text_string_id": 74801,
-      "enabled": false
+      "enabled": true,
+      "job": 11
     },
     {
       "id": 3090030,

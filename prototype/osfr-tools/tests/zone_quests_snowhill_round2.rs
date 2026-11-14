@@ -416,16 +416,18 @@ fn warrior_weapon_stays_off_until_the_cudgel_can_be_forged() {
 /// for the re-check) the day one of them lands:
 /// - its record has no steps, and no item row or pickup places the pieces of Fastvi's weapon;
 /// - the 2014 kits have Quake and Commanding Shout but no "Kick" and no "Spinning Blade".
-/// The game-table lesson (3150018) has no caverns step: its one step is the "Weed Killing!"
-/// tower-defense table (text 15135), which `tower_defense.json` does not hold. Asking Old Folks
-/// follows the last enabled Warrior step while both are off.
+/// The game-table lesson (3150018) has no caverns step: it is the "Weed Killing!" tower-defense
+/// table (text 15135) next to Sir Whittington. L1207 put it on once `tower_defense.json` held the
+/// table: game 353, "Weed Killing! - Easy" (text 14909), the quest's own goal line. Asking Old
+/// Folks still follows W16 while Steele is Useful is off.
 #[test]
 fn steele_is_useful_stays_off_until_frostfang_caverns_has_an_encounter() {
     const CAVERNS_FIGHT: u64 = 14027;
     const CHILLBLAINE: u64 = 950_060;
-    const WEED_KILLING: u64 = 15135;
+    const WEED_KILLING_EASY: u64 = 353;
     assert!(!shipped_quest(STEELE_IS_USEFUL).enabled);
-    assert!(!shipped_quest(FASTVI_LEGEND).enabled);
+    let fastvi = shipped_quest(FASTVI_LEGEND);
+    assert!(fastvi.enabled, "Legend of Fastville went live in L1207");
 
     // The caverns part is ready: the record maps onto the fight its door runs, and that fight's
     // main goal is Chillblaine.
@@ -464,10 +466,20 @@ fn steele_is_useful_stays_off_until_frostfang_caverns_has_an_encounter() {
         !moves.contains(&"Kick") && !moves.contains(&"Spinning Blade"),
         "the kits have Kick or Spinning Blade now: re-check quest 3150020"
     );
+    // Fastville's table step names a game the tower-defense table holds.
     let tables = read_json(&content_dir().join("tower_defense.json"));
     assert!(
-        !(tables["games"].as_array().unwrap().iter()).any(|game| game["name_id"] == WEED_KILLING),
-        "the Weed Killing! table ships now: re-check quest 3150018"
+        (tables["games"].as_array().unwrap().iter()).any(|game| game["game_id"] == WEED_KILLING_EASY),
+        "tower_defense.json holds Weed Killing! - Easy ({WEED_KILLING_EASY})"
+    );
+    let record = read_json(&content_dir().join("quests/warrior.json"));
+    let fastvi_row = (record["records"].as_array().unwrap().iter())
+        .find(|row| row["id"] == u64::from(FASTVI_LEGEND))
+        .expect("the Fastville record");
+    assert!(
+        (fastvi_row["objectives"].as_array().unwrap().iter())
+            .any(|goal| goal["kind"] == "finish_minigame" && goal["minigame_id"] == WEED_KILLING_EASY),
+        "Legend of Fastville's table step is game {WEED_KILLING_EASY}"
     );
     assert_eq!(
         shipped_quest(ASKING_OLD_FOLKS).prerequisite_quest_ids,

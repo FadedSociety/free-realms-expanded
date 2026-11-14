@@ -13,7 +13,8 @@ use std::{
 };
 
 const FILE: &str = "collection_nodes.json";
-const MAX_FILE_BYTES: u64 = 1 << 20;
+/// The node loader's cap (`harvest_nodes.rs`, 4 MiB since L1202).
+const MAX_FILE_BYTES: u64 = 1 << 22;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 fn content_dir() -> PathBuf {

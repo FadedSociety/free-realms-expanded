@@ -9947,10 +9947,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn pixie female NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AChicory"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000102,
@@ -10780,8 +10787,27 @@
       "location_evidence": [
         "Bristlewood (wiki Forgotten Lunchbox). Exact stand unknown. [video: marker 6 m, ns0rlvCjXtU/00002]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957994,
+          "title": "Fuzzy Socks",
+          "title_string_id": 17271,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Fuzzy Socks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_fuzzy_socks_0a5908)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957994
+      ],
       "quests_given_text": [
         "Forgotten Lunchbox; wolf-vine meat (client 369763845); bear fur socks (661444111, 1724428388); Crispy Choychoy Delight (581174815); a cake (1321265408). Appears in Farmer's Market (Chef)."
       ],
@@ -31859,13 +31885,103 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3070022,
+          "title": "Fisherman: Restocking the Stream",
+          "title_string_id": 409358,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 18; name 'Fisherman: Restocking the Stream'; title id cell 1958796589 / 4007798221"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070022 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 17; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3070019,
+          "title": "Fisherman: Hungry Chugs",
+          "title_string_id": 409370,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Cluster D - Gunther at Brambleback's Bayou (Briarwood), row 15; name 'Fisherman: Hungry Chugs'; title id cell 31742645 / 1875532559"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3070019 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3953698,
         3070020,
         3070025,
-        3070033
+        3070033,
+        3070022,
+        3070019
       ],
       "quests_given_text": [
         "Fisherman: Hungry Chugs, Fisherman: Fishy Fungus, Fisherman: Ink Cod Ink, Fisherman: Restocking the Stream, Fisherman: Undercover, Fisherman: VIP Fish, Fisherman: Say Cheese!."
@@ -36698,11 +36814,18 @@
             "kind": "legacy-data",
             "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1422; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2679 (ModelId=833, ModelFileName=human_m_kade_carmichael.agr, NameId=101924)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 0.158672,
       "model_id": 833,
-      "model_file_name": "human_m_kade_carmichael.agr"
+      "model_file_name": "human_m_kade_carmichael.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000154,
@@ -46806,11 +46929,28 @@
               "evidence": "Kitty, Get the Spider! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kitty_get_the_spider_807341)."
             }
           ]
+        },
+        {
+          "quest_id": 3958027,
+          "title": "Like Mother, Like Daughter",
+          "title_string_id": 72051,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Like Mother, Like Daughter (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_like_mother_like_daughter_3fc52a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3951159,
-        3954923
+        3954923,
+        3958027
       ],
       "quests_given_text": [],
       "quests_accepted": [],
@@ -47964,8 +48104,108 @@
       "location_evidence": [
         "Tangletrack Speedway (client 565302289). [video: nameplate read as \"Miranda Vega\" with a quest marker, n151vLzDLdY/00170]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080039,
+          "title": "Kart Driver: The Right Stuff",
+          "title_string_id": 3583,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 37; name 'Kart Driver: The Right Stuff'; title id cell 509182203 ucdt; 3652101059 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 37; name 'Kart Driver: The Right Stuff'; title id cell 509182203 ucdt; 3652101059 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080039 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395304 (lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080040,
+          "title": "Kart Driver: Miner's Guild Sponsorship",
+          "title_string_id": 395310,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 38; name \"Kart Driver: Miner's Guild Sponsorship\"; title id cell 472092027 ucdt; 2013492570 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 38; name \"Kart Driver: Miner's Guild Sponsorship\"; title id cell 472092027 ucdt; 2013492570 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080040 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080039,
+        3080040
+      ],
       "quests_given_text": [
         "Kart Driver: The Keys to Victory, Kart Driver: The Right Stuff."
       ],
@@ -54741,8 +54981,27 @@
       "location_evidence": [
         "\"Just outside of the Hedge Maze in Bristlewood\" (client 883895111). [video: marker 20 m, piWfe7lXZ9I/00081; stands left of the path beside Private Spano, ry1nzdYrPKM/00092]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958139,
+          "title": "That Warm Fuzzy Feeling",
+          "title_string_id": 17248,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "That Warm Fuzzy Feeling (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_that_warm_fuzzy_feeling_a53e14)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958139
+      ],
       "quests_given_text": [
         "Receives the socks in the bear-fur quest (client 846901484) and a package from Loryn of Snowhill (1348741959, 2156861996). Merry Vale vacation pitch (971749749)."
       ],
@@ -55120,11 +55379,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1315; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2572 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=3518)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.472698,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000195,
@@ -59751,8 +60017,27 @@
       "location_evidence": [
         "\"Eastern Nettleseed\" (client 728681896)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958164,
+          "title": "The Vegetarian Shambler",
+          "title_string_id": 16914,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Vegetarian Shambler (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_vegetarian_shambler_8382bf)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958164
+      ],
       "quests_given_text": [
         "The Vegetarian Shambler; wants animated plant parts from Bristlewood Glade (client 117967153, 3573854834) and produce (584396396). Sends the player to \"Landon\" in Blackspore (1478385537, 322212726)."
       ],
@@ -61845,8 +62130,202 @@
       "location_evidence": [
         "Tangletrack Speedway (client 2745949781)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080041,
+          "title": "Kart Driver: Tangletrack Sprint Challenge",
+          "title_string_id": 395316,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 39; name 'Kart Driver: Tangletrack Sprint Challenge'; title id cell 1025540288 ucdt; 2291785024 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 39; name 'Kart Driver: Tangletrack Sprint Challenge'; title id cell 1025540288 ucdt; 2291785024 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080041 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080042,
+          "title": "Kart Driver: Tangletrack Endurance Challenge",
+          "title_string_id": 395322,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 40; name 'Kart Driver: Tangletrack Endurance Challenge'; title id cell 3858423748 ucdt; 221410696 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 40; name 'Kart Driver: Tangletrack Endurance Challenge'; title id cell 3858423748 ucdt; 221410696 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080042 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080043,
+          "title": "Kart Driver: Dominating at Tangletrack",
+          "title_string_id": 3598,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 41; name 'Kart Driver: Dominating at Tangletrack'; title id cell 3661707843 ucdt; 2517634487 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080043 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395326 (lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080044,
+          "title": "Kart Driver: Celebrity Giveaway",
+          "title_string_id": 395332,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 42; name 'Kart Driver: Celebrity Giveaway'; title id cell 2968269447 ucdt; 359008695 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 4 - Tangletrack Speedway (rivals: Antonio Taurino, Linx Redline, Mirana Vega; sponsor: Shamus Sootbender), row 42; name 'Kart Driver: Celebrity Giveaway'; title id cell 2968269447 ucdt; 359008695 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080044 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080041,
+        3080042,
+        3080043,
+        3080044
+      ],
       "quests_given_text": [
         "Kart Driver: Miner's Guild Sponsorship, Kart Driver: Tangletrack Sprint Challenge, Kart Driver: Tangletrack Endurance Challenge, Kart Driver: Dominating at Tangletrack, Kart Driver: Celebrity Giveaway."
       ],
@@ -64752,11 +65231,28 @@
               "evidence": "title_string_id corrected from raw locale hash 829879740 to Global.Text id 78337 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3957924,
+          "title": "Chugawugs are Not Spider Food",
+          "title_string_id": 16933,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chugawugs are Not Spider Food (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chugawugs_are_not_spider_food_15796e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3100028,
-        3100029
+        3100029,
+        3957924
       ],
       "quests_given_text": [
         "Miner: Rare Rock Collection and Miner: Part of the Guild; receives the moonstone in Miner: Mother Lode Lift. Target of The Search for Snorg."
@@ -65696,8 +66192,27 @@
       "location_evidence": [
         "Sperry's hut and Sperry's Spore Farm (client 1332010006); the Trail of Betrayal entrance is \"just up the hill from Sperry's hut\" (767037747)."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958194,
+          "title": "What a Slacker",
+          "title_string_id": 16893,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "What a Slacker (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_what_a_slacker_cf2608)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958194
+      ],
       "quests_given_text": [
         "Spores for the trolls' food supply (client 124087218, 1471134824); mushrooms from Dark Spore Depths (1847812506); a red mushroom (147460872); a map fragment (497770506); gives vegetables to Chugilda (1375017034). Titles not found."
       ],
@@ -75577,10 +76092,17 @@
             "kind": "reconstructed",
             "evidence": "(R) stand-in body: the most common model of drawn chugawug male NPCs; race/gender from the fanbyte wiki page https://fr.fanbyte.com/wiki/FR_Mob%3AWuumba"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000238,

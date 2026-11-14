@@ -1102,7 +1102,75 @@
       "prerequisite_quest_ids": [
         3160010
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 388301,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Troll Bone Shamans - 0/8 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_troll_magic_1f97ce)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'troll bone shaman' is definition [930025]"
+            }
+          ],
+          "model_id": 930025,
+          "count": 8
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 388353,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Troll Summoners - 0/2 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_troll_magic_1f97ce)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'troll summoner' is definition [930096]"
+            }
+          ],
+          "model_id": 930096,
+          "count": 2
+        },
+        {
+          "kind": "defeat",
+          "id": 3,
+          "text_string_id": 388846,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Robgoblin Campers - 0/6 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_troll_magic_1f97ce)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'robgoblin' is definition [1230201, 1230202, 1230203]"
+            }
+          ],
+          "kinds": [
+            1230201,
+            1230202,
+            1230203
+          ],
+          "count": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 388848,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Natali (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_contract_troll_magic_1f97ce)."
+            }
+          ],
+          "npc_id": 9500000360
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1154,12 +1222,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 388285,
       "intro_text_string_id": 388283,
       "end_text_string_id": 388286,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3160012,
