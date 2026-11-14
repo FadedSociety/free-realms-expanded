@@ -99,6 +99,8 @@ fn w120_player_denial_is_logged_and_studio_requires_admin() {
         bundle.push(child.len() as u8);
         bundle.extend(child);
     }
+    // The refused bundle is dropped whole and the session goes on (DONT-DO 5; owner 2026-11-13:
+    // an item-window equip in a bundle ended the session).
     assert!(
         session
             .dispatch_message(
@@ -110,7 +112,7 @@ fn w120_player_denial_is_logged_and_studio_requires_admin() {
                 &mut server.sessions,
                 None
             )
-            .is_err()
+            .is_ok()
     );
     assert_eq!(session.gateway.snapshot(), before);
     server.flush_security();
@@ -1509,8 +1511,8 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
                 &mut sessions,
                 None,
             )
-            .is_err(),
-        "a jump before Ready is refused"
+            .is_ok(),
+        "a jump before Ready is refused (dropped; the session goes on)"
     );
     assert_eq!(early.gateway.state(), &before_ready);
     assert!(

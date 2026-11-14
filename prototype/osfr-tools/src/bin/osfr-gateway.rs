@@ -1736,7 +1736,11 @@ impl Session {
                         &error.to_string(),
                     )?;
                 }
-                return Err(error.into());
+                // A refused message is dropped whole (nothing staged commits), never the session
+                // (DONT-DO 5; owner 2026-11-13: an item-window equip ended the session).
+                let reason = error.to_string();
+                event(json!({"event":"message_refused","peer":self.peer.to_string(),"reason":reason}));
+                return Ok(());
             }
         };
         held.leave(&mut staged_gateway, &outcome, combat);

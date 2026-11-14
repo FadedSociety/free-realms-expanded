@@ -171,13 +171,15 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     server.world.session_keys.insert(victim_id, key);
     server.sessions.insert(key, victim);
 
-    // A 26/42 with a trailing byte is a handler error; a bundle makes the child
-    // error surface instead of a silent single-request refusal, and the server
-    // turns it into an end for this session alone (see `Server::step`).
+    // A bundle nested in a bundle is a framing error (`application_messages`): the
+    // server turns it into an end for this session alone (see `Server::step`). A
+    // handler's refusal (once a malformed 26/42) is only dropped since L1203.
     let wire = {
         let session = &server.sessions[&key];
+        let inner = bundle(&[vec![26, 0, 42, 0]]);
         let mut payload = 0u16.to_be_bytes().to_vec();
-        payload.extend(bundle(&[vec![26, 0, 42, 0, 0]]));
+        payload.extend([0, 25, inner.len() as u8]);
+        payload.extend(inner);
         session
             .codec
             .encode(RELIABLE_DATA, &payload)
