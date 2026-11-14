@@ -81404,37 +81404,6 @@
           "evidence": "EV live_event halloween: (R) a ghost cat beside the Halloween boombox and dispenser, one Halloween group in the capture"
         }
       ]
-    },
-    {
-      "legacy_npc_id": null,
-      "model_id": 4499,
-      "model_file_name": "human_m_merchant_brawler_caucasian.agr",
-      "name": "Hank Fisticuffs",
-      "name_string_id": 90196,
-      "position": [
-        228.9,
-        23.445,
-        382.5
-      ],
-      "position_w": null,
-      "heading": -1.33,
-      "capture_match": null,
-      "source": [
-        {
-          "kind": "client",
-          "evidence": "npc_name 90196 'Hank Fisticuffs'; the next string, 90197, reads 'Brawler & Ninja Weapons', his merchant title."
-        },
-        {
-          "kind": "video",
-          "evidence": "index.tsv: solved at x=236.6 z=385.3, error 4.0 m, 3 sightings, confidence high, placed_ok against record 9500000751 (8 m). Frame 0-8dyaBN6rs/00080 shows the plate at 10 m but not a readable body."
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) Body 4499, the male brawler merchant, by his client title, seen in model-view; race not proven. Kept on the record's exact spot because tests/content_npc_placement.rs requires a bound spawn at a video_index record's position. No wiki page. Probe not run (position taken from the record)."
-        }
-      ],
-      "spawn_guid": 100000090068,
-      "content_key": 9500000751
     }
   ]
 }
