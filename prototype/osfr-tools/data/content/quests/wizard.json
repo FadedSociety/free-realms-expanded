@@ -2462,11 +2462,51 @@
       "prerequisite_quest_ids": [
         3160026
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "complete_dungeon",
+          "id": 1,
+          "text_string_id": 22325,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Retrieve the crystal from Azure's staff (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_sven_s_job_offer_2316b5)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'Azure' is the boss of fight 14075; winning the fight takes the item"
+            }
+          ],
+          "encounter_id": 14075
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 22327,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Sven outside of the Briar Patch (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_sven_s_job_offer_2316b5)."
+            }
+          ],
+          "npc_id": 9000000209
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 4962,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Wizard Wand (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_sven_s_job_offer_2316b5)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 360
           },
@@ -2514,10 +2554,25 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1210: intro 24976 is Sven's offer ('I heard that there is a powerful wizard inside of the Briar Patch ... Or are you scared?'), the wiki's offer line; 24975-24977 are the intros of 3160026-3160028."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1210: the client has no closing line of its own for this quest (its block 22321-22327 holds title, description and two goal lines); the end text is the client's generic 416261 'Thanks for helping us!', as the quest before it (3160026) closes."
         }
       ],
       "description_string_id": 22322,
-      "enabled": false
+      "enabled": true,
+      "job": 12,
+      "intro_text_string_id": 24976,
+      "end_text_string_id": 416261
     },
     {
       "id": 3160028,
@@ -2526,11 +2581,57 @@
       "prerequisite_quest_ids": [
         3160027
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "complete_dungeon",
+          "id": 1,
+          "text_string_id": 22357,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Treeleaf Hedge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_a_twig_from_treeleaf_98fdef)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: 'Treeleaf Hedge' is the boss of fight 14067; winning the fight is the step"
+            }
+          ],
+          "encounter_id": 14067
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 12643,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Wizard Slacks (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_a_twig_from_treeleaf_98fdef)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            },
+            {
+              "definition_id": 12350,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Wizard Skirt (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_a_twig_from_treeleaf_98fdef)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 360
           },
@@ -2578,10 +2679,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1210: intro 24977 is Sven's offer ('There is talk of a giant tree that has taken over part of Thistlerow ...'), the wiki's offer line; end 22329 is Sven taking the twig ('This twig isn't the best, but it will have to do ...'); 116390 'has defeated Treeleaf Hedge and recovered one of his twigs for Sven!' is its completion."
         }
       ],
       "description_string_id": 22354,
-      "enabled": false
+      "enabled": true,
+      "job": 12,
+      "intro_text_string_id": 24977,
+      "end_text_string_id": 22329
     },
     {
       "id": 3160029,
@@ -2590,11 +2702,40 @@
       "prerequisite_quest_ids": [
         3160028
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 76322,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Queen Arachnia (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_one_thing_to_bind_them_580f20)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: enemy 'Queen Arachnia' is definition [2714]"
+            }
+          ],
+          "model_id": 2714,
+          "count": 1
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10843,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Wizard Triangle Shard (lab/references/quest-table-20261102/quests.json wiki:fr_quest_wizard_one_thing_to_bind_them_580f20)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "12": 360
           },
@@ -2642,19 +2783,56 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 76315,
       "intro_text_string_id": 76313,
       "end_text_string_id": 76316,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160030,
       "title_string_id": 387671,
       "giver_npc_id": 9000000209,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3160029
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 387678,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Meet Natali (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_reach_level_20_175768)."
+            }
+          ],
+          "npc_id": 9500000360
+        },
+        {
+          "kind": "job_level",
+          "id": 2,
+          "text_string_id": 387702,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Reach level 20 as a Wizard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wizard_reach_level_20_175768)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 387702 is this step; profile 12 from live records 3160010/3160017/3160024 (wizard.json)"
+            }
+          ],
+          "profile_id": 12,
+          "level": 20
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -2706,12 +2884,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 387672,
       "intro_text_string_id": 387670,
       "end_text_string_id": 387673,
-      "enabled": false
+      "enabled": true,
+      "job": 12
     },
     {
       "id": 3160031,

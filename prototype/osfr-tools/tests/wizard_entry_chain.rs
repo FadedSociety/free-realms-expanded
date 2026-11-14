@@ -838,7 +838,8 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
         // Fizzlesticks' Robgoblin Camp chapter. T542's Become a Wizard (3160035) is the
         // Jobs-window record, not part of that chapter shape. 3160026 went live with the bulk
         // quest wiring and is not part of it either. Combat quests wave 2 wires Lightning Bolt!
-        // through Student Profits (3160006-3160009, tests/zone_quests_wilds_part2.rs).
+        // through Student Profits (3160006-3160009, tests/zone_quests_wilds_part2.rs). L1210 wires
+        // Sven's line after 3160026: Sven's Job Offer through Reach Level 20 (3160027-3160030).
         .filter(|record| {
             ![
                 3_160_006,
@@ -846,6 +847,10 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
                 3_160_008,
                 3_160_009,
                 3_160_026,
+                3_160_027,
+                3_160_028,
+                3_160_029,
+                3_160_030,
                 3_160_010,
                 3_160_011, // L1207: Contract: Troll Magic, Natali's band, not this chapter
                 3_160_017,
