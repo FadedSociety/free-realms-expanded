@@ -36657,12 +36657,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) L1211: the offer 24825 is the wiki's Frostpetal line; the description 5655 and closing 5650 ('...it is my job to greet all newcomers') sit with the title 5544 in the client's old Snowhill block."
+          "evidence": "(R) L1211, corrected: the offer 24825 is the wiki's Frostpetal line and the description 5655 sits with the title 5544 in the client's old Snowhill block. 5650 ('...it is my job to greet all newcomers') is Frostpetal's own greeting bark (native, 2026-11-14), not a line for Tevin, where the quest closes; the closing is the client's generic 416261 'Thanks for helping us!', as L1210's Sven quest closes."
         }
       ],
       "description_string_id": 5655,
       "intro_text_string_id": 24825,
-      "end_text_string_id": 5650,
+      "end_text_string_id": 416261,
       "enabled": true
     },
     {
