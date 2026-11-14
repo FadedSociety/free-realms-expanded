@@ -122,7 +122,7 @@ impl EncounterEngine {
         // Disposition 1 (neutral): 0 is hostile and would be Tab-targeted.
         out.replies.push(self.spawn(&actor, position, 1));
         if kind.coins_by_tier.is_some() {
-            let sender = self.shared_sender.unwrap_or(1);
+            let sender = self.me();
             out.replies.push(composite_effect(sender, COIN_DROP_EFFECT, position));
         }
         self.pickups.push(PowerUpDrop {
@@ -217,7 +217,7 @@ impl EncounterEngine {
             POWER_UP_PICKUP_EFFECT
         };
         out.replies.push(composite_effect(
-            self.shared_sender.unwrap_or(1),
+            self.me(),
             effect,
             drop.position,
         ));

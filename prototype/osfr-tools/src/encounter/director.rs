@@ -185,4 +185,7 @@ pub struct FightState {
     pub(super) pacing: Arc<super::pacing::PacingTable>,
     /// A40: coins this player picked up from coin piles this session, before any booster.
     pub(super) pile_coins: u32,
+    /// L1212 (A42): this player's own guid, as gameplay names it before each message and tick.
+    /// 0 until then, which reads as 1 (`EncounterEngine::solo_guid`).
+    pub(super) player_guid: u64,
 }

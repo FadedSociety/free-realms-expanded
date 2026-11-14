@@ -436,7 +436,7 @@ impl EncounterEngine {
             .get(&guid)
             .copied()
             .or(self.arena.acting)
-            .unwrap_or(1)
+            .unwrap_or_else(|| self.solo_guid())
     }
 
     /// Where the enemy stands, its home, how far it may go from home and where its target is.
