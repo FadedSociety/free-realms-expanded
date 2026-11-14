@@ -535,11 +535,16 @@ impl OpeningEngine {
             .collect()
     }
 
-    pub fn initialization(&self) -> OpeningOutcome {
+    /// The login batch. Its lines (the reconstruction notice, the step counter, the guide's
+    /// coordinates) are lab scaffolding no player saw in the original: only a session with dev
+    /// tools reads them (KNOWN-BUGS A30, native run 2026-11-13). Steps still report as they
+    /// change.
+    pub fn initialization(&self, dev_tools: bool) -> OpeningOutcome {
         let mut outcome = self.status();
         outcome
             .messages
             .insert(0, self.content.reconstruction_notice.clone());
+        outcome.messages.retain(|_| dev_tools);
         outcome
     }
 

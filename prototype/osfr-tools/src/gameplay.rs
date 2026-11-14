@@ -1908,7 +1908,7 @@ impl Gameplay {
             .on_position(character.zone_id, character.position)?;
         self.apply_opening(result, &mut out)?;
         self.opening_equipment_events(&mut out)?;
-        let result = self.opening()?.initialization();
+        let result = self.opening()?.initialization(self.dev_tools);
         self.apply_opening(result, &mut out)?;
         if !self.encounter()?.active() {
             let visible: Vec<_> = self

@@ -42,7 +42,7 @@
       "name": "Bixie Soldier",
       "name_id": 440711,
       "model_id": 220,
-      "rank": "normal",
+      "rank": "minion",
       "behaviour": {
         "rules": [
           {
@@ -101,7 +101,7 @@
       "name": "Bixie Battlemage",
       "name_id": 440712,
       "model_id": 211,
-      "rank": "normal"
+      "rank": "minion"
     },
     "drone_fauzz": {
       "definition_id": 1300319,
@@ -783,6 +783,7 @@
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/bixie_hive.json, its notes page and the fork battle; the entrance counts as battle 12370 for quests."
     },
-    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Bixie Hive' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/fr_place_Bixie_Hive.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Blue Defense Warrior Gauntlets' as 'Base Defense Warrior Gauntlets'. It replaces every earlier note in this record about the prize wheel or its prizes."}
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Bixie Hive' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/fr_place_Bixie_Hive.html). Each class's wheel holds its own items and the shared items; the coins are the page's. (R) The wiki's spelling read as the client's item: 'Blue Defense Warrior Gauntlets' as 'Base Defense Warrior Gauntlets'. It replaces every earlier note in this record about the prize wheel or its prizes."},
+    {"kind": "capture", "evidence": "L1199 (KNOWN-BUGS A28): Bixie Soldier and Bixie Battlemage are rank minion, as their enemies.json catalogue rows say: capture p12 (2014-03-25) measured a Bixie Soldier at 260 health = 279 x 0.932, the minion rank at tier 1; the Battlemages stood among them (R). The generator had ranked every kind but the boss normal, about 3x the captured health. Of all 221 fight kinds and 42 field battle rows, the only rank conflict the evidence settles (lab audit fight-kind-ranks-20261113.md)"}
   ]
 }
