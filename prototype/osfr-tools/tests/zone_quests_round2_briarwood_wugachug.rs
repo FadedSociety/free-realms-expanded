@@ -349,10 +349,12 @@ fn the_loader_binds_each_giver_and_turn_in() {
 #[test]
 // Named when ten rows were off; two have since gone live.
 fn the_other_ten_stay_off_until_their_blocker_lifts() {
-    const OFF: [(u32, Option<u32>); 8] = [
+    // L1207: Fisherman: Hungry Chugs (3070019) went live; its Bag of Spices is a quest node beside
+    // Gunther (R) and its Fanged Grouper is item 68092, the fanged_grouper catch.
+    assert!(shipped_quest(3_070_019).enabled, "Hungry Chugs went live in L1207");
+    const OFF: [(u32, Option<u32>); 7] = [
         (3_000_043, None),
         (3_000_044, None),
-        (3_070_019, None),
         (3_090_019, None),
         (3_090_020, Some(77_549)),
         (3_090_023, None),

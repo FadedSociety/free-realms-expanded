@@ -286,17 +286,16 @@ fn the_wrong_job_and_a_missing_prerequisite_change_nothing() {
     }
 }
 
-/// Merry Vale rows that stay disabled: the Card Duelist and Postman quests of
-/// `zone-quests-matched/merry-vale.json` `still_blocked`, each needing a mechanic the server
-/// lacks (see `notes/Autopilot/T672.md`). A row that gains objectives has to be re-checked.
+/// Merry Vale rows that stayed disabled: the Postman quests of `zone-quests-matched/merry-vale.json`
+/// `still_blocked` (see `notes/Autopilot/T672.md`). L1207 re-checked them and put all three on:
+/// Missing Mail (3130012) and Mail Mix-Up (3130013) waited on the package-pickup and
+/// deliver-the-mail game results, which the server now produces (246, 248); Beautiful Bouquet
+/// (3130015) waited on a drawn giver, which it now has. Each live row keeps its steps.
 #[test]
 fn the_other_merry_vale_rows_stay_off() {
     for id in [3_130_012, 3_130_013, 3_130_015] {
         let quest = shipped_quest(id);
-        assert!(!quest.enabled, "quest {id} is enabled, not blocked");
-        assert!(
-            quest.objectives.is_empty(),
-            "{id} grew objectives; re-check it"
-        );
+        assert!(quest.enabled, "quest {id} went live in L1207");
+        assert!(!quest.objectives.is_empty(), "{id} lost its steps");
     }
 }

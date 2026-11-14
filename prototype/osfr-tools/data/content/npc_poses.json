@@ -3478,6 +3478,12 @@
     },
     {
       "model_ids": [
+        76
+      ],
+      "source": "sh_mailbox_01.adr: no walk, run, emote, fidget or combat clip (L1207's Entry Box quest node)"
+    },
+    {
+      "model_ids": [
         80
       ],
       "source": "bw_sack_02.adr: no walk, run, emote, fidget or combat clip"

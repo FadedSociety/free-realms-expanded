@@ -1148,12 +1148,69 @@
       "id": 3130012,
       "title_string_id": 117036,
       "giver_npc_id": 9000000174,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130015
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 117068,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Merry Vale Package Pickup minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_missing_mail_2e256b)."
+            }
+          ],
+          "minigame_id": 246,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 117070,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Postmaster Vixie in Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_missing_mail_2e256b)."
+            }
+          ],
+          "npc_id": 9000000174
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 13221,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Shorts (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_missing_mail_2e256b)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            },
+            {
+              "definition_id": 13371,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Skirt (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_missing_mail_2e256b)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) one wearer's cell: the page's cells together pay boys and girls."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 300
           },
@@ -1205,23 +1262,67 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 117037,
       "intro_text_string_id": 117035,
       "end_text_string_id": 117038,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130013,
       "title_string_id": 117075,
       "giver_npc_id": 9000000174,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130012
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 117081,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Deliver the Mail in Merry Vale minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mail_mix_up_cbe616)."
+            }
+          ],
+          "minigame_id": 248,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 117070,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Postmaster Vixie in Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_mail_mix_up_cbe616)."
+            }
+          ],
+          "npc_id": 9000000174
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10869,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Square Shard (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_mail_mix_up_cbe616)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 300
           },
@@ -1269,19 +1370,93 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 117076,
       "intro_text_string_id": 117074,
       "end_text_string_id": 117077,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130014,
       "title_string_id": 117169,
       "giver_npc_id": 9000000174,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130013
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 141819,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Merry Vale Mail Sorting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_and_the_winner_is_a9ece1)."
+            }
+          ],
+          "minigame_id": 381,
+          "count": 1
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 117175,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Pick a winning entry from the box (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_and_the_winner_is_a9ece1)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 117175 is this step, 117176 'Get a good one!'; Postmaster Vixie 9000000174 at (-1108.3, -40, -394)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "model 76 sh_mailbox_01 is the mailbox world_challenges.json uses ('Deliver the mail: mailbox model'); not in objects.json's checked list"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the box stands 3.5 m from Vixie and 6.6 m from the Merry Vale Postboxes spawn"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "/api/assets/model/76: sh_mailbox_01.adr, desc 'Snowhill Mailbox', kind prop, status ok; a mailbox is the entry box the postmaster keeps"
+            }
+          ],
+          "node_type": "quest-entry-box-q3130014",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 117177,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Myrea in Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_and_the_winner_is_a9ece1)."
+            }
+          ],
+          "npc_id": 9500000411
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 117179,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Enaine in Seaside (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_and_the_winner_is_a9ece1)."
+            }
+          ],
+          "npc_id": 9000000079
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1333,19 +1508,51 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 117170,
       "intro_text_string_id": 117168,
       "end_text_string_id": 117171,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130015,
       "title_string_id": 117017,
-      "giver_npc_id": 9000000545,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9000000107,
+      "prerequisite_quest_ids": [
+        3130011
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 117022,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Rosalie (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beautiful_bouquet_939bcb)."
+            }
+          ],
+          "npc_id": 9500000421
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 117024,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Postmaster Vixie in Merry Vale (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beautiful_bouquet_939bcb)."
+            }
+          ],
+          "npc_id": 9000000174
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -1397,23 +1604,122 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 117018,
       "intro_text_string_id": 117016,
       "end_text_string_id": 117019,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130016,
       "title_string_id": 117306,
       "giver_npc_id": 9000000079,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3130014
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 117315,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Enve (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+            }
+          ],
+          "npc_id": 9000000080
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 117317,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Invitation Investigation minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+            }
+          ],
+          "minigame_id": 262,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 388827,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Enve (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+            }
+          ],
+          "npc_id": 9000000080
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 4,
+          "text_string_id": 388821,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the Seaside Mail Sorting minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+            }
+          ],
+          "minigame_id": 377,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 101565,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Enve (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+            }
+          ],
+          "npc_id": 9000000080
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 12916,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used for each wearer."
+                }
+              ]
+            },
+            {
+              "definition_id": 13256,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Postman Shoes (lab/references/quest-table-20261102/quests.json wiki:fr_quest_postman_it_s_a_breeze_61be70)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 2 rows; the lowest id is used for each wearer."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "4": 300
           },
@@ -1465,12 +1771,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 117307,
       "intro_text_string_id": 117305,
       "end_text_string_id": 117308,
-      "enabled": false
+      "enabled": true,
+      "job": 4
     },
     {
       "id": 3130017,

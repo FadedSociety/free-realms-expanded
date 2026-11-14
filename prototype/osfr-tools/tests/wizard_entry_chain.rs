@@ -847,6 +847,7 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
                 3_160_009,
                 3_160_026,
                 3_160_010,
+                3_160_011, // L1207: Contract: Troll Magic, Natali's band, not this chapter
                 3_160_017,
                 3_160_019,
                 3_160_024,

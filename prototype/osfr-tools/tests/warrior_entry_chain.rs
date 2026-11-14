@@ -901,6 +901,9 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         // Combat quests wave 2: Knocking Some Sense In and Take Care of That Ankle
         // (tests/zone_quests_sanctuary_r2.rs, tests/combat_quests_on.rs).
         .filter(|row| ![3_150_012, 3_150_013].contains(&row["id"].as_u64().unwrap()))
+        // L1207: Legend of Fastville (the Weed Killing! table, game 353), which has its own
+        // shape (tests/zone_quests_snowhill_round2.rs).
+        .filter(|row| row["id"].as_u64() != Some(3_150_018))
         .collect();
     assert_eq!(
         enabled
@@ -1057,6 +1060,8 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             // battle) and Take Care of That Ankle (one talk) are live.
             3_150_012,
             3_150_013,
+            // L1207: Legend of Fastville (the Weed Killing! table) is live.
+            3_150_018,
         ]
         .contains(&(id as u32))
         {

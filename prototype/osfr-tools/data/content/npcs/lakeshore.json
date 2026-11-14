@@ -11275,8 +11275,59 @@
       "location_evidence": [
         "Lakeshore (wiki: \"Natali in Lakeshore\"). The client has no location sentence. This row is wiki placement only."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3160011,
+          "title": "Contract: Troll Magic",
+          "title_string_id": 388284,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 9; name 'Contract: Troll Magic (repeatable)'; title id cell ucdt 1293936818 / ugdt 316942395"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 2: level 5 to 10 (Natali, Fizzlesticks, Yaren, Yvelle), row 9; name 'Contract: Troll Magic (repeatable)'; title id cell ucdt 1293936818 / ugdt 316942395"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3160011 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 8; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3160011
+      ],
       "quests_given_text": [
         "Four repeatable Wizard contracts: Contract: Troll Magic, Contract: Robgoblin Magic, Contract: Secret Magic, Contract: Life and Death Magic (1093631623, 1918275545, 2241882459, 1216743102). News: \"This studious wizard at Lakeshore really knows how to pick her targets\" (2008469677)."
       ],
@@ -11642,9 +11693,16 @@
             "kind": "reconstructed",
             "evidence": "(R) facing kept from the earlier Sanctuary-main placement; the video index gives a position, not a heading"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
-      "heading": -0.604641049
+      "heading": -0.604641049,
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000361,

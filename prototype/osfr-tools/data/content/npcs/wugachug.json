@@ -14815,13 +14815,64 @@
               "evidence": "Taste Testing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_taste_testing_708738)."
             }
           ]
+        },
+        {
+          "quest_id": 3958213,
+          "title": "A Refreshing Reward",
+          "title_string_id": 386248,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Refreshing Reward (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_refreshing_reward_782965)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958389,
+          "title": "Party Scout",
+          "title_string_id": 45756,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Party Scout (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_party_scout_77090c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958491,
+          "title": "Those Darn Rebels!",
+          "title_string_id": 74311,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Those Darn Rebels! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_those_darn_rebels_00b489)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040020,
         3040021,
         3954594,
-        3955014
+        3955014,
+        3958213,
+        3958389,
+        3958491
       ],
       "quests_given_text": [
         "The Brewery errand chain: \"A Sasparilla Brewmaster never rests! I need you to speak with Brockoom ... Farmer Murglot ... Guard Thoomlug\" (3759436651; objective 1685817269); bixie trouble (\"wants you to deal with the bixies\", 3598316925; \"Hurry to Brewmaster Wugawump and tell him about the bixies in Sweetwater Climb!\", 2694227573); party scouting (\"scout out some party locations\", 1392384911, 3411949842; thanks 1425009787); sasparilla bills to Runalug (2048485603, 3134368944); a job for Virtalot (4219676670, 1637372591); the party-tent monsters (2070279671, by wording); the thugawug raid letter to Glugmort (\"Deliver Sasparilla Brewmaster Wugawump's letter to Glugmort at the Greenwood Camp.\", 2970237973). Job quests: Card Duelist: Squash the Shuffler (wiki giver) and Card Duelist: Parcel Recovery (wiki lists him; the video shows Runalug first). Sends the reward: \"go tell Brockoom to let you have some of the private stock!\" (307692584)."
