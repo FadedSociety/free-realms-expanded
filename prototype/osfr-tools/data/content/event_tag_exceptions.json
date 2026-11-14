@@ -333,6 +333,41 @@
       "id": "spawn:9500000774",
       "looks_like": "snow_days",
       "reason": "the themed-party merchant all year (A Luau, Party for Pets, Winter Party); the holiday outfit is his look"
+    },
+    {
+      "id": "node:100060",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
+    },
+    {
+      "id": "node:100061",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
+    },
+    {
+      "id": "node:100062",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
+    },
+    {
+      "id": "node:100063",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
+    },
+    {
+      "id": "node:100064",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
+    },
+    {
+      "id": "node:100065",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
+    },
+    {
+      "id": "node:100066",
+      "looks_like": "spring_eggstravaganza",
+      "reason": "bird eggs for the year-round Greenwood Camp quest A Fancy Meal for Glugmort (3957859), not Easter eggs"
     }
   ]
 }

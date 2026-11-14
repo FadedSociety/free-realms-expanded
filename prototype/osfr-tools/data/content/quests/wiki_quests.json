@@ -33345,11 +33345,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) This quest stays disabled (L1202, 2026-11-13): the wiki's step is 'Recover eggs from within Danger Peaks! (0/5)', inside the Danger Peaks dungeon (fight 14001), but quest_wire placed the egg pickups in the open world (quest_nodes.json 100060-100066). On again once the dungeon holds the eggs."
         }
       ],
       "description_string_id": 20567,
       "intro_text_string_id": 24817,
-      "enabled": true,
+      "enabled": false,
       "end_text_string_id": 416261
     },
     {
@@ -33782,7 +33786,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "Stays disabled (L1202, 2026-11-13): the wiki's goal is 'Knock out some Cray Royal Servants! (0/8)' in the battle 'Prince of the Low Tide!', but that door's fight (fights/14052.json) holds Bandit Patrolmen, Thugawug Stompers and Brugo, no cray, and enemy 930075 is placed nowhere. On again once the fight has its Cray Royal Servants."
+          "evidence": "(R) This quest stays disabled (L1202, 2026-11-13): the wiki's goal is 'Knock out some Cray Royal Servants! (0/8)' in the battle 'Prince of the Low Tide!', but that door's fight (fights/14052.json) holds Bandit Patrolmen, Thugawug Stompers and Brugo, no cray, and enemy 930075 is placed nowhere. On again once the fight has its Cray Royal Servants."
         }
       ],
       "description_string_id": 400103,
