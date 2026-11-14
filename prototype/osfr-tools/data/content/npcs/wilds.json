@@ -52572,8 +52572,8 @@
       "placement_candidates": [],
       "capture_match": null,
       "position_reason": "(R) Inside the Wilds Farm lot's build box (houses.json property 34: x 1356..1406, z 723.4..778.2), 11.5 m west of the lot spawn (1409, 0, 750.8) and facing it, so the player sees him on arrival as the tutorial quest says; y 0 is the lot spawn's height (the farm scene's ground is unread).",
-      "model_id": 1788,
-      "model_file_name": "evnt_world_party_luau_chug_drum_01.adr",
+      "model_id": 488,
+      "model_file_name": "chugawug_farmer_m.adr",
       "greeting_string_id": 134934,
       "greeting_reason": "Client text 134934 'Howdy neighbor! The name is Farmer Chug. I live over on the farm next door...' is his introduction (wiki Farming: Meet Farmer Chug! quotes the same line).",
       "source": [
