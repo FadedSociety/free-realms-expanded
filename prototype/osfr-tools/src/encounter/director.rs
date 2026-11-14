@@ -183,4 +183,6 @@ pub struct FightState {
     pub(super) saved: Option<run::Saved>,
     /// The overworld instance fights' pacing (`instance_pacing.json`, `pacing.rs`).
     pub(super) pacing: Arc<super::pacing::PacingTable>,
+    /// A40: coins this player picked up from coin piles this session, before any booster.
+    pub(super) pile_coins: u32,
 }

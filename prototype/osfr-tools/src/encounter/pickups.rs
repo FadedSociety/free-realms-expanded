@@ -209,6 +209,7 @@ impl EncounterEngine {
                 coins,
                 ..Default::default()
             });
+            self.fight_state.pile_coins = self.fight_state.pile_coins.saturating_add(coins);
         }
         let effect = if coins.is_some() {
             COIN_PICKUP_EFFECT
@@ -221,6 +222,12 @@ impl EncounterEngine {
             drop.position,
         ));
         true
+    }
+
+    /// Coins this player has picked up from coin piles this session, before any booster. A
+    /// pile's coins are random, so a check of what a fight pays leaves them out.
+    pub fn pile_coins(&self) -> u32 {
+        self.fight_state.pile_coins
     }
 
     /// Where the health pickups lying in this run stand (the simulator steps onto them).

@@ -375,7 +375,8 @@ fn count_item(game: &Gameplay, definition_id: i32) -> u32 {
 
 fn economy(game: &Gameplay) -> Economy {
     Economy {
-        coins: game.state().inventory.coins,
+        // A40: the random coin piles enemies drop are left out.
+        coins: game.state().inventory.coins.saturating_sub(game.pile_coins()),
         gloves: count_item(game, GLOVES),
         packs: count_item(game, MYSTERY_PACK),
         potions: count_item(game, POTION),

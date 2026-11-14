@@ -1310,8 +1310,9 @@ pub fn active_job(game: &Gameplay) -> i32 {
     state_active_job(&game.state())
 }
 
+/// The wallet without the coins picked up from enemies' random coin piles (A40).
 pub fn coins(game: &Gameplay) -> u32 {
-    game.state().inventory.coins
+    game.state().inventory.coins.saturating_sub(game.pile_coins())
 }
 
 pub fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
