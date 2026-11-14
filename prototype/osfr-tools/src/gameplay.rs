@@ -4582,11 +4582,21 @@ impl Gameplay {
         })
     }
 
+    /// A refused request is logged with its head (ids only), so a refusal shows which field failed
+    /// (owner 2026-11-13: "equipment does not match profile or slot" from the item window; the
+    /// trace hides a bundle's bodies).
     fn handle_inventory(&mut self, inner: &[u8]) -> io::Result<crate::inventory::InventoryOutcome> {
-        match self.equip_context() {
+        let result = match self.equip_context() {
             Some(player) => self.inventory.handle_with(inner, &player),
             None => self.inventory.handle(inner),
-        }
+        };
+        result.inspect_err(|error| {
+            let head = crate::trace::hex_prefix_len(inner, false, 24);
+            let reason = error.to_string();
+            npc_event(serde_json::json!({
+                "event": "inventory_refused", "reason": reason, "request": head
+            }));
+        })
     }
 
     pub fn initialization(&mut self, position: [f32; 3]) -> io::Result<Outcome> {
