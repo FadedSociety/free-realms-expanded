@@ -418,7 +418,7 @@ impl EncounterEngine {
     fn party(&self) -> Party {
         Party {
             members: vec![Member {
-                guid: self.arena.acting.unwrap_or(1),
+                guid: self.arena.acting.unwrap_or_else(|| self.solo_guid()),
                 profile: u32::try_from(self.player_profile).unwrap_or(0),
                 level: self.job_level.min(255) as u8,
             }],
@@ -902,7 +902,7 @@ impl EncounterEngine {
     /// player is still fighting in it.
     fn tell(&mut self, run: &Run, out: &mut EncounterOutcome) -> Option<bool> {
         let def = &run.def;
-        let me = self.arena.acting.unwrap_or(1);
+        let me = self.arena.acting.unwrap_or_else(|| self.solo_guid());
         let seen = &mut self.fight_state.seen;
         if !seen.settings {
             seen.settings = true;
@@ -1055,7 +1055,7 @@ impl EncounterEngine {
             self.run.run = Some(run);
             return false;
         }
-        let guid = self.arena.acting.unwrap_or(1);
+        let guid = self.arena.acting.unwrap_or_else(|| self.solo_guid());
         self.feed(&mut run, &Signal::PlayerDown { guid }, now_ms, out);
         let (lost, left, recover) = (
             run.outcome() == Some(false),

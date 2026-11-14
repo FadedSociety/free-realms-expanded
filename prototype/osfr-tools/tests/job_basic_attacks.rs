@@ -426,6 +426,29 @@ fn enemy_health(game: &Gameplay, target: u64) -> u32 {
     active.enemies.iter().find(|enemy| enemy.guid == target).unwrap().health
 }
 
+/// L1212 (KNOWN-BUGS A42, owner 2026-11-14: "clicking enemies or using 1 and 2 ... doesn't work
+/// at all"): the client aims its basic at itself, the player's own guid. A realm's characters are
+/// 7, 8 and so on, and the kit path took only guid 1 as the caster, so every other character's
+/// basic was dropped in instance fights (the lab's characters are all guid 1). Guid 8's
+/// self-aimed basic lands, and its hit names guid 8.
+#[test]
+fn a_character_that_is_not_guid_1_lands_its_self_aimed_basic() {
+    let fixture = kit_fixture();
+    let (mut game, mut location, _) = fresh_game(&fixture, 43);
+    location.guid = 8;
+    let (position, target, health) = start_cave(&mut game, &location);
+    location.zone_id = 411;
+    location.position = position;
+    game.initialize_world(&location, 300).unwrap();
+
+    let out = game.handle_in_world(&slot_press(0, 8), &location, 1_000).unwrap();
+    assert!(enemy_health(&game, target) < health, "guid 8's self-aimed basic dealt damage");
+    let names_eight = |packet: &Vec<u8>| {
+        packet.starts_with(&[32, 0, 7, 0]) && packet.get(4..12) == Some(8_u64.to_le_bytes().as_slice())
+    };
+    assert!(out.replies.iter().any(names_eight), "the hit names guid 8, not 1");
+}
+
 /// The real entry path: 36/10 bar 1 slot 0 and slot 1 through `Gameplay`, each job holding its
 /// starter weapon. Slot 0 is the kit's basic on the Power 1 ladder, slot 1 its super for the
 /// whole energy bar, and a second super is refused with the client's "not enough energy" (285).

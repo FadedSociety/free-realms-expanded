@@ -1024,6 +1024,28 @@ impl EncounterEngine {
         }
     }
 
+    /// L1212 (A42): the solo player's own guid. A realm's characters are 7, 8 and so on; only a
+    /// lab character is 1, so a fixed 1 dropped every other player's basic attack (the client
+    /// aims it at itself) and aimed enemy hits at nobody. 1 until gameplay names the player.
+    pub(super) fn solo_guid(&self) -> u64 {
+        match self.fight_state.player_guid {
+            0 => 1,
+            guid => guid,
+        }
+    }
+
+    /// The acting player: a shared field's sender, else the solo player.
+    pub(super) fn me(&self) -> u64 {
+        self.shared_sender.unwrap_or_else(|| self.solo_guid())
+    }
+
+    /// L1212: gameplay names the character before each tick; `handle` takes it from the message.
+    pub fn set_player_guid(&mut self, guid: u64) {
+        if guid != 0 {
+            self.fight_state.player_guid = guid;
+        }
+    }
+
     /// The active job's level: max health and weapon damage follow it. A
     /// player at full health stays full; health never exceeds the new max.
     pub fn set_player_job(&mut self, profile: i32, level: u32) -> Vec<Vec<u8>> {
@@ -1428,6 +1450,7 @@ impl EncounterEngine {
         profile_id: i32,
         now_ms: u64,
     ) -> io::Result<EncounterOutcome> {
+        self.set_player_guid(player_guid);
         let Some(op) = crate::le::u16(inner, 0) else {
             return Ok(EncounterOutcome::default());
         };
@@ -1791,7 +1814,7 @@ impl EncounterEngine {
         let mut out = EncounterOutcome {
             changed: true,
             replies: self.player_hit_packets(wire::PlayerHit {
-                attacker: self.shared_sender.unwrap_or(1),
+                attacker: self.me(),
                 target: guid,
                 dealt,
                 health: hp,
@@ -1882,7 +1905,7 @@ impl EncounterEngine {
         let healed = self.state.player_health.saturating_sub(before) as i32;
         if healed > 0 {
             out.replies.extend(replies);
-            let player = self.shared_sender.unwrap_or(1);
+            let player = self.me();
             let (max, current) = (self.max_health as i32, self.state.player_health as i32);
             out.replies.push(wire::hitpoints(
                 player, player, true, max, current, healed, false,

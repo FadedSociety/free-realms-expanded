@@ -331,7 +331,7 @@ impl EncounterEngine {
             self.state.player_health = before.saturating_add(heal).min(self.max_health);
             let healed = self.state.player_health.saturating_sub(before) as i32;
             self.log_fight(now_ms, "heal", "you", "you", i64::from(healed));
-            let me = self.shared_sender.unwrap_or(1);
+            let me = self.me();
             out.replies.push(wire::hitpoints(
                 me,
                 me,
@@ -396,7 +396,7 @@ impl EncounterEngine {
         }
         // (R) Reuse verified same-job swing where exact clips are unrecovered.
         out.replies.push(animation(
-            self.shared_sender.unwrap_or(1),
+            self.me(),
             if ability.animation_id > 0 {
                 ability.animation_id
             } else {
@@ -406,7 +406,7 @@ impl EncounterEngine {
         ));
         if ability.effect_id > 0 {
             out.replies.push(composite_effect(
-                self.shared_sender.unwrap_or(1),
+                self.me(),
                 ability.effect_id,
                 position,
             ));

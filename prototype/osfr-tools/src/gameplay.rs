@@ -2129,6 +2129,7 @@ impl Gameplay {
             // W158: pickups left in another zone are already gone from the client.
             encounter.enter_zone(character.zone_id);
             let profiles = self.profiles.as_ref().ok_or_else(|| unloaded("profiles"))?;
+            encounter.set_player_guid(character.guid);
             let result = encounter.tick(character.position, profiles.active(), now_ms)?;
             self.apply_encounter(result, &mut out)?;
         }

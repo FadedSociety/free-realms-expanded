@@ -143,7 +143,7 @@ impl EncounterEngine {
         let healed = self.state.player_health - before;
         self.skills.kit.last_health = Some(self.state.player_health);
         self.log_fight(now_ms, "heal", "you", "you", i64::from(healed));
-        let me = self.shared_sender.unwrap_or(1);
+        let me = self.me();
         out.replies.push(wire::hitpoints(
             me,
             me,
@@ -236,7 +236,7 @@ impl EncounterEngine {
         }
         self.refresh_passives();
         self.skills.kit.position = Some(position);
-        let me = self.shared_sender.unwrap_or(1);
+        let me = self.me();
         let enemies = self.enemy_bodies();
         let selected = enemies.iter().any(|b| b.guid == target).then_some(target);
         // A named target that is not a live enemy here is a forged or stale GUID: nothing
@@ -435,7 +435,7 @@ impl EncounterEngine {
                 let amount = (u64::from(self.max_health) * u64::from(t.heal_pct) / 100) as u32;
                 self.kit_heal_self(amount, now_ms, out);
                 if t.group {
-                    let me = self.shared_sender.unwrap_or(1);
+                    let me = self.me();
                     out.group_heal = Some(GroupHeal { percent: t.heal_pct, kill: (me, now_ms) });
                 }
             }

@@ -291,7 +291,7 @@ impl Book {
 impl EncounterEngine {
     fn status_wire_guid(&self, key: u64) -> u64 {
         if key == ME {
-            self.shared_sender.unwrap_or(1)
+            self.me()
         } else {
             key
         }
@@ -382,7 +382,7 @@ impl EncounterEngine {
             out.replies.push(self.status_state_packet(key));
         }
         if refresh.is_none() && wire.attached_effects && row.effect_id > 0 {
-            let source = self.shared_sender.unwrap_or(1);
+            let source = self.me();
             out.replies.push(wire::attach(wire_guid, tag, row.effect_id, source));
         }
         if key == ME && row.icon_id > 0 {
