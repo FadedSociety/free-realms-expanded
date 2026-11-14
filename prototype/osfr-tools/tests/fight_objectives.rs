@@ -440,8 +440,9 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
     )]);
     enter(&mut engine, 620, 1_000);
     let mut now = 1_000;
+    // Each knockout lands after the last stand-up's fight grace (at most a minute) is over.
     for taken in 1..=10_u32 {
-        now += 1_000;
+        now += 61_000;
         let down = engine.receive_arena_damage(u32::MAX, now);
         assert_eq!(
             engine.run_phase(),
@@ -481,7 +482,7 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
         );
         assert!(up.zoning.is_none(), "where they fell, not at the safe spot");
     }
-    let last = engine.receive_arena_damage(u32::MAX, now + 2_000);
+    let last = engine.receive_arena_damage(u32::MAX, now + 61_000);
     assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
     assert!(last.facts.contains(&FightFact::Lost { fight: 620 }));
     assert!(
@@ -495,6 +496,104 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
         "none left of ten, and no points"
     );
     assert_eq!(rows["scoreTotalScore"].2, 0);
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "add an identifier for enemies spawned in dungeons and inside instances
+/// that they don't get the ui interact menu pop up". Every hostile the engine spawns in an
+/// instance draws no press-X reach, whatever its numbers: a kind that states no hit (a prop to
+/// destroy, a dummy) had a 3 m reach under the old "a hostile that hits" rule.
+#[test]
+fn an_instance_enemy_draws_no_press_x_even_without_a_hit() {
+    let (dir, mut engine) = engine_with(&[fight(
+        622,
+        json!({
+            "kinds": {
+                "chief": {"definition_id": 7003, "name": "Chief", "name_id": 1, "model_id": 3, "rank": "boss", "boss": true},
+                "post": {"definition_id": 7004, "name": "Post", "name_id": 2, "model_id": 3, "rank": "object", "damage": 0}
+            },
+            "actors": {
+                "boss": {"definition": "chief", "at": [0, 0, 10]},
+                "post": {"definition": "post", "at": [3, 0, 10]}
+            },
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    let replies = enter(&mut engine, 622, 1_000);
+    let hostile: Vec<_> = (replies.iter())
+        .filter(|r| r.starts_with(&[35, 0, 2, 0]))
+        .map(|r| osfr_tools::startup_world::parse_add_npc(r).unwrap())
+        .filter(|npc| npc.disposition == 0)
+        .collect();
+    assert_eq!(hostile.len(), 2, "the chief and the post are drawn hostile");
+    for npc in hostile {
+        assert_eq!(npc.interact_range, 0, "{}: no press-X reach", npc.npc_name);
+        assert_eq!(npc.is_interactable, 1, "{}: still clickable", npc.npc_name);
+    }
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "when running out of knockouts it doesn't send you back to the over world".
+/// A lost run waits on its results card; when the card is never closed, the tick sends the player
+/// back to the world after `combat_rules.json` `revive.lost_exit_ms` (at most ten minutes).
+#[test]
+fn a_lost_run_returns_to_the_world_when_its_card_is_never_closed() {
+    let (dir, mut engine) = engine_with(&[fight(
+        623,
+        json!({
+            "rules": {"knockouts": 1},
+            "actors": {"boss": {"definition": "chief", "at": [0, 0, 10]}},
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    enter(&mut engine, 623, 1_000);
+    engine.receive_arena_damage(u32::MAX, 2_000);
+    engine
+        .handle(&stand_up(), 1, [0.0; 3], BRAWLER, 2_500)
+        .unwrap();
+    // Past any fight grace (at most a minute): the second knockout loses the run.
+    let lost = engine.receive_arena_damage(u32::MAX, 70_000);
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
+    assert!(lost.replies.iter().any(|r| r.starts_with(&[39, 0, 18])), "game over");
+    let waiting = engine.tick([0.0; 3], BRAWLER, 70_001).unwrap();
+    assert!(waiting.zoning.is_none(), "the card stays up a while");
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Lost));
+    let back = engine.tick([0.0; 3], BRAWLER, 70_001 + 600_001).unwrap();
+    assert!(back.zoning.is_some(), "back to the world");
+    assert_eq!(engine.run_phase(), None, "the run is closed");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// Owner 2026-11-13: "3-4 seconds of invincibility after a combat knockout". A player who
+/// stands up takes no enemy damage for the fight grace (`combat_rules.json`
+/// `revive.fight_grace_ms`, at most a minute), and is hit again once it is over.
+#[test]
+fn a_player_who_stands_up_takes_no_damage_for_the_fight_grace() {
+    let (dir, mut engine) = engine_with(&[fight(
+        621,
+        json!({
+            "actors": {"boss": {"definition": "chief", "at": [0, 0, 10]}},
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"}}]
+        }),
+    )]);
+    enter(&mut engine, 621, 1_000);
+    engine.receive_arena_damage(u32::MAX, 2_000);
+    assert_eq!(engine.player_health().0, 0, "knocked out");
+    engine
+        .handle(&stand_up(), 1, [0.0; 3], BRAWLER, 2_500)
+        .unwrap();
+    let full = engine.player_health();
+    assert_eq!(full.0, full.1, "stands up at full health");
+    let guarded = engine.receive_arena_damage(u32::MAX, 2_501);
+    assert_eq!(engine.player_health(), full, "no damage right after standing up");
+    assert!(
+        guarded.replies.iter().all(|r| !r.starts_with(&[41, 0, 125, 0])),
+        "and no knockout"
+    );
+    assert_eq!(engine.fight_run().unwrap().knockouts_left(), 9);
+    engine.receive_arena_damage(full.1 / 2, 2_500 + 60_001);
+    assert!(engine.player_health().0 < full.1, "hit again after the grace");
+    assert_eq!(engine.run_phase(), Some(EncounterPhase::Fighting));
     let _ = std::fs::remove_dir_all(dir);
 }
 

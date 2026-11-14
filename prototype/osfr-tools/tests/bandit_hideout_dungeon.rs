@@ -605,8 +605,9 @@ fn refusals_leave_state_and_pending_battle_unchanged() {
     assert_eq!((gateway.snapshot(), saved_bytes(&gateway)), before);
 
     // Out-of-range Go: the screen opens at the marker, the player walks 50 m
-    // away and Go is inert. The out-of-reach screen is dropped, so the same Go
-    // stays inert after walking back; reopening at the marker works.
+    // away and Go is refused with no state change. The refusal says why and
+    // puts the card back (A33, owner 2026-11-13: a silent drop left the HUD
+    // hidden), so back at the marker the same card's Go starts the run.
     let mut gateway = fixture.gateway(MARKER, 2002);
     assert!(send(&mut gateway, &switch_job(BRAWLER), 300).state_changed);
     send(&mut gateway, &chat::local_request("realm level 20"), 350);
@@ -622,14 +623,9 @@ fn refusals_leave_state_and_pending_battle_unchanged() {
     let before = (gateway.snapshot(), saved_bytes(&gateway));
     let refused = send(&mut gateway, &go(&screen), now + 100);
     assert!(!refused.began_zoning && !refused.state_changed);
+    assert!(details(&refused).is_some(), "the refusal puts the card back");
     assert_eq!((gateway.snapshot(), saved_bytes(&gateway)), before);
     walk(&mut gateway, player, MARKER, &mut now);
-    let replay = send(&mut gateway, &go(&screen), now + 100);
-    assert!(
-        !replay.began_zoning && !replay.state_changed,
-        "an out-of-reach screen was dropped, not kept for a later Go"
-    );
-    let screen = open_battle(&mut gateway, MARKER_GUID, row, now + 200);
     assert!(send(&mut gateway, &go(&screen), now + 300).began_zoning);
 
     // Knocked out: Go is a chat refusal that reopens the same screen.

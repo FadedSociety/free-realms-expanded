@@ -473,7 +473,7 @@ impl EncounterEngine {
                 // The client's own timer asks to stand up; this is the fallback.
                 let down = self.fight_state.down_since;
                 if down.is_some_and(|at| now_ms >= at + recover + 2000) {
-                    self.stand_up(out);
+                    self.stand_up(now_ms, out);
                 }
             }
         }
@@ -804,7 +804,7 @@ impl EncounterEngine {
             if let Some(door) = exit_door(def) {
                 // As captured: added hostile, then made friendly at once.
                 out.replies
-                    .push(self.spawn(&door, ground.snapped(door.position), 0));
+                    .push(self.spawn_object(&door, ground.snapped(door.position), 0));
                 out.replies.push(wire::disposition(guid, 1));
             }
         } else if let Some(i) = (0..def.roster.len()).find(|&i| def.guid(Some(i)) == guid) {
@@ -1072,12 +1072,14 @@ impl EncounterEngine {
                 .is_some_and(|a| a.phase == EncounterPhase::Fighting)
     }
 
-    /// Back on their feet where they fell, at full health (wiki combat guide; R: no grace).
-    pub(in crate::encounter) fn stand_up(&mut self, out: &mut EncounterOutcome) {
+    /// Back on their feet where they fell, at full health (wiki combat guide), and out of the
+    /// enemies' reach for the fight grace (owner 2026-11-13).
+    pub(in crate::encounter) fn stand_up(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
         if !self.down_in_fight() {
             return;
         }
         self.fight_state.down_since = None;
+        self.fight_state.guarded_until = now_ms.saturating_add(self.rules.revive.fight_grace_ms);
         self.state.player_health = self.max_health;
         out.changed = true;
         out.replies

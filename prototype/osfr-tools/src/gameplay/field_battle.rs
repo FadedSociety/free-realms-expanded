@@ -123,11 +123,18 @@ impl Gameplay {
             ));
             return Ok(true);
         }
+        let pending = (self.encounter.as_ref()).and_then(|encounter| encounter.pending_battle_id());
         let Some(battle) = self
             .encounter
             .as_mut()
             .and_then(|encounter| encounter.take_pending_battle(character.position))
         else {
+            // A refused Go is said aloud with the card back; dropped to the next handler it left
+            // the client waiting with its HUD hidden (owner 2026-11-13).
+            if let Some(battle) = pending {
+                self.refuse_battle(battle, profile, "Move closer to the battle to start it.", out);
+                return Ok(true);
+            }
             return Ok(false);
         };
         if !self.battle_prizes_available(battle) {

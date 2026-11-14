@@ -11,7 +11,7 @@
     "35": {"health": 1.0, "crit_percent": 3},
     "43": {"health": 1.0, "crit_percent": 3}
   },
-  "revive": {"timer_ms": 10000, "field_grace_ms": 8000, "auto_ms": 15000},
+  "revive": {"timer_ms": 10000, "field_grace_ms": 8000, "fight_grace_ms": 3500, "lost_exit_ms": 20000, "auto_ms": 15000},
   "death_delay_ms": {"field": 0, "battle": 0},
   "player_hit_wire": false,
   "source": [
@@ -49,6 +49,16 @@
       "field": "revive",
       "kind": "reconstructed",
       "evidence": "(R) 8 s of field grace after a revive and the 15 s server fallback revive"
+    },
+    {
+      "field": "revive",
+      "kind": "owner",
+      "evidence": "fight_grace_ms: the owner, 2026-11-13: 'I'd recommend 3-4 seconds of invincibility after a combat knockout'; 3.5 s, the middle. A native run on main had enemies knock a player out again as they stood up, 14 times in 80 s in the Bixie Hive"
+    },
+    {
+      "field": "revive",
+      "kind": "reconstructed",
+      "evidence": "(R) lost_exit_ms: 20 s after a lost run's results card is shown, a player who never closed it (no 26/42) is sent back to the world (owner 2026-11-13: 'when running out of knockouts it doesn't send you back to the over world'); the card's own close still leaves at once"
     },
     {
       "field": "death_delay_ms",

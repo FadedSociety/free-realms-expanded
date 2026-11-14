@@ -14,8 +14,8 @@
   "player_base_health": 500,
   "enemy_health_scale": 3.72,
   "enemy_damage_scale": 0.5,
-  "enemy_health_multiplier": 2.0,
-  "enemy_damage_multiplier": 1.5,
+  "enemy_health_multiplier": 1.0,
+  "enemy_damage_multiplier": 1.0,
   "max_level": 20,
   "health_step_levels": 4,
   "ability_damage": {
@@ -223,12 +223,12 @@
     {
       "field": "enemy_health_multiplier",
       "kind": "owner",
-      "evidence": "The owner, 2026-11-11 (rc-0136): 'increase every enemy in the games damage by 1.5x and enemy health by 2x'. Applied once to every enemy's final health: authored rows after the T639 conversion, rank rows, fight kinds and rows, catalogue kinds; the rank solo_seconds bands are the 2014 pace at x1 and stretch by it"
+      "evidence": "The owner, 2026-11-13: 'Remove the damage and 2x hp and keep the natural curve we had originally that's the way the game intended'. 1.0, the 2014 curve; the x2 of 2026-11-11 (rc-0136) is off. Applied once to every enemy's final health: authored rows after the T639 conversion, rank rows, fight kinds and rows, catalogue kinds; the rank solo_seconds bands are the 2014 pace at x1 and stretch by it"
     },
     {
       "field": "enemy_damage_multiplier",
       "kind": "owner",
-      "evidence": "The owner, 2026-11-11 (rc-0136): x1.5 enemy damage, applied once to every enemy's final hit on every path, as enemy_health_multiplier is to health"
+      "evidence": "The owner, 2026-11-13: 'Remove the damage and 2x hp and keep the natural curve'. 1.0, the 2014 curve; the x1.5 of 2026-11-11 (rc-0136) is off. Applied once to every enemy's final hit on every path, as enemy_health_multiplier is to health"
     },
     {
       "field": "max_level",

@@ -303,8 +303,8 @@ fn two_players_start_the_same_marker_with_independent_encounters() {
     assert!(encounter_active(&a).is_none());
     assert!(encounter_active(&b).is_none());
 
-    // An out-of-range Go is inert: A walks 50 m away, the request changes no
-    // byte, and the server drops A's stale screen (it is never saved). A walks
+    // An out-of-range Go is refused: A walks 50 m away, the request changes no
+    // byte, and the refusal puts A's card back (A33; it is never saved). A walks
     // back and reopens its own marker screen before starting.
     let mut a_now = 700;
     let a_guid = a.state().guid;
@@ -317,9 +317,10 @@ fn two_players_start_the_same_marker_with_independent_encounters() {
     let a_away = (a.snapshot(), saved_bytes(&a));
     let refused_go = send(&mut a, &go(&a_screen), a_now + 100);
     assert!(
-        !refused_go.began_zoning && !refused_go.state_changed && refused_go.replies.is_empty(),
+        !refused_go.began_zoning && !refused_go.state_changed,
         "an out-of-range Go changes nothing"
     );
+    assert!(details(&refused_go).is_some(), "the refusal puts A's card back");
     assert_eq!((a.snapshot(), saved_bytes(&a)), a_away);
     a_now += 200;
     walk(&mut a, a_guid, marker, &mut a_now);

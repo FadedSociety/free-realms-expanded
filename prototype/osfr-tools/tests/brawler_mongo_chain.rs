@@ -666,7 +666,7 @@ fn the_brawling_ring_gate_starts_the_mongo_battle() {
     at += 100;
     game.initialize_world(&character, at).expect("world return");
 
-    // A Go from outside the marker radius is inert and drops the open screen.
+    // A Go from outside the marker radius is refused (the card comes back) and starts nothing.
     at += 100;
     let details = open_gate(&mut game, &character, at);
     let mut far = character.clone();

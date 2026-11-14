@@ -67,7 +67,7 @@ use self::wire::{
     attack_processed, boss_display, combat_flag, encounter_header, encounter_state,
     enemy_health, enemy_hp, game_over, header, menu, minigame, movement, objective,
     objective_complete, player_hp, relevance, remove, replace_string, respawn_hide, rules,
-    spawn_actor,
+    left_unfinished, spawn_actor,
 };
 use crate::abilities::effect_packets::encode_play_composite_effect as composite_effect;
 
@@ -2010,6 +2010,9 @@ impl EncounterEngine {
                 return Ok(self.revive_at_safe_location(now_ms));
             }
         }
+        if let Some(exit) = self.lost_run_exit(now_ms) {
+            return exit;
+        }
         // The run's own clock goes first, on every call: a run keeps time while the player is
         // down, the fight is not armed yet, or less than a tick has passed.
         let mut energy = EncounterOutcome::default();
@@ -2103,11 +2106,12 @@ impl EncounterEngine {
         let Some(a) = self.state.active.take() else {
             return Ok(EncounterOutcome::default());
         };
+        self.fight_state.lost_since = None;
         let mut zone = self.content.world.clone();
         zone.zone_id = a.return_location.zone_id;
         zone.position = a.return_location.position;
         zone.rotation = a.return_location.rotation;
-        let remove_state = minigame(19, a.instance_id, a.encounter_id); // exact header only
+        let remove_state = left_unfinished(a.instance_id, a.encounter_id);
         let results_presented = self.results_presented;
         let mut replies = vec![
             rules(false),
@@ -2115,7 +2119,7 @@ impl EncounterEngine {
             combat_flag(133, a.encounter_id, a.instance_id, false),
         ];
         if !results_presented {
-            replies.push(remove_state);
+            replies.extend(remove_state);
         }
         replies.push(player_hp(self.max_health, self.max_health));
         self.state.player_health = self.max_health;
@@ -2142,6 +2146,7 @@ impl EncounterEngine {
         };
         a.enemies = enemies;
         a.phase = EncounterPhase::Loading;
+        self.fight_state.lost_since = None;
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
@@ -2152,8 +2157,16 @@ impl EncounterEngine {
         })
     }
 
+    /// An engine actor; a hostile one (disposition 0) is an enemy, in the open world or an
+    /// instance, and draws no press-X prompt.
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-        spawn_actor(&self.content.template, a, position, disposition)
+        spawn_actor(&self.content.template, a, position, disposition, disposition == 0)
+    }
+
+    /// A hostile-flagged actor that is not an enemy (the exit door, made friendly at once): it
+    /// keeps its press-X prompt.
+    fn spawn_object(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
+        spawn_actor(&self.content.template, a, position, disposition, false)
     }
 }
 

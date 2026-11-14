@@ -67,15 +67,15 @@ fn brawler() -> Gameplay {
 
 /// `realm sim 96` (the Troll Summoner battle) before the move, captured at base `75e3d982`;
 /// rc-0136 retuned the battle to its tier's 2014 numbers. rc-0137: the simulator plays the job's
-/// real bar (`EncounterEngine::simulate_clear`) against the owner's x2 health and x1.5 hits, and
-/// says more; this content has no pacing row or power-ups, so the level-1 bot loses.
+/// real bar (`EncounterEngine::simulate_clear`) and says more. The owner's multipliers are 1.0
+/// again (2026-11-13, "keep the natural curve"), so the numbers are rc-0136's once more.
 const SIM_96: [&str; 6] = [
     "Battle 96, job 43 (scripted bot):",
-    "  level  1: lost in 10s, health left 0/500, lowest 0, dealt 4354 (0 crits), 0 hearts, 1 knockouts",
-    "  level  5: won in 7s, health left 533/875, lowest 533, dealt 6533 (0 crits), 0 hearts, 0 knockouts",
-    "  level 10: won in 7s, health left 1229/1761, lowest 1229, dealt 9573 (0 crits), 0 hearts, 0 knockouts",
-    "  level 15: won in 0s, health left 3545/3545, lowest 3545, dealt 3453 (0 crits), 0 hearts, 0 knockouts",
-    "  level 20: won in 0s, health left 7135/7135, lowest 7135, dealt 3453 (0 crits), 0 hearts, 0 knockouts",
+    "  level  1: won in 7s, health left 250/500, lowest 250, dealt 3266 (0 crits), 0 hearts, 0 knockouts",
+    "  level  5: won in 7s, health left 525/875, lowest 525, dealt 4786 (0 crits), 0 hearts, 0 knockouts",
+    "  level 10: won in 0s, health left 1761/1761, lowest 1761, dealt 1726 (0 crits), 0 hearts, 0 knockouts",
+    "  level 15: won in 0s, health left 3545/3545, lowest 3545, dealt 1726 (0 crits), 0 hearts, 0 knockouts",
+    "  level 20: won in 0s, health left 7135/7135, lowest 7135, dealt 1726 (0 crits), 0 hearts, 0 knockouts",
 ];
 
 #[test]

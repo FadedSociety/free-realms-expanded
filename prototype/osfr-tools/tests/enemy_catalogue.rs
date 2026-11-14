@@ -222,7 +222,11 @@ fn rows_inherit_from_their_definition_and_unranked_rows_keep_the_old_rule() {
     let mut engine = scratch.load();
     // The world wolf wrote 100 health at level 8: a normal enemy of tier 3.
     assert_eq!(world_health(&engine, WORLD_WOLF), scale::enemy_health(Rank::Normal, 3, 1));
-    assert_eq!(world_health(&engine, WORLD_WOLF), 4_647, "2,324 times the owner's x2 (rc-0137)");
+    assert_eq!(
+        world_health(&engine, WORLD_WOLF),
+        scale::live_health(2_324),
+        "2,324 times the owner's health multiplier"
+    );
     let out = engine.on_zone_ready(MEDIC, 0).unwrap();
     let stated = Some(scale::live_health(5_000));
     assert_eq!(max_health(&out, FIELD_KING), stated, "health stated outright, times the owner's x2");

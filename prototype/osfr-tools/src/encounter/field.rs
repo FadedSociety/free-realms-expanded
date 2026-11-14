@@ -274,17 +274,27 @@ impl EncounterEngine {
     }
 
     /// The battle whose start screen is open, consumed by Go (41/108). The
-    /// player must still stand within `BATTLE_SCREEN_RADIUS` of the marker:
-    /// an out-of-reach screen is dropped so Go cannot start a battle after
-    /// walking away. `None` covers no open screen and a dropped one.
+    /// player must still stand within `BATTLE_SCREEN_RADIUS` of the marker (or near
+    /// where the click opened the card): an out-of-reach Go starts nothing, and the
+    /// caller reopens the card with the reason (A33). `None` covers both cases.
     pub fn take_pending_battle(&mut self, position: [f32; 3]) -> Option<u32> {
         let (id, _) = self.pending_battle.take()?;
-        let near = self.battles.iter().find(|b| b.id == id).is_some_and(|b| {
-            let marker = self.marker_position(b);
-            distance(position, marker) <= BATTLE_SCREEN_RADIUS
-                || self.linked_actor_near(b.spawner.guid, marker, position)
-        });
+        // Owner 2026-11-13: Go from a hooligan's card "didn't send me into an instance": the
+        // hooligan had wandered off while the card was read. Go counts from the click's spot.
+        let from = self.fight_state.card_from.take();
+        let clicked_near = from.is_some_and(|from| distance(position, from) <= LINKED_CLICK_REACH);
+        let near = clicked_near
+            || self.battles.iter().find(|b| b.id == id).is_some_and(|b| {
+                let marker = self.marker_position(b);
+                distance(position, marker) <= BATTLE_SCREEN_RADIUS
+                    || self.linked_actor_near(b.spawner.guid, marker, position)
+            });
         near.then_some(id)
+    }
+
+    /// The battle whose waiting card is open, without consuming it.
+    pub fn pending_battle_id(&self) -> Option<u32> {
+        self.pending_battle.map(|(id, _)| id)
     }
 
     /// L1191: whether `position` is within reach of an actor whose click opens `starter`'s card
@@ -348,7 +358,9 @@ impl EncounterEngine {
         if home.is_some_and(|home| distance(home, at) > LINKED_AREA) {
             return None;
         }
-        Some(self.battle_screen(starter, at, profile))
+        let card = self.battle_screen(starter, at, profile);
+        self.fight_state.card_from = Some(position);
+        Some(card)
     }
 
     /// Spawner click: show the battle's start screen (difficulty, description,

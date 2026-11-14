@@ -251,7 +251,11 @@ fn a_field_enemy_keeps_its_hits_to_kill_and_hits_to_die() {
 fn enemy_rows_are_scaled_once_where_they_load() {
     let f = Fixture::new(180, 25);
     let mut e = f.load();
-    assert_eq!(combat_scale::enemy_health(180), 1_339, "670 times the owner's x2 (rc-0137)");
+    assert_eq!(
+        combat_scale::enemy_health(180),
+        (180.0 * 3.72 * combat_scale::multipliers().0).round() as u32,
+        "180 x 3.72 = 669.6, times the owner's health multiplier"
+    );
     e.set_player_job(MEDIC, 1);
     let first = damages(&e.attack(GUID, [0.0; 3], MEDIC, 0, 0).unwrap());
     assert_eq!(first, [combat_scale::basic(MEDIC)]);
@@ -515,7 +519,11 @@ fn an_enemy_hit_is_five_percent_of_health_at_the_tier_floor() {
     }
     assert_eq!(scale::enemy_hit(Rank::Minion, 1), scale::live_hit(25));
     assert_eq!(scale::enemy_hit(Rank::Tough, 5), scale::live_hit(204));
-    assert_eq!(scale::enemy_hit(Rank::Elite, 1), 56, "25 x1.5 x the owner's 1.5, 56.25");
+    assert_eq!(
+        scale::enemy_hit(Rank::Elite, 1),
+        (37.5 * combat_scale::multipliers().1).round() as u32,
+        "25 x1.5 (elite), times the owner's damage multiplier"
+    );
     assert_eq!(scale::enemy_hit(Rank::Boss, 5), scale::live_hit(408));
     assert_eq!(scale::special_hit(206), 309, "the captured special bite");
     assert_eq!(scale::enemy_hit_interval_ms(), 2_300);
@@ -618,9 +626,11 @@ fn the_kill_table_sits_in_each_ranks_band_at_every_level() {
         }
     }
     let line = &engine.kill_table(WARRIOR, Rank::Normal, None, (None, None), &[1])[0];
-    // 25 a hit and 20 to fall (46 s) before the owner's x1.5 (rc-0137).
-    assert_eq!((line.enemy_hit, line.hits_to_fall), (scale::live_hit(25), 14));
-    assert!((line.seconds_to_fall - 32.2).abs() < 0.01);
+    // 25 a hit times the owner's damage multiplier, against a level-one 500, 2.3 s apart
+    // (20 hits and 46 s at x1).
+    let (hit, fall) = (scale::live_hit(25), 500_u32.div_ceil(scale::live_hit(25)));
+    assert_eq!((line.enemy_hit, line.hits_to_fall), (hit, fall));
+    assert!((line.seconds_to_fall - fall as f32 * 2.3).abs() < 0.01);
     // A kind's own numbers replace the rank's, as given.
     let own = &engine.kill_table(WARRIOR, Rank::Tough, Some(5), (Some(16_143), Some(206)), &[20])[0];
     assert_eq!((own.enemy_health, own.enemy_hit, own.hits), (16_143, 206, 7));

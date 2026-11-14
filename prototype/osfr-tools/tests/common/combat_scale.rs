@@ -32,6 +32,12 @@ pub fn multipliers() -> (f64, f64) {
     (get("enemy_health_multiplier"), get("enemy_damage_multiplier"))
 }
 
+/// The authored health that keeps `old`'s hit counts whatever the owner's health multiplier
+/// (the loader multiplies it back up; 1.0 since 2026-11-13).
+pub fn unmultiplied(old: u32) -> u32 {
+    (f64::from(old) / multipliers().0).round() as u32
+}
+
 /// An authored (old-scale) enemy health as the loader scales it at level one.
 pub fn enemy_health(authored: u32) -> u32 {
     let scale = data()["enemy_health_scale"].as_f64().unwrap();
