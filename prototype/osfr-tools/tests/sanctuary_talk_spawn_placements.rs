@@ -185,9 +185,12 @@ fn every_placed_row_is_drawn_at_its_position() {
 /// the same two characters drawn by a regional row and by a separate extras body. They are
 /// recorded here so the latch can be strict for everything else; fixing them moves extras
 /// data outside this slice.
-const KNOWN_CLOSE_PAIRS: [(u64, u64); 2] = [
+const KNOWN_CLOSE_PAIRS: [(u64, u64); 3] = [
     (9_000_000_174, 100_000_002_298),
     (9_000_000_179, 100_000_003_853),
+    // L1202: Sirdo "King of Squirrels" (spawn 100000001585, keyed 9500000064 for his quest)
+    // stands 0.58 m from his squirrel (100000001586, model 402 squirrel.adr), as captured.
+    (100_000_001_585, 100_000_001_586),
 ];
 
 /// The brief's duplicate rule. Every drawn actor in the open world is a candidate: regional

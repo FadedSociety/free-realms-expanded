@@ -1745,8 +1745,45 @@
       "title_string_id": 414951,
       "giver_npc_id": 9000000053,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 415003,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Score 5 goals (lab/references/quest-table-20261102/quests.merged.json client:3140025)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "MiniGameData 332 is named Twinkle Toes (soccer.json game 332, the Twinkletoes); client 415004 'Coach Eddie wants you to practice your goal scoring'"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "soccer rows report the team's goals as the score (enabled_quest_reachability)"
+            }
+          ],
+          "minigame_id": 332,
+          "count": 1,
+          "require": {
+            "min_score": 5
+          }
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) No source gives this client-only quest's reward; Soccer Star: Twinkle Toes pays the usual few coins."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1779,12 +1816,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 414952,
       "intro_text_string_id": 414950,
       "end_text_string_id": 414953,
-      "enabled": false
+      "enabled": true,
+      "job": 52
     },
     {
       "id": 3140026,

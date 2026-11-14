@@ -531,18 +531,18 @@ fn quest_nodes_load_rejects_bad_rows() {
     let error = load_error(&kind, &content);
     assert!(error.contains("unknown node type"), "{error}");
 
-    // The loader's 1 MiB file bound.
+    // The loader's 4 MiB file bound (1 MiB until L1202's quests passed it).
     let big = Scratch::new("big");
     fs::write(
         big.path().join("quest_nodes.json"),
-        vec![b' '; (1 << 20) + 1],
+        vec![b' '; (4 << 20) + 1],
     )
     .expect("scratch oversized file");
     let error = GatheringNodes::load(big.path())
         .err()
         .expect("an oversized quest node file must be refused")
         .to_string();
-    assert!(error.contains("1 MiB"), "{error}");
+    assert!(error.contains("4 MiB"), "{error}");
 }
 
 /// Two wiring batches each made a `quest-crate` pool; the merge kept one pool of six for both

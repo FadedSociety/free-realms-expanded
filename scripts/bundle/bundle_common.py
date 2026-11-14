@@ -115,9 +115,10 @@ ACTIVITY_MAX_BYTES = {
     "harvesting.json": 1024 * 1024,
     "mail_sorting.json": 1024 * 1024,
     "fishing_spots.json": 64 * 1024,
-    "mining_nodes.json": 1024 * 1024,
-    "harvest_nodes.json": 1024 * 1024,
-    "quest_nodes.json": 1024 * 1024,
+    # harvest_nodes.rs MAX_FILE_BYTES (4 MiB since L1202) loads all three node files.
+    "mining_nodes.json": 4 * 1024 * 1024,
+    "harvest_nodes.json": 4 * 1024 * 1024,
+    "quest_nodes.json": 4 * 1024 * 1024,
     "world_challenges.json": 1024 * 1024,
 }
 

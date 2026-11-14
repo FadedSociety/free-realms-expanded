@@ -4549,12 +4549,62 @@
       "title_string_id": 3583,
       "intro_text_string_id": 395304,
       "giver_npc_id": 9000000409,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080038
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395477,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "win \"The RightStuff\" minigame (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_the_right_stuff_aee86d)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "MiniGameData 651 is named The Right Stuff ('Be sure to place higher than Mirana Vega on the Tangletrack speedway!'), a kart_rows.json producer"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Mirana Vega': kart_ai.json names Mirana Vega (name 101923) as the rival on this row, and the race reports `won` only when the racer finished ahead of her. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event (L1202)."
+            }
+          ],
+          "minigame_id": 651,
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 395457,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Mirana (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_the_right_stuff_aee86d)."
+            }
+          ],
+          "npc_id": 9000000409
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76300,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Crankshaft Kart Driver Jacket (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_the_right_stuff_aee86d)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 183
           },
@@ -4602,17 +4652,55 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395304 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 395474,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080040,
       "title_string_id": 395310,
-      "giver_npc_id": 9500000210,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9000000409,
+      "prerequisite_quest_ids": [
+        3080039
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 395489,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Shamus Sootbender (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_miner_s_guild_sponsorship_4d21a3)."
+            }
+          ],
+          "npc_id": 9500000210
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Kart Driver: Miner's Guild Sponsorship (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_miner_s_guild_sponsorship_4d21a3)."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -4649,19 +4737,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 395311,
       "intro_text_string_id": 395309,
       "end_text_string_id": 395312,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080041,
       "title_string_id": 395316,
       "giver_npc_id": 9500000210,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080040
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395503,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Tangletrack Sprint Challenge\" race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_tangletrack_sprint_challenge_d5a759)."
+            }
+          ],
+          "minigame_id": 652,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 395489,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Shamus Sootbender (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_tangletrack_sprint_challenge_d5a759)."
+            }
+          ],
+          "npc_id": 9500000210
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -4713,19 +4834,52 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 395317,
       "intro_text_string_id": 395315,
       "end_text_string_id": 395318,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080042,
       "title_string_id": 395322,
       "giver_npc_id": 9500000210,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080041
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395543,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Tangletrack Endurance Challenge\" race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_tangletrack_endurance_challenge_982eb8)."
+            }
+          ],
+          "minigame_id": 653,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 395489,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Shamus Sootbender (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_tangletrack_endurance_challenge_982eb8)."
+            }
+          ],
+          "npc_id": 9500000210
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -4777,20 +4931,60 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 395323,
       "intro_text_string_id": 395321,
       "end_text_string_id": 395324,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080043,
       "title_string_id": 3598,
       "intro_text_string_id": 395326,
       "giver_npc_id": 9500000210,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080042
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 395658,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Dominating at Tangletrack\" race three times - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_tangletrack_f7b0be)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Win the race' is first place among the seven AI racers of kart_ai.json; the race reports the racer's place, so only a first place credits (`require.max_placement` 1) (L1202)."
+            }
+          ],
+          "minigame_id": 654,
+          "count": 3,
+          "require": {
+            "max_placement": 1
+          }
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 395489,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Shamus Sootbender (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_tangletrack_f7b0be)."
+            }
+          ],
+          "npc_id": 9500000210
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -4838,16 +5032,104 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395326 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 395655,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080044,
       "title_string_id": 395332,
       "giver_npc_id": 9500000210,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "prerequisite_quest_ids": [
+        3080043
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 78342,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Therin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_celebrity_giveaway_5c6325)."
+            }
+          ],
+          "npc_id": 9000000217
+        },
+        {
+          "kind": "collect_node",
+          "id": 2,
+          "text_string_id": 415019,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Click the barrel (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_celebrity_giveaway_5c6325)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model sh_barrel_01.adr is what the world draws for this kind of thing; the nearest placed one is unknown distance from the quest's giver, so the quest's own instance needs placing"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: wooden barrel with dark bands (sheets/a_world_click1.png r0c0, tile of sh_barrel_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_kart_driver_celebrity_giveaway_5c6325)."
+            }
+          ],
+          "node_type": "quest-barrel-2-q3080044",
+          "quantity": 1
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 3,
+          "text_string_id": 395809,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Complete the 'Celebrity Giveaway minigame' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_celebrity_giveaway_5c6325)."
+            }
+          ],
+          "minigame_id": 315,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 395811,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Therin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_celebrity_giveaway_5c6325)."
+            }
+          ],
+          "npc_id": 9000000217
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 397975,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Kade Carmichael at Wildwood Speedway (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_celebrity_giveaway_5c6325)."
+            }
+          ],
+          "npc_id": 9500000912
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -4899,23 +5181,75 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 395333,
       "intro_text_string_id": 395331,
       "end_text_string_id": 395334,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080045,
       "title_string_id": 3511,
-      "giver_npc_id": 9500000153,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000912,
+      "prerequisite_quest_ids": [
+        3080044
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 398003,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Sacred Grove: Wildwood\" race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_wildwood_497032)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: MiniGameData 634 'SG Tour 400: Wildwood' (type 10) is in the server's pinned producer set; objective client text 'Win the Sacred Grove: Wildwood race'."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client MiniGameData 634 'SG Tour 400: Wildwood', pinned; wiki calls it 'Sacred Grove: Wildwood'."
+            }
+          ],
+          "minigame_id": 634,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 398005,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Kade outside Wildwood (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_wildwood_497032)."
+            }
+          ],
+          "npc_id": 9500000912
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76305,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leadfoot Kart Driver Shoes (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_wildwood_497032)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 150
           },
@@ -4959,16 +5293,60 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Offer, description and closing line from the client's own text, read by the lead (L1202, 2026-11-13): the SG Tour 400 block, laid out as Frost Ridge's (395342-395345): 395337 'The first leg of the championship is here at Wildwood...', 395339 'You've finally made it to the SG Tour 400!...', 395340 'Bravo! It's been a long time since anyone has beaten me!...'."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "end_text_string_id": 395340,
+      "intro_text_string_id": 395337,
+      "description_string_id": 395339
     },
     {
       "id": 3080046,
       "title_string_id": 395343,
-      "giver_npc_id": 9500000153,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000912,
+      "prerequisite_quest_ids": [
+        3080045
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 398079,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Sacred Grove: Frost Ridge\" race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_frost_ridge_d392a4)."
+            }
+          ],
+          "minigame_id": 641,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 398081,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Kade outside Frost Ridge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_frost_ridge_d392a4)."
+            }
+          ],
+          "npc_id": 9500000912
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -5016,20 +5394,53 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 395344,
       "intro_text_string_id": 395342,
       "end_text_string_id": 395345,
-      "enabled": false
+      "enabled": true,
+      "job": 48
     },
     {
       "id": 3080047,
       "title_string_id": 3580,
       "intro_text_string_id": 395347,
-      "giver_npc_id": 9500000153,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000912,
+      "prerequisite_quest_ids": [
+        3080046
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 398091,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Sacred Grove: Thunder Falls\" race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_thunder_falls_fcc58b)."
+            }
+          ],
+          "minigame_id": 648,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 398093,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Kade outside Thunder Falls (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_thunder_falls_fcc58b)."
+            }
+          ],
+          "npc_id": 9500000912
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -5077,17 +5488,72 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395347 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 398088,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080048,
       "title_string_id": 3599,
       "intro_text_string_id": 395353,
-      "giver_npc_id": 9500000153,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
+      "giver_npc_id": 9500000912,
+      "prerequisite_quest_ids": [
+        3080047
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "text_string_id": 398218,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Win the \"Sacred Grove: Tangletrack\" race (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_tangletrack_e9eb64)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "MiniGameData 655 is named SG Tour 400: Tangletrack ('Win the race!'), a kart_rows.json producer"
+            }
+          ],
+          "minigame_id": 655,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 398220,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Kade outside Tangletrack (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_tangletrack_e9eb64)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 398220 'Return to Kade outside of Tangletrack' is the step line (the other three legs use 398005/398081/398093 'Return to Kade outside Wildwood/Frost Ridge/Thunder Falls', which the wiki table already carries)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Kade Carmichael 9500000153 stands at (-295.7, -61.0, 1949.6) in npcs/briarwood.json, 18 m from the Tangletrack Speedway POI; records 3080046-3080048 already name him as giver"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "the quest stays blocked by its race (MiniGameData 655 'SG Tour 400: Tangletrack', bw_kt_track, not served); this row only clears the return step"
+            }
+          ],
+          "npc_id": 9500000153
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
@@ -5143,9 +5609,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395353 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it). The block's title + 2 slot holds an item-trade error, not a turn-in line (read by the lead, L1202)."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 48,
+      "description_string_id": 398215,
+      "end_text_string_id": 416261
     },
     {
       "id": 3080049,

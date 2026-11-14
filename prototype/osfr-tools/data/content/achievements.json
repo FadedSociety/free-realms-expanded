@@ -5883,7 +5883,7 @@
       "name": "Rageracer",
       "description": "Complete the Kart Driver Questline.",
       "threshold": 1,
-      "counter_key": "waiting:quest_disabled:3080048",
+      "counter_key": "quest_done:3080048",
       "client_trophy_id": null,
       "reward": {
         "wiki_text": "Gold Trophy - 15 Points; Title: Racer",

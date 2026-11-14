@@ -870,8 +870,27 @@
       "location_evidence": [
         "Not stated in text. Video: nameplate in KYKRXeDqYDc/00008, /00018 (Misty Mountain 130 m), O2CxtPU7yb0/00156."
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958177,
+          "title": "Touring the Glade",
+          "title_string_id": 92537,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Touring the Glade (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_touring_the_glade_d4500b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958177
+      ],
       "quests_given_text": [
         "Self-guided tour: \"Welcome to Shrouded Glade, home of the renowned Druid Academy. Feel free to take a self-guided tour.\" (1147367134); stops are the warpstone (1790585929), the Gardener's Hutch (481137731), the Wishing Well (891264519), the Pet Park (2670232921) and the Druid Academy (4136803544); \"Visit multiple areas within Shrouded Glade.\" (3118727217). Who speaks the tour offer is not stated."
       ],
@@ -1249,11 +1268,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:126; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1348 (ModelId=456, ModelFileName=fairy_druid_f.adr, NameId=45453)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -2.26088,
       "model_id": 456,
-      "model_file_name": "fairy_druid_f.adr"
+      "model_file_name": "fairy_druid_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000650,

@@ -2514,11 +2514,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2985; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4319 (ModelId=3001, ModelFileName=sasquatch_bigfoot_costume.adr, NameId=428930)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": 2.261742,
       "model_id": 3001,
-      "model_file_name": "sasquatch_bigfoot_costume.adr"
+      "model_file_name": "sasquatch_bigfoot_costume.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000288,
@@ -3824,10 +3831,27 @@
               "evidence": "Glugmort's Palate (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_glugmort_s_palate_20863e)."
             }
           ]
+        },
+        {
+          "quest_id": 3957859,
+          "title": "A Fancy Meal for Glugmort",
+          "title_string_id": 20566,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "A Fancy Meal for Glugmort (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_a_fancy_meal_for_glugmort_64e290)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3950199
+        3950199,
+        3957859
       ],
       "quests_given_text": [
         "Boring Burnetta (title 4087542426; matched by wording to 2595534078, 3960786902, 4015276437: convince her to cook something new); the daily cooking contest (\"Every day, the camp archers compete ... The victorious archer is rewarded with some of Burnetta's Crispy Choychoy Delight\", 1073363634; \"Cook Up Some Crispy Choychoy Delight and Feed One Greenwood Archer of Your Choice\", 3485791053); A Fancy Meal for Glugmort (title 3033698600; she needs eggs from Danger Peaks for Glugmort, 3960176192, 889224962, 3474404536); the worm-soup test ends with Glugmort (Glugmort's Palate). Taste-tester stop for Darkthorne's cook search (4206732159, 3609159894; the quest title may be \"Interviewing the Tasters\" 1058217131, unproven). She also hands out Burnetta's Curious Creation; the recipe is sold by Bordon Cloo (829103903) and Mae Farnum (30334094, 2373329029)."
@@ -6526,10 +6550,27 @@
               "evidence": "Camp Troubles (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_camp_troubles_049260)."
             }
           ]
+        },
+        {
+          "quest_id": 3957927,
+          "title": "Confronting Bigfoot",
+          "title_string_id": 429074,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Confronting Bigfoot (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_confronting_bigfoot_111bbf)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3955105
+        3955105,
+        3957927
       ],
       "quests_given_text": [
         "Camp Troubles (wiki; client title 3182673722; text 1503619310 \"Bigfoot has been scaring off many campers... See if you can find its lair\", 3971714069 \"Help the camp counselors find Bigfoot's lair\"); Confronting Bigfoot (wiki; video tracker with \"Confront Bigfoot and see what he wants\", \"Speak to Counselor Edmond\", \"Return to Chatty\", \"Talk to Bob\", L27vxozHOls/00280, /00296; reward \"You receive 1 Camp Chatty Hat\", L27vxozHOls/00326); Putting Your Foot Down (wiki, repeatable; client text 3852371818). Details on Bigfoot's Lair. Goal target \"Knock out Counselor Edmond\" (1141526814)."

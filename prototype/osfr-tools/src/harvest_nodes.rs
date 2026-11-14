@@ -43,7 +43,8 @@ use std::{
     sync::Arc,
 };
 
-const MAX_FILE_BYTES: u64 = 1 << 20;
+/// A sanity bound, not a budget: `quest_nodes.json` passed 1 MiB with L1202's 56 quests (1.03 MiB).
+const MAX_FILE_BYTES: u64 = 1 << 22;
 /// AddNpc prefixes each appearance string with its byte length; the other actor kinds cap their
 /// alias at the same 120 bytes.
 const MAX_TEXTURE_ALIAS: usize = 120;
@@ -118,7 +119,7 @@ impl HarvestNodesContent {
         if fs::metadata(path)?.len() > MAX_FILE_BYTES {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
-                "node file over 1 MiB",
+                "node file over 4 MiB",
             ));
         }
         let bytes = fs::read(path)?;

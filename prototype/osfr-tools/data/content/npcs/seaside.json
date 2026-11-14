@@ -38797,8 +38797,27 @@
       "location_evidence": [
         "Seaspray Inn, \"the oldest building around\" (1382851082), \"down the road to the North\" (638365284), \"has a green roof\" (1161383376)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3957935,
+          "title": "Craving Something Tasty",
+          "title_string_id": 101053,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Craving Something Tasty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_craving_something_tasty_ed8610)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3957935
+      ],
       "quests_given_text": [
         "Know Your Enemy (title 1126268857; client: \"Seaspray suspects Orchid Eventide is secretly pushing them into a frenzy. Learn more about the Cray by defeating them in combat\", 3294890624, and the Cray-under-the-boardwalk hint 987130004); Craving Something Tasty (title 811105456, wiki \"Chef: Craving Something Tasty\"); appears in The Oldest Building, Hasty Food Delivery (Diggy's new dish, 3153561848) and Tides of Change"
       ],
@@ -43884,10 +43903,27 @@
               "evidence": "Cook-off Contest (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_contest_b40269)."
             }
           ]
+        },
+        {
+          "quest_id": 3957934,
+          "title": "Cook-off Catastrophe",
+          "title_string_id": 400105,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Cook-off Catastrophe (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_cook_off_catastrophe_a4a407)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3955364
+        3955364,
+        3957934
       ],
       "quests_given_text": [
         "Cook-off Contest (title 1708640854, mystery pot roast, 467466749); Cook-off Catastrophe (title 2620912414, \"knock out some Cray Royal Servants\", then the Prince of Low Tide, 1851684279). See Chef and Prince of Low Tide"

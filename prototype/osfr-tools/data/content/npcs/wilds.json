@@ -10657,6 +10657,50 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3140025,
+          "title": "Soccer Star: Twinkle Toes",
+          "title_string_id": 414951,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 3 - The trophy and the finals, row 22; name 'Soccer Star: Twinkle Toes'; title id cell 243982524 ucdt; 3036778201 ugdt (bare \"Twinkle Toes\" 3792008236 ucdt, 981979353 ugdt)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3140025 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -10667,7 +10711,8 @@
         3140009,
         3140011,
         3140010,
-        3140017
+        3140017,
+        3140025
       ],
       "quests_given_text": [
         "The Soccer Star line from Meeting The Team on: Soccer Star: The Perfect Mascot, Soccer Star: Achieve Level 2, Soccer Star: Slowing The Snowspurs, Soccer Star: Goal Stopper, Soccer Star: Power Game, Soccer Star: Achieve Level 5, Soccer Star: Briarwood's Fancy Feet, Soccer Star: Mascot Madness, Soccer Star: Achieve Level 8, Soccer Star: Cheetahs Double Challenge, Soccer Star: Missing Soccer Balls, Soccer Star: Mud Hopping, Soccer Star: Achieve Level 10, Soccer Star: Black Widows' Rematch, Soccer Star: Trophy Detective, Soccer Star: Returning The Trophy, Soccer Star: Achieve Level 13, Soccer Star: Making The Finals, Soccer Star: Twinkle Toes, Soccer Star: Achieve Level 15, Soccer Star: Ants In The Pants, Soccer Star: Robgoblin Troublemakers, Soccer Star: Achieve Level 19, Soccer Star: Tournament Champion."
@@ -25595,10 +25640,27 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3958033,
+          "title": "Margin of Victory",
+          "title_string_id": 384001,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Margin of Victory (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_margin_of_victory_5114b6)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3080003
+        3080003,
+        3958033
       ],
       "quests_given_text": [
         "Unlocks the job (2067788454); the licence line \"First get your Driver's License. Then help Johnny Thunder pull off an upset against the Gloam Racers at Wildwood Speedway\" (2486626195, title not found); town referrals from Shakey (4211297395) and Ricky Danger (2454371300)."
@@ -26115,8 +26177,198 @@
       "location_evidence": [
         "Wildwood Speedway (\"Find Kade Carmichael at Wildwood Speedway\", 3159992813); later \"outside\" each speedway (1431919381 \"Return to Kade outside Thunder Falls\"). [video: dialog header and giver on 47 frames, FkCPRbskFVU/00008, /00012, /00010]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080045,
+          "title": "Kart Driver: SG Tour 400: Wildwood",
+          "title_string_id": 3511,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 43; name 'Kart Driver: SG Tour 400: Wildwood'; title id cell 523224539 ucdt; 3816033076 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 43; name 'Kart Driver: SG Tour 400: Wildwood'; title id cell 523224539 ucdt; 3816033076 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080045 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080046,
+          "title": "Kart Driver: SG Tour 400: Frost Ridge",
+          "title_string_id": 395343,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 44; name 'Kart Driver: SG Tour 400: Frost Ridge'; title id cell 1987584609 ucdt; 3959003574 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080046 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080047,
+          "title": "Kart Driver: SG Tour 400: Thunder Falls",
+          "title_string_id": 3580,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 45; name 'Kart Driver: SG Tour 400: Thunder Falls'; title id cell 3074989322 ucdt; 2142238476 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080047 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395347 (lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3080048,
+          "title": "Kart Driver: SG Tour 400: Tangletrack",
+          "title_string_id": 3599,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 46; name 'Kart Driver: SG Tour 400: Tangletrack'; title id cell 3121341489 ucdt; 1143773866 ugdt"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 46; name 'Kart Driver: SG Tour 400: Tangletrack'; title id cell 3121341489 ucdt; 1143773866 ugdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > SG Tour 400 (champion: Kade Carmichael), row 46; name 'Kart Driver: SG Tour 400: Tangletrack'; title id cell 3121341489 ucdt; 1143773866 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3080048 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 395353 (lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3080045,
+        3080046,
+        3080047,
+        3080048
+      ],
       "quests_given_text": [
         "Kart Driver: SG Tour 400: Wildwood; and the Frost Ridge, Thunder Falls and Tangletrack legs."
       ],
@@ -26504,10 +26756,17 @@
             "kind": "legacy-data",
             "evidence": "data/content/npcs/briarwood.json npc_id=9500000153 (same name)"
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "model_id": 833,
-      "model_file_name": "human_m_kade_carmichael.agr"
+      "model_file_name": "human_m_kade_carmichael.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9500000913,

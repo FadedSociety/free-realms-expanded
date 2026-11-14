@@ -107,6 +107,13 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
             if let Some(npc_id) = goal["npc_id"].as_u64() {
                 referenced_npcs.insert(npc_id);
             }
+            // An any_of step's talks name NPCs too, and the loader checks them (L1202: Show
+            // Promoter hands its fliers to three of five Snowhill people).
+            for alternative in goal["alternatives"].as_array().into_iter().flatten() {
+                if let Some(npc_id) = alternative["npc_id"].as_u64() {
+                    referenced_npcs.insert(npc_id);
+                }
+            }
         }
     }
     let mut resolved_ids = HashSet::new();
