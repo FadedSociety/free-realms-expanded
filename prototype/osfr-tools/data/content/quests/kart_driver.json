@@ -4565,10 +4565,17 @@
             {
               "kind": "wiki",
               "evidence": "MiniGameData 651 is named The Right Stuff ('Be sure to place higher than Mirana Vega on the Tangletrack speedway!'), a kart_rows.json producer"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Place higher than Mirana Vega': kart_ai.json names Mirana Vega (name 101923) as the rival on this row, and the race reports `won` only when the racer finished ahead of her. The placement bound (8, any place) only makes the goal match the race's result instead of the id-only finish event (L1202)."
             }
           ],
           "minigame_id": 651,
-          "count": 1
+          "count": 1,
+          "require": {
+            "max_placement": 8
+          }
         },
         {
           "kind": "talk_to_npc",
@@ -4953,10 +4960,17 @@
             {
               "kind": "wiki",
               "evidence": "Win the \"Dominating at Tangletrack\" race three times - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_dominating_at_tangletrack_f7b0be)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) C6: 'Win the race' is first place among the seven AI racers of kart_ai.json; the race reports the racer's place, so only a first place credits (`require.max_placement` 1) (L1202)."
             }
           ],
           "minigame_id": 654,
-          "count": 3
+          "count": 3,
+          "require": {
+            "max_placement": 1
+          }
         },
         {
           "kind": "talk_to_npc",
