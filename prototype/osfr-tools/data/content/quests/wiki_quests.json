@@ -36354,10 +36354,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) This quest stays disabled (L1207, 2026-11-13): its only client title, 45756, reads 'NOT LIVE - Party Scout' (one of the client's 470 'NOT LIVE - ' quest titles), so the client marks it as never shipped and a player would read the prefix on the quest card."
         }
       ],
       "description_string_id": 70268,
-      "enabled": true,
+      "enabled": false,
       "end_text_string_id": 416261
     },
     {
