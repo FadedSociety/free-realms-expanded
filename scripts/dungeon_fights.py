@@ -46,6 +46,23 @@ MODEL_BINDINGS = {
         "bixie; no client or reference row names the worker's body",
     ),
 }
+# Model files no client pack holds that the community host serves to every install, asked for the
+# way the launcher asks (https, the client's bucket, the manifest crc; L1197, 2026-11-13): the
+# .adr and every mesh and texture it names answered with crc-matching bytes. The launcher
+# installs the full asset set (owner 2026-11-04), so players hold them.
+HOST_SERVED = {
+    "toad_black.adr", "treesoldier_mushroom.adr", "forestgiantboss.adr",
+    "human_briarpatchboss_m.adr", "screecher_boss.adr", "gloam_m_construct.adr", "gloam_m_boss.adr",
+}
+# Fork model ids the 2014 client's Models.txt does not have: the same file under the client's id.
+MODEL_REMAP = {
+    11122: (4446, "the fork's model 11122 is its own id for cray_king_lowtide.adr; the 2014 client's "
+                  "Models.txt names that file 4446"),
+}
+# Fork name ids that are another client string: the client's own string for the name.
+NAME_FIX = {
+    "Snowface": (103637, "the fork's 140750 reads 'Defeat Snowface!'; Global.Text 103637 is 'Snowface'"),
+}
 # The fork fights' score values (design section 10 defaults).
 SCORE = {"per_enemy": 300, "per_knockout_left": 25000, "knockout_penalty": 5000,
          "quick_value": 100000, "quick_loss_per_s": 500}
@@ -116,7 +133,13 @@ class Lab:
 
     def model_ok(self, model_id):
         row = self.models.get(model_id)
-        return row is not None and row[0].lower() in self.packed
+        return row is not None and (row[0].strip().lower() in self.packed or self.host_only(model_id))
+
+    def host_only(self, model_id):
+        """A model no pack holds that the community host serves (HOST_SERVED)."""
+        row = self.models.get(model_id)
+        return (row is not None and row[0].strip().lower() not in self.packed
+                and row[0].strip().lower() in HOST_SERVED)
 
     def body(self, name):
         """(model id, evidence) of a named NPC with no reference row, or None."""
@@ -248,12 +271,23 @@ class Mapper:
         key = shared["id"] if shared else snake(name)
         if key not in fight["kinds"]:
             model = shared["model_id"] if shared else npc.get("ModelId", 0)
+            notes = []
+            if model in MODEL_REMAP:
+                model, why = MODEL_REMAP[model]
+                notes.append(f"{name}: {why}")
             if not self.lab.model_ok(model):
                 return None, f"{name}: model {model} is in no client pack"
+            if self.lab.host_only(model):
+                notes.append(f"{name}: model {model} ({self.lab.models[model][0].strip()}) is in no client pack; "
+                             f"the community host serves it and every file it names ({TOOL} HOST_SERVED)")
+            name_id = shared["name_string_id"] if shared else npc["NameId"]
+            if not shared and name in NAME_FIX:
+                name_id, why = NAME_FIX[name]
+                notes.append(f"{name}: {why}")
             fight["kinds"][key] = {
                 "definition_id": shared["definition_id"] if shared else fight["id"] * 100 + n,
-                "name": name, "name_id": shared["name_string_id"] if shared else npc["NameId"],
-                "model_id": model, "rank": "normal"}
+                "name": name, "name_id": name_id, "model_id": model, "rank": "normal"}
+            fight["source"] += [r(note) for note in notes]
         return key, None
 
     def from_fork(self, guide, entrance, scene, base, battle, fight_id):

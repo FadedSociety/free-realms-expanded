@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 13052,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/13052.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) No script runs (scripts/dungeon_fights.py): its entrance names no fight, and no fork battle stands behind it."
+                "evidence": "(R) Goals map onto fights/13052.json (scripts/dungeon_fights.py); not mapped: bonus 'Destroy all of the Corrupted Artifacts!' is not a free-the-captives goal the mapping places."
               }
             ]
           }

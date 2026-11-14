@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "id": 14047,
+  "kind": "dungeon",
+  "title_id": 90478,
+  "description_id": 140757,
+  "icon_id": 310,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5
+  },
+  "place": {
+    "zone": 1228,
+    "arena": "gl_misty_mountain",
+    "arrive": [
+      144.7,
+      27.85,
+      388.16
+    ],
+    "exit_door": [
+      201.2,
+      51.03,
+      551.7
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "elemental_guardian": {
+      "definition_id": 1404701,
+      "name": "Elemental Guardian",
+      "name_id": 103636,
+      "model_id": 3933,
+      "rank": "normal"
+    },
+    "wind_elemental": {
+      "definition_id": 1404702,
+      "name": "Wind Elemental",
+      "name_id": 103654,
+      "model_id": 1026,
+      "rank": "normal"
+    },
+    "snowface": {
+      "definition_id": 1404719,
+      "name": "Snowface",
+      "name_id": 103637,
+      "model_id": 3956,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "elemental_guardian",
+      "at": [
+        165.16,
+        34.3,
+        412.11
+      ],
+      "heading": -2.367,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "wind_elemental",
+      "at": [
+        162.62,
+        33.59,
+        408.78
+      ],
+      "heading": -2.282,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "elemental_guardian",
+      "at": [
+        167.02,
+        33.84,
+        410.29
+      ],
+      "heading": -2.117,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "wind_elemental",
+      "at": [
+        222.1,
+        43.5,
+        426.3
+      ],
+      "heading": -1.504,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "elemental_guardian",
+      "at": [
+        218.39,
+        43.25,
+        426.84
+      ],
+      "heading": -1.867,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "wind_elemental",
+      "at": [
+        226.0,
+        43.63,
+        427.2
+      ],
+      "heading": -1.642,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "elemental_guardian",
+      "at": [
+        261.3,
+        37.07,
+        388.05
+      ],
+      "heading": -1.578,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "wind_elemental",
+      "at": [
+        264.11,
+        37.06,
+        388.96
+      ],
+      "heading": -1.672,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "elemental_guardian",
+      "at": [
+        258.03,
+        37.13,
+        390.84
+      ],
+      "heading": -2.263,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "wind_elemental",
+      "at": [
+        315.8,
+        36.76,
+        414.29
+      ],
+      "heading": -1.059,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "elemental_guardian",
+      "at": [
+        317.73,
+        36.7,
+        412.11
+      ],
+      "heading": -0.936,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "wind_elemental",
+      "at": [
+        312.83,
+        36.59,
+        412.75
+      ],
+      "heading": -0.325,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "elemental_guardian",
+      "at": [
+        358.85,
+        40.95,
+        467.27
+      ],
+      "heading": 2.899,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "wind_elemental",
+      "at": [
+        360.92,
+        41.22,
+        469.44
+      ],
+      "heading": -3.107,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "elemental_guardian",
+      "at": [
+        356.27,
+        41.24,
+        470.03
+      ],
+      "heading": 2.727,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "wind_elemental",
+      "at": [
+        283.0,
+        44.39,
+        492.7
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "elemental_guardian",
+      "at": [
+        286.41,
+        43.76,
+        493.74
+      ],
+      "heading": -1.866,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "wind_elemental",
+      "at": [
+        285.04,
+        44.32,
+        496.24
+      ],
+      "heading": -2.619,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "snowface",
+      "at": [
+        216.43,
+        51.24,
+        545.53
+      ],
+      "heading": -3.121,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.1
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        215.72,
+        50.9,
+        542.58
+      ],
+      [
+        216.39,
+        51.47,
+        548.84
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "elemental_guardian",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "wind_elemental",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 140758,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75100, "name_id": 131984, "icon_id": 3217, "job": 2},
+      {"item_id": 75410, "name_id": 131154, "icon_id": 3717, "job": 2},
+      {"item_id": 75382, "name_id": 131126, "icon_id": 1195, "job": 2},
+      {"item_id": 76234, "name_id": 133242, "icon_id": 5375, "job": 2},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 2},
+      {"item_id": 75070, "name_id": 131954, "icon_id": 3145, "job": 11},
+      {"item_id": 75345, "name_id": 131089, "icon_id": 3717, "job": 11},
+      {"item_id": 75317, "name_id": 131061, "icon_id": 1195, "job": 11},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 11},
+      {"item_id": 75160, "name_id": 132044, "icon_id": 3253, "job": 12},
+      {"item_id": 75540, "name_id": 131284, "icon_id": 3717, "job": 12},
+      {"item_id": 75512, "name_id": 131256, "icon_id": 1195, "job": 12},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 12},
+      {"item_id": 75130, "name_id": 132014, "icon_id": 3129, "job": 32},
+      {"item_id": 75475, "name_id": 131219, "icon_id": 3717, "job": 32},
+      {"item_id": 75447, "name_id": 131191, "icon_id": 1195, "job": 32},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 32},
+      {"item_id": 75010, "name_id": 131894, "icon_id": 3111, "job": 35},
+      {"item_id": 75215, "name_id": 130959, "icon_id": 3717, "job": 35},
+      {"item_id": 75187, "name_id": 130931, "icon_id": 1195, "job": 35},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 35},
+      {"item_id": 75040, "name_id": 131924, "icon_id": 3123, "job": 43},
+      {"item_id": 75280, "name_id": 131024, "icon_id": 3717, "job": 43},
+      {"item_id": 75252, "name_id": 130996, "icon_id": 1195, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730}
+    ],
+    "wheel_coins": 1,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Elemental Guardian: model 3933 (gloam_m_construct.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Snowface: model 3956 (gloam_m_boss.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Snowface: the fork's 140750 reads 'Defeat Snowface!'; Global.Text 103637 is 'Snowface'"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 29 ('Misty Mountain (the live dungeon: the oracle's enslaved elemental guardians up t'): scene gl_misty_mountain, 6 groups standing at the start, 1 coming later, the boss Snowface last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 90478, 140757, icon 310 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene gl_misty_mountain needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14047*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/misty_mountain.json, its notes page and the fork battle; under the id (14047) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_misty_mountain_19961b.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Misty Mountain' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Misty_Mountain.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

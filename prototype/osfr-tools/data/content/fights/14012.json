@@ -1,0 +1,547 @@
+{
+  "schema_version": 1,
+  "id": 14012,
+  "kind": "dungeon",
+  "title_id": 18219,
+  "description_id": 77966,
+  "icon_id": 887,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9
+  },
+  "place": {
+    "zone": 1237,
+    "arena": "bw_vale_of_thorns",
+    "arrive": [
+      194.57,
+      -16.99,
+      217.56
+    ],
+    "exit_door": [
+      29.62,
+      -0.72,
+      401.17
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "smuggler": {
+      "definition_id": 950023,
+      "name": "Smuggler",
+      "name_id": 91865,
+      "model_id": 669,
+      "rank": "normal"
+    },
+    "belching_toad": {
+      "definition_id": 1401202,
+      "name": "Belching Toad",
+      "name_id": 20002,
+      "model_id": 1648,
+      "rank": "normal"
+    },
+    "black_swamp_frog": {
+      "definition_id": 1401203,
+      "name": "Black Swamp Frog",
+      "name_id": 75936,
+      "model_id": 1648,
+      "rank": "normal"
+    },
+    "smuggler_hannah": {
+      "definition_id": 1551,
+      "name": "Smuggler Hannah",
+      "name_id": 77319,
+      "model_id": 685,
+      "rank": "dungeon_boss",
+      "boss": true
+    },
+    "smuggler_han": {
+      "definition_id": 2834,
+      "name": "Smuggler Han",
+      "name_id": 77317,
+      "model_id": 669,
+      "rank": "normal"
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "smuggler",
+      "at": [
+        176.0,
+        -9.95,
+        243.01
+      ],
+      "heading": 2.847,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "belching_toad",
+      "at": [
+        175.26,
+        -9.6,
+        240.22
+      ],
+      "heading": 2.715,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "black_swamp_frog",
+      "at": [
+        172.4,
+        -9.35,
+        243.49
+      ],
+      "heading": 2.635,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "smuggler",
+      "at": [
+        176.96,
+        -10.48,
+        246.4
+      ],
+      "heading": 2.961,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "belching_toad",
+      "at": [
+        173.51,
+        -7.18,
+        281.49
+      ],
+      "heading": -3.113,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "black_swamp_frog",
+      "at": [
+        175.84,
+        -7.45,
+        280.29
+      ],
+      "heading": -2.948,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "smuggler",
+      "at": [
+        172.99,
+        -7.68,
+        277.88
+      ],
+      "heading": 3.134,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "belching_toad",
+      "at": [
+        175.38,
+        -7.96,
+        276.78
+      ],
+      "heading": -2.928,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "black_swamp_frog",
+      "at": [
+        168.28,
+        -5.93,
+        321.53
+      ],
+      "heading": 2.887,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "smuggler",
+      "at": [
+        170.03,
+        -5.96,
+        317.74
+      ],
+      "heading": 2.946,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "belching_toad",
+      "at": [
+        171.28,
+        -6.01,
+        320.94
+      ],
+      "heading": 3.064,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "black_swamp_frog",
+      "at": [
+        170.23,
+        -6.02,
+        323.45
+      ],
+      "heading": 3.018,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "smuggler",
+      "at": [
+        161.89,
+        -4.12,
+        357.17
+      ],
+      "heading": 2.902,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "belching_toad",
+      "at": [
+        162.64,
+        -4.36,
+        354.48
+      ],
+      "heading": 2.915,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "black_swamp_frog",
+      "at": [
+        163.31,
+        -4.86,
+        351.86
+      ],
+      "heading": 2.931,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "smuggler",
+      "at": [
+        165.03,
+        -4.35,
+        356.59
+      ],
+      "heading": -3.049,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "belching_toad",
+      "at": [
+        143.58,
+        -6.83,
+        387.11
+      ],
+      "heading": 1.344,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "black_swamp_frog",
+      "at": [
+        144.49,
+        -6.87,
+        389.66
+      ],
+      "heading": 2.034,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "smuggler",
+      "at": [
+        141.07,
+        -6.42,
+        389.26
+      ],
+      "heading": 1.75,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "belching_toad",
+      "at": [
+        141.12,
+        -7.54,
+        384.97
+      ],
+      "heading": 1.132,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "black_swamp_frog",
+      "at": [
+        97.76,
+        -2.23,
+        405.69
+      ],
+      "heading": 2.052,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g22": {
+      "definition": "smuggler",
+      "at": [
+        101.43,
+        -2.67,
+        405.2
+      ],
+      "heading": 2.128,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g23": {
+      "definition": "belching_toad",
+      "at": [
+        100.27,
+        -2.74,
+        410.73
+      ],
+      "heading": 2.324,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g24": {
+      "definition": "black_swamp_frog",
+      "at": [
+        96.91,
+        -2.39,
+        409.14
+      ],
+      "heading": 2.17,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g25": {
+      "definition": "smuggler",
+      "at": [
+        62.68,
+        -0.26,
+        407.65
+      ],
+      "heading": 1.359,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g26": {
+      "definition": "belching_toad",
+      "at": [
+        65.15,
+        -0.49,
+        410.39
+      ],
+      "heading": 2.3,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g27": {
+      "definition": "black_swamp_frog",
+      "at": [
+        59.39,
+        -0.34,
+        406.66
+      ],
+      "heading": 1.326,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g28": {
+      "definition": "smuggler",
+      "at": [
+        67.15,
+        -0.94,
+        408.61
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "smuggler_hannah",
+      "at": [
+        34.9,
+        -1.81,
+        402.51
+      ],
+      "heading": 1.255,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.15
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        36.91,
+        -2.3,
+        405.37
+      ],
+      [
+        38.8,
+        -1.84,
+        400.94
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "smuggler_han",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "belching_toad",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 20472,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 76433, "name_id": 133441, "icon_id": 5065, "job": 12},
+      {"item_id": 75162, "name_id": 132046, "icon_id": 3162, "job": 12},
+      {"item_id": 75508, "name_id": 131252, "icon_id": 550, "job": 12},
+      {"item_id": 75552, "name_id": 131296, "icon_id": 3721, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726}
+    ],
+    "wheel_coins": 1,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Belching Toad: model 1648 (toad_black.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Black Swamp Frog: model 1648 (toad_black.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 38 ('Croaking Vale (the live dungeon: smugglers and the vale's belching toads along t'): scene bw_vale_of_thorns, 7 groups standing at the start, 1 coming later, the boss Smuggler Hannah last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 18219, 77966, icon 887 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_vale_of_thorns needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14012*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/croaking_vale.json, its notes page and the fork battle; under the id (14012) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 15, the page's own \"Don't get knocked out 15 times\" (fr_place_croaking_vale_52c033.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Croaking Vale' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Croaking_Vale.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

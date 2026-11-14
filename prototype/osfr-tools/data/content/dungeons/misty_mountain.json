@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14047,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14047.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Elemental Guardian: model 3933 is in no client pack; Snowface: model 3956 is in no client pack."
+                "evidence": "(R) Goals map onto fights/14047.json (scripts/dungeon_fights.py); not mapped: bonus 'Search throughout the Misty Mountains to find the 4 pieces of the lost teachings of the Oracle! ' is not a free-the-captives goal the mapping places."
               }
             ]
           }

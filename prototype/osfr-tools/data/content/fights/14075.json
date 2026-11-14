@@ -1,0 +1,492 @@
+{
+  "schema_version": 1,
+  "id": 14075,
+  "kind": "dungeon",
+  "title_id": 5078,
+  "description_id": 74131,
+  "icon_id": 881,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9
+  },
+  "place": {
+    "zone": 1219,
+    "arena": "bw_briar_patch",
+    "arrive": [
+      212.6,
+      -6.92,
+      116.61
+    ],
+    "exit_door": [
+      126.99,
+      -8.0,
+      429.67
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "briar_patch_wolf": {
+      "definition_id": 1407501,
+      "name": "Briar Patch Wolf",
+      "name_id": 7156,
+      "model_id": 142,
+      "rank": "normal"
+    },
+    "mutated_tree_soldier": {
+      "definition_id": 1407502,
+      "name": "Mutated Tree Soldier",
+      "name_id": 434079,
+      "model_id": 478,
+      "rank": "normal"
+    },
+    "vicious_vinewolf": {
+      "definition_id": 2872,
+      "name": "Vicious Vinewolf",
+      "name_id": 103401,
+      "model_id": 142,
+      "rank": "normal"
+    },
+    "azure": {
+      "definition_id": 1407525,
+      "name": "Azure",
+      "name_id": 6455,
+      "model_id": 383,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        196.0,
+        -7.97,
+        141.37
+      ],
+      "heading": 2.191,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        198.66,
+        -8.7,
+        141.77
+      ],
+      "heading": 2.355,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        193.4,
+        -8.52,
+        142.66
+      ],
+      "heading": 2.162,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        196.56,
+        -9.07,
+        144.51
+      ],
+      "heading": 2.385,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        192.75,
+        -13.68,
+        200.75
+      ],
+      "heading": -1.925,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        187.98,
+        -14.17,
+        200.11
+      ],
+      "heading": 1.476,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        191.22,
+        -13.9,
+        202.97
+      ],
+      "heading": 2.799,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        191.45,
+        -13.62,
+        195.61
+      ],
+      "heading": 0.132,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        195.6,
+        -15.08,
+        231.61
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        193.17,
+        -15.23,
+        234.97
+      ],
+      "heading": 2.516,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        196.11,
+        -15.25,
+        227.19
+      ],
+      "heading": -0.115,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        197.38,
+        -15.1,
+        235.45
+      ],
+      "heading": -2.709,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        176.66,
+        -5.26,
+        290.89
+      ],
+      "heading": -3.03,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        174.8,
+        -6.68,
+        278.39
+      ],
+      "heading": -3.096,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        175.0,
+        -4.32,
+        294.25
+      ],
+      "heading": -3.119,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        175.2,
+        -5.71,
+        286.31
+      ],
+      "heading": -3.094,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        169.83,
+        -4.1,
+        325.79
+      ],
+      "heading": 2.899,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        167.97,
+        -4.43,
+        327.99
+      ],
+      "heading": 2.784,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        170.87,
+        -4.72,
+        330.31
+      ],
+      "heading": 3.063,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        170.39,
+        -3.33,
+        321.6
+      ],
+      "heading": 2.79,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        151.75,
+        -8.08,
+        376.81
+      ],
+      "heading": 2.742,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g22": {
+      "definition": "briar_patch_wolf",
+      "at": [
+        150.38,
+        -9.09,
+        380.05
+      ],
+      "heading": 2.742,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g23": {
+      "definition": "mutated_tree_soldier",
+      "at": [
+        154.14,
+        -7.23,
+        374.26
+      ],
+      "heading": 3.032,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g24": {
+      "definition": "vicious_vinewolf",
+      "at": [
+        145.18,
+        -9.1,
+        378.59
+      ],
+      "heading": 2.307,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "azure",
+      "at": [
+        130.0,
+        -7.19,
+        426.41
+      ],
+      "heading": -2.853,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.1
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        133.49,
+        -7.63,
+        428.52
+      ],
+      [
+        133.49,
+        -7.42,
+        425.06
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "vicious_vinewolf",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "mutated_tree_soldier",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 7009,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 76437, "name_id": 133445, "icon_id": 5665, "job": 12},
+      {"item_id": 75166, "name_id": 132050, "icon_id": 3162, "job": 12},
+      {"item_id": 75513, "name_id": 131257, "icon_id": 1196, "job": 12},
+      {"item_id": 75552, "name_id": 131296, "icon_id": 3721, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731}
+    ],
+    "wheel_coins": 847,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Mutated Tree Soldier: model 478 (treesoldier_mushroom.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Azure: model 383 (human_briarpatchboss_m.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 20 ('Briar Patch (the live dungeon: Azure's mutated wolves and tree soldiers from the'): scene bw_briar_patch, 6 groups standing at the start, 1 coming later, the boss Azure last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5078, 74131, icon 881 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_briar_patch needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14075*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/briar_patch.json, its notes page and the fork battle; under the id (14075) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 15, the page's own \"Don't get knocked out 15 times\" (fr_place_briar_patch_1cd5f5.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Briar Patch' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Briar_Patch.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14012,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14012.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Belching Toad: model 1648 is in no client pack; Black Swamp Frog: model 1648 is in no client pack; held: belching_toad: model 1648 is toad_black.adr, which no client pack holds."
+                "evidence": "(R) Goals map onto fights/14012.json (scripts/dungeon_fights.py); not mapped: Captured Frogs: the captive has no client name or model in the packs."
               }
             ]
           }

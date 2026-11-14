@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14075,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14075.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Mutated Tree Soldier: model 478 is in no client pack; Azure: model 383 is in no client pack; held: azure: model 383 is human_briarpatchboss_m.adr, which no client pack holds."
+                "evidence": "(R) Goals map onto fights/14075.json (scripts/dungeon_fights.py); not mapped: bonus 'Defeat the Mutated Shepards before Azure is defeated!' is not a free-the-captives goal the mapping places."
               }
             ]
           }

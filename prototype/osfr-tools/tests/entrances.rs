@@ -272,54 +272,24 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
         }
     }
     open.sort_unstable();
+    // An entrance opens exactly when the fight it names ships (a fights/ file or a
+    // field_battles.json row): a new fight file opens its door by itself.
+    let files: BTreeSet<u32> = (fs::read_dir(content_dir().join("fights")).unwrap())
+        .filter_map(|e| e.ok()?.path().file_stem()?.to_str()?.parse().ok())
+        .collect();
+    let rows: BTreeSet<u64> = (battles()["battles"].as_array().unwrap().iter())
+        .filter_map(|b| b["id"].as_u64())
+        .collect();
+    let mut shipped: Vec<&str> = (table.entrances.iter())
+        .filter(|r| r.fight.is_some_and(|f| files.contains(&f) || rows.contains(&u64::from(f))))
+        .map(|r| r.id.as_str())
+        .collect();
+    shipped.sort_unstable();
     assert_eq!(
-        open,
-        // Lead 2026-11-11: the combat quests' fight files (fights/14xxx.json) open 21 more.
-        // Fix F5: the dungeon guides' fights built from the fork battles open five more.
-        // rc-0136: five Legacy spawner huts open their combat-quest fights.
-        [
-            "arachnia_s_lair",
-            "bandit_hideout",
-            "bixie_hive",
-            "briarheart_caverns",
-            "cracked_claw_caverns",
-            "cray_marauders",
-            "cursed_graveyard",
-            "danger_peaks",
-            "darvon_s_descent",
-            "deep_mines",
-            "explosive_robgoblins",
-            "floren_forest",
-            "forest_troll_fort",
-            "frostfang_caverns",
-            "frostfang_growler",
-            "frostfang_snarlers",
-            "grexan_s_camp",
-            "hooligan_brawling_club",
-            "hooligan_bullies",
-            "hot_springs_haven",
-            "howling_hills",
-            "ice_troll_scout",
-            "moldy_shamblers",
-            "mugwort_s_hollow",
-            "petty_yetis",
-            "robgoblin_adept_trouble",
-            "robgoblin_geomancer",
-            "robgoblin_treasure_trove",
-            "robgoblin_troublemakers",
-            "shady_smugglers",
-            "sheep_watch",
-            "snakes_in_a_maze",
-            "snowy_canyon",
-            "sweetwater_climb",
-            "tanglewood_fort",
-            "tavern_cellar",
-            "thugawug_thug",
-            "tormented_spirits",
-            "vulture_watch"
-        ],
+        open, shipped,
         "the entrances whose fight exists today; a new fight file opens its door by itself"
     );
+    assert!(open.len() > 1, "doors open");
     assert_eq!(closed, table.entrances.len() - open.len());
     // The battle markers of field_battles.json are untouched by their doors.
     let file = battles();

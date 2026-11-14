@@ -1,0 +1,355 @@
+{
+  "schema_version": 1,
+  "id": 13019,
+  "kind": "dungeon",
+  "title_id": 5703,
+  "description_id": 16114,
+  "icon_id": 683,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5
+  },
+  "place": {
+    "zone": 1234,
+    "arena": "sg_changeling_caverns_return",
+    "arrive": [
+      357.11,
+      21.63,
+      261.57
+    ],
+    "exit_door": [
+      257.5,
+      19.78,
+      399.72
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "changeling_arcanus": {
+      "definition_id": 1301901,
+      "name": "Changeling Arcanus",
+      "name_id": 16181,
+      "model_id": 234,
+      "rank": "normal"
+    },
+    "changeling_kicker": {
+      "definition_id": 1301902,
+      "name": "Changeling Kicker",
+      "name_id": 16939,
+      "model_id": 238,
+      "rank": "normal"
+    },
+    "changeling_brawler": {
+      "definition_id": 1301903,
+      "name": "Changeling Brawler",
+      "name_id": 37255,
+      "model_id": 239,
+      "rank": "normal"
+    },
+    "amoranth": {
+      "definition_id": 1301913,
+      "name": "Amoranth",
+      "name_id": 40154,
+      "model_id": 254,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "changeling_arcanus",
+      "at": [
+        325.69,
+        19.39,
+        256.81
+      ],
+      "heading": 1.211,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "changeling_kicker",
+      "at": [
+        323.25,
+        19.39,
+        257.73
+      ],
+      "heading": 1.369,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "changeling_brawler",
+      "at": [
+        323.27,
+        19.39,
+        260.66
+      ],
+      "heading": 1.638,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "changeling_kicker",
+      "at": [
+        291.24,
+        21.81,
+        275.41
+      ],
+      "heading": -2.797,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "changeling_brawler",
+      "at": [
+        291.05,
+        22.77,
+        272.61
+      ],
+      "heading": -2.549,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "changeling_arcanus",
+      "at": [
+        288.81,
+        20.37,
+        278.2
+      ],
+      "heading": 3.082,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "changeling_brawler",
+      "at": [
+        287.64,
+        15.8,
+        320.74
+      ],
+      "heading": -3.056,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "changeling_arcanus",
+      "at": [
+        285.05,
+        16.08,
+        322.92
+      ],
+      "heading": 2.945,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "changeling_kicker",
+      "at": [
+        285.47,
+        15.13,
+        317.89
+      ],
+      "heading": 2.832,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "changeling_arcanus",
+      "at": [
+        294.67,
+        24.32,
+        365.25
+      ],
+      "heading": 2.918,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "changeling_kicker",
+      "at": [
+        292.9,
+        24.23,
+        361.88
+      ],
+      "heading": 2.268,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "changeling_brawler",
+      "at": [
+        297.99,
+        24.6,
+        368.01
+      ],
+      "heading": -2.922,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "amoranth",
+      "at": [
+        269.98,
+        21.91,
+        409.2
+      ],
+      "heading": 1.704,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.45
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        274.05,
+        22.4,
+        408.23
+      ],
+      [
+        265.18,
+        20.88,
+        408.42
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "changeling_arcanus",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "changeling_brawler",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 416980,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75410, "name_id": 131154, "icon_id": 3717, "job": 2},
+      {"item_id": 75392, "name_id": 131136, "icon_id": 554, "job": 2},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 2},
+      {"item_id": 75345, "name_id": 131089, "icon_id": 3717, "job": 11},
+      {"item_id": 75327, "name_id": 131071, "icon_id": 554, "job": 11},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 11},
+      {"item_id": 75540, "name_id": 131284, "icon_id": 3717, "job": 12},
+      {"item_id": 75522, "name_id": 131266, "icon_id": 554, "job": 12},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 12},
+      {"item_id": 75126, "name_id": 132010, "icon_id": 3129, "job": 32},
+      {"item_id": 75475, "name_id": 131219, "icon_id": 3717, "job": 32},
+      {"item_id": 75457, "name_id": 131201, "icon_id": 554, "job": 32},
+      {"item_id": 76342, "name_id": 133350, "icon_id": 5414, "job": 32},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 32},
+      {"item_id": 75215, "name_id": 130959, "icon_id": 3717, "job": 35},
+      {"item_id": 75197, "name_id": 130941, "icon_id": 554, "job": 35},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 35},
+      {"item_id": 75280, "name_id": 131024, "icon_id": 3717, "job": 43},
+      {"item_id": 75262, "name_id": 131006, "icon_id": 554, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3}
+    ],
+    "wheel_coins": 1,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 35 ('Forgotten Caves (the live dungeon: changelings through the caves' magic fires, A'): scene sg_changeling_caverns_return, 4 groups standing at the start, 1 coming later, the boss Amoranth last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5703, 16114, icon 683 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene sg_changeling_caverns_return needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13019*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/forgotten_caves.json, its notes page and the fork battle; under the id (13019) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_forgotten_caves_e6e498.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Forgotten Caves' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Forgotten_Caves.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "id": 14067,
+  "kind": "dungeon",
+  "title_id": 5133,
+  "description_id": 5599,
+  "icon_id": 906,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9
+  },
+  "place": {
+    "zone": 1220,
+    "arena": "bw_treeleaf_retreat",
+    "arrive": [
+      139.18,
+      1.01,
+      173.77
+    ],
+    "exit_door": [
+      143.38,
+      -22.0,
+      418.45
+    ]
+  },
+  "rules": {
+    "knockouts": 15,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "tree_soldier": {
+      "definition_id": 1406701,
+      "name": "Tree Soldier",
+      "name_id": 4186,
+      "model_id": 74,
+      "rank": "normal"
+    },
+    "hedge_guardian": {
+      "definition_id": 2644,
+      "name": "Hedge Guardian",
+      "name_id": 4084,
+      "model_id": 74,
+      "rank": "normal"
+    },
+    "hedge_knight": {
+      "definition_id": 950112,
+      "name": "Hedge Knight",
+      "name_id": 4215,
+      "model_id": 74,
+      "rank": "normal"
+    },
+    "treeleaf_hedge": {
+      "definition_id": 1406723,
+      "name": "Treeleaf Hedge",
+      "name_id": 5739,
+      "model_id": 75,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "tree_soldier",
+      "at": [
+        139.7,
+        2.72,
+        213.52
+      ],
+      "heading": 3.135,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "hedge_guardian",
+      "at": [
+        139.25,
+        3.34,
+        215.84
+      ],
+      "heading": 3.119,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "hedge_guardian",
+      "at": [
+        188.45,
+        -10.74,
+        245.75
+      ],
+      "heading": -1.457,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "hedge_knight",
+      "at": [
+        185.41,
+        -8.63,
+        248.0
+      ],
+      "heading": -1.799,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "tree_soldier",
+      "at": [
+        181.52,
+        -11.88,
+        237.93
+      ],
+      "heading": -0.179,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "hedge_guardian",
+      "at": [
+        191.17,
+        -11.45,
+        245.48
+      ],
+      "heading": -1.461,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "hedge_knight",
+      "at": [
+        286.48,
+        -7.98,
+        234.23
+      ],
+      "heading": -1.963,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "tree_soldier",
+      "at": [
+        282.98,
+        -8.5,
+        232.87
+      ],
+      "heading": -1.969,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "hedge_guardian",
+      "at": [
+        285.53,
+        -7.96,
+        231.29
+      ],
+      "heading": -1.807,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "hedge_knight",
+      "at": [
+        291.2,
+        -6.3,
+        234.7
+      ],
+      "heading": -1.899,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "tree_soldier",
+      "at": [
+        343.35,
+        -7.18,
+        266.87
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "hedge_guardian",
+      "at": [
+        345.72,
+        -7.24,
+        268.27
+      ],
+      "heading": -2.108,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "hedge_knight",
+      "at": [
+        343.41,
+        -6.89,
+        263.16
+      ],
+      "heading": -0.018,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "tree_soldier",
+      "at": [
+        339.92,
+        -7.2,
+        265.15
+      ],
+      "heading": 1.107,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "hedge_guardian",
+      "at": [
+        311.45,
+        -17.83,
+        325.37
+      ],
+      "heading": 2.177,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "hedge_knight",
+      "at": [
+        312.75,
+        -18.07,
+        327.87
+      ],
+      "heading": 2.346,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "tree_soldier",
+      "at": [
+        309.12,
+        -18.25,
+        326.55
+      ],
+      "heading": 2.158,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "hedge_guardian",
+      "at": [
+        310.52,
+        -17.36,
+        322.42
+      ],
+      "heading": 1.985,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "hedge_knight",
+      "at": [
+        242.04,
+        -21.45,
+        377.61
+      ],
+      "heading": 1.779,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "tree_soldier",
+      "at": [
+        243.89,
+        -21.26,
+        381.18
+      ],
+      "heading": 1.967,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "hedge_guardian",
+      "at": [
+        246.76,
+        -20.87,
+        376.39
+      ],
+      "heading": 1.766,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g22": {
+      "definition": "hedge_knight",
+      "at": [
+        239.5,
+        -21.96,
+        381.68
+      ],
+      "heading": 1.918,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "treeleaf_hedge",
+      "at": [
+        158.97,
+        -22.0,
+        422.83
+      ],
+      "heading": 2.79,
+      "boss": true,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        156.32,
+        -22.0,
+        424.46
+      ],
+      [
+        160.78,
+        -22.0,
+        425.46
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "tree_soldier",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "hedge_knight",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 5601,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 76108, "name_id": 133116, "icon_id": 2344, "job": 11},
+      {"item_id": 75078, "name_id": 131962, "icon_id": 3149, "job": 11},
+      {"item_id": 75328, "name_id": 131072, "icon_id": 555, "job": 11},
+      {"item_id": 75357, "name_id": 131101, "icon_id": 3721, "job": 11},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "job": 11},
+      {"item_id": 76426, "name_id": 133434, "icon_id": 2425, "job": 12},
+      {"item_id": 75168, "name_id": 132052, "icon_id": 3162, "job": 12},
+      {"item_id": 75523, "name_id": 131267, "icon_id": 555, "job": 12},
+      {"item_id": 75552, "name_id": 131296, "icon_id": 3721, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726, "job": 12},
+      {"item_id": 11005, "name_id": 422906, "icon_id": 726}
+    ],
+    "wheel_coins": 1,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Treeleaf Hedge: model 75 (forestgiantboss.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 21 ('Treeleaf's Retreat (the live dungeon: Treeleaf's animated tree soldiers through '): scene bw_treeleaf_retreat, 6 groups standing at the start, 1 coming later, the boss Treeleaf Hedge last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 5133, 5599, icon 906 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_treeleaf_retreat needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14067*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/treeleaf_s_retreat.json, its notes page and the fork battle; under the id (14067) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 15, the page's own \"Don't get knocked out 15 times\" (fr_place_treeleaf_s_retreat_5e14cc.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'fr place:Treeleaf's Retreat' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Treeleaf_s_Retreat.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}
