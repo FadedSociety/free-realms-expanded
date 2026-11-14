@@ -40,6 +40,12 @@ pub struct Behaviour {
     pub attack_ms: u64,
     /// In arenas, stops chasing a player farther than this (m).
     pub chase_limit: f32,
+    /// In a dungeon (an unpaced fight), an enemy standing there from the start notices the
+    /// player only this close (m), or when hit; a wave or a woken enemy uses `chase_limit`.
+    /// (R) 15 m: dungeon groups stand 22.8-38.3 m from the arrival in 20 of 22 dungeons, and
+    /// the 2014 Bixie Hive video (wlFOW5TbYSI, 0:02-0:10) shows the player running about 8 s
+    /// in before the first group fights; the field notices at 8-10 m.
+    pub notice: f32,
     /// Skittish cycle when alone: run for `run_ms` at `run_speed` (slower
     /// than a running player), then rest `rest_ms` playing `rest_animation`
     /// (com_stunned, AnimationTypes.xml 1401) without attacking - the window
@@ -164,6 +170,7 @@ impl Default for Behaviour {
             reach: 2.5,
             attack_ms: 1000,
             chase_limit: 40.0,
+            notice: 15.0,
             run_ms: 4000,
             rest_ms: 3000,
             run_speed: 3.5,
@@ -352,6 +359,7 @@ impl Behaviour {
             ("move_speed", self.move_speed),
             ("reach", self.reach),
             ("chase_limit", self.chase_limit),
+            ("notice", self.notice),
             ("run_speed", self.run_speed),
             ("leash", self.leash),
             ("run_from", self.run_from),

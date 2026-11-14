@@ -857,6 +857,11 @@ impl EncounterEngine {
             out.replies.push(relevance(&wake, false));
             out.changed = true;
             self.enemies_spawned(&wake, now_ms, out);
+            for guid in &wake {
+                if let Some(memory) = self.arena.brains.get_mut(guid) {
+                    memory.alert = true;
+                }
+            }
         }
         if run.exit_is_open() && run.bind.shown.insert(def.guid(None)) {
             self.send_extra(&def, def.guid(None), out);
