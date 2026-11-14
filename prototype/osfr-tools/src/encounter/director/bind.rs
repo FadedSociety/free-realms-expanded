@@ -858,7 +858,7 @@ impl EncounterEngine {
                     out.replies.push(boss_display(a.guid, true));
                 }
             }
-            out.replies.push(relevance(&wake, false));
+            out.replies.push(instance_relevance(&wake, false));
             out.changed = true;
             self.enemies_spawned(&wake, now_ms, out);
             for guid in &wake {

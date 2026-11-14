@@ -332,6 +332,7 @@ impl SharedFieldState {
                     f.state.position,
                     0,
                     true,
+                    false, // a shared field is the open world (L1213)
                 )),
                 field_marker::enemy(guid, f.marker),
                 Some(bar),

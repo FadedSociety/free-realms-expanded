@@ -188,12 +188,30 @@ pub(super) fn hover(guid: u64, cursor: u8) -> Vec<u8> {
     b.extend([1, cursor, 0]);
     b
 }
+/// 35/12 cursor rows (`Resources/Cursors.txt`): 1 `cursor_interaction_combat`, 5 `cursor_talk`,
+/// 11 `cursor_interaction_fight`.
+const COMBAT_CURSOR: u8 = 1;
+const TALK_CURSOR: u8 = 5;
+const FIGHT_CURSOR: u8 = 11;
+
+/// 35/12 for open-world enemies (and a guide first, with the talk cursor).
 pub(super) fn relevance(guids: &[u64], guide: bool) -> Vec<u8> {
+    relevance_with(guids, guide, COMBAT_CURSOR)
+}
+
+/// L1213 (A43): 35/12 for the enemies of an instance fight. Live gave them cursor 11 (p12: all
+/// 52 Bixie Soldier, Battlemage and wave-wolf rows). With it and the live reach (`reach`), the
+/// client keeps its press-X prompt off them and a click attacks (native, 2026-11-14).
+pub(super) fn instance_relevance(guids: &[u64], guide: bool) -> Vec<u8> {
+    relevance_with(guids, guide, FIGHT_CURSOR)
+}
+
+fn relevance_with(guids: &[u64], guide: bool, cursor: u8) -> Vec<u8> {
     let mut b = header(35, 12);
     b.extend((guids.len() as i32).to_le_bytes());
     for (i, g) in guids.iter().enumerate() {
         b.extend(g.to_le_bytes());
-        b.extend([1, if guide && i == 0 { 5 } else { 1 }, 0]);
+        b.extend([1, if guide && i == 0 { TALK_CURSOR } else { cursor }, 0]);
     }
     b
 }
@@ -248,23 +266,28 @@ pub fn zone_begin_packet(zone: &ZoneTransition) -> Vec<u8> {
     b
 }
 
-/// AddNpc `interact_range` (+133) for an engine actor: the guide 12 m, an enemy 0, the rest
-/// (the exit door, captives, talkers, pickups) 3 m. The client's press-X prompt picks the nearest
-/// interactive actor whose range covers the player (`sub_BAF6E0` 00baf6e0 reads it at actor
-/// +0x1818); the Kaboomers' 3 m drew it over them (owner, rc-0137), and so did every dungeon
-/// enemy whose hit comes from its rank, not a `damage` of its own (owner 2026-11-13: "add an
-/// identifier for enemies spawned in dungeons and inside instances"). `enemy` is that marker:
-/// the caller knows what it spawns. (R) Live sent 100 to its hostiles (p12: all 52 Bixie
-/// Soldier, Battlemage and wave-wolf AddNpc rows, with 35/12 cursor 11), so 0 is the owner's
-/// rule, not the capture's. The enemy stays interactable (+224) with its 35/12 cursor, so a
-/// click still targets it.
-fn reach(disposition: i32, enemy: bool) -> i32 {
+/// AddNpc `interact_range` (+133) for an engine actor: the guide 12 m, an instance enemy 100, an
+/// open-world enemy 0, the rest (the exit door, captives, talkers, pickups) 3 m. The client's
+/// press-X prompt picks the nearest interactive actor whose range covers the player (`sub_BAF6E0`
+/// 00baf6e0 reads it at actor +0x1818); the Kaboomers' 3 m drew it over them (owner, rc-0137),
+/// and so did every dungeon enemy whose hit comes from its rank (owner 2026-11-13: "add an
+/// identifier for enemies spawned in dungeons and inside instances"). `enemy` is that marker.
+/// L1213 (A43): an instance enemy with reach 0 could not be clicked at all (the click walked the
+/// player to it and never attacked). Live sent its instance hostiles 100 with 35/12 cursor 11
+/// (p12: all 52 Bixie Soldier, Battlemage and wave-wolf AddNpc rows), and with both the press-X
+/// prompt stays off them and a click attacks (native, 2026-11-14). Open-world enemies keep 0 and
+/// cursor 1, as before; they are not checked natively with 100 (R).
+fn reach(disposition: i32, enemy: bool, instance: bool) -> i32 {
     match disposition {
         2 => 12,
+        0 if enemy && instance => INSTANCE_ENEMY_REACH,
         0 if enemy => 0,
         _ => 3,
     }
 }
+
+/// Live's AddNpc reach for an instance hostile (p12).
+const INSTANCE_ENEMY_REACH: i32 = 100;
 
 pub(super) fn spawn_actor(
     template: &[u8],
@@ -272,6 +295,7 @@ pub(super) fn spawn_actor(
     position: [f32; 3],
     disposition: i32,
     enemy: bool,
+    instance: bool,
 ) -> Vec<u8> {
     let mut b = template.to_vec();
     b[4..12].copy_from_slice(&a.guid.to_le_bytes());
@@ -287,7 +311,7 @@ pub(super) fn spawn_actor(
     b[69..73].copy_from_slice(&0_i32.to_le_bytes());
     b[77..81].copy_from_slice(&disposition.to_le_bytes());
     b[128..132].copy_from_slice(&3.0_f32.to_le_bytes());
-    b[133..137].copy_from_slice(&reach(disposition, enemy).to_le_bytes());
+    b[133..137].copy_from_slice(&reach(disposition, enemy, instance).to_le_bytes());
     b[137..141].copy_from_slice(&2_i32.to_le_bytes());
     b[141..145].copy_from_slice(&3_i32.to_le_bytes());
     b[145..149].copy_from_slice(&1_i32.to_le_bytes());

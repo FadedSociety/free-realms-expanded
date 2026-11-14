@@ -66,7 +66,7 @@ pub use self::wire::{animation, zone_begin_packet};
 use self::wire::{
     attack_processed, boss_display, combat_flag, encounter_header, encounter_state,
     enemy_health, enemy_hp, game_over, header, menu, minigame, movement, objective,
-    objective_complete, player_hp, relevance, remove, replace_string, respawn_hide, rules,
+    objective_complete, player_hp, relevance, instance_relevance, remove, replace_string, respawn_hide, rules,
     left_unfinished, spawn_actor,
 };
 use crate::abilities::effect_packets::encode_play_composite_effect as composite_effect;
@@ -1407,7 +1407,9 @@ impl EncounterEngine {
                 }
             }
         }
-        out.replies.push(relevance(&guids, true));
+        // L1213: the talk cursor only when a guide leads the list; without one, the first enemy
+        // took the talk cursor.
+        out.replies.push(instance_relevance(&guids, d.guide.is_some()));
         if !self.run_goals(&mut out) {
             let (count, goal) = goal_progress(d, active);
             out.replies.extend(card::goal_opened(&card::goal_row(d.objective_id, false, goal)));
@@ -2112,15 +2114,16 @@ impl EncounterEngine {
     }
 
     /// An engine actor; a hostile one (disposition 0) is an enemy, in the open world or an
-    /// instance, and draws no press-X prompt.
+    /// instance (a running fight), and draws no press-X prompt.
     fn spawn(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-        spawn_actor(&self.content.template, a, position, disposition, disposition == 0)
+        let (enemy, instance) = (disposition == 0, self.active());
+        spawn_actor(&self.content.template, a, position, disposition, enemy, instance)
     }
 
     /// A hostile-flagged actor that is not an enemy (the exit door, made friendly at once): it
     /// keeps its press-X prompt.
     fn spawn_object(&self, a: &Actor, position: [f32; 3], disposition: i32) -> Vec<u8> {
-        spawn_actor(&self.content.template, a, position, disposition, false)
+        spawn_actor(&self.content.template, a, position, disposition, false, false)
     }
 }
 

@@ -270,6 +270,9 @@ fn an_open_world_enemy_is_clickable_but_draws_no_press_x() {
 /// file's kinds hit by their rank, with no `damage` of their own, so the old "a hostile that
 /// hits" rule gave the Bixie Hive's guards a 3 m reach. Every enemy the engine spawns inside an
 /// instance is marked as one and draws no prompt; it can still be clicked.
+/// L1213 (A43): with reach 0 a click on one only walked the player to it. Live's instance values,
+/// reach 100 and the fight cursor (Cursors.txt 11), keep press-X off and let a click attack
+/// (native, run `client-baseline-20261114T121807Z`).
 #[test]
 fn an_instance_enemy_is_clickable_but_draws_no_press_x() {
     let door = entrance("bixie_hive");
@@ -282,9 +285,15 @@ fn an_instance_enemy_is_clickable_but_draws_no_press_x() {
         .collect();
     let enemies: Vec<_> = drawn.iter().filter(|npc| npc.disposition == 0).collect();
     assert!(!enemies.is_empty(), "the hive's guards are drawn on arrival");
+    let cursor = |guid: u64| {
+        (arena.iter().filter(|p| p.starts_with(&[35, 0, 12, 0]))).find_map(|p| {
+            (p[8..].chunks_exact(11)).find(|e| e[..8] == guid.to_le_bytes()).map(|e| e[9])
+        })
+    };
     for npc in &enemies {
-        assert_eq!(npc.interact_range, 0, "{} ({}) draws a press-X", npc.npc_name, npc.actor_id);
+        assert_eq!(npc.interact_range, 100, "{} ({}): live's reach", npc.npc_name, npc.actor_id);
         assert_eq!(npc.is_interactable, 1, "{} cannot be clicked", npc.actor_id);
+        assert_eq!(cursor(npc.actor_id), Some(11), "{}: the fight cursor", npc.actor_id);
     }
     for npc in drawn.iter().filter(|npc| npc.disposition != 0) {
         assert!(npc.interact_range > 0, "{} lost its press-X", npc.npc_name);
