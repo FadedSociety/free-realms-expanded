@@ -597,6 +597,51 @@ fn a_player_who_stands_up_takes_no_damage_for_the_fight_grace() {
     let _ = std::fs::remove_dir_all(dir);
 }
 
+/// A39 (owner 2026-11-13): the Bixie Workers could not be freed. The client makes an actor
+/// clickable only through its 35/12 hover cursor, and no ally ever got one. A captive a `free`
+/// goal targets now gets the talk cursor (5) when it appears and a click frees it; its
+/// `interact` toggle switches that off, and then a click frees nobody.
+#[test]
+fn a_captive_gets_the_talk_cursor_and_its_toggle_switches_it_off() {
+    let captive_fight = |id: u32, interact: Value| {
+        fight(
+            id,
+            json!({
+                "kind": "dungeon",
+                "actors": {
+                    "boss": {"definition": "chief", "at": [0, 0, 40]},
+                    "worker": {"definition": "captive", "at": [0, 0, 5], "tags": ["captive"],
+                               "interact": interact}
+                },
+                "objectives": [
+                    {"id": "boss", "kind": "defeat", "text_id": 14, "target": {"actor": "boss"},
+                     "primary": true},
+                    {"id": "bonus", "kind": "free", "text_id": 15, "target": {"tag": "captive"},
+                     "count": 1, "bonus": true}
+                ]
+            }),
+        )
+    };
+    for (id, interact, cursor) in [(625, Value::Null, true), (626, json!({"enabled": false}), false)] {
+        let (dir, mut engine) = engine_with(&[captive_fight(id, interact)]);
+        let replies = enter(&mut engine, id, 1_000);
+        let worker = (replies.iter())
+            .filter(|r| r.starts_with(&[35, 0, 2, 0]))
+            .map(|r| osfr_tools::startup_world::parse_add_npc(r).unwrap())
+            .find(|npc| npc.npc_name == "Captive")
+            .expect("the captive is drawn")
+            .actor_id;
+        let mut hover = vec![35, 0, 12, 0, 1, 0, 0, 0];
+        hover.extend(worker.to_le_bytes());
+        hover.extend([1, 5, 0]);
+        assert_eq!(replies.contains(&hover), cursor, "fight {id}: the talk cursor");
+        engine.handle(&click(worker), 1, [0.0, 0.0, 5.0], BRAWLER, 2_000).unwrap();
+        let freed = engine.fight_run().unwrap().goal("bonus").unwrap().1;
+        assert_eq!(freed, u32::from(cursor), "fight {id}: the click frees the captive");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+}
+
 /// A26 (native, 2026-11-13): the Bixie Hive's first guards stood 32-34 m from the arrival,
 /// inside the 40 m chase limit, and charged the player before they could act. In a dungeon (an
 /// unpaced fight) an enemy standing there from the start waits until the player comes within
