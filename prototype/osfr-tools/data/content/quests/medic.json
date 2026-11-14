@@ -2151,11 +2151,17 @@
               ]
             }
           ],
-          "job_xp": {},
+          "job_xp": {
+            "11": 360
+          },
           "source": [
             {
               "kind": "wiki",
               "evidence": "Medic: No Pain, No Gain (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_no_pain_no_gain_9a3249)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) Medic XP 360: the wiki names this quest's item but no stars; the band-4 Medic quests before the level-20 gate pay 350-360 (3090024-3090026 360, 3090028 350), so the band-5 quest after it pays 360 (L1202, 2026-11-13)."
             }
           ]
         }
