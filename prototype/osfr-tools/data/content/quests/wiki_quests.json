@@ -34206,12 +34206,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Description from the client's own text, read by the lead (L1202, 2026-11-13): 10161 'Get the kart parts for Speedy from the Robgoblin Treasure Trove.' (title + 1). Title - 1 (10159) is the previous quest's goal line, so the quest has no offer id of its own."
         }
       ],
       "enabled": true,
       "end_text_string_id": 416261,
       "repeatable": true,
-      "repeat_hours": 24
+      "repeat_hours": 24,
+      "description_string_id": 10161
     },
     {
       "id": 3958018,
@@ -34349,10 +34354,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Offer from the client's own text, read by the lead (L1202, 2026-11-13): 72554 'My mother told me she once dropped something very special to her when she was fleeing from a spider...', the wiki's intro word for word."
         }
       ],
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 416261,
+      "intro_text_string_id": 72554
     },
     {
       "id": 3958033,
@@ -34407,9 +34417,13 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) This quest stays disabled (L1202, 2026-11-13): its title id 384001 is the card game's stat label 'Margin of Victory' (between 384000 'Number of Turns' and 384002 'Number of Heroes Played'), and the client's locale holds none of the quest's own text (the wiki's 'the Gloam seems to have its own racing team now'), so its card would show a stat label. On again with a client title and offer line."
         }
       ],
-      "enabled": true,
+      "enabled": false,
       "end_text_string_id": 416261
     },
     {
@@ -35010,7 +35024,7 @@
     },
     {
       "id": 3958130,
-      "title_string_id": 10395,
+      "title_string_id": 392131,
       "giver_npc_id": 9500000770,
       "prerequisite_quest_ids": [
         3958110
@@ -35110,11 +35124,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Title, offer and closing line from the quest's own client block, read by the lead (L1202, 2026-11-13): 392130 offer, 392131 'Super Star!', 392132 description, 392133 'Did you hear the crowd cheer as you played?...'. quest_wire had matched the player title 'Superstar' (10395) by name."
         }
       ],
       "description_string_id": 392132,
       "enabled": true,
-      "end_text_string_id": 416261
+      "end_text_string_id": 392133,
+      "intro_text_string_id": 392130
     },
     {
       "id": 3958139,

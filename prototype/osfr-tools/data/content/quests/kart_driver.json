@@ -5301,11 +5301,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) No closing line in the wiki or the client block: stock client line 416261 'Thanks for helping us!' (an NPC-side line beside its player reply 416262; no client code references it)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Offer, description and closing line from the client's own text, read by the lead (L1202, 2026-11-13): the SG Tour 400 block, laid out as Frost Ridge's (395342-395345): 395337 'The first leg of the championship is here at Wildwood...', 395339 'You've finally made it to the SG Tour 400!...', 395340 'Bravo! It's been a long time since anyone has beaten me!...'."
         }
       ],
       "enabled": true,
       "job": 48,
-      "end_text_string_id": 416261
+      "end_text_string_id": 395340,
+      "intro_text_string_id": 395337,
+      "description_string_id": 395339
     },
     {
       "id": 3080046,
