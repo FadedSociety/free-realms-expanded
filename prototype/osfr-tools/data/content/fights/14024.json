@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "id": 14024,
+  "kind": "dungeon",
+  "title_id": 4469,
+  "description_id": 92480,
+  "icon_id": 9556,
+  "difficulty": 5,
+  "entry": {
+    "min_combat_level": 13
+  },
+  "place": {
+    "zone": 1232,
+    "arena": "bw_mo_mushrooms",
+    "arrive": [
+      60.68,
+      30.62,
+      153.05
+    ],
+    "exit_door": [
+      259.93,
+      31.24,
+      222.1
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "dark_spore_knight": {
+      "definition_id": 1402401,
+      "name": "Dark Spore Knight",
+      "name_id": 4692,
+      "model_id": 478,
+      "rank": "normal"
+    },
+    "spore_shambler": {
+      "definition_id": 950054,
+      "name": "Spore Shambler",
+      "name_id": 4456,
+      "model_id": 72,
+      "rank": "normal"
+    },
+    "mushroom_shambler": {
+      "definition_id": 1402403,
+      "name": "Mushroom Shambler",
+      "name_id": 4081,
+      "model_id": 478,
+      "rank": "normal"
+    },
+    "necrolaceous": {
+      "definition_id": 1402421,
+      "name": "Necrolaceous",
+      "name_id": 4580,
+      "model_id": 478,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "dark_spore_knight",
+      "at": [
+        90.68,
+        30.06,
+        165.65
+      ],
+      "heading": -2.358,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "spore_shambler",
+      "at": [
+        86.72,
+        30.08,
+        165.83
+      ],
+      "heading": -2.744,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "mushroom_shambler",
+      "at": [
+        91.78,
+        30.04,
+        162.04
+      ],
+      "heading": -1.97,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "dark_spore_knight",
+      "at": [
+        92.34,
+        30.03,
+        168.68
+      ],
+      "heading": -2.431,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "spore_shambler",
+      "at": [
+        120.32,
+        30.0,
+        183.41
+      ],
+      "heading": -0.661,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "mushroom_shambler",
+      "at": [
+        121.85,
+        30.02,
+        180.19
+      ],
+      "heading": -0.595,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "dark_spore_knight",
+      "at": [
+        117.45,
+        29.92,
+        183.98
+      ],
+      "heading": -0.352,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "spore_shambler",
+      "at": [
+        123.9,
+        29.99,
+        182.93
+      ],
+      "heading": -0.891,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "mushroom_shambler",
+      "at": [
+        158.49,
+        29.94,
+        191.05
+      ],
+      "heading": -2.854,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "dark_spore_knight",
+      "at": [
+        159.23,
+        29.99,
+        194.49
+      ],
+      "heading": -2.877,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "spore_shambler",
+      "at": [
+        155.98,
+        29.96,
+        191.79
+      ],
+      "heading": 3.123,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "mushroom_shambler",
+      "at": [
+        161.16,
+        30.14,
+        192.05
+      ],
+      "heading": -2.629,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "dark_spore_knight",
+      "at": [
+        200.84,
+        31.37,
+        203.13
+      ],
+      "heading": -1.974,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "spore_shambler",
+      "at": [
+        205.15,
+        31.82,
+        202.91
+      ],
+      "heading": -1.864,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "mushroom_shambler",
+      "at": [
+        198.53,
+        30.95,
+        199.52
+      ],
+      "heading": -1.73,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "dark_spore_knight",
+      "at": [
+        203.01,
+        31.66,
+        204.76
+      ],
+      "heading": -2.015,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "spore_shambler",
+      "at": [
+        235.4,
+        33.23,
+        204.41
+      ],
+      "heading": -2.421,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "mushroom_shambler",
+      "at": [
+        232.17,
+        33.8,
+        205.57
+      ],
+      "heading": -3.045,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "dark_spore_knight",
+      "at": [
+        237.14,
+        33.31,
+        202.45
+      ],
+      "heading": -1.97,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "spore_shambler",
+      "at": [
+        235.51,
+        32.83,
+        207.36
+      ],
+      "heading": -2.65,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "necrolaceous",
+      "at": [
+        263.07,
+        31.27,
+        219.56
+      ],
+      "heading": -2.213,
+      "boss": true,
+      "dormant": true,
+      "scale": 2.1
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        260.1,
+        31.26,
+        216.82
+      ],
+      [
+        265.23,
+        31.24,
+        223.46
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "dark_spore_knight",
+          "count": 2,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 92413,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 76266, "name_id": 133274, "icon_id": 5392, "job": 2},
+      {"item_id": 76260, "name_id": 133268, "icon_id": 5395, "job": 2},
+      {"item_id": 75412, "name_id": 131156, "icon_id": 3717, "job": 2},
+      {"item_id": 75379, "name_id": 131123, "icon_id": 551, "job": 2},
+      {"item_id": 75113, "name_id": 131997, "icon_id": 3152, "job": 2},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 2},
+      {"item_id": 76136, "name_id": 133144, "icon_id": 5735, "job": 11},
+      {"item_id": 76130, "name_id": 133138, "icon_id": 5350, "job": 11},
+      {"item_id": 75347, "name_id": 131091, "icon_id": 3717, "job": 11},
+      {"item_id": 75314, "name_id": 131058, "icon_id": 551, "job": 11},
+      {"item_id": 75083, "name_id": 131967, "icon_id": 3122, "job": 11},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 11},
+      {"item_id": 76462, "name_id": 133470, "icon_id": 5087, "job": 12},
+      {"item_id": 76455, "name_id": 133463, "icon_id": 5090, "job": 12},
+      {"item_id": 75542, "name_id": 131286, "icon_id": 3717, "job": 12},
+      {"item_id": 75509, "name_id": 131253, "icon_id": 551, "job": 12},
+      {"item_id": 75173, "name_id": 132057, "icon_id": 3160, "job": 12},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 12},
+      {"item_id": 76376, "name_id": 133384, "icon_id": 5800, "job": 32},
+      {"item_id": 76370, "name_id": 133378, "icon_id": 5456, "job": 32},
+      {"item_id": 75477, "name_id": 131221, "icon_id": 3717, "job": 32},
+      {"item_id": 75444, "name_id": 131188, "icon_id": 551, "job": 32},
+      {"item_id": 75143, "name_id": 132027, "icon_id": 3219, "job": 32},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 32},
+      {"item_id": 75790, "name_id": 132798, "icon_id": 5739, "job": 35},
+      {"item_id": 75784, "name_id": 132792, "icon_id": 4954, "job": 35},
+      {"item_id": 75217, "name_id": 130961, "icon_id": 3717, "job": 35},
+      {"item_id": 75184, "name_id": 130928, "icon_id": 551, "job": 35},
+      {"item_id": 75023, "name_id": 131907, "icon_id": 3106, "job": 35},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 35},
+      {"item_id": 75911, "name_id": 132919, "icon_id": 5633, "job": 43},
+      {"item_id": 75905, "name_id": 132913, "icon_id": 5002, "job": 43},
+      {"item_id": 75282, "name_id": 131026, "icon_id": 3717, "job": 43},
+      {"item_id": 75249, "name_id": 130993, "icon_id": 551, "job": 43},
+      {"item_id": 75053, "name_id": 131937, "icon_id": 3126, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973, "job": 43},
+      {"item_id": 10482, "name_id": 6666, "icon_id": 973}
+    ],
+    "wheel_coins": 117,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Dark Spore Knight: model 478 (treesoldier_mushroom.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Mushroom Shambler: model 478 (treesoldier_mushroom.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Necrolaceous: model 478 (treesoldier_mushroom.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 33 ('Dark Spore Depths (the live dungeon: Necrolaceous's fungal army through the mush'): scene bw_mo_mushrooms, 5 groups standing at the start, 1 coming later, the boss Necrolaceous last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 4469, 92480, icon 9556 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_mo_mushrooms needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 14024*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/dark_spore_depths.json, its notes page and the fork battle; under the id (14024) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_dark_spore_depths_4393b7.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Dark Spore Depths' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Dark_Spore_Depths.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

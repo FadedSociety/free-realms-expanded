@@ -10,12 +10,26 @@
         "encounters": [
           {
             "id": "main",
-            "goals": [],
+            "goals": [
+              {
+                "kind": "fight_goal",
+                "id": 1,
+                "fight_id": 14024,
+                "goal": "main",
+                "count": 1,
+                "source": [
+                  {
+                    "kind": "reconstructed",
+                    "evidence": "(R) fights/14024.json goal 'main' (scripts/dungeon_fights.py)"
+                  }
+                ]
+              }
+            ],
             "rewards": [],
             "source": [
               {
                 "kind": "reconstructed",
-                "evidence": "(R) No script runs (scripts/dungeon_fights.py): Dark Spore Knight: model 478 is in no client pack; Mushroom Shambler: model 478 is in no client pack; Necrolaceous: model 478 is in no client pack; held: dark_spore_knight: model 478 is treesoldier_mushroom.adr, which no client pack holds."
+                "evidence": "(R) Goals map onto fights/14024.json (scripts/dungeon_fights.py); not mapped: bonus 'Remove five Necro Spores from Dark Spore Depths!' is not a free-the-captives goal the mapping places."
               }
             ]
           }

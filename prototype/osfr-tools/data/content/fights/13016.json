@@ -1,0 +1,405 @@
+{
+  "schema_version": 1,
+  "id": 13016,
+  "kind": "dungeon",
+  "title_id": 71770,
+  "description_id": 74906,
+  "icon_id": 310,
+  "difficulty": 1,
+  "entry": {
+    "min_combat_level": 0
+  },
+  "place": {
+    "zone": 1205,
+    "arena": "mv_den_of_secrets",
+    "arrive": [
+      264.39,
+      14.49,
+      302.11
+    ],
+    "exit_door": [
+      302.39,
+      2.77,
+      121.49
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "cultist_initiate": {
+      "definition_id": 1301601,
+      "name": "Cultist Initiate",
+      "name_id": 440726,
+      "model_id": 500,
+      "rank": "normal"
+    },
+    "w58_fairy_cultist_l3_enemy": {
+      "definition_id": 930010,
+      "name": "Fairy Cultist",
+      "name_id": 441992,
+      "model_id": 500,
+      "rank": "normal"
+    },
+    "illusionist_liana": {
+      "definition_id": 1301619,
+      "name": "Illusionist Liana",
+      "name_id": 74894,
+      "model_id": 458,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "cultist_initiate",
+      "at": [
+        265.65,
+        7.56,
+        272.93
+      ],
+      "heading": 0.14,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        267.69,
+        7.64,
+        270.83
+      ],
+      "heading": -0.038,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "cultist_initiate",
+      "at": [
+        263.13,
+        7.91,
+        269.65
+      ],
+      "heading": 0.278,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        308.57,
+        12.16,
+        223.9
+      ],
+      "heading": -1.083,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "cultist_initiate",
+      "at": [
+        304.99,
+        12.0,
+        223.79
+      ],
+      "heading": -0.966,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        304.06,
+        11.76,
+        226.61
+      ],
+      "heading": -1.105,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "cultist_initiate",
+      "at": [
+        354.01,
+        9.12,
+        249.09
+      ],
+      "heading": -2.187,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        352.67,
+        9.63,
+        244.79
+      ],
+      "heading": -1.946,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "cultist_initiate",
+      "at": [
+        355.64,
+        9.97,
+        245.09
+      ],
+      "heading": -1.889,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        352.79,
+        17.49,
+        205.39
+      ],
+      "heading": 0.061,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "cultist_initiate",
+      "at": [
+        350.36,
+        17.62,
+        206.93
+      ],
+      "heading": 0.511,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        350.07,
+        17.79,
+        203.89
+      ],
+      "heading": 0.368,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "cultist_initiate",
+      "at": [
+        289.9,
+        16.53,
+        196.36
+      ],
+      "heading": 2.219,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        293.93,
+        17.09,
+        195.63
+      ],
+      "heading": 2.593,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "cultist_initiate",
+      "at": [
+        294.15,
+        17.01,
+        199.38
+      ],
+      "heading": 2.849,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        265.42,
+        10.89,
+        151.71
+      ],
+      "heading": -0.699,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "cultist_initiate",
+      "at": [
+        269.5,
+        11.58,
+        151.78
+      ],
+      "heading": -0.909,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "w58_fairy_cultist_l3_enemy",
+      "at": [
+        264.86,
+        10.9,
+        155.07
+      ],
+      "heading": -0.883,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "illusionist_liana",
+      "at": [
+        310.29,
+        2.3,
+        112.39
+      ],
+      "heading": -2.284,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.2
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        310.61,
+        2.3,
+        115.79
+      ],
+      [
+        307.33,
+        2.35,
+        113.7
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "w58_fairy_cultist_l3_enemy",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "cultist_initiate",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 74907,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75748, "name_id": 132756, "icon_id": 2395, "job": 35},
+      {"item_id": 75005, "name_id": 131889, "icon_id": 3110, "job": 35},
+      {"item_id": 75196, "name_id": 130940, "icon_id": 553, "job": 35},
+      {"item_id": 75225, "name_id": 130969, "icon_id": 3721, "job": 35},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "job": 35},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730}
+    ],
+    "wheel_coins": 1,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 6 ('Den of Secrets (the live dungeon: fairy cultists past the prisoners' cages, Illu'): scene mv_den_of_secrets, 6 groups standing at the start, 1 coming later, the boss Illusionist Liana last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 71770, 74906, icon 310 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene mv_den_of_secrets needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13016*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/den_of_secrets.json, its notes page and the fork battle; under the id (13016) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_den_of_secrets_0cdc04.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Den of Secrets' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Den_of_Secrets.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "id": 13032,
+  "kind": "dungeon",
+  "title_id": 4187,
+  "description_id": 103198,
+  "icon_id": 676,
+  "difficulty": 3,
+  "entry": {
+    "min_combat_level": 5
+  },
+  "place": {
+    "zone": 1210,
+    "arena": "bw_mushroom_cave",
+    "arrive": [
+      63.34,
+      30.56,
+      142.93
+    ],
+    "exit_door": [
+      345.15,
+      39.2,
+      152.59
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "mushroom_shambler": {
+      "definition_id": 1303201,
+      "name": "Mushroom Shambler",
+      "name_id": 4081,
+      "model_id": 478,
+      "rank": "normal"
+    },
+    "fungal_soldier": {
+      "definition_id": 1303202,
+      "name": "Fungal Soldier",
+      "name_id": 4581,
+      "model_id": 71,
+      "rank": "normal"
+    },
+    "screecher_bat": {
+      "definition_id": 1303203,
+      "name": "Screecher Bat",
+      "name_id": 6498,
+      "model_id": 29,
+      "rank": "normal"
+    },
+    "marasmius": {
+      "definition_id": 1303222,
+      "name": "Marasmius",
+      "name_id": 5506,
+      "model_id": 121,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "mushroom_shambler",
+      "at": [
+        90.74,
+        30.08,
+        163.18
+      ],
+      "heading": -2.321,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "fungal_soldier",
+      "at": [
+        92.26,
+        30.0,
+        165.32
+      ],
+      "heading": -2.349,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "screecher_bat",
+      "at": [
+        88.61,
+        30.07,
+        165.11
+      ],
+      "heading": -2.499,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "fungal_soldier",
+      "at": [
+        124.15,
+        29.98,
+        184.0
+      ],
+      "heading": -2.68,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "screecher_bat",
+      "at": [
+        121.85,
+        29.93,
+        185.24
+      ],
+      "heading": -2.847,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "mushroom_shambler",
+      "at": [
+        118.91,
+        29.94,
+        184.73
+      ],
+      "heading": -3.032,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "screecher_bat",
+      "at": [
+        155.77,
+        30.0,
+        189.33
+      ],
+      "heading": 3.06,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "mushroom_shambler",
+      "at": [
+        161.36,
+        30.07,
+        193.69
+      ],
+      "heading": -2.614,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "fungal_soldier",
+      "at": [
+        155.2,
+        29.85,
+        193.33
+      ],
+      "heading": 3.032,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "mushroom_shambler",
+      "at": [
+        211.89,
+        32.17,
+        188.24
+      ],
+      "heading": -1.26,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "fungal_soldier",
+      "at": [
+        210.08,
+        32.27,
+        185.76
+      ],
+      "heading": -0.707,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "screecher_bat",
+      "at": [
+        207.19,
+        31.55,
+        187.81
+      ],
+      "heading": -0.314,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "fungal_soldier",
+      "at": [
+        266.62,
+        30.0,
+        181.51
+      ],
+      "heading": -0.904,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "screecher_bat",
+      "at": [
+        264.63,
+        29.96,
+        178.59
+      ],
+      "heading": -0.68,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "mushroom_shambler",
+      "at": [
+        268.94,
+        30.0,
+        178.24
+      ],
+      "heading": -0.844,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "screecher_bat",
+      "at": [
+        294.84,
+        33.72,
+        183.13
+      ],
+      "heading": -2.38,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "mushroom_shambler",
+      "at": [
+        298.33,
+        34.11,
+        183.4
+      ],
+      "heading": -2.22,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "fungal_soldier",
+      "at": [
+        295.03,
+        33.12,
+        179.9
+      ],
+      "heading": -2.14,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "mushroom_shambler",
+      "at": [
+        326.34,
+        34.73,
+        178.23
+      ],
+      "heading": 0.0,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "fungal_soldier",
+      "at": [
+        323.38,
+        34.69,
+        178.16
+      ],
+      "heading": 1.547,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "screecher_bat",
+      "at": [
+        326.69,
+        35.39,
+        174.79
+      ],
+      "heading": -0.1,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "marasmius",
+      "at": [
+        339.04,
+        38.46,
+        156.73
+      ],
+      "heading": -0.216,
+      "boss": true,
+      "dormant": true
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        338.91,
+        38.7,
+        153.07
+      ],
+      [
+        341.22,
+        38.45,
+        160.59
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "mushroom_shambler",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "screecher_bat",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 5095,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75096, "name_id": 131980, "icon_id": 3217, "job": 2},
+      {"item_id": 75421, "name_id": 131165, "icon_id": 3721, "job": 2},
+      {"item_id": 75392, "name_id": 131136, "icon_id": 554, "job": 2},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 2},
+      {"item_id": 76099, "name_id": 133107, "icon_id": 2359, "job": 11},
+      {"item_id": 75066, "name_id": 131950, "icon_id": 3145, "job": 11},
+      {"item_id": 75356, "name_id": 131100, "icon_id": 3721, "job": 11},
+      {"item_id": 75327, "name_id": 131071, "icon_id": 554, "job": 11},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 11},
+      {"item_id": 75551, "name_id": 131295, "icon_id": 3721, "job": 12},
+      {"item_id": 75522, "name_id": 131266, "icon_id": 554, "job": 12},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 12},
+      {"item_id": 76339, "name_id": 133347, "icon_id": 2523, "job": 32},
+      {"item_id": 75126, "name_id": 132010, "icon_id": 3129, "job": 32},
+      {"item_id": 75486, "name_id": 131230, "icon_id": 3721, "job": 32},
+      {"item_id": 75457, "name_id": 131201, "icon_id": 554, "job": 32},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 32},
+      {"item_id": 75006, "name_id": 131890, "icon_id": 3111, "job": 35},
+      {"item_id": 75226, "name_id": 130970, "icon_id": 3721, "job": 35},
+      {"item_id": 75197, "name_id": 130941, "icon_id": 554, "job": 35},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 35},
+      {"item_id": 75036, "name_id": 131920, "icon_id": 3123, "job": 43},
+      {"item_id": 75291, "name_id": 131035, "icon_id": 3721, "job": 43},
+      {"item_id": 75262, "name_id": 131006, "icon_id": 554, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3, "job": 43},
+      {"item_id": 2173, "name_id": 422909, "icon_id": 730, "quantity": 3}
+    ],
+    "wheel_coins": 80,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Mushroom Shambler: model 478 (treesoldier_mushroom.adr) is in no client pack; the community host serves it and every file it names (scripts/dungeon_fights.py HOST_SERVED)"
+    },
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 11 ('Mushroom Cavern (the live dungeon: fungal beasts and bats across the caverns, Ma'): scene bw_mushroom_cave, 7 groups standing at the start, 1 coming later, the boss Marasmius last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 4187, 103198, icon 676 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_mushroom_cave needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13032*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/mushroom_cavern.json, its notes page and the fork battle; under the id (13032) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_mushroom_cavern_342977.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Mushroom Cavern' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Mushroom_Cavern.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}

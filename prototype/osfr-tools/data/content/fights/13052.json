@@ -1,0 +1,494 @@
+{
+  "schema_version": 1,
+  "id": 13052,
+  "kind": "dungeon",
+  "title_id": 18143,
+  "description_id": 77964,
+  "icon_id": 886,
+  "difficulty": 4,
+  "entry": {
+    "min_combat_level": 9
+  },
+  "place": {
+    "zone": 1236,
+    "arena": "bw_corrupted_vale",
+    "arrive": [
+      149.6,
+      -1.55,
+      154.65
+    ],
+    "exit_door": [
+      102.46,
+      -33.7,
+      436.5
+    ]
+  },
+  "rules": {
+    "knockouts": 5,
+    "group_max": 4,
+    "time_limit_s": 0,
+    "retry": true,
+    "score": {
+      "per_enemy": 300,
+      "per_knockout_left": 25000,
+      "knockout_penalty": 5000,
+      "quick_value": 100000,
+      "quick_loss_per_s": 500
+    }
+  },
+  "kinds": {
+    "corrupted_wolf": {
+      "definition_id": 1305201,
+      "name": "Corrupted Wolf",
+      "name_id": 6285,
+      "model_id": 177,
+      "rank": "normal"
+    },
+    "gloam_hound": {
+      "definition_id": 1305202,
+      "name": "Gloam Hound",
+      "name_id": 437671,
+      "model_id": 3317,
+      "rank": "normal"
+    },
+    "mysterious_stranger": {
+      "definition_id": 1305225,
+      "name": "Mysterious Stranger",
+      "name_id": 18891,
+      "model_id": 733,
+      "rank": "dungeon_boss",
+      "boss": true
+    }
+  },
+  "actors": {
+    "g1": {
+      "definition": "corrupted_wolf",
+      "at": [
+        140.01,
+        2.22,
+        186.79
+      ],
+      "heading": 3.106,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g2": {
+      "definition": "gloam_hound",
+      "at": [
+        140.01,
+        3.16,
+        183.96
+      ],
+      "heading": 3.089,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g3": {
+      "definition": "corrupted_wolf",
+      "at": [
+        140.04,
+        1.69,
+        189.15
+      ],
+      "heading": 3.116,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g4": {
+      "definition": "gloam_hound",
+      "at": [
+        139.7,
+        0.67,
+        197.7
+      ],
+      "heading": 3.11,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g5": {
+      "definition": "gloam_hound",
+      "at": [
+        165.95,
+        -1.45,
+        249.3
+      ],
+      "heading": -2.277,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g6": {
+      "definition": "corrupted_wolf",
+      "at": [
+        167.15,
+        -1.44,
+        252.66
+      ],
+      "heading": -2.435,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g7": {
+      "definition": "gloam_hound",
+      "at": [
+        169.71,
+        -2.47,
+        250.9
+      ],
+      "heading": -2.175,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g8": {
+      "definition": "corrupted_wolf",
+      "at": [
+        163.52,
+        -1.49,
+        245.92
+      ],
+      "heading": -2.036,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g9": {
+      "definition": "corrupted_wolf",
+      "at": [
+        231.83,
+        -15.04,
+        256.64
+      ],
+      "heading": -2.102,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g10": {
+      "definition": "gloam_hound",
+      "at": [
+        229.67,
+        -14.81,
+        258.62
+      ],
+      "heading": -2.369,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g11": {
+      "definition": "corrupted_wolf",
+      "at": [
+        233.6,
+        -14.92,
+        258.73
+      ],
+      "heading": -2.168,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g12": {
+      "definition": "gloam_hound",
+      "at": [
+        229.54,
+        -14.85,
+        254.82
+      ],
+      "heading": -2.051,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g13": {
+      "definition": "gloam_hound",
+      "at": [
+        275.91,
+        -14.68,
+        311.56
+      ],
+      "heading": 2.425,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g14": {
+      "definition": "corrupted_wolf",
+      "at": [
+        278.09,
+        -14.49,
+        313.7
+      ],
+      "heading": 2.661,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g15": {
+      "definition": "gloam_hound",
+      "at": [
+        272.58,
+        -14.92,
+        312.65
+      ],
+      "heading": 2.311,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g16": {
+      "definition": "corrupted_wolf",
+      "at": [
+        276.96,
+        -13.96,
+        307.37
+      ],
+      "heading": 2.204,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g17": {
+      "definition": "corrupted_wolf",
+      "at": [
+        231.8,
+        -20.69,
+        361.05
+      ],
+      "heading": 2.548,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g18": {
+      "definition": "gloam_hound",
+      "at": [
+        229.09,
+        -21.01,
+        360.96
+      ],
+      "heading": 2.377,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g19": {
+      "definition": "corrupted_wolf",
+      "at": [
+        232.7,
+        -20.16,
+        358.05
+      ],
+      "heading": 2.443,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g20": {
+      "definition": "gloam_hound",
+      "at": [
+        230.0,
+        -21.0,
+        367.5
+      ],
+      "heading": 2.663,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g21": {
+      "definition": "gloam_hound",
+      "at": [
+        184.25,
+        -34.37,
+        410.04
+      ],
+      "heading": 3.125,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g22": {
+      "definition": "corrupted_wolf",
+      "at": [
+        181.43,
+        -34.2,
+        409.39
+      ],
+      "heading": 2.81,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g23": {
+      "definition": "gloam_hound",
+      "at": [
+        184.32,
+        -33.78,
+        406.0
+      ],
+      "heading": 3.127,
+      "tags": [
+        "guards"
+      ]
+    },
+    "g24": {
+      "definition": "corrupted_wolf",
+      "at": [
+        181.47,
+        -34.46,
+        413.17
+      ],
+      "heading": 2.909,
+      "tags": [
+        "guards"
+      ]
+    },
+    "boss": {
+      "definition": "mysterious_stranger",
+      "at": [
+        108.25,
+        -33.86,
+        423.6
+      ],
+      "heading": 3.042,
+      "boss": true,
+      "dormant": true,
+      "scale": 1.1
+    }
+  },
+  "points": {
+    "w1": [
+      [
+        105.17,
+        -34.28,
+        423.85
+      ],
+      [
+        107.24,
+        -34.11,
+        418.24
+      ]
+    ]
+  },
+  "waves": [
+    {
+      "id": "w1",
+      "when": {
+        "tag_dead": {
+          "tag": "guards",
+          "left": 0
+        }
+      },
+      "spawn": [
+        {
+          "definition": "gloam_hound",
+          "count": 1,
+          "at": "w1"
+        },
+        {
+          "definition": "corrupted_wolf",
+          "count": 1,
+          "at": "w1"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "main",
+      "kind": "defeat",
+      "text_id": 18908,
+      "target": {
+        "actor": "boss"
+      },
+      "primary": true
+    }
+  ],
+  "script": [
+    {
+      "id": "boss_in",
+      "when": {
+        "wave_left": {
+          "wave": "w1",
+          "left": 0
+        }
+      },
+      "once": true,
+      "do": [
+        {
+          "wake": {
+            "tag": "actor:boss"
+          }
+        }
+      ]
+    }
+  ],
+  "rewards": {
+    "coins": 25,
+    "job_xp": 50,
+    "wheel": [
+      {"item_id": 75411, "name_id": 131155, "icon_id": 3717, "job": 2},
+      {"item_id": 75378, "name_id": 131122, "icon_id": 550, "job": 2},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 2},
+      {"item_id": 75079, "name_id": 131963, "icon_id": 3149, "job": 11},
+      {"item_id": 75346, "name_id": 131090, "icon_id": 3717, "job": 11},
+      {"item_id": 75313, "name_id": 131057, "icon_id": 550, "job": 11},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 11},
+      {"item_id": 75541, "name_id": 131285, "icon_id": 3717, "job": 12},
+      {"item_id": 75508, "name_id": 131252, "icon_id": 550, "job": 12},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 12},
+      {"item_id": 75139, "name_id": 132023, "icon_id": 3127, "job": 32},
+      {"item_id": 75476, "name_id": 131220, "icon_id": 3717, "job": 32},
+      {"item_id": 75443, "name_id": 131187, "icon_id": 550, "job": 32},
+      {"item_id": 76351, "name_id": 133359, "icon_id": 2522, "job": 32},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 32},
+      {"item_id": 75216, "name_id": 130960, "icon_id": 3717, "job": 35},
+      {"item_id": 75183, "name_id": 130927, "icon_id": 550, "job": 35},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 35},
+      {"item_id": 75049, "name_id": 131933, "icon_id": 3128, "job": 43},
+      {"item_id": 75281, "name_id": 131025, "icon_id": 3717, "job": 43},
+      {"item_id": 75248, "name_id": 130992, "icon_id": 550, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3, "job": 43},
+      {"item_id": 3082, "name_id": 422912, "icon_id": 731, "quantity": 3}
+    ],
+    "wheel_coins": 202,
+    "drops": []
+  },
+  "source": [
+    {
+      "kind": "reference",
+      "evidence": "BJX fork Resources/Battles.json Id 37 ('Vale of the Ancients (the live dungeon: corrupted wolves and gloam hounds throug'): scene bw_corrupted_vale, 6 groups standing at the start, 1 coming later, the boss Mysterious Stranger last; every spot is the fork's."
+    },
+    {
+      "kind": "client",
+      "evidence": "Card: Global.Text 18143, 77964, icon 886 (the fork battle's own ids)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Not proven in the client: the scene bw_corrupted_vale needs one native load with this roster. The fork's scene layout, not a captured one; local kinds take ids 13052*100+n; knockouts, score, coins and the level gate are the fork fights' (fights/14xxx.json); job XP is the battles' 50."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) 1 later group(s) of the fork come as waves at their own spots: the first when the guards are down, each next one when the one before is down or 16 s after it (the captured Frostfang battle's gap)."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The guide's main goal is the one goal shown from the start and is done when the boss falls; the boss waits, dormant, for the waves. The results follow the exit door, which opens with the main goal."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/vale_of_the_ancients.json, its notes page and the fork battle; under the id (13052) quests name."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "L1197: knockouts 5, the page's own \"Don't get knocked out 5 times\" (fr_place_vale_of_the_ancients_544bed.html); the generator's default was 15"
+    },
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Vale of the Ancients' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Vale_of_the_Ancients.html). Each class's wheel holds its own items and the shared items; the coins are the page's."}
+  ]
+}
