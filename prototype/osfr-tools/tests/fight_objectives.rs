@@ -642,6 +642,59 @@ fn a_captive_gets_the_talk_cursor_and_its_toggle_switches_it_off() {
     }
 }
 
+/// A40 (owner 2026-11-13: "when killing enemies they have a chance to drop gold stacks, but our
+/// enemies don't"): an instance enemy's coin pile pays the coins of its fight's tier, and a fight
+/// with no difficulty counts as tier 1.
+#[test]
+fn an_instance_coin_pile_pays_the_coins_of_the_fights_tier() {
+    let shipped: Value =
+        serde_json::from_str(include_str!("../data/content/power_ups.json")).unwrap();
+    for (id, difficulty) in [(627_u32, 0_u64), (628, 3)] {
+        let mut kinds = kinds();
+        kinds["grunt"]["power_up_table"] = json!("t_coins");
+        kinds["grunt"]["max_health"] = json!(1);
+        let coin_fight = fight(
+            id,
+            json!({
+                "kind": "dungeon", "difficulty": difficulty, "kinds": kinds,
+                "actors": {
+                    "boss": {"definition": "chief", "at": [0, 0, 40]},
+                    "grunt": {"definition": "grunt", "at": [0, 0, 3]}
+                },
+                "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14,
+                                "target": {"actor": "boss"}, "primary": true}]
+            }),
+        );
+        let (dir, mut engine) = engine_with(&[coin_fight]);
+        let mut power_ups = shipped.clone();
+        power_ups["tables"]["t_coins"] =
+            json!({"guaranteed": ["coins_small"], "source": "test table"});
+        let path = dir.join("power_ups.json");
+        std::fs::write(&path, power_ups.to_string()).unwrap();
+        engine.load_power_ups(&path).unwrap();
+        enter(&mut engine, id, 1_000);
+        let nearest = |engine: &osfr_tools::encounter::EncounterEngine| {
+            (engine.standing_enemies().into_iter())
+                .filter(|e| e.1[2] < 20.0)
+                .map(|e| (e.0, e.1))
+                .next()
+        };
+        let (mut now, mut spot) = (2_000, [0.0; 3]);
+        while let Some((grunt, at)) = nearest(&engine) {
+            assert!(now < 60_000, "fight {id}: the grunt falls");
+            spot = at;
+            engine.attack(grunt, at, BRAWLER, 0, now).unwrap();
+            now += 700;
+        }
+        let picked = engine.tick(spot, BRAWLER, now).unwrap();
+        let tier = difficulty.max(1) as usize - 1;
+        let coins = shipped["kinds"]["coins_small"]["coins_by_tier"][tier].as_u64().unwrap();
+        let paid: Vec<u64> = picked.rewards.iter().map(|r| u64::from(r.coins)).collect();
+        assert_eq!(paid, [coins], "fight {id}: tier {}", tier + 1);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+}
+
 /// A26 (native, 2026-11-13): the Bixie Hive's first guards stood 32-34 m from the arrival,
 /// inside the 40 m chase limit, and charged the player before they could act. In a dungeon (an
 /// unpaced fight) an enemy standing there from the start waits until the player comes within

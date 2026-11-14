@@ -113,7 +113,7 @@ impl EncounterEngine {
             }
             Act::Drop(table) => {
                 if let Some(at) = self.enemy(guid).map(|(_, s)| s.position) {
-                    self.drop_power_ups(table, (guid, now_ms), at, now_ms, 1, out);
+                    self.drop_power_ups(table, (guid, now_ms), at, now_ms, 1, true, out);
                 }
             }
             // The rest needs a roster to draw from: battles only.

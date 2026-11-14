@@ -61,6 +61,8 @@ pub struct Kind {
     #[serde(default)]
     pub invulnerable: bool,
     pub speed_pct: Option<u32>,
+    /// A coin pile: the coins it pays on pickup, by battle tier 1..5 (automatic kinds only).
+    pub coins_by_tier: Option<Vec<u32>>,
     pub source: String,
 }
 
@@ -77,6 +79,8 @@ pub struct Roll {
 pub struct Table {
     pub health_roll: Option<Roll>,
     pub other_roll: Option<Roll>,
+    /// A third independent roll for coin piles (A40).
+    pub coin_roll: Option<Roll>,
     #[serde(default)]
     pub guaranteed: Vec<String>,
     pub source: String,
@@ -252,6 +256,9 @@ impl Kind {
             .damage_by_tier
             .as_ref()
             .is_none_or(|t| t.len() == TIERS && t.iter().all(|&x| in_range(x, 0.01, 1000.0)));
+        let coins = (self.coins_by_tier.as_ref()).is_none_or(|t| {
+            self.auto && t.len() == TIERS && t.iter().all(|c| (1..=10_000).contains(c))
+        });
         self.model_id > 0
             && sourced(&self.source)
             // A stored kind is shown on the client's key slot, so it needs a
@@ -270,6 +277,7 @@ impl Kind {
             && area
             && burn
             && tiers
+            && coins
     }
 }
 
@@ -278,10 +286,13 @@ impl Table {
         sourced(&self.source)
             && self.guaranteed.len() <= MAX_GUARANTEED
             && self.guaranteed.iter().all(|k| kinds.contains_key(k))
-            && [&self.health_roll, &self.other_roll]
-                .into_iter()
-                .flatten()
-                .all(|r| r.valid(kinds))
+            && self.rolls().all(|r| r.valid(kinds))
+    }
+
+    fn rolls(&self) -> impl Iterator<Item = &Roll> {
+        [&self.health_roll, &self.other_roll, &self.coin_roll]
+            .into_iter()
+            .flatten()
     }
 }
 
@@ -335,7 +346,7 @@ impl Rng {
 
 /// Kinds a defeated enemy drops: the guaranteed list, then the health roll,
 /// then the other roll (R: two independent rolls, mirroring the two original
-/// reactive procs). Pure: the same table and RNG state give the same drops.
+/// reactive procs), then the coin roll. Pure: the same table and RNG state give the same drops.
 pub fn roll<'a>(table: &'a Table, rng: &mut Rng) -> Vec<&'a str> {
     roll_scaled(table, rng, 1.0)
 }
@@ -343,10 +354,7 @@ pub fn roll<'a>(table: &'a Table, rng: &mut Rng) -> Vec<&'a str> {
 /// `roll` with every roll chance multiplied by `chance_scale` (shared kills).
 pub fn roll_scaled<'a>(table: &'a Table, rng: &mut Rng, chance_scale: f64) -> Vec<&'a str> {
     let mut drops: Vec<&str> = table.guaranteed.iter().map(String::as_str).collect();
-    for r in [&table.health_roll, &table.other_roll]
-        .into_iter()
-        .flatten()
-    {
+    for r in table.rolls() {
         if rng.next_f64() < r.chance * chance_scale {
             drops.extend(pick(&r.pool, rng));
         }

@@ -525,8 +525,10 @@ pub fn economy(gateway: &Gateway, prize_ids: &BTreeSet<i32>) -> Economy {
     let state = gateway.snapshot().gameplay.unwrap();
     let profiles = state.profiles.unwrap();
     let active = profiles.active;
+    // A40: coin piles enemies drop are random; what a battle pays leaves them out.
+    let piles = gateway.gameplay().map_or(0, |game| game.pile_coins());
     Economy {
-        coins: state.inventory.coins,
+        coins: state.inventory.coins.saturating_sub(piles),
         prizes: prize_ids
             .iter()
             .map(|id| {
@@ -545,8 +547,11 @@ pub fn economy(gateway: &Gateway, prize_ids: &BTreeSet<i32>) -> Economy {
     }
 }
 
+/// The wallet without the coins picked up from enemies' random coin piles (A40), so a check of
+/// what a battle pays stays exact.
 pub fn coins(gateway: &Gateway) -> u32 {
-    gateway.snapshot().gameplay.unwrap().inventory.coins
+    let piles = gateway.gameplay().map_or(0, |game| game.pile_coins());
+    (gateway.snapshot().gameplay.unwrap().inventory.coins).saturating_sub(piles)
 }
 
 pub fn active_profile(gateway: &Gateway) -> i32 {

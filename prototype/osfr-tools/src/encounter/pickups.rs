@@ -11,6 +11,11 @@ use super::*;
 /// enemy that names none, by its rank, as field enemies drop by theirs (`power_ups.json`: `boss`
 /// a guaranteed big heart, `elite` more often, `standard` the rest). An object and a minion (a
 /// summoned helper, which must not be farmed) drop nothing.
+/// A40: `PFX_coins_gold_collect_loot` (ActorCompositeEffectDefinitions.xml 15094) plays when a
+/// coin pile is picked up, and `PFX_coins_gold_explode_loot` (15093) where one lands.
+const COIN_PICKUP_EFFECT: i32 = 15094;
+const COIN_DROP_EFFECT: i32 = 15093;
+
 pub(in crate::encounter) fn rank_table(rank: Rank) -> Option<String> {
     let table = match rank {
         Rank::Object | Rank::Minion => return None,
@@ -25,7 +30,9 @@ impl EncounterEngine {
     /// Roll `table` for one participant of the kill and spawn each drop as a
     /// pickup actor. An unknown table, no loaded file or a full ground drops
     /// nothing. With several participants every chance is scaled by the file's
-    /// group multiplier.
+    /// group multiplier. `coin_piles` false skips coin piles (a field kill that already paid its
+    /// coins straight to the wallet).
+    #[allow(clippy::too_many_arguments)]
     pub(super) fn drop_power_ups(
         &mut self,
         table: &str,
@@ -33,6 +40,7 @@ impl EncounterEngine {
         at: [f32; 3],
         now_ms: u64,
         participants: usize,
+        coin_piles: bool,
         out: &mut EncounterOutcome,
     ) {
         let Some(power_ups) = self.power_ups.clone() else {
@@ -51,8 +59,12 @@ impl EncounterEngine {
             if self.pickups.len() >= power_ups.pickup.max_alive_per_instance as usize {
                 break;
             }
+            let kind = power_ups.kind(kind_id);
+            if !coin_piles && kind.is_some_and(|k| k.coins_by_tier.is_some()) {
+                continue;
+            }
             // A paced fight's hearts all come out of its heal budget (`pacing.rs`).
-            let heal = (power_ups.kind(kind_id)).and_then(|k| k.heal_pct_max).unwrap_or(0);
+            let heal = kind.and_then(|k| k.heal_pct_max).unwrap_or(0);
             if !self.paced_heart_fits(heal) {
                 continue;
             }
@@ -109,6 +121,10 @@ impl EncounterEngine {
         };
         // Disposition 1 (neutral): 0 is hostile and would be Tab-targeted.
         out.replies.push(self.spawn(&actor, position, 1));
+        if kind.coins_by_tier.is_some() {
+            let sender = self.shared_sender.unwrap_or(1);
+            out.replies.push(composite_effect(sender, COIN_DROP_EFFECT, position));
+        }
         self.pickups.push(PowerUpDrop {
             guid,
             kind: kind_id.to_owned(),
@@ -118,6 +134,100 @@ impl EncounterEngine {
             told: false,
         });
         true
+    }
+
+    /// Despawn expired pickups and collect the ones the player stands on. The
+    /// position is the server's own (never a client claim).
+    pub(super) fn tick_power_ups(
+        &mut self,
+        position: [f32; 3],
+        now_ms: u64,
+        out: &mut EncounterOutcome,
+    ) {
+        let Some(power_ups) = self.power_ups.clone() else {
+            return;
+        };
+        let radius = power_ups.pickup.radius as f32;
+        for mut drop in std::mem::take(&mut self.pickups) {
+            let collected = now_ms < drop.expires_ms
+                && self.state.player_health > 0
+                && horizontal_distance(position, drop.position) <= radius
+                && self.collect_power_up(&mut drop, &power_ups, out);
+            if collected || now_ms >= drop.expires_ms {
+                out.replies.push(remove(drop.guid));
+            } else {
+                self.pickups.push(drop);
+            }
+        }
+    }
+
+    /// Apply one pickup. `false` leaves it on the ground (the player already
+    /// holds a power-up and this kind is stored, not automatic).
+    fn collect_power_up(
+        &mut self,
+        drop: &mut PowerUpDrop,
+        power_ups: &PowerUps,
+        out: &mut EncounterOutcome,
+    ) -> bool {
+        // A reload that removed the kind just clears the stale pickup.
+        let Some(kind) = power_ups.kind(&drop.kind) else {
+            return true;
+        };
+        if !kind.auto {
+            if self.held_power_up.is_some() {
+                if !drop.told && out.feedback.is_none() {
+                    out.feedback = Some(ONE_POWER_UP_TEXT.into());
+                    drop.told = true;
+                }
+                return false;
+            }
+            self.held_power_up = Some(drop.kind.clone());
+        }
+        if let Some(percent) = kind.heal_pct_max {
+            self.heal_with_number(percent, out);
+            if kind.group {
+                out.group_heal = Some(GroupHeal {
+                    percent: percent.min(100),
+                    kill: drop.kill,
+                });
+            }
+        }
+        if let Some(energy) = kind.energy {
+            self.energy = self
+                .energy
+                .saturating_add(energy as i32)
+                .min(self.rules.energy.max);
+            out.replies.push(crate::abilities::build_energy(
+                self.energy,
+                self.rules.energy.max,
+            ));
+        }
+        // A40: a coin pile pays its tier's coins through the reward path (wallet, booster, 38/19).
+        let coins = (kind.coins_by_tier.as_ref()).and_then(|t| t.get(self.battle_tier() - 1));
+        if let Some(&coins) = coins {
+            out.rewards.push(EncounterReward {
+                coins,
+                ..Default::default()
+            });
+            self.fight_state.pile_coins = self.fight_state.pile_coins.saturating_add(coins);
+        }
+        let effect = if coins.is_some() {
+            COIN_PICKUP_EFFECT
+        } else {
+            POWER_UP_PICKUP_EFFECT
+        };
+        out.replies.push(composite_effect(
+            self.shared_sender.unwrap_or(1),
+            effect,
+            drop.position,
+        ));
+        true
+    }
+
+    /// Coins this player has picked up from coin piles this session, before any booster. A
+    /// pile's coins are random, so a check of what a fight pays leaves them out.
+    pub fn pile_coins(&self) -> u32 {
+        self.fight_state.pile_coins
     }
 
     /// Where the health pickups lying in this run stand (the simulator steps onto them).

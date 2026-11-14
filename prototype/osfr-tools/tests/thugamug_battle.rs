@@ -1006,8 +1006,10 @@ fn pending_turnin(gateway: &Gateway) -> Option<u32> {
         .pending_turnin
 }
 
+/// The wallet without the coins picked up from enemies' random coin piles (A40).
 fn wallet(gateway: &Gateway) -> u32 {
-    gateway.snapshot().gameplay.unwrap().inventory.coins
+    let piles = gateway.gameplay().map_or(0, |game| game.pile_coins());
+    (gateway.snapshot().gameplay.unwrap().inventory.coins).saturating_sub(piles)
 }
 
 fn typed_state(gateway: &Gateway) -> GameplayState {

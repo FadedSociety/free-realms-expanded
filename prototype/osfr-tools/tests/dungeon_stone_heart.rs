@@ -283,7 +283,9 @@ fn economy(gateway: &Gateway) -> (u32, u32, u32) {
         .get(&BRAWLER)
         .copied()
         .unwrap_or(0);
-    (state.inventory.coins, item_count, experience)
+    // A40: coin piles enemies drop are random; what the fight pays leaves them out.
+    let piles = gateway.gameplay().map_or(0, |game| game.pile_coins());
+    (state.inventory.coins.saturating_sub(piles), item_count, experience)
 }
 
 fn active_enemy(
@@ -559,10 +561,14 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
     assert!(!repeated_attack.state_changed);
     assert_eq!(economy(&gateway), paid);
 
+    // A40: the coins picked up from piles are in the saved wallet, but the reconnected session has
+    // no fight that counted them, so `economy` no longer leaves them out there.
+    let piles = gateway.gameplay().map_or(0, |game| game.pile_coins());
     let reconnected = reopen(&fixture, &gateway, "won.json");
+    let piles_after = reconnected.gameplay().map_or(0, |game| game.pile_coins());
     assert_eq!(
         economy(&reconnected),
-        paid,
+        ((paid.0 + piles).saturating_sub(piles_after), paid.1, paid.2),
         "the reward survives a save and reconnect"
     );
     assert!(
@@ -591,7 +597,12 @@ fn stone_heart_hideaway_is_singular_level_gated_and_pays_through_gateway_once() 
         "a duplicate results Close changes no saved state"
     );
 
+    // The reload, like the reconnect above, has no fight that counted the pile coins.
     let reloaded = reopen(&fixture, &gateway, "closed.json");
-    assert_eq!(economy(&reloaded), paid);
+    let piles_reloaded = reloaded.gameplay().map_or(0, |game| game.pile_coins());
+    assert_eq!(
+        economy(&reloaded),
+        ((paid.0 + piles).saturating_sub(piles_reloaded), paid.1, paid.2)
+    );
     assert_eq!(reloaded.state().zone_id, 0);
 }

@@ -51,6 +51,19 @@
       "invulnerable": true,
       "speed_pct": 30,
       "source": "Model 1951 powerup_super_shield.adr; name 103799; description 103800 'prevents you from being hurt and increases your run speed for a few seconds'. (R) 5 s and +30% speed; mesh and icon are missing from the extracted pack set."
+    },
+    "coins_small": {
+      "model_id": 841,
+      "auto": true,
+      "coins_by_tier": [2, 4, 7, 12, 18],
+      "source": "Model 841 loot_coins_01.adr (Models.txt; served per Assets_manifest). Client locale 431547: 'Sometimes when you defeat an opponent they'll drop coins. Run near or Interact with the coin pile to pick them up.'; 435933 'Coin Pile'. Pickup effect 15094 PFX_coins_gold_collect_loot, drop burst 15093 PFX_coins_gold_explode_loot. Used automatically. (R) The coins by tier are the field_kill_rewards.json band at each tier's recommended level (1, 3, 5, 9, 13+); no source holds the original amounts."
+    },
+    "coins_big": {
+      "model_id": 841,
+      "auto": true,
+      "scale": 1.4,
+      "coins_by_tier": [6, 12, 21, 36, 54],
+      "source": "Model 841 loot_coins_01.adr (Models.txt; served per Assets_manifest). Client locale 431547: 'Sometimes when you defeat an opponent they'll drop coins. Run near or Interact with the coin pile to pick them up.'; 435933 'Coin Pile'. Pickup effect 15094 PFX_coins_gold_collect_loot, drop burst 15093 PFX_coins_gold_explode_loot. Used automatically. (R) Three times coins_small, drawn 1.4x larger; no source holds the original amounts."
     }
   },
   "tables": {
@@ -60,7 +73,8 @@
         "chance": 0.10,
         "pool": { "energy": 30, "flame_wave": 25, "earth_shard": 25, "super_shield": 20 }
       },
-      "source": "(R) Chances and weights are reconstructed: no source holds them (the original 'standard weights' lived on the server). Two independent rolls mirror the two reactive procs 420826/420828."
+      "coin_roll": { "chance": 0.35, "pool": { "coins_small": 90, "coins_big": 10 } },
+      "source": "(R) Chances and weights are reconstructed: no source holds them (the original 'standard weights' lived on the server). Two independent rolls mirror the two reactive procs 420826/420828. A40: the coin roll is a third roll (locale 431547 'Sometimes ... they'll drop coins'); its chance is reconstructed."
     },
     "elite": {
       "health_roll": { "chance": 0.25, "pool": { "health_small": 70, "health_big": 30 } },
@@ -68,6 +82,7 @@
         "chance": 0.25,
         "pool": { "energy": 25, "flame_wave": 25, "earth_shard": 25, "super_shield": 25 }
       },
+      "coin_roll": { "chance": 0.5, "pool": { "coins_small": 60, "coins_big": 40 } },
       "source": "(R) Tougher enemies drop more often; chances and weights are reconstructed."
     },
     "boss": {
