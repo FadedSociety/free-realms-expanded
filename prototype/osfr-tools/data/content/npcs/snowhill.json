@@ -2728,10 +2728,44 @@
               "evidence": "title_string_id corrected from raw locale hash 3204709185 to Global.Text id 410500 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3958499,
+          "title": "Wayward Worms",
+          "title_string_id": 92600,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wayward Worms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wayward_worms_9f9fac)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958497,
+          "title": "The Hole Thing",
+          "title_string_id": 92628,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Hole Thing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hole_thing_3858c9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070038
+        3070038,
+        3958499,
+        3958497
       ],
       "quests_given_text": [
         "Fisherman: Joining Big J's Crew. Town quest Big J Says Thanks (wiki; client texts 44115377, 230341578). Lost-worms errand (client 1298960165, 2749557570)."
@@ -17434,10 +17468,27 @@
               "evidence": "title_string_id corrected from raw locale hash 769699029 to Global.Text id 78873 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3958494,
+          "title": "Meet the Mayor!",
+          "title_string_id": 5544,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Meet the Mayor! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_the_mayor_89b23c)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3110012
+        3110012,
+        3958494
       ],
       "quests_given_text": [
         "Meet the Mayor! and Ninja: Return to the Mentor (wiki). Appears in Ninja: Troubled Waters and Snowhill Secret Society (wiki). Sends new arrivals to the town's helpers: \"Did Frostpetal send you? I could indeed use your help\" (client 2115880896, 2441022007); the Ninja kidnapping lead \"Speak to Frostpetal for more information on the kidnappings in Snowhill\" (1145256149)."
@@ -29109,11 +29160,62 @@
               "evidence": "Resort Refreshments (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_resort_refreshments_cbe30e)."
             }
           ]
+        },
+        {
+          "quest_id": 3958492,
+          "title": "Bad Neighbors",
+          "title_string_id": 6814,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bad Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958498,
+          "title": "Toiling with Towels",
+          "title_string_id": 79042,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toiling with Towels (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toiling_with_towels_c24d47)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958495,
+          "title": "Smoothie Operator",
+          "title_string_id": 90150,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Smoothie Operator (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070047,
-        3955248
+        3955248,
+        3958492,
+        3958498,
+        3958495
       ],
       "quests_given_text": [
         "Fisherman: Fisherman: Snowhill Getaway, Fisherman: My Hut is Your Hut (hands off to Lenore). Hot Springs problems (yeti noise, clean towels from Downey, overdue book, smoothie shop; client 472821565, 545298654, 308421505, 4158807195, 3958234421). The title of that chain is not proven (see #Town and event quests). Tilda's overdue-book errand (client 1613887895)."
@@ -41748,10 +41850,44 @@
               "evidence": "title_string_id corrected from raw locale hash 1258558122 to Global.Text id 130791 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3958493,
+          "title": "Hot Mess",
+          "title_string_id": 79019,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hot Mess (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hot_mess_eb7b13)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958496,
+          "title": "Something Fishy",
+          "title_string_id": 90285,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Something Fishy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_fishy_187bfa)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3030014
+        3030014,
+        3958493,
+        3958496
       ],
       "quests_given_text": [
         "Brawler: Way of the Brawler (ends the Highroad line, sends the player to Petra in Blackspore; client 1014135925). Receives Gerold's report in Brawler: The Growler Report. Client says \"Speak to Tevin, the mayor's assistant, to see what you can do to help\" (1648315621) and lists a chain of Snowhill problems starting with Murphy at the Hot Springs (4280092987); the title that chain belongs to is not proven (see #Town and event quests Status Reports)."
@@ -42214,11 +42350,18 @@
             "kind": "client",
             "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 657 = fairy_m_freestyle_08.agr (line 658); the client's model table maps this id to this body."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.07071997,
       "model_id": 657,
-      "model_file_name": "fairy_m_freestyle_08.agr"
+      "model_file_name": "fairy_m_freestyle_08.agr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000217,

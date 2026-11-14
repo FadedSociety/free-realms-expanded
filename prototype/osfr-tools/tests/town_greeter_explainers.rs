@@ -64,9 +64,10 @@ const GREETERS: &[Greeter] = &[
         npc_id: 9_000_000_093,
         name: "Frostpetal",
         greeting: 430_860,
-        // Her quest 3110012 is defined but disabled with an unmet prerequisite
-        // (data/content/quests/ninja.json), so this Talk carries no quest row.
-        offer: None,
+        // L1211: Meet the Mayor! (3958494, title 5544) opens the Snowhill chain. With its
+        // row, three of her four pages fit the five-button window; the fourth waits until
+        // the quest is taken (`shown_topics`). Her 3110012 stays disabled (ninja.json).
+        offer: Some((3_958_494, 5_544)),
         topics: &[(37933, 37936), (31328, 37942), (37945, 37948), (7910, 7911)],
     },
     Greeter {
@@ -101,8 +102,16 @@ fn new_game() -> Gameplay {
     game
 }
 
+/// The pages one Talk shows: the five-button window keeps a row for Goodbye and one for a
+/// quest on offer (`npc_interaction::dialogue_rows`), so a quest greeter's last page waits
+/// until its quest is taken (Frostpetal's fourth, L1211).
+fn shown_topics(greeter: &Greeter) -> &'static [(u32, u32)] {
+    let room = 5 - 1 - usize::from(greeter.offer.is_some());
+    &greeter.topics[..greeter.topics.len().min(room)]
+}
+
 /// The dialogue rows a greeter's Talk should carry: the quest row when the same Talk
-/// offers one, then one row per explainer page in content order, then Goodbye.
+/// offers one, then one row per shown explainer page in content order, then Goodbye.
 fn expected_rows(greeter: &Greeter) -> Vec<[u32; 5]> {
     let mut rows: Vec<[u32; 5]> = greeter
         .offer
@@ -110,8 +119,7 @@ fn expected_rows(greeter: &Greeter) -> Vec<[u32; 5]> {
         .map(|(_, title)| quest_dialogue_choice(title))
         .collect();
     rows.extend(
-        greeter
-            .topics
+        shown_topics(greeter)
             .iter()
             .enumerate()
             .map(|(index, (label, _))| {
@@ -238,7 +246,7 @@ fn choosing_an_explainer_row_replays_the_dialogue_with_that_page() {
     let mut game = new_game();
     for greeter in GREETERS {
         talk(&mut game, greeter);
-        for (index, (label, body)) in greeter.topics.iter().enumerate() {
+        for (index, (label, body)) in shown_topics(greeter).iter().enumerate() {
             let response_id = FIRST_PAGE_ROW + index as i32;
             let replies = choose(&mut game, greeter, response_id);
             let dialogue = page_after_close(&replies, greeter, response_id);

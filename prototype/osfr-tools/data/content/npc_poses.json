@@ -3514,6 +3514,12 @@
     },
     {
       "model_ids": [
+        110
+      ],
+      "source": "sh_icehole_01.adr: no walk, run, emote, fidget or combat clip (L1211's fishing-hole quest node)"
+    },
+    {
+      "model_ids": [
         113
       ],
       "source": "bw_mushroom_door_02.adr: no walk, run, emote, fidget or combat clip"

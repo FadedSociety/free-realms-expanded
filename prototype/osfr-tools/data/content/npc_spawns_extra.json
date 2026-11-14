@@ -79547,7 +79547,8 @@
           "evidence": "(R) Neither the wiki nor the videos show this NPC, so a generic client body that fits; owner's reasoning for a body nobody documented: \"nobody remembers what they looked like\". The three spawns named Fisherman are all at Lakeshore; 4 video markers named Fisherman exist and were not traced to a place, so they are not counted as sightings of him. Spot is 11 m past the boat prop (72.9, 353.1) from Big J's side. No ice-hole prop was found by the boat; the nearest fishing-water prop is a pond 88 m away at (59.8, 440.8), which may be the hole, so the exact spot is unknown. Probe: all directions open, no water, slope 14."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005942
     },
     {
       "spawn_guid": 100000090039,

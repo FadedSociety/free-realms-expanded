@@ -36441,6 +36441,688 @@
       "repeatable": true,
       "repeat_hours": 24,
       "end_text_string_id": 74313
+    },
+    {
+      "id": 3958492,
+      "title_string_id": 6814,
+      "giver_npc_id": 9000000158,
+      "prerequisite_quest_ids": [
+        3958493
+      ],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 15080,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Yeti Loungers - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1211: the 2014 client names no Yeti Lounger or Yeti Chucker (only the goal lines 15080/15082); the dungeon guide lists 'yeti bouncer, yeti chucker, yeti lounger' in Hot Springs Haven, whose fight 14013 carries Yeti 930073 (the resort's loungers), Cave Yeti 950032 and Yeti Bouncer 950031, so a Yeti Lounger is the fight's Yeti."
+            }
+          ],
+          "model_id": 930073,
+          "in_fight": 14013,
+          "count": 5
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 15082,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Yeti Chuckers - (0/5) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1211: the 2014 client names no Yeti Lounger or Yeti Chucker (only the goal lines 15080/15082); the dungeon guide lists 'yeti bouncer, yeti chucker, yeti lounger' in Hot Springs Haven, whose fight 14013 carries Yeti 930073 (the resort's loungers), Cave Yeti 950032 and Yeti Bouncer 950031, so a Yeti Chucker is the fight's Cave Yeti."
+            }
+          ],
+          "model_id": 950032,
+          "in_fight": 14013,
+          "count": 5
+        },
+        {
+          "kind": "defeat",
+          "id": 3,
+          "text_string_id": 22397,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat Yeti Bouncers - (0/1) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1211: the Yeti Bouncer is fight 14013's kind yeti_bouncer (name 6501), one of its mini-bosses."
+            }
+          ],
+          "model_id": 950031,
+          "in_fight": 14013,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 37583,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Murphy at the Snowhill Hot Springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+            }
+          ],
+          "npc_id": 9000000158
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 36,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bad Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Bad Neighbors (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_bad_neighbors_fd9497)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1211: the client's Bad Neighbors block holds no closing line; 9742 is Murphy's thanks for quieting the yetis ('...If you don't mind, I have another favor'), which leads into Toiling with Towels."
+        }
+      ],
+      "description_string_id": 6823,
+      "intro_text_string_id": 24786,
+      "end_text_string_id": 9742,
+      "enabled": true
+    },
+    {
+      "id": 3958493,
+      "title_string_id": 79019,
+      "giver_npc_id": 9000000215,
+      "prerequisite_quest_ids": [
+        3958494
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 79025,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Murphy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hot_mess_eb7b13)."
+            }
+          ],
+          "npc_id": 9000000158
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Hot Mess (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hot_mess_eb7b13)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Hot Mess (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hot_mess_eb7b13)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1211: the client block around the title (offer, title, description, closing), 79018-79021."
+        }
+      ],
+      "description_string_id": 79020,
+      "intro_text_string_id": 79018,
+      "end_text_string_id": 79021,
+      "enabled": true
+    },
+    {
+      "id": 3958494,
+      "title_string_id": 5544,
+      "giver_npc_id": 9000000093,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 35632,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Mayor Crystalline (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_the_mayor_89b23c)."
+            }
+          ],
+          "npc_id": 9000000143
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 115711,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Tevin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_the_mayor_89b23c)."
+            }
+          ],
+          "npc_id": 9000000215
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Meet the Mayor! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_the_mayor_89b23c)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Meet the Mayor! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_meet_the_mayor_89b23c)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1211: the offer 24825 is the wiki's Frostpetal line; the description 5655 and closing 5650 ('...it is my job to greet all newcomers') sit with the title 5544 in the client's old Snowhill block."
+        }
+      ],
+      "description_string_id": 5655,
+      "intro_text_string_id": 24825,
+      "end_text_string_id": 5650,
+      "enabled": true
+    },
+    {
+      "id": 3958495,
+      "title_string_id": 90150,
+      "giver_npc_id": 9000000158,
+      "prerequisite_quest_ids": [
+        3958498
+      ],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "text_string_id": 90192,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Snowberry - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Snowberry' is item 2876 (item-table.json); harvesting.json outputs it in Perry's Pastures Harvesting (115)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2876,
+          "quantity": 2
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "text_string_id": 90210,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Stainberry - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Stainberry' is item 2887 (item-table.json); harvesting.json outputs it in Farnum's Farm Harvesting (111), Perry's Pastures Harvesting (115), Thorny Tillage Harvesting (119)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2887,
+          "quantity": 2
+        },
+        {
+          "kind": "gather_resource",
+          "id": 3,
+          "text_string_id": 90224,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Starnut - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Starnut' is item 2886 (item-table.json); harvesting.json outputs it in Perry's Pastures Harvesting (115)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2886,
+          "quantity": 2
+        },
+        {
+          "kind": "gather_resource",
+          "id": 4,
+          "text_string_id": 90260,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Harvest Spiralmint - (0/2) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: 'Bundle of Spiralmint' is item 2877 (item-table.json); harvesting.json outputs it in Farnum's Farm Harvesting (111), Perry's Pastures Harvesting (115), Thorny Tillage Harvesting (119)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "server: harvesting raises GatherResource{resource_id: output definition} (gameplay/crafting.rs:765); targets.gather lists harvesting.json outputs."
+            }
+          ],
+          "resource_id": 2877,
+          "quantity": 2
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 90262,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the ingredients to Carrie at the Snowhill Hot Springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            }
+          ],
+          "npc_id": 9500000734
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 90264,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Murphy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            }
+          ],
+          "npc_id": 9000000158
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Smoothie Operator (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Smoothie Operator (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_smoothie_operator_1d0418)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1211: the client block around the title (offer, title, description, closing), 90149-90152."
+        }
+      ],
+      "description_string_id": 90151,
+      "intro_text_string_id": 90149,
+      "end_text_string_id": 90152,
+      "enabled": true
+    },
+    {
+      "id": 3958496,
+      "title_string_id": 90285,
+      "giver_npc_id": 9000000215,
+      "prerequisite_quest_ids": [
+        3958495
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 90297,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Big J (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_fishy_187bfa)."
+            }
+          ],
+          "npc_id": 9000000024
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Something Fishy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_fishy_187bfa)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Something Fishy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_something_fishy_187bfa)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1211: the client block around the title (offer, title, description, closing), 90284-90287 (quest_wire had put the offer in the description)."
+        }
+      ],
+      "description_string_id": 90286,
+      "intro_text_string_id": 90284,
+      "end_text_string_id": 90287,
+      "enabled": true
+    },
+    {
+      "id": 3958497,
+      "title_string_id": 92628,
+      "giver_npc_id": 9000000024,
+      "prerequisite_quest_ids": [
+        3958499
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 92633,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Check the fishing hole (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hole_thing_3858c9)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) seen: ragged hole cut in white ice (sheets/c_click3.png r1c2, tile of sh_icehole_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_the_hole_thing_3858c9)."
+            }
+          ],
+          "node_type": "quest-hole-q3958497",
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92635,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to the fisherman (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hole_thing_3858c9)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "The fisherman at the hole."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "spawn_guid 100000090038"
+            }
+          ],
+          "npc_id": 9500005942
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 92637,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Big J (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hole_thing_3858c9)."
+            }
+          ],
+          "npc_id": 9000000024
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "The Hole Thing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hole_thing_3858c9)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "The Hole Thing (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_the_hole_thing_3858c9)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1211: the client block around the title (offer, title, description, closing), 92627-92630."
+        }
+      ],
+      "intro_text_string_id": 92627,
+      "description_string_id": 92629,
+      "end_text_string_id": 92630,
+      "enabled": true
+    },
+    {
+      "id": 3958498,
+      "title_string_id": 79042,
+      "giver_npc_id": 9000000158,
+      "prerequisite_quest_ids": [
+        3958492
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 79047,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Visit Downey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toiling_with_towels_c24d47)."
+            }
+          ],
+          "npc_id": 9500000743
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 79049,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get Smitty to dry the towels (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toiling_with_towels_c24d47)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki target(s): ['Smitty']"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_toiling_with_towels_c24d47)."
+            }
+          ],
+          "npc_id": 9000000206
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 79051,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the towels to Murphy at the Snowhill Hot Springs (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toiling_with_towels_c24d47)."
+            }
+          ],
+          "npc_id": 9000000158
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Toiling with Towels (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toiling_with_towels_c24d47)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Toiling with Towels (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_toiling_with_towels_c24d47)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1211: the client block around the title (offer, title, description, closing), 79041-79044."
+        }
+      ],
+      "description_string_id": 79043,
+      "intro_text_string_id": 79041,
+      "end_text_string_id": 79044,
+      "enabled": true
+    },
+    {
+      "id": 3958499,
+      "title_string_id": 92600,
+      "giver_npc_id": 9000000024,
+      "prerequisite_quest_ids": [
+        3958496
+      ],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "text_string_id": 92611,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find the lost worms - (0/6) (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wayward_worms_9f9fac)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client: model mkt_baitbucket_01.adr is in Models.txt, seen by eye below"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "seen: blue hooped bait bucket (sheets/l_existing.png r1c1, tile of mkt_baitbucket_01.adr)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: step text in quests.merged.json (wiki:fr_quest_wayward_worms_9f9fac)."
+            }
+          ],
+          "node_type": "quest-worm-q3958499",
+          "quantity": 6
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 92613,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return the worms to Big J (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wayward_worms_9f9fac)."
+            }
+          ],
+          "npc_id": 9000000024
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 9,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Wayward Worms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wayward_worms_9f9fac)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Wayward Worms (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_wayward_worms_9f9fac)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1211: the client block around the title (offer, title, description, closing), 92599-92602."
+        }
+      ],
+      "intro_text_string_id": 92599,
+      "description_string_id": 92601,
+      "end_text_string_id": 92602,
+      "enabled": true
     }
   ]
 }
