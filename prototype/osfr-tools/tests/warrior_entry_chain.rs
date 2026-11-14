@@ -904,6 +904,9 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         // L1207: Legend of Fastville (the Weed Killing! table, game 353), which has its own
         // shape (tests/zone_quests_snowhill_round2.rs).
         .filter(|row| row["id"].as_u64() != Some(3_150_018))
+        // L1216: General Concerns (a Quake cast) and Finding Facts About Fastvi, wired from the
+        // wiki with their own steps.
+        .filter(|row| ![3_150_014, 3_150_015].contains(&row["id"].as_u64().unwrap()))
         .collect();
     assert_eq!(
         enabled
@@ -1062,6 +1065,10 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             3_150_013,
             // L1207: Legend of Fastville (the Weed Killing! table) is live.
             3_150_018,
+            // L1216: General Concerns (Quake on the Changeling Marauders) and Finding Facts
+            // About Fastvi are live.
+            3_150_014,
+            3_150_015,
         ]
         .contains(&(id as u32))
         {

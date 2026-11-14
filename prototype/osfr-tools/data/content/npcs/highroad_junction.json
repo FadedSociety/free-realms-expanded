@@ -6564,11 +6564,45 @@
               "evidence": "the wiki starts it at Merigold (https://fr.fanbyte.com/wiki/FR_Quest%3AChef%3A_Ranger_Requisition)."
             }
           ]
+        },
+        {
+          "quest_id": 3958500,
+          "title": "Brawler: Bear Safety",
+          "title_string_id": 140501,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Bear Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bear_safety_b6bbea)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958501,
+          "title": "Chef: Highroad Cooking",
+          "title_string_id": 140456,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chef: Highroad Cooking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_highroad_cooking_bc1ac8)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3050011,
-        3000020
+        3000020,
+        3958500,
+        3958501
       ],
       "quests_given_text": [
         "Visit Merigold and Meet Merigold [inferred from title pairs 1553143299/1333151367 and 510375985/139862142; text \"Visit Merigold to get started in Free Realms!\" 3345147503, \"Welcome to Free Realms, visit Merigold to get started!\" 3866999428]. She points the player at Harold (\"Merigold has pointed you towards Harold, an animal control agent who's looking for some help with a recently escaped bear!\" 2362498448). Return objectives: \"Return to Merigold\" (2057457121, 3927401947); thank-you pointers from Harold's bear problem (3404995492, 23059866) and Auguste's party problem (3562100712, 2551974680); \"Hey, Merigold was looking for you. I think she has a few more quests!\" (1623587804); \"Merigold was looking for you while you were learning about racing. Raina thinks she has more quests for you\" (2622336658)."

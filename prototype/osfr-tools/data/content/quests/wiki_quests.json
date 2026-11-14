@@ -37123,6 +37123,116 @@
       "description_string_id": 92601,
       "end_text_string_id": 92602,
       "enabled": true
+    },
+    {
+      "id": 3958500,
+      "title_string_id": 140501,
+      "giver_npc_id": 9000000402,
+      "prerequisite_quest_ids": [
+        3000060
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 140518,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Harold (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bear_safety_b6bbea)."
+            }
+          ],
+          "npc_id": 9000000102
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {
+            "43": 25
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Brawler: Bear Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bear_safety_b6bbea)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Brawler: Bear Safety (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_bear_safety_b6bbea)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1216: the client block around the title, 140500-140503; the closing 140503 is Harold's, where the quest ends."
+        }
+      ],
+      "job": 43,
+      "description_string_id": 140502,
+      "intro_text_string_id": 140500,
+      "end_text_string_id": 140503,
+      "enabled": true
+    },
+    {
+      "id": 3958501,
+      "title_string_id": 140456,
+      "giver_npc_id": 9000000402,
+      "prerequisite_quest_ids": [
+        3000060
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 140514,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Auguste (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_highroad_cooking_bc1ac8)."
+            }
+          ],
+          "npc_id": 9000000019
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Chef: Highroad Cooking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_highroad_cooking_bc1ac8)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Chef: Highroad Cooking (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_chef_highroad_cooking_bc1ac8)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "client",
+          "evidence": "L1216: the client block around the title, 140455-140458; the closing 140458 is Auguste Frydaze's, where the quest ends."
+        }
+      ],
+      "job": 45,
+      "description_string_id": 140457,
+      "intro_text_string_id": 140455,
+      "end_text_string_id": 140458,
+      "enabled": true
     }
   ]
 }

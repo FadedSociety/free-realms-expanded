@@ -1315,11 +1315,65 @@
       "prerequisite_quest_ids": [
         3150013
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 91887,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find General Glowlight in Sanctuary (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_general_concerns_a35e8d)."
+            }
+          ],
+          "npc_id": 9000000097
+        },
+        {
+          "kind": "use_ability",
+          "id": 2,
+          "text_string_id": 91889,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Use your Quake ability on Changeling Marauders - 0/10 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_general_concerns_a35e8d)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: ability 'quake' is definition 62006"
+            }
+          ],
+          "ability_id": 62006,
+          "count": 10,
+          "target_actor_kind_id": 950009
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 38090,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to General Glowlight (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_general_concerns_a35e8d)."
+            }
+          ],
+          "npc_id": 9000000097
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 46914,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "L1216: the fanbyte quest page pays one Pro Warrior Pauldrons (lab/references/quest-table-20261102/quests.merged.json rewards_wiki); item 46914 by its exact client name in data/release/item-table.json."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 282
           },
@@ -1363,9 +1417,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1216: the title 77244 stands alone in the client; its description 71355 sits in the block 71353-71356 ('A Warrior's Task'), whose offer and closing tell the same story (General Glowlight, the changelings in the Forgotten Caves)."
         }
       ],
-      "enabled": false
+      "job": 32,
+      "description_string_id": 71355,
+      "intro_text_string_id": 71353,
+      "end_text_string_id": 71356,
+      "enabled": true
     },
     {
       "id": 3150015,
@@ -1374,11 +1440,35 @@
       "prerequisite_quest_ids": [
         3150014
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 94083,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Talk to Sir Whittington (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_warrior_finding_facts_about_fastvi_cf21e7)."
+            }
+          ],
+          "npc_id": 9000000205
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 10836,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "L1216: the fanbyte quest page pays one Pro Warrior Triangle Shard (lab/references/quest-table-20261102/quests.merged.json rewards_wiki); item 10836 by its exact client name in data/release/item-table.json."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "32": 360
           },
@@ -1426,11 +1516,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1216: the block 45367-45369 holds no closing line; the closing is the client's generic 416261 'Thanks for helping us!'."
         }
       ],
       "description_string_id": 45369,
       "intro_text_string_id": 45367,
-      "enabled": false
+      "job": 32,
+      "end_text_string_id": 416261,
+      "enabled": true
     },
     {
       "id": 3150016,

@@ -461,16 +461,14 @@ use Blocker::{Giver, NoJobGate, NoObjectives, NoProfile, Prerequisite};
 /// drawn, its prerequisite live), so ten; job 120's starter outfit lifted 3040003 and 3040011 (the
 /// Card Duelist line, 2026-11-08), so eight; Gavin's branch of Queensfields went live, so seven;
 /// L1202's quest pass put Fisherman 3070026 live once its giver was drawn (its Live Bait game is
-/// a nettletrout pickup, R), so six; the test name keeps the T723 count for the protected
-/// test list.
+/// a nettletrout pickup, R), so six; L1216 put General Concerns (3150014, its Quake step now a
+/// `use_ability`) and Finding Facts About Fastvi (3150015) live, so four. The test name keeps
+/// the T723 count for the protected test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 6] = [
+    const OFF: [(u32, &[Blocker]); 4] = [
         (3_020_031, &[Giver, Prerequisite]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
-        // Combat quests wave 2 put Take Care of That Ankle (3150013) live: its prerequisite lifted.
-        (3_150_014, &[NoObjectives]),
-        (3_150_015, &[Prerequisite]),
         (3_160_016, &[Prerequisite]),
         (3_160_033, &[Prerequisite]),
     ];
