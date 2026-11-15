@@ -5,7 +5,8 @@
     "models: a role default per client Models.txt id. Every id is an AmbientLoops slot (client AnimationTypes.xml) that the model's own .adr binds to a clip (section 9, AnimationSlotRecordRead 007e6190); the clip names are quoted per row. A model with several loops gives each spawn one by GUID (src/npc_life.rs). tests/npc_life.rs re-reads every .adr.",
     "spawns: per-actor choices. animation_id 1 keeps loc_stand (the client then fidgets on its own, 00970b60). keep_height gives a body the floor would move the evidence that its authored height is right; every other body is set onto the floor at load.",
     "props: client models that are things, not bodies (no walk, run, emote, fidget or combat clip in their own .adr); they keep the height they were placed at, because the warpstones of the original server stand 0.8-1.0 m and its radio 1.6 m above the floor (startup/snapshot.json): the origin of a prop is not its foot. Bodies are set onto the floor.",
-    "Evidence: the model clips (client), video frames where quoted, the 2014 prop placements (fires, bedrolls) for camp rows; everything else is (R), inferred from the model's own clips and the row's role."
+    "Evidence: the model clips (client), video frames where quoted, the 2014 prop placements (fires, bedrolls) for camp rows; everything else is (R), inferred from the model's own clips and the row's role.",
+    "L1219 (A46): the pixie-child sit row (models 241, 12, 242, 11 on loop 2110) is gone: the client draws that loop from fairy_children_amb_sit_loop.gr2, which no host serves (lab/reports/dead-assets-20261105/dead.tsv); the bodies stand on loc_stand with fairy_children_loc_fidget_01-04 (R)"
   ],
   "models": [
     {
@@ -194,20 +195,6 @@
         2100
       ],
       "source": "Sanctuary NpcAmbient.json (Sanctuary-main-20261019@10f129e, already in npc_ambient.json) sits human children on idle 2100 for three of these models; every human child model's only idle loop is sitting (R for the others). Clips: 2100 human_f_child_amb_sit_loop"
-    },
-    {
-      "model_ids": [
-        241,
-        12,
-        242,
-        11
-      ],
-      "model_file_name": "fairychild_f_pigtailsdress.adr, fairychild_f_sleevesandshorts.adr, fairychild_m_mohawkshorts.adr, fairychild_m_pointyhair.adr",
-      "role": "child",
-      "animation_ids": [
-        2110
-      ],
-      "source": "(R) the pixie child's own sit loop, as the human children sit; hide and chase are game loops. Clips: 2110 fairy_f_child_amb_sit_loop"
     },
     {
       "model_ids": [
