@@ -69,6 +69,33 @@ impl Gameplay {
         Ok(())
     }
 
+    /// A49: a recipe row names the bag stack each component is checked against
+    /// (`recipes::component_key`), so a stack that comes, goes or is replaced must reach the
+    /// client as a RecipeComponentUpdate (op 2), or the recipe window keeps counting the old
+    /// stack. One op 2 for every learned component whose key differs from `before`'s; a recipe
+    /// learned since `before` resends its nonzero keys, in case the bag changed after its op 1.
+    pub fn recipe_key_updates(&self, before: &Gameplay) -> Vec<Vec<u8>> {
+        let (old, new) = (&before.inventory.state().items, &self.inventory.state().items);
+        if old == new && before.learned_recipes == self.learned_recipes {
+            return Vec::new();
+        }
+        let mut packets = Vec::new();
+        for recipe in &self.recipe_catalog.records {
+            let Some(id) = recipe.recipe_id.filter(|id| self.learned_recipes.contains(id)) else {
+                continue;
+            };
+            let known = before.learned_recipes.contains(&id);
+            for (index, ingredient) in (0u32..).zip(&recipe.ingredients) {
+                let key = crate::recipes::component_key(new, ingredient.definition_id);
+                let was = known.then(|| crate::recipes::component_key(old, ingredient.definition_id));
+                if was.map_or(key != 0, |was| was != key) {
+                    packets.push(crate::recipes::encode_component_update(id, index, key));
+                }
+            }
+        }
+        packets
+    }
+
     /// The running movie, first in the gate's intercept order. At most one can
     /// be active; the order is what the five separate blocks used to encode.
     pub(super) fn running_movie(&self) -> Option<Movie> {

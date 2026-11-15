@@ -312,8 +312,9 @@ impl RecipeCatalog {
                         tint_key: item.map_or(0, |item| item.icon_tint.max(0) as u32),
                         description_id: 0, // (R) No recipe-component description mapping.
                         required_count: ingredient.count,
-                        inventory_key: ingredient.definition_id as u32, // (R) Content definition key.
-                        unknown_20: 0,
+                        inventory_key: component_key(&inventory.state().items, ingredient.definition_id),
+                        // The live login's components all carry 0xffffffff here.
+                        unknown_20: u32::MAX,
                         item_definition_id: ingredient.definition_id as u32,
                     })
                 })
@@ -339,6 +340,24 @@ impl RecipeCatalog {
         rows.sort_by_key(|(id, _)| *id);
         Ok(rows)
     }
+}
+
+/// A component's key word (row offset +0x1c): the bag stack the client checks it against. The
+/// recipe window (`RecipeDataSource__GetColumnValue`, 00c8b360) looks the key up in the client
+/// inventory by item instance id (008becc0) and marks the component met when that one stack's
+/// count, less the two counts stored after it (consumed, and stored as read here), covers the
+/// requirement. The live login
+/// (`lab/references/rust-gateway-reference/0007-login.bin`, recipe 4) names instance 1995, the
+/// character's 19 x item 2739, and 0 for the ingredient it had none of. With several stacks of
+/// one item, the fullest is named, so the window agrees whenever one stack is enough.
+pub fn component_key(items: &[crate::inventory::InventoryItem], definition_id: i32) -> u32 {
+    let usable = |item: &crate::inventory::InventoryItem| item.spendable().saturating_sub(item.consumed_count);
+    items
+        .iter()
+        .filter(|item| item.definition_id == definition_id)
+        .max_by_key(|item| (usable(item), std::cmp::Reverse(item.id)))
+        .and_then(|item| u32::try_from(item.id).ok())
+        .unwrap_or(0)
 }
 
 impl UnresolvedRecipeCatalog {

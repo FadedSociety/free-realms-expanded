@@ -1854,6 +1854,11 @@ impl Session {
         outcome.nearby.extend(ended.nearby);
         client_area_routing::world_ready(&mut outcome, &staged_gateway, world);
         offer_routing::dress(&mut outcome, &mut staged_gateway);
+        // A49: every reply passes here, so the recipe rows follow every bag change.
+        if let (Some(after), Some(before)) = (staged_gateway.gameplay(), self.gateway.gameplay()) {
+            let updates = after.recipe_key_updates(before);
+            outcome.replies.extend(updates.iter().map(|packet| wrap_application(packet)));
+        }
         self.bundle_budget.stage(&outcome.replies)?;
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;

@@ -1,7 +1,7 @@
 use osfr_tools::inventory::Inventory;
 use osfr_tools::recipes::{
-    CraftingJob, RecipeCatalog, RecipeWireComponent, RecipeWireRow, encode_component_update,
-    encode_recipe_add, encode_recipe_remove, encode_recipe_replace_all,
+    CraftingJob, RecipeCatalog, RecipeWireComponent, RecipeWireRow, component_key,
+    encode_component_update, encode_recipe_add, encode_recipe_remove, encode_recipe_replace_all,
 };
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -204,10 +204,11 @@ fn a_captured_recipe_row_emits_the_product_fields_at_the_native_offsets() {
     // presents 333/2148/0, so the assertions pin product over pattern.
     //
     // This is product-field coverage, not a byte-identical replay of the
-    // captured row: description_id, unknown_1c, component
-    // description/inventory_key/unknown_20 and row 4's component order still
-    // differ (open gap in notes/Autopilot/T255.md). A future raw-capture replay
-    // needs those fields recovered first.
+    // captured row: description_id, unknown_1c, component description and
+    // row 4's component order still differ (open gap in notes/Autopilot/T255.md).
+    // A49 recovered the component key and the word after it from the same row:
+    // the key is the player's bag stack of that item (1995 there, 0 for none;
+    // this fixture's bag holds neither) and the next word is 0xffffffff.
     let (catalog, inventory) = loaded();
     let row = emitted_row(&catalog, &inventory, 4);
     assert_eq!(
@@ -235,9 +236,9 @@ fn a_captured_recipe_row_emits_the_product_fields_at_the_native_offsets() {
         hex(r#"3f 00 01 04 00 00 00 68 00 00 00 ce 01 00 00 00
                00 00 00 00 00 00 00 00 00 00 00 00 09 00 00 00
                02 00 00 00 9d 55 00 00 ba 02 00 00 64 00 00 00
-               00 00 00 00 05 00 00 00 b3 0a 00 00 00 00 00 00
+               00 00 00 00 05 00 00 00 00 00 00 00 ff ff ff ff
                b3 0a 00 00 6e 03 00 00 03 07 00 00 00 00 00 00
-               00 00 00 00 03 00 00 00 6f 03 00 00 00 00 00 00
+               00 00 00 00 03 00 00 00 00 00 00 00 ff ff ff ff
                6f 03 00 00 19 55 00 00 01 00 00 00 00"#)
     );
     // Product words at the native row reader's offsets (row 0090a720).
@@ -389,4 +390,28 @@ fn the_existing_frame_layout_and_length_are_unchanged() {
             .sum::<usize>();
     assert_eq!(replace.len(), expected);
     assert_eq!(&replace[..7], &[0x3f, 0, 5, 4, 0, 0, 0]);
+}
+
+/// A49: the client checks each component against the one bag stack its key names, as the live
+/// login's recipe 4 names instance 1995 (that character's 19 x item 2739) and 0 for none.
+#[test]
+fn a_component_key_names_the_bag_stack_the_client_counts() {
+    let (catalog, mut inventory) = loaded();
+    let keys = |inventory: &Inventory| {
+        (emitted_row(&catalog, inventory, 4).components.iter())
+            .map(|c| (c.item_definition_id, c.inventory_key, c.unknown_20))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(keys(&inventory), [(2739, 0, u32::MAX), (879, 0, u32::MAX)], "no stack, no key");
+    inventory.grant(0, 2739, 9).unwrap();
+    let stack = (inventory.state().items.iter()).find(|i| i.definition_id == 2739).unwrap().clone();
+    assert_eq!(keys(&inventory), [(2739, stack.id as u32, u32::MAX), (879, 0, u32::MAX)]);
+
+    // Two stacks of one item: the fuller one is named, banked units left out.
+    let mut items = vec![stack.clone(), stack];
+    (items[0].id, items[0].count, items[1].id, items[1].count) = (5, 2, 9, 7);
+    assert_eq!(component_key(&items, 2739), 9);
+    items[1].stored_count = 6;
+    assert_eq!(component_key(&items, 2739), 5);
+    assert_eq!(component_key(&items, 879), 0);
 }

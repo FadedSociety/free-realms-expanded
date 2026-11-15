@@ -2584,3 +2584,35 @@ fn a_quest_brings_the_recipe_no_pattern_teaches() {
     game.teach_quest_recipes(&mut again).unwrap();
     assert!(again.replies.is_empty(), "taught only once");
 }
+
+/// A49: the recipe window counts each component from the one bag stack its row names, so a
+/// stack that comes or goes must reach the client as a RecipeComponentUpdate with the new key.
+#[test]
+fn a_bag_stack_that_comes_or_goes_moves_its_recipe_component_key() {
+    let mut game = game();
+    let owned = |game: &Gameplay, definition: i32| {
+        (game.inventory.state().items.iter()).find(|item| item.definition_id == definition).map(|item| item.id)
+    };
+    let (recipe_id, index, definition) = (game.recipe_catalog.records.iter())
+        .filter_map(|r| r.recipe_id.filter(|id| game.learned_recipes.contains(id)).map(|id| (id, r)))
+        .flat_map(|(id, r)| (0u32..).zip(&r.ingredients).map(move |(i, x)| (id, i, x.definition_id)))
+        .find(|&(_, _, definition)| owned(&game, definition).is_none())
+        .expect("a learned recipe wants an item the bag lacks");
+    let before = game.clone();
+    assert!(game.recipe_key_updates(&before).is_empty(), "no bag change, no update");
+
+    game.inventory.grant(0, definition, 3).unwrap();
+    let stack = owned(&game, definition).unwrap();
+    let came = game.recipe_key_updates(&before);
+    let named = crate::recipes::encode_component_update(recipe_id, index, stack as u32);
+    assert!(came.contains(&named), "the new stack is named: {came:?}");
+
+    let before = game.clone();
+    game.inventory.grant(0, definition, 2).unwrap();
+    assert!(game.recipe_key_updates(&before).is_empty(), "the same stack grew: nothing to rename");
+
+    game.inventory.consume(stack, 5).unwrap();
+    let gone = game.recipe_key_updates(&before);
+    let cleared = crate::recipes::encode_component_update(recipe_id, index, 0);
+    assert!(gone.contains(&cleared), "a spent stack names nothing: {gone:?}");
+}
