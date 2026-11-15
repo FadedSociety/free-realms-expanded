@@ -368,6 +368,78 @@
           "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 91222 (91223 'One of those cray wandering about probably has it...'); the wiki's help says 'The Cray Marauders battle is just north of Ancient's Wall. Defeat at least one cray inside this battle to receive the update', and that battle is fights/14006.json (title 73977 'Cray Marauders'): Cray Marauder 930038 x12, Cray Snapper 930008 x2, Cray Marauder Captain 950015; the chance is a local value."
         }
       ]
+    },
+    {
+      "definition_id": 1404301,
+      "item_id": 96000008,
+      "chance": 50,
+      "quest_id": 3090009,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: the wiki's walkthrough (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Supply_Recovery_5c58564d.html) sends you through the cellar door at the back of The Roadhouse into the dungeon Tavern Cellar to 'fight your way to the supplies'; that is fights/14043.json (door tavern_cellar in entrances.json), whose own kinds are the Hooligan Brawler 1404301 (6 per run) and Cal 1404313; only they drop the supplies (its Hooligan Archer 930012 also fights in 14021, so it drops nothing here); the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 1404313,
+      "item_id": 96000008,
+      "chance": 50,
+      "quest_id": 3090009,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: the wiki's walkthrough (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Supply_Recovery_5c58564d.html) sends you through the cellar door at the back of The Roadhouse into the dungeon Tavern Cellar to 'fight your way to the supplies'; that is fights/14043.json (door tavern_cellar in entrances.json), whose own kinds are the Hooligan Brawler 1404301 (6 per run) and Cal 1404313; only they drop the supplies (its Hooligan Archer 930012 also fights in 14021, so it drops nothing here); the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 1402901,
+      "item_id": 96000009,
+      "chance": 50,
+      "quest_id": 3090010,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: Terrence's offer on the wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Medic_on_a_Mission_*.html) says the thieving bixies 'live at the top of Sweetwater Climb', and the card says 'Recover the last of the Medical Supplies in Sweetwater Climb'; that is fights/14029.json (door sweetwater_climb in entrances.json), whose Rebel Bixie Warrior 1402901, Mage 1402902, Elite 1402903 and boss Rebel Mage Pollentine 1402919 fight nowhere else, so they drop the supplies; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 1402902,
+      "item_id": 96000009,
+      "chance": 50,
+      "quest_id": 3090010,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: Terrence's offer on the wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Medic_on_a_Mission_*.html) says the thieving bixies 'live at the top of Sweetwater Climb', and the card says 'Recover the last of the Medical Supplies in Sweetwater Climb'; that is fights/14029.json (door sweetwater_climb in entrances.json), whose Rebel Bixie Warrior 1402901, Mage 1402902, Elite 1402903 and boss Rebel Mage Pollentine 1402919 fight nowhere else, so they drop the supplies; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 1402903,
+      "item_id": 96000009,
+      "chance": 50,
+      "quest_id": 3090010,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: Terrence's offer on the wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Medic_on_a_Mission_*.html) says the thieving bixies 'live at the top of Sweetwater Climb', and the card says 'Recover the last of the Medical Supplies in Sweetwater Climb'; that is fights/14029.json (door sweetwater_climb in entrances.json), whose Rebel Bixie Warrior 1402901, Mage 1402902, Elite 1402903 and boss Rebel Mage Pollentine 1402919 fight nowhere else, so they drop the supplies; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 1402919,
+      "item_id": 96000009,
+      "chance": 50,
+      "quest_id": 3090010,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: Terrence's offer on the wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Medic_on_a_Mission_*.html) says the thieving bixies 'live at the top of Sweetwater Climb', and the card says 'Recover the last of the Medical Supplies in Sweetwater Climb'; that is fights/14029.json (door sweetwater_climb in entrances.json), whose Rebel Bixie Warrior 1402901, Mage 1402902, Elite 1402903 and boss Rebel Mage Pollentine 1402919 fight nowhere else, so they drop the supplies; the chance is a local value."
+        }
+      ]
     }
   ]
 }

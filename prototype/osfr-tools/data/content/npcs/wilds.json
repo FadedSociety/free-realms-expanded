@@ -44750,9 +44750,63 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part A. The Roadhouse and the Tavern Cellar (Northern Wilds), row 36; source cell: [client][video][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3090010,
+          "title": "Medic: Medic on a Mission",
+          "title_string_id": 73493,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 10; name 'Medic: Medic on a Mission'; title id cell ucdt 623216863 / ugdt 2466271411"
+            },
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 10; name 'Medic: Medic on a Mission'; title id cell ucdt 623216863 / ugdt 2466271411"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 2: level 5 to 10 (supplies, Terrence and Clover), row 10; name 'Medic: Medic on a Mission'; title id cell ucdt 623216863 / ugdt 2466271411"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3090010 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 9; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3090010
+      ],
       "quests_given_text": [
         "Medic: Medic on a Mission (wiki and video give Terrence; the video quest header is qCG_K2piQgE/00104); target of Medic: Supply Recovery (\"Terrence at The Roadhouse sent me a letter explaining that there was a problem with the shipment\", 3668350740); hand-in for Warrior: You Deserve Better (the weapon crates \"in storage\", 2351991534) and Warrior: Steele is Useful; Groceries for Terrence (client title 248566274; \"Deliver the groceries to Terrence at The Roadhouse\", 1621982566; the giver is unnamed: \"All my couriers are busy\", 216630976). Client text for a second Medic stage sends the player to Sweetwater Climb for supplies stolen \"from his inn\" (419732842). He is also a customer name on the Chef Farmer's Market list (\"Farmer's Market - Terrence\", 528225170)."
       ],

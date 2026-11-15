@@ -200,6 +200,11 @@ pub fn assert_enabled_medic_chapter_records() {
             VITAMINS => vec![(4_613, 1), (524, 1)],
             // L1202: No Pain, No Gain, the All-Star Medic Square Shard (the wiki's cell).
             3_090_029 => vec![(10_828, 1)],
+            // L1222: Surgical Precision's Pro Medic Boots, Supply Recovery's Urgent Care Medic
+            // Gloves and Medic on a Mission's Power Shard of Vitality II (the wiki's cells).
+            3_090_008 => vec![(18_470, 1)],
+            3_090_009 => vec![(76_086, 1)],
+            3_090_010 => vec![(75_355, 1)],
             _ => vec![],
         };
         assert_eq!(rewards.len(), 1, "quest {quest_id}: one reward bundle");
@@ -392,15 +397,18 @@ pub fn assert_enabled_medic_chapter_records() {
         Some(u64::from(LEVEL_END_TEXT))
     );
 
-    // The Bixie Hive, the repeatable contract 3090007 and every record from
-    // Surgical Precision onward stay closed.
+    // The Bixie Hive, the repeatable contract 3090007 and every record after
+    // Surgical Precision stay closed.
     for record in records {
         let id = record["id"].as_u64().unwrap();
         // T743 enables Callahan's Seaside level-20 gate (3090027); its own suite covers it.
         // T542 enables the Jobs-window Become a Medic (3090034).
         // L1202 enables No Pain, No Gain (3090029), the quest after the level-20 gate.
+        // L1222 enables Surgical Precision, Supply Recovery and Medic on a Mission
+        // (3090008-3090010); medic_level_five_chapter covers the first offer.
         if id == u64::from(3_090_002_u32)
             || (id >= 3_090_007
+                && !(u64::from(SURGICAL_PRECISION)..=3_090_010).contains(&id)
                 && id != u64::from(LEVEL_TWENTY)
                 && id != u64::from(BECOME_A_MEDIC)
                 && id != 3_090_029)

@@ -873,21 +873,26 @@ fn refusals_and_reconnect_change_nothing() {
 
 #[test]
 fn surgical_precision_stays_disabled() {
-    let fixture = Fixture::new();
+    // L1222: the name is kept from when Surgical Precision (3090008) was off. It is live
+    // now, so this checks that Gordon offers it once Achieve Level 5 is done, and that the
+    // records after it stay closed. quest_wire wired it, so the fixture keeps bulk-wired
+    // quests on.
+    let fixture = Fixture::new().with_bulk_quests();
     let mut now = 50_000;
     let (mut game, _naia, _greyli, gordon) = finish_chapter(&fixture, CHARACTER, &mut now);
 
-    // The next record stays closed in content, and every later one does too.
     let surgical = medic_record(SURGICAL_PRECISION);
-    assert_eq!(surgical["enabled"].as_bool(), Some(false));
+    assert_ne!(surgical["enabled"].as_bool(), Some(false));
     let document = read_json(&content_dir().join("quests/medic.json"));
     for record in document["records"].as_array().unwrap() {
         let id = record["id"].as_u64().unwrap();
         // T743 enables Callahan's Seaside level-20 gate and T542 the Jobs-window
         // Become a Medic; L1202 enables No Pain, No Gain (3090029), the quest after that gate;
-        // the rest stay off.
+        // L1222 enables Surgical Precision, Supply Recovery and Medic on a Mission
+        // (3090008-3090010); the rest stay off.
         let after_gate = 3_090_029;
         if id >= 3_090_007
+            && !(u64::from(SURGICAL_PRECISION)..=3_090_010).contains(&id)
             && id != u64::from(LEVEL_TWENTY)
             && id != u64::from(BECOME_A_MEDIC)
             && id != after_gate
@@ -900,37 +905,17 @@ fn surgical_precision_stays_disabled() {
         }
     }
 
-    // Even with every prerequisite and the rank-five job gate satisfied, the
-    // disabled record is not offered.
-    let before_state = game.state();
-    let before_bytes = saved(&game);
-    assert_no_offer(
-        &mut game,
-        &gordon,
-        GORDON,
-        &mut now,
-        "Surgical Precision after Achieve Level 5",
-    );
+    // With Achieve Level 5 done, Gordon's next offer is Surgical Precision, and nothing
+    // is saved for it until the player accepts.
+    now += 10;
+    offer(&mut game, &gordon, GORDON, SURGICAL_PRECISION, now);
     assert_eq!(
-        game.state(),
-        before_state,
-        "the disabled-record Talk changed state"
+        quest_status(&game, SURGICAL_PRECISION),
+        QuestStatus::Offered
     );
-    assert_eq!(
-        saved(&game),
-        before_bytes,
-        "the disabled-record Talk changed the save"
-    );
-    assert!(
-        !game
-            .state()
-            .npc_quests
-            .as_ref()
-            .unwrap()
-            .quests
-            .contains_key(&SURGICAL_PRECISION),
-        "Surgical Precision must not be offered"
-    );
+    now += 10;
+    accept(&mut game, &gordon, SURGICAL_PRECISION, now);
+    assert_eq!(quest_status(&game, SURGICAL_PRECISION), QuestStatus::Active);
 }
 
 #[test]

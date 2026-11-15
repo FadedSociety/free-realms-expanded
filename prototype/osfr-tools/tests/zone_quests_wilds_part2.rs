@@ -338,8 +338,12 @@ fn the_other_wilds_rows_stay_off_with_a_blocker() {
             .all(|p| shipped_quest(*p).enabled);
         assert!(live, "{id}: the quest before it is live");
     }
+    // L1222 wired Medic on a Mission (3090010, Terrence: the supplies from Sweetwater Climb)
+    // behind the live Supply Recovery; the Medic suites cover it.
+    let mission = shipped_quest(3_090_010);
+    assert!(mission.enabled && !mission.objectives.is_empty());
     // The rest of the list: still stubs nobody has wired.
-    for id in [3_060_022, 3_090_010, 3_160_012] {
+    for id in [3_060_022, 3_160_012] {
         assert!(
             off(id).objectives.is_empty(),
             "{id} grew objectives; re-check it"

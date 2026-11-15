@@ -747,11 +747,91 @@
       "prerequisite_quest_ids": [
         3090006
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 76761,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Nurse Naia (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_surgical_precision_15bda2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: Nurse Naia's line 387990 'I've heard rumors about wandering Bixie Warriors that are preying on the florists west of Queensfield...', the wiki's Naia line at this step"
+            }
+          ],
+          "npc_id": 9000000161,
+          "dialogue_string_id": 387990,
+          "lines": [
+            {
+              "text_id": 387990
+            }
+          ]
+        },
+        {
+          "kind": "use_ability",
+          "id": 2,
+          "text_string_id": 101595,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "As a medic, use Target Vitals (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_surgical_precision_15bda2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: ability 'target vitals' is definition 62001"
+            }
+          ],
+          "ability_id": 62001,
+          "count": 1
+        },
+        {
+          "kind": "defeat",
+          "id": 3,
+          "text_string_id": 101597,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Defeat the Bixie Warriors - 0/5 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_surgical_precision_15bda2)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: the Bixie Warrior's FR_Mob page (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_mob_Bixie_Warrior_fcb75278.html) is a Battle Starter for 'Bixies Gone Wild!', which is field battle 12301 (title 75452 'Bixies Gone Wild!', objective 76505 'Defeat all bixies!'); any of its three bixies counts, so 5 takes two runs. Client line 101597 'Defeat the Bixie Warriors'"
+            }
+          ],
+          "in_fight": 12301,
+          "count": 5
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 387980,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Nurse Naia (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_surgical_precision_15bda2)."
+            }
+          ],
+          "npc_id": 9000000161
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 18470,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Pro Medic Boots, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [18470]; data/release/item-table.json row 18470, medic-greencross-L3 boots)"
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "11": 125
           },
@@ -759,6 +839,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 125 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090008)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: the reward is the wiki's: the Pro Medic Boots, 125 stars as Medic XP (L926) and no coins"
             }
           ]
         }
@@ -799,12 +883,21 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1222: offer 387465 'I see you've been studying! Target Vitals is an interesting ability. Speak to Nurse Naia, she knows more about it than I do.', Doctor Gordon's line in the version the wiki plays (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Surgical_Precision_024efab4.html: Gordon sends you to Naia about Target Vitals); 76747, beside the title, is the older version where Clover spars with you outside town ('Clover will be assisting us'), whose goal lines 76753-76759 no longer match"
         }
       ],
       "description_string_id": 76749,
-      "intro_text_string_id": 76747,
+      "intro_text_string_id": 387465,
       "end_text_string_id": 76750,
-      "enabled": false
+      "enabled": true,
+      "job": 11
     },
     {
       "id": 3090009,
@@ -813,11 +906,78 @@
       "prerequisite_quest_ids": [
         3090008
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 73366,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "As a medic, talk to Terrence at The Roadhouse (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_supply_recovery_4c9e1a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: Terrence's line 73368 'Oh yes, the medical supplies! We were storing the shipment in the cellar, but now there's a bunch of hooligans down there making trouble!', the wiki walkthrough's Terrence line at this step"
+            }
+          ],
+          "npc_id": 9000000488,
+          "dialogue_string_id": 73368,
+          "lines": [
+            {
+              "text_id": 73368
+            }
+          ]
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 73371,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "As a medic, get the Medical Supplies from the hooligans! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_supply_recovery_4c9e1a)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: the wiki's walkthrough (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Supply_Recovery_5c58564d.html) sends you through the cellar door at the back of The Roadhouse into the dungeon Tavern Cellar to 'fight your way to the supplies'; that is fights/14043.json (door tavern_cellar in entrances.json), whose own kinds are the Hooligan Brawler 1404301 (6 per run) and Cal 1404313; only they drop the supplies (its Hooligan Archer 930012 also fights in 14021, so it drops nothing here)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: the wiki's walkthrough (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Supply_Recovery_5c58564d.html) sends you through the cellar door at the back of The Roadhouse into the dungeon Tavern Cellar to 'fight your way to the supplies'; that is fights/14043.json (door tavern_cellar in entrances.json), whose own kinds are the Hooligan Brawler 1404301 (6 per run) and Cal 1404313; only they drop the supplies (its Hooligan Archer 930012 also fights in 14021, so it drops nothing here); a quest drop with no bag item"
+            }
+          ],
+          "item_id": 96000008,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 73394,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "return to Terrence (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_supply_recovery_4c9e1a)."
+            }
+          ],
+          "npc_id": 9000000488
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76086,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Urgent Care Medic Gloves, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [76086]; stores.json row 76086)"
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "11": 88
           },
@@ -825,6 +985,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 88 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090009)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: the reward is the wiki's: the Urgent Care Medic Gloves, 88 stars as Medic XP (L926) and no coins"
             }
           ]
         }
@@ -865,12 +1029,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 73362,
       "intro_text_string_id": 73360,
       "end_text_string_id": 73363,
-      "enabled": false
+      "enabled": true,
+      "job": 11
     },
     {
       "id": 3090010,
@@ -879,11 +1048,78 @@
       "prerequisite_quest_ids": [
         3090009
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 73723,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "As a medic, recover the Medical Supplies (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_medic_on_a_mission_4eaa9f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: Terrence's offer on the wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Medic_on_a_Mission_*.html) says the thieving bixies 'live at the top of Sweetwater Climb', and the card says 'Recover the last of the Medical Supplies in Sweetwater Climb'; that is fights/14029.json (door sweetwater_climb in entrances.json), whose Rebel Bixie Warrior 1402901, Mage 1402902, Elite 1402903 and boss Rebel Mage Pollentine 1402919 fight nowhere else, so they drop the supplies"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: (R) L1222: Terrence's offer on the wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Medic_Medic_on_a_Mission_*.html) says the thieving bixies 'live at the top of Sweetwater Climb', and the card says 'Recover the last of the Medical Supplies in Sweetwater Climb'; that is fights/14029.json (door sweetwater_climb in entrances.json), whose Rebel Bixie Warrior 1402901, Mage 1402902, Elite 1402903 and boss Rebel Mage Pollentine 1402919 fight nowhere else, so they drop the supplies; a quest drop with no bag item"
+            }
+          ],
+          "item_id": 96000009,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 73394,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Terrence (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_medic_on_a_mission_4eaa9f)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: Terrence's line 73727 'That looks like everything! Now get those supplies back to Naia!', the wiki walkthrough's Terrence line at this step; the closing 73495 is Naia's, where the quest ends"
+            }
+          ],
+          "npc_id": 9000000488,
+          "dialogue_string_id": 73727,
+          "lines": [
+            {
+              "text_id": 73727
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 73729,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Bring the supplies to Nurse Naia (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_medic_on_a_mission_4eaa9f)."
+            }
+          ],
+          "npc_id": 9000000161
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 75355,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Medic's Power Shard of Vitality II, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [75355])"
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "11": 100
           },
@@ -891,6 +1127,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090010)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1222: the reward is the wiki's: the Medic's Power Shard of Vitality II, 100 stars as Medic XP (L926) and no coins"
             }
           ]
         }
@@ -935,12 +1175,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 73494,
       "intro_text_string_id": 73492,
       "end_text_string_id": 73495,
-      "enabled": false
+      "enabled": true,
+      "job": 11
     },
     {
       "id": 3090011,
