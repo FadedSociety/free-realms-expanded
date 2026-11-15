@@ -196,16 +196,123 @@
     },
     {
       "id": 3110003,
+      "job": 2,
       "title_string_id": 78845,
       "giver_npc_id": 9000000223,
       "prerequisite_quest_ids": [
         3110002
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "text_string_id": 90382,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Use the Shuriken Toss ability on Yeti Bouncers - (0/8) (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
+            },
+            {
+              "kind": "client",
+              "evidence": "90382 'Defeat Yeti Bouncers in the Hot Springs Haven', the client's goal line (the wiki keeps a later wording that names the Shuriken Toss)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: the Yeti Bouncer is fight 14013's kind yeti_bouncer (definition 950031, name 6501): 7 guards plus one in wave w1, exactly the wiki's 8; a kill of any ability counts, as in Bad Neighbors (L1211)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: our quest steps run in order (quest_engine.rs 'Steps run in order, one active at a time'), so the wiki's order takes two runs of the Hot Springs Haven: fight 14013 wakes Umari only after every guard and wave w1 is down, so run one counts the 8 Bouncers and then Umari, and run two the 8 Cave Yetis"
+            }
+          ],
+          "model_id": 950031,
+          "in_fight": 14013,
+          "count": 8
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "text_string_id": 90396,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Use the Shuriken Toss ability on Umari (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
+            },
+            {
+              "kind": "client",
+              "evidence": "90396 'Defeat Umari in the Hot Springs Haven' (90395 is the short form 'Defeat Umari.')"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: Umari is fight 14013's boss, kind umari (definition 950033, name 6502)"
+            }
+          ],
+          "model_id": 950033,
+          "in_fight": 14013,
+          "count": 1
+        },
+        {
+          "kind": "defeat",
+          "id": 3,
+          "text_string_id": 90398,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Use the Shuriken Toss ability on Yeti Chuckers - (0/8) (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
+            },
+            {
+              "kind": "client",
+              "evidence": "90398 'Defeat Yeti Chuckers in the Hot Springs Haven'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: the Yeti Chucker is fight 14013's kind cave_yeti (definition 950032), as Bad Neighbors maps it (L1211): the client names no Yeti Chucker, and the fight holds 8 Cave Yetis (7 guards plus one in wave w1), the wiki's 8, against 7 plain Yetis"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: our quest steps run in order (quest_engine.rs 'Steps run in order, one active at a time'), so the wiki's order takes two runs of the Hot Springs Haven: fight 14013 wakes Umari only after every guard and wave w1 is down, so run one counts the 8 Bouncers and then Umari, and run two the 8 Cave Yetis"
+            }
+          ],
+          "model_id": 950032,
+          "in_fight": 14013,
+          "count": 8
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 90402,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Ty in Lakeshore (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
+            },
+            {
+              "kind": "client",
+              "evidence": "90402 'Return to Ty in Lakeshore'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: Ty 9000000223 is the giver and hears the closing 78847 'Not bad. There is some hope for you yet.'"
+            }
+          ],
+          "npc_id": 9000000223
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 76211,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Kusa Ninja Cowl, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [76211]); the retired Amateur Ninja Cowl and Gi are not granted (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "2": 37
           },
@@ -213,6 +320,14 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 37 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/ninja.json, record 3110003)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "no coin cell: the wiki pays the Kusa Ninja Cowl and 37 stars only, so coins stay 0 (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: the reward is the wiki's own: the Kusa Ninja Cowl, its 37 stars as Ninja (profile 2) XP (L926) and no coins; nothing is inferred"
             }
           ]
         }
@@ -253,12 +368,20 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1221: job 2 (Ninja) like the chapter's other records; the quest advances the Ninja job per the wiki ('This quest will advance the Ninja job')"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1221: enabled: the four steps above give the record a playable path; the old note that 3110003 waited on an unavailable troll-fort encounter is out of date, the wiki and the client put the practice in the Hot Springs Haven (description 78846 'Defeat your foes at the Hot Springs Haven in Snowhill.')"
         }
       ],
       "description_string_id": 78846,
       "intro_text_string_id": 78844,
       "end_text_string_id": 78847,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3110004,
@@ -266,7 +389,7 @@
       "title_string_id": 78849,
       "giver_npc_id": 9000000223,
       "prerequisite_quest_ids": [
-        3110002
+        3110003
       ],
       "objectives": [
         {
@@ -424,6 +547,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T202: job 2 (Ninja) gate. The client title is \"Ninja: Silence is Golden... and Deadly\" and the mentor chain is Ninja training; it is offered only while Ninja is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "prerequisite 3110003: the Silence page's series box puts Ninja: Super Star before it ('<< previous'), and Super Star's own box puts Stolen Away before it; the T107 skip of the disabled 3110003 ends with L1221 (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_quest_Ninja_Super_Star_d4f3960a.html)"
         }
       ],
       "description_string_id": 78850,

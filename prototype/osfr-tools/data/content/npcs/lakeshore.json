@@ -15255,6 +15255,10 @@
             {
               "kind": "client",
               "evidence": "title_string_id corrected from raw locale hash 3233537318 to Global.Text id 78849 (content_check text_raw_hash, 2026-10-15)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1221: the prerequisite is now Ninja: Super Star 3110003 (live with its Hot Springs Haven steps); the skip noted above no longer applies"
             }
           ]
         },

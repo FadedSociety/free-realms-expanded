@@ -17,7 +17,8 @@ const CHLOE: u64 = 9_000_000_047;
 const UNRELATED: u64 = 9_000_000_189;
 const NINJA_PATH: u32 = 3_110_001;
 const STOLEN_AWAY: u32 = 3_110_002;
-const HALTED_MONGO_CHAIN: u32 = 3_110_003;
+// Ninja: Super Star, live since L1221 (it was the disabled "halted" chapter before).
+const SUPER_STAR: u32 = 3_110_003;
 const STEALTH_REFERRAL: u32 = 3_110_004;
 const STEALTH_REWARD_COINS: u32 = 5;
 const TALK_MENU_STRING_ID: u32 = 3300;
@@ -47,11 +48,26 @@ fn active_stealth(counts: Vec<u32>) -> QuestProgress {
     }
 }
 
-fn completed_through_stolen_away(character_id: u64, stealth: Option<QuestProgress>) -> QuestState {
+/// The saved chapter: Ninja Path and Stolen Away done, then Super Star (the referral's
+/// prerequisite since L1221) when `super_star` is set, then the referral's own progress.
+fn completed_chapter(
+    character_id: u64,
+    super_star: bool,
+    stealth: Option<QuestProgress>,
+) -> QuestState {
     let mut quests = BTreeMap::from([
         (NINJA_PATH, completed_quest()),
         (STOLEN_AWAY, completed_quest()),
     ]);
+    if super_star {
+        quests.insert(
+            SUPER_STAR,
+            QuestProgress {
+                status: QuestStatus::Completed,
+                counts: vec![8, 1, 8, 1],
+            },
+        );
+    }
     if let Some(progress) = stealth {
         quests.insert(STEALTH_REFERRAL, progress);
     }
@@ -83,6 +99,10 @@ struct Session {
 
 impl Session {
     fn new(npc_id: u64, stealth: Option<QuestProgress>) -> Self {
+        Self::at_chapter(npc_id, true, stealth)
+    }
+
+    fn at_chapter(npc_id: u64, super_star: bool, stealth: Option<QuestProgress>) -> Self {
         let mut character = CharacterState {
             guid: 700_107,
             zone_id: 0,
@@ -102,7 +122,7 @@ impl Session {
             unlocked: BTreeSet::from([1, 2, 43]),
             experience: BTreeMap::new(),
         });
-        state.npc_quests = Some(completed_through_stolen_away(character.guid, stealth));
+        state.npc_quests = Some(completed_chapter(character.guid, super_star, stealth));
         let mut game = Gameplay::load(&gameplay_content(), Some(state)).unwrap();
         game.bind_npc_quest_catalogue(&content_root(), character.guid)
             .unwrap();
@@ -211,7 +231,7 @@ fn quest_id(body: &[u8]) -> u32 {
     u32::from_le_bytes(body[6..10].try_into().unwrap())
 }
 
-fn halted_mongo_chain_is_disabled() -> bool {
+fn super_star_is_enabled() -> bool {
     let document: serde_json::Value =
         serde_json::from_slice(&std::fs::read(content_root().join("quests/ninja.json")).unwrap())
             .unwrap();
@@ -219,8 +239,8 @@ fn halted_mongo_chain_is_disabled() -> bool {
         .as_array()
         .unwrap()
         .iter()
-        .find(|record| record["id"] == HALTED_MONGO_CHAIN)
-        .is_some_and(|record| record["enabled"] == false)
+        .find(|record| record["id"] == SUPER_STAR)
+        .is_some_and(|record| record["enabled"] != false)
 }
 
 #[test]
@@ -247,8 +267,9 @@ fn ty_offers_the_stealth_referral_after_stolen_away() {
     );
     assert!(session.saved_quests().pending_offer.is_none());
 
+    // A completed Super Star cannot be accepted again.
     let before = session.game.state();
-    let refused = session.send(&quest_reply(HALTED_MONGO_CHAIN));
+    let refused = session.send(&quest_reply(SUPER_STAR));
     assert!(!refused.changed);
     assert_eq!(session.game.state(), before);
 
@@ -364,7 +385,7 @@ fn return_to_ty_settles_once() {
     );
     let coins_before = session.game.state().inventory.coins;
     let before = session.game.state();
-    let forged = session.send(&quest_end_reply(HALTED_MONGO_CHAIN));
+    let forged = session.send(&quest_end_reply(SUPER_STAR));
     assert!(!forged.changed);
     assert_eq!(session.game.state(), before);
 
@@ -400,12 +421,15 @@ fn return_to_ty_settles_once() {
 
 #[test]
 fn halted_mongo_chain_stays_hidden_and_save_reloads() {
-    assert!(halted_mongo_chain_is_disabled());
+    // L1221: the name is kept from when 3110003 was a disabled, hidden chapter. It is Ninja:
+    // Super Star now, live, and the referral's prerequisite: after Stolen Away, Ty offers
+    // Super Star first, and its accepted progress survives a reload.
+    assert!(super_star_is_enabled());
 
-    let mut session = Session::new(TY, None);
+    let mut session = Session::at_chapter(TY, false, None);
     session.talk(TY);
     let before = session.game.state();
-    let refused = session.send(&quest_reply(HALTED_MONGO_CHAIN));
+    let refused = session.send(&quest_reply(STEALTH_REFERRAL));
     assert!(!refused.changed);
     assert_eq!(session.game.state(), before);
 
@@ -414,7 +438,24 @@ fn halted_mongo_chain_stays_hidden_and_save_reloads() {
         .replies
         .iter()
         .find(|body| body.starts_with(&[49, 0, 1, 0]))
-        .expect("Ty offers the enabled referral, not the disabled chapter");
+        .expect("Ty offers Super Star before the referral");
+    assert_eq!(quest_id(offer), SUPER_STAR);
+    assert!(session.send(&quest_reply(SUPER_STAR)).changed);
+    let reloaded = session.reconnect_at(TY);
+    let quests = reloaded.saved_quests();
+    assert_eq!(quests.quests[&SUPER_STAR].status, QuestStatus::Active);
+    assert_eq!(quests.quests[&SUPER_STAR].counts, [0, 0, 0, 0]);
+    assert!(!quests.quests.contains_key(&STEALTH_REFERRAL));
+
+    // With Super Star done, the referral runs to its end and its save reloads.
+    let mut session = Session::new(TY, None);
+    session.talk(TY);
+    let offered = session.send(&quest_choice());
+    let offer = offered
+        .replies
+        .iter()
+        .find(|body| body.starts_with(&[49, 0, 1, 0]))
+        .expect("Ty offers the referral once Super Star is done");
     assert_eq!(quest_id(offer), STEALTH_REFERRAL);
 
     assert!(session.send(&quest_reply(STEALTH_REFERRAL)).changed);
@@ -448,8 +489,7 @@ fn halted_mongo_chain_stays_hidden_and_save_reloads() {
         QuestStatus::Completed
     );
     assert_eq!(quests.quests[&STEALTH_REFERRAL].counts, [1, 1, 1, 1]);
-    assert!(!quests.quests.contains_key(&HALTED_MONGO_CHAIN));
+    assert_eq!(quests.quests[&SUPER_STAR].status, QuestStatus::Completed);
     assert_eq!(quests.pending_turnin, None);
     assert_eq!(saved.inventory.coins, coins_before + STEALTH_REWARD_COINS);
-    assert!(halted_mongo_chain_is_disabled());
 }

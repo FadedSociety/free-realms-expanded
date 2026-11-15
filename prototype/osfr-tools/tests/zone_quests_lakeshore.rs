@@ -42,8 +42,10 @@ const STEALTH: u32 = 3_110_004;
 /// T542's Job Browser starter, also offered by Ty with no gate; every save here has it done so
 /// the quests under test are the only offers left.
 const BECOME_A_NINJA: u32 = 3_110_026;
-/// The shipped Ninja entry line, done: The Ninja Path, Stolen Away, the stealth referral.
-const ENTRY_LINE: [(u32, usize); 3] = [(3_110_001, 1), (3_110_002, 1), (STEALTH, 4)];
+/// The shipped Ninja entry line, done: The Ninja Path, Stolen Away, Super Star (L1221), the
+/// stealth referral.
+const ENTRY_LINE: [(u32, usize); 4] =
+    [(3_110_001, 1), (3_110_002, 1), (3_110_003, 4), (STEALTH, 4)];
 const MAP: ZoneQuests = ZoneQuests {
     default_file: "lakeshore.json",
     files: &[],
@@ -136,7 +138,7 @@ fn level_ten_gate_is_refused_to_the_wrong_job_and_the_wrong_point_in_the_line() 
 
     // A Ninja one step earlier gets the stealth referral, not the gate, and cannot
     // forge the gate's accept.
-    let mut early = save_for(&fixture, NINJA, 900, &ENTRY_LINE[..2]);
+    let mut early = save_for(&fixture, NINJA, 900, &ENTRY_LINE[..3]);
     offer(&mut early, &ty, TY, STEALTH, now + 10);
     assert_packet_changes_nothing(&mut early, &ty, &forged, now + 20, "a forged 49/2");
     assert_eq!(quest_status(&early, STEALTH), QuestStatus::Offered);
@@ -177,8 +179,8 @@ fn level_gate_waits_for_the_finished_stealth_referral() {
         .expect("the shipped catalogue loads")
     };
     // The referral is open or untouched: the gate is not offerable. Finished: it is.
-    assert!(!engine(&ENTRY_LINE[..2], Some(STEALTH)).can_offer(LEVEL_TEN, TY));
-    assert!(!engine(&ENTRY_LINE[..2], None).can_offer(LEVEL_TEN, TY));
+    assert!(!engine(&ENTRY_LINE[..3], Some(STEALTH)).can_offer(LEVEL_TEN, TY));
+    assert!(!engine(&ENTRY_LINE[..3], None).can_offer(LEVEL_TEN, TY));
     assert!(engine(&ENTRY_LINE, None).can_offer(LEVEL_TEN, TY));
     // Only its giver offers it.
     assert!(!engine(&ENTRY_LINE, None).can_offer(LEVEL_TEN, BRY));

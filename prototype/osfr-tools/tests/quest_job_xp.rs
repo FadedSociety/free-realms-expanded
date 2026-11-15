@@ -1022,7 +1022,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, reward item ids, job gate, profile, XP).
     // Coins and items are the wiki's (lab/tools/quest_rewards.py, 2026-11-09).
-    let expected: [(&str, u32, u64, &[u32], u32, &[u32], Option<i32>, i32, u32); 31] = [
+    let expected: [(&str, u32, u64, &[u32], u32, &[u32], Option<i32>, i32, u32); 32] = [
         // L1057: the Kart line's next link, gated like the rest of it.
         (
             "kart_driver.json",
@@ -1199,11 +1199,23 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             NINJA,
             25,
         ),
+        // L1221: Ninja: Super Star, the wiki's step between Stolen Away and the referral.
+        (
+            "ninja.json",
+            3_110_003,
+            TY,
+            &[3_110_002],
+            0,
+            &[76_211],
+            Some(NINJA),
+            NINJA,
+            37, // L926: wiki stars
+        ),
         (
             "ninja.json",
             3_110_004,
             TY,
-            &[3_110_002],
+            &[3_110_003],
             5,
             &[75_092],
             Some(NINJA),
@@ -1426,6 +1438,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_080_007 | 3_080_009 => "(R) T732:",
             3_080_019 => "(R) T726:",
             3_080_008 => "(R) 2026-11-08:",
+            3_110_003 => "(R) L1221:",
             _ => "",
         };
         source.as_array().is_some_and(|tags| {
