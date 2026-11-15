@@ -3912,11 +3912,143 @@
               "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
             }
           ]
+        },
+        {
+          "quest_id": 3020028,
+          "title": "Blacksmith: No Sticks and Plenty of Stones",
+          "title_string_id": 95100,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "title 95100 'Blacksmith: No Sticks and Plenty of Stones' (client Global.Text, the Blacksmith titles 95096-95103)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Anata gives the Summersaber chain after Tools of the Trade; the record's giver moved here from the undrawn placeholder 9000000006"
+            }
+          ]
+        },
+        {
+          "quest_id": 3020029,
+          "title": "Blacksmith: Gemstone Roundup",
+          "title_string_id": 95101,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "title 95101 'Blacksmith: Gemstone Roundup' (client Global.Text, the Blacksmith titles 95096-95103)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Anata gives the Summersaber chain after Tools of the Trade; the record's giver moved here from the undrawn placeholder 9000000006"
+            }
+          ]
+        },
+        {
+          "quest_id": 3020030,
+          "title": "Blacksmith: Legendary Summersaber",
+          "title_string_id": 95102,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 30; name 'Blacksmith: Legendary Summersaber'; title id cell ucdt 3545650075 / ugdt 3568033116; bare 34081128"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 30; name 'Blacksmith: Legendary Summersaber'; title id cell ucdt 3545650075 / ugdt 3568033116; bare 34081128"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3020030 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 29; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95153 (lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3020031,
+          "title": "Blacksmith: The Royal Smithy",
+          "title_string_id": 95103,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 31; name 'Blacksmith: The Royal Smithy'; title id cell ucdt 2298742401 / ugdt 2525715277; bare 3911620995"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 5: Anata Caliburn (north of Blackspore, after level 20), row 31; name 'Blacksmith: The Royal Smithy'; title id cell ucdt 2298742401 / ugdt 2525715277; bare 3911620995"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3020031 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) source explicitly says after row 30; mapped that page label to the preceding batch content key"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95155 (lab/reports/locale-id-to-text.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3020026,
-        3020027
+        3020027,
+        3020028,
+        3020029,
+        3020030,
+        3020031
       ],
       "quests_given_text": [],
       "quests_accepted": [],

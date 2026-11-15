@@ -156,6 +156,27 @@ impl Catalogue {
         self.by_id.get(&id).map(|index| &self.quests[*index])
     }
 
+    /// True when `ancestor` is a prerequisite of `id`, directly or transitively. A cycle or a
+    /// missing record ends the walk; the reachability rule reports those on its own.
+    fn is_ancestor(&self, ancestor: u32, id: u32) -> bool {
+        let mut seen = BTreeSet::new();
+        let mut stack = vec![id];
+        while let Some(current) = stack.pop() {
+            let Some(quest) = self.quest(current) else {
+                continue;
+            };
+            for &prerequisite in &quest.prerequisite_quest_ids {
+                if prerequisite == ancestor {
+                    return true;
+                }
+                if seen.insert(prerequisite) {
+                    stack.push(prerequisite);
+                }
+            }
+        }
+        false
+    }
+
     /// `None` means reachable; `Some(reason)` names the first missing or
     /// disabled prerequisite on the chain. Disabled quests themselves are
     /// reported as unreachable, which is what a dependent sees.
@@ -307,15 +328,26 @@ impl Catalogue {
         let mut violations = Vec::new();
         // One hand-over event credits every open step with the same NPC, item and units, so two
         // enabled steps may not share an NPC and item (T786 review: no double credit per item).
-        let mut handed_over = BTreeSet::new();
+        // L1225: unless one quest is the other's prerequisite, directly or transitively, so the two
+        // are never open together (Anata takes Moonstone in No Sticks and again in Gemstone Roundup).
+        let mut handed_over: BTreeMap<(Option<u64>, Option<i64>), Vec<u32>> = BTreeMap::new();
         for quest in self.reachable_enabled() {
             for (index, goal) in quest.objectives.iter().enumerate() {
                 let objective = goal["id"].as_u64().unwrap_or(0);
                 let owner = format!("quest {} objective {objective} (#{index})", quest.id);
                 self.objective_violations(&mut violations, &owner, goal, false);
-                if goal["kind"] == "deliver_item"
-                    && !handed_over.insert((goal["npc_id"].as_u64(), goal["item_id"].as_i64()))
-                {
+                if goal["kind"] != "deliver_item" {
+                    continue;
+                }
+                let holders = handed_over
+                    .entry((goal["npc_id"].as_u64(), goal["item_id"].as_i64()))
+                    .or_default();
+                let shared = holders.iter().any(|&other| {
+                    other == quest.id
+                        || !(self.is_ancestor(other, quest.id) || self.is_ancestor(quest.id, other))
+                });
+                holders.push(quest.id);
+                if shared {
                     violations.push(format!(
                         "{owner}: another enabled deliver_item step already takes this item from this NPC"
                     ));

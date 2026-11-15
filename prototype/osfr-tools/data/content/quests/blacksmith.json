@@ -2814,13 +2814,12 @@
     },
     {
       "id": 3020028,
+      "job": 16,
       "title_string_id": 95100,
-      "giver_npc_id": 9000000006,
+      "giver_npc_id": 9500002016,
       "prerequisite_quest_ids": [
         3020027
       ],
-      "objectives": [],
-      "rewards": [],
       "source": [
         {
           "kind": "client",
@@ -2853,20 +2852,140 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: giver Anata Caliburn 9500002016, her drawn row (quest_spawned.json), as for Lady of the Lake and Tools of the Trade before these; the record's 9000000006 was an undrawn placeholder"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: job 16 (Blacksmith), like Tools of the Trade, the quest before it"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: card text 95149 / 95111 / 95150 from Anata's client block 95144-95156 (offer, the description line 95108-95113 for this step of the Summersaber chain, her closing)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: the 2014 client's version: its goal lines 101269-101277 and description 95111 ('Locate Topaz, Onyx, Moonstone and Turquoise') ask for Topaz, Onyx, Turquoise and Moonstone; the wiki's row lists Garnet, Rubies, Turquoise and Malachite (an older version with no client lines for three of them), and client evidence comes first"
         }
       ],
-      "enabled": false
+      "intro_text_string_id": 95149,
+      "description_string_id": 95111,
+      "end_text_string_id": 95150,
+      "objectives": [
+        {
+          "kind": "deliver_item",
+          "id": 1,
+          "text_string_id": 101269,
+          "npc_id": 9500002016,
+          "item_id": 2750,
+          "quantity": 10,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "101269 'Give Anata 10 Topaz' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Topaz is item 2750 (data/release/item-table.json; a mining output in data/content/mining.json); the step hands 10 to Anata on a Talk and is credited with it (T786 deliver_item)"
+            }
+          ]
+        },
+        {
+          "kind": "deliver_item",
+          "id": 2,
+          "text_string_id": 101272,
+          "npc_id": 9500002016,
+          "item_id": 2748,
+          "quantity": 10,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "101272 'Give Anata 10 Onyx' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Onyx is item 2748 (data/release/item-table.json; a mining output in data/content/mining.json); the step hands 10 to Anata on a Talk and is credited with it (T786 deliver_item)"
+            }
+          ]
+        },
+        {
+          "kind": "deliver_item",
+          "id": 3,
+          "text_string_id": 101274,
+          "npc_id": 9500002016,
+          "item_id": 2752,
+          "quantity": 10,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "101274 'Give Anata 10 Turquoise' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Turquoise is item 2752 (data/release/item-table.json; a mining output in data/content/mining.json); the step hands 10 to Anata on a Talk and is credited with it (T786 deliver_item)"
+            }
+          ]
+        },
+        {
+          "kind": "deliver_item",
+          "id": 4,
+          "text_string_id": 101276,
+          "npc_id": 9500002016,
+          "item_id": 2747,
+          "quantity": 10,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "101276 'Give Anata 10 Moonstone' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Moonstone is item 2747 (data/release/item-table.json; a mining output in data/content/mining.json); the step hands 10 to Anata on a Talk and is credited with it (T786 deliver_item)"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 21577,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Goggleguard, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [21577])"
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "All-Star Blacksmith Goggleguard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_no_sticks_and_plenty_of_stones_70c49a)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: the reward is the wiki's single item cell; the page shows no coins or stars"
+            }
+          ]
+        }
+      ],
+      "enabled": true
     },
     {
       "id": 3020029,
+      "job": 16,
       "title_string_id": 95101,
       "intro_text_string_id": 95151,
-      "giver_npc_id": 9000000006,
+      "giver_npc_id": 9500002016,
       "prerequisite_quest_ids": [
         3020028
       ],
-      "objectives": [],
-      "rewards": [],
       "source": [
         {
           "kind": "client",
@@ -2903,20 +3022,161 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95151 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: giver Anata Caliburn 9500002016, her drawn row (quest_spawned.json), as for Lady of the Lake and Tools of the Trade before these; the record's 9000000006 was an undrawn placeholder"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: job 16 (Blacksmith), like Tools of the Trade, the quest before it"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: card text 95151 / 95112 / 95152 from Anata's client block 95144-95156 (offer, the description line 95108-95113 for this step of the Summersaber chain, her closing)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: the client's goal lines 101529 and 101531 and the wiki agree: 20 Moonstones and 20 Fire Agates"
         }
       ],
-      "enabled": false
+      "description_string_id": 95112,
+      "end_text_string_id": 95152,
+      "objectives": [
+        {
+          "kind": "deliver_item",
+          "id": 1,
+          "text_string_id": 101529,
+          "npc_id": 9500002016,
+          "item_id": 2747,
+          "quantity": 20,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "101529 'Give Anata 20 Moonstones' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Moonstone is item 2747 (data/release/item-table.json; a mining output in data/content/mining.json); the step hands 20 to Anata on a Talk and is credited with it (T786 deliver_item)"
+            }
+          ]
+        },
+        {
+          "kind": "deliver_item",
+          "id": 2,
+          "text_string_id": 101531,
+          "npc_id": 9500002016,
+          "item_id": 2744,
+          "quantity": 20,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "101531 'Give Anata 20 Fire Agates' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Fire Agate is item 2744 (data/release/item-table.json; a mining output in data/content/mining.json); the step hands 20 to Anata on a Talk and is credited with it (T786 deliver_item)"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 10849,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Triangle Shard, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [10849])"
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "All-Star Blacksmith Triangle Shard (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_gemstone_roundup_68d898)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: the reward is the wiki's single item cell; the page shows no coins or stars"
+            }
+          ]
+        }
+      ],
+      "enabled": true
     },
     {
       "id": 3020030,
       "title_string_id": 95102,
       "intro_text_string_id": 95153,
-      "giver_npc_id": 9000000006,
+      "giver_npc_id": 9500002016,
       "prerequisite_quest_ids": [
         3020029
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 101605,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge the Summersaber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_legendary_summersaber_f64a99)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "recipes.json 198 Sturdy Summersaber, the item the wiki's goal names"
+            }
+          ],
+          "recipe_id": 198,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 101633,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Anata Caliburn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_legendary_summersaber_f64a99)."
+            }
+          ],
+          "npc_id": 9500002016
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 1411,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Apron, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [1411])"
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Legendary Summersaber (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_legendary_summersaber_f64a99)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: the reward is the wiki's single item cell; the page shows no coins or stars"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2953,20 +3213,75 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95153 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: closing 95154 'Oh, goodness. It's so wondrous. You've come a long way', Anata's voice where the quest ends (Speak with Anata); Anata's client block 95144-95156"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: recipe 198 'Sturdy Summersaber' (recipes.json, rank 16) has no pattern item, so the engine teaches it while this quest is active (gameplay/crafting.rs teach_quest_recipes), which matches Anata's offer 95153 'I've given you the knowledge needed to create the Summersaber'"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 16,
+      "description_string_id": 95113,
+      "end_text_string_id": 95154
     },
     {
       "id": 3020031,
       "title_string_id": 95103,
       "intro_text_string_id": 95155,
-      "giver_npc_id": 9000000007,
+      "giver_npc_id": 9500002016,
       "prerequisite_quest_ids": [
         3020030
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 116137,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Steelbloom (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_the_royal_smithy_b1bc21)."
+            }
+          ],
+          "npc_id": 9000000207
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 6343,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Forge Blower, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [6343])"
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: The Royal Smithy (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_the_royal_smithy_b1bc21)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: the reward is the wiki's single item cell; the page shows no coins or stars"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3003,9 +3318,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95155 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1225: closing 95156 'Is that.. oh my! The legendary Summersaber. You reconstructed this?', Steelbloom's voice where the quest ends (Speak to Steelbloom); Anata's client block 95144-95156"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 16,
+      "description_string_id": 95114,
+      "end_text_string_id": 95156
     },
     {
       "id": 3020032,

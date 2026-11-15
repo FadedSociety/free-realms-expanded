@@ -462,12 +462,12 @@ use Blocker::{Giver, NoJobGate, NoObjectives, NoProfile, Prerequisite};
 /// Card Duelist line, 2026-11-08), so eight; Gavin's branch of Queensfields went live, so seven;
 /// L1202's quest pass put Fisherman 3070026 live once its giver was drawn (its Live Bait game is
 /// a nettletrout pickup, R), so six; L1216 put General Concerns (3150014, its Quake step now a
-/// `use_ability`) and Finding Facts About Fastvi (3150015) live, so four. The test name keeps
-/// the T723 count for the protected test list.
+/// `use_ability`) and Finding Facts About Fastvi (3150015) live, so four; L1225 put The Royal
+/// Smithy live (its giver is Anata's drawn row and its chain is live), so three. The test name
+/// keeps the T723 count for the protected test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 4] = [
-        (3_020_031, &[Giver, Prerequisite]),
+    const OFF: [(u32, &[Blocker]); 3] = [
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
         (3_160_016, &[Prerequisite]),
         (3_160_033, &[Prerequisite]),

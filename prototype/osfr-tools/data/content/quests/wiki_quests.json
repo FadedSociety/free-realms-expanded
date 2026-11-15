@@ -37447,9 +37447,19 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) L1217: client 93023 'Give the recovered supplies to Little J' (with 93022 'Return to Little J') in the quest's own block; the supplies are the previous step's quest drop, so the hand-in is a talk at Little J"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1225: Little J's hand-in line 93026 'Ah, great! You found it! Thanks a lot ... Go on ahead and let my brother know I'm alright', the next line of his client block after the goal 93023 (read from en_us_data.dat); the native check of 2026-11-15 (run client-baseline-20261115T175022Z) showed the stock 'Hello!' here without it"
             }
           ],
-          "npc_id": 9500000699
+          "npc_id": 9500000699,
+          "dialogue_string_id": 93026,
+          "lines": [
+            {
+              "text_id": 93026
+            }
+          ]
         },
         {
           "kind": "talk_to_npc",
