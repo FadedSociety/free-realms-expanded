@@ -2219,6 +2219,7 @@
     },
     {
       "id": 3020021,
+      "job": 16,
       "title_string_id": 95094,
       "intro_text_string_id": 95137,
       "giver_npc_id": 9000000203,
@@ -2227,8 +2228,26 @@
       ],
       "objectives": [
         {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 100015,
+          "recipe_id": 200,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "100015 'Forge A Tempest Woven Wand' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1226: recipes.json 200 'Tempest Woven Wand' makes item 30480, the wand the next step hands over; it has no pattern item, so the engine teaches it while this quest is active (gameplay/crafting.rs teach_quest_recipes); rank 12"
+            }
+          ]
+        },
+        {
           "kind": "deliver_item",
-          "id": 3,
+          "id": 2,
+          "text_string_id": 100017,
           "npc_id": 9000000203,
           "item_id": 30480,
           "quantity": 1,
@@ -2236,6 +2255,22 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T786: quest-lines/objective-specs-fixed.json q3020021 objectives[2] (locale:100017, hand the wand to NPC 9000000203; status needs_server, rule locale:100018); the wand item 30480 is that record's objectives[1] evidence (client item 'Tempest Woven Wand', repo prototype/osfr-tools/data/reference/weapons.json:44434-44467). Quantity 1 is the singular 'A Tempest Woven Wand' of locale:100015 (R)."
+            },
+            {
+              "kind": "client",
+              "evidence": "100017 'Give the Wand to Silverray' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 100019,
+          "npc_id": 9000000203,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "100019 'Speak with Silverray' (client Global.Text (lab/clients/community-filled/Locale/en_us_data.dat, read with lead-loc.py))"
             }
           ]
         }
@@ -2243,7 +2278,18 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 21179,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Boots, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [21179])"
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 878
           },
@@ -2251,6 +2297,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 878 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020021)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1226: the reward is the wiki's: the All-Star Blacksmith Boots and 878 stars as Blacksmith XP; no coins"
             }
           ]
         }
@@ -2295,9 +2345,15 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95137 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1226: enabled: the T895 hold note above waited on a hollow Silver Appearance (3020020), which is live now (talk step to 9500003029). The client block gives the three goals 100015/100017/100019 (craft, hand over, speak), the card 100013 title / 100014 description, Silverray's offer 95137 and his closing 95138 'Marvelous! This will work much better. You're talented at constructing wands.'; job 16 like the rest of his line"
         }
       ],
-      "enabled": false
+      "description_string_id": 100014,
+      "end_text_string_id": 95138,
+      "enabled": true
     },
     {
       "id": 3020022,
@@ -2362,13 +2418,73 @@
       "intro_text_string_id": 95141,
       "giver_npc_id": 9000000203,
       "prerequisite_quest_ids": [
-        3020021
+        3020021,
+        3958509
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 100131,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Stalking Panther Scythe - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_scythes_of_stalking_7dd33f)."
+            }
+          ],
+          "recipe_id": 26,
+          "quantity": 3
+        },
+        {
+          "kind": "deliver_item",
+          "id": 2,
+          "text_string_id": 100136,
+          "npc_id": 9000000203,
+          "item_id": 30470,
+          "quantity": 3,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the Scythes to Silverray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_scythes_of_stalking_7dd33f)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 100136 is this step; recipient named in the text and is the quest giver"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1226: the scythes are item 30470 (recipe 26 'Stalking Panther Scythe', the goal 100131 x3 before it); 100136 'Give the Scythes to Silverray' / 100137 'Hand in the Scythes that you crafted'; a hand-over (T786 deliver_item), not a plain Talk: the bag gives up 3 and the step is credited together"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 100019,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with Silverray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_scythes_of_stalking_7dd33f)."
+            }
+          ],
+          "npc_id": 9000000203
+        }
+      ],
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 21002,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "All-Star Blacksmith Shirt, the wiki's reward cell (tests/fixtures/quest_wiki_facts.json ids [21002])"
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "16": 700
           },
@@ -2376,6 +2492,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 700 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020023)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1226: the reward is the wiki's: the All-Star Blacksmith Shirt and 700 stars as Blacksmith XP; no coins"
             }
           ]
         }
@@ -2416,9 +2536,20 @@
         {
           "kind": "client",
           "evidence": "49/1 offer line (ShowQuestStartScreen 0x00a94be0 formats it as QuestNpcIntroTextMessage; 0 shows the client's default 'Can you help me?' 8125): the quest table matched the wiki offer line to client id 95141 (lab/reports/locale-id-to-text.json)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1226: closing 95142 'Life has been much easier with you around! Thanks. Here's your profit.', Silverray's voice where the quest ends, after his offer 95141"
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "job": 16,
+      "description_string_id": 95107,
+      "end_text_string_id": 95142
     },
     {
       "id": 3020024,

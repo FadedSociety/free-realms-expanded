@@ -5,8 +5,8 @@
 //! Every runtime test drives the production request path (`Gameplay::handle_in_world`, the
 //! gateway's game handler, reached here through the shared 26/8 -> 26/10 Talk helpers) against
 //! the shipped Blacksmith record 3020021, copied into the opening fixture and enabled there.
-//! The shipped record is `enabled: false` because its other steps and its reward wait for the
-//! data pass; the fixture enables it exactly as the pet-trick suite enables its disabled record.
+//! The shipped record is live since L1226 (forge, hand over, speak); the fixture keeps only its
+//! delivery step, exactly as the pet-trick suite trims its record.
 //!
 //! The shipped step names item 30480 (the wand the objective spec names) at NPC 9000000203
 //! (Silverray, the quest's giver and its turn-in row). The reference opening inventory defines
@@ -54,6 +54,8 @@ const QUEST_XP: u32 = 878;
 const GIVER: u64 = 9_000_000_203;
 /// The item the shipped step names: the wand its craft step points at (30480).
 const WAND: i32 = 30_480;
+/// L1226: Silverray's closing on the record, "Marvelous! This will work much better."
+const END_TEXT: u32 = 95_138;
 /// A real opening-inventory definition (`slot 7`, uncapped) the reference bag can hold.
 const FIXTURE_ITEM: i32 = 75_060;
 /// A real opening-inventory definition the state validator accepts as equipped on profile 1
@@ -97,12 +99,22 @@ fn patch_record(scratch: &Fixture, edit: impl FnOnce(&mut Value)) {
 /// Point the shipped delivery step at a definition the opening bag can hold and (optionally)
 /// change its required units.
 fn rewrite_step(record: &mut Value, item: i32, quantity: u32) {
+    // L1226: the shipped record also forges the wand first and speaks with Silverray last, and
+    // pays the Blacksmith Boots. These runtime tests exercise the hand-over alone, so the fixture
+    // keeps only the delivery step and the job XP (the opening bag defines neither the wand nor
+    // the boots).
     let goals = record["objectives"]
         .as_array_mut()
         .expect("the shipped record has the delivery step");
-    assert_eq!(goals.len(), 1, "the shipped record carries one step");
+    goals.retain(|goal| goal["kind"] == "deliver_item");
+    assert_eq!(
+        goals.len(),
+        1,
+        "the shipped record carries one delivery step"
+    );
     goals[0]["item_id"] = json!(item);
     goals[0]["quantity"] = json!(quantity);
+    record["rewards"][0]["items"] = json!([]);
 }
 
 /// One bag stack; `rental` makes it a stack a delivery must ignore.
@@ -215,7 +227,7 @@ fn hand_in_takes_the_items_and_credits_the_step() {
 
     // The record's coin reward is unrecovered (0 coins); its job XP is the wiki star reward. The
     // turn-in path completes the quest end to end.
-    let end = release_end_screen(&mut game, &who, QUEST, GIVER, 0, NOW + 2);
+    let end = release_end_screen(&mut game, &who, QUEST, GIVER, END_TEXT, NOW + 2);
     assert!(
         has_family(&end, 49, 13, Some(QUEST)),
         "the held 49/13 names the quest"
@@ -574,8 +586,8 @@ fn gateway_short_hand_in_commits_nothing_and_keeps_the_menu() {
 }
 
 /// The shipped record itself: the wand id, the delivery NPC and the unit count are the data the
-/// mechanism reads, and the production split loader binds the record (still disabled, because the
-/// rest of the line and its reward wait for the data pass).
+/// mechanism reads, and the production split loader binds the record (live since L1226, with its
+/// forge and speak steps around the hand-over).
 #[test]
 fn shipped_record_names_the_wand() {
     let document = read_json(&content_dir().join("quests/blacksmith.json"));
@@ -585,18 +597,25 @@ fn shipped_record_names_the_wand() {
         .iter()
         .find(|record| record["id"].as_u64() == Some(u64::from(QUEST)))
         .expect("the Wand Replacement record exists");
-    assert!(
-        !record["enabled"].as_bool().unwrap_or(true),
-        "the record ships disabled until the id pass completes the line"
+    // L1226: the record is live: forge the wand (recipe 200 makes item 30480), hand it to
+    // Silverray, then speak with him.
+    assert_ne!(
+        record["enabled"].as_bool(),
+        Some(false),
+        "the record ships live"
     );
     let goals = record["objectives"]
         .as_array()
-        .expect("the record carries its delivery step");
-    assert_eq!(goals.len(), 1, "only the delivery step is wired");
-    assert_eq!(goals[0]["kind"].as_str(), Some("deliver_item"));
-    assert_eq!(goals[0]["npc_id"].as_u64(), Some(GIVER));
-    assert_eq!(goals[0]["item_id"].as_i64(), Some(i64::from(WAND)));
-    assert_eq!(goals[0]["quantity"].as_u64(), Some(1));
+        .expect("the record carries its steps");
+    assert_eq!(goals.len(), 3, "forge, hand over, speak");
+    assert_eq!(goals[0]["kind"].as_str(), Some("craft_recipe"));
+    assert_eq!(goals[0]["recipe_id"].as_u64(), Some(200));
+    assert_eq!(goals[1]["kind"].as_str(), Some("deliver_item"));
+    assert_eq!(goals[1]["npc_id"].as_u64(), Some(GIVER));
+    assert_eq!(goals[1]["item_id"].as_i64(), Some(i64::from(WAND)));
+    assert_eq!(goals[1]["quantity"].as_u64(), Some(1));
+    assert_eq!(goals[2]["kind"].as_str(), Some("talk_to_npc"));
+    assert_eq!(goals[2]["npc_id"].as_u64(), Some(GIVER));
 
     let eligibility = CharacterEligibility {
         player_level: 20,
@@ -604,8 +623,5 @@ fn shipped_record_names_the_wand() {
     };
     let engine = QuestEngine::from_split_content(&content_dir(), CHARACTER, eligibility, None)
         .expect("the shipped split catalogue binds");
-    assert!(
-        !engine.is_enabled(QUEST),
-        "a disabled record is never offered"
-    );
+    assert!(engine.is_enabled(QUEST), "the live record binds enabled");
 }

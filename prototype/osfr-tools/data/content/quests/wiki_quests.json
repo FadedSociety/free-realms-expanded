@@ -37951,6 +37951,103 @@
       "intro_text_string_id": 78713,
       "enabled": true,
       "end_text_string_id": 78716
+    },
+    {
+      "id": 3958509,
+      "title_string_id": 95095,
+      "giver_npc_id": 9000000203,
+      "prerequisite_quest_ids": [
+        3020021
+      ],
+      "objectives": [
+        {
+          "kind": "craft_recipe",
+          "id": 1,
+          "text_string_id": 100111,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Forge Tempest Woven Wand - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_teacher_s_aid_f4f13b)."
+            }
+          ],
+          "recipe_id": 200,
+          "quantity": 3
+        },
+        {
+          "kind": "deliver_item",
+          "id": 2,
+          "text_string_id": 100113,
+          "npc_id": 9000000203,
+          "item_id": 30480,
+          "quantity": 3,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the wands to Silverray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_teacher_s_aid_f4f13b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1226: the wands are item 30480 (recipe 200's output, the goal 100111 'Forge Tempest Woven Wands' x3 before it); 100113 'Give the Wands to Silverray' / 100114 'Hand the wands over to Silverray'; a hand-over (T786 deliver_item), not a plain Talk: the bag gives up 3 and the step is credited together"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 100123,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Silverray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_teacher_s_aid_f4f13b)."
+            }
+          ],
+          "npc_id": 9000000203
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 12,
+          "items": [],
+          "job_xp": {
+            "16": 819
+          },
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Teacher's Aid (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_teacher_s_aid_f4f13b)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Blacksmith: Teacher's Aid (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_teacher_s_aid_f4f13b)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1226: closing 95140 'Looking good. Be sure to keep these coming!', Silverray's voice where the quest ends; his offer 95139 and this closing are the pair in his client block 95136-95143"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Repeatable: the wiki marks it repeatable (https://fr.fanbyte.com/wiki/FR_Quest:Blacksmith:_Teacher's_Aid)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the wiki gives no period; once a day, as every page that names one says: repeat_hours 24."
+        }
+      ],
+      "job": 16,
+      "description_string_id": 95106,
+      "intro_text_string_id": 95139,
+      "enabled": true,
+      "end_text_string_id": 95140,
+      "repeatable": true,
+      "repeat_hours": 24
     }
   ]
 }

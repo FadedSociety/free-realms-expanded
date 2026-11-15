@@ -31918,6 +31918,22 @@
               "evidence": "title_string_id corrected from raw locale hash 710045233 to Global.Text id 78173 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3958509,
+          "title": "Blacksmith: Teacher's Aid",
+          "title_string_id": 95095,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Blacksmith: Teacher's Aid (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_teacher_s_aid_f4f13b)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -31929,7 +31945,8 @@
         3100021,
         3100022,
         3100023,
-        3100024
+        3100024,
+        3958509
       ],
       "quests_given_text": [
         "Miner: Minor Mix-Up; Miner: Smelting Secrets; Miner: Reach Level 20; Miner: Growing Up So Quickly (candidate) (Miner); Blacksmith: Wand Replacement; Blacksmith: Teacher's Aid (repeatable); Blacksmith: Scythes of Stalking; Blacksmith: Forging Rumors (Blacksmith)"
