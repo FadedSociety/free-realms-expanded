@@ -320,6 +320,54 @@
           "evidence": "(R) lab/tools/quest_wire.py: (R) L1217: the goal line is client 93021 ('Retrieve the stolen supplies from the wolves by defeating them.'), beside 93020 'Defeat wolves in Frostfang Caverns' in the quest's own block (93003-93023); the wolves are fights/14027.json (the Frostfang Caverns dungeon) kind frostfang_wolf, definition 950061, 12 of them per run (10 placed, 2 in wave w1), which matches the wiki's 0/12; the chance is a local value."
         }
       ]
+    },
+    {
+      "definition_id": 1407501,
+      "item_id": 96000006,
+      "chance": 50,
+      "quest_id": 3958506,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 18217 'Gather haunches of meat' (18218 'Gather haunches of meat from the wolves in the Briar Patch.'); the wiki's help says 'You will need to knock out three Briar Patch Wolves to get the updates', and the Briar Patch dungeon is fights/14075.json, kind briar_patch_wolf, definition 1407501, 8 per run; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 930038,
+      "item_id": 96000007,
+      "chance": 50,
+      "quest_id": 3958507,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 91222 (91223 'One of those cray wandering about probably has it...'); the wiki's help says 'The Cray Marauders battle is just north of Ancient's Wall. Defeat at least one cray inside this battle to receive the update', and that battle is fights/14006.json (title 73977 'Cray Marauders'): Cray Marauder 930038 x12, Cray Snapper 930008 x2, Cray Marauder Captain 950015; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 930008,
+      "item_id": 96000007,
+      "chance": 50,
+      "quest_id": 3958507,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 91222 (91223 'One of those cray wandering about probably has it...'); the wiki's help says 'The Cray Marauders battle is just north of Ancient's Wall. Defeat at least one cray inside this battle to receive the update', and that battle is fights/14006.json (title 73977 'Cray Marauders'): Cray Marauder 930038 x12, Cray Snapper 930008 x2, Cray Marauder Captain 950015; the chance is a local value."
+        }
+      ]
+    },
+    {
+      "definition_id": 950015,
+      "item_id": 96000007,
+      "chance": 50,
+      "quest_id": 3958507,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 91222 (91223 'One of those cray wandering about probably has it...'); the wiki's help says 'The Cray Marauders battle is just north of Ancient's Wall. Defeat at least one cray inside this battle to receive the update', and that battle is fights/14006.json (title 73977 'Cray Marauders'): Cray Marauder 930038 x12, Cray Snapper 930008 x2, Cray Marauder Captain 950015; the chance is a local value."
+        }
+      ]
     }
   ]
 }

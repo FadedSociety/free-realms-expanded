@@ -10803,10 +10803,27 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3958506,
+          "title": "Haunches of Meat",
+          "title_string_id": 16902,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Haunches of Meat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_haunches_of_meat_e76287)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3957994
+        3957994,
+        3958506
       ],
       "quests_given_text": [
         "Forgotten Lunchbox; wolf-vine meat (client 369763845); bear fur socks (661444111, 1724428388); Crispy Choychoy Delight (581174815); a cake (1321265408). Appears in Farmer's Market (Chef)."

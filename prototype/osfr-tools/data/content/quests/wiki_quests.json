@@ -37630,6 +37630,194 @@
       "intro_text_string_id": 93035,
       "enabled": true,
       "end_text_string_id": 93038
+    },
+    {
+      "id": 3958506,
+      "title_string_id": 16902,
+      "giver_npc_id": 9500000104,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_item",
+          "id": 1,
+          "text_string_id": 18217,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Gather haunches of meat - 0/3 (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_haunches_of_meat_e76287)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1220: the goal line is client 18217 'Gather haunches of meat' (18218 'Gather haunches of meat from the wolves in the Briar Patch.'); the wiki's help says 'You will need to knock out three Briar Patch Wolves to get the updates', and the Briar Patch dungeon is fights/14075.json, kind briar_patch_wolf, definition 1407501, 8 per run"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 18217 'Gather haunches of meat' (18218 'Gather haunches of meat from the wolves in the Briar Patch.'); the wiki's help says 'You will need to knock out three Briar Patch Wolves to get the updates', and the Briar Patch dungeon is fights/14075.json, kind briar_patch_wolf, definition 1407501, 8 per run; a quest drop with no bag item"
+            }
+          ],
+          "item_id": 96000006,
+          "quantity": 3
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 16735,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Chugilda (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_haunches_of_meat_e76287)."
+            }
+          ],
+          "npc_id": 9500000104
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 19,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Haunches of Meat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_haunches_of_meat_e76287)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Haunches of Meat (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_haunches_of_meat_e76287)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1220: card text: Chugilda's offer 24905 (the wiki's words; 17066 is an older version of it), the description 16903 beside the title 16902, and the closing 2143 'These are nice pieces of meat and should cook up nicely. Thank you.', her voice where the quest ends; quest_wire had put the offer in the description too"
+        }
+      ],
+      "description_string_id": 16903,
+      "intro_text_string_id": 24905,
+      "enabled": true,
+      "end_text_string_id": 2143
+    },
+    {
+      "id": 3958507,
+      "title_string_id": 91211,
+      "giver_npc_id": 9500000044,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 91220,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Norville (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_more_norv_dd8cab)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1220: Norville's line when found, 91214 'Thank goodness you're here! I was attacked by a cray!'"
+            }
+          ],
+          "npc_id": 9500000053,
+          "dialogue_string_id": 91214,
+          "lines": [
+            {
+              "text_id": 91214
+            }
+          ]
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 91222,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Retrieve Norv's first aid kit from the wandering cray (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_more_norv_dd8cab)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1220: the goal line is client 91222 (91223 'One of those cray wandering about probably has it...'); the wiki's help says 'The Cray Marauders battle is just north of Ancient's Wall. Defeat at least one cray inside this battle to receive the update', and that battle is fights/14006.json (title 73977 'Cray Marauders'): Cray Marauder 930038 x12, Cray Snapper 930008 x2, Cray Marauder Captain 950015"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: (R) L1220: the goal line is client 91222 (91223 'One of those cray wandering about probably has it...'); the wiki's help says 'The Cray Marauders battle is just north of Ancient's Wall. Defeat at least one cray inside this battle to receive the update', and that battle is fights/14006.json (title 73977 'Cray Marauders'): Cray Marauder 930038 x12, Cray Snapper 930008 x2, Cray Marauder Captain 950015; a quest drop with no bag item"
+            }
+          ],
+          "item_id": 96000007,
+          "quantity": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 91227,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Norville (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_more_norv_dd8cab)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1220: Norville's line when his bag comes back, 91216 'You found my bag! Go tell Marco I'm fine'"
+            }
+          ],
+          "npc_id": 9500000053,
+          "dialogue_string_id": 91216,
+          "lines": [
+            {
+              "text_id": 91216
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 91231,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Marco in Mire's Edge (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_more_norv_dd8cab)."
+            }
+          ],
+          "npc_id": 9500000044
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "No More Norv (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_more_norv_dd8cab)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "No More Norv (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_no_more_norv_dd8cab)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1220: card text from the block around the title 91211: Marco's offer 91210, the description 91212 'What happened to Marco's partner?' and Marco's closing 91213 'He's ok?! That's great news!', where the quest ends"
+        }
+      ],
+      "description_string_id": 91212,
+      "enabled": true,
+      "intro_text_string_id": 91210,
+      "end_text_string_id": 91213
     }
   ]
 }
