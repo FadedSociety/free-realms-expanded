@@ -488,6 +488,20 @@ fn is_video_index_move(old: &Value, new: &Value) -> bool {
         && without_fields(&old, &VIDEO_INDEX_FIELDS) == without_fields(&new, &VIDEO_INDEX_FIELDS)
 }
 
+/// L1218 (KNOWN-BUGS A47): a `video_index` row stood on the floor where the video put it (Murphy
+/// had taken the bake's height, 7.7 m under the Hot Springs floor). Only its position, the reason
+/// and the location evidence that says where the height came from change, and it stays a
+/// `video_index` row. `npc_life` and `content_npc_placement.rs` pin the values.
+const VIDEO_INDEX_REMEASURE_FIELDS: [&str; 3] =
+    ["position", "position_reason", "location_evidence"];
+
+fn is_video_index_remeasure(old: &Value, new: &Value) -> bool {
+    old["placement"] == "video_index"
+        && new["placement"] == "video_index"
+        && without_fields(old, &VIDEO_INDEX_REMEASURE_FIELDS)
+            == without_fields(new, &VIDEO_INDEX_REMEASURE_FIELDS)
+}
+
 /// `row` with `fields` and their `field_sources` evidence removed.
 fn without_fields(row: &Value, fields: &[&str]) -> Value {
     let mut row = row.clone();
@@ -644,6 +658,7 @@ fn is_quest_binding_change_between(path: &str, old: &Value, new: &Value) -> bool
         if quest_old == quest_new
             || is_reference_spawn_row(old, new)
             || is_video_index_move(old, new)
+            || is_video_index_remeasure(old, new)
         {
             return true;
         }

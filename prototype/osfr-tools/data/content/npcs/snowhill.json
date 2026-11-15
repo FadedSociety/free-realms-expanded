@@ -29513,7 +29513,8 @@
       ],
       "enemy_kind": null,
       "location_evidence": [
-        "\"At the Snowhill Hot Springs\" (client 500911197, 2147128354); his suite address is \"1 Way Back Way\" (client 1184924269). [video: green markers near Frostfang area, os5l_1mh9vM/00006, DRoB1oX61Os/00096; confidence low in the video]"
+        "\"At the Snowhill Hot Springs\" (client 500911197, 2147128354); his suite address is \"1 Way Back Way\" (client 1184924269). [video: green markers near Frostfang area, os5l_1mh9vM/00006, DRoB1oX61Os/00096; confidence low in the video]",
+        "L1218: height 22.38 is the Hot Springs grotto floor the client grounds a body on at this x/z (native run client-baseline-20261115T072602Z: a teleport to (259.7, 24.5, 260.0) settled at 22.377, beside the juice bar's sh_juicebar_table_01 and lounge chairs at y 21.9-22.2); the terrain bake's 14.71 is under that floor, so he stood 7.7 m underground and could not be clicked"
       ],
       "quests_given": [
         {
@@ -29637,7 +29638,7 @@
       "services_reason": null,
       "position": [
         259.7,
-        14.71,
+        22.38,
         260.0
       ],
       "position_w": null,
@@ -29992,6 +29993,10 @@
           {
             "kind": "video",
             "evidence": "Video archive placement index (2026-10-29): Murphy solved at x=259.7 z=260.0, error 4.0 m, 7 sightings in 3 videos (ring), confidence high; height sampled from the zone-0 terrain grid."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) L1218: height 22.38 is the Hot Springs grotto floor the client grounds a body on at this x/z (native run client-baseline-20261115T072602Z: a teleport to (259.7, 24.5, 260.0) settled at 22.377, beside the juice bar's sh_juicebar_table_01 and lounge chairs at y 21.9-22.2); the terrain bake's 14.71 is under that floor, so he stood 7.7 m underground and could not be clicked"
           }
         ],
         "position_reason": [

@@ -3143,12 +3143,81 @@
     {
       "id": 3070037,
       "title_string_id": 410174,
-      "giver_npc_id": 9000000218,
+      "giver_npc_id": 9500000784,
       "prerequisite_quest_ids": [
-        3070036
+        3070042
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 410179,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410179 'Visit Murphy in Snowhill' (410180 'Murphy in Snowhill should help you with your accomodations.'); Murphy's line 410190 'You can find your room at 1 Way Back Way. It's the Glacier Suite'"
+            }
+          ],
+          "npc_id": 9000000158,
+          "dialogue_string_id": 410190,
+          "lines": [
+            {
+              "text_id": 410190
+            }
+          ]
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "text_string_id": 410181,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410181 'Find your suite' (410182 'Murphy says your suite is located in Snowhill at 1 Way Back Way.')"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1218: the suite is reached, not clicked: the 1 Way Back Way mailbox (row 9500001014, model 910) is a static prop the client sends no interaction for (native run client-baseline-20261115T074150Z), so reaching it counts; its spot (287.1, 23.8, 341.7) is the Sanctuary-main 33692 placement, ground 23.84"
+            }
+          ],
+          "zone_id": 0,
+          "position": [
+            287.1,
+            23.84,
+            341.7
+          ],
+          "radius": 6.0
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 410186,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 410186 'There has to be some sort of mistake! Murphy in Snowhill should be able to sort it all out.'; Murphy's closing 410176 ends the quest"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1218: this locale has no shorter goal line for the return (410185 is empty), so the step shows 410186"
+            }
+          ],
+          "npc_id": 9000000158
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1218: Murphy's closing 410176 'Let me at least pay you for your troubles'; 5 coins like the Fisherman quests around it (3070034, 3070035, 3070038, 3070042)"
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -3181,12 +3250,15 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1218: giver Dwight Limburger 9500000784, the tournament host: his Fishing Frenzy (3070042) closes 410111 'We have a winner ... You're going to love your prize', and this quest's offer 410173 is 'This year's tournament winner gets the best prize yet. Murphy over at the Snowhill Hot Springs ...', so it follows Fishing Frenzy rather than the guide's row 32 (One Spot Left, still off). The guide's row 33 named only a generic 'tournament host' (npcs_unresolved 9000000218). Murphy's closing 410176 leads into My Hut is Your Hut (3070047, Murphy, which already names this quest as its prerequisite)"
         }
       ],
       "description_string_id": 410175,
       "intro_text_string_id": 410173,
-      "end_text_string_id": 410176,
-      "enabled": false
+      "end_text_string_id": 410176
     },
     {
       "id": 3070038,
@@ -3255,13 +3327,17 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) the ice patches are not placed: reaching the frozen lake at Big J (snowhill.json 9000000024, the Wintery Basin's fishing spot) counts as blasting them"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1218: the frozen lake is Snowhill's ice fishing hole, the client's sh_icehole_01 at (109.7, 23.1, 431.5) and (111.6, 24.8, 447.8) (lab/reports/world-objects-20261015.json); the spot was Big J's old zone-centre position (51.6, 31.0, 360.5), which L1217 moved to his shop, and is now between the two holes (ground 22.6)"
             }
           ],
           "zone_id": 0,
           "position": [
-            51.624,
-            30.987,
-            360.502
+            110.0,
+            22.6,
+            438.0
           ],
           "radius": 12
         }

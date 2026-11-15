@@ -63881,7 +63881,7 @@
       "name_string_id": 3063,
       "position": [
         259.7,
-        14.71,
+        22.38,
         260.0
       ],
       "heading": -0.391319999,
@@ -63906,6 +63906,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) position replaced by the video archive index; the earlier Sanctuary-main position was [263.157, 24.16891, 243.43916] and its heading is kept"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1218: height 22.38 is the Hot Springs grotto floor the client grounds a body on at this x/z (native run client-baseline-20261115T072602Z: a teleport to (259.7, 24.5, 260.0) settled at 22.377, beside the juice bar's sh_juicebar_table_01 and lounge chairs at y 21.9-22.2); the terrain bake's 14.71 is under that floor, so he stood 7.7 m underground and could not be clicked"
         }
       ],
       "position_w": null,

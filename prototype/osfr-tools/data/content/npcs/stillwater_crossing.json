@@ -1988,10 +1988,23 @@
               "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
             }
           ]
+        },
+        {
+          "quest_id": 3070037,
+          "title": "Fisherman: Snowhill Getaway",
+          "title_string_id": 410174,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1218: the offer 410173 is the tournament host's ('This year's tournament winner gets the best prize yet'), after his Fishing Frenzy closing 410111"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
-        3070042
+        3070042,
+        3070037
       ],
       "quests_given_text": [
         "Fetch quest, title not found (1000005671 \"Return to Dwight Limburger\")."
