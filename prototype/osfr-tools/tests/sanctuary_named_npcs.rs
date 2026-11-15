@@ -45,11 +45,11 @@ const TY: u64 = 9_000_000_223;
 const BRODY: u64 = 9_000_000_033;
 /// Names the lead held back (the regions disagree, so it may be another NPC) plus the two
 /// duplicate rows of NPCs that are already drawn: Morninglory (extras 9000000155) and Chip
-/// Numbwing (extras 9500000736).
-const HELD_BACK: [(&str, u64); 6] = [
+/// Numbwing (extras 9500000736). L1217 drew Little J: his wiki page puts him beside Snowhill's
+/// ice fishing hole, where Sanctuary-main has him.
+const HELD_BACK: [(&str, u64); 5] = [
     ("Clark", 9_500_000_342),
     ("Finn", 9_500_000_026),
-    ("Little J", 9_500_000_699),
     ("Raven", 9_500_000_336),
     ("Morninglory duplicate", 9_500_000_506),
     ("Chip Numbwing seaside duplicate", 9_500_000_566),
@@ -105,8 +105,8 @@ fn every_reference_row_is_drawn_once() {
     let rows = moved();
     assert_eq!(
         rows.len(),
-        105,
-        "T470 drew 90 named NPCs, T506 moved 19 more; T544 converted Gerold and Tevin; T883 moved Felipe, Murphy and Natali to the video index; P-banking added Yoink"
+        107,
+        "T470 drew 90 named NPCs, T506 moved 19 more; T544 converted Gerold and Tevin; T883 moved Felipe, Murphy and Natali to the video index; P-banking added Yoink; L1217 drew Little J and moved Big J"
     );
     let extras = extra_rows();
     let guids: BTreeSet<_> = extras

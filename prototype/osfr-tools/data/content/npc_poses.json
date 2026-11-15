@@ -3431,6 +3431,12 @@
       "name": "Hector",
       "keep_height": "(R) stands on the Pixiewood Hills plaza paving, 0.6 m over the terrain grid: the same paving the reference rows of Cadie, Edwin and Skelly stand on (y -14.2 to -14.4)",
       "source": "PL-A npc-placement-a: guessed rows off the terrain are settled one by one"
+    },
+    {
+      "guid": 9500000699,
+      "name": "Little J",
+      "animation_id": 1,
+      "source": "(R) L1217: his wiki page (fr_mob_Little_J_377aedc1.html) has him 'stands beside the ice fishing hole below Big J's', and nothing to sit on is placed there; the pixie child body has its own stand loop and fidgets (fairy_children_loc_stand.gr2, fairy_children_loc_fidget_01-04.gr2), so loc_stand plays"
     }
   ],
   "props": [

@@ -2686,7 +2686,8 @@
       ],
       "enemy_kind": null,
       "location_evidence": [
-        "At the Ice Skating and Bait Shop (client 352146976, 1941898979); wiki: next to Mr. Twinkle and Momma Meepster, in front of the cafe."
+        "At the Ice Skating and Bait Shop (client 352146976, 1941898979); wiki: next to Mr. Twinkle and Momma Meepster, in front of the cafe.",
+        "Sanctuary's spot (146.6, 23.5, 386.1) is 5 m from Mr. Twinkle (151.6, 386.3), the wiki's \"next to Mr. Twinkle and Momma Meepster, in front of the cafe\", and beside the shop's client props (sh_skatecheckout_01 at (148.1, 23.4, 394.1), the cafe's coffee cups at (146.7, 25.0, 390.1); lab/reports/world-objects-20261015.json). The old row stood at the Snowhill zone centre (51.6, 30.3, 360.5), about 100 m away."
       ],
       "quests_given": [
         {
@@ -2760,12 +2761,46 @@
               "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
             }
           ]
+        },
+        {
+          "quest_id": 3958504,
+          "title": "Little J is Missing!",
+          "title_string_id": 93004,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Little J is Missing! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958502,
+          "title": "Big J Says Thanks",
+          "title_string_id": 140768,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Big J Says Thanks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_big_j_says_thanks_ddea59)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3070038,
         3958499,
-        3958497
+        3958497,
+        3958504,
+        3958502
       ],
       "quests_given_text": [
         "Fisherman: Joining Big J's Crew. Town quest Big J Says Thanks (wiki; client texts 44115377, 230341578). Lost-worms errand (client 1298960165, 2749557570)."
@@ -2779,27 +2814,22 @@
       ],
       "services_reason": null,
       "position": [
-        51.623921,
-        30.3067,
-        360.501988
+        146.60031,
+        23.5477,
+        386.07446
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.676868416297486,
+        0.9997129398262149,
         0.0,
-        0.7361040327419306
+        0.023959088964874985
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 0
-        }
-      ],
+      "heading": 3.09366989,
+      "placement": "reference_data",
+      "placement_source": "reference_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
       "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 3. This is not a recovered NPC transform.",
       "source": [
@@ -3013,6 +3043,10 @@
           {
             "kind": "wiki",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 66; source cell: [client][wiki]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "L1217: fr_mob_Big_J_4ccd25f0.html 'Found in front of Big J's'; the Sanctuary spot is 5 m from Mr. Twinkle and beside the shop's client props (sh_skatecheckout_01, the cafe's coffee cups; lab/reports/world-objects-20261015.json)"
           }
         ],
         "quests_given": [
@@ -3147,12 +3181,8 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 3 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ],
         "position_reason": [
@@ -3169,36 +3199,32 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 3 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ],
         "capture_match": [
@@ -3211,6 +3237,12 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653"
           }
         ]
       },
@@ -25441,6 +25473,38 @@
               "evidence": "Holiday Recital (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_holiday_recital_ccf51b)."
             }
           ]
+        },
+        {
+          "quest_id": 3958505,
+          "title": "Status Reports",
+          "title_string_id": 93036,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Status Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        },
+        {
+          "quest_id": 3958503,
+          "title": "Key to the City",
+          "title_string_id": 67177,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Key to the City (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_key_to_the_city_206947)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -25452,7 +25516,9 @@
         3040043,
         3090017,
         3090018,
-        3954907
+        3954907,
+        3958505,
+        3958503
       ],
       "quests_given_text": [
         "Wiki list: Status Reports, Key to the City, Brawler: Achieve Level 10, Brawler: An Honest Mistake, Brawler: Confronting the Crook, Brawler: Reputation Regained, Medic: A Blustery Blunder, Medic: Into the Bristlewood, Card Duelist: Snowhill is Melting, Card Duelist: Defenders Duty, Holiday Recital (Snow Days repeatable). Also named for Card Duelist: In Search of The Baron (client 4041075594 \"Nothing happens in that town that she doesn't know about\"), Medic: Flu Season (hands out the flu list, client 3646015500), Wizard: Student Profits and Brawler: Curious Key."
@@ -27284,6 +27350,347 @@
       "heading": -2.924096,
       "model_id": 30,
       "model_file_name": "fairy_m_old_01.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
+    },
+    {
+      "npc_id": 9500000699,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Little J",
+      "name_reason": null,
+      "name_string_id": 5449,
+      "name_string_ids": [
+        {
+          "table": "ucdt",
+          "id": 3690572207
+        },
+        {
+          "table": "ugdt",
+          "id": 1522458791
+        }
+      ],
+      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "zone": "Snowhill",
+      "zone_id": 13,
+      "zone_reason": null,
+      "region_pages": [
+        "Snowhill"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Big J's younger brother (\"Help Big J find his little brother, Little J.\" 4120949896). Not Little Jimmy of Tanglewood Fort (NPCs - Briarwood), who is Tania's brother."
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_mob_Little_J_377aedc1.html): a male Pixie in Snowhill who \"stands beside the ice fishing hole below Big J's\"; the quest page (fr_quest_Little_J_is_Missing_df0b7f62.html) says he hides behind Big J's building on the way up to Frostfang Cavern. The client places the ice hole sh_icehole_01 at (109.7, 23.1, 431.5) and (111.6, 24.8, 447.8) (lab/reports/world-objects-20261015.json); this spot is 7.8 m east of the first. The wiki's map picture 142962 (lab/references/fanbyte-images-littlej/142962.png), fitted on the client's Cooking Table and Checkers & Chess travel points, puts him about 17 m south of the hole."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "\"Little J is Missing!\" (client title 1686197677 / ugdt 3558936240): Big J asks for help (3018788977 \"My brother's gone missing! I haven't seen Little J since I sent him to fetch supplies\", 3114452067); objectives \"Find Little J\" (3406225953), \"Give the recovered supplies to Little J\" (4269245113), \"Return to Little J\" (1084081755). Text-to-title pairing is by wording. Target of the water-stink errand in NPCs - Shrouded Glade (\"Let Embir know that Little J's fishing bait is causing the smell\" 1593063336). A flier hand-in (\"Give a flier to Little J\" 3101422509) is probably a Postman delivery, unproven."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "services": [],
+      "services_reason": "The regional row lists no distinct service.",
+      "position": [
+        117.473656,
+        22.357075,
+        431.42136
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.9948873516167117,
+        0.0,
+        0.10099087876182401
+      ],
+      "heading": 2.93926597,
+      "placement": "reference_data",
+      "placement_source": "reference_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) Chosen POI id 8 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.2 m from every other row; moved 4.6 m south-east from [-7.160009, 41.038, 1115.996779] to [-10.66, 40.217, 1119.0], the lab terrain bake: terrain floor, no obstacle over it. The position is still a reconstruction, not a captured transform.",
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) reference aliases retain resolved W22 keys so unchanged jobs.json trainer ids remain joinable"
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "L1217: his wiki page files him under Snowhill Mobs; the row moved from shrouded_glade.json"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone association follows the regional guide where its row places the NPC; no native zone id was recovered here"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) presence is a directory classification derived from the guide section"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) this row does not establish an enemy kind"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "L1217: fr_mob_Little_J_377aedc1.html 'stands beside the ice fishing hole below Big J's'; the client's sh_icehole_01 stands at (109.7, 23.1, 431.5), 7.8 m from the Sanctuary spot (lab/reports/world-objects-20261015.json)"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The page provides no vendor stock for this NPC."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The regional row lists no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Hot Springs, Big J's and the penguin yards, row 67; source cell: [client]"
+          }
+        ],
+        "position": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621"
+          }
+        ]
+      },
       "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {

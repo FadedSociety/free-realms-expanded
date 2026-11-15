@@ -366,8 +366,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // their shops are reachable (3,275 + 23 = 3,298). P-banking: Yoink's body (3,299). rc-0136
     // F1: Going Batty's bat got its own body in Memorial Caverns; the Seaside bat mount stays as
     // dressing (3,300). EV: the captured login stream's three Halloween actors at the Blackspore
-    // warpstone are rows tagged halloween, so they leave with the event (3,303).
-    assert_eq!(extra_rows.len(), 3303);
+    // warpstone are rows tagged halloween, so they leave with the event (3,303). L1217: Little J's
+    // body beside Snowhill's ice fishing hole (3,304).
+    assert_eq!(extra_rows.len(), 3304);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

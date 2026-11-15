@@ -308,6 +308,18 @@
           "evidence": "(R) lab/tools/quest_wire.py: 'Wraith' drops the item this step counts; the chance is a local value."
         }
       ]
+    },
+    {
+      "definition_id": 950061,
+      "item_id": 96000005,
+      "chance": 50,
+      "quest_id": 3958504,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) lab/tools/quest_wire.py: (R) L1217: the goal line is client 93021 ('Retrieve the stolen supplies from the wolves by defeating them.'), beside 93020 'Defeat wolves in Frostfang Caverns' in the quest's own block (93003-93023); the wolves are fights/14027.json (the Frostfang Caverns dungeon) kind frostfang_wolf, definition 950061, 12 of them per run (10 placed, 2 in wave w1), which matches the wiki's 0/12; the chance is a local value."
+        }
+      ]
     }
   ]
 }

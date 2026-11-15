@@ -37233,6 +37233,403 @@
       "intro_text_string_id": 140455,
       "end_text_string_id": 140458,
       "enabled": true
+    },
+    {
+      "id": 3958502,
+      "title_string_id": 140768,
+      "giver_npc_id": 9000000024,
+      "prerequisite_quest_ids": [
+        3958504
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 140780,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Tevin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_big_j_says_thanks_ddea59)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1217: Tevin's line 140777 ('Great job over there with Big J! The mayor is impressed ...'), which sends the player on to the mayor (the next step)"
+            }
+          ],
+          "npc_id": 9000000215,
+          "dialogue_string_id": 140777,
+          "lines": [
+            {
+              "text_id": 140777
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 140782,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak with the mayor of Snowhill (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_big_j_says_thanks_ddea59)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 140782 is this step; the quest's own card (client 140767) names Mayor Crystalline"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "one mayor in Snowhill: row 9000000143 is listed as Mayor of Snowhill"
+            }
+          ],
+          "npc_id": 9000000143
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 4,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Big J Says Thanks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_big_j_says_thanks_ddea59)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Big J Says Thanks (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_big_j_says_thanks_ddea59)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1217: the closing 140770 ('Tevin and I sure do appreciate the help') is the mayor's, where the quest ends ('Speak with the mayor of Snowhill'); 140777 is Tevin's step line"
+        }
+      ],
+      "description_string_id": 140769,
+      "intro_text_string_id": 140767,
+      "enabled": true,
+      "end_text_string_id": 140770
+    },
+    {
+      "id": 3958503,
+      "title_string_id": 67177,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3958505
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 46620,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Smitty (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_key_to_the_city_206947)."
+            }
+          ],
+          "npc_id": 9000000206
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 23564,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "L1217: the fanbyte quest page pays one Key to the City (lab/references/quest-table-20261102/quests.merged.json rewards_wiki); item 23564 by its client name 67177 'Key to the City' in data/release/item-table.json"
+                }
+              ]
+            }
+          ],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Key to the City (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_key_to_the_city_206947)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Key to the City (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_key_to_the_city_206947)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1217: the block is 93195 (the mayor's offer), 93197 (description) and 93198 (Smitty's closing, where the quest ends at 'Find Smitty'). 93196 has no line in this locale, so the title stays 67177, the reward item's name 'Key to the City', the only client string with those words; the step's 46620 'Find Smitty' is the same words from another block"
+        }
+      ],
+      "description_string_id": 93197,
+      "enabled": true,
+      "intro_text_string_id": 93195,
+      "end_text_string_id": 93198
+    },
+    {
+      "id": 3958504,
+      "title_string_id": 93004,
+      "giver_npc_id": 9000000024,
+      "prerequisite_quest_ids": [
+        3958497
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 93018,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Find Little J (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1217: Little J's two lines in the quest's block: 93012 'Gah! Stupid wolves! ... stole all the foodstuffs' and 93014, his ask to go into Frostfang Caverns for them"
+            }
+          ],
+          "npc_id": 9500000699,
+          "dialogue_string_id": 93012,
+          "lines": [
+            {
+              "text_id": 93012
+            },
+            {
+              "text_id": 93014
+            }
+          ]
+        },
+        {
+          "kind": "collect_item",
+          "id": 2,
+          "text_string_id": 93021,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Retrieve the stolen supplies from the wolves in Frostfang Cavern - (0/12) by defeating them. (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1217: the goal line is client 93021 ('Retrieve the stolen supplies from the wolves by defeating them.'), beside 93020 'Defeat wolves in Frostfang Caverns' in the quest's own block (93003-93023); the wolves are fights/14027.json (the Frostfang Caverns dungeon) kind frostfang_wolf, definition 950061, 12 of them per run (10 placed, 2 in wave w1), which matches the wiki's 0/12"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) lab/tools/quest_wire.py: (R) L1217: the goal line is client 93021 ('Retrieve the stolen supplies from the wolves by defeating them.'), beside 93020 'Defeat wolves in Frostfang Caverns' in the quest's own block (93003-93023); the wolves are fights/14027.json (the Frostfang Caverns dungeon) kind frostfang_wolf, definition 950061, 12 of them per run (10 placed, 2 in wave w1), which matches the wiki's 0/12; a quest drop with no bag item"
+            }
+          ],
+          "item_id": 96000005,
+          "quantity": 12
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 93023,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Give the supplies to Little J (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1217: client 93023 'Give the recovered supplies to Little J' (with 93022 'Return to Little J') in the quest's own block; the supplies are the previous step's quest drop, so the hand-in is a talk at Little J"
+            }
+          ],
+          "npc_id": 9500000699
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 92637,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Big J (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+            }
+          ],
+          "npc_id": 9000000024
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 75,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Little J is Missing! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Little J is Missing! (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_little_j_is_missing_6adb23)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1217: card text from the quest's own client block around its title 93004: Big J's offer 93003, the description 93005 and Big J's thanks 93006, where the quest ends (his 'Return to Big J' step)"
+        }
+      ],
+      "enabled": true,
+      "intro_text_string_id": 93003,
+      "description_string_id": 93005,
+      "end_text_string_id": 93006
+    },
+    {
+      "id": 3958505,
+      "title_string_id": 93036,
+      "giver_npc_id": 9000000143,
+      "prerequisite_quest_ids": [
+        3958502
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 93045,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Report from Flynn (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            }
+          ],
+          "npc_id": 9500000747
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 93047,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Report from Brandywine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            }
+          ],
+          "npc_id": 9500005980
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 93050,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Get Brandywine some hot chocolate (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "wiki: Brandywine 'If you bring me a piping cup of hot chocolate from Carrie's juice bar'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) getting the cup is a talk with Carrie 9500000734 (drawn)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the server has no hand-over event for this item; the talk completes the step and the player keeps nothing"
+            }
+          ],
+          "npc_id": 9500000734
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 93052,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Brandywine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            }
+          ],
+          "npc_id": 9500005980
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 93168,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return from Therin (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1217: Therin's report 93173 ('Report? I'll give you a report! I've got lazy miners'), beside the step's 93168 'Report from Therin'"
+            }
+          ],
+          "npc_id": 9000000217,
+          "dialogue_string_id": 93173,
+          "lines": [
+            {
+              "text_id": 93173
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 93177,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to the mayor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            }
+          ],
+          "npc_id": 9000000143
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Status Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Status Reports (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_status_reports_cc174e)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1217: the closing 93038 ('everything looks to be in order ... you're quite the helper') is the mayor's, where the quest ends ('Return to the mayor'), in the block of the title 93036"
+        }
+      ],
+      "description_string_id": 93037,
+      "intro_text_string_id": 93035,
+      "enabled": true,
+      "end_text_string_id": 93038
     }
   ]
 }

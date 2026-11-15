@@ -37479,7 +37479,8 @@
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2320; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3577 (ModelId=391, ModelFileName=fairy_m_warrior_01.agr, NameId=93128)."
         }
       ],
-      "position_w": null
+      "position_w": null,
+      "content_key": 9500005980
     },
     {
       "spawn_guid": 100000003582,
@@ -61230,11 +61231,11 @@
       "name": "Big J",
       "name_string_id": 6375,
       "position": [
-        51.623921,
-        30.3067,
-        360.501988
+        146.60031,
+        23.5477,
+        386.07446
       ],
-      "heading": 0.0,
+      "heading": 3.09366989,
       "capture_match": null,
       "source": [
         {
@@ -61256,6 +61257,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T385: drawable guide for the Wintery Basin trip. The position [51.623921, 30.987, 360.501988] is the NPC row's reconstructed unanchored zone-centre placement, not a captured transform; the zone-0 terrain grid puts the ground 0.68 m below it. (R) Model 1587 is a generic pixie male fisherman body chosen for the wiki's race/gender and his bait-shop and ice-fishing-crew role; no Big J asset exists in Models.txt, catalog.tsv or Assets_manifest.txt. The T385 brief's human body (1590) was not used because the wiki names him a pixie. (R) Heading 0.0: no recovered NPC facing. (R) spawn_guid/content_key reuse the 9000000000-range NPC content key as the runtime actor GUID, so the ordinary 26/8 click addresses the fishing_spots.json guide key; it is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3872 spawnNpcWithGuid(33653); src/Resources/Npcs.json Id=33653 NameId=6375 (Big J)"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Sanctuary's spot (146.6, 23.5, 386.1) is 5 m from Mr. Twinkle (151.6, 386.3), the wiki's \"next to Mr. Twinkle and Momma Meepster, in front of the cafe\", and beside the shop's client props (sh_skatecheckout_01 at (148.1, 23.4, 394.1), the cafe's coffee cups at (146.7, 25.0, 390.1); lab/reports/world-objects-20261015.json). The old row stood at the Snowhill zone centre (51.6, 30.3, 360.5), about 100 m away."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ground offset -0.0 m (lab/terrain/zone_0.hgt height 23.57); L1217 replaced the zone-centre position the legacy-data source above describes; the body stays the client Fisherman guide's fairy_m_fisherman_03 (Sanctuary draws fairy_m_02)"
         }
       ],
       "position_w": null
@@ -63466,6 +63479,41 @@
       "position_w": null,
       "texture_alias": "goggles",
       "tint_alias": "goggles-green"
+    },
+    {
+      "spawn_guid": 9500000699,
+      "legacy_npc_id": null,
+      "content_key": 9500000699,
+      "model_id": 12,
+      "model_file_name": "fairychild_m_pointyhair.adr",
+      "name": "Little J",
+      "name_string_id": 5449,
+      "position": [
+        117.473656,
+        22.357075,
+        431.42136
+      ],
+      "heading": 2.93926597,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3842 spawnNpcWithGuid(33621); src/Resources/Npcs.json Id=33621 NameId=5449 (Little J) ModelId=12 fairychild_m_pointyhair.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5449 = Little J (lab/reports/locale-id-to-text.json); Models.txt 12 = fairychild_m_pointyhair.adr (race 2 fairy/pixie)"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "wiki (lab/references/fanbyte-fr-full-20261112/pages/fr/fr_mob_Little_J_377aedc1.html): a male Pixie in Snowhill who \"stands beside the ice fishing hole below Big J's\"; the quest page (fr_quest_Little_J_is_Missing_df0b7f62.html) says he hides behind Big J's building on the way up to Frostfang Cavern. The client places the ice hole sh_icehole_01 at (109.7, 23.1, 431.5) and (111.6, 24.8, 447.8) (lab/reports/world-objects-20261015.json); this spot is 7.8 m east of the first. The wiki's map picture 142962 (lab/references/fanbyte-images-littlej/142962.png), fitted on the client's Cooking Table and Checkers & Chess travel points, puts him about 17 m south of the hole."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) ground offset +0.0 m (lab/terrain/zone_0.hgt height 22.33)"
+        }
+      ],
+      "position_w": null
     },
     {
       "spawn_guid": 9500000757,
