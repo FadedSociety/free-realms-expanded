@@ -37818,6 +37818,129 @@
       "enabled": true,
       "intro_text_string_id": 91210,
       "end_text_string_id": 91213
+    },
+    {
+      "id": 3958508,
+      "title_string_id": 78714,
+      "giver_npc_id": 9500000019,
+      "prerequisite_quest_ids": [
+        3952076
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 385606,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Rumor Duskveil (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1224: Rumor's line 78723 'I have a task for you, one that should reveal your usefulness. Donovan has many people working for him, and some of them get paid today.', the next line of the client block (78722 is the goal 'Donovan asked me to speak to Rumor')"
+            }
+          ],
+          "npc_id": 9500000061,
+          "dialogue_string_id": 78723,
+          "lines": [
+            {
+              "text_id": 78723
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "text_string_id": 78725,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Hennessey (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            }
+          ],
+          "npc_id": 9500000033
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 78742,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Vysha (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            }
+          ],
+          "npc_id": 9500000079
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "text_string_id": 140554,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Oswald (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            }
+          ],
+          "npc_id": 9500000056
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "text_string_id": 77203,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Deliver to Virgil Veilmont (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            }
+          ],
+          "npc_id": 9000000505
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 6,
+          "text_string_id": 78721,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Rumor (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            }
+          ],
+          "npc_id": 9500000061
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Easy Money (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "wiki",
+          "evidence": "Easy Money (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) L1224: closing 78716 'You've done well, and shown you can be trusted. Good thing you didn't try to keep the money for yourself.', beside the title 78714 and the description 78715; it is Rumor's voice, where the quest ends (Return to Rumor, 78721)"
+        }
+      ],
+      "description_string_id": 78715,
+      "intro_text_string_id": 78713,
+      "enabled": true,
+      "end_text_string_id": 78716
     }
   ]
 }

@@ -8417,8 +8417,27 @@
       "location_evidence": [
         "Mire's Edge, a house with a campfire next to it (wiki); \"down the trail to the southeast\" of the arrival path (1239774079)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3958508,
+          "title": "Easy Money",
+          "title_string_id": 78714,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Easy Money (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_easy_money_074db0)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
+            }
+          ]
+        }
+      ],
+      "quest_ids_given": [
+        3958508
+      ],
       "quests_given_text": [
         "The Road to Mire's Edge (arrival; \"Speak to Donovan Shadeweaver\" 1730471579); Easy Money; Darci's Deficiencies; Favors for Favors; Combating the Cray; The Mining Operation (wiki lists all six as his; see the series table). Named but not giving: The Eye of Necrosis (mentioned), The Last Laugh (Sirdo's squirrels aimed at him)"
       ],
@@ -29438,11 +29457,18 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:318; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1551 (ModelId=685, ModelFileName=human_blackspore_thief_f.adr, NameId=45297)."
           }
+        ],
+        "greeting_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The client has no greeting for this NPC; its quests' own text carries the talk."
+          }
         ]
       },
       "heading": -1.640832,
       "model_id": 685,
-      "model_file_name": "human_blackspore_thief_f.adr"
+      "model_file_name": "human_blackspore_thief_f.adr",
+      "greeting_reason": "The client has no greeting for this NPC; its quests' own text carries the talk."
     },
     {
       "npc_id": 9000000446,
