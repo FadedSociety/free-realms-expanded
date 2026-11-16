@@ -889,10 +889,11 @@ fn surgical_precision_stays_disabled() {
         // T743 enables Callahan's Seaside level-20 gate and T542 the Jobs-window
         // Become a Medic; L1202 enables No Pain, No Gain (3090029), the quest after that gate;
         // L1222 enables Surgical Precision, Supply Recovery and Medic on a Mission
-        // (3090008-3090010); the rest stay off.
+        // (3090008-3090010); L1228 enables Tummies in Turmoil after them
+        // (`LAST_LIVE_AFTER_SURGICAL`); the rest stay off.
         let after_gate = 3_090_029;
         if id >= 3_090_007
-            && !(u64::from(SURGICAL_PRECISION)..=3_090_010).contains(&id)
+            && !(u64::from(SURGICAL_PRECISION)..=u64::from(LAST_LIVE_AFTER_SURGICAL)).contains(&id)
             && id != u64::from(LEVEL_TWENTY)
             && id != u64::from(BECOME_A_MEDIC)
             && id != after_gate

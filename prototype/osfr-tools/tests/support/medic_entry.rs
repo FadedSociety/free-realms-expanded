@@ -27,6 +27,9 @@ pub const LEVEL_TWENTY: u32 = 3_090_027;
 /// The next Medic record; it stays disabled in this slice (no friendly-NPC
 /// Target Vitals path), and no later record may become offerable by accident.
 pub const SURGICAL_PRECISION: u32 = 3_090_008;
+/// L1228: the last live record of the chain that starts at Surgical Precision (Tummies in
+/// Turmoil). Named here so no stay-off test body spells its id (quest_wire's pin scan).
+pub const LAST_LIVE_AFTER_SURGICAL: u32 = 3_090_011;
 /// T542's Jobs-window record: Nurse Naia is its giver, its one talk target and the turn-in.
 pub const BECOME_A_MEDIC: u32 = 3_090_034;
 pub const SUNFLOWER: u64 = 9_500_000_536;
@@ -405,10 +408,11 @@ pub fn assert_enabled_medic_chapter_records() {
         // T542 enables the Jobs-window Become a Medic (3090034).
         // L1202 enables No Pain, No Gain (3090029), the quest after the level-20 gate.
         // L1222 enables Surgical Precision, Supply Recovery and Medic on a Mission
-        // (3090008-3090010); medic_level_five_chapter covers the first offer.
+        // (3090008-3090010); medic_level_five_chapter covers the first offer. L1228 enables
+        // Tummies in Turmoil after them (`LAST_LIVE_AFTER_SURGICAL`).
         if id == u64::from(3_090_002_u32)
             || (id >= 3_090_007
-                && !(u64::from(SURGICAL_PRECISION)..=3_090_010).contains(&id)
+                && !(u64::from(SURGICAL_PRECISION)..=u64::from(LAST_LIVE_AFTER_SURGICAL)).contains(&id)
                 && id != u64::from(LEVEL_TWENTY)
                 && id != u64::from(BECOME_A_MEDIC)
                 && id != 3_090_029)

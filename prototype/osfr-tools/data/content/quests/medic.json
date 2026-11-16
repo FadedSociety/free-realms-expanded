@@ -1194,10 +1194,56 @@
       "prerequisite_quest_ids": [
         3090010
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "text_string_id": 73767,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Speak to Clover (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_tummies_in_turmoil_650c4b)."
+            }
+          ],
+          "npc_id": 9000000052
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "text_string_id": 73765,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "As a medic, administer the medicine (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_tummies_in_turmoil_650c4b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "client 73765 is this step; MiniGameData 267 is Medic: Tummies in Turmoil"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) L1228: MiniGameData 267 is served: `world_challenges.json` row 267 (five deliveries, 150 s, Clover's menu) and the finish_minigame producer pin in tests/enabled_quest_reachability.rs list it"
+            }
+          ],
+          "minigame_id": 267,
+          "count": 1
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "text_string_id": 73818,
+          "source": [
+            {
+              "kind": "wiki",
+              "evidence": "Return to Clover (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_tummies_in_turmoil_650c4b)."
+            }
+          ],
+          "npc_id": 9000000052
+        }
+      ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 2,
           "items": [],
           "job_xp": {
             "11": 100
@@ -1206,6 +1252,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/medic.json, record 3090011)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1228: 2 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_tummies_in_turmoil_650c4b rewards_wiki: coins 2, stars 100)"
             }
           ]
         }
@@ -1246,12 +1296,17 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) bulk-wired by lab/tools/quest_wire.py"
         }
       ],
       "description_string_id": 73753,
       "intro_text_string_id": 73751,
       "end_text_string_id": 73754,
-      "enabled": false
+      "enabled": true,
+      "job": 11
     },
     {
       "id": 3090012,
