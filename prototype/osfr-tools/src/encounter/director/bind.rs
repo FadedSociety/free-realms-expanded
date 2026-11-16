@@ -1069,6 +1069,7 @@ impl EncounterEngine {
             return false;
         }
         self.fight_state.down_since = Some(now_ms);
+        out.replies.push(self.knockout_state(true));
         out.replies
             .push(wire::respawn_window((recover * 1000) as i32, 0));
         out.feedback = Some(format!("Knocked out. Knockouts remaining: {left}."));
@@ -1099,6 +1100,7 @@ impl EncounterEngine {
         out.replies
             .push(player_hp(self.max_health, self.max_health));
         out.replies.push(respawn_hide());
+        out.replies.push(self.knockout_state(false));
     }
 
     /// The results card of a fight run, in place of the engine's two fixed rows.

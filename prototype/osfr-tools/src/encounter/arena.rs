@@ -371,7 +371,7 @@ impl EncounterEngine {
                 } else {
                     // (R) Overworld knockout: stay down and show the recovered
                     // respawn window; 41/122 (`resume`) revives the player.
-                    out.replies.push(self.respawn_window());
+                    out.replies.extend(self.respawn_window());
                     out.feedback = Some("Knocked out.".into());
                 }
             }

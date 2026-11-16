@@ -466,6 +466,16 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
             "and no price inside a fight"
         );
         assert_eq!(engine.fight_run().unwrap().knockouts_left(), 10 - taken);
+        // L1236: the knocked-out state (35/20) goes ahead of the window, live's 0x81 (knocked out,
+        // still alive), so the client shows the player down.
+        let state_at = |replies: &[Vec<u8>]| -> Option<(usize, u32)> {
+            let at = replies.iter().position(|r| r.starts_with(&[35, 0, 20, 0]))?;
+            Some((at, u32::from_le_bytes(replies[at][12..16].try_into().unwrap())))
+        };
+        let (at, bits) = state_at(&down.replies).expect("the knocked-out state");
+        assert_eq!(bits, 0x81);
+        let window_at = (down.replies.iter()).position(|r| r.starts_with(&[41, 0, 125, 0]));
+        assert!(Some(at) < window_at, "the state before the window");
         // The fight goes on around a player who is down.
         assert!(down.replies.iter().all(|r| !r.starts_with(&[39, 0, 18])));
         let up = engine
@@ -480,6 +490,8 @@ fn knockouts_in_the_engine_stand_the_player_up_until_the_allowance_is_gone() {
             up.replies.iter().any(|r| r.starts_with(&[41, 0, 126, 0])),
             "the window closes"
         );
+        let (_, bits) = state_at(&up.replies).expect("the standing state");
+        assert_eq!(bits & 0x81, 0x1, "alive and no longer knocked out: {bits:#x}");
         assert!(up.zoning.is_none(), "where they fell, not at the safe spot");
     }
     let last = engine.receive_arena_damage(u32::MAX, now + 61_000);

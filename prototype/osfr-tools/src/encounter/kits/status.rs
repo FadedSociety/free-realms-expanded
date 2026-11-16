@@ -297,6 +297,23 @@ impl EncounterEngine {
         }
     }
 
+    /// L1236 (A52, testers' Dungeons 2: "the knocked-out character does not fall"): this
+    /// player's 35/20 for a knock-out: knocked out and still alive, live's 0x81 (live sent 0x8080
+    /// first; natively 0x8080 left the HUD portrait blank after recovery, 0x81 keeps the face and
+    /// the player still falls and lies down), and for standing up again: alive
+    /// (live's 0x1 at rest) with the player's base bits and any status still on them. The client
+    /// blocks abilities and plays `PFX_knocked_out_loop` (composite 5017) on the knocked-out bit
+    /// (`0x0092f460`).
+    pub(in crate::encounter) fn knockout_state(&self, down: bool) -> Vec<u8> {
+        let bits = if down {
+            wire::bits::KNOCKED_OUT | wire::bits::ALIVE
+        } else {
+            let base = self.skills.kit.statuses.wire.base_bits.player;
+            wire::bits::ALIVE | base | self.skills.kit.book.bits(ME)
+        };
+        wire::state(self.me(), bits)
+    }
+
     fn status_state_packet(&self, key: u64) -> Vec<u8> {
         let wire = &self.skills.kit.statuses.wire;
         let base = if key == ME { wire.base_bits.player } else { wire.base_bits.enemy };

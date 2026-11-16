@@ -108,6 +108,14 @@ fn window() -> Vec<u8> {
 fn hide() -> Vec<u8> {
     [vec![41, 0, 126, 0], vec![0; 8]].concat()
 }
+/// L1236: 35/20 for the player (guid 1): knocked out and still alive (live's 0x81) ...
+fn down_state() -> Vec<u8> {
+    [vec![35, 0, 20, 0], 1_u64.to_le_bytes().to_vec(), 0x81_u32.to_le_bytes().to_vec()].concat()
+}
+/// ... and standing again (alive, live's 0x1).
+fn up_state() -> Vec<u8> {
+    [vec![35, 0, 20, 0], 1_u64.to_le_bytes().to_vec(), 1_u32.to_le_bytes().to_vec()].concat()
+}
 fn hp(health: i32, max: i32) -> Vec<u8> {
     [
         vec![38, 0, 1, 0],
@@ -281,7 +289,8 @@ fn paid_revive_is_refused_and_the_window_comes_back() {
     let out = send(&mut e, &resume(1, 0, 0), 2_000);
     assert!(!out.changed && out.zoning.is_none() && out.rewards.is_empty());
     assert_eq!(e.state(), &before); // no health, no relocation, no currency
-    assert_eq!(out.replies, vec![window()]); // the window hid itself on the click
+    // The window hid itself on the click; the player is still down.
+    assert_eq!(out.replies, vec![down_state(), window()]);
     assert!(out.feedback.as_deref().unwrap().contains("1000 coins"));
     // Free still works afterwards.
     assert!(send(&mut e, &free(), 2_100).zoning.is_some());
@@ -296,7 +305,7 @@ fn paid_revive_charges_the_price_once_and_revives_in_place() {
     let (out, price) = e.paid_revive(REVIVE_COST as u32, 5_000);
     assert_eq!(price, REVIVE_COST as u32, "exactly the window's price");
     assert!(out.changed && out.zoning.is_none() && out.rewards.is_empty());
-    assert_eq!(out.replies, vec![hp(full(), full()), hide()]);
+    assert_eq!(out.replies, vec![hp(full(), full()), hide(), up_state()]);
     assert_eq!(e.state().player_health, full() as u32);
     assert!(e.state().active.is_none());
     // The same grace as the free revive: the wolf on the spot cannot kill again.
@@ -324,7 +333,7 @@ fn paid_revive_below_the_price_changes_nothing() {
     let (out, price) = e.paid_revive(REVIVE_COST as u32 - 1, 2_000);
     assert_eq!(price, 0);
     assert!(refused(&out, "1000 coins"));
-    assert_eq!(out.replies, vec![window()]);
+    assert_eq!(out.replies, vec![down_state(), window()]);
     assert_eq!(e.state(), &before);
     // The server fallback still runs: the refusal did not clear the knockout.
     e.tick([0.0; 3], 11, 2_100).unwrap();

@@ -756,7 +756,7 @@ impl EncounterEngine {
                 .push(player_hp(self.state.player_health, self.max_health));
             if self.state.player_health == 0 {
                 // (R) Hold the knockout; 41/122 chooses the way back up.
-                out.replies.push(self.respawn_window());
+                out.replies.extend(self.respawn_window());
             }
         }
         if self.field_combat != engaged && !self.world_stage_fighting() {
@@ -1127,6 +1127,7 @@ impl EncounterEngine {
         ];
         if was_down {
             out.push(respawn_hide());
+            out.push(self.knockout_state(false));
         }
         out
     }
@@ -1349,7 +1350,7 @@ impl EncounterEngine {
             replies.extend(self.field_initialization());
             if self.state.player_health == 0 {
                 // (R) A knocked-out player whose scene reloads gets the window back.
-                replies.push(self.respawn_window());
+                replies.extend(self.respawn_window());
             }
             return Ok(EncounterOutcome {
                 replies,
@@ -2079,6 +2080,10 @@ impl EncounterEngine {
             replies.extend(remove_state);
         }
         replies.push(player_hp(self.max_health, self.max_health));
+        if self.state.player_health == 0 {
+            // A lost run left the player knocked out: they leave standing (L1236).
+            replies.push(self.knockout_state(false));
+        }
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
@@ -2104,12 +2109,14 @@ impl EncounterEngine {
         a.enemies = enemies;
         a.phase = EncounterPhase::Loading;
         self.fight_state.lost_since = None;
+        let stood_up = (self.state.player_health == 0).then(|| self.knockout_state(false));
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
         Ok(EncounterOutcome {
             changed: true,
             zoning: self.zone(),
+            replies: stood_up.into_iter().collect(),
             ..Default::default()
         })
     }

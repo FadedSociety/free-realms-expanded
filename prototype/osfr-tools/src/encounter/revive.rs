@@ -119,7 +119,7 @@ impl EncounterEngine {
         if wallet < cost {
             return refuse(
                 format!("You need {cost} coins to revive here."),
-                vec![self.respawn_window()],
+                self.respawn_window(),
             );
         }
         let mut out = self.revive(now_ms);
@@ -162,13 +162,19 @@ impl EncounterEngine {
         self.knocked_out_at = None;
         EncounterOutcome {
             changed: true,
-            replies: vec![player_hp(self.max_health, self.max_health), respawn_hide()],
+            replies: vec![
+                player_hp(self.max_health, self.max_health),
+                respawn_hide(),
+                self.knockout_state(false),
+            ],
             ..Default::default()
         }
     }
 
-    /// The knockout window (41/125) with this engine's timer and price.
-    pub(super) fn respawn_window(&self) -> Vec<u8> {
-        wire::respawn_window(self.rules.revive.timer_ms, self.paid_revive_cost)
+    /// The knockout as the client sees it: the knocked-out state (L1236), then the window
+    /// (41/125) with this engine's timer and price.
+    pub(super) fn respawn_window(&self) -> Vec<Vec<u8>> {
+        let window = wire::respawn_window(self.rules.revive.timer_ms, self.paid_revive_cost);
+        vec![self.knockout_state(true), window]
     }
 }
