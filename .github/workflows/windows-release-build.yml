@@ -1,0 +1,59 @@
+# Builds the shipped Windows realm programs from this commit on a GitHub-hosted runner, with their
+# version resources, and keeps them as a workflow artifact. A code-signing service (SignPath, A50)
+# signs only programs built this way. Started by hand for a release.
+name: Windows release build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the "v" (for example 0.1.43)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      OSFR_RELEASE_VERSION: ${{ inputs.version }}
+      TOOLCHAIN: 1.99.0-x86_64-pc-windows-gnu
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: prototype/osfr-tools
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain (the one local releases use)
+        run: rustup toolchain install $env:TOOLCHAIN --profile minimal
+      - name: Resource compiler
+        run: |
+          $windres = Get-Command windres.exe -ErrorAction SilentlyContinue
+          if (-not $windres) {
+            $windres = Get-ChildItem C:\mingw64\bin\windres.exe, C:\msys64\mingw64\bin\windres.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+          }
+          if (-not $windres) { throw "no windres.exe on this runner" }
+          $path = if ($windres.Source) { $windres.Source } else { $windres.FullName }
+          "OSFR_WINDRES=$path" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "windres: $path"
+      - name: Build
+        run: cargo +$env:TOOLCHAIN build --release --locked --bin osfr-gateway --bin osfr-login --bin osfr-account
+      - name: Check the version resources
+        run: |
+          foreach ($name in 'osfr-gateway', 'osfr-login', 'osfr-account') {
+            $info = (Get-Item "target/release/$name.exe").VersionInfo
+            Write-Host "$name.exe: $($info.ProductName) $($info.ProductVersion) ($($info.OriginalFilename))"
+            if ($info.ProductName -ne 'Free Realms Expanded' -or $info.ProductVersion -ne $env:OSFR_RELEASE_VERSION) {
+              throw "$name.exe has no matching version resource"
+            }
+          }
+      - name: Keep the programs
+        uses: actions/upload-artifact@v4
+        with:
+          name: realm-programs-${{ inputs.version }}
+          path: |
+            prototype/osfr-tools/target/release/osfr-gateway.exe
+            prototype/osfr-tools/target/release/osfr-login.exe
+            prototype/osfr-tools/target/release/osfr-account.exe
+          if-no-files-found: error
