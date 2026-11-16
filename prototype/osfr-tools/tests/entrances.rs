@@ -92,11 +92,12 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
         .count();
     assert_eq!(
         (table.entrances.len(), doors, table.scenes.len()),
-        (57, 35, 46),
-        "35 dungeon doors and 22 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
+        (65, 43, 46),
+        "43 dungeon doors and 22 battle starters in 46 scenes (rc-0136: a Bone Bog snake and five \
          Legacy spawner huts, two of them in scenes of their own; rc-0137 holds the Troll \
          Summoner starter, where battle 96's own marker now stands; L1192 places the Hooligan \
-         Brawling Club hut for fight 14017; L1193 the Thugawug Thug for fight 14080)"
+         Brawling Club hut for fight 14017; L1193 the Thugawug Thug for fight 14080; L1231 a \
+         closed door at each of the 8 held dungeons with a travel point)"
     );
     for row in &table.entrances {
         let actor = spawners.iter().find(|actor| actor.0 == row.guid);
@@ -116,7 +117,8 @@ fn every_proven_entrance_has_an_actor_and_every_door_a_scene_row() {
             row.id
         );
         let scene = row.scene.as_deref().and_then(|name| table.scene(name));
-        if row.kind == EntranceKind::Door {
+        // L1231: a closed door (no fight: a held dungeon's) never zones anywhere, so needs no scene.
+        if row.kind == EntranceKind::Door && row.fight.is_some() {
             let scene = scene.unwrap_or_else(|| panic!("the door {} has no scene row", row.id));
             assert!(
                 scene.zone_id != 0 && !scene.sky.is_empty() && scene.geometry_id != 0,
