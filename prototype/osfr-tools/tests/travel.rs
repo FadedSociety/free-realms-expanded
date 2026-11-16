@@ -169,6 +169,7 @@ fn every_point_is_a_teleport_that_lands_on_walkable_ground() {
         now += 1;
     }
     let (mut on_ground, mut interior) = (0, 0);
+    let mut interiors = Vec::new();
     // EV: an event marker is closed here (no calendar runs); `gameplay/travel.rs` tests it.
     for point in points.iter().filter(|p| p.get("live_event").is_none()) {
         let (id, name) = (
@@ -208,6 +209,7 @@ fn every_point_is_a_teleport_that_lands_on_walkable_ground() {
                     "{id} {name}: only dungeon gates"
                 );
                 interior += 1;
+                interiors.push(name);
             }
             Some(ground) => {
                 let above = to.position[1] - ground;
@@ -221,6 +223,7 @@ fn every_point_is_a_teleport_that_lands_on_walkable_ground() {
             None => {
                 assert_eq!(to.position[1], spawn[1], "{id} {name}");
                 interior += 1;
+                interiors.push(name);
             }
         }
         if point["notification_type"] == 7 {
@@ -235,7 +238,7 @@ fn every_point_is_a_teleport_that_lands_on_walkable_ground() {
     assert_eq!(
         (on_ground, interior),
         (127, 8),
-        "measured against the zone 0 grid"
+        "measured against the zone 0 grid; kept at their own height: {interiors:?}"
     );
 }
 

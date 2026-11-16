@@ -1383,3 +1383,26 @@ fn every_shipped_instance_link_opens_its_starter() {
         assert!(base.is_battle_spawner(starter), "object {}: instance {starter} is no placed starter", r["spawn_guid"]);
     }
 }
+
+/// A52: the map's arrival at a dungeon stood on the gate's own spot, inside the gate model, and a
+/// player who then entered came back to that spot. A solid gate (the barricade, model 111, and the
+/// web, 413) keeps its arrival clear; a cave mouth or portal may keep its own spot (Going Batty's
+/// bat stands just ahead of Forgotten Caves' arrival, as the wiki says).
+#[test]
+fn a_dungeon_map_arrival_stands_in_front_of_its_gate() {
+    let table = table();
+    let travel: Value = serde_json::from_slice(&fs::read(content_dir().join("travel.json")).unwrap()).unwrap();
+    let points = travel["points"].as_array().unwrap();
+    let mut checked = 0;
+    let solid = |row: &&osfr_tools::encounter::director::entrances::Entrance| [111, 413].contains(&row.model_id);
+    for row in (table.entrances.iter()).filter(|row| row.kind == EntranceKind::Door).filter(solid) {
+        let Some(point) = points.iter().find(|p| p["name"].as_str() == Some(row.title.as_str())) else {
+            continue;
+        };
+        let spot = &point["spawn"];
+        let (x, z) = (spot[0].as_f64().unwrap() as f32 - row.at[0], spot[2].as_f64().unwrap() as f32 - row.at[2]);
+        assert!(x.hypot(z) >= 2.0, "{}: the arrival is {:.1} m from the gate", row.id, x.hypot(z));
+        checked += 1;
+    }
+    assert!(checked > 0, "no solid gate has a travel point");
+}
