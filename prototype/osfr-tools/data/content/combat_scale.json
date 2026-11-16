@@ -106,7 +106,8 @@
     },
     "regen_percent": {
       "fight": 1.0,
-      "idle": 5.0
+      "idle": 5.0,
+      "idle_after_ms": 5000
     },
     "weapon_range": 5.0,
     "weapon_speed_ms": 1000,
@@ -299,6 +300,11 @@
       "field": "player",
       "kind": "reconstructed",
       "evidence": "(R) damage multiplier 1.0 before gear (the captured player had 1.05)"
+    },
+    {
+      "field": "player",
+      "kind": "reconstructed",
+      "evidence": "(R) L1234: the server regenerates the player's health out of a fight only, regen_percent.idle a second once no damage has landed for regen_percent.idle_after_ms 5000 (the job items' 'regeneration while out of combat', Global.Text 442097-442102; Sanctuary's server regenerates out of combat only). The wait is not in any source. regen_percent.fight is sent as the client's stat 65 and not applied: no source shows health coming back during a fight (testers' notes 2026-11-16 Jobs 1)"
     },
     {
       "field": "speeds",

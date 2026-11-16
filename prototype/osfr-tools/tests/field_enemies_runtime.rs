@@ -201,6 +201,11 @@ fn a_kill_reward_row_with_loot_pays_the_rolled_items() {
 #[test]
 fn a_heal_over_time_comes_a_step_a_second_and_stops() {
     let f = Fixture::new(1, 0.0);
+    // L1234: out of the fight the player's own regeneration would add to the potion's steps.
+    let mut scale: Value =
+        serde_json::from_str(include_str!("../data/content/combat_scale.json")).unwrap();
+    scale["player"]["regen_percent"]["idle"] = json!(0.0);
+    fs::write(f.0.join("combat_scale.json"), scale.to_string()).unwrap();
     let mut e = f.load();
     let max = e.state().player_health;
     let mut now = 0;

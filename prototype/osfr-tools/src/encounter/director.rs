@@ -188,4 +188,15 @@ pub struct FightState {
     /// L1212 (A42): this player's own guid, as gameplay names it before each message and tick.
     /// 0 until then, which reads as 1 (`EncounterEngine::solo_guid`).
     pub(super) player_guid: u64,
+    /// L1234 (A52): the player's health regeneration (`EncounterEngine::regenerate_health`).
+    pub(super) regen: HealthRegen,
+}
+
+/// The player's health as the last tick saw it, when it last fell, and when the next
+/// regeneration step is due.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct HealthRegen {
+    pub(super) seen: u32,
+    pub(super) hit_at: u64,
+    pub(super) next_at: u64,
 }

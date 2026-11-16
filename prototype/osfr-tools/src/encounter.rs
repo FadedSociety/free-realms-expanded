@@ -1999,6 +1999,7 @@ impl EncounterEngine {
             return Ok(energy);
         }
         self.regenerate_energy(now_ms, &mut energy);
+        self.regenerate_health(now_ms, &mut energy);
         let mut out = EncounterOutcome::default();
         out.changed = energy.changed;
         out.rewards.append(&mut energy.rewards);

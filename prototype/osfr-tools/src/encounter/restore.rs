@@ -223,4 +223,55 @@ mod tests {
         engine.set_consumable_buff(0, 0, 0);
         assert!(engine.skills.caster_buffs.is_empty());
     }
+
+    /// L1234 (A52): out of a fight health comes back a step a second once no damage has landed
+    /// for the wait; a fresh hit restarts it; never past the maximum and never while knocked
+    /// out. The tick runs it.
+    #[test]
+    fn health_regenerates_once_no_damage_has_landed_for_a_while() {
+        let (_dir, mut engine) = super::super::shared::tests::engine();
+        let (idle, after_ms) = engine.scale.health_regen();
+        assert!(idle > 0.0 && after_ms > 1_000, "the shipped rate and wait: {idle} {after_ms}");
+        let max = engine.max_health;
+        let step = ((max as f32 * idle / 100.0).round() as u32).max(1);
+        let mut out = EncounterOutcome::default();
+        engine.regenerate_health(0, &mut out);
+        assert!(out.replies.is_empty(), "full stays full");
+
+        // A hit at 10 s: nothing until the wait is over, then a step a second.
+        engine.state.player_health = max / 2;
+        engine.regenerate_health(10_000, &mut out);
+        engine.regenerate_health(10_000 + after_ms - 1, &mut out);
+        assert_eq!(engine.state.player_health, max / 2, "still in the fight");
+        assert!(out.replies.is_empty());
+        engine.regenerate_health(10_000 + after_ms, &mut out);
+        assert_eq!(engine.state.player_health, max / 2 + step);
+        assert_eq!(out.replies.len(), 1, "one 38/1");
+        engine.regenerate_health(10_000 + after_ms + 500, &mut out);
+        assert_eq!(engine.state.player_health, max / 2 + step, "one step a second");
+        engine.regenerate_health(10_000 + after_ms + 1_000, &mut out);
+        let quiet = max / 2 + 2 * step;
+        assert_eq!(engine.state.player_health, quiet);
+
+        // A fresh hit restarts the wait; the last step stops at the maximum.
+        engine.state.player_health = quiet - 1;
+        let at = 10_000 + after_ms + 2_000;
+        engine.regenerate_health(at, &mut out);
+        engine.regenerate_health(at + after_ms - 1, &mut out);
+        assert_eq!(engine.state.player_health, quiet - 1, "the wait starts again");
+        engine.state.player_health = max - 1;
+        engine.regenerate_health(at + after_ms, &mut out);
+        assert_eq!(engine.state.player_health, max, "capped at the maximum");
+        engine.state.player_health = 0;
+        let sent = out.replies.len();
+        engine.regenerate_health(at + 10 * after_ms, &mut out);
+        assert_eq!((engine.state.player_health, out.replies.len()), (0, sent), "a knockout");
+
+        // The tick carries it, far from the fixture's enemy.
+        engine.state.player_health = max / 2;
+        let far = [500.0, 0.0, 500.0];
+        let out = engine.tick(far, 43, at + 20 * after_ms).unwrap();
+        assert!(engine.state.player_health > max / 2, "the tick regenerates");
+        assert!(out.replies.contains(&player_hp(engine.state.player_health, max)));
+    }
 }

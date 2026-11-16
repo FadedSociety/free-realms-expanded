@@ -91,6 +91,13 @@ struct CritRow {
 struct Regen {
     fight: f32,
     idle: f32,
+    /// (R) How long after the last damage the player counts as out of the fight.
+    #[serde(default = "idle_after_ms")]
+    idle_after_ms: u32,
+}
+
+fn idle_after_ms() -> u32 {
+    5_000
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -246,6 +253,7 @@ impl CombatScale {
             && crit(player.melee_crit)
             && share(player.regen_percent.fight)
             && share(player.regen_percent.idle)
+            && player.regen_percent.idle_after_ms <= 600_000
             && positive(player.weapon_range, 1_000.0)
             && scale.speeds.len() <= 16
             && scale.speeds.values().flatten().all(|s| positive(*s, 100.0))
@@ -320,6 +328,13 @@ let steps = (level.clamp(1, self.max_level) - 1) as f32 / self.health_step_level
 
     pub(super) fn player_base_health(&self) -> u32 {
         self.player_base_health
+    }
+
+    /// The player's out-of-fight health regeneration in percent of maximum health a second, and
+    /// how long after the last damage it begins. (`fight` is only the client's stat 65.)
+    pub(super) fn health_regen(&self) -> (f32, u64) {
+        let regen = self.player.regen_percent;
+        (regen.idle, u64::from(regen.idle_after_ms))
     }
 
     /// Scale an authored enemy row (level-one baselines) onto the live scale:

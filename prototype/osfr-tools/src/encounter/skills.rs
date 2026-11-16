@@ -619,6 +619,36 @@ impl EncounterEngine {
         }
     }
 
+    /// L1234 (A52): out of a fight the player's health comes back, `regen_percent.idle` of the
+    /// maximum each second once no damage has landed for `idle_after_ms` (the client's stat 4
+    /// Health Refill, +356 a second on 7116 in capture packets_3; the job items grant "bonus
+    /// health ... regeneration while out of combat"; Sanctuary's server also regenerates out of
+    /// combat only). Any fall in health restarts the wait, whatever caused it. A knocked-out
+    /// player gets none.
+    pub(super) fn regenerate_health(&mut self, now_ms: u64, out: &mut EncounterOutcome) {
+        let (health, max) = (self.state.player_health, self.max_health);
+        let (percent, after_ms) = self.scale.health_regen();
+        let regen = &mut self.fight_state.regen;
+        if health < regen.seen {
+            regen.hit_at = now_ms;
+        }
+        regen.seen = health;
+        if health == 0
+            || health >= max
+            || percent <= 0.0
+            || now_ms < regen.hit_at.saturating_add(after_ms)
+            || now_ms < regen.next_at
+        {
+            return;
+        }
+        let step = ((max as f32 * percent / 100.0).round() as u32).max(1);
+        let health = health.saturating_add(step).min(max);
+        (regen.seen, regen.next_at) = (health, now_ms.saturating_add(1_000));
+        // No save of its own, as a heal over time: the next change saves the health with it.
+        self.state.player_health = health;
+        out.replies.push(player_hp(health, max));
+    }
+
     /// One critical-hit roll for the player at the active job's chance.
     pub(crate) fn roll_crit(&mut self) -> bool {
         self.crit_seed = self
