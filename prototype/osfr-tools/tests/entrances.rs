@@ -302,14 +302,17 @@ fn an_open_entrance_zones_into_its_scene_and_a_closed_one_never_starts() {
     );
 }
 
-/// A door stands still while a starter may walk, and a closed entrance shows no combat marker.
+/// A door stands still while a starter may walk, and every entrance carries the combat marker.
+/// (The name predates L1233: a closed door had none, and the client offered no click on it, so
+/// its 41/4 answer never reached a player.)
 #[test]
 fn doors_stand_still_and_only_open_entrances_carry_the_marker() {
     let (table, mut engine) = (table(), engine());
     let marked: BTreeSet<u64> = engine.battle_markers().iter().map(|m| m.0).collect();
+    let closed = (table.entrances.iter()).filter(|row| !engine.entrance(row.guid).unwrap().1);
+    assert!(closed.count() > 0, "a closed entrance to check");
     for row in &table.entrances {
-        let open = engine.entrance(row.guid).unwrap().1;
-        assert_eq!(marked.contains(&row.guid), open, "{}", row.id);
+        assert!(marked.contains(&row.guid), "{} has no marker", row.id);
     }
     // A player in sight of the hive door for a minute: the door never moves.
     let hive = row(&table, "bixie_hive");

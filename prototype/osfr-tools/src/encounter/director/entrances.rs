@@ -143,7 +143,9 @@ pub struct Table {
     pub job_switch_text_id: i32,
     /// Text of the 41/4 a closed entrance answers with.
     pub closed_text_id: i32,
-    /// The marker an open entrance shows; a row whose `name_id` is 0 takes the actor's own.
+    /// The marker every entrance shows, closed ones too: the client offers the click and press X
+    /// only on an actor with this kind-3 row (L1233, A52). A row whose `name_id` is 0 takes the
+    /// actor's own.
     #[serde(default)]
     combat_marker: Option<Notification>,
     #[serde(default)]
@@ -501,7 +503,7 @@ impl EncounterEngine {
                     required_combat_level: fight.map_or(0, |f| f.entry.min_combat_level),
                     spawner,
                     combat_marker: MarkerSetting::default(),
-                    marker: marker.filter(|_| dungeon.is_some()),
+                    marker,
                     zone: dungeon.map_or_else(|| self.content.world.clone(), |d| d.zone.clone()),
                     icon_id: dungeon.map_or(-1, |d| d.icon_id),
                     prizes: dungeon.map_or_else(Vec::new, |d| d.prizes.clone()),
