@@ -3106,6 +3106,57 @@ fn quest_gated_field_enemies_spawn_fight_and_respawn() {
     assert!(!encounter.is_field_enemy(HOOLIGAN));
 }
 
+/// A51: a talk step with no line of its own does not say the NPC's greeting when that greeting
+/// is another quest's offer. Seafoam's quest 3950360 sends the player to Bordon Cloo, whose
+/// greeting is his own quest's offer (3050020's 387246): he says the stock thanks instead.
+#[test]
+fn a_talk_step_without_its_own_line_never_says_another_quests_offer() {
+    const QUEST: u32 = 3_950_360;
+    const BORDON: u64 = 9_000_000_028;
+    let reference = reference();
+    let mut game = Gameplay::load(&reference, None).unwrap();
+    game.profiles = Some(Profiles::load(&reference, Some(native_test_profiles())).unwrap());
+    game.bind_npc_quest_catalogue(&bundled_content(), 1).unwrap();
+    let engine = engine_mut(&mut game);
+    assert!(engine.dev_mark_offered(QUEST));
+    assert!(engine.accept(QUEST).denial.is_none(), "accepted");
+    let greeting = engine.intro_text_string_id(3_050_020);
+    assert!(greeting.is_some_and(|id| id != crate::quest_engine::STOCK_THANKS));
+
+    let file: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(bundled_content().join("npcs/sanctuary.json")).unwrap(),
+    )
+    .unwrap();
+    let bordon = (file["records"].as_array().unwrap().iter())
+        .find(|record| record["npc_id"] == BORDON)
+        .unwrap();
+    assert_eq!(bordon["greeting_string_id"].as_u64().map(|id| id as u32), greeting);
+    let character = CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: serde_json::from_value(bordon["position"].clone()).unwrap(),
+        rotation: [1.0, 0.0, 0.0],
+    };
+    game.update_npc_visibility(&character).unwrap();
+    game.handle_in_world(&packet_for_npc(BORDON), &character, 2_000)
+        .unwrap();
+    let out = game
+        .handle_in_world(&select_npc_option(BORDON, 1), &character, 2_001)
+        .unwrap();
+    let dialogue = (out.replies.iter())
+        .find(|p| p.starts_with(&[26, 0, 3, 0]))
+        .expect("Bordon answers with a dialog");
+    assert_eq!(
+        npc_interaction::decode_dialogue_26_3(dialogue)
+            .unwrap()
+            .initial_dwords[0],
+        crate::quest_engine::STOCK_THANKS,
+        "the stock thanks, not 3050020's offer"
+    );
+    let progress = game.npc_quests.as_ref().unwrap().progress(QUEST).unwrap();
+    assert_eq!(progress.counts.first(), Some(&1), "the step is done: {progress:?}");
+}
+
 /// Cobblestone starter chain, as played natively in run 215840: Introduce Yourself
 /// (Samantha -> Ricky), Call the Crew! (Ricky -> Shakey -> Ricky), Back for More
 /// (Ricky -> Samantha). Steps are ordered: Ricky does not count before Shakey.

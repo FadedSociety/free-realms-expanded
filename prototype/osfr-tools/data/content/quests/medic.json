@@ -1203,9 +1203,14 @@
             {
               "kind": "wiki",
               "evidence": "Speak to Clover (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_medic_tummies_in_turmoil_650c4b)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1235 (A51): Clover's line at this step, wiki dialog speaker Clover: 'We need to rush this medicine out to all the sick people. Be sure to hurry, this stuff doesn't last too long once it's out of storage!' (Global.Text 141305; the player's reply 'I'm on it!' is 141306). Without it Clover said his greeting, Clover's Crisis's offer 73782."
             }
           ],
-          "npc_id": 9000000052
+          "npc_id": 9000000052,
+          "dialogue_string_id": 141305
         },
         {
           "kind": "finish_minigame",

@@ -561,8 +561,13 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T665: the crate pickup is not modelled; the talk to Terrence is the step (answer lab/references/quest-lines/quests.json q3150007 objective 1, kind talk)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "L1235 (A51): Terrence's line at this step, wiki dialog speaker Terrence (The Roadhouse): 'Doesn't Steele realize this is an inn, and not his personal storage area? I don't even have the weapons crates because some robgoblins ran off with them. ...' (Global.Text 141388; 141390 'If you want the crates back, I guess you'll have to chase after the robgoblins.' follows in the same block). Without it Terrence said his greeting, Medic: Medic on a Mission's offer 73492."
             }
-          ]
+          ],
+          "dialogue_string_id": 141388
         },
         {
           "kind": "talk_to_npc",

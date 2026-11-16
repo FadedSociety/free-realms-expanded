@@ -111,10 +111,11 @@ fn meeting_the_team() -> ZoneQuest {
 }
 
 fn you_deserve_better() -> ZoneQuest {
-    // Terrence speaks his bound greeting (73492, T298) when the step completes.
+    // Terrence speaks his own line for the step (141388, L1235); his bound greeting (73492,
+    // T298) is Medic: Medic on a Mission's offer, which no talk step says (A51).
     quest(
         YOU_DESERVE_BETTER,
-        &[(TERRENCE, 73_492)],
+        &[(TERRENCE, 141_388)],
         TUMBOLINA,
         WARRIOR,
     )

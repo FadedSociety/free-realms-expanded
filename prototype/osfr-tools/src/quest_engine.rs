@@ -42,6 +42,10 @@ const MAX_EXCLUSIONS: usize = 16;
 const MAX_UI_EVENT_BYTES: usize = 64;
 const MAX_SPLIT_CONTENT_BYTES: u64 = 8 * 1024 * 1024;
 const MAX_SPLIT_TOTAL_BYTES: u64 = 32 * 1024 * 1024;
+/// (R) Global.Text 416261 "Thanks for helping us!", the client's stock NPC line (beside its
+/// player reply 416262; no client code references it), already the closing of quests the wiki
+/// gives none: what a talk step with no line of its own says instead of another quest's text.
+pub const STOCK_THANKS: u32 = 416_261;
 
 #[derive(Deserialize)]
 struct SplitNpcFile {
@@ -1859,16 +1863,29 @@ impl QuestEngine {
             .and_then(|fields| fields.intro_text_string_id)
     }
 
-    /// What the NPC says for a talk step this outcome just completed, if any.
-    pub fn step_dialogue_for(&self, outcome: &QuestOutcome) -> Option<u32> {
-        outcome.outbound.iter().find_map(|message| match message {
+    /// What the NPC says for a talk step this outcome just completed: the step's own line, or,
+    /// when it has none and the NPC's `greeting` is a quest's offer or another quest's closing,
+    /// the stock [`STOCK_THANKS`] (A51: Clover said Clover's Crisis's offer at Tummies in
+    /// Turmoil's "Speak to Clover"). `None` keeps the greeting, the quest's own closing too.
+    pub fn step_dialogue_for(&self, outcome: &QuestOutcome, greeting: Option<u32>) -> Option<u32> {
+        let step = outcome.outbound.iter().find_map(|message| match message {
             OutboundMessage::Quest(QuestMessage::ObjectiveComplete {
                 quest_id,
                 objective_id,
                 ..
-            }) => self.step_dialogue.get(&(*quest_id, *objective_id)).copied(),
+            }) => Some((*quest_id, *objective_id)),
             _ => None,
-        })
+        })?;
+        if let Some(line) = self.step_dialogue.get(&step) {
+            return Some(*line);
+        }
+        let greeting = greeting.filter(|&id| id != 0)?;
+        let own_closing = self.end_text_string_id(step.0) == Some(greeting);
+        let quest_text = (self.split_locale_fields.values()).any(|fields| {
+            fields.intro_text_string_id == Some(greeting)
+                || fields.end_text_string_id == Some(greeting)
+        });
+        (quest_text && !own_closing).then_some(STOCK_THANKS)
     }
 
     /// T543: the open talk step at `npc_id` that has a conversation, if any. Only a

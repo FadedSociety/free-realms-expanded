@@ -1608,8 +1608,8 @@ impl Gameplay {
             let quest =
                 engine.on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;
             // A completed talk step speaks its own line (Shakey's bubble was
-            // blank in native run 215840).
-            if let Some(line) = engine.step_dialogue_for(&quest) {
+            // blank in native run 215840), never another quest's offer (A51).
+            if let Some(line) = engine.step_dialogue_for(&quest, context.body_string_id) {
                 context.body_string_id = Some(line);
             }
             self.append_npc_quest_outcome_synced(quest, out)?;
