@@ -106,13 +106,35 @@
       "model_id": 180,
       "rank": "normal"
     },
-    "blighted_floren": {
+    "ozymandias": {
       "definition_id": 1403713,
-      "name": "Blighted Floren",
-      "name_id": 16040,
-      "model_id": 134,
+      "name": "Ozymandias",
+      "name_id": 16066,
+      "model_id": 39,
       "rank": "dungeon_boss",
       "boss": true
+    },
+    "evil_floren": {
+      "definition_id": 1403714,
+      "name": "Evil Floren",
+      "name_id": 45047,
+      "model_id": 134,
+      "rank": "elite"
+    },
+    "great_white_snake": {
+      "definition_id": 1403715,
+      "name": "Great White Snake",
+      "name_id": 45025,
+      "model_id": 180,
+      "rank": "boss"
+    },
+    "floren_budling": {
+      "definition_id": 1403716,
+      "name": "Floren Budling",
+      "name_id": 130583,
+      "model_id": 4469,
+      "rank": "normal",
+      "side": "ally"
     }
   },
   "actors": {
@@ -177,7 +199,7 @@
       ]
     },
     "g6": {
-      "definition": "vile_floren",
+      "definition": "great_white_snake",
       "at": [
         295.1,
         11.08,
@@ -261,7 +283,7 @@
       ]
     },
     "boss": {
-      "definition": "blighted_floren",
+      "definition": "ozymandias",
       "at": [
         373.36,
         11.11,
@@ -271,6 +293,70 @@
       "boss": true,
       "dormant": true,
       "scale": 1.7
+    },
+    "evil_1": {
+      "definition": "evil_floren",
+      "at": [
+        370.86,
+        11.11,
+        190.91
+      ],
+      "heading": -2.078,
+      "tags": [
+        "guards"
+      ]
+    },
+    "budling_1": {
+      "definition": "floren_budling",
+      "at": [
+        269.65,
+        9.89,
+        87.87
+      ],
+      "heading": -0.961,
+      "tags": [
+        "captive",
+        "budling_1"
+      ]
+    },
+    "budling_2": {
+      "definition": "floren_budling",
+      "at": [
+        298.73,
+        11.27,
+        107.51
+      ],
+      "heading": -1.787,
+      "tags": [
+        "captive",
+        "budling_2"
+      ]
+    },
+    "budling_3": {
+      "definition": "floren_budling",
+      "at": [
+        322.17,
+        11.11,
+        132.64
+      ],
+      "heading": -1.489,
+      "tags": [
+        "captive",
+        "budling_3"
+      ]
+    },
+    "budling_4": {
+      "definition": "floren_budling",
+      "at": [
+        347.47,
+        11.11,
+        171.01
+      ],
+      "heading": 1.032,
+      "tags": [
+        "captive",
+        "budling_4"
+      ]
     }
   },
   "points": {
@@ -319,6 +405,16 @@
         "actor": "boss"
       },
       "primary": true
+    },
+    {
+      "id": "bonus",
+      "kind": "free",
+      "text_id": 130589,
+      "target": {
+        "tag": "captive"
+      },
+      "count": 4,
+      "bonus": true
     }
   ],
   "script": [
@@ -392,6 +488,9 @@
       "kind": "reconstructed",
       "evidence": "(R) Built by scripts/dungeon_fights.py from data/content/dungeons/floren_forest.json, its notes page and the fork battle; under the id (14037) quests name."
     },
-    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Floren Forest' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Floren_Forest.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."}
+    {"kind": "wiki", "evidence": "L1194 (owner 2026-11-12: the end-of-battle prize wheel depends on the player's class): the wheel is this battle's own fanbyte page 'FR Place:Floren Forest' (Prize Wheel Rewards, one list per class plus its General Purpose part; cached lab/references/fanbyte-battles-20261112/FR_Place_Floren_Forest.html). Each class's wheel holds its own items and the shared items; the coins are the page's. It replaces every earlier note in this record about the prize wheel or its prizes."},
+    {"kind": "wiki", "evidence": "L1232 (testers' notes A52): the battle page's primary goal is 'Defeat Ozymandias!' (lab/references/fanbyte-battles-20261112/FR_Place_Floren_Forest.html), bonus 'Rescue the Floren Budlings! - 0/4'; FR_Mob:Ozymandias, a Stone Head boss 'all the way down the right hand path, hiding behind a barrier' / 'At the end of the dungeon with the Evil Floren'; the mobs category: Evil Floren, Floren Sprout, Flowerchild, Great White Snake, Ozymandias, Twisted Serpent, Withered Floren"},
+    {"kind": "client", "evidence": "L1232: names Global.Text 16066 'Ozymandias', 45047 'Evil Floren', 45025 'Great White Snake', 130583 'Floren Budling', bonus 130589 'Rescue the Floren Budlings!'; models 39 tikihead_m_ozymandias.adr, 134 floren.adr, 180 snake.adr, 4469 floren_m_baby.adr; the guide (notes/Build Guides/Content/Dungeons/Floren Forest.md) names the Great White Snake the mini-boss"},
+    {"kind": "reconstructed", "evidence": "(R) L1232: no video shows the fight. The boss Blighted Floren (the fork's) is Ozymandias at its spot; the middle group's Vile Floren (g6) is the Great White Snake; one Evil Floren stands 3.5 m from the boss among the guards; the 4 Budlings stand 2.5 m from a guard in each group (the snake's white skin and the boss's barrier are not reproduced)"}
   ]
 }
