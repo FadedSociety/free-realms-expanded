@@ -27011,8 +27011,8 @@
         0.0,
         0.35983479962616605
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -27022,7 +27022,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 90 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside Misty Mountain by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",

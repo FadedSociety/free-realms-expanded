@@ -18194,8 +18194,8 @@
         0.0,
         0.9602600152913049
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -18205,7 +18205,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 69 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) Review 2026-11-12 (npc-placement-b): the row was within 3.5 m of 0 other row(s) on the POI spiral (); no source places it more exactly than the area, so it moved to the nearest free flat spot at least 3.8 m from every other row; moved 0.7 m north-west from [-221.8758, 3.543965, -800.55] to [-221.38, 3.548, -801.05], world editor /api/probe: stand.y 3.548 from the terrain, no water, 7 or 8 of 8 directions open. The position is still a reconstruction, not a captured transform.",
+      "position_reason": "(R) L1237 (A52): inside Floren Forest by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",

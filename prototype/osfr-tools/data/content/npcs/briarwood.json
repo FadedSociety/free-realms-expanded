@@ -27480,8 +27480,8 @@
         0.0,
         0.4001644903602777
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -27491,7 +27491,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 79 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform. (R) PL-A npc-placement-a, 2026-11-12: moved from [-679.1266, 44.23315, 1492.3203]: it stood 5.1 m under the terrain at Grexan's Camp; the placement research stands it on the camp's ground; the new spot is on walkable ground clear of props and other bodies.",
+      "position_reason": "(R) L1237 (A52): inside Grexan's Camp by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",
@@ -28258,9 +28258,9 @@
         0.0,
         0.24059744168208771
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
+      "placement": "instance",
+      "placement_source": "instance_interior",
+      "placement_confidence": "medium",
       "placement_candidates": [
         {
           "poi_id": 66,
@@ -28274,7 +28274,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 66 by longest normalized whole-name score 18; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside the Briarheart Caverns by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",
@@ -45163,8 +45163,8 @@
         0.0,
         0.4877899854948204
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -45174,7 +45174,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 75 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside the Mushroom Cavern by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",
@@ -49625,8 +49625,8 @@
         0.0,
         0.705987369601021
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -49636,7 +49636,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 77 by longest normalized whole-name score 20; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside the Vale of the Ancients by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",
@@ -58491,8 +58491,8 @@
         0.0,
         0.7730094338744549
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -58502,7 +58502,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 52 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside Arachnia's Lair by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",
@@ -64511,8 +64511,8 @@
         0.0,
         0.9994171843966381
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -64522,7 +64522,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 72 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside the Croaking Vale by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",
@@ -64928,8 +64928,8 @@
         0.0,
         0.9994171843966381
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "instance",
+      "placement_source": "instance_interior",
       "placement_confidence": "medium",
       "placement_candidates": [
         {
@@ -64939,7 +64939,7 @@
         }
       ],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 72 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) L1237 (A52): inside the Croaking Vale by this row's own location evidence (a boss, an enemy or a captive there), so the open world does not draw it; the earlier POI-name anchor stood it at the dungeon's entrance. The position is kept only as a record.",
       "source": [
         {
           "kind": "client",

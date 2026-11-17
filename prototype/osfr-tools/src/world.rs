@@ -258,11 +258,14 @@ impl RegionalNpc {
     /// model and a name id (AddNpc reader `0x00921a10`; a zero of either draws nothing
     /// usable). L924 (owner 2026-11-02): a known NPC stands in the world even at a
     /// reconstructed POI or zone-centre spot; the quest marker guides the player there (R).
+    /// L1237 (A52): an `instance` row lives inside a dungeon by its own evidence (a boss, an
+    /// enemy or a captive there), so the open world never draws it.
     fn drawn(&self) -> bool {
         let body = self.model_id.is_some_and(|model| model > 0)
             && self.name_string_id.is_some_and(|name| name > 0);
         match self.placement.as_deref() {
             Some("legacy_data") => true,
+            Some("instance") => false,
             Some("video_index") => {
                 self.placement_confidence
                     .as_deref()
@@ -2421,6 +2424,10 @@ mod tests {
         assert!(
             !row("video_index", 964, 20671).drawn(),
             "a video row keeps its confidence floor"
+        );
+        assert!(
+            !row("instance", 964, 20671).drawn(),
+            "L1237: a dungeon insider stays out of the world, body and all"
         );
     }
 

@@ -81,9 +81,18 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                         | "poi_anchor"
                         | "unanchored"
                         | "house_lot"
+                        | "instance"
                 ),
                 "{owner}: unknown placement class {placement:?}"
             );
+            if placement == "instance" {
+                // L1237: inside a dungeon by the row's own evidence, never drawn in the world.
+                assert_eq!(source, "instance_interior", "{owner}: unexpected source");
+                assert!(
+                    (npc["location_evidence"].as_array()).is_some_and(|rows| !rows.is_empty()),
+                    "{owner}: an instance row cites where it lives"
+                );
+            }
             if placement == "house_lot" {
                 // P-housing: an NPC inside a player's lot (Farmer Chug on the Wilds Farm). It is
                 // drawn only in that lot's scene, so it must name an enterable lot and stand in

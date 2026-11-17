@@ -573,6 +573,18 @@ fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
     })
 }
 
+/// L1237: a dungeon insider (`poi_anchor` -> `instance`) keeps its row and stops being drawn; only
+/// its placement fields and their note change. `content_npc_placement` pins the class, source and
+/// evidence of every `instance` row.
+fn is_instance_placement_change_between(old: &Value, new: &Value) -> bool {
+    changed_rows_are(old, new, false, |old, new| {
+        let fields = ["placement", "placement_source", "placement_confidence", "position_reason"];
+        old["placement"].as_str() == Some("poi_anchor")
+            && new["placement"].as_str() == Some("instance")
+            && without_fields(old, &fields) == without_fields(new, &fields)
+    })
+}
+
 /// L924: giving positioned rows a body (model, client name id, a nudge off an overlapping
 /// actor) so the world draws them touches every region; the drawing suites pin the values.
 /// rc-0136 F4: so does the `season` that draws an event NPC only while its event runs
@@ -1068,7 +1080,8 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
                 || is_npc_body_change_between(&old, &new)
                 // L1047: a quest giver drawn, bound and noted in one wiring pass, committed
                 // or not (Vittorio: body and greeting note together).
-                || is_quest_binding_and_greeting_change_between(&old, &new),
+                || is_quest_binding_and_greeting_change_between(&old, &new)
+                || is_instance_placement_change_between(&old, &new),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
     }
