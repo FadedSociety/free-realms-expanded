@@ -327,7 +327,9 @@ impl Bot {
                 max_message,
                 max_queued_bytes: 32 * 1024 * 1024,
                 retry_ms: 250,
-                max_retries: 40,
+                // A48: 30 s. A debug gateway under a whole test suite stalls about 12 s on a
+                // login's large packets; 10 s (40) dropped a bot's request meanwhile.
+                max_retries: 120,
             },
         )
         .map_err(|e| e.to_string())?;

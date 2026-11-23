@@ -607,7 +607,9 @@ impl Rig {
             .arg("--broker-profile")
             .arg(&profile)
             .args(["--guid", &a.guid.to_string(), "--version", VERSION])
-            .args(["--expect-timeout", "15000"]);
+            // A48: the debug gateway under a whole suite stalls about 12 s on a login's
+            // large packets; 15 s left the muted chat's answer unseen.
+            .args(["--expect-timeout", "45000"]);
         for cmd in cmds {
             command.args(["--cmd", cmd]);
         }
@@ -642,6 +644,20 @@ fn ask(bot: &mut bot::Bot, text: &str, needle: &str) -> String {
         .wait_for(T, |m| system_text(m).is_some_and(|t| t.contains(needle)))
         .unwrap_or_else(|e| panic!("`{text}` never answered `{needle}`: {e}"));
     system_text(&reply).unwrap()
+}
+
+/// A48: run `work` (a CLI subprocess, a second login) on another thread while `bot` keeps its
+/// own session served, acking and resending. Left unread for the 25 s or more those take on a
+/// loaded machine, the session's next request was never acknowledged ("reliable send: retry
+/// limit reached").
+fn served<T: Send>(bot: &mut bot::Bot, work: impl FnOnce() -> T + Send) -> T {
+    std::thread::scope(|scope| {
+        let job = scope.spawn(work);
+        while !job.is_finished() {
+            bot.pump(Duration::from_millis(50)).unwrap();
+        }
+        job.join().unwrap()
+    })
 }
 
 /// Processing barrier: a read-only builder request. The gateway handles datagrams
@@ -1835,17 +1851,19 @@ fn moderator_mute_and_ban_land_while_login_runs_and_lapse() {
         "realm mute FixtureB Record 1",
         "Player muted.",
     );
-    let muted = rig.cli(
-        1,
-        &[
-            "chat l042 muted line",
-            "expect-text cannot chat right now",
-            "quit",
-        ],
-    );
+    let muted = served(&mut moderator, || {
+        rig.cli(
+            1,
+            &[
+                "chat l042 muted line",
+                "expect-text cannot chat right now",
+                "quit",
+            ],
+        )
+    });
     assert!(muted.status.success(), "{}", text_of(&muted));
     // Gate 3: the ban ends the player's live session and refuses the broker re-login.
-    let player = rig.connect(1, "l042player");
+    let player = served(&mut moderator, || rig.connect(1, "l042player"));
     ask(
         &mut moderator,
         "realm ban FixtureB Record 1",
