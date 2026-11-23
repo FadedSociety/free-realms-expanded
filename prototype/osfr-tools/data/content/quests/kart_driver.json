@@ -5350,7 +5350,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59620,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Advanced Turbo Booster: one of the two names in the wiki's reward cell 'Advanced Turbo Booster, Leadfoot Kart Driver Pants' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_frost_ridge_d392a4)."
+                }
+              ]
+            },
+            {
+              "definition_id": 76307,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leadfoot Kart Driver Pants: one of the two names in the wiki's reward cell 'Advanced Turbo Booster, Leadfoot Kart Driver Pants' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_frost_ridge_d392a4)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 150
           },
@@ -5444,7 +5465,28 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 59608,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Racing Advanced Engine: one of the two names in the wiki's reward cell 'Racing Advanced Engine, Leadfoot Kart Driver Jacket' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_thunder_falls_fcc58b)."
+                }
+              ]
+            },
+            {
+              "definition_id": 76304,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leadfoot Kart Driver Jacket: one of the two names in the wiki's reward cell 'Racing Advanced Engine, Leadfoot Kart Driver Jacket' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_thunder_falls_fcc58b)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 150
           },
@@ -5557,7 +5599,32 @@
       "rewards": [
         {
           "coins": 0,
-          "items": [],
+          "items": [
+            {
+              "definition_id": 60605,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Lightning Cup: one of the two names in the wiki's reward cell 'Lightning Cup, Leadfoot Kart Driver Helmet' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_tangletrack_e9eb64)."
+                },
+                {
+                  "kind": "reconstructed",
+                  "evidence": "(R) This name has 35 rows (colours: the same item in 35 tints); the lowest id is used."
+                }
+              ]
+            },
+            {
+              "definition_id": 76306,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "wiki",
+                  "evidence": "Leadfoot Kart Driver Helmet: one of the two names in the wiki's reward cell 'Lightning Cup, Leadfoot Kart Driver Helmet' (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_kart_driver_sg_tour_400_tangletrack_e9eb64)."
+                }
+              ]
+            }
+          ],
           "job_xp": {
             "48": 150
           },
