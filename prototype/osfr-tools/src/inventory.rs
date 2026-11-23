@@ -420,6 +420,8 @@ struct Content {
     definitions: BTreeMap<i32, Definition>,
     captured_definition_ids: BTreeSet<i32>,
     initial_state: Option<InventoryState>,
+    /// L1243: each weapon (slot 7) class's client wield type, from the definitions.
+    weapon_wield: BTreeMap<i32, i32>,
 }
 
 impl Content {
@@ -435,6 +437,7 @@ impl Content {
             definitions: BTreeMap::new(),
             captured_definition_ids: BTreeSet::new(),
             initial_state: None,
+            weapon_wield: BTreeMap::new(),
         }
     }
 }
@@ -617,6 +620,10 @@ impl Inventory {
                 }
             }
         }
+        let mut weapon_wield = BTreeMap::new();
+        for definition in definitions.values().filter(|d| d.slot == 7 && d.wield_type > 0) {
+            weapon_wield.entry(definition.class_id).or_insert(definition.wield_type);
+        }
         let content = Arc::new(Content {
             player_guid: manifest.player_guid,
             default_state: manifest.default_state,
@@ -626,6 +633,7 @@ impl Inventory {
             definitions,
             captured_definition_ids,
             initial_state,
+            weapon_wield,
         });
         let mut end = 13;
         let mut kinds = BTreeSet::new();
@@ -942,9 +950,19 @@ impl Inventory {
         .concat();
         let replies = self.definition_replies(&request).ok()?;
         let row = replies.first()?;
-        (row.get(44..48) == Some(required_class.to_le_bytes().as_slice())
+        let class = i32::from_le_bytes(row.get(44..48)?.try_into().ok()?);
+        (self.same_weapon_family(class, required_class)
             && row.get(52..56) == Some(7_i32.to_le_bytes().as_slice()))
         .then_some(item.definition_id)
+    }
+
+    /// L1243: the client joins a job's weapon classes by wield type (`ItemClasses.txt`): Brawler's
+    /// 1- and 2-handed hammers (71, 5) are wield 13, Medic's scalpels, bonesaws and reflex hammers
+    /// (27, 28, 20) wield 14, Ninja's swords and kamas (6, 30) wield 9. A job that names one of
+    /// its classes takes them all; 1,425 such weapons had left their job unarmed.
+    fn same_weapon_family(&self, class: i32, required: i32) -> bool {
+        let wield = |class| self.content.weapon_wield.get(&class);
+        class == required || wield(required).is_some_and(|w| wield(class) == Some(w))
     }
 
     /// `profile`'s weapon (slot 7) definition's client wield type, 0 when the slot is empty or

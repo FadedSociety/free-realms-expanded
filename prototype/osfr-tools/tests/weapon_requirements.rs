@@ -99,6 +99,38 @@ fn current_owned_weapon_class_is_required_and_unequip_revokes_it() {
     );
 }
 
+/// L1243: a job takes every weapon class that shares its class's client wield type. Brawler's
+/// basics name the 1-handed hammers (71); its 2-handed hammers (5, 736 items) are wield 13 as well.
+#[test]
+fn a_weapon_of_the_jobs_wield_family_counts_and_another_does_not() {
+    let fixture = Fixture::new();
+    let item = |id, definition| json!({"id":id,"definition_id":definition,"tint":0,"count":1,"consumed_count":0,"stored_count":0,"last_cast_time":0,"rental":null,"ability_count":0,"activate_enabled":false});
+    let state = json!({"coins":0,"items":[item(81,100),item(82,101)],"equipment":[{"profile_id":43,"slot":7,"item_id":81,"category":7}]});
+    let hash = |b: &[u8]| format!("{:x}", Sha256::digest(b));
+    // (definition, class, wield): a 2-handed hammer, a wand, and a 1-handed hammer no item holds.
+    let definitions: Vec<_> = [(100_i32, 5_i32, 13_i32), (101, 10, 10), (102, 71, 13)].into_iter().map(|(id, class, wield)| {
+        let mut bytes = vec![0;56];
+        for (offset,value) in [(0,id),(32,class),(40,7)] { bytes[offset..offset+4].copy_from_slice(&value.to_le_bytes()); }
+        json!({"id":id,"slot":7,"class_id":class,"default_tint":0,"max_stack":1,"model":"synthetic.adr","texture":"","tint_alias":"","effect":0,"wield_type":wield,"serialized_hex":bytes.iter().map(|b|format!("{b:02x}")).collect::<String>(),"sha256":hash(&bytes)})
+    }).collect();
+    let coins = vec![0; 4];
+    let equipment: Vec<_> = [1_i32, 7, 81, 7].into_iter().flat_map(i32::to_le_bytes).collect();
+    let mut items = 2_i32.to_le_bytes().to_vec();
+    for (id, def) in [(81_i32, 100_i32), (82, 101)] {
+        for value in [def, 0, id, 1, 0, 0] {
+            items.extend(value.to_le_bytes());
+        }
+        items.extend([0; 6]);
+    }
+    let span = |kind, offset, b: &[u8], profile| json!({"kind":kind,"offset":offset,"length":b.len(),"sha256":hash(b),"profile_id":profile});
+    fixture.write("inventory.json", &json!({"schema_version":1,"player_guid":1,"default_state":state,"profiles":[{"id":43,"allowed_classes":[5,10,71],"slots":[7]}],"spans":[span("coins",13,&coins,0),span("equipment",17,&equipment,43),span("items",33,&items,0)],"definitions":definitions}));
+    let mut inventory = Inventory::load(&fixture.0, None).unwrap();
+    assert!(equipped_weapon_matches(&inventory, 43, Some(71)), "a 2-handed hammer arms the Brawler");
+    assert!(equipped_weapon_matches(&inventory, 43, Some(5)), "and the exact class still does");
+    inventory.equip_owned_definition(101, 43).unwrap();
+    assert!(!equipped_weapon_matches(&inventory, 43, Some(71)), "a wand is another job's weapon");
+}
+
 fn command(family: u16, sub: u16, fields: &[i32]) -> Vec<u8> {
     [
         family.to_le_bytes().to_vec(),

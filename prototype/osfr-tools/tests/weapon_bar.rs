@@ -32,9 +32,12 @@ const STARTER_NAME: i32 = 131914;
 /// Second Brawler hammer of the same class, `name_id` 131915.
 const SECOND: i32 = 75031;
 const SECOND_NAME: i32 = 131915;
-/// A class-5 Brawler hammer: profile 43 may equip it, but the job's cast gate
-/// (class 71) refuses it, so it leaves the job unarmed.
-const WRONG_CLASS: i32 = 13658;
+/// A class-5 two-handed hammer: Brawler's other hammer class, the same client wield type (13)
+/// as the starter's class 71 (`ItemClasses.txt`), so it arms the job (L1243).
+const TWO_HANDED: i32 = 13658;
+/// The class-181 chainsaw ("Freestyle, Brawler", wield 8): profile 43 may equip it, but it is
+/// not the job's weapon, so it leaves the job unarmed.
+const WRONG_CLASS: i32 = 78558;
 /// A class-21 slot-7 item profile 45 may wear, but class 45 is not unlocked.
 const LOCKED_PROFILE_ITEM: i32 = 75587;
 
@@ -274,8 +277,15 @@ fn unarmed_bar_is_empty_and_rearm_restores_it() {
         "no ability definitions while unarmed"
     );
 
-    // A wrong-class weapon is also unarmed: profile 43 may equip class 5, but
-    // its cast gate requires class 71.
+    // A two-handed hammer is the job's weapon too (L1243): the bar comes back.
+    let two_handed = give(&mut game, &character, TWO_HANDED, 250);
+    let out = game
+        .handle_in_world(&equip(two_handed, BRAWLER, 7), &character, 260)
+        .unwrap();
+    assert_eq!(slots(sole_bar(&out)), ARMED_BAR, "a two-handed hammer arms the Brawler");
+
+    // A wrong-class weapon is unarmed: profile 43 may equip the chainsaw (class 181), but it
+    // is not a Brawler weapon.
     let wrong = give(&mut game, &character, WRONG_CLASS, 300);
     let out = game
         .handle_in_world(&equip(wrong, BRAWLER, 7), &character, 400)
