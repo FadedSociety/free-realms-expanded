@@ -54,7 +54,8 @@ const LITTLE_BROTHER: ZoneQuest = ZoneQuest {
     steps: &[(HASTI, 140_679)],
     turnin: NOMI,
     end_text: 73_239,
-    coins: 20,
+    // L1244: the wiki's 30, not the fork's 20.
+    coins: 30,
     xp: 20,
     profile_xp: 20,
 };
@@ -110,7 +111,7 @@ fn nomis_little_brother_through_the_extra_spawn() {
     assert_eq!(counts(&game, LITTLE_BROTHER.id), [1, 0]);
     now += 10;
     MAP.turn_in(&mut game, CHARACTER, &LITTLE_BROTHER, ADVENTURER, &mut now);
-    assert_eq!(coins(&game), coins_before + 20);
+    assert_eq!(coins(&game), coins_before + LITTLE_BROTHER.coins);
     assert_eq!(profile_xp(&game, ADVENTURER), xp_before + 20);
     assert_eq!(
         quest_status(&game, LITTLE_BROTHER.id),

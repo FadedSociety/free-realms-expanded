@@ -93,7 +93,8 @@ const LITTLE_BROTHER: ZoneQuest = ZoneQuest {
     steps: &[(HASTI, 140_679)],
     turnin: NOMI,
     end_text: 73_239,
-    coins: 20,
+    // L1244: the wiki's 30, not the fork's 20.
+    coins: 30,
     xp: 20,
     profile_xp: 20,
 };

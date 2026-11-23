@@ -38,7 +38,7 @@
       ],
       "rewards": [
         {
-          "coins": 20,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "1": 20
@@ -51,6 +51,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Coins: Lxzxrus 20 against Sanctuary-main 30, 20 used. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (two goals)."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_nomi_s_little_brother_c4f1fe); this replaces the fork value 20 (Lxzxrus Quests.json QuestId=3001), which the forks call a placeholder; Sanctuary-main also has 30."
             }
           ]
         }
@@ -118,7 +122,7 @@
       ],
       "rewards": [
         {
-          "coins": 40,
+          "coins": 30,
           "items": [],
           "job_xp": {
             "1": 25
@@ -131,6 +135,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 25 goes to profile 1 (Adventurer) on the T202 collect rung (notes/Autopilot/T202.md:137-141). The fork RewardItems [69834] is recorded only here and grants no item: item rewards wait for T412."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "30 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_hasti_s_homework_heist_9f514c); this replaces the fork value 40 (Lxzxrus Quests.json QuestId=3002), which the forks call a placeholder."
             }
           ]
         }

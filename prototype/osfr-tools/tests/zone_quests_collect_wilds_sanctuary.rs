@@ -88,7 +88,8 @@ const HOMEWORK_QUEST: ZoneQuest = ZoneQuest {
     steps: &[],
     turnin: NOMI,
     end_text: 72_906,
-    coins: 40,
+    // L1244: the wiki's 30, not the fork's 40.
+    coins: 30,
     xp: 25,
     profile_xp: 25,
 };
@@ -244,7 +245,7 @@ fn hasti_homework_heist() {
     SANCTUARY.turn_in(&mut game, CHARACTER, &HOMEWORK_QUEST, ADVENTURER, &mut now);
 
     assert_eq!(quest_status(&game, HOMEWORK), QuestStatus::Completed);
-    assert_eq!(coins(&game), coins_before + 40);
+    assert_eq!(coins(&game), coins_before + HOMEWORK_QUEST.coins);
     assert_eq!(profile_xp(&game, ADVENTURER), xp_before + 25);
 }
 

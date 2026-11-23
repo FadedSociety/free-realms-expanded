@@ -1315,7 +1315,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 6,
           "items": [
             {
               "definition_id": 75289,
@@ -1335,6 +1335,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030016)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_get_mcgrobie_5ecdbd)."
             }
           ]
         }
@@ -1427,7 +1431,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 15,
           "items": [
             {
               "definition_id": 75858,
@@ -1447,6 +1451,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 50 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/brawler.json, record 3030017)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "15 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_brawler_stolen_merchandise_f8ae90)."
             }
           ]
         }

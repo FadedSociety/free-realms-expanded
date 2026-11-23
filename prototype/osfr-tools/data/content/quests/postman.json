@@ -1180,7 +1180,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 6,
           "items": [
             {
               "definition_id": 13221,
@@ -1218,6 +1218,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130012)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_missing_mail_2e256b)."
             }
           ]
         }
@@ -1559,7 +1563,7 @@
       ],
       "rewards": [
         {
-          "coins": 0,
+          "coins": 6,
           "items": [],
           "job_xp": {
             "4": 300
@@ -1568,6 +1572,10 @@
             {
               "kind": "wiki",
               "evidence": "L926: job XP 300 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/postman.json, record 3130015)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "6 coins, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_postman_beautiful_bouquet_939bcb)."
             }
           ]
         }
