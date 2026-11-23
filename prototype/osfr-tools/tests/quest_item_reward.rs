@@ -743,3 +743,32 @@ fn the_gate_uses_no_dev_commands() {
     );
     assert_eq!(pending_turnin(&game), None, "the character is free again");
 }
+
+/// L1241: a reward's `recipe_ids` teaches the recipe at the turn-in, once, and the save keeps it.
+/// Motorsmith Gloves (187) has no client pattern item; Breaking a Sweat teaches it the same way.
+#[test]
+fn a_reward_recipe_is_taught_at_the_turn_in_and_kept() {
+    const RECIPE: u32 = 187;
+    let fixture = Fixture::new();
+    let mut first = rewards(COINS, items(ITEM, COUNT));
+    first[0]["recipe_ids"] = json!([RECIPE]);
+    write_json(
+        &fixture.path().join("quests/quest_item_reward.json"),
+        json!({"schema_version": 1, "records": [
+            quest(QUEST, GIVER, first),
+            quest(SECOND_QUEST, SECOND_GIVER, rewards(COINS, items(ITEM, COUNT))),
+        ]}),
+    );
+    let mut game = fixture.game(A, None);
+    let mut now = 7_000;
+    switch_job(&mut game, A, BRAWLER, now);
+    assert!(!game.state().learned_recipes.contains(&RECIPE), "not known before the turn-in");
+    open_end_screen(&mut game, A, QUEST, GIVER, GIVER_POSITION, &mut now);
+    assert!(!game.state().learned_recipes.contains(&RECIPE), "the end screen teaches nothing");
+
+    let paid = turn_in(&mut game, A, now);
+    assert!(paid.changed);
+    assert!(game.state().learned_recipes.contains(&RECIPE), "the turn-in teaches it");
+    let game = fixture.save_and_reload(A, &game);
+    assert!(game.state().learned_recipes.contains(&RECIPE), "the save keeps it");
+}

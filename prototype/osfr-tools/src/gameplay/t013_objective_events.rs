@@ -2585,6 +2585,39 @@ fn a_quest_brings_the_recipe_no_pattern_teaches() {
     assert!(again.replies.is_empty(), "taught only once");
 }
 
+/// L1241 (R): a recipe that no pattern item, quest step or quest reward teaches comes with its
+/// rank in its job, and never for a job the player has not unlocked.
+#[test]
+fn a_recipe_nothing_else_teaches_comes_with_its_rank() {
+    let mut game = game();
+    let active = game.profiles.as_ref().unwrap().active();
+    let learned = game.learned_recipes.clone();
+    let mut free = (game.recipe_catalog.records.iter_mut())
+        .filter(|recipe| recipe.recipe_id.is_some_and(|id| !learned.contains(&id)));
+    let (ranked, locked) = (free.next().expect("an unlearned recipe"), free.next().expect("a second one"));
+    for (recipe, profile) in [(&mut *ranked, active), (&mut *locked, 999_999)] {
+        recipe.recipe_item_definition_id = None;
+        recipe.job_profile_id = profile;
+        recipe.required_job_rank = Some(2);
+    }
+    let (ranked, locked) = (ranked.recipe_id.unwrap(), locked.recipe_id.unwrap());
+    // The opening fixture's other recipes all have patterns, so only these two are candidates.
+    let mut out = Outcome::default();
+    game.teach_rank_recipes(&mut out);
+    assert!(!game.learned_recipes.contains(&ranked), "rank 1 is below the recipe's rank 2");
+    assert!(out.replies.is_empty() && !out.changed);
+
+    game.profiles.as_mut().unwrap().set_experience(1_000_000);
+    game.teach_rank_recipes(&mut out);
+    assert!(game.learned_recipes.contains(&ranked), "taught at its rank");
+    assert!(!game.learned_recipes.contains(&locked), "a locked job teaches nothing");
+    assert_eq!(out.replies.len(), 1, "the client is told once");
+    assert!(out.changed, "what was taught is saved");
+    let mut again = Outcome::default();
+    game.teach_rank_recipes(&mut again);
+    assert!(again.replies.is_empty() && !again.changed, "taught only once");
+}
+
 /// A49: the recipe window counts each component from the one bag stack its row names, so a
 /// stack that comes or goes must reach the client as a RecipeComponentUpdate with the new key.
 #[test]

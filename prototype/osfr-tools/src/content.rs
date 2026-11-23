@@ -177,6 +177,10 @@ pub struct RewardGrant {
     pub items: Vec<ItemGrant>,
     /// Keys are the client profile IDs used by `rewards::RewardGrant::job_xp`.
     pub job_xp: BTreeMap<i32, u32>,
+    /// L1241: `recipes.json` recipe ids a finished quest teaches (a wiki "<name> Recipe" reward
+    /// no client pattern item carries, such as Breaking a Sweat's Motorsmith Gloves).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub recipe_ids: Vec<u32>,
     pub source: Vec<SourceTag>,
 }
 

@@ -44,12 +44,41 @@ impl Gameplay {
 
     /// (R) A recipe no pattern item teaches comes with the quest that asks for it: the client has
     /// no pattern for these, so the live server must have taught them itself. Run on accept and
-    /// on world entry, for quests accepted before this existed.
+    /// on world entry, for quests accepted before this existed. L1241: also the recipes a
+    /// finished quest's reward teaches (a turn-in, or a save from before), and the rank recipes.
     pub(super) fn teach_quest_recipes(&mut self, out: &mut Outcome) -> io::Result<()> {
-        let Some(engine) = self.npc_quests.as_ref() else {
-            return Ok(());
+        let mut recipes = Vec::new();
+        if let Some(engine) = self.npc_quests.as_ref() {
+            recipes = engine.active_craft_recipes();
+            recipes.extend(engine.finished_reward_recipes());
+        }
+        self.teach_recipes(recipes, out);
+        self.teach_rank_recipes(out);
+        Ok(())
+    }
+
+    /// (R) L1241: a recipe that no pattern item, quest step or quest reward teaches is taught when
+    /// the player has its job at its rank. 27 recipes (25 Blacksmith, 2 Chef) had no way in: the
+    /// client carries no pattern item for them, and the wiki's quest table names only Motorsmith
+    /// Gloves as a reward. Run at world entry, on accept and wherever a job rank can change.
+    pub(super) fn teach_rank_recipes(&mut self, out: &mut Outcome) {
+        let Some(profiles) = self.profiles.as_ref() else {
+            return;
         };
-        for recipe_id in engine.active_craft_recipes() {
+        let taught = (self.npc_quests.as_ref()).map(|engine| engine.quest_taught_recipes()).unwrap_or_default();
+        let unlocked = &profiles.state().unlocked;
+        let due: Vec<u32> = (self.recipe_catalog.records.iter())
+            .filter(|r| r.recipe_item_definition_id.is_none() && unlocked.contains(&r.job_profile_id))
+            .filter(|r| profiles.rank(r.job_profile_id) >= u32::from(r.required_job_rank.unwrap_or(1)))
+            .filter_map(|r| r.recipe_id)
+            .filter(|id| !taught.contains(id) && !self.learned_recipes.contains(id))
+            .collect();
+        self.teach_recipes(due, out);
+    }
+
+    /// Teach each pattern-less recipe once; a row that cannot be encoded is logged, never fatal.
+    fn teach_recipes(&mut self, recipes: Vec<u32>, out: &mut Outcome) {
+        for recipe_id in recipes {
             let no_pattern = (self.recipe_catalog.records.iter())
                 .any(|r| r.recipe_id == Some(recipe_id) && r.recipe_item_definition_id.is_none());
             if !no_pattern {
@@ -66,7 +95,6 @@ impl Gameplay {
                 })),
             }
         }
-        Ok(())
     }
 
     /// A49: a recipe row names the bag stack each component is checked against

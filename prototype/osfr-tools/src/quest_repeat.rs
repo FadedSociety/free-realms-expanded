@@ -63,6 +63,8 @@ pub(super) struct Rules {
     clock: Option<u64>,
     /// When the next finished repeatable quest comes due (unix seconds), if one waits.
     wake: Option<u64>,
+    /// L1241: quest id to the recipe ids its reward teaches (`RewardGrant::recipe_ids`).
+    recipes: BTreeMap<u32, Vec<u32>>,
 }
 
 impl QuestState {
@@ -117,6 +119,10 @@ impl QuestEngine {
                 }
                 rules.needs.entry(quest.id).or_default().push((other, times));
             }
+            let recipes: Vec<u32> = (quest.rewards.iter()).flat_map(|r| r.recipe_ids.iter().copied()).collect();
+            if !recipes.is_empty() {
+                rules.recipes.insert(quest.id, recipes);
+            }
         }
         self.rules = Box::new(rules);
         self.rewake();
@@ -139,6 +145,31 @@ impl QuestEngine {
 
     pub fn repeat_hours(&self, quest_id: u32) -> Option<u32> {
         self.rules.hours.get(&quest_id).copied()
+    }
+
+    /// L1241: the recipes the finished quests' rewards teach.
+    pub fn finished_reward_recipes(&self) -> Vec<u32> {
+        (self.rules.recipes.iter())
+            .filter(|(quest, _)| self.state.is_done(**quest))
+            .flat_map(|(_, recipes)| recipes.iter().copied())
+            .collect()
+    }
+
+    /// L1241: every recipe a quest that is not switched off teaches, by a craft step (taught on
+    /// accept) or by its reward.
+    pub fn quest_taught_recipes(&self) -> BTreeSet<u32> {
+        let live = |quest: &u32| !self.disabled.contains(quest);
+        let crafted = (self.definitions.iter())
+            .filter(|(id, _)| live(id))
+            .flat_map(|(_, definition)| &definition.objectives)
+            .filter_map(|objective| match objective.kind {
+                ObjectiveKind::CraftRecipe { recipe_id } => Some(recipe_id),
+                _ => None,
+            });
+        let rewarded = (self.rules.recipes.iter())
+            .filter(|(id, _)| live(id))
+            .flat_map(|(_, recipes)| recipes.iter().copied());
+        crafted.chain(rewarded).collect()
     }
 
     /// Every calendar-gated quest and its event key.

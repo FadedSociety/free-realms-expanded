@@ -692,6 +692,8 @@ impl Gameplay {
                 )?;
                 // A Mystery Gift the reward paid opens at once (`mystery_chests.json` gifts).
                 self.open_gifts(player_guid, &mut out);
+                // L1241: a recipe the reward teaches (`RewardGrant::recipe_ids`).
+                self.teach_quest_recipes(&mut out)?;
             }
             out.replies.push(END_DIALOG_26_4.to_vec());
             // The line goes straight on (`-zp-94_-ImE` 223-224); with nothing more to offer,

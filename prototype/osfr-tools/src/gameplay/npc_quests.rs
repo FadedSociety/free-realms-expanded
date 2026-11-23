@@ -216,6 +216,8 @@ impl Gameplay {
     /// and changes nothing.
     pub(super) fn sync_job_level_objectives(&mut self, out: &mut Outcome) -> io::Result<()> {
         self.pet_earn_job_ranks();
+        // L1241: a new rank can bring a recipe (`teach_rank_recipes`).
+        self.teach_rank_recipes(out);
         let Some(engine) = &self.npc_quests else {
             return Ok(());
         };

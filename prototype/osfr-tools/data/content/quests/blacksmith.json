@@ -3693,10 +3693,17 @@
           "job_xp": {
             "16": 100
           },
+          "recipe_ids": [
+            187
+          ],
           "source": [
             {
               "kind": "wiki",
               "evidence": "L926: job XP 100 = the fanbyte wiki star reward (lab/kg/dossiers/jobs/blacksmith.json, record 3020034)"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "Motorsmith Gloves Recipe, the wiki's reward cell (lab/references/quest-table-20261102/quests.merged.json wiki:fr_quest_blacksmith_breaking_a_sweat_027fd4): recipes.json blacksmith.motorsmith_gloves, recipe_id 187. The client has no pattern item for it, so the turn-in teaches it (L1241)."
             }
           ]
         }
