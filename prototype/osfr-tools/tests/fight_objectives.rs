@@ -715,6 +715,57 @@ fn an_instance_coin_pile_pays_the_coins_of_the_fights_tier() {
     }
 }
 
+/// L1242 (tester notes, dungeons 10: "coins from earlier kills left floating after leaving"): a
+/// coin pile still on the ground when the player leaves the run is removed from the client.
+#[test]
+fn leaving_a_run_removes_the_coin_piles_left_on_the_ground() {
+    let mut kinds = kinds();
+    kinds["grunt"]["power_up_table"] = json!("t_coins");
+    kinds["grunt"]["max_health"] = json!(1);
+    let id = 629;
+    let coin_fight = fight(
+        id,
+        json!({
+            "kind": "dungeon", "kinds": kinds,
+            "actors": {
+                "boss": {"definition": "chief", "at": [0, 0, 40]},
+                "grunt": {"definition": "grunt", "at": [0, 0, 3]}
+            },
+            "objectives": [{"id": "boss", "kind": "defeat", "text_id": 14,
+                            "target": {"actor": "boss"}, "primary": true}]
+        }),
+    );
+    let (dir, mut engine) = engine_with(&[coin_fight]);
+    let mut power_ups: Value =
+        serde_json::from_str(include_str!("../data/content/power_ups.json")).unwrap();
+    power_ups["tables"]["t_coins"] = json!({"guaranteed": ["coins_small"], "source": "test table"});
+    let path = dir.join("power_ups.json");
+    std::fs::write(&path, power_ups.to_string()).unwrap();
+    engine.load_power_ups(&path).unwrap();
+    enter(&mut engine, id, 1_000);
+    let mut now = 2_000;
+    let mut piles = Vec::new();
+    while let Some((grunt, at)) = (engine.standing_enemies().into_iter())
+        .find(|e| e.1[2] < 20.0)
+        .map(|e| (e.0, e.1))
+    {
+        assert!(now < 60_000, "the grunt falls");
+        let out = engine.attack(grunt, at, BRAWLER, 0, now).unwrap();
+        piles.extend(spawned(&out.replies).into_iter().filter(|guid| guid >> 32 == 0x5057_5550));
+        now += 700;
+    }
+    assert_eq!(piles.len(), 1, "the grunt drops one coin pile");
+    assert_eq!(engine.pickup_count(), 1, "it is still on the ground");
+
+    let left = engine.exit().unwrap();
+    let removes = |guid: u64| {
+        (left.replies.iter()).any(|r| !r.starts_with(&[35, 0, 2, 0]) && r.windows(8).any(|w| w == guid.to_le_bytes()))
+    };
+    assert!(removes(piles[0]), "leaving removes the pile from the client");
+    assert_eq!(engine.pickup_count(), 0);
+    let _ = std::fs::remove_dir_all(dir);
+}
+
 /// A26 (native, 2026-11-13): the Bixie Hive's first guards stood 32-34 m from the arrival,
 /// inside the 40 m chase limit, and charged the player before they could act. In a dungeon (an
 /// unpaced fight) an enemy standing there from the start waits until the player comes within

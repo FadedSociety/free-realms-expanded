@@ -2084,6 +2084,7 @@ impl EncounterEngine {
             // A lost run left the player knocked out: they leave standing (L1236).
             replies.push(self.knockout_state(false));
         }
+        replies.extend(self.remove_pickups());
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
@@ -2110,15 +2111,25 @@ impl EncounterEngine {
         a.phase = EncounterPhase::Loading;
         self.fight_state.lost_since = None;
         let stood_up = (self.state.player_health == 0).then(|| self.knockout_state(false));
+        let mut replies: Vec<Vec<u8>> = stood_up.into_iter().collect();
+        replies.extend(self.remove_pickups());
         self.state.player_health = self.max_health;
         self.reset_session();
         self.run_closed();
         Ok(EncounterOutcome {
             changed: true,
             zoning: self.zone(),
-            replies: stood_up.into_iter().collect(),
+            replies,
             ..Default::default()
         })
+    }
+
+    /// The pickups still on the ground, removed from the client. Leaving a run does not always
+    /// wipe them: a tester's frame showed coin piles from earlier kills still floating after
+    /// leaving Cracked Claw Caverns mid-run (tester notes, dungeons 10). They are the client's
+    /// actors until now, so removing them is safe before the zone change.
+    fn remove_pickups(&mut self) -> Vec<Vec<u8>> {
+        (std::mem::take(&mut self.pickups).into_iter()).map(|drop| remove(drop.guid)).collect()
     }
 
     /// An engine actor; a hostile one (disposition 0) is an enemy, in the open world or an
