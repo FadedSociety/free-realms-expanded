@@ -25,6 +25,8 @@ use std::collections::HashMap;
 pub const CONTENT_FILE: &str = "npc_presentation.json";
 /// The client reads the cursor id as a signed byte.
 const MAX_CURSOR_ID: u8 = 127;
+/// `Resources/Cursors.txt` row 5, `cursor_talk`.
+const TALK_CURSOR: u8 = 5;
 /// (R) AddNpc dispositions in use are 0 (hostile), 1 (friendly) and 2 (companion); a typo guard.
 const MAX_DISPOSITION: i32 = 2;
 /// (R) A typo guard on a dressing harvest's regrow time.
@@ -131,6 +133,14 @@ impl Presentation {
             }
         }
         Ok(Self { by_name })
+    }
+
+    /// L1238 (R): the hover cursor of an NPC this table has no row for: the talk cursor, so the
+    /// client offers press-X (a controller's only way to talk) as well as the click. The table's
+    /// own talkable rows carry cursor 5; a row it has keeps its own value, none included.
+    pub fn talk_cursor_if_uncovered(&self, name_string_id: i32) -> Option<Cursor> {
+        let covered = u32::try_from(name_string_id).is_ok_and(|id| self.by_name.contains_key(&id));
+        (!covered).then_some(Cursor { id: TALK_CURSOR, flag: false })
     }
 
     /// The click answer of the row for this name id, if it has one (rc-0136 F4).
@@ -294,5 +304,22 @@ mod tests {
         // Image 0 is the original server's warpstone row: read by the client, nothing drawn.
         let stone = r#"{"name_string_id": 1, "notifications": [{"kind": 6, "state": 3, "image_id": 0, "name_id": 1}]}"#;
         assert!(Presentation::new(vec![row(stone)]).is_ok());
+    }
+
+    /// L1238: an NPC the table leaves out talks with the talk cursor; a row the table has keeps
+    /// its own cursor, its deliberate "none" included.
+    #[test]
+    fn an_uncovered_npc_gets_the_talk_cursor_and_a_covered_one_keeps_its_own() {
+        let table = Presentation::new(vec![
+            row(r#"{"name_string_id": 7, "cursor_id": 17}"#),
+            row(r#"{"name_string_id": 8, "sub_text_name_string_id": 36}"#),
+        ])
+        .unwrap();
+        assert_eq!(
+            table.talk_cursor_if_uncovered(9),
+            Some(Cursor { id: 5, flag: false })
+        );
+        assert_eq!(table.talk_cursor_if_uncovered(7), None, "its own 17 stands");
+        assert_eq!(table.talk_cursor_if_uncovered(8), None, "a row without a cursor stays without");
     }
 }

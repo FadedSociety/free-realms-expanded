@@ -600,6 +600,8 @@ impl NpcVisibility {
             if stocked.contains(&npc.npc_id) {
                 cursor = npc_presentation::vendor_marker(&spawn, &mut notifications, cursor);
             }
+            // L1238: press-X as well as the click on any NPC the presentation table leaves out.
+            cursor = cursor.or_else(|| presentation.talk_cursor_if_uncovered(spawn.name_string_id));
             result.push(
                 draw_zone,
                 VisibleNpc {
@@ -665,6 +667,11 @@ impl NpcVisibility {
             let mut cursor = presentation.apply(&mut spawn, &mut notifications);
             if stocked.contains(&key) {
                 cursor = npc_presentation::vendor_marker(&spawn, &mut notifications, cursor);
+            }
+            // L1238: an extra bound to an NPC record talks like one; props and boxes do not.
+            if npc.content_key.is_some() && npc.boombox_item_id.is_none() {
+                cursor =
+                    cursor.or_else(|| presentation.talk_cursor_if_uncovered(spawn.name_string_id));
             }
             result.push(
                 OPEN_WORLD_ZONE,
