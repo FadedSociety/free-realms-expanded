@@ -7512,9 +7512,9 @@
       "name": "Bat",
       "name_string_id": 2241,
       "position": [
-        -916.586,
+        -921.425,
         -63.6597,
-        401.482
+        404.096
       ],
       "heading": 2.0661,
       "capture_match": null,
@@ -7529,7 +7529,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Going Batty (3950200): the wiki's tip (eq2.fanbyte.com/wiki/fr_quest:Going_Batty) is to teleport to Forgotten Caves, where 'the bat will be just ahead of you, at the bottom of the hill'. The bat stands 5 m ahead of that teleport's arrival (travel.json row 63, (-912.19, -63.66, 399.11), heading -1.0755; facing (sin h, cos h)) on the arrival's own floor height, at least 2.5 m from Amoranth, Archmage Petulia and the changeling mages there, facing the player. The caverns' floor is in neither the baked collision nor Studio's probe (both answer the Sanctuary surface above), so the height is the arrival's."
+          "evidence": "(R) Going Batty (3950200): the wiki's tip (eq2.fanbyte.com/wiki/fr_quest:Going_Batty) is to teleport to Forgotten Caves, where 'the bat will be just ahead of you, at the bottom of the hill'. The bat stands 5 m ahead of that teleport's arrival (travel.json row 63, (-917.03, -63.66, 401.72) since L1246 moved it out of the gate, heading -1.0755; facing (sin h, cos h)) on the arrival's own floor height, at least 2.5 m from Amoranth, Archmage Petulia and the changeling mages there, facing the player. The caverns' floor is in neither the baked collision nor Studio's probe (both answer the Sanctuary surface above), so the height is the arrival's."
         },
         {
           "kind": "reconstructed",
