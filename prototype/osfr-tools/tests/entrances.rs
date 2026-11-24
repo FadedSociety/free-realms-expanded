@@ -1411,3 +1411,18 @@ fn a_dungeon_map_arrival_stands_in_front_of_its_gate() {
     }
     assert!(checked > 0, "no solid gate has a travel point");
 }
+
+/// L1245 (A52): Mushroom Cavern's door drew the cave facade (model 2034,
+/// `cave_entrance_facade_01_natural.adr`), and the client gave it no target and no press-X prompt,
+/// natively, while the same packets with the fence or the invisible cube take X. The world already
+/// draws the facade, so a door at one stays the invisible cube.
+#[test]
+fn no_door_draws_the_cave_facade_the_client_cannot_target() {
+    const CAVE_FACADE: i32 = 2034;
+    let table = table();
+    let facades: Vec<&str> = (table.entrances.iter())
+        .filter(|row| row.kind == EntranceKind::Door && row.model_id == CAVE_FACADE)
+        .map(|row| row.id.as_str())
+        .collect();
+    assert!(facades.is_empty(), "doors drawn as the cave facade: {facades:?}");
+}
