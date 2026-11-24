@@ -470,7 +470,7 @@ pub struct Inventory {
 /// or per purchase cost seconds and ~50 MiB each. The key includes each file's
 /// size and modification time, so edited content is parsed again.
 fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
-    type Key = (PathBuf, Option<[u8; 32]>, [Option<(u64, SystemTime)>; 3]);
+    type Key = (PathBuf, Option<[u8; 32]>, [Option<(u64, SystemTime)>; 5]);
     static CACHE: OnceLock<Mutex<HashMap<Key, Arc<Content>>>> = OnceLock::new();
     // inventory.json (~2 MB) is keyed by its content: a same-size rewrite inside
     // one timestamp tick must not return the old definitions. The ~50 MB
@@ -494,6 +494,9 @@ fn shared_content(directory: &Path) -> io::Result<Arc<Content>> {
             stamp("item-catalogue.json"),
             stamp("item-table.json"),
             stamp("item-table-supplement.json"),
+            // L1250: the weapon entries come from the job roster and the kits.
+            stamp("opening-abilities.json"),
+            stamp("weapon_kits.json"),
         ],
     );
     let cache = CACHE.get_or_init(Default::default);
@@ -566,7 +569,7 @@ impl Inventory {
                 definitions.insert(definition.id, definition);
             }
         }
-        let captured_definition_ids = definitions.keys().copied().collect();
+        let captured_definition_ids: BTreeSet<i32> = definitions.keys().copied().collect();
         // Fixed operator-selected content paths; remote item IDs never become paths. Order is
         // precedence (T877): the lab catalogue fills what `inventory.json` lacks, then the release
         // table fills what both lack, so a lab package keeps its richer rows.
@@ -624,6 +627,7 @@ impl Inventory {
         for definition in definitions.values().filter(|d| d.slot == 7 && d.wield_type > 0) {
             weapon_wield.entry(definition.class_id).or_insert(definition.wield_type);
         }
+        add_weapon_abilities(directory, &mut definitions, &captured_definition_ids, &weapon_wield);
         let content = Arc::new(Content {
             player_guid: manifest.player_guid,
             default_state: manifest.default_state,
@@ -961,8 +965,7 @@ impl Inventory {
     /// (27, 28, 20) wield 14, Ninja's swords and kamas (6, 30) wield 9. A job that names one of
     /// its classes takes them all; 1,425 such weapons had left their job unarmed.
     fn same_weapon_family(&self, class: i32, required: i32) -> bool {
-        let wield = |class| self.content.weapon_wield.get(&class);
-        class == required || wield(required).is_some_and(|w| wield(class) == Some(w))
+        same_family(&self.content.weapon_wield, class, required)
     }
 
     /// `profile`'s weapon (slot 7) definition's client wield type, 0 when the slot is empty or
@@ -989,8 +992,11 @@ impl Inventory {
         };
         let item_id = self.state.equipped_weapon_item(profile);
         let equipped = (self.state.items.iter()).find(|i| i.id == item_id && i.count > 0);
+        // L1250: a release-table weapon's ids name their own row.
+        let built = ability_id.checked_sub(ITEM_ABILITY_BASE).filter(|n| *n >= 0).map(|n| n / 2);
         equipped
             .and_then(|item| named(item.definition_id))
+            .or_else(|| built.and_then(named))
             .or_else(|| self.content.captured_definition_ids.iter().find_map(|&id| named(id)))
     }
 
@@ -1890,6 +1896,46 @@ fn resell_value_offset(bytes: &[u8]) -> Option<usize> {
     let alias = past_model_strings(bytes)?.checked_add(48)?;
     let at = skip_text(bytes, alias)?.checked_add(17)?;
     (at.checked_add(4)? <= bytes.len()).then_some(at)
+}
+
+/// Whether item class `class` is `required`'s weapon family: the same class or the same client
+/// wield type (L1243).
+fn same_family(wield: &BTreeMap<i32, i32>, class: i32, required: i32) -> bool {
+    class == required || wield.get(&required).is_some_and(|w| wield.get(&class) == Some(w))
+}
+
+/// L1250 (A61): the first of a release-table weapon's two own ability ids; its basic is
+/// `ITEM_ABILITY_BASE + 2 * definition` and its super the next. Far above every real ability id
+/// (the captured ones stay under 7,000, ours under 63,000).
+pub const ITEM_ABILITY_BASE: i32 = 1_000_000_000;
+
+/// L1250 (A61): the release item table builds 3,876 combat weapons with no ability list (the
+/// original table has no such column), so the weapon tab and item tooltips have nothing to show.
+/// Each gets two entries, its basic and its super, with the icons of the kit it gives its job,
+/// under ids `ITEM_ABILITY_BASE` maps back to it (R). Captured rows stay as live sent them. Needs
+/// `opening-abilities.json` and `weapon_kits.json` beside the catalogue; without them (the item
+/// table's wire pin folder) rows stay as encoded.
+fn add_weapon_abilities(
+    directory: &Path,
+    definitions: &mut BTreeMap<i32, Definition>,
+    captured: &BTreeSet<i32>,
+    wield: &BTreeMap<i32, i32>,
+) {
+    let Ok(abilities) = osfr_tools::opening_abilities::OpeningAbilities::load(directory) else {
+        return;
+    };
+    for definition in (definitions.values_mut()).filter(|d| d.slot == 7 && !captured.contains(&d.id)) {
+        if !ability_entries(&definition.bytes).is_some_and(|entries| entries.is_empty()) {
+            continue;
+        }
+        let class = definition.class_id;
+        let Some(entries) = abilities.weapon_entries(definition.id, |required| same_family(wield, class, required)) else {
+            continue;
+        };
+        definition.bytes.truncate(definition.bytes.len() - 4);
+        put(&mut definition.bytes, entries.len() as i32);
+        entries.iter().flatten().for_each(|word| put(&mut definition.bytes, *word));
+    }
 }
 
 /// A definition row's ability list (`piece_096` `decode_abilities`; the client copies it with

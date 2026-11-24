@@ -425,9 +425,27 @@ impl OpeningAbilities {
     /// L1249 (A61): the combat job whose weapon family `definition` belongs to (by the job's
     /// starter class and its wield type, L1243), for a weapon the player does not wield.
     pub fn job_of_weapon(&self, inventory: &crate::inventory::Inventory, definition: i32) -> Option<i32> {
+        self.job_of_family(|class| inventory.weapon_of_family(definition, class))
+    }
+
+    /// The combat job whose starter weapon class `family` accepts.
+    fn job_of_family(&self, family: impl Fn(i32) -> bool) -> Option<i32> {
         (self.basics.iter())
-            .find(|(_, basic)| basic.weapon_class.is_some_and(|class| inventory.weapon_of_family(definition, class)))
+            .find(|(_, basic)| basic.weapon_class.is_some_and(&family))
             .map(|(&profile, _)| profile)
+    }
+
+    /// L1250 (A61): the ability entries a release-table weapon lacks: `(0, basic id, 0, icon)` and
+    /// `(1, super id, 0, icon)`, the icons of the kit it gives the job whose weapon family `family`
+    /// says it belongs to, the ids `ITEM_ABILITY_BASE + 2 * definition` and the next (R). `None`
+    /// for a weapon no combat job wields or a kit without both slots.
+    pub fn weapon_entries(&self, definition: i32, family: impl Fn(i32) -> bool) -> Option<[[i32; 4]; 2]> {
+        let table = self.kits.as_ref()?;
+        let job = u32::try_from(self.job_of_family(family)?).ok()?;
+        let kit = table.kit_for(job, &WeaponFacts { item_id: definition, ..Default::default() })?;
+        let icon = |slot: u8| kit.slot(slot).map(|ability| ability.icon_id);
+        let id = definition.checked_mul(2)?.checked_add(crate::inventory::ITEM_ABILITY_BASE)?;
+        Some([[0, id, 0, icon(0)?], [1, id.checked_add(1)?, 0, icon(1)?]])
     }
 
     /// What the live slot-7 weapon means for this job's toolbar (T521). A

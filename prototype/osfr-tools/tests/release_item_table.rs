@@ -274,3 +274,56 @@ fn a_malformed_table_is_refused() {
         );
     }
 }
+
+/// L1250 (A61): beside the job roster and the kits, every release-table weapon a combat job wields
+/// gains its two ability entries, its basic and its super under `ITEM_ABILITY_BASE + 2 * id` and
+/// the next, which map back to it and their slot; captured rows stay byte for byte as captured.
+/// Without those files (the folders above) the table's rows stay as the generator encodes them.
+#[test]
+fn release_table_weapons_gain_their_two_abilities_beside_the_kits() {
+    use osfr_tools::inventory::ITEM_ABILITY_BASE;
+    let scratch = Scratch::new("l1250-weapon-abilities");
+    for file in ["inventory.json", "item-table.json", "item-table-supplement.json"] {
+        fs::copy(data(&format!("release/{file}")), scratch.path().join(file)).unwrap();
+    }
+    for file in ["opening-abilities.json", "weapon_kits.json", "status_effects.json"] {
+        fs::copy(content_dir().join(file), scratch.path().join(file)).unwrap();
+    }
+    let inventory = Inventory::load(scratch.path(), None).unwrap();
+    let release = read(&data("release/inventory.json"));
+    let captured: BTreeSet<i64> = (release["definitions"].as_array().unwrap().iter())
+        .map(|row| row["id"].as_i64().unwrap())
+        .collect();
+    let table = read(&data("release/item-table.json"));
+    let slot = table["columns"].as_array().unwrap().iter().position(|c| c == "Slot").unwrap();
+    let class = table["columns"].as_array().unwrap().iter().position(|c| c == "Class").unwrap();
+    let mut gained = 0;
+    for row in table["rows"].as_array().unwrap() {
+        let id = row[0].as_i64().unwrap();
+        if row[1][slot] != 7 || captured.contains(&id) {
+            continue;
+        }
+        let id = id as i32;
+        let basic = ITEM_ABILITY_BASE + 2 * id;
+        match (inventory.weapon_ability(0, basic), inventory.weapon_ability(0, basic + 1)) {
+            (Some(first), Some(second)) => {
+                assert_eq!((first, second), ((id, 0), (id, 1)), "item {id}");
+                gained += 1;
+            }
+            (None, None) => {}
+            other => panic!("item {id} has one of its two entries: {other:?}"),
+        }
+    }
+    assert!(gained > 0, "no release-table weapon gained its abilities");
+    // A Brawler hammer of the release table, the class the starter Mallet has (71).
+    let hammer = (table["rows"].as_array().unwrap().iter())
+        .find(|row| row[1][slot] == 7 && row[1][class] == 71 && !captured.contains(&row[0].as_i64().unwrap()))
+        .map(|row| row[0].as_i64().unwrap() as i32)
+        .expect("a release-table Brawler hammer");
+    assert_eq!(inventory.weapon_ability(0, ITEM_ABILITY_BASE + 2 * hammer), Some((hammer, 0)));
+    for row in release["definitions"].as_array().unwrap() {
+        let id = row["id"].as_i64().unwrap() as i32;
+        let hex: String = inventory.definition_record(id).unwrap().iter().map(|b| format!("{b:02x}")).collect();
+        assert_eq!(hex, row["serialized_hex"].as_str().unwrap(), "captured row {id} changed");
+    }
+}
