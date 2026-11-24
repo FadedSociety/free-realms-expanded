@@ -10072,7 +10072,7 @@
       "services_reason": "The regional row lists no distinct service.",
       "position": [
         406.094597,
-        47.112,
+        47.3062,
         349.129653
       ],
       "position_w": null,
@@ -10357,19 +10357,19 @@
         ],
         "model_id": [
           {
-            "kind": "legacy-data",
-            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2317 (same name)"
+            "kind": "reconstructed",
+            "evidence": "(R) L1248: Legacy's Npcs.json Id=2317 gives model 37 dwarf_m_miner_01.adr, which has a Models.txt row but no asset in the client (not in Assets_manifest.txt; native 2026-11-24: 'Actor definition dwarf_m_miner_01.adr ... failed to load'), so he never drew. Model 382 dwarf_miner_m.adr, the body of his Singing Crystal Mines neighbours Sorin, Tennin, Spruce Waynehammer and Bruno Battlerock, matches the wiki picture (freerealms.fandom.com/wiki/Cronyn: a red-bearded dwarf in a lamp helmet and orange miner's clothes; lab model-view render)."
           }
         ],
         "model_file_name": [
           {
-            "kind": "legacy-data",
-            "evidence": "lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2317 (same name)"
+            "kind": "reconstructed",
+            "evidence": "(R) L1248: Legacy's Npcs.json Id=2317 gives model 37 dwarf_m_miner_01.adr, which has a Models.txt row but no asset in the client (not in Assets_manifest.txt; native 2026-11-24: 'Actor definition dwarf_m_miner_01.adr ... failed to load'), so he never drew. Model 382 dwarf_miner_m.adr, the body of his Singing Crystal Mines neighbours Sorin, Tennin, Spruce Waynehammer and Bruno Battlerock, matches the wiki picture (freerealms.fandom.com/wiki/Cronyn: a red-bearded dwarf in a lamp helmet and orange miner's clothes; lab model-view render)."
           }
         ]
       },
-      "model_id": 37,
-      "model_file_name": "dwarf_m_miner_01.adr"
+      "model_id": 382,
+      "model_file_name": "dwarf_miner_m.adr"
     },
     {
       "npc_id": 9500000741,
