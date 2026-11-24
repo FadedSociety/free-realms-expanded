@@ -233,13 +233,14 @@ QF_CLOSE = {
 
 def reward_cells(row, names, qr):
     """The page's PC item cells as ({name, count, ids, picks, close}, ...) and the cells no item
-    row matches, each with its reason. A cell "A or B" is two cells; single-gender cells that
-    together cover boys and girls each pay their own wearer."""
+    row matches, each with its reason. A cell "A or B" is two cells, and so is "A, B" (L1246:
+    the SG Tour 400 pages list two prizes in one cell); single-gender cells that together cover
+    boys and girls each pay their own wearer."""
     rewards, unresolved = [], []
     cells = []
     for cell in (c for c in qr.pc_cells(row.get("rewards_wiki") or []) if c.get("type") == "item"):
         name = cell.get("name") or ""
-        parts = re.split(r"\s+or\s+", name)
+        parts = re.split(r"\s+or\s+|,\s+", name)
         if len(parts) > 1 and not qr.resolve(name, names) and all(qr.resolve(p, names) for p in parts):
             cells += [dict(cell, name=p) for p in parts]
         else:
