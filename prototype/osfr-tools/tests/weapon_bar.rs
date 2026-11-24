@@ -371,3 +371,40 @@ fn unrelated_or_refused_equip_sends_no_bar() {
         .unwrap();
     assert!(toolbars(&out).is_empty(), "a no-op replay sends no bar");
 }
+
+/// L1249 (A61): the character window's weapon tab and item tooltips look up a weapon's own
+/// abilities (its definition row's list: the starter Mallet of Sweeps names 4441 and 4437), which
+/// no toolbar uses. Each answers with the toolbar slot it stands for (entry 0 the basic, entry 1
+/// the super) in the bar that weapon gives its job, sent under the asked id, also while another
+/// weapon is equipped: the client asks while it only shows the item, and never asks again. An id
+/// no row names stays silent. The bar sent with a weapon carries its ids already.
+#[test]
+fn the_weapon_tab_resolves_the_weapons_own_abilities() {
+    let fixture = Fixture::new();
+    let (mut game, character) = fixture.game();
+    let ask = |game: &mut Gameplay, id: i32, now: u64| {
+        let out = game.handle_in_world(&command(36, 12, &[id]), &character, now).unwrap();
+        out.replies.into_iter().find(|packet| packet.starts_with(&[36, 0, 13, 0]))
+    };
+    let pairs = [(4441, ARMED_BAR[0].unwrap()), (4437, ARMED_BAR[1].unwrap())];
+    let expected: Vec<Vec<u8>> = (pairs.iter())
+        .map(|&(_, slot_ability)| ask(&mut game, slot_ability, 200).expect("the toolbar's own definition resolves"))
+        .collect();
+    let check = |game: &mut Gameplay, now: u64, when: &str| {
+        for (&(item_ability, _), expected) in pairs.iter().zip(&expected) {
+            let answer = ask(game, item_ability, now).unwrap_or_else(|| panic!("{item_ability} unanswered {when}"));
+            assert_eq!(answer[4..8], item_ability.to_le_bytes(), "sent under the asked id");
+            assert_eq!(answer[8..], expected[8..], "{item_ability} is its toolbar slot's definition {when}");
+        }
+    };
+    check(&mut game, 300, "with the Mallet equipped");
+    let second = give(&mut game, &character, SECOND, 400);
+    let out = game.handle_in_world(&equip(second, BRAWLER, 7), &character, 500).unwrap();
+    assert_eq!(equipped_item(&game, BRAWLER, 7), second);
+    // The bar sent with a weapon carries that weapon's own ids too (75031 names 4483 and 4484), so
+    // the tab, which draws at once from the client's cache, has them on its first open.
+    let sent = definitions(&out);
+    assert!(sent.contains(&4483) && sent.contains(&4484), "{sent:?}");
+    check(&mut game, 600, "with another hammer equipped");
+    assert!(ask(&mut game, 4438, 700).is_none(), "an id no row names stays silent");
+}

@@ -793,6 +793,30 @@ pub fn definition_reply(loaded: &[Vec<u8>], id: i32) -> Option<Vec<u8>> {
         .cloned()
 }
 
+/// L1249 (A61): the definition of toolbar `slot` (the 36/5 in `loaded`), sent as `id`. A
+/// weapon's own definition names its abilities by ids no toolbar uses (the Mallet of Sweeps:
+/// 4441 and 4437), and the character window's weapon tab looks them up (`ItemAbilitiesDataSource`
+/// `00a7ea90`); unanswered, it draws "-1". No capture holds a 36/13 for such an id, so the weapon's
+/// entry k answers with the toolbar's slot k, which is that weapon's basic (0) or super (1) (R:
+/// the Mallet's entry 1 icon, 11637, is its kit super Leg Sweep's). `None` for an empty slot.
+pub fn slot_definition_as(loaded: &[Vec<u8>], slot: i32, id: i32) -> Option<Vec<u8>> {
+    // A 36/5 slot is a 0 dword when empty, else 41 bytes: [3, ability, cost, icon, name, 4], the
+    // range, [1, ability, 0] and a flag byte (`opening_abilities::ability_entry`).
+    let toolbar = loaded.iter().rev().find(|m| m.starts_with(&[36, 0, 5, 0]))?;
+    let mut at = 12;
+    for index in 0..=slot {
+        let kind = crate::le::i32(toolbar, at)?;
+        let ability = if kind == 0 { None } else { crate::le::i32(toolbar, at + 4) };
+        if index == slot {
+            let mut definition = definition_reply(loaded, ability?)?;
+            definition[4..8].copy_from_slice(&id.to_le_bytes());
+            return Some(definition);
+        }
+        at += if kind == 0 { 4 } else { 41 };
+    }
+    None
+}
+
 /// Classify a client 36/10 start-ability request this server cannot serve.
 /// Writer `00a342e0`: bar, slot, then a mode dword; mode 0 carries one `u64`
 /// target id (24 bytes in all), any other mode four dwords (ground/pulse

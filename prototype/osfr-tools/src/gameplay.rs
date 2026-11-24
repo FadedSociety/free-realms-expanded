@@ -4122,8 +4122,13 @@ impl Gameplay {
         if inner.starts_with(&[36, 0, 12, 0]) {
             let id = crate::abilities::parse_definition_request(inner)?;
             let loaded = self.ability_activation_for(active_profile)?;
-            out.replies
-                .extend(crate::abilities::definition_reply(&loaded, id));
+            // L1249 (A61): else a weapon's own ability id (its definition row's list, which the
+            // weapon tab and item tooltips read) answers with the toolbar slot it stands for.
+            let reply = match crate::abilities::definition_reply(&loaded, id) {
+                Some(reply) => Some(reply),
+                None => self.weapon_ability_definition(active_profile, id)?,
+            };
+            out.replies.extend(reply);
             return Ok(out);
         }
         // Ground/pulse modes and other bars get a client failure, never silence. (R)

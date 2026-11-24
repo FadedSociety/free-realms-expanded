@@ -422,6 +422,14 @@ impl OpeningAbilities {
         crate::abilities::equipped_weapon_matches(inventory, profile, required)
     }
 
+    /// L1249 (A61): the combat job whose weapon family `definition` belongs to (by the job's
+    /// starter class and its wield type, L1243), for a weapon the player does not wield.
+    pub fn job_of_weapon(&self, inventory: &crate::inventory::Inventory, definition: i32) -> Option<i32> {
+        (self.basics.iter())
+            .find(|(_, basic)| basic.weapon_class.is_some_and(|class| inventory.weapon_of_family(definition, class)))
+            .map(|(&profile, _)| profile)
+    }
+
     /// What the live slot-7 weapon means for this job's toolbar (T521). A
     /// matching weapon names the basic slot with its definition's `name_id`;
     /// an empty slot or a wrong-class weapon leaves the job unarmed (R, OSFR

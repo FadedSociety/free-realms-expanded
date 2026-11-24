@@ -978,6 +978,43 @@ impl Inventory {
             .map_or(0, |definition| definition.wield_type.max(0))
     }
 
+    /// L1249 (A61): the weapon definition whose row names ability `ability_id`, and the toolbar
+    /// slot that entry stands for (its first word: 0 basic, 1 super). `profile`'s equipped weapon
+    /// is tried first, then every captured row: the client asks while it only shows an item (an
+    /// Equipment tab tile, a tooltip), before any equip, and never asks again.
+    pub fn weapon_ability(&self, profile: i32, ability_id: i32) -> Option<(i32, i32)> {
+        let named = |definition: i32| {
+            let entries = ability_entries(self.definition_record(definition)?)?;
+            (entries.into_iter()).find_map(|[slot, ability, _, _]| (ability == ability_id).then_some((definition, slot)))
+        };
+        let item_id = self.state.equipped_weapon_item(profile);
+        let equipped = (self.state.items.iter()).find(|i| i.id == item_id && i.count > 0);
+        equipped
+            .and_then(|item| named(item.definition_id))
+            .or_else(|| self.content.captured_definition_ids.iter().find_map(|&id| named(id)))
+    }
+
+    /// `profile`'s slot-7 weapon's own ability entries `(slot, ability id)`; empty when no weapon
+    /// is equipped or its row names none.
+    pub fn equipped_weapon_abilities(&self, profile: i32) -> Vec<(i32, i32)> {
+        let item_id = self.state.equipped_weapon_item(profile);
+        (self.state.items.iter())
+            .find(|i| i.id == item_id && i.count > 0)
+            .and_then(|item| ability_entries(self.definition_record(item.definition_id)?))
+            .map_or_else(Vec::new, |entries| entries.into_iter().map(|[slot, ability, _, _]| (slot, ability)).collect())
+    }
+
+    /// Whether `definition` is a slot-7 weapon of `required_class`'s wield family (L1243).
+    pub fn weapon_of_family(&self, definition: i32, required_class: i32) -> bool {
+        let Some(row) = self.definition_record(definition) else {
+            return false;
+        };
+        let (Ok(class), Ok(slot)) = (read(row, 32), read(row, 40)) else {
+            return false;
+        };
+        slot == 7 && required_class > 0 && self.same_weapon_family(class, required_class)
+    }
+
     /// Native CharacterAttachmentData list for a complete class outfit.
     pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
         let visible = self.client_visible_state();
@@ -1853,6 +1890,28 @@ fn resell_value_offset(bytes: &[u8]) -> Option<usize> {
     let alias = past_model_strings(bytes)?.checked_add(48)?;
     let at = skip_text(bytes, alias)?.checked_add(17)?;
     (at.checked_add(4)? <= bytes.len()).then_some(at)
+}
+
+/// A definition row's ability list (`piece_096` `decode_abilities`; the client copies it with
+/// `00a7ea40`): after ResellValue come three dwords, the stat list (a count, then 17 bytes each)
+/// and the ability list (a count, then four dwords each), which ends the row. `None` unless the
+/// walk ends exactly at the row's end (all 1,696 captured rows do).
+fn ability_entries(bytes: &[u8]) -> Option<Vec<[i32; 4]>> {
+    const MAX_ENTRIES: usize = 16;
+    let stats = resell_value_offset(bytes)?.checked_add(16)?;
+    let count = |at: usize| usize::try_from(read(bytes, at).ok()?).ok().filter(|n| *n <= MAX_ENTRIES);
+    let list = stats.checked_add(4 + 17 * count(stats)?)?;
+    let entries = count(list)?;
+    if list + 4 + 16 * entries != bytes.len() {
+        return None;
+    }
+    let word = |at: usize| read(bytes, at).ok();
+    (0..entries)
+        .map(|k| {
+            let at = list + 4 + 16 * k;
+            Some([word(at)?, word(at + 4)?, word(at + 8)?, word(at + 12)?])
+        })
+        .collect()
 }
 
 /// Write `worth` as a serialized definition row's ResellValue (the Sell tab's Worth), leaving

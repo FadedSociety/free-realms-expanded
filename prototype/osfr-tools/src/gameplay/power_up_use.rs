@@ -26,13 +26,42 @@ impl Gameplay {
         let power_up = self.encounter.as_ref().and_then(|e| e.held_power_up_slot());
         let weapon = abilities.weapon_label(profile, &self.inventory);
         let facts = abilities.weapon_facts(profile, &self.inventory);
-        abilities.activation_equipped(
+        let mut bar = abilities.activation_equipped(
             profile,
             self.job_level(profile),
             power_up.as_ref(),
             weapon,
             facts.as_ref(),
-        )
+        )?;
+        // L1249 (A61): the equipped weapon's own ability ids (its row's list) as the slots they
+        // stand for, after the bar: the weapon tab draws at once from the client's cache and
+        // does not redraw when a 36/12 answer arrives, so it showed "-1" on its first open.
+        let warm: Vec<_> = (self.inventory.equipped_weapon_abilities(profile).into_iter())
+            .filter_map(|(slot, id)| crate::abilities::slot_definition_as(&bar, slot, id))
+            .collect();
+        bar.extend(warm);
+        Ok(bar)
+    }
+
+    /// L1249 (A61): a weapon's own ability id (its definition row's list, which the weapon tab
+    /// and item tooltips read) answers with the toolbar slot it stands for, as the bar that weapon
+    /// gives its job at the player's level, sent under the asked id. `None` when no row names it.
+    pub(crate) fn weapon_ability_definition(&self, profile: i32, id: i32) -> io::Result<Option<Vec<u8>>> {
+        let (Some(abilities), Some((weapon, slot))) = (self.abilities.as_ref(), self.inventory.weapon_ability(profile, id)) else {
+            return Ok(None);
+        };
+        let Some(job) = abilities.job_of_weapon(&self.inventory, weapon) else {
+            return Ok(None);
+        };
+        let facts = crate::encounter::kits::WeaponFacts { item_id: weapon, ..Default::default() };
+        let bar = abilities.activation_equipped(
+            job,
+            self.job_level(job),
+            None,
+            crate::opening_abilities::WeaponLabel::Starter,
+            Some(&facts),
+        )?;
+        Ok(crate::abilities::slot_definition_as(&bar, slot, id))
     }
 
     /// T521: after an inventory request commits, resend the job toolbar once
