@@ -327,3 +327,35 @@ fn release_table_weapons_gain_their_two_abilities_beside_the_kits() {
         assert_eq!(hex, row["serialized_hex"].as_str().unwrap(), "captured row {id} changed");
     }
 }
+
+/// L1251 (A62): the original table files some job weapons under the job's Gear class (Brawler Gear
+/// 25, wield type 0) where live sent the weapon class (the captured Mallet of Sweeps: 71), so those
+/// weapons matched no job's family and left it unarmed. The generator reclasses a weapon of an
+/// original class whose captured weapons all name one other live class: no weapon keeps such a
+/// class, and each target is a job weapon family (it has a wield type).
+#[test]
+fn release_table_weapons_take_the_live_class_their_captured_siblings_name() {
+    let table = read(&data("release/item-table.json"));
+    let columns = table["columns"].as_array().unwrap();
+    let slot = columns.iter().position(|c| c == "Slot").unwrap();
+    let class = columns.iter().position(|c| c == "Class").unwrap();
+    let remapped = table["weapon_class_from_capture"].as_object().unwrap();
+    assert!(!remapped.is_empty(), "no original weapon class was remapped");
+    for (original, live) in remapped {
+        assert!(
+            table["wield_by_class"][live.to_string()].as_i64().is_some_and(|wield| wield > 0),
+            "class {original} maps to {live}, which is no job's weapon family"
+        );
+    }
+    for row in table["rows"].as_array().unwrap() {
+        let kept = row[1][class].to_string();
+        assert!(
+            row[1][slot] != 7 || !remapped.contains_key(&kept),
+            "weapon {} keeps original class {kept}",
+            row[0]
+        );
+    }
+    // The Brawler's Hammer of Rumbling (75033, a release-table weapon) is a Brawler hammer.
+    let inventory = Inventory::load(scratch_with("l1251-classes", true).path(), None).unwrap();
+    assert!(inventory.weapon_of_family(75033, 71));
+}

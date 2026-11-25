@@ -284,15 +284,37 @@ def wield_by_class(inventory):
     return {str(k): v for k, v in sorted(seen.items()) if v}
 
 
-def release_table(ps3, wield):
+def weapon_classes(inventory, ps3):
+    """L1251 (A62): {original class: live class} for weapons (slot 7), from the captured rows.
+
+    The original table files some job weapons under the job's Gear class (Brawler Gear 25, wield type 0), where
+    live sent the weapon class (the Mallet of Sweeps: table 25, live 71). A Gear-class weapon matches no job's
+    weapon family, so it left its job unarmed. Every captured weapon the table classes differently names one live
+    class per original class; the uncaptured rows of that class take it (R: inferred from their captured
+    siblings). An original class whose captured weapons do not all agree (Freestyle Gear 1: some live 1, some 173)
+    keeps its class."""
+    live = {}
+    for row in inventory["definitions"]:
+        cells = ps3.get(row["id"])
+        if "source" in row or row["slot"] != 7 or cells is None:
+            continue
+        live.setdefault(ps3_values(cells)["Class"], set()).add(row["class_id"])
+    return {original: next(iter(seen)) for original, seen in live.items() if len(seen) == 1 and original not in seen}
+
+
+def release_table(ps3, wield, classes=None):
     """The release table document. Every wire field the original table names comes from its row; the rest of the
     wire row (tint, resell value, VIP and race-set requirements, stats, abilities) stays at the zero defaults (R).
-    `wire_sha256` hashes the established encoder's bytes for every row, so the Rust encoder is checked against it."""
+    `wire_sha256` hashes the established encoder's bytes for every row, so the Rust encoder is checked against it.
+    `classes` ({original class: live class}, from `weapon_classes`) reclasses the weapons (slot 7) of those classes."""
+    classes = classes or {}
     rows, wire = [], hashlib.sha256()
     for item_id in sorted(ps3):
         row = legacy_row({"Id": item_id})
         for key, value in ps3_values(ps3[item_id]).items():
             put(row, key, value)
+        if row["Slot"] == 7 and row["Class"] in classes:
+            row["Class"] = classes[row["Class"]]
         raw = encoder(row)
         assert decode(raw) == row
         wire.update(raw)
@@ -301,7 +323,8 @@ def release_table(ps3, wield):
         rows.append([item_id, [now[key] for key in RELEASE_INTS] + [flags], *(now[key] for key in RELEASE_TEXTS)])
     return {"schema_version": 1, "source": {"table": PS3_PROVENANCE, "sha256": PS3_SHA256},
             "columns": [*RELEASE_INTS, "Flags", *RELEASE_TEXTS], "flags": list(RELEASE_FLAGS),
-            "wield_by_class": wield, "wire_sha256": wire.hexdigest(), "rows": rows}
+            "wield_by_class": wield, "weapon_class_from_capture": {str(k): v for k, v in sorted(classes.items())},
+            "wire_sha256": wire.hexdigest(), "rows": rows}
 
 
 def differences(before, after):
@@ -463,8 +486,10 @@ def main():
         raise ValueError("original item table is not the pinned file")
     ps3 = ps3_table(ps3_text.decode("utf-8-sig"))
     if args.release_table:
-        wield = wield_by_class(json.loads(RELEASE_INVENTORY.read_text(encoding="utf-8")))
-        text = json.dumps(release_table(ps3, wield), separators=(",", ":"), sort_keys=True) + "\n"
+        release_inventory = json.loads(RELEASE_INVENTORY.read_text(encoding="utf-8"))
+        wield = wield_by_class(release_inventory)
+        classes = weapon_classes(release_inventory, ps3)
+        text = json.dumps(release_table(ps3, wield, classes), separators=(",", ":"), sort_keys=True) + "\n"
         args.release_table.write_bytes(text.encode())
         print(f"release item table: {len(ps3)} rows, {len(text.encode())} bytes")
         return
