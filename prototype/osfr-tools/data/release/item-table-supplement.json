@@ -409,7 +409,9 @@
       911311,
       911312,
       911313
-    ]
+    ],
+    "recipe_output_pets": "A59 (2026-11-25): the four forged Blacksmith pets 910202 Chrome Drakeling, 910203 Chrome Mini-Rocklar, 910212 Mini-Mech and 910223 Striped Mini-Mech had copied Faerie Drake's icon 0 and model. Each now carries the client's own: Models.txt 1524/1520/1522/1523 ('rumble_ridgerecipe Metal Baby Drake / Metal Rocklar / Mini Mech Solid / Mini Mech Stripe'), the texture alias its .adr declares (drake_metal, mechlar, mechpet-solid, mechpet-stripe; tint dyetint) and the ImageSets.txt set named for that model and alias (7968, 7955, 7930, 7932).",
+    "recipe_output_decor": "A59 siblings (2026-11-25): Models.txt labels each forged product 'rumble_ridgerecipe <name>', so five more reconstructed outputs take the client's own art in place of the nearest item's: 910204 Drake Statue (hsg_drake_skeleton_01.adr, set 7995), 910209 Manguana Statue (hsg_manguana_shaman_statue_01.adr, set 73), 910221 Robgoblin Archway (hsg_sv_junkpile_04.adr, set 8001; the seaside archway icon it had is not served by the community host), 910222 Skullz Wall Hanging (hsg_painting_skullz_01.adr, set 7999), each with the texture alias its set name carries (item_<model>_<alias>) and tint dyetint; 910206 Dwarf Biker Firework takes set 7974 (item_mkt_fireworks_dwarftech_01_dwarfworks) and keeps no model, as before. Type, category and the other columns stay the nearest item's (R)."
   },
   "columns": [
     "NameId",
@@ -1837,7 +1839,7 @@
       [
         33902,
         0,
-        0,
+        7968,
         0,
         10000,
         0,
@@ -1859,16 +1861,16 @@
         0,
         7
       ],
-      "faeriedrake.adr",
-      "",
-      ""
+      "feathereddrake_m_metaldrakeling.adr",
+      "drake_metal",
+      "dyetint"
     ],
     [
       910203,
       [
         33892,
         0,
-        0,
+        7955,
         0,
         10000,
         0,
@@ -1890,16 +1892,16 @@
         0,
         7
       ],
-      "faeriedrake.adr",
-      "",
-      ""
+      "rocklar_m_mechlar.adr",
+      "mechlar",
+      "dyetint"
     ],
     [
       910204,
       [
         34049,
         0,
-        1089,
+        7995,
         126,
         10,
         0,
@@ -1921,8 +1923,8 @@
         0,
         0
       ],
-      "",
-      "",
+      "hsg_drake_skeleton_01.adr",
+      "fun-drakeskeleton-L1",
       "dyetint"
     ],
     [
@@ -1961,7 +1963,7 @@
       [
         33960,
         33961,
-        6361,
+        7974,
         0,
         10,
         9,
@@ -2054,7 +2056,7 @@
       [
         34045,
         0,
-        1089,
+        73,
         126,
         10,
         0,
@@ -2076,8 +2078,8 @@
         0,
         0
       ],
-      "",
-      "",
+      "hsg_manguana_shaman_statue_01.adr",
+      "decorative-manguanastatue-L1",
       "dyetint"
     ],
     [
@@ -2147,7 +2149,7 @@
       [
         33898,
         0,
-        0,
+        7930,
         0,
         10000,
         0,
@@ -2169,9 +2171,9 @@
         0,
         7
       ],
-      "faeriedrake.adr",
-      "",
-      ""
+      "robgoblin_mechpet.adr",
+      "mechpet-solid",
+      "dyetint"
     ],
     [
       910213,
@@ -2426,7 +2428,7 @@
       [
         34047,
         0,
-        6756,
+        8001,
         0,
         50,
         0,
@@ -2448,8 +2450,8 @@
         0,
         96
       ],
-      "hsg_archway_seaside_01.adr",
-      "archway-seaside-L1",
+      "hsg_sv_junkpile_04.adr",
+      "decorative-junkyardentry-L1",
       "dyetint"
     ],
     [
@@ -2457,7 +2459,7 @@
       [
         34051,
         0,
-        6338,
+        7999,
         261,
         2000,
         0,
@@ -2479,8 +2481,8 @@
         0,
         100
       ],
-      "hsg_flags_pirate_01.adr",
-      "pirate-wallflag-L1",
+      "hsg_painting_skullz_01.adr",
+      "fun-hsg_wallhanging_skullz_01-L1",
       "dyetint"
     ],
     [
@@ -2488,7 +2490,7 @@
       [
         33900,
         0,
-        0,
+        7932,
         0,
         10000,
         0,
@@ -2510,9 +2512,9 @@
         0,
         7
       ],
-      "faeriedrake.adr",
-      "",
-      ""
+      "robgoblin_mechpet.adr",
+      "mechpet-stripe",
+      "dyetint"
     ],
     [
       910224,
