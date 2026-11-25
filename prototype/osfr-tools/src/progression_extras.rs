@@ -243,7 +243,6 @@ pub struct AchievementClientRow {
     pub description_id: u32,
     pub icon_id: u32,
     pub trophy_id: u32,
-    pub trophy_points: u32,
     pub threshold: u32,
 }
 
@@ -312,7 +311,6 @@ impl AchievementBindings {
                 description_id: definition.description_id.unwrap_or(0),
                 icon_id: definition.image_id.or(definition.image_set_id).unwrap_or(0),
                 trophy_id: reward.client_trophy_id.unwrap_or(0),
-                trophy_points: reward.trophy_points,
                 threshold,
                 });
             }
@@ -427,10 +425,13 @@ impl AchievementBindings {
             put_u32(&mut packet, 0);
             put_u32(&mut packet, row.icon_id); // (R) IconData id
             put_u32(&mut packet, 0); // IconData tint
-            put_u32(&mut packet, row.trophy_points); // (R) record +340
-            put_u32(&mut packet, row.trophy_id); // (R) record +344
-            packet.push(u8::from(done)); // record +352
-            put_u32(&mut packet, 0); // record +348 (R)
+            // A53: +340 is the AchievementTrophies.txt row; on 150/3 the client looks it up and
+            // reads the row without a null check (`00badec0` at `00bae04c`). The trophy's points
+            // went here, so 15-, 25- and 40-point achievements crashed the client on completion.
+            put_u32(&mut packet, row.trophy_id); // record +340, trophy row (Sanctuary `TrophyId`)
+            put_u32(&mut packet, 0); // record +344, bonus points on top of the trophy's own
+            packet.push(u8::from(done)); // record +352, suppress toast
+            put_u32(&mut packet, 0); // record +348, AchievementCategories.txt row (none in our data)
         }
         packet
     }
@@ -926,7 +927,7 @@ impl AchievementProgression {
             if current >= rule.threshold {
                 staged_state.completed.insert(rule.key.clone());
                 if let Some(id) = rule.client_id {
-                    packets.push(achievement_complete_packet(id, rule.trophy_id.unwrap_or(0)));
+                    packets.push(achievement_complete_packet(id));
                 }
                 if !grant_is_empty(&rule.reward) {
                     let (next, mut emitted) = apply_award(
@@ -993,11 +994,19 @@ fn achievement_progress_packet(
     packet
 }
 
-fn achievement_complete_packet(achievement_id: u32, trophy_id: u32) -> Vec<u8> {
+/// `emo_achievement_unlocked` in the client's `AnimationTypes.xml`, the animation live played on
+/// completion (Sanctuary's `AchievementCompletePacket.UnlockedAnimationId`).
+const ACHIEVEMENT_UNLOCKED_ANIMATION: u32 = 3370;
+
+/// 150/3 in the client reader's order (`00baaf10`): achievement id, a suppress-toast byte, the
+/// animation played on the player. A53: we sent the trophy id where the byte goes, so the toast
+/// was hidden and the animation id read as 0x01000000, which crashed the client when an
+/// encounter card was open.
+fn achievement_complete_packet(achievement_id: u32) -> Vec<u8> {
     let mut packet = packet_u16_u32(150, 3);
     put_u32(&mut packet, achievement_id);
-    put_u32(&mut packet, trophy_id);
-    packet.push(1); // R: normal-completion flag; field meaning from ctor `00ba98c0`.
+    packet.push(0);
+    put_u32(&mut packet, ACHIEVEMENT_UNLOCKED_ANIMATION);
     packet
 }
 

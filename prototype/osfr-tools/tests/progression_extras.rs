@@ -413,6 +413,14 @@ fn achievement_threshold_awards_once_and_emits_150_messages() {
     assert_eq!(completed.packets.len(), 2);
     assert_eq!(achievement_subtype(&completed.packets[0]), Some(7));
     assert_eq!(achievement_subtype(&completed.packets[1]), Some(3));
+    // The client's reader (`00baaf10`): id, a suppress-toast byte, then the animation played
+    // (3370 `emo_achievement_unlocked` in AnimationTypes.xml). A53: a dword in the byte's place
+    // hid the toast and played animation 0x01000000.
+    let mut want = vec![150, 0, 3, 0, 0, 0];
+    want.extend(9001u32.to_le_bytes());
+    want.push(0);
+    want.extend(3370u32.to_le_bytes());
+    assert_eq!(completed.packets[1], want);
     assert_eq!(completed.reward_state.inventory.state().coins, 1);
 
     let replay = progression
@@ -1078,7 +1086,9 @@ fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
         let required = reader.u32();
         reader.take(4 + 1 + 4); // extra, bool, i32
         reader.take(8); // IconData id and tint
-        reader.take(8); // two trailing i32
+        // A53: +340 is the trophy row the client looks up on 150/3, +344 bonus points.
+        assert_eq!(reader.u32(), row.trophy_id, "record +340 is the AchievementTrophies.txt row");
+        assert_eq!(reader.u32(), 0, "record +344, bonus points");
         let completed = reader.take(1)[0];
         reader.take(4);
         assert_eq!(required, row.threshold);

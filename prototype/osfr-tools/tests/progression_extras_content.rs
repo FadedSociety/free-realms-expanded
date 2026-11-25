@@ -148,3 +148,28 @@ fn title_and_collection_ids_resolve_to_client_data() {
             .all(|entry| entry.item_definition_id.is_some())
     );
 }
+
+/// A53: on 150/3 the client looks the record's trophy id up in `AchievementTrophies.txt` and reads
+/// the row without a null check (`00badec0` at `00bae04c`), so an achievement whose trophy is not a
+/// client row crashes the client when it completes.
+#[test]
+fn every_achievement_sent_to_the_client_names_a_client_trophy() {
+    let trophies: HashSet<u32> = fs::read_to_string(lab_path(
+        "working/OSFR.Client/OSFR Client/Resources/AchievementTrophies.txt",
+    ))
+    .unwrap()
+    .lines()
+    .filter_map(|line| line.split('^').next()?.parse().ok())
+    .collect();
+    let bindings =
+        osfr_tools::progression_extras::AchievementBindings::load(&project_path("data/content"))
+            .unwrap();
+    assert!(!bindings.client_rows().is_empty());
+    let missing: Vec<_> = bindings
+        .client_rows()
+        .iter()
+        .filter(|row| !trophies.contains(&row.trophy_id))
+        .map(|row| (row.key.as_str(), row.trophy_id))
+        .collect();
+    assert!(missing.is_empty(), "no client trophy row: {missing:?}");
+}
