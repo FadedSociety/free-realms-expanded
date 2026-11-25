@@ -111,7 +111,7 @@ impl Scratch {
 }
 
 /// The maximum health from a 35/5 UpdateHitpoints reply (client reader `0x008D6F10`: the
-/// u64 actor id, then current health at 12..16 and the maximum at 16..20).
+/// u64 actor id, then the percent at 12..16, the maximum at 16..20 and current at 20..24).
 fn max_health(out: &EncounterOutcome, guid: u64) -> Option<u32> {
     out.replies
         .iter()

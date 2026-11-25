@@ -473,6 +473,23 @@ local function buildState()
         state.closest = name
       end
     end
+    -- The boss bar's rows (BossesDataSource 00a79eb0: 0 guid, 1 name, 2 health, 3 max).
+    local okBoss, bosses = pcall(tables.Find, "BaseClient.Bosses")
+    if okBoss and bosses then
+      local okCount, count = pcall(function() return bosses:GetRowCount() end)
+      if okCount and tonumber(count) and tonumber(count) > 0 then
+        local rows = {}
+        for row = 0, math.min(tonumber(count), 4) - 1 do
+          local cells = {}
+          for col = 0, 5 do
+            local okCell, value = pcall(function() return bosses:GetData(row, col) end)
+            cells[col + 1] = okCell and text(value) or "?"
+          end
+          rows[#rows + 1] = table.concat(cells, "|")
+        end
+        state.bosses = rows
+      end
+    end
   end
 
   local target = rawget(_G, "Target")

@@ -741,13 +741,13 @@ pub fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> 
 
 /// 35/5 `PlayerUpdatePacketUpdateHitpoints` reader `0x008d6f10` (base header reader
 /// `0x008d6830`): after the four-byte header it reads the actor guid as two dwords
-/// (`4..12`), then three i32s; the first is the current hitpoints (`12..16`).
+/// (`4..12`), then three i32s: percent, maximum and current hitpoints (`20..24`).
 pub fn enemy_hp(replies: &[Vec<u8>], guid: u64) -> Option<u32> {
     replies.iter().find_map(|packet| {
         (has_family(packet, 35, 5, None)
             && packet.get(4..12) == Some(guid.to_le_bytes().as_slice())
-            && packet.len() >= 16)
-            .then(|| u32::from_le_bytes(packet[12..16].try_into().unwrap()))
+            && packet.len() >= 24)
+            .then(|| u32::from_le_bytes(packet[20..24].try_into().unwrap()))
     })
 }
 

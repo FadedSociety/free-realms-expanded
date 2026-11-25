@@ -868,13 +868,8 @@ fn build_actor_health(actor: &CombatState) -> Vec<u8> {
     if actor.kind == ActorKind::Player {
         build_health(actor.health, actor.max_health)
     } else {
-        // Client family-35 sub-5 reader `008d6f10` consumes actor id and three integers.
-        let mut bytes = header(35, 5);
-        bytes.extend(actor.guid.to_le_bytes());
-        for value in [actor.health, actor.max_health, 0] {
-            put_i32(&mut bytes, value); // final zero remains (R)
-        }
-        bytes
+        let wire = |v: i32| u32::try_from(v).unwrap_or(0);
+        crate::encounter::wire::enemy_hp(actor.guid, wire(actor.health), wire(actor.max_health))
     }
 }
 

@@ -103,6 +103,25 @@ fn hitpoints_is_max_current_delta_with_real_ids() {
 }
 
 #[test]
+fn the_health_bar_is_percent_max_current() {
+    // 35/5 reader 0x008d6f10. The dispatcher (0092f460 case 5) queues a PlayerHitpointEvent
+    // from its three ints as percent, max and current, Sanctuary's order. Current health in
+    // the first slot read as a percent over 100 and kept every enemy's bar full (A35).
+    let bar = wire::enemy_hp(9, 3024, 3800);
+    assert_eq!(bar.len(), 24);
+    assert_eq!(bar[..12], [[35, 0, 5, 0].as_slice(), &9_u64.to_le_bytes()].concat());
+    assert_eq!(bar[12..16], 79_i32.to_le_bytes());
+    assert_eq!(bar[16..20], 3800_i32.to_le_bytes());
+    assert_eq!(bar[20..24], 3024_i32.to_le_bytes());
+    let percent = |hp, max| i32::from_le_bytes(wire::enemy_hp(9, hp, max)[12..16].try_into().unwrap());
+    assert_eq!(
+        [percent(0, 3800), percent(3800, 3800), percent(1, 3800), percent(5, 0), percent(9, 4)],
+        [0, 100, 1, 0, 100],
+        "dead, full, a living sliver, no maximum, overhealed"
+    );
+}
+
+#[test]
 fn states_and_status_bits_match_the_live_values() {
     for (name, value) in [
         ("state_idle", bits::IDLE),
@@ -454,6 +473,10 @@ fn a_kill_through_the_engine_sends_the_hit_and_the_death_packets_in_order() {
         assert_eq!(heads[hit - 1], [35, 0, 8, 0], "the swing comes first");
         assert_eq!(heads[hit + 1], [35, 0, 5, 0], "then the bar");
         assert_eq!(out.replies[hit][20..28], target.to_le_bytes());
+        let (attack, bar) = (&out.replies[hit], &out.replies[hit + 1]);
+        let percent = i32::from_le_bytes(bar[12..16].try_into().unwrap());
+        assert!((0..=100).contains(&percent), "the bar's first int is a percent");
+        assert_eq!(bar[16..24], [&attack[32..36], &attack[46..50]].concat(), "then max, current");
         if !out.defeated.is_empty() {
             break out;
         }

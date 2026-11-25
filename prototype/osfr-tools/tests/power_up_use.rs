@@ -391,7 +391,7 @@ fn enemy_health(out: &Outcome, guid: u64) -> Option<i32> {
         .iter()
         .rev()
         .find(|p| p.starts_with(&[35, 0, 5, 0]) && p[4..12] == guid.to_le_bytes())
-        .map(|p| i32::from_le_bytes(p[12..16].try_into().unwrap()))
+        .map(|p| i32::from_le_bytes(p[20..24].try_into().unwrap()))
 }
 
 fn player_health(game: &Gameplay) -> u32 {

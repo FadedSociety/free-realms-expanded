@@ -84,6 +84,21 @@ HOOK_SETS = {
         {"addr": 0x00A97EF0, "kind": "enter", "label": "quest.SendQuestEndReply", "read": ["mem32:ecx+0x1c"]},
         {"addr": 0x00A864C0, "kind": "enter", "label": "quest.QuestEndReplyPacketCtor", "read": ["arg:0"]},
     ],
+    # An enemy's health event (A35, the boss bar): 35/35 handler 008d3020 (source, target, show,
+    # crit, max, current, delta), PlayerHitpointEvent ctor 00ae2190 (stamp = ++actor+0x828),
+    # its apply 00ae2280 (flag bit 0; event +0x48 guid, +0x50 stamp, +0x54 hp, +0x58 max,
+    # +0x5c percent) and 008ba940 (stamp, actor, hp, max, percent; keeps only stamp > +0x82c).
+    "boss_hp": [
+        {"addr": 0x008D3020, "kind": "enter", "label": "hp.35_35",
+         "read": ["arg:0", "arg:1", "arg:2", "arg:3", "arg:4", "arg:5", "arg:6", "arg:7", "arg:8"]},
+        {"addr": 0x00AE2190, "kind": "enter", "label": "hp.event_ctor",
+         "read": ["mem32:esp+0x0", "arg:0", "arg:1", "arg:2", "arg:3", "arg:4", "arg:5", "arg:6"]},
+        {"addr": 0x00AE2280, "kind": "enter", "label": "hp.event_apply",
+         "read": ["arg:1", "mem32:ecx+0x48", "mem32:ecx+0x4c", "mem32:ecx+0x50", "mem32:ecx+0x54",
+                  "mem32:ecx+0x58", "mem32:ecx+0x5c"]},
+        {"addr": 0x008BA940, "kind": "enter", "label": "hp.set_actor",
+         "read": ["arg:0", "arg:1", "arg:2", "arg:3", "arg:4"]},
+    ],
 }
 
 AGENT = r"""

@@ -264,7 +264,7 @@ fn damage_cast_updates_energy_health_and_emits_exact_reader_bytes() {
 
     let mut target_health = packet(35, 5, &[]);
     target_health.extend(TARGET.to_le_bytes());
-    for value in [15, 50, 0] {
+    for value in [30, 50, 15] {
         push_i32(&mut target_health, value);
     }
     let mut energy = packet(38, 13, &[]);

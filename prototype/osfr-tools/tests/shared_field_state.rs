@@ -115,7 +115,7 @@ mod unit {
             .iter()
             .find(|p| p.starts_with(&[35, 0, 5, 0]))
             .unwrap();
-        u32::from_le_bytes(p[12..16].try_into().unwrap())
+        u32::from_le_bytes(p[20..24].try_into().unwrap())
     }
     fn hit(out: &osfr_tools::encounter::EncounterOutcome, attacker: u64) -> u32 {
         let p = out
@@ -1000,7 +1000,7 @@ fn hp_values(messages: &[Vec<u8>]) -> Vec<u32> {
     messages
         .iter()
         .filter(|p| is_sub(p, 35, 5) && p.get(4..12) == Some(E.to_le_bytes().as_slice()))
-        .map(|p| u32::from_le_bytes(p[12..16].try_into().unwrap()))
+        .map(|p| u32::from_le_bytes(p[20..24].try_into().unwrap()))
         .collect()
 }
 #[test]

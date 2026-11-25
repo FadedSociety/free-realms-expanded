@@ -38,7 +38,8 @@
 //! - 49/9 reader `00c7af60` and 49/10 reader `00c7b070`: quest, objective, current counter
 //!   at 6..10/10..14/14..18.
 //! - 35/5 `PlayerUpdatePacketUpdateHitpoints` reader `008d6f10` (base header reader
-//!   `008d6830`): four-byte header, actor guid at 4..12, current hitpoints at 12..16.
+//!   `008d6830`): four-byte header, actor guid at 4..12, then percent, maximum and
+//!   current hitpoints (20..24).
 //! - 36/10 `ClientRequestStartAbility` writer `00a342e0` (action-bar path `00a35150`):
 //!   this suite passes the parsed `SharedFieldAction::Ability` that the production
 //!   `EncounterEngine::shared_action` parser derives from that body to

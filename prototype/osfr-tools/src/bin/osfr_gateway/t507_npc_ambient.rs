@@ -322,9 +322,9 @@ fn t507_ambient_animations_follow_the_model_table_for_every_viewer() {
         .expect("the chugawug row fires again");
     let mut lethal = vec![35, 0, 5, 0];
     lethal.extend(actor.to_le_bytes());
-    lethal.extend(0_i32.to_le_bytes()); // hp zero: the held-corpse resync trigger
-    lethal.extend(1000_i32.to_le_bytes());
-    lethal.extend(0_i32.to_le_bytes());
+    lethal.extend(0_i32.to_le_bytes()); // percent
+    lethal.extend(1000_i32.to_le_bytes()); // max
+    lethal.extend(0_i32.to_le_bytes()); // current zero: the held-corpse resync trigger
     server.membership.queue_field_packets(0, vec![lethal]);
     server.npc_ambient_ms = resync_firing - 1;
     server.tick_shared_fields(resync_firing);

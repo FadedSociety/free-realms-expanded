@@ -12,7 +12,7 @@
 //! - 35/2 AddNpc reader `0x00921A10`: the u64 actor id is the first field and
 //!   there is no per-actor level field.
 //! - 35/5 UpdateHitpoints reader `0x008D6F10`: a u64 actor id and then three
-//!   i32 (current, maximum, zero); this suite reads the maximum at bytes 16..20.
+//!   i32 (percent, maximum, current); this suite reads the maximum at bytes 16..20.
 //! - 38/19 coin balance: one i32, client constructor `0x0089E670`.
 //! - 38/14 job update: six i32, client reader `0x008D86E0`.
 
@@ -196,8 +196,8 @@ fn position(value: &Value) -> [f32; 3] {
 }
 
 /// The maximum health from a 35/5 UpdateHitpoints reply. The client reader
-/// `0x008D6F10` reads the u64 actor id and then three i32: current health
-/// (bytes 12..16), maximum (16..20) and a zero (20..24).
+/// `0x008D6F10` reads the u64 actor id and then three i32: the percent
+/// (bytes 12..16), maximum (16..20) and current health (20..24).
 fn max_health(out: &EncounterOutcome, guid: u64) -> Option<u32> {
     out.replies
         .iter()

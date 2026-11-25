@@ -124,7 +124,7 @@ fn hp_updates(messages: &[Vec<u8>], guid: u64) -> Vec<u32> {
     messages
         .iter()
         .filter(|m| is_sub(m, 35, 5) && guid_at(m, 4) == guid)
-        .map(|m| u32::from_le_bytes(m[12..16].try_into().unwrap()))
+        .map(|m| u32::from_le_bytes(m[20..24].try_into().unwrap()))
         .collect()
 }
 

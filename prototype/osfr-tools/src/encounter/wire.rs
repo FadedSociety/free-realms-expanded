@@ -93,22 +93,34 @@ pub(super) fn player_hp(hp: u32, max: u32) -> Vec<u8> {
     b.extend((max as i32).to_le_bytes());
     b
 }
-pub(super) fn enemy_hp(guid: u64, hp: u32, max: u32) -> Vec<u8> {
+/// 35/5 UpdateHitpoints, 24 bytes (client reader `0x008d6f10`): the actor, its health as a
+/// percent (0 to 100), its maximum and its current health, the order of Sanctuary's
+/// `PlayerUpdatePacketUpdateHitpoints`. The dispatcher (`0092f460` case 5) queues a
+/// `PlayerHitpointEvent` from it on every actor but the local player, with those three as
+/// percent, max and current; `008ba940` keeps only the newest event and writes the percent
+/// into +0x14c, which the boss bar and the nameplate show. Current health in the first slot
+/// read as a percent of over 100, so every bar stayed full (A35, native trace 2026-11-25).
+/// A living actor keeps at least 1 percent (R: so the bar never empties before it falls).
+pub fn enemy_hp(guid: u64, hp: u32, max: u32) -> Vec<u8> {
+    let percent = match (hp, max) {
+        (0, _) | (_, 0) => 0,
+        _ => (u64::from(hp) * 100 / u64::from(max)).clamp(1, 100),
+    };
+    let wire = |v: u64| i32::try_from(v).unwrap_or(i32::MAX);
     let mut b = header(35, 5);
     b.extend(guid.to_le_bytes());
-    for v in [hp as i32, max as i32, 0] {
-        b.extend(v.to_le_bytes());
+    for v in [percent, u64::from(max), u64::from(hp)] {
+        b.extend(wire(v).to_le_bytes());
     }
     b
 }
 /// An enemy's health as the client must hold it: the 35/5 bar over its head, then the 35/35
-/// health statement (show 0, delta 0: live sent that shape for every regen tick, C13). Only
-/// 35/35 and 32/7 set the actor's current and maximum health (`PlayerHitpointEvent`,
-/// `008ba940` writes +0x160 / +0x15c), and those two fields are what the boss bar reads
-/// (`BaseClient.Bosses` cell getter `00a79eb0`, columns 2 and 3); the 35/5 handler (dispatch
-/// `0092f460` case 5) only moves the nameplate bar. 32/7 alone subtracts its damage from the
-/// client's copy (`00a2ba40`), which is zero until a statement sets it: every spawn, heal and
-/// regen sends one; a hit sends its 32/7 (`player_hit`).
+/// health statement (show 0, delta 0: live sent that shape for every regen tick, C13). Both,
+/// and 32/7, queue a `PlayerHitpointEvent` (`008ba940` writes +0x14c percent, +0x15c max,
+/// +0x160 current, keeping only the newest), which is what the boss bar reads
+/// (`BaseClient.Bosses` cell getter `00a79eb0`). 32/7 subtracts its damage from the client's
+/// copy of current health (`00a2ba40`), which is zero until a statement sets it: every
+/// spawn, heal and regen sends one; a hit sends its 32/7 (`player_hit`).
 pub(super) fn enemy_health(guid: u64, hp: u32, max: u32) -> [Vec<u8>; 2] {
     let wire = |v: u32| i32::try_from(v).unwrap_or(i32::MAX);
     [

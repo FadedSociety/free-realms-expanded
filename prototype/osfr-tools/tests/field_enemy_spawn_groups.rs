@@ -29,7 +29,7 @@ fn hp(out: &EncounterOutcome, guid: u64) -> Option<(u32, u32)> {
         .find(|packet| packet.starts_with(&[35, 0, 5, 0]) && packet[4..12] == guid.to_le_bytes())
         .map(|packet| {
             (
-                u32::from_le_bytes(packet[12..16].try_into().unwrap()),
+                u32::from_le_bytes(packet[20..24].try_into().unwrap()),
                 u32::from_le_bytes(packet[16..20].try_into().unwrap()),
             )
         })

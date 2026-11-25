@@ -3022,8 +3022,9 @@ impl Server {
         // Idle ticks already reconciled poses/readiness above; do not rank the
         // entire passive population twice when simulation changes nothing.
         let mut resync = committed.iter().any(|packet| {
+            // 35/5: the actor, percent, max, current (`encounter::wire::enemy_hp`).
             packet.starts_with(&[35, 0, 5, 0])
-                && packet.get(12..16) == Some(0_u32.to_le_bytes().as_slice())
+                && packet.get(20..24) == Some(0_u32.to_le_bytes().as_slice())
         });
         let deliveries = self
             .sessions

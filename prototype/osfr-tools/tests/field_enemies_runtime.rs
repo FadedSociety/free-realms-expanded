@@ -89,7 +89,7 @@ fn hp(out: &EncounterOutcome) -> Option<(u32, u32)> {
         .find(|p| p.starts_with(&[35, 0, 5, 0]) && p[4..12] == GUID.to_le_bytes())
         .map(|p| {
             (
-                u32::from_le_bytes(p[12..16].try_into().unwrap()),
+                u32::from_le_bytes(p[20..24].try_into().unwrap()),
                 u32::from_le_bytes(p[16..20].try_into().unwrap()),
             )
         })

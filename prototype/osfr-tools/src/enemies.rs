@@ -787,12 +787,8 @@ fn header(family: u16, sub: u16) -> Vec<u8> {
 }
 
 fn actor_health_packet(guid: u64, health: i32, max_health: i32) -> Vec<u8> {
-    let mut bytes = header(35, 5);
-    bytes.extend(guid.to_le_bytes());
-    for value in [health, max_health, 0] {
-        bytes.extend(value.to_le_bytes());
-    }
-    bytes
+    let wire = |v: i32| u32::try_from(v).unwrap_or(0);
+    crate::encounter::wire::enemy_hp(guid, wire(health), wire(max_health))
 }
 
 fn player_health_packet(health: i32, max_health: i32) -> Vec<u8> {

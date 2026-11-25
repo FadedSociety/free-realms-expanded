@@ -250,7 +250,7 @@ fn enemy_hp(replies: &[Vec<u8>], guid: u64) -> Option<u32> {
     replies.iter().find_map(|packet| {
         (has_family(packet, 35, 5, None)
             && packet.get(4..12) == Some(guid.to_le_bytes().as_slice()))
-        .then(|| u32::from_le_bytes(packet[12..16].try_into().unwrap()))
+        .then(|| u32::from_le_bytes(packet[20..24].try_into().unwrap()))
     })
 }
 
