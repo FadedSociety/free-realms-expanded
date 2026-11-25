@@ -99,6 +99,13 @@ HOOK_SETS = {
         {"addr": 0x008BA940, "kind": "enter", "label": "hp.set_actor",
          "read": ["arg:0", "arg:1", "arg:2", "arg:3", "arg:4"]},
     ],
+    # A .cdt collision tree bound in place: BindBvhToContiguousBuffer 01132fb0 (buffer, size, swap) returns
+    # null when nodes * (0x10 if the bool at +0x48 else 0x40) + (subtrees + 6) * 0x20 exceeds size (A66).
+    "cdt_bvh": [
+        {"addr": 0x01132FB0, "kind": "enter", "label": "bvh.bind",
+         "read": ["arg:0", "arg:1", "arg:2", "bytes:arg0:80"]},
+        {"addr": 0x01132FB0, "kind": "leave", "label": "bvh.bound", "read": []},
+    ],
 }
 
 AGENT = r"""
