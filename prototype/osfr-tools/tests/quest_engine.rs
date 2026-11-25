@@ -203,9 +203,15 @@ fn content_db_definitions_drive_accept_progress_and_turnin_packets() {
     assert_eq!(quest_opcodes(&accepted), vec![(49, 3), (49, 8)]);
     let accepted_record = engine.quest_add_packet(101).unwrap();
     let login = engine.active_login_packets(&BTreeSet::new()).unwrap();
-    assert_eq!(login[0], accepted_record);
+    // The login record is the accept record with SuppressStartBanner (record +36, wire byte 35)
+    // set: the client shows "Quest Started!" only for a 0 there (`00a92680`), and a quest the
+    // player already holds must not announce itself again at every login.
+    let mut restored = accepted_record.clone();
+    assert_eq!(restored[35], 0, "an accept shows the banner");
+    restored[35] = 1;
+    assert_eq!(login[0], restored);
     assert_eq!(
-        login[0],
+        accepted_record,
         match &accepted.outbound[0] {
             OutboundMessage::Quest(QuestMessage::QuestAdd { quest_id }) => {
                 engine.quest_add_packet(*quest_id).unwrap()

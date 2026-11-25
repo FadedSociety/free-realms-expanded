@@ -1965,6 +1965,14 @@ impl QuestEngine {
     /// Locale fields absent from this content set and reward display rows use
     /// zero/empty placeholders (R); authoritative reward grants remain typed.
     pub fn quest_add_packet(&self, quest_id: u32) -> io::Result<Vec<u8>> {
+        self.quest_record(quest_id, false)
+    }
+
+    /// `suppress_banner` is the record's SuppressStartBanner byte (+36; Sanctuary's
+    /// `ClientQuest`): the 49/3 handler (`00c7cd40` case 3) shows "Quest Started!" through
+    /// `NotifyQuestStarted` (`00a92680`) only while it is 0, so a quest the player already holds
+    /// is restored at login with it set.
+    fn quest_record(&self, quest_id: u32, suppress_banner: bool) -> io::Result<Vec<u8>> {
         let definition = self
             .definitions
             .get(&quest_id)
@@ -1987,7 +1995,7 @@ impl QuestEngine {
         bytes.push(0);
         bytes.extend(0i64.to_le_bytes());
         put_i32(&mut bytes, 0);
-        bytes.push(0);
+        bytes.push(u8::from(suppress_banner));
         bytes.extend(0.0f32.to_le_bytes());
         bytes.extend([0; 69]);
         put_i32(&mut bytes, definition.objectives.len() as i32);
@@ -2054,7 +2062,7 @@ impl QuestEngine {
             ) else {
                 return Err(invalid("unknown quest add definition"));
             };
-            packets.push(self.quest_add_packet(quest_id)?);
+            packets.push(self.quest_record(quest_id, true)?);
 
             // (R) This mirrors accept(): all unordered goals or the first unfinished ordered goal
             // become active. The full 49/3 record already carries each saved current count.
