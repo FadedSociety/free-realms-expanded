@@ -24,11 +24,11 @@
     "client_achievement_ids_recovered": false,
     "counter_bindings_are_null": false,
     "trophy_mapping_is_null": false,
-    "definition_ids_assigned_r": 318,
+    "definition_ids_assigned_r": 331,
     "original_server_ids_unrecovered": true,
-    "definition_name_ids_assigned": 318,
-    "definition_description_ids_assigned": 318,
-    "counter_bindings_assigned_r": 313,
+    "definition_name_ids_assigned": 331,
+    "definition_description_ids_assigned": 331,
+    "counter_bindings_assigned_r": 326,
     "counter_bindings_unresolved": 0,
     "trophy_crosswalk_rows": 318
   },
@@ -8183,6 +8183,318 @@
       "description_id": 5103225,
       "image_id": null,
       "image_set_id": 7044
+    },
+    {
+      "key": "live:achievement:1004:zoinks",
+      "client_id": 1090519359,
+      "client_category_id": 20,
+      "name": "Zoinks",
+      "description": "Complete Unmasking the Villain.",
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:unmasking_the_villain",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 5,
+        "title_names": [],
+        "client_trophy_id": 5,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 441996,
+      "description_id": 442016,
+      "image_id": null,
+      "image_set_id": 7912
+    },
+    {
+      "key": "live:achievement:1005:southside-survivor",
+      "client_id": 1090519360,
+      "client_category_id": 20,
+      "name": "Southside Survivor",
+      "description": "Complete all Wilds South Book Quests.",
+      "threshold": 24,
+      "counter_key": "waiting:quest_book:wilds_south",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 10,
+        "title_names": [],
+        "client_trophy_id": 6,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 441997,
+      "description_id": 442017,
+      "image_id": null,
+      "image_set_id": 542
+    },
+    {
+      "key": "live:achievement:1018:sticker-fever-i",
+      "client_id": 1090519361,
+      "client_category_id": 20,
+      "name": "Sticker Fever I",
+      "description": "Complete 10 Sticker Quests.",
+      "threshold": 10,
+      "counter_key": "waiting:sticker_quests",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 5,
+        "title_names": [],
+        "client_trophy_id": 5,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 442010,
+      "description_id": 442030,
+      "image_id": null,
+      "image_set_id": 606
+    },
+    {
+      "key": "live:achievement:1019:a-brewing-darkness",
+      "client_id": 1090519362,
+      "client_category_id": 20,
+      "name": "A Brewing Darkness",
+      "description": "Complete If a Darkness Festers...",
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:if_a_darkness_festers",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 5,
+        "title_names": [],
+        "client_trophy_id": 5,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 442706,
+      "description_id": 442718,
+      "image_id": null,
+      "image_set_id": 6849
+    },
+    {
+      "key": "live:achievement:1020:the-bugawug-queen",
+      "client_id": 1090519363,
+      "client_category_id": 20,
+      "name": "The Bugawug Queen",
+      "description": "Complete Raven, Lunatic",
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:raven_lunatic",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 5,
+        "title_names": [],
+        "client_trophy_id": 5,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 442707,
+      "description_id": 442719,
+      "image_id": null,
+      "image_set_id": 6847
+    },
+    {
+      "key": "live:achievement:1021:last-call-for-justice",
+      "client_id": 1090519364,
+      "client_category_id": 20,
+      "name": "Last Call for Justice",
+      "description": "Complete A Light Brewing",
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:a_light_brewing",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 10,
+        "title_names": [],
+        "client_trophy_id": 6,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 442708,
+      "description_id": 442720,
+      "image_id": null,
+      "image_set_id": 2234
+    },
+    {
+      "key": "live:achievement:1041:let-s-get-kraken",
+      "client_id": 1090519365,
+      "client_category_id": 20,
+      "name": "Let's Get Kraken",
+      "description": "Complete Defeat the Kraken.",
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:defeat_the_kraken",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 5,
+        "title_names": [],
+        "client_trophy_id": 5,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 5101662,
+      "description_id": 5101674,
+      "image_id": null,
+      "image_set_id": 4856
+    },
+    {
+      "key": "live:achievement:1042:beach-bum",
+      "client_id": 1090519366,
+      "client_category_id": 20,
+      "name": "Beach Bum",
+      "description": "Complete all Seaside Book Quests.",
+      "threshold": 1,
+      "counter_key": "waiting:quest_book:seaside",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 10,
+        "title_names": [],
+        "client_trophy_id": 6,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Quests",
+      "source_tag": "live_catalogue",
+      "name_id": 5101663,
+      "description_id": 5101675,
+      "image_id": null,
+      "image_set_id": 3987
+    },
+    {
+      "key": "live:achievement:1063:fortune-and-glory",
+      "client_id": 1090519367,
+      "client_category_id": 26,
+      "name": "Fortune and Glory",
+      "description": "Track down and open 25 Lost Treasure Chests.",
+      "threshold": 25,
+      "counter_key": "waiting:lost_treasure_chest_opened",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 10,
+        "title_names": [],
+        "client_trophy_id": 6,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Events",
+      "source_tag": "live_catalogue",
+      "name_id": 5102682,
+      "description_id": 5102683,
+      "image_id": null,
+      "image_set_id": 752
+    },
+    {
+      "key": "live:achievement:1074:florist",
+      "client_id": 1090519368,
+      "client_category_id": 27,
+      "name": "Florist",
+      "description": "Complete Petal Picker for Cudip 5 times.",
+      "threshold": 5,
+      "counter_key": "waiting:quest_repeat_completions:3955888",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 5,
+        "title_names": [],
+        "client_trophy_id": 5,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Festival of Hearts",
+      "source_tag": "live_catalogue",
+      "name_id": 5103162,
+      "description_id": 5103163,
+      "image_id": null,
+      "image_set_id": 5994
+    },
+    {
+      "key": "live:achievement:1075:botanist",
+      "client_id": 1090519369,
+      "client_category_id": 27,
+      "name": "Botanist",
+      "description": "Complete Petal Picker for Cudip 30 times.",
+      "threshold": 30,
+      "counter_key": "waiting:quest_repeat_completions:3955888",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 10,
+        "title_names": [],
+        "client_trophy_id": 6,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Festival of Hearts",
+      "source_tag": "live_catalogue",
+      "name_id": 5103165,
+      "description_id": 5103166,
+      "image_id": null,
+      "image_set_id": 5993
+    },
+    {
+      "key": "live:achievement:1076:matchmaker",
+      "client_id": 1090519370,
+      "client_category_id": 27,
+      "name": "Matchmaker",
+      "description": "Reunite the separated lovers.",
+      "threshold": 1,
+      "counter_key": "waiting:quest_title:reunite_the_separated_lovers",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 15,
+        "title_names": [],
+        "client_trophy_id": 7,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Festival of Hearts",
+      "source_tag": "live_catalogue",
+      "name_id": 5103216,
+      "description_id": 5103217,
+      "image_id": null,
+      "image_set_id": 744
+    },
+    {
+      "key": "live:achievement:1077:errand-lover",
+      "client_id": 1090519371,
+      "client_category_id": 27,
+      "name": "Errand Lover",
+      "description": "Complete 100 Festival of Hearts repeatable quests.",
+      "threshold": 100,
+      "counter_key": "waiting:quest_repeat_completions:festival_of_hearts",
+      "client_trophy_id": null,
+      "reward": {
+        "wiki_text": null,
+        "trophy_points": 25,
+        "title_names": [],
+        "client_trophy_id": 8,
+        "item_ids": null,
+        "source_tag": "live_catalogue"
+      },
+      "wiki_section": "Festival of Hearts",
+      "source_tag": "live_catalogue",
+      "name_id": 5103219,
+      "description_id": 5103220,
+      "image_id": null,
+      "image_set_id": 5995
     }
   ],
   "gaps": [
@@ -8195,7 +8507,7 @@
     "provenance": "(R)",
     "namespace_base_hex": "0x41000000",
     "first_assigned_id": 1090519041,
-    "last_assigned_id": 1090519358,
+    "last_assigned_id": 1090519371,
     "policy": "Persist each key-to-id mapping. Allocate new rows from the next unused id in this namespace. Never renumber or reuse; retain removed ids as tombstones."
   },
   "locale_match_report": {
@@ -10546,12 +10858,12 @@
     "provenance": "(R) Mapping of wiki text onto the server events and saved state that already exist. Counter keys are data bindings, not recovered original server bindings.",
     "retired_rows": 5,
     "retired_reason": "Pet Trainer was removed 2009-12-14 (fandom Pet_Trainer; fanbyte Obsolete Jobs); its five rank rows have no trigger on purpose (A-V check).",
-    "live_rows": 189,
+    "live_rows": 202,
     "waiting_rows": 124,
     "counter_classes": {
       "completed_of": 11,
       "consumable_use": 1,
-      "dungeon_clear": 20,
+      "dungeon_clear": 32,
       "job_rank": 80,
       "job_rank_max": 1,
       "join_dance_team": 2,
@@ -10563,7 +10875,7 @@
       "pet_trick": 3,
       "pets_owned": 1,
       "quest_completed_count": 5,
-      "quest_done": 10,
+      "quest_done": 11,
       "recipes_all": 1,
       "retired": 5,
       "tcg_win": 4,
@@ -10592,93 +10904,108 @@
       }
     }
   },
-    "image_report": {
-      "achievement_definition_icon_ids_resolved": 0,
-      "achievement_definition_image_set_ids_resolved": 318,
-      "achievement_definition_rows_without_icon": 0,
-      "trophy_rows_with_client_image_set_id": 10,
-      "reason": "Achievement IconData is an ImageSets.txt id (the client draws its Large image, type 7). Paired rows carry the live 2014 IconId and IconTint (live_catalogue); the rest an (R) analogue."
-    },
-    "live_catalogue": {
-      "source": "Sanctuary (BubbaJoeX fork), src/Resources/Achievements.json: the 321 achievements the live server sent in 2014",
-      "license": "AGPL-3.0, Copyright (C) 2026 Open Source Free Realms",
-      "sha256": "d09bd734d901c69c35b02083c6d72b0f1bea9fc0cd1f2b155be6b331485ef00b",
-      "paired_rows": 308,
-      "pairing": "client name text, then name plus description, then description alone",
-      "fields": "name, description, name_id, description_id, image_set_id (IconId), image_tint_id (IconTint), client_category_id (CategoryId), reward/client_trophy_id (TrophyId)",
-      "reconstructed": [
-        {
-          "key": "wiki:achievement:182:bad-doggie-i",
-          "name": "Bad Doggie I",
-          "image_set_id": 6873,
-          "client_category_id": 16,
-          "reason": "(R) item_pet_wolf_m_timber: the live kill rows use the creature's pet or item icon"
-        },
-        {
-          "key": "wiki:achievement:183:bad-doggie-ii",
-          "name": "Bad Doggie II",
-          "image_set_id": 6873,
-          "client_category_id": 16,
-          "reason": "(R) item_pet_wolf_m_timber: the live kill rows use the creature's pet or item icon"
-        },
-        {
-          "key": "wiki:achievement:184:bad-doggie-iii",
-          "name": "Bad Doggie III",
-          "image_set_id": 6873,
-          "client_category_id": 16,
-          "reason": "(R) item_pet_wolf_m_timber: the live kill rows use the creature's pet or item icon"
-        },
-        {
-          "key": "wiki:achievement:197:don-t-be-a-troll-i",
-          "name": "Don't be a Troll I",
-          "image_set_id": 6471,
-          "client_category_id": 16,
-          "reason": "(R) item_hsg_totemsegment_icetroll: an ice troll icon, as above"
-        },
-        {
-          "key": "wiki:achievement:198:don-t-be-a-troll-ii",
-          "name": "Don't be a Troll II",
-          "image_set_id": 6471,
-          "client_category_id": 16,
-          "reason": "(R) item_hsg_totemsegment_icetroll: an ice troll icon, as above"
-        },
-        {
-          "key": "wiki:achievement:199:don-t-be-a-troll-iii",
-          "name": "Don't be a Troll III",
-          "image_set_id": 6471,
-          "client_category_id": 16,
-          "reason": "(R) item_hsg_totemsegment_icetroll: an ice troll icon, as above"
-        },
-        {
-          "key": "wiki:achievement:212:not-quite-yeti-i",
-          "name": "Not Quite Yeti I",
-          "image_set_id": 683,
-          "client_category_id": 16,
-          "reason": "(R) environments_yeti_head: a yeti icon, as above"
-        },
-        {
-          "key": "wiki:achievement:213:not-quite-yeti-ii",
-          "name": "Not Quite Yeti II",
-          "image_set_id": 683,
-          "client_category_id": 16,
-          "reason": "(R) environments_yeti_head: a yeti icon, as above"
-        },
-        {
-          "key": "wiki:achievement:214:not-quite-yeti-iii",
-          "name": "Not Quite Yeti III",
-          "image_set_id": 683,
-          "client_category_id": 16,
-          "reason": "(R) environments_yeti_head: a yeti icon, as above"
-        },
-        {
-          "key": "wiki:achievement:317:epic-dueler",
-          "name": "Epic Dueler",
-          "image_set_id": 1109,
-          "client_category_id": 26,
-          "reason": "(R) the live Duelist (Win a Duel!) icon; Holidays & Events > Events like its wiki section"
-        }
-      ]
-    },
+  "image_report": {
+    "achievement_definition_icon_ids_resolved": 0,
+    "achievement_definition_image_set_ids_resolved": 331,
+    "achievement_definition_rows_without_icon": 0,
+    "trophy_rows_with_client_image_set_id": 10,
+    "reason": "Achievement IconData is an ImageSets.txt id (the client draws its Large image, type 7). Paired rows carry the live 2014 IconId and IconTint (live_catalogue); the rest an (R) analogue."
+  },
+  "live_catalogue": {
+    "source": "Sanctuary (BubbaJoeX fork), src/Resources/Achievements.json: the 321 achievements the live server sent in 2014",
+    "license": "AGPL-3.0, Copyright (C) 2026 Open Source Free Realms",
+    "sha256": "d09bd734d901c69c35b02083c6d72b0f1bea9fc0cd1f2b155be6b331485ef00b",
+    "paired_rows": 308,
+    "pairing": "client name text, then name plus description, then description alone",
+    "fields": "name, description, name_id, description_id, image_set_id (IconId), image_tint_id (IconTint), client_category_id (CategoryId), reward/client_trophy_id (TrophyId)",
+    "reconstructed": [
+      {
+        "key": "wiki:achievement:182:bad-doggie-i",
+        "name": "Bad Doggie I",
+        "image_set_id": 6873,
+        "client_category_id": 16,
+        "reason": "(R) item_pet_wolf_m_timber: the live kill rows use the creature's pet or item icon"
+      },
+      {
+        "key": "wiki:achievement:183:bad-doggie-ii",
+        "name": "Bad Doggie II",
+        "image_set_id": 6873,
+        "client_category_id": 16,
+        "reason": "(R) item_pet_wolf_m_timber: the live kill rows use the creature's pet or item icon"
+      },
+      {
+        "key": "wiki:achievement:184:bad-doggie-iii",
+        "name": "Bad Doggie III",
+        "image_set_id": 6873,
+        "client_category_id": 16,
+        "reason": "(R) item_pet_wolf_m_timber: the live kill rows use the creature's pet or item icon"
+      },
+      {
+        "key": "wiki:achievement:197:don-t-be-a-troll-i",
+        "name": "Don't be a Troll I",
+        "image_set_id": 6471,
+        "client_category_id": 16,
+        "reason": "(R) item_hsg_totemsegment_icetroll: an ice troll icon, as above"
+      },
+      {
+        "key": "wiki:achievement:198:don-t-be-a-troll-ii",
+        "name": "Don't be a Troll II",
+        "image_set_id": 6471,
+        "client_category_id": 16,
+        "reason": "(R) item_hsg_totemsegment_icetroll: an ice troll icon, as above"
+      },
+      {
+        "key": "wiki:achievement:199:don-t-be-a-troll-iii",
+        "name": "Don't be a Troll III",
+        "image_set_id": 6471,
+        "client_category_id": 16,
+        "reason": "(R) item_hsg_totemsegment_icetroll: an ice troll icon, as above"
+      },
+      {
+        "key": "wiki:achievement:212:not-quite-yeti-i",
+        "name": "Not Quite Yeti I",
+        "image_set_id": 683,
+        "client_category_id": 16,
+        "reason": "(R) environments_yeti_head: a yeti icon, as above"
+      },
+      {
+        "key": "wiki:achievement:213:not-quite-yeti-ii",
+        "name": "Not Quite Yeti II",
+        "image_set_id": 683,
+        "client_category_id": 16,
+        "reason": "(R) environments_yeti_head: a yeti icon, as above"
+      },
+      {
+        "key": "wiki:achievement:214:not-quite-yeti-iii",
+        "name": "Not Quite Yeti III",
+        "image_set_id": 683,
+        "client_category_id": 16,
+        "reason": "(R) environments_yeti_head: a yeti icon, as above"
+      },
+      {
+        "key": "wiki:achievement:317:epic-dueler",
+        "name": "Epic Dueler",
+        "image_set_id": 1109,
+        "client_category_id": 26,
+        "reason": "(R) the live Duelist (Win a Duel!) icon; Holidays & Events > Events like its wiki section"
+      }
+    ],
+    "added_rows": [
+      "live:achievement:1004:zoinks",
+      "live:achievement:1005:southside-survivor",
+      "live:achievement:1018:sticker-fever-i",
+      "live:achievement:1019:a-brewing-darkness",
+      "live:achievement:1020:the-bugawug-queen",
+      "live:achievement:1021:last-call-for-justice",
+      "live:achievement:1041:let-s-get-kraken",
+      "live:achievement:1042:beach-bum",
+      "live:achievement:1063:fortune-and-glory",
+      "live:achievement:1074:florist",
+      "live:achievement:1075:botanist",
+      "live:achievement:1076:matchmaker",
+      "live:achievement:1077:errand-lover"
+    ]
+  },
   "client_category_locale_sentinels": {
     "reason": "First-party category resource uses 0 where no locale string is supplied; zero is not a key in the extracted locale table.",
     "rows": [

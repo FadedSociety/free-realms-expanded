@@ -621,7 +621,8 @@ fn source_content_ids_are_unique_and_locale_backed() {
     );
     assert_eq!(achievements.client_categories.len(), 23);
     assert_eq!(achievements.trophies.len(), 10);
-    assert_eq!(achievements.definitions.len(), 318);
+    // The wiki's 318 rows plus the live catalogue's (A68); a total is not pinned here.
+    assert!(achievements.definitions.len() >= 318);
     assert!(
         achievements
             .definitions
@@ -643,7 +644,11 @@ fn source_content_ids_are_unique_and_locale_backed() {
         )
         .chain(titles.definitions.iter().map(|row| row.client_id.unwrap()))
         .collect();
-    assert_eq!(ids.len(), 649);
+    // A68: no total pinned; every row of the three tables has an id, and the ids are unique.
+    assert_eq!(
+        ids.len(),
+        collections.definitions.len() + achievements.definitions.len() + titles.definitions.len()
+    );
     assert_eq!(
         ids.iter().copied().collect::<BTreeSet<_>>().len(),
         ids.len()
@@ -668,7 +673,8 @@ fn source_content_ids_are_unique_and_locale_backed() {
     );
     assert!(achievements.definitions.iter().all(|row| {
         row.client_id
-            .is_some_and(|id| (0x4100_0001..=0x4100_013e).contains(&id))
+            // The 0x41000000 namespace; `definition_id_assignment` records the last id (A68).
+            .is_some_and(|id| (0x4100_0001..=0x41ff_ffff).contains(&id))
     }));
     assert!(
         titles
@@ -745,7 +751,7 @@ fn source_content_ids_are_unique_and_locale_backed() {
             .iter()
             .filter(|row| row["counter_key"].is_string())
             .count(),
-        318,
+        achievement_json["definitions"].as_array().unwrap().len(),
         "every row has a counter key; the whole-table test checks what each one means"
     );
 
@@ -820,6 +826,10 @@ const WAITING: &[(&str, &str)] = &[
     ("snowball_fighting_win", "Snowball Fighting (SB) is being built; it raises this event"),
     ("eight_bit_meep_summoned", "the 8-Bit Meep pet is not built"),
     ("love_arrows_hit_stone_heart", "the Stone Heart arrow game is not built"),
+    // A68: live 2014 rows with no counter yet.
+    ("quest_book", "quest records carry no quest-book membership, so a whole book cannot be counted"),
+    ("sticker_quests", "no quest record is marked a Sticker Quest"),
+    ("lost_treasure_chest_opened", "no Lost Treasure Chest exists in the world"),
 ];
 
 #[test]
