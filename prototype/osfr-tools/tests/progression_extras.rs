@@ -1030,6 +1030,7 @@ fn item_rewards_are_queued_as_claims_for_the_items_the_tables_hold() {
     assert_eq!(by_number("313"), Some(vec![76623])); // Lump of Coal
     assert_eq!(by_number("318"), Some(vec![911045])); // Stone Heart's Pink Bear
     assert_eq!(by_number("269"), Some(vec![911257])); // Commander Kluggenkrush
+    assert_eq!(by_number("1075"), Some(vec![911046])); // Botanist: Black Rose Arrangement (A69)
     // Every bound item is a row of the client item tables.
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/release");
     let mut ids = BTreeSet::new();

@@ -8438,7 +8438,7 @@
         "trophy_points": 10,
         "title_names": [],
         "client_trophy_id": 6,
-        "item_ids": null,
+        "item_ids": [911046],
         "source_tag": "live_catalogue"
       },
       "wiki_section": "Festival of Hearts",
@@ -10890,7 +10890,8 @@
         "Green Santa Hat 911084": "row 311",
         "Lump of Coal 76623": "row 313",
         "Stone Heart's Pink Bear 911045": "row 318",
-        "Commander Kluggenkrush 911257": "row 269"
+        "Commander Kluggenkrush 911257": "row 269",
+        "Black Rose Arrangement 911046": "live:achievement:1075:botanist (A69, the live reward)"
       },
       "dropped_with_reason": {
         "Hat of Hats (row 089)": "no item row (locale 10022)",
