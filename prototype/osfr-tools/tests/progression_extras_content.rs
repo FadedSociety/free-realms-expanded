@@ -173,3 +173,39 @@ fn every_achievement_sent_to_the_client_names_a_client_trophy() {
         .collect();
     assert!(missing.is_empty(), "no client trophy row: {missing:?}");
 }
+
+/// A67: an icon of 0 or a set with no Large image draws the client's "OOPS!" placeholder, and
+/// a category that is not an AchievementCategories.txt row leaves the row out of the window.
+#[test]
+fn every_achievement_sent_to_the_client_has_a_client_icon_and_category() {
+    let first_ids = |path: &str| -> Vec<Vec<String>> {
+        fs::read_to_string(lab_path(path))
+            .unwrap()
+            .lines()
+            .filter(|line| !line.starts_with('#'))
+            .map(|line| line.split('^').map(str::to_owned).collect())
+            .collect()
+    };
+    let large_sets: HashSet<u32> =
+        first_ids("working/OSFR.Client/OSFR Client/Resources/Images/ImageSetMappings.txt")
+            .into_iter()
+            .filter(|row| row.get(1).map(String::as_str) == Some("7"))
+            .filter_map(|row| row[0].parse().ok())
+            .collect();
+    let categories: HashSet<u32> =
+        first_ids("working/OSFR.Client/OSFR Client/Resources/AchievementCategories.txt")
+            .into_iter()
+            .filter_map(|row| row[0].parse().ok())
+            .collect();
+    let bindings =
+        osfr_tools::progression_extras::AchievementBindings::load(&project_path("data/content"))
+            .unwrap();
+    assert!(!bindings.client_rows().is_empty());
+    let bad: Vec<_> = bindings
+        .client_rows()
+        .iter()
+        .filter(|row| !large_sets.contains(&row.icon_id) || !categories.contains(&row.category_id))
+        .map(|row| (row.key.as_str(), row.icon_id, row.category_id))
+        .collect();
+    assert!(bad.is_empty(), "no client icon or category: {bad:?}");
+}

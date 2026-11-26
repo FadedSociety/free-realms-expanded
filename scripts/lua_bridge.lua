@@ -490,6 +490,31 @@ local function buildState()
         state.bosses = rows
       end
     end
+    -- A67: the achievements window's rows (AchievementsDSColumn: 0 id, 1 title, 4 finished,
+    -- 5 complete, 8 icon, 9 trophy, 12 points, 14 category), summed, plus the first done rows.
+    local okAch, achievements = pcall(tables.Find, "BaseClient.Achievements")
+    if okAch and achievements then
+      local okCount, count = pcall(function() return achievements:GetRowCount() end)
+      if okCount and tonumber(count) and tonumber(count) > 0 then
+        local sum = { rows = tonumber(count), complete = 0, no_icon = 0, no_category = 0, done = {} }
+        for row = 0, tonumber(count) - 1 do
+          local function cell(col)
+            local okCell, value = pcall(function() return achievements:GetData(row, col) end)
+            return okCell and text(value) or "?"
+          end
+          local complete = cell(5)
+          if complete == "1" or complete == "true" then
+            sum.complete = sum.complete + 1
+            if #sum.done < 6 then
+              sum.done[#sum.done + 1] = table.concat({ cell(1), cell(4), cell(8), cell(9), cell(12), cell(14) }, "|")
+            end
+          end
+          if cell(8) == "0" then sum.no_icon = sum.no_icon + 1 end
+          if cell(14) == "0" then sum.no_category = sum.no_category + 1 end
+        end
+        state.achievements = sum
+      end
+    end
   end
 
   local target = rawget(_G, "Target")

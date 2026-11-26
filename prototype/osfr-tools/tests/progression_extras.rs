@@ -704,10 +704,12 @@ fn source_content_ids_are_unique_and_locale_backed() {
     let title_json: Value =
         serde_json::from_slice(include_bytes!("../data/content/titles.json")).unwrap();
     assert_eq!(definition_field_count(&collection_json, "name_id"), 238);
-    assert_eq!(definition_field_count(&achievement_json, "name_id"), 187);
+    // A67: every achievement carries the live name and description ids.
+    let achievement_rows = achievement_json["definitions"].as_array().unwrap().len();
+    assert_eq!(definition_field_count(&achievement_json, "name_id"), achievement_rows);
     assert_eq!(
         definition_field_count(&achievement_json, "description_id"),
-        226
+        achievement_rows
     );
     assert_eq!(definition_field_count(&title_json, "name_id"), 90);
     assert_eq!(
@@ -1070,7 +1072,7 @@ fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
     let mut reader = ClientReader { bytes: &packet, at: 6 };
     let count = reader.u32() as usize;
     assert_eq!(count, bindings.client_rows().len());
-    assert!(count > 100 && count < 313, "only rows with a name id are sent: {count}");
+    assert!(count > 100, "the bundled rows reach the window: {count}");
     for row in bindings.client_rows() {
         assert_eq!(reader.u32(), row.client_id, "the record key leads, as the list reader keys it");
         assert_ne!(row.name_id, 0, "no nameless record in the window");
@@ -1085,12 +1087,13 @@ fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
         let current = reader.u32();
         let required = reader.u32();
         reader.take(4 + 1 + 4); // extra, bool, i32
-        reader.take(8); // IconData id and tint
-        // A53: +340 is the trophy row the client looks up on 150/3, +344 bonus points.
+        // A67: IconData (image set and tint), then A53's trophy row at +340, bonus at +344.
+        assert_eq!(reader.u32(), row.icon_id, "IconData image set");
+        assert_eq!(reader.u32(), row.icon_tint_id, "IconData tint");
         assert_eq!(reader.u32(), row.trophy_id, "record +340 is the AchievementTrophies.txt row");
         assert_eq!(reader.u32(), 0, "record +344, bonus points");
         let completed = reader.take(1)[0];
-        reader.take(4);
+        assert_eq!(reader.u32(), row.category_id, "record +348, the window's category");
         assert_eq!(required, row.threshold);
         let this_done = row.key == done.key;
         assert_eq!((completed == 1, state_value == 2), (this_done, this_done));
@@ -1101,9 +1104,19 @@ fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
 
 #[test]
 fn a_nameless_row_is_counted_but_sends_nothing() {
-    let bindings =
-        AchievementBindings::load(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"))
-            .unwrap();
+    // Every shipped row has a name id since A67, so the test drops one in its own copy.
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("a_nameless_row_is_counted");
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(&dir).unwrap();
+    let mut achievements: Value =
+        serde_json::from_slice(&fs::read(content.join("achievements.json")).unwrap()).unwrap();
+    achievements["definitions"][0]["name_id"] = Value::Null;
+    fs::write(dir.join("achievements.json"), serde_json::to_vec(&achievements).unwrap()).unwrap();
+    for file in ["titles.json", "jobs.json"] {
+        fs::copy(content.join(file), dir.join(file)).unwrap();
+    }
+    let bindings = AchievementBindings::load(&dir).unwrap();
     let sent: BTreeSet<&str> = bindings.client_rows().iter().map(|r| r.key.as_str()).collect();
     let rule = bindings
         .rules()

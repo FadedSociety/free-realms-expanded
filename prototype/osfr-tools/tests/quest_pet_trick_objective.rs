@@ -289,7 +289,11 @@ fn each_accepted_perform_counts_once() {
         quest_packets(&after).is_empty(),
         "a completed step sends no update"
     );
-    assert_eq!(saved(&game), before, "a completed step changes nothing");
+    assert_eq!(
+        without_progress(saved(&game)),
+        without_progress(before),
+        "a completed step changes nothing but achievement progress"
+    );
 }
 
 #[test]
@@ -305,12 +309,24 @@ fn perform_after_completion_changes_nothing() {
         accepted(&again.replies),
         "the trick itself is still allowed"
     );
-    assert!(!again.changed, "a completed objective marks no save");
+    // A67: the trick still moves Performer and Entertainer (live name ids), which saves.
     assert!(
         quest_packets(&again).is_empty(),
         "a completed objective sends no quest packet"
     );
-    assert_eq!(saved(&game), completed, "the quest state is unchanged");
+    assert_eq!(
+        without_progress(saved(&game)),
+        without_progress(completed),
+        "the quest state is unchanged"
+    );
+}
+
+/// A save without its achievement progress: every accepted trick moves the Tricky, Performer and
+/// Entertainer counters (C7, A67), so "changes nothing" means the rest of the save.
+fn without_progress(bytes: Vec<u8>) -> serde_json::Value {
+    let mut value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+    value["progression_extras"].take();
+    value
 }
 
 #[test]
@@ -329,11 +345,6 @@ fn other_trick_changes_nothing() {
     // C7 (L1184): any trick moves the Tricky achievement counter, so the save changes; that
     // progress is the only thing a different trick changes.
     assert!(performed.changed);
-    let without_progress = |bytes: Vec<u8>| {
-        let mut value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
-        value["progression_extras"].take();
-        value
-    };
     assert_eq!(
         without_progress(saved(&game)),
         without_progress(before),

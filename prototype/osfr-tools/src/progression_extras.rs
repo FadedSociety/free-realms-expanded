@@ -165,6 +165,12 @@ pub struct AchievementDefinitionContent {
     pub description_id: Option<u32>,
     pub image_id: Option<u32>,
     pub image_set_id: Option<u32>,
+    /// IconData tint (live `IconTint`); 0 or absent is untinted.
+    #[serde(default)]
+    pub image_tint_id: Option<u32>,
+    /// AchievementCategories.txt row the window files it under (live `CategoryId`).
+    #[serde(default)]
+    pub client_category_id: Option<u32>,
     pub counter_key: Option<String>,
     pub threshold: Option<u32>,
     #[serde(default)]
@@ -241,8 +247,12 @@ pub struct AchievementClientRow {
     pub client_id: u32,
     pub name_id: u32,
     pub description_id: u32,
+    /// IconData: an ImageSets.txt id (the client draws its Large image) and its tint.
     pub icon_id: u32,
+    pub icon_tint_id: u32,
     pub trophy_id: u32,
+    /// AchievementCategories.txt row, record +348.
+    pub category_id: u32,
     pub threshold: u32,
 }
 
@@ -310,7 +320,9 @@ impl AchievementBindings {
                 name_id,
                 description_id: definition.description_id.unwrap_or(0),
                 icon_id: definition.image_id.or(definition.image_set_id).unwrap_or(0),
+                icon_tint_id: definition.image_tint_id.unwrap_or(0),
                 trophy_id: reward.client_trophy_id.unwrap_or(0),
+                category_id: definition.client_category_id.unwrap_or(0),
                 threshold,
                 });
             }
@@ -423,15 +435,16 @@ impl AchievementBindings {
             put_u32(&mut packet, 0);
             packet.push(0);
             put_u32(&mut packet, 0);
-            put_u32(&mut packet, row.icon_id); // (R) IconData id
-            put_u32(&mut packet, 0); // IconData tint
+            // A67: IconData, an ImageSets.txt id and its tint (live 2014 values; 0 drew "OOPS!").
+            put_u32(&mut packet, row.icon_id);
+            put_u32(&mut packet, row.icon_tint_id);
             // A53: +340 is the AchievementTrophies.txt row; on 150/3 the client looks it up and
             // reads the row without a null check (`00badec0` at `00bae04c`). The trophy's points
             // went here, so 15-, 25- and 40-point achievements crashed the client on completion.
             put_u32(&mut packet, row.trophy_id); // record +340, trophy row (Sanctuary `TrophyId`)
             put_u32(&mut packet, 0); // record +344, bonus points on top of the trophy's own
             packet.push(u8::from(done)); // record +352, suppress toast
-            put_u32(&mut packet, 0); // record +348, AchievementCategories.txt row (none in our data)
+            put_u32(&mut packet, row.category_id); // record +348, AchievementCategories.txt row
         }
         packet
     }
