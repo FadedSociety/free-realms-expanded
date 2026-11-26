@@ -253,6 +253,7 @@ pub struct AchievementClientRow {
     pub trophy_id: u32,
     /// AchievementCategories.txt row, record +348.
     pub category_id: u32,
+    pub counter_key: String,
     pub threshold: u32,
 }
 
@@ -323,6 +324,7 @@ impl AchievementBindings {
                 icon_tint_id: definition.image_tint_id.unwrap_or(0),
                 trophy_id: reward.client_trophy_id.unwrap_or(0),
                 category_id: definition.client_category_id.unwrap_or(0),
+                counter_key: counter_key.clone(),
                 threshold,
                 });
             }
@@ -415,23 +417,34 @@ impl AchievementBindings {
             } else {
                 state.counters.get(&row.key).copied().unwrap_or(0).min(row.threshold)
             };
+            let required = shown(&row.counter_key, row.threshold);
+            let current = shown(&row.counter_key, current);
+            // A67: a done row needs a finish time or the window counts it undone (0/313, no
+            // points). Rows completed before L1257 have no saved time: 1 sorts them oldest.
+            let finished = if done {
+                state.finished.get(&row.key).copied().unwrap_or(1)
+            } else {
+                0
+            };
             put_u32(&mut packet, row.client_id);
-            put_u32(&mut packet, row.name_id); // (R)
-            put_u32(&mut packet, row.description_id); // (R)
-            packet.push(0);
-            packet.extend([0u8; 16]); // two i64
-            put_u32(&mut packet, 0);
-            packet.extend([0u8; 69]); // empty reward bundle `008e7930`
+            put_u32(&mut packet, row.name_id);
+            put_u32(&mut packet, row.description_id);
+            packet.push(0); // members only
+            packet.extend(finished.to_le_bytes()); // time started (R: the finish time when done)
+            packet.extend(finished.to_le_bytes()); // time finished
+            let progress = if required == 0 { 0.0 } else { (current as f32 / required as f32).min(1.0) };
+            packet.extend(progress.to_le_bytes()); // the bar, 0 to 1
+            packet.extend(EMPTY_REWARD_BUNDLE); // reward bundle `008e7930`
             put_u32(&mut packet, 1); // one objective, the counter
             put_u32(&mut packet, 1); // key
             put_u32(&mut packet, 1); // definition id (the rules' objective id)
             put_u32(&mut packet, row.name_id);
             put_u32(&mut packet, row.description_id);
             packet.push(0);
-            packet.extend([0u8; 69]);
+            packet.extend(EMPTY_REWARD_BUNDLE);
             put_u32(&mut packet, if done { 2 } else { 1 });
             put_u32(&mut packet, current);
-            put_u32(&mut packet, row.threshold);
+            put_u32(&mut packet, required);
             put_u32(&mut packet, 0);
             packet.push(0);
             put_u32(&mut packet, 0);
@@ -818,6 +831,40 @@ pub struct AchievementRule {
 pub struct AchievementState {
     pub counters: BTreeMap<String, u32>,
     pub completed: BTreeSet<String>,
+    /// Unix seconds each row was completed (A67: the window counts a row done, and orders its
+    /// Recent list, by the record's finish time). Rows completed before L1257 have none.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub finished: BTreeMap<String, u64>,
+}
+
+/// The reward bundle live sent with no reward (Sanctuary `ClientAchievement.EmptyReward`, the
+/// `008e7930` layout `rewards::encode_display_bundle` writes): no success, multiplier 1 at byte
+/// 25, icon and name -1 at 53 and 57. A67: all zeros made the window look up image set 0 for
+/// both bundles of every row it listed.
+const EMPTY_REWARD_BUNDLE: [u8; 69] = {
+    let mut bundle = [0u8; 69];
+    let one = 1.0f32.to_le_bytes();
+    let mut i = 0;
+    while i < 4 {
+        bundle[25 + i] = one[i];
+        i += 1;
+    }
+    let mut j = 53;
+    while j < 61 {
+        bundle[j] = 0xFF;
+        j += 1;
+    }
+    bundle
+};
+
+/// A67: a `job_rank:<job>` counter holds the rank minus 1, but the window shows levels
+/// ("Reach Level 4" reads 1/4 at level 1, as live's JobRank objective counted).
+fn shown(counter_key: &str, value: u32) -> u32 {
+    if counter_key.starts_with("job_rank:") {
+        value.saturating_add(1)
+    } else {
+        value
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -933,8 +980,8 @@ impl AchievementProgression {
                 packets.push(achievement_progress_packet(
                     id,
                     rule.objective_id,
-                    current,
-                    rule.threshold,
+                    shown(&rule.counter_key, current),
+                    shown(&rule.counter_key, rule.threshold),
                 ));
             }
             if current >= rule.threshold {

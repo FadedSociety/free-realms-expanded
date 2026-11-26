@@ -264,11 +264,16 @@ fn frames(out: &EncounterOutcome) -> Vec<Frame> {
                             base: packet[20] == 1,
                         }
                     }
-                    5 => Frame::EnemyHp {
-                        guid: u64_at(packet, 4),
-                        hp: u32_at(packet, 12),
-                        max: u32_at(packet, 16),
-                    },
+                    // L1252 (A35): 35/5 is percent, max, current (dispatcher case 5).
+                    5 => {
+                        let (max, hp) = (u32_at(packet, 16), u32_at(packet, 20));
+                        assert!(u32_at(packet, 12) <= 100, "35/5 leads with a percent");
+                        Frame::EnemyHp {
+                            guid: u64_at(packet, 4),
+                            hp,
+                            max,
+                        }
+                    }
                     35 => {
                         assert_eq!((packet.len(), packet[20], i32_at(packet, 29)), (34, 0, 0));
                         Frame::Statement {

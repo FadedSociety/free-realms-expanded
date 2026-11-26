@@ -360,7 +360,13 @@ impl Gameplay {
             completed,
             self.achievement_bindings.title_bindings(),
         )?);
-        staged.set_achievement_state(achievements.state().clone());
+        // A67: the window counts a row done by its finish time.
+        let mut state = achievements.state().clone();
+        let now = current_unix_seconds();
+        for key in completed {
+            state.finished.entry(key.clone()).or_insert(now);
+        }
+        staged.set_achievement_state(state);
         self.progression_extras = staged;
         out.replies.extend(packets);
         out.changed = true;

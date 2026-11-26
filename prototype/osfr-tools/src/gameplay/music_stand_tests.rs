@@ -251,5 +251,11 @@ fn entering_the_world_sends_the_achievement_definitions() {
         .collect();
     assert_eq!(packets.len(), 1, "one 150/4 on world entry");
     let rows = u32::from_le_bytes(packets[0][6..10].try_into().unwrap());
-    assert!(rows >= 150 && rows < 313, "the live and waiting rows are all in the window: {rows}");
+    // A67: every row carries its live name id, so every bound row is in the window.
+    assert_eq!(
+        rows as usize,
+        game.achievement_bindings.client_rows().len(),
+        "the live and waiting rows are all in the window: {rows}"
+    );
+    assert!(rows >= 150, "the bundled rows reach the window: {rows}");
 }

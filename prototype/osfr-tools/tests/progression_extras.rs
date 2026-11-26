@@ -1054,8 +1054,14 @@ impl ClientReader<'_> {
         u32::from_le_bytes(self.take(4).try_into().unwrap())
     }
     fn bundle(&mut self) {
+        // A67: live's empty bundle (Sanctuary `EmptyReward`): no success, multiplier 1, icon and
+        // name -1; T202's all-zero bundle made the window look up image set 0 per row.
         let bundle = self.take(69);
-        assert!(bundle.iter().all(|b| *b == 0), "an empty bundle is 69 zero bytes (T202)");
+        assert_eq!(bundle[0], 0, "no success");
+        assert_eq!(&bundle[25..29], &1.0f32.to_le_bytes(), "multiplier 1");
+        assert_eq!(&bundle[53..61], &[0xFF; 8], "icon and name -1");
+        let rest = [&bundle[1..25], &bundle[29..53], &bundle[61..]].concat();
+        assert!(rest.iter().all(|b| *b == 0), "the rest of an empty bundle is zero");
     }
 }
 
@@ -1078,7 +1084,10 @@ fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
         assert_ne!(row.name_id, 0, "no nameless record in the window");
         assert_eq!(reader.u32(), row.name_id);
         assert_eq!(reader.u32(), row.description_id);
-        reader.take(1 + 16 + 4); // bool, two i64, i32
+        reader.take(1); // members only
+        let started = u64::from_le_bytes(reader.take(8).try_into().unwrap());
+        let finished = u64::from_le_bytes(reader.take(8).try_into().unwrap());
+        let bar = f32::from_le_bytes(reader.take(4).try_into().unwrap());
         reader.bundle();
         assert_eq!(reader.u32(), 1, "one objective");
         reader.take(4 * 4 + 1); // key, definition id, name, description, bool
@@ -1094,10 +1103,15 @@ fn the_150_4_packet_reads_back_the_way_the_client_reads_it() {
         assert_eq!(reader.u32(), 0, "record +344, bonus points");
         let completed = reader.take(1)[0];
         assert_eq!(reader.u32(), row.category_id, "record +348, the window's category");
-        assert_eq!(required, row.threshold);
+        // A67: a job_rank counter is the rank minus 1; the window shows the level.
+        let level = u32::from(row.counter_key.starts_with("job_rank:"));
+        assert_eq!(required, row.threshold + level);
         let this_done = row.key == done.key;
         assert_eq!((completed == 1, state_value == 2), (this_done, this_done));
         assert_eq!(current == required, this_done, "only the completed row shows full progress");
+        // A67: the window counts a row done by its finish time; a row with no saved time sends 1.
+        assert_eq!((started != 0, finished != 0), (this_done, this_done), "{}", row.key);
+        assert_eq!(bar == 1.0, this_done, "the bar is full only when done");
     }
     assert_eq!(reader.at, packet.len(), "the reader consumes exactly the packet");
 }

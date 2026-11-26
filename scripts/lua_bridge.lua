@@ -502,8 +502,8 @@ local function buildState()
             local okCell, value = pcall(function() return achievements:GetData(row, col) end)
             return okCell and text(value) or "?"
           end
-          local complete = cell(5)
-          if complete == "1" or complete == "true" then
+          local complete = tonumber(cell(5))
+          if complete and complete >= 1 then
             sum.complete = sum.complete + 1
             if #sum.done < 6 then
               sum.done[#sum.done + 1] = table.concat({ cell(1), cell(4), cell(8), cell(9), cell(12), cell(14) }, "|")
